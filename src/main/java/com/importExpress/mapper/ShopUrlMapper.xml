@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.ShopUrlMapper">
+
+
+    <resultMap id="shopBrandAuthorizationResultMap" type="com.importExpress.pojo.ShopBrandAuthorization">
+        <id column="id" property="id"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="shop_name" property="shopName"/>
+        <result column="brand_name" property="brandName"/>
+        <result column="authorize_state" property="authorizeState"/>
+        <result column="term_of_validity" property="termOfValidity"/>
+        <result column="certificate_file" property="certificateFile"/>
+        <result column="create_time" property="createTime"/>
+        <result column="local_path" property="localPath"/>
+        <result column="remote_path" property="remotePath"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="queryBrandAuthorizationByShopId" resultMap="shopBrandAuthorizationResultMap">
+        select id,shop_id,shop_name,brand_name,authorize_state,term_of_validity,certificate_file,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,local_path,remote_path,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time
+        from shop_brand_authorization where shop_id = #{shopId}
+    </select>
+
+    <select id="queryBrandAuthorizationById" resultMap="shopBrandAuthorizationResultMap">
+        select id,shop_id,shop_name,brand_name,authorize_state,term_of_validity,certificate_file,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as ,local_path,remote_path,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time
+        from shop_brand_authorization where id = #{id}
+    </select>
+
+    <insert id="insertIntoShopBrandAuthorization" parameterType="com.importExpress.pojo.ShopBrandAuthorization">
+        insert into shop_brand_authorization(shop_id,shop_name,brand_name,authorize_state,term_of_validity,
+        certificate_file,local_path,remote_path)
+        values(#{shopId},#{shopName},#{brandName},#{authorizeState},#{termOfValidity},
+        #{certificateFile},#{localPath},#{remotePath})
+    </insert>
+
+    <update id="updateShopBrandAuthorization" parameterType="com.importExpress.pojo.ShopBrandAuthorization">
+        update shop_brand_authorization set shop_id = #{shopId}
+        <if test="brandName != null">
+            ,brand_name = #{brandName}
+        </if>
+        <if test="authorizeState > 0">
+            ,authorize_state = #{authorizeState}
+        </if>
+        <if test="termOfValidity != null">
+            ,term_of_validity = #{termOfValidity}
+        </if>
+        <if test="certificateFile != null">
+            ,certificate_file = #{certificateFile}
+        </if>
+        <if test="localPath != null">
+            ,local_path = #{localPath}
+        </if>
+        <if test="remotePath != null">
+            ,remote_path = #{remotePath}
+        </if>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteShopBrandAuthorizationById">
+        delete from shop_brand_authorization where id = #{id}
+    </delete>
+
+    <delete id="deleteShopBrandAuthorizationByShopId">
+        delete from shop_brand_authorization where shop_id = #{shopId}
+    </delete>
+
+</mapper>

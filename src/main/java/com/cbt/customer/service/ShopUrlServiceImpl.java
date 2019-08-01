@@ -4,6 +4,9 @@ package com.cbt.customer.service;
 import com.cbt.bean.*;
 import com.cbt.customer.dao.IShopUrlDao;
 import com.cbt.customer.dao.ShopUrlDaoImpl;
+import com.importExpress.mapper.ShopUrlMapper;
+import com.importExpress.pojo.ShopBrandAuthorization;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +16,10 @@ import java.util.Map;
 @Service
 public class ShopUrlServiceImpl implements IShopUrlService {
 
-    IShopUrlDao dao = new ShopUrlDaoImpl();
+    @Autowired
+    private ShopUrlMapper shopUrlMapper;
+
+   IShopUrlDao dao = new ShopUrlDaoImpl();
 
     @Override
     public ShopUrl findById(int id) {
@@ -263,6 +269,36 @@ public class ShopUrlServiceImpl implements IShopUrlService {
     @Override
     public int reDownShopGoods(String shopId, int adminId) {
         return dao.reDownShopGoods(shopId, adminId);
+    }
+
+    @Override
+    public List<ShopBrandAuthorization> queryBrandAuthorizationByShopId(String shopId) {
+        return shopUrlMapper.queryBrandAuthorizationByShopId(shopId);
+    }
+
+    @Override
+    public ShopBrandAuthorization queryBrandAuthorizationById(Integer brandId) {
+        return shopUrlMapper.queryBrandAuthorizationById(brandId);
+    }
+
+    @Override
+    public int insertIntoShopBrandAuthorization(ShopBrandAuthorization shopBrandAuthorization) {
+        return shopUrlMapper.insertIntoShopBrandAuthorization(shopBrandAuthorization);
+    }
+
+    @Override
+    public int updateShopBrandAuthorization(ShopBrandAuthorization shopBrandAuthorization) {
+        return shopUrlMapper.updateShopBrandAuthorization(shopBrandAuthorization);
+    }
+
+    @Override
+    public int deleteShopBrandAuthorizationById(Integer brandId) {
+        return shopUrlMapper.deleteShopBrandAuthorizationById(brandId);
+    }
+
+    @Override
+    public int deleteShopBrandAuthorizationByShopId(String shopId) {
+        return shopUrlMapper.deleteShopBrandAuthorizationByShopId(shopId);
     }
 
 

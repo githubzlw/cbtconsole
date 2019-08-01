@@ -15,8 +15,10 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.MD5Util;
+import com.importExpress.pojo.ShopBrandAuthorization;
 import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -898,7 +900,7 @@ public class ShopUrlController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("jumpGoodsReady error:" + e.getMessage());
-            LOG.error("jumpGoodsReady error:" + e.getMessage());
+            LOG.error("jumpGoodsReady error:", e);
             mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("show", 0);
         }
@@ -1010,7 +1012,7 @@ public class ShopUrlController {
             json.setOk(false);
             json.setMessage("保存失败，原因：" + e.getMessage());
             System.err.println("saveAndUpdateInfos error:" + e.getMessage());
-            LOG.error("saveAndUpdateInfos error:" + e.getMessage());
+            LOG.error("saveAndUpdateInfos error:", e);
         }
         return json;
     }
@@ -1043,7 +1045,7 @@ public class ShopUrlController {
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             System.err.println("doGoodsClear error:" + e.getMessage());
-            LOG.error("doGoodsClear error:" + e.getMessage());
+            LOG.error("doGoodsClear error:", e);
         }
         return json;
     }
@@ -1180,7 +1182,7 @@ public class ShopUrlController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("beforeOnlineGoodsShow error:" + e.getMessage());
-            LOG.error("beforeOnlineGoodsShow error:" + e.getMessage());
+            LOG.error("beforeOnlineGoodsShow error:", e);
             mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("show", 0);
         }
@@ -1226,7 +1228,7 @@ public class ShopUrlController {
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             System.err.println("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:", e);
         }
         return json;
     }
@@ -1270,7 +1272,7 @@ public class ShopUrlController {
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             System.err.println("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:", e);
         }
         return json;
     }
@@ -1437,7 +1439,7 @@ public class ShopUrlController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("shopId:" + shopId + ",showShopPublicImg error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",showShopPublicImg error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",showShopPublicImg error:", e);
             mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("show", 0);
         }
@@ -1548,7 +1550,7 @@ public class ShopUrlController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("shopId:" + shopId + ",showShopPublicImg error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",showShopPublicImg error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",showShopPublicImg error:", e);
             mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("show", 0);
         }
@@ -1734,7 +1736,7 @@ public class ShopUrlController {
                             }catch (Exception e){
                                 e.printStackTrace();
                                 System.err.println("发送GET请求出现异常！" + e.getMessage());
-                                LOG.error("发送GET请求出现异常！" + e.getMessage());
+                                LOG.error("发送GET请求出现异常！", e);
                                 //step v1. @author: cjc @date：2019/3/29 11:55:35   Description : 请求失败就break
                                 break;
                             }
@@ -1865,7 +1867,7 @@ public class ShopUrlController {
             json.setOk(false);
             json.setMessage("保存失败，原因：" + e.getMessage());
             System.err.println("shopId:" + shopId + ",deleteGoodsImgs error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",deleteGoodsImgs error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",deleteGoodsImgs error:", e);
         }
         return json;
     }
@@ -2045,7 +2047,7 @@ public class ShopUrlController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("shopId:" + shopId + ",editGoods error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",editGoods error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",editGoods error:", e);
             mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("show", 0);
         }
@@ -2286,7 +2288,7 @@ public class ShopUrlController {
                 msg = "";
                 err = "上传错误";
                 e.printStackTrace();
-                LOG.error("上传错误：" + e.getMessage());
+                LOG.error("上传错误：", e);
             }
         }
         map.put("err", err);
@@ -2385,7 +2387,7 @@ public class ShopUrlController {
                 e.printStackTrace();
                 json.setOk(false);
                 json.setMessage("上传错误:" + e.getMessage());
-                LOG.error("上传错误：" + e.getMessage());
+                LOG.error("上传错误：", e);
             }
         }
         return json;
@@ -2703,7 +2705,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",pid:" + pidStr + ",保存错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",pid:" + pidStr + ",保存错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",pid:" + pidStr + ",保存错误，原因：", e);
         }
         return json;
     }
@@ -2774,7 +2776,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
         }
         return json;
     }
@@ -2824,7 +2826,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
         }
         return json;
     }
@@ -2871,7 +2873,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
         }
         return json;
     }
@@ -2988,7 +2990,7 @@ public class ShopUrlController {
             e.printStackTrace();
             mv.addObject("msgStr", "展示重量异常商品错误，原因：" + e.getMessage());
             mv.addObject("show", 0);
-            LOG.error("shopId:" + shopId + ",展示重量异常商品错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",展示重量异常商品错误，原因：", e);
         }
         return mv;
     }
@@ -3090,7 +3092,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
         }
         return json;
     }
@@ -3199,7 +3201,7 @@ public class ShopUrlController {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：", e);
         }
         return json;
     }
@@ -3316,7 +3318,7 @@ public class ShopUrlController {
             e.printStackTrace();
             mv.addObject("msgStr", "执行错误，原因：" + e.getMessage());
             mv.addObject("show", 0);
-            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：", e);
         }
         return mv;
     }
@@ -3386,7 +3388,7 @@ public class ShopUrlController {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：", e);
         }
         return json;
     }
@@ -3430,7 +3432,7 @@ public class ShopUrlController {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",执行错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",执行错误，原因：", e);
         }
         return json;
     }
@@ -3522,7 +3524,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新问题店铺标识失败，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + "，更新问题店铺标识失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，更新问题店铺标识失败，原因：", e);
         }
         return json;
     }
@@ -3575,7 +3577,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新店铺类型失败，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + "，更新店铺类型失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，更新店铺类型失败，原因：", e);
         }
         return json;
     }
@@ -3617,7 +3619,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新店铺已授权失败，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + "，更新店铺已授权失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，更新店铺已授权失败，原因：", e);
         }
         return json;
     }
@@ -3652,7 +3654,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新标识失败，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + "，更新标识失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，更新标识失败，原因：", e);
         }
         return json;
     }
@@ -3686,11 +3688,51 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，设置重新下载失败，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + "，设置重新下载失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，设置重新下载失败，原因：", e);
         }
         return json;
     }
 
+
+
+
+    @RequestMapping("/shopBrandAuthorizationList")
+    public ModelAndView shopBrandAuthorizationList(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mv = new ModelAndView("shopBrandAuthorizationList");
+        if (UserInfoUtils.checkIsLogin(request)) {
+            mv.addObject("msgStr", "用户未登录");
+            mv.addObject("show", 0);
+            return mv;
+        }
+
+        String shopId = request.getParameter("shopId");
+        if (shopId == null || "".equals(shopId)) {
+            mv.addObject("msgStr", "获取shopId失败");
+            mv.addObject("show", 0);
+            return mv;
+        } else {
+            mv.addObject("shopId", shopId);
+        }
+
+        try {
+            List<ShopBrandAuthorization> brandAuthorizationList = shopUrlService.queryBrandAuthorizationByShopId(shopId);
+            if (brandAuthorizationList == null || brandAuthorizationList.size() == 0) {
+                mv.addObject("msgStr", "当前店铺无品牌录入!");
+                mv.addObject("show", 0);
+                mv.addObject("brandsNum", 0);
+            } else {
+                mv.addObject("brandAuthorizationList", brandAuthorizationList);
+                mv.addObject("brandsNum", brandAuthorizationList.size());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("shopBrandAuthorizationList error:" + e.getMessage());
+            LOG.error("shopBrandAuthorizationList error:", e);
+            mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
+            mv.addObject("show", 0);
+        }
+        return mv;
+    }
 
 
 
