@@ -1000,4 +1000,48 @@
         </foreach>
     </select>
 
+    <!--void insertLoginLog(@Param("userid") Integer userid, @Param("admid") Integer admid, @Param("site") Integer site);-->
+    <insert id="insertLoginLog">
+        INSERT INTO user_login_log (userid, admid, site)
+        VALUES (#{userid}, #{admid}, #{site})
+    </insert>
+
+    <!--void updateUserCheckout(@Param("userid") Integer userid, @Param("type") Integer type);-->
+    <update id="updateUserCheckout">
+        INSERT INTO user_checkout (id, flag) VALUES (#{userid}, #{type}) ON DUPLICATE KEY UPDATE flag = #{type};
+    </update>
+
+    <!--List<TimingWarningInfo> queryTimingWarningInfo(@Param("valid") Integer valid, @Param("day") Integer day);-->
+    <select id="queryTimingWarningInfo" resultType="com.importExpress.pojo.TimingWarningInfo">
+        SELECT id, parent_id parentId, info_index infoIndex, title, info,
+          waring_result waringResult, waring_unit waringUnit, quota_gt quotaGt, quota_lt quotaLt,
+          quota_ge quotaGe, quota_le quotaLe, quota_unit quotaUnit, waring_quota waringQuota,
+          valid, remark, unix_timestamp(cur_time) curTime
+        FROM tab_timing_warning_info_log
+        WHERE valid = #{valid}
+        <if test="day > 0">
+            AND cur_time > NOW() - INTERVAL #{day} DAY
+        </if>
+        ORDER BY info_index
+    </select>
+
+    <!--TimingWarningInfo queryQuotaData(@Param("id") Integer id);-->
+    <select id="queryQuotaData" resultType="com.importExpress.pojo.TimingWarningInfo">
+        SELECT id, info_index infoIndex, title, info,
+          quota_gt quotaGt, quota_lt quotaLt,
+          quota_ge quotaGe, quota_le quotaLe, quota_unit quotaUnit,
+          valid, remark
+        FROM tab_timing_warning_info
+        WHERE id = #{id}
+    </select>
+
+    <!--void udpateQuotaData(@Param("bean") TimingWarningInfo bean);-->
+    <update id="udpateQuotaData">
+        UPDATE tab_timing_warning_info
+        SET quota_unit = #{bean.quotaUnit} , quota_gt = #{bean.quotaGt}
+            , quota_lt = #{bean.quotaLt} , quota_ge = #{bean.quotaGe}
+            , quota_le = #{bean.quotaLe}
+        WHERE id = #{bean.id}
+    </update>
+
 </mapper>

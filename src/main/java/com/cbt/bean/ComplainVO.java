@@ -30,8 +30,18 @@ public class ComplainVO extends Complain {
 	private String rcurrency;
 	protected String rcurrencyShow;
 	private String imgUrl;
-	
-	private List<String> orderIdList;
+
+	private Integer site;
+
+    public Integer getSite() {
+        return site;
+    }
+
+    public void setSite(Integer site) {
+        this.site = site;
+    }
+
+    private List<String> orderIdList;
 	
 	private List<String> disputeList;//申诉集合
 	

@@ -11,6 +11,7 @@ import com.cbt.website.bean.PurchasesBean;
 import com.importExpress.pojo.PurchaseInfoBean;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 import java.util.Map;
@@ -486,6 +487,13 @@ public interface IPurchaseMapper {
 	 */
 	public String getUseInventory(@Param("odid") int odid);
 
+	/**
+	 * 取得最后一次采购来源
+	 * @param goodsId
+	 * @return
+	 */
+	public String getLastPurchaseSource(@Param("goodsId") String goodsId);
+
 	public List<Map<String,String>> getTaoBaoInfoByShipno(@Param("shipnos") String shipnos);
 
 	public List<String> getBhShopId(@Param("orderNo") String orderNo, @Param("goodsid") String goodsid);
@@ -549,4 +557,10 @@ public interface IPurchaseMapper {
 	 * @return
 	 */
 	List<PurchaseInfoBean> queryOrderProductSourceByOrderNo(String orderNo);
+    @Update("update goods_distribution set admuserid=#{integer}  where orderid = #{orderNo}")
+    void changeAllBuyer(@Param("orderNo") String orderNo, @Param("integer") Integer integer);
+    @Update("UPDATE goods_distribution SET admuserid=#{admid} WHERE goods_pid=#{pid} AND orderid=#{orderNo}")
+    void changeBuyerByPid(@Param("odid") String odid, @Param("admid") String admid, @Param("orderNo") String orderNo,@Param("pid")String pid);
+    @Select("SELECT goods_pid FROM goods_distribution WHERE odid=#{odid}")
+	String FindPidByOdid(@Param("odid") String odid);
 }

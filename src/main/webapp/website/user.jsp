@@ -32,6 +32,8 @@
 	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
 <script type="text/javascript"
 	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript"
+			src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
 <title>用户信息管理</title>
 <style type="text/css">
 .but_color {
@@ -121,6 +123,27 @@ tr .td_class{width:230px;}
             $("#userid").val(userid);
             doQuery(1);
         }
+
+        $('#user_type input[name=user_type]').change(function () {
+            var userid = $('#user_type input[name=userid]').val();
+            var type = $("#user_type input[name=user_type]:checked").val();
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/queryuser/updateUserCheckout.do",
+                data: {
+                    userid:userid,
+                    type:type
+                },
+                dataType:"json",
+                success: function(msg){
+                    if (msg.state == 'true') {
+                        $('#user_type').window('close');
+                        doQuery(1);
+                    }
+                }
+            });
+        });
+
 	})
 
     // 获取url中参数
@@ -200,13 +223,78 @@ tr .td_class{width:230px;}
     }
 
 	function useraddress(userid, name, currency) {
-		window.open(
+		$.dialog({
+			title : '模拟登陆暂停使用',
+			content : "模拟登陆暂停使用",
+			max : false,
+			min : false,
+			lock : true,
+			drag : false,
+			fixed : true,
+			ok : function() {
+				return;
+			}/*,
+			cancel : function() {
+				return;
+			}*/
+		});
+		/*window.open(
 				"http://www.import-express.com/simulateLogin/toDeliverAddress?userName="
 						+ userid + "&password=" + name.replace(/\s+/g,'') + "&currency="
-						+ currency, "_blank");
+						+ currency, "_blank");*/
 	}
+    function userloginJump() {
+        var userid = $('#user_login_message input[name=userid]').val();
+        var site = $("#user_login_message input[name=site]:checked").val();
+        //获取数据 记录模拟登陆日志
+        $.ajax({
+            type:'post',
+            url:'/cbtconsole/queryuser/insertLoginLog.do',
+            data:{
+                userid:userid,
+                site:site
+            },
+            success:function(data){
+                if(data.state == "true"){
+                    $("#user_login_from input[name=email]").val(data.bean.email);
+                    $("#user_login_from input[name=pass]").val(data.bean.pass);
+                    if (site == 1) {
+                        $("#user_login_from").attr("action", "https://www.import-express.com/user/loginNew")
+                    } else if (site == 2) {
+                        $("#user_login_from").attr("action", "https://www.kidsproductwholesale.com/user/loginNew")
+                    }
+                    $("#user_login_from").submit();
+                }else{
+                    alert(data.message);
+                }
+            }
+        });
+    }
+    function showUserType(userid, type) {
+        $('#user_type input[name=user_type][value=' + type + ']').prop('checked', 'checked');
+        $('#user_type input[name=userid]').val(userid);
+        $('#user_type').window('open');
+    }
+
 	function userlogin(userid, name, currency) {
-		//获取加密信息
+        $('#user_login_message input[name=userid]').val(userid);
+        $('#user_login_message').window('open');
+		// $.dialog({
+		// 	title : '模拟登陆暂停使用',
+		// 	content : "模拟登陆暂停使用",
+		// 	max : false,
+		// 	min : false,
+		// 	lock : true,
+		// 	drag : false,
+		// 	fixed : true,
+		// 	ok : function() {
+		// 		return;
+		// 	}/*,
+		// 	cancel : function() {
+		// 		return;
+		// 	}*/
+		// });
+		/*//获取加密信息
 		$.ajax({
 			type:'post',
 			url:'../warehouse/encodeStr',
@@ -224,7 +312,7 @@ tr .td_class{width:230px;}
 					alert("加密用户名报错勒！！");
 				}
 			}
-		});
+		});*/
 
 	}
 	function toShopCar(userid, name, currency) {
@@ -484,6 +572,12 @@ tr .td_class{width:230px;}
 </script>
 </head>
 <body>
+    <div style="display: none">
+        <form id="user_login_from" method="post" target="_blank">
+            <input type="text" name="email">
+            <input type="password" name="pass">
+        </form>
+    </div>
 	<div id="win" class="easyui-window" title="变更用户电话号码" data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"  style="width:400px;height:200px;display: none;">
 		 <form id="ff" method="post">
 			<div style="margin-bottom:20px">
@@ -517,6 +611,36 @@ tr .td_class{width:230px;}
                 <a href="javascript:void(0)" class="easyui-linkbutton"
                    onclick="addUserRemark()" style="width:80px">添加备注</a>
             </div>
+    </div>
+    <div id="user_login_message" class="easyui-window" title="选择登陆网站"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:400px;height:200px;display: none;font-size: 16px;">
+        <div style="margin-left:20px;">
+            <input type="hidden" name="userid">
+            <br />
+            <input checked='checked' type='radio' name='site' value='1'/>
+            <span onclick="">import-express</span>
+            <br /><br />
+            <input type='radio' name='site' value='2'/>
+            <span>kidsproductwholesale</span>
+            <br /><br />
+        </div>
+        <div style="margin-left: 260px;">
+            <button onclick="userloginJump()">模拟登陆</button>
+        </div>
+    </div>
+    <div id="user_type" class="easyui-window" title="用户类型"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:400px;height:200px;display: none;font-size: 16px;">
+        <div style="margin-left:20px;">
+            <input type="hidden" name="userid">
+            <br /><br />
+            <input type="radio" name="user_type" value="0">未满足$70美国用户
+            <br /><br />
+            <input type="radio" name="user_type" value="1">满足$70美国用户
+        </div>
+        <div style="margin-left: 260px;">
+        </div>
     </div>
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div>
@@ -590,9 +714,9 @@ tr .td_class{width:230px;}
 				<th data-options="field:'userLogin',width:80,align:'center'">用户登陆</th>
 				<th data-options="field:'userManager',width:80,align:'center'">用户管理</th>
 				<th data-options="field:'grade',width:50">用户等级</th>
-				<th data-options="field:'admuser',width:65,align:'center'">负责人</th>
+				<th data-options="field:'admuser',width:85,align:'center'">负责人</th>
 				<th data-options="field:'currency',width:30,align:'center'">货币单位</th>
-				<th data-options="field:'operation',width:230,align:'center'">操作</th>
+				<th data-options="field:'operation',width:210,align:'center'">操作</th>
 			</tr>
 		</thead>
 	</table>

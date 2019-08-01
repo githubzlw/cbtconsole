@@ -1,5 +1,6 @@
 package com.importExpress.service.impl;
 
+import com.cbt.website.util.EasyUiJsonResult;
 import com.importExpress.mapper.PaysuccessinfoMapper;
 import com.importExpress.pojo.Paysuccessinfo;
 import com.importExpress.pojo.PaysuccessinfoExample;
@@ -96,7 +97,7 @@ public class PaysuccessinfoServiceImpl implements PaysuccessinfoService {
         return paysuccessinfoMapper.queryUserListByAdminId(adminId);
     }
     @Override
-    public List<Paysuccessinfo> queryPaySuccessInfoList(String pageStr,String limitNumStr,String sttime,String edtime,String userIdStr,String orderNo,Integer userId){
+    public EasyUiJsonResult queryPaySuccessInfoList(String pageStr,String limitNumStr,String sttime,String edtime,String userIdStr,String orderNo,Integer userId){
         //格式化 日期
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         int startNum = 0;
@@ -193,8 +194,13 @@ public class PaysuccessinfoServiceImpl implements PaysuccessinfoService {
             }
             e.setOrderno("<a href ='/cbtconsole/orderDetails/queryByOrderNo.do?orderNo="+e.getOrderno()+"' target='_blank'>"+e.getOrderno()+"</a>");
         });
+        long total = paysuccessinfoList.stream().count();
         //分页
         paysuccessinfoList = paysuccessinfoList.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
-        return paysuccessinfoList;
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        json.setTotal((int) total);
+        json.setRows(paysuccessinfoList);
+        json.setSuccess(true);
+        return json;
     }
 }

@@ -3047,8 +3047,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		String insert_split_details="insert into split_details(new_orderid,goodsid) values";
 		String tempSql ="";
 
-		String goodsDistributionSqlBegin = "insert into goods_distribution(orderid,odid,goodsid,admuserid,goodscatid,goods_pid) " +
-                "select '"+odbeanNew.getOrderNo()+"' as orderid,odid,goodsid,admuserid,goodscatid,goods_pid " +
+		String goodsDistributionSqlBegin = "insert into goods_distribution(orderid,odid,goodsid,admuserid,goodscatid,goods_pid,createtime) " +
+                "select '"+odbeanNew.getOrderNo()+"' as orderid,odid,goodsid,admuserid,goodscatid,goods_pid,now() " +
                 "from goods_distribution where orderid = '"+orderNoOld +"' and odid in(";
         String goodsDistributionSqlEnd="";
 		for (OrderDetailsBean oddsb : nwOrderDetails) {

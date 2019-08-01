@@ -1421,6 +1421,11 @@
             where id = ${item.id}
         </foreach>
     </update>
+    <select id="querySampleOrderInfoByOrderId" resultType="java.lang.Integer">
+        select count(0)
+        from orderinfo
+        where order_no = concat(#{orderNo} ,'_SP')
+    </select>
     <select id="getOrderDataCheck" resultType="java.util.Map">
     SELECT DISTINCT odsm.specid,odsm.skuid,
     od.id AS odid,od.goodsprice AS odGoodsPrice,od.checked,od.remark AS odremark,

@@ -100,6 +100,8 @@
         <result column ="goods_type" property="goodsType"/>
         <result column ="norm_least" property="moq"/>
         <result column ="ali_name" property="aliName"/>
+        <result column ="ali_name" property="aliName"/>
+        <result column ="website" property="website"/>
     </resultMap>
 
     <resultMap id="shopCarUserStatisticResultMap" type="com.importExpress.pojo.ShopCarUserStatistic">
@@ -227,8 +229,14 @@
     method_feight, price1, price2, price3, notfreeprice, theproductfrieght, isvolume, 
     freeprice, firstprice, firstnumber, updatetime, addPrice, isFeight, isBattery, aliPosttime, 
     price4, goodsUrlMD5, bizPriceDiscount, spiderPrice, priceListSize, comparealiPrice, 
-    group_buy_id, skuid_1688, isFreeShipProduct, sampleFee, sampleMoq
+    group_buy_id, skuid_1688, isFreeShipProduct, sampleFee, sampleMoq, website
   </sql>
+    <select id="selectByUserIdAndType" resultMap="BaseResultMap" >
+        select <include refid="Base_Column_List"/>
+        from shop_car_marketing
+        where userid = #{userId} and website = #{website}
+    </select>
+
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.importExpress.pojo.ShopCarMarketingExample">
         select
@@ -1624,10 +1632,9 @@
         select a.id,a.itemId as pid,a.googs_price,a.googs_number,a.price1,a.per_weight,
         b.custom_main_image,b.remotpath,b.wprice,b.isBenchmark,b.bm_flag,b.wholesale_price,
         b.weight,b.ali_pid,b.ali_img,b.ali_price,b.final_weight,b.catid1,
-        a.goods_title,a.goods_type,a.norm_least,a.googs_img,a.price1,b.ali_name
-        from shop_car_marketing a LEFT JOIN custom_benchmark_ready b
-        on a.itemId = b.pid
-        where a.userid = #{userId}
+        a.goods_title,a.goods_type,a.norm_least,a.googs_img,a.price1,b.ali_name,a.website
+        from shop_car_marketing a, custom_benchmark_ready b
+        where a.userid = #{userId} and a.itemId = b.pid and b.valid in(1,2)
     </select>
 
     <select id="queryUserInfo" resultMap="shopCarUserStatisticResultMap">

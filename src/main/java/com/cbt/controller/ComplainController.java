@@ -1,22 +1,5 @@
 package com.cbt.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.cbt.bean.Complain;
 import com.cbt.bean.ComplainFile;
 import com.cbt.bean.ComplainVO;
@@ -35,6 +18,17 @@ import com.importExpress.pojo.CustomerDisputeBean;
 import com.importExpress.pojo.CustomerDisputeVO;
 import com.importExpress.service.CustomComplainService;
 import com.importExpress.service.CustomerDisputeService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 @Controller
 @RequestMapping("/complain")
@@ -157,6 +151,7 @@ public class ComplainController {
 		double moneyAmountByCid = additionalBalanceService.getMoneyAmountByCid(cid+"");
 		
 		if(complain!=null){
+//            mv.addObject("websiteType",MultiSiteUtil.getSiteTypeNum(complain.getRefOrderId()));
 			mv.addObject("status","1");
 			mv.addObject("complain",complain);
 			mv.addObject("imgsList",imgs);

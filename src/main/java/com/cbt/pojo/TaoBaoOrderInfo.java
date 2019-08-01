@@ -399,6 +399,19 @@ public class TaoBaoOrderInfo implements Serializable{
 	public void setPaytreasureid(String paytreasureid) {
 		this.paytreasureid = paytreasureid;
 	}
-	
 
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder("{");
+		sb.append("\"tbOr1688\":\"")
+				.append(tbOr1688).append('\"');
+		sb.append(",\"orderid\":\"")
+				.append(orderid).append('\"');
+		sb.append(",\"itemid\":\"")
+				.append(itemid).append('\"');
+		sb.append(",\"itemurl\":\"")
+				.append(itemurl).append('\"');
+		sb.append('}');
+		return sb.toString();
+	}
 }

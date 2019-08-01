@@ -298,6 +298,11 @@ public interface IPurchaseService {
 	 * @return
 	 */
 	List<PurchaseInfoBean> queryOrderProductSourceByOrderNo(String orderNo);
+	
+    void changeAllBuyer(String orderNo, Integer integer);
+
+
+	void changeBuyerByPid(String odid, String admid, String orderNo);
 	/**
 	 * @param map
 	 * @return

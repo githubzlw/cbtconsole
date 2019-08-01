@@ -94,4 +94,13 @@ public interface LookReturnOrderServiceNewMapper {
     List<returndisplay> getOrderByship(@Param("shipno") String shipno);
    @Update("UPDATE return_display set actual_money=#{number} where shipno=#{ship}")
 	Boolean SetUpMoney(@Param("ship") String ship, @Param("number") double number);
+    @Select("SELECT a.orderid as a1688Order ,a.orderdate as placeDate,a.seller as sellerpeo,itemname,imgurl,a.itemid as item,a.itemqty as itemNumber,a.shipno as a1688Shipno,a.username as optUser," +
+			"a.delivery_date as signtime,a.sku,a.id AS tbId from taobao_1688_order_history a WHERE a.orderid=#{tborder}")
+	List<returndisplay> FindAllByTborder(@Param("tborder") String tborder);
+
+	@Select("SELECT DISTINCT b.orderid AS customerorder,a.orderid as a1688Order ,a.orderdate as placeDate,a.seller as sellerpeo,a.itemid as item,a.itemqty as itemNumber,a.shipno as a1688Shipno,a.username as optUser," +
+			" a.delivery_date as signtime,sku,a.id AS tbId from taobao_1688_order_history a LEFT JOIN id_relationtable b ON a.orderid=b.tborderid WHERE a.id=#{tbId};")
+	returndisplay FindOrderByTbid(@Param("tbId") String tbId);
+    @Select("SELECT SUM(Return_number) from return_display WHERE tb_id=#{tbId}")
+    int FindRetuByTbid(@Param("tbId") String tbId);
 }

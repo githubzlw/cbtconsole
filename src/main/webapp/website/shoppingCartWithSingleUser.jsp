@@ -62,6 +62,12 @@
             closeDialog('simple_email_div', 'simple_form_enter');
             closeDialog('shop_cart_div', 'hop_cart_form');
             imgLazyLoad();
+            var website = '${param.website}';
+            if (website == '1') {
+                $("#select_web_site").val(1);
+            } else {
+                $("#select_web_site").val(0);
+            }
         });
 
         function imgLazyLoad() {
@@ -211,9 +217,10 @@
         }
         
 
-        function  openSendEmail(userId) {
+        function  openSendEmail(userId, website) {
             var type = $("#send_type").val();
-            var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId=" + userId + "&type=" + type;
+            var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId="
+                + userId + "&type=" + type + "&website=" + website;
             var iWidth = 1680; //弹出窗口的宽度;
             var iHeight = 880; //弹出窗口的高度;
             var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
@@ -234,6 +241,12 @@
                     bottom: ''
                 }
             });
+        }
+
+        function changeWebsite(userId, obj) {
+            var website = $(obj).val();
+            window.location.href = '/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId='
+                + userId + '&website=' + website;
         }
     </script>
 </head>
@@ -314,7 +327,10 @@
                         <%--<input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>--%>
-
+                        <span>网站:<select id="select_web_site"  style="height: 28px;width: 180px;" onchange="changeWebsite(${userId},this)">
+                            <option value="0">import-express</option>
+                            <option value="1">kidsproductwholesale</option>
+                        </select></span>
                        <span>邮件类型:
                             <select id="send_type" style="height: 28px;width: 180px;">
                             <option value="1" selected="selected">不做变动,直接发送</option>
@@ -324,13 +340,13 @@
                             </select>
                         </span>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="发送邮件" onclick="openSendEmail(${userId})"/>
+                        <input class="btn_sty" type="button" value="发送邮件" onclick="openSendEmail(${userId}, ${param.website})"/>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId})"/>
+                        <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId}, ${param.website})"/>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="查看客户信息" onclick="openUserInfo(${userId})"/>
+                        <input class="btn_sty" type="button" value="查看客户信息" onclick="openUserInfo(${userId}, ${param.website})"/>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="查看EDM跟踪" onclick="openUserFollow(${userId})"/>
+                        <input class="btn_sty" type="button" value="查看EDM跟踪" onclick="openUserFollow(${userId}, ${param.website})"/>
                     </div>
                 </td>
             </tr>

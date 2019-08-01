@@ -4,13 +4,11 @@ import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.ChangeEntypeUtils;
-import com.cbt.util.FirstLetterUtitl;
 import com.cbt.util.FtpConfig;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.GoodsInfoUtils;
 import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.utli.ImageCompressionByNoteJs;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,6 +24,8 @@ import java.util.Map;
 
 public class PublishGoodsToOnlineThread extends Thread {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PublishGoodsToOnlineThread.class);
+
+    private static List<String> kidsCatidList = new ArrayList<>();
     /**
      * 图片服务器选择主图路径
      */
@@ -54,7 +54,10 @@ public class PublishGoodsToOnlineThread extends Thread {
         List<String> imgList = new ArrayList<String>();
 
         try {
-            customGoodsService.insertIntoGoodsImgUpLog(pid,"",adminId,"test");
+            if (kidsCatidList == null || kidsCatidList.size() == 0) {
+                kidsCatidList = customGoodsService.queryKidsCanUploadCatid();
+            }
+            customGoodsService.insertIntoGoodsImgUpLog(pid, "", adminId, "test");
 
             LOG.info("Pid : " + pid + " Execute Start");
 
@@ -67,10 +70,14 @@ public class PublishGoodsToOnlineThread extends Thread {
 
             // 根据pid获取商品信息
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-            
-            goods.setEntypeNew(ChangeEntypeUtils.getEntypeNew(goods.getEntype(),goods.getSku(), "")); 
-          
-            
+            int isKids = 0;
+            if (kidsCatidList.contains(goods.getCatid1())) {
+                isKids = 1;
+            }
+
+            goods.setEntypeNew(ChangeEntypeUtils.getEntypeNew(goods.getEntype(), goods.getSku(), ""));
+
+
             goods.setIsUpdateImg(isUpdateImg);
             // 判断是否处于发布中的状态
             if (goods.getGoodsState() != 1) {
@@ -114,7 +121,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                         goods.setImg(tempImgs.toString().replace(remotepath, ""));
                         // 获取第一张图片数据的大图
                         firstImg = tempImgs.get(0).replace(".60x60", ".400x400");
-                        if(isUpdateImg == 1){
+                        if (isUpdateImg == 1) {
                             goods.setShowMainImage(firstImg);
                         }
                     }
@@ -165,14 +172,14 @@ public class PublishGoodsToOnlineThread extends Thread {
                                 System.err.println("this pid:" + pid + ",file:" + localImgPath + " is not exists");
                                 LOG.error("this pid:" + pid + ",file:" + localImgPath + " is not exists");
                                 // 记录上传失败日志
-                                customGoodsService.insertIntoGoodsImgUpLog(pid,localImgPath,adminId,",file:" + localImgPath + " is not exists");
+                                customGoodsService.insertIntoGoodsImgUpLog(pid, localImgPath, adminId, ",file:" + localImgPath + " is not exists");
                                 isSuccess = false;
                                 break;
                             }
                         }
                         //批量上传
                         if (isSuccess) {
-                            isSuccess = UploadByOkHttp.doUpload(uploadMap);
+                            isSuccess = UploadByOkHttp.doUpload(uploadMap, isKids);
                         }
                     }
                     if (isSuccess) {
@@ -188,13 +195,13 @@ public class PublishGoodsToOnlineThread extends Thread {
                             deleteFileChild(localDownImgPre);
 
                             String downImgUrl;
-                            if(isUpdateImg == 2){
+                            if (isUpdateImg == 2) {
                                 downImgUrl = goods.getShowMainImage().replace(".220x220", ".400x400");
-                            }else{
+                            } else {
                                 downImgUrl = goods.getShowMainImage();
                             }
                             isSuccess = ImgDownload.downFromImgService(downImgUrl, localDownImg);
-                            if(!isSuccess){
+                            if (!isSuccess) {
                                 // 重新下载一次
                                 isSuccess = ImgDownload.downFromImgService(downImgUrl, localDownImg);
                             }
@@ -211,23 +218,30 @@ public class PublishGoodsToOnlineThread extends Thread {
                                 // 压缩成功后，上传图片
                                 if (isCompress) {
                                     System.err.println("Compress:[" + localDownImg + "] 285x285,285x380,img220x220 success");
-                                    String destPath = GoodsInfoUtils.changeRemotePathToLocal(goods.getShowMainImage().substring(0, goods.getShowMainImage().lastIndexOf("/")));
+                                    String destPath = GoodsInfoUtils.changeRemotePathToLocal(goods.getShowMainImage().substring(0, goods.getShowMainImage().lastIndexOf("/")), isKids);
                                     //上传
                                     File upFile = new File(localDownImgPre);
                                     if (upFile.exists() && upFile.isDirectory()) {
                                         boolean isUpload;
-                                        isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath);
+                                        isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, isKids);
                                         if (isUpload) {
                                             System.err.println("this pid:" + pid + ",上传产品主图成功");
                                         } else {
                                             // 重试一次
-                                            isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath);
+                                            isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, isKids);
                                             if (isUpload) {
                                                 System.err.println("this pid:" + pid + ",上传产品主图成功");
+                                                if (isKids > 0) {
+                                                    // kids的维护import
+                                                    boolean isImport = UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
+                                                    if (!isImport) {
+                                                        UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
+                                                    }
+                                                }
                                             } else {
                                                 System.err.println("this pid:" + pid + ",上传产品主图失败");
                                                 // 记录上传失败日志
-                                                customGoodsService.insertIntoGoodsImgUpLog(pid,localDownImgPre,adminId,"to " + destPath + "error");
+                                                customGoodsService.insertIntoGoodsImgUpLog(pid, localDownImgPre, adminId, "to " + destPath + "error");
                                                 isSuccess = false;
                                             }
                                         }
@@ -235,23 +249,23 @@ public class PublishGoodsToOnlineThread extends Thread {
                                         System.err.println("this pid:" + pid + ",下载图片文件夹[" + localDownImgPre + "] 不存在----");
                                         LOG.error("this pid:" + pid + ",下载图片文件夹[" + localDownImgPre + "] 不存在----");
                                         // 记录上传失败日志
-                                        customGoodsService.insertIntoGoodsImgUpLog(pid,localDownImgPre,adminId,"下载图片文件夹[" + localDownImgPre + "] 不存在----");
+                                        customGoodsService.insertIntoGoodsImgUpLog(pid, localDownImgPre, adminId, "下载图片文件夹[" + localDownImgPre + "] 不存在----");
                                         isSuccess = false;
                                     }
                                 } else {
                                     System.err.println("this pid:" + pid + ",压缩img [" + localDownImg + "] error----");
                                     LOG.error("this pid:" + pid + ",压缩img [" + localDownImg + "] error----");
                                     // 记录上传失败日志
-                                    customGoodsService.insertIntoGoodsImgUpLog(pid,localDownImgPre,adminId,"压缩img[" + localDownImgPre + "] error----");
+                                    customGoodsService.insertIntoGoodsImgUpLog(pid, localDownImgPre, adminId, "压缩img[" + localDownImgPre + "] error----");
                                     isSuccess = false;
                                 }
                             } else {
                                 LOG.error("this pid:" + pid + ",下载图片失败,无法设置主图");
-                                customGoodsService.insertIntoGoodsImgUpLog(pid,localDownImgPre,adminId,"下载图片失败,无法设置主图");
+                                customGoodsService.insertIntoGoodsImgUpLog(pid, localDownImgPre, adminId, "下载图片失败,无法设置主图");
                             }
                             if (isSuccess) {
-                                String nwMainImg = goods.getShowMainImage().replace(".400x400.",".220x220.")
-                                        .replace(goods.getRemotpath(),"");
+                                String nwMainImg = goods.getShowMainImage().replace(".400x400.", ".220x220.")
+                                        .replace(goods.getRemotpath(), "");
                                 goods.setShowMainImage(nwMainImg);
                                 System.err.println("nwMainImg:[" + nwMainImg + "]");
                                 customGoodsService.publish(goods);
@@ -265,12 +279,12 @@ public class PublishGoodsToOnlineThread extends Thread {
                         }
                     } else {
                         // 记录上传失败日志
-                        customGoodsService.insertIntoGoodsImgUpLog(pid,"批量上传失败,size:" + imgList.size(),adminId,imgList.toString());
+                        customGoodsService.insertIntoGoodsImgUpLog(pid, "批量上传失败,size:" + imgList.size(), adminId, imgList.toString());
                         customGoodsService.updateGoodsState(pid, 3);
                     }
                 } else {
                     // 记录上传失败日志
-                    customGoodsService.insertIntoGoodsImgUpLog(pid,"" + imgList.size(),adminId,"update goodsState error");
+                    customGoodsService.insertIntoGoodsImgUpLog(pid, "" + imgList.size(), adminId, "update goodsState error");
                     LOG.error("this pid:" + pid + " update goodsstate error!");
                 }
             } else {
@@ -278,9 +292,9 @@ public class PublishGoodsToOnlineThread extends Thread {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            LOG.error("PublishGoodsToOnlineThread pid:" + pid + " error:",e);
+            LOG.error("PublishGoodsToOnlineThread pid:" + pid + " error:", e);
             System.err.println("PublishGoodsToOnlineThread pid:" + pid + " error:" + e.getMessage());
-            customGoodsService.insertIntoGoodsImgUpLog(pid,"" + imgList.size(),adminId,"PublishGoodsToOnlineThread error:" + e.getMessage());
+            customGoodsService.insertIntoGoodsImgUpLog(pid, "" + imgList.size(), adminId, "PublishGoodsToOnlineThread error:" + e.getMessage());
             customGoodsService.updateGoodsState(pid, 3);
         }
         LOG.info("Pid : " + pid + " Execute End");
@@ -291,11 +305,11 @@ public class PublishGoodsToOnlineThread extends Thread {
         return file.exists() && file.isFile();
     }
 
-    private void deleteFileChild(String fileName){
+    private void deleteFileChild(String fileName) {
         File file = new File(fileName);
-        if(file.exists() && file.isDirectory()){
+        if (file.exists() && file.isDirectory()) {
             File[] childList = file.listFiles();
-            for(File child : childList){
+            for (File child : childList) {
                 child.delete();
             }
             childList = null;

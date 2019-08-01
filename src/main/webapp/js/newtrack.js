@@ -298,7 +298,8 @@ function relabel(orderid, odid, taobao_itemid, strcar_type, userid, goods_p_pric
  * @param goodurl
  */
 function put_print(orderid, usid, odid, strcartype, count, loginName,
-                   tbOrderId, count1, record_, unit, goods_name, barcode, goodurl, odid, position) {
+                   tbOrderId, count1, record_, unit, goods_name, barcode, goodurl, odid, position,
+                   dp_num, dp_total, dp_city, dp_province, dp_country) {
     var d = new Date();
     var str = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
     document.getElementById("div_body").style.display = "none";
@@ -308,8 +309,21 @@ function put_print(orderid, usid, odid, strcartype, count, loginName,
     document.getElementById("barcode_info").style.display = "none";
     document.getElementById("operating_area").style.display = "none";
     document.getElementById("divTip").style.display = "none";
-    document.getElementById('td1').innerHTML = orderid;
-    document.getElementById('td2').innerHTML = usid;
+    if (dp_num > 0) {
+        if (dp_total == 1) {
+            document.getElementById('td1').innerHTML = orderid + "(D,T1)";
+        } else {
+            document.getElementById('td1').innerHTML = orderid + "(D)";
+        }
+    } else {
+        document.getElementById('td1').innerHTML = orderid;
+    }
+    if (dp_num > 0) {
+        document.getElementById('td2').innerHTML = usid + "(" + dp_city + "," + dp_province + "," + dp_country + ")";
+    } else {
+        document.getElementById('td2').innerHTML = usid;
+    }
+
     document.getElementById('td3').innerHTML = odid;
     $("#td5").html(strcartype);
     document.getElementById('td6').innerHTML = count;
@@ -408,7 +422,8 @@ function addInventory(barcode, inventory_count, orderid, odid, count, record_, u
  * @param repState
  */
 function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
-                           strcartype, usid, goodspprice, position, odid, isDropshipOrder, goodurl, status, index, repState) {
+                           strcartype, usid, goodspprice, position, odid, isDropshipOrder, goodurl, status, index, repState,
+                           dp_num, dp_total, dp_city, dp_province, dp_country) {
     position = position.replace("CR-", "");
     var seiUnit = document.getElementById("unit_" + odid + "").innerHTML;
     var unit = seiUnit.replace(/[^0-9]/ig, "");//产品计量单位
@@ -484,7 +499,7 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
         addInventory(barcode, inventory_count, orderid, odid, count, record_, unit, goods_name, tbOrderId, strcartype, goodurl);
     }
     put_print(orderid, usid, odid, strcartype, count, loginName, tbOrderId,
-        _count, record_, unit, goods_name, barcode, goodurl, odid, position);
+        _count, record_, unit, goods_name, barcode, goodurl, odid, position,dp_num, dp_total, dp_city, dp_province, dp_country);
 }
 
 //仓库位置
@@ -1084,7 +1099,8 @@ function search() {
                                 + json[i].isDropshipOrder
                                 + '\',\''
                                 + json[i].goods_url.replace("'", "").replace(/[\r\n]/g, "")
-                                + '\',1,' + i + ');");">验货无误</button>';
+                                + '\',1,' + i +',0,' + json[i].dp_num + ',' + json[i].dp_total
+                                + ',\'' + json[i].dp_city + '\',\'' + json[i].dp_province + '\',\'' + json[i].dp_country + '\')">验货无误</button>';
                             str += '<button style="height: 30px;width:80px;" onclick="updategoodstatus(this,\''
                                 + json[i].goods_pid
                                 + '\',\''
@@ -1472,7 +1488,8 @@ function search() {
                                     + json[i].isDropshipOrder
                                     + '\',\''
                                     + json[i].goods_url
-                                    + '\',1,' + i + ',0)">验货无误</button>';
+                                    + '\',1,' + i + ',0,' + json[i].dp_num + ',' + json[i].dp_total
+                                    + ',\'' + json[i].dp_city + '\',\'' + json[i].dp_province + '\',\'' + json[i].dp_country + '\')">验货无误</button>';
                                 str += '<button style="height: 30px;width:80px;" name = "arrival' + i + '" onclick="updatecancelChecktatus(this,\''
                                     + json[i].orderid
                                     + '\',\''

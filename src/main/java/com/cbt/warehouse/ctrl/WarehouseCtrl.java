@@ -67,6 +67,7 @@ import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.service.TabCouponService;
 import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -173,6 +174,8 @@ public class WarehouseCtrl {
 	private IPurchaseService iPurchaseService;
 	@Autowired
 	private FreightFeeSerive freightFeeSerive;
+	@Autowired
+	private TabCouponService tabCouponService;
 	/**
 	 *
 	 * @Title getAllBuyer
@@ -389,7 +392,7 @@ public class WarehouseCtrl {
 				picPath=Util.PIC_URL+localFilePath+"";
 				if(flag){
 					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
-					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath);
+					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath, 1);
 					picPath=Util.PIC_URL+localFilePath+"";
 				}
 			}
@@ -6551,10 +6554,13 @@ public class WarehouseCtrl {
 				modelM.put("phone",ob.getPhonenumber());
 				modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
 				String temp="";
-				if ("0".equals(WebSite)){
+
+				if (MultiSiteUtil.getSiteTypeNum(orderid)==1){
+					modelM.put("websiteType",1);
 					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
 				}
-				if ("1".equals(WebSite)){
+				if (MultiSiteUtil.getSiteTypeNum(orderid)==0){
+					modelM.put("websiteType",2);
 					modelM.put("toHref","https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
 					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK_KIDS);
 				}
@@ -8728,7 +8734,7 @@ public class WarehouseCtrl {
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
 				if(flag){
 					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
-					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath.substring(0,localFilePath.lastIndexOf("/")));
+					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath.substring(0,localFilePath.lastIndexOf("/")), 1);
 				}
 				int row=0;
 				if(flag){
@@ -8755,7 +8761,9 @@ public class WarehouseCtrl {
 	}
 	@RequestMapping(value = "/reply", method = { RequestMethod.POST })
 	@ResponseBody
-	public JsonResult reply(@RequestParam(value = "gbookid", required = true) String gbookid, @RequestParam(value = "replyContent1", required = true) String replyContent1,
+	public JsonResult reply(@RequestParam(value = "gbookid", required = true) String gbookid,
+                            @RequestParam(value = "replyContent1", required = true) String replyContent1,
+                            @RequestParam(value = "websiteType", defaultValue = "1", required = false) Integer websiteType, //网站名
                             @RequestParam(value = "uploadfile1", required = true) MultipartFile file, HttpServletRequest request) {
 		JsonResult json = new JsonResult();
 		boolean flag=false;
@@ -8790,7 +8798,7 @@ public class WarehouseCtrl {
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgUploadPath + localFilePath);
 				if(flag){
 					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgUploadPath + localFilePath);
-					flag = UploadByOkHttp.uploadFile(new File(imgUploadPath + localFilePath),UPLOAD_IMG_PATH + localFilePath.substring(0,localFilePath.lastIndexOf("/")));
+					flag = UploadByOkHttp.uploadFile(new File(imgUploadPath + localFilePath),UPLOAD_IMG_PATH + localFilePath.substring(0,localFilePath.lastIndexOf("/")), 1);
 				}
 				int row=0;
 				if(flag){
@@ -8826,7 +8834,9 @@ public class WarehouseCtrl {
 				Date now = new Date();
 				dateFormat.setLenient(false);
 				String date = dateFormat.format(now);
-				count = ibs.reply(id, replyContent1,date,name,qustion,pname,email,Integer.parseInt(userId),purl,sale_email,picPath);
+				// 发送邮件等 原方法不能注入 邮件发送转移位置
+                tabCouponService.SendGuestbook(id, replyContent1,date,name,qustion,pname,email,Integer.parseInt(userId),purl,sale_email,picPath, websiteType);
+                count = ibs.reply(id, replyContent1,date,name,qustion,pname,email,Integer.parseInt(userId),purl,sale_email,picPath);
 				if(count>0){
 					json.setOk(true);
 				}
@@ -8903,7 +8913,7 @@ public class WarehouseCtrl {
 		boolean flag=false;
 		try {
 			// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
-			flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + storePath.substring(0,storePath.lastIndexOf("/")));
+			flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + storePath.substring(0,storePath.lastIndexOf("/")), 1);
 			if(flag){
 				Connection conn = DBHelper.getInstance().getConnection2();// 仓库不用
 				Connection conn1 = DBHelper.getInstance().getConnection();

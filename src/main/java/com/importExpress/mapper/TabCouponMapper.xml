@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.importExpress.mapper.TabCouponMapper">
 	
-    <!-- List<TabCouponNew> queryTabCouponList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("typeCode") String typeCode, @Param("valid") Integer valid, @Param("timeTo") Integer timeTo); -->
+    <!-- List<TabCouponNew> queryTabCouponList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("typeCode") String typeCode, @Param("valid") Integer valid, @Param("timeTo") Integer timeTo, @Param("couponSite") Integer couponSite); -->
 	<select id="queryTabCouponList" resultType="com.importExpress.pojo.TabCouponNew">
 		SELECT a.id, a.count, a.leftCount, a.describe, a.value, a.from, a.to, a.type, a.valid, a.userid, a.mqlog, a.createtime, b.admName username, a.share_flag shareFlag
 		FROM tab_coupon_new a
@@ -20,12 +20,15 @@
             <if test="timeTo == 2">
                 AND NOW() > a.to
             </if>
+            <if test="couponSite > 0">
+                AND (site = 0 OR site = #{couponSite})
+            </if>
 		</where>
         ORDER BY createtime DESC
 		LIMIT #{startBars},#{rows}
     </select>
 
-	<!-- Long queryTabCouponListCount(@Param("typeCode") String typeCode, @Param("valid") Integer valid, @Param("timeTo") Integer timeTo); -->
+	<!-- Long queryTabCouponListCount(@Param("typeCode") String typeCode, @Param("valid") Integer valid, @Param("timeTo") Integer timeTo, @Param("couponSite") Integer couponSite); -->
 	<select id="queryTabCouponListCount" resultType="long">
 		SELECT COUNT(1)
 		FROM tab_coupon_new a
@@ -41,6 +44,9 @@
             </if>
             <if test="timeTo == 2">
                 AND NOW() > a.to
+            </if>
+            <if test="couponSite > 0">
+                AND (site = 0 OR site = #{couponSite})
             </if>
 		</where>
     </select>
@@ -60,9 +66,11 @@
     
     <!-- void addCoupon(@Param("tabCouponNew") TabCouponNew tabCouponNew); -->
     <insert id="addCoupon">
-    	INSERT INTO tab_coupon_new (`id`, `count`, `leftCount`, `describe`, `value`, `from`, `to`, `type`, `valid`, `userid`, `mqlog`, `createtime`, `share_flag`)
+    	INSERT INTO tab_coupon_new (`id`, `count`, `leftCount`, `describe`, `value`, `from`,
+    	  `to`, `type`, `valid`, `userid`, `mqlog`, `createtime`, `share_flag`, `site`)
     	VALUES (#{tabCouponNew.id}, #{tabCouponNew.count}, #{tabCouponNew.leftCount}, #{tabCouponNew.describe}, #{tabCouponNew.value}, 
-    		#{tabCouponNew.from}, #{tabCouponNew.to}, #{tabCouponNew.type}, #{tabCouponNew.valid}, #{tabCouponNew.userid}, #{tabCouponNew.mqlog}, NOW(), #{tabCouponNew.shareFlag})
+    		#{tabCouponNew.from}, #{tabCouponNew.to}, #{tabCouponNew.type}, #{tabCouponNew.valid}, #{tabCouponNew.userid},
+    		#{tabCouponNew.mqlog}, NOW(), #{tabCouponNew.shareFlag}, #{tabCouponNew.site})
     </insert>
     
     <!-- Long checkCouponCode(@Param("couponCode") String couponCode); -->
@@ -73,7 +81,7 @@
     <!--TabCouponNew queryTabCouponOne(@Param("couponCode") String couponCode);-->
     <select id="queryTabCouponOne" resultType="com.importExpress.pojo.TabCouponNew">
         SELECT a.id, a.count, a.leftCount, a.describe, a.value, a.from, a.to, a.type, a.valid, a.userid,
-        a.mqlog, a.createtime, b.admName username, a.share_flag shareFlag
+        a.mqlog, a.createtime, b.admName username, a.share_flag shareFlag, a.site
 		FROM tab_coupon_new a
 		LEFT JOIN admuser b ON a.userid = b.id
 		WHERE a.id = #{couponCode}

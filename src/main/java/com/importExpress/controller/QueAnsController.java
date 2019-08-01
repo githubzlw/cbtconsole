@@ -28,6 +28,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 后台提问回答功能
@@ -214,7 +216,7 @@ public class QueAnsController {
 		int qid = StrUtils.isNum(strqid) ? Integer.valueOf(strqid) : 0;
 		String replyContent = request.getParameter("rcontent");
 		String url=request.getParameter("url");
-		String Website=request.getParameter("Website");
+		String purl=request.getParameter("purl");
 		if(StringUtils.isBlank(replyContent) || qid == 0){
 			return -1;
 		}
@@ -223,10 +225,16 @@ public class QueAnsController {
 		Date now = new Date();
 		dateFormat.setLenient(false);
 		String date = dateFormat.format(now);
+		String Website="0";
+		String reg=".*kidsproductwholesale.*";  //判断字符串中是否含有ll
+		boolean isValid=purl.matches(reg);
+		if (isValid){
+			Website="1";
+		}
 		//给客户发送邮件
 		QueAns q=questionAndAnswerService.getQueAnsinfo(qid);
 		int updateReplyContent=questionAndAnswerService.replyReportQes(q.getQuestionid(),replyContent, date, q.getEmail(), q.getQuestion_content(), q.getEmail(), Integer.valueOf(q.getUserid()), q.getSale_email(),url,Website);
-		return updateReplyContent;
+		return 1;
 	}
 	/**回复提问
 	 * @date 2018年3月26日
@@ -246,7 +254,7 @@ public class QueAnsController {
 		int adminid = user.getId();
 		String strqid = request.getParameter("qid");
 		String isShow = request.getParameter("isShow");
-		String Website=request.getParameter("Website");
+		String purl=request.getParameter("purl");
 		//影响同店铺标识 1影响
 		String shop_flag=request.getParameter("shop_flag");
 		String shop_id=request.getParameter("shop_id");
@@ -272,6 +280,12 @@ public class QueAnsController {
 					sendMQ.sendMsg(new RunSqlModel(" update question_answer set isShow=2 where questionid='"+qid+"'"));
 				}
 			}
+		}
+		String Website="0";
+		String reg=".*kidsproductwholesale.*";  //判断字符串中是否含有ll
+		boolean isValid=purl.matches(reg);
+		if (isValid){
+			Website="1";
 		}
 		sendMQ.closeConn();
 		//给客户发送邮件

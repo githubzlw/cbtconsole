@@ -387,7 +387,11 @@
 
     <sql id="getTrackInfo">
         FROM shipping_package sp
-        INNER JOIN orderinfo of ON sp.orderid = of.order_no
+        INNER JOIN (
+            SELECT order_no, user_id, orderpaytime FROM orderinfo    -- 普通订单 + dp订单
+            UNION
+            SELECT child_order_no AS 'order_no', user_id, orderpaytime FROM dropshiporder
+        ) of ON sp.orderid = of.order_no
         LEFT JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no
 
         <if test="export != null and export == 1">
@@ -411,7 +415,7 @@
 
         /*订单编号*/
         <if test="orderNo != null and orderNo != ''">
-            AND (sp.orderid = #{orderUserid} OR sp.orderid LIKE #{orderNoLike})
+            AND (sp.orderid = #{orderNo} OR sp.orderid LIKE #{orderNoLike} OR sp.REMARKS LIKE #{orderNoLike})
         </if>
 
         /*运单号 转单号*/
@@ -513,5 +517,13 @@
         <include refid="getTrackInfo" />
     </select>
 
+    <!--List<String> getIsDropshipOrder(@Param("list") List<TabTrackInfo> list);-->
+    <select id="getIsDropshipOrder" resultType="java.lang.String">
+        SELECT child_order_no FROM dropshiporder
+        WHERE child_order_no IN
+        <foreach collection="list" open="(" close=")" item="item" separator=",">
+            #{item.orderNo}
+        </foreach>
+    </select>
 
 </mapper>

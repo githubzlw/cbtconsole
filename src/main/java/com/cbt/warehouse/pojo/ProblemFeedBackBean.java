@@ -1,6 +1,5 @@
 package com.cbt.warehouse.pojo;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 注册页面、购物车页面、支付页面反馈弹框bean
@@ -37,6 +36,24 @@ public class ProblemFeedBackBean implements Serializable{
 	private String whatsApp;
     private String business;//your business name
     private String tellBusiness;//tell us about your business
+    private String siteType;
+    private Integer site;
+
+    public String getSiteType() {
+        return siteType;
+    }
+
+    public void setSiteType(String siteType) {
+        this.siteType = siteType;
+    }
+
+    public Integer getSite() {
+        return site;
+    }
+
+    public void setSite(Integer site) {
+        this.site = site;
+    }
 
     public String getBusiness() {
         return business;
@@ -118,7 +135,7 @@ public class ProblemFeedBackBean implements Serializable{
 		this.qustion = qustion;
 	}
 
-	
+
 
 	public int getId() {
 		return id;
@@ -155,11 +172,11 @@ public class ProblemFeedBackBean implements Serializable{
 	public String getCreatetime() {
 		return createtime;
 	}
-	
+
 	public void setCreatetime(String createtime) {
 		this.createtime = createtime;
 	}
-	
+
 	public int getType() {
 		return type;
 	}
@@ -182,8 +199,8 @@ public class ProblemFeedBackBean implements Serializable{
 				+ ", createtime=" + createtime + ", type=" + type + ", admName=" + admName + "]";
 	}
 
-	
-	
-	
-	
+
+
+
+
 }

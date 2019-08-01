@@ -27,6 +27,7 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.InputData;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import lombok.extern.slf4j.Slf4j;
@@ -621,7 +622,6 @@ public class OrderInfoController{
 		PrintWriter out = response.getWriter();
 		String orderNo = null;
 		String orderNo1 = request.getParameter("orderNo");
-		String Website = request.getParameter("Website");
 		int whichOne = Integer.parseInt(request.getParameter("whichOne"));
 		// 获取到是否是isDropship订单
 		int isDropship = Integer.parseInt(request.getParameter("isDropship"));
@@ -639,10 +639,13 @@ public class OrderInfoController{
 			modelM.put("orderNo",orderNo);
 			modelM.put("name",email);
 			modelM.put("accountLink","https://www.import-express.com/orderInfo/emailLink?orderNo="+orderNo+"");
-			if ("0".equals(Website)){
+            MultiSiteUtil.getSiteTypeNum(orderNo);
+			if (MultiSiteUtil.getSiteTypeNum(orderNo)==1){
+				modelM.put("websiteType",1);
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
 			}
-			if ("1".equals(Website)){
+			if (MultiSiteUtil.getSiteTypeNum(orderNo)==2){
+				modelM.put("websiteType",2);
 				modelM.put("accountLink","https://www.kidsproductwholesale.com/orderInfo/emailLink?orderNo="+orderNo+"");
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE_KIDS);
 			}
@@ -1167,7 +1170,7 @@ public class OrderInfoController{
 
 								/**********把图片上传到图片服务器 start*****/
 								//String remoteSavePath = remotePath+File.separator+"desc"+File.separator+replace_img;
-								String remoteSavePath = GoodsInfoUtils.changeRemotePathToLocal(imgPath);
+								String remoteSavePath = GoodsInfoUtils.changeRemotePathToLocal(imgPath, 1);
 		                        remoteSavePath = remoteSavePath.replace(imgName, "");
 		                        uploadMap.put(replace_localpath, remoteSavePath+"@@@@"+uploadFileName);
 	                            /**********把图片上传到图片服务器 end*****/
@@ -1185,7 +1188,7 @@ public class OrderInfoController{
 
 						//每100张上传一次
                         if(count==100) {
-                        	boolean dsds = UploadByOkHttp.doUpload(uploadMap);
+                        	boolean dsds = UploadByOkHttp.doUpload(uploadMap, 1);
                 			//更新已上传状态
                 			if(up_ids.size()>0&&dsds) {
                 				purchaseService.updateSizeChartUpload(up_ids);

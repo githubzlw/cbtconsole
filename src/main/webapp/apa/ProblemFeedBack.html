@@ -84,6 +84,7 @@ table th {
 								tbody += "支付页面反馈";
 							}
 							tbody += "</td>";
+                            tbody += "<td>" + results[i].siteType + "</td>";
 							if(results[i].admName == null || results[i].admName == ""){
 								tbody += "<td></td>";
 							} else{
@@ -102,7 +103,7 @@ table th {
 							} else{
 								tbody += "<td>"+results[i].reply_time+"</td>";
 							}
-							tbody += "<td><a style='margin-left:35px' href='javascript:openReplyCustom("+results[i].id+")'>回复</a></td>";
+							tbody += "<td><a style='margin-left:35px' href=\"javascript:openReplyCustom(\'"+results[i].id+"\', \'" + results[i].site + "\')\">回复</a></td>";
 							tbody+="</tr>";
 						}
 						$("#problemTable tbody").append(tbody);
@@ -118,8 +119,9 @@ table th {
 	}
 	
 	//打开回复弹出框
-	function openReplyCustom(report_id){
+	function openReplyCustom(report_id, site){
 		$("#report_id").val(report_id);
+		$("#website_type").val(site);
 		var rfddd = document.getElementById("repalyDiv1");
 		rfddd.style.display = "block";
 	}
@@ -127,6 +129,7 @@ table th {
 		function saveRepalyContent() {
 		var report_id = $("#report_id").val();
 		var text = $("#remark_content_").val();
+		var websiteType = $("#website_type").val();
 		$
 				.ajax({
 					type : 'POST',
@@ -134,7 +137,8 @@ table th {
 					url : '/cbtconsole/problemFeedBack/saveRepalyContent',
 					data : {
 						'report_id' : report_id,
-						'text' : text
+						'text' : text,
+                        'websiteType' : websiteType
 					},
 					dataType : 'text',
 					success : function(data) {
@@ -246,6 +250,7 @@ table th {
 					<th style="width: 100px">企业业务</th>
 					<th style="width: 200px">反馈问题</th>
 					<th style="width: 160px">类型</th>
+					<th style="width: 80px">网站</th>
 					<th style="width: 100px">销售</th>
 					<th style="width: 210px">创建时间</th>
 					<th style="width: 210px">回复内容</th>
@@ -282,6 +287,14 @@ table th {
 		反馈内容:
 		<textarea name="remark_content" rows="8" cols="50"
 			id="remark_content_"></textarea>
+            <br />
+            <input type="hidden" id="website_type">
+            <!--邮件回复网站名:
+            <select id="website_type" style="height: 28px;width: 160px;">
+                <option value="1" selected="selected">import-express</option>
+                <option value="2">kidsproductwholesale</option>
+            </select>
+            <br />-->
 		<input type="button" id="repalyBtnId" onclick="saveRepalyContent()"
 			value="提交反馈">
 	</div>

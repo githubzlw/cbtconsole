@@ -220,9 +220,9 @@
                             <br><br>
                             <input type="button" value="确认" class="btn_sty"
                                    onclick="beforeAddRemark(${aproval.id},${aproval.dealState},${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},1,this)"/>
-                            <%--<br>
+                            <br>
                             <input type="button" value="驳回" class="refuse_sty"
-                                   onclick="beforeAddRemark(${aproval.id},4,${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},-1,this)"/>--%>
+                                   onclick="beforeAddRemark(${aproval.id},4,${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},-1,this)"/>
                         </c:if>
                     </c:if>
                     <c:if test="${aproval.dealState >= 3}">

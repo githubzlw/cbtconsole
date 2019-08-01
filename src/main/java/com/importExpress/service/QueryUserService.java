@@ -5,6 +5,8 @@ import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsReview;
 import com.importExpress.pojo.OrderShare;
+import com.importExpress.pojo.TimingWarningInfo;
+import com.importExpress.pojo.UserBean;
 
 import java.util.List;
 import java.util.Map;
@@ -70,4 +72,14 @@ public interface QueryUserService {
     EasyUiJsonResult lookShareableOrder(Integer page, Integer rows, String orderNo,String name,int userid,int share);
 
     void SetShareByOrderno(String orderNo);
+
+    UserBean insertLoginLog(Integer userid, Integer admid, Integer site);
+
+    Map<String, Object> updateUserCheckout(Integer userid, Integer type);
+
+    List<TimingWarningInfo> queryTimingWarningInfo(Integer valid, Integer day);
+
+    TimingWarningInfo queryQuotaData(Integer id);
+
+    void udpateQuotaData(TimingWarningInfo bean);
 }

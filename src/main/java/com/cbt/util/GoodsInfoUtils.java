@@ -19,11 +19,17 @@ import java.util.regex.Pattern;
 public class GoodsInfoUtils {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsInfoUtils.class);
 
-    private static final String SERVICE_LOCAL_PATH = "/usr/local/goodsimg";
-    private static final String SERVICE_SHOW_URL_1 = "http://img.import-express.com";
-    private static final String SERVICE_SHOW_URL_2 = "http://img1.import-express.com";
-    private static final String SERVICE_SHOW_URL_3 = "https://img.import-express.com";
-    private static final String SERVICE_SHOW_URL_4 = "https://img1.import-express.com";
+    public static final String SERVICE_LOCAL_IMPORT_PATH = "/usr/local/goodsimg";
+    public static final String SERVICE_SHOW_IMPORT_URL_1 = "http://img.import-express.com";
+    public static final String SERVICE_SHOW_IMPORT_URL_2 = "http://img1.import-express.com";
+    public static final String SERVICE_SHOW_IMPORT_URL_3 = "https://img.import-express.com";
+    public static final String SERVICE_SHOW_IMPORT_URL_4 = "https://img1.import-express.com";
+
+    public static final String SERVICE_LOCAL_KIDS_PATH = "/data";
+    public static final String SERVICE_SHOW_KIDS_URL_1 = "http://img.import-express.com";
+    public static final String SERVICE_SHOW_KIDS_URL_2 = "http://img1.import-express.com";
+    public static final String SERVICE_SHOW_KIDS_URL_3 = "https://img.import-express.com";
+    public static final String SERVICE_SHOW_KIDS_URL_4 = "https://img1.import-express.com";
 
     private static String chineseChar = "([\\一-\\龥]+)";
 
@@ -320,17 +326,20 @@ public class GoodsInfoUtils {
         return tempVal;
     }
 
-    public static String changeRemotePathToLocal(String remotepath) {
+    public static String changeRemotePathToLocal(String remotepath, int isKids) {
 
         String localPathByRemote = remotepath;
-        if (remotepath.contains(SERVICE_SHOW_URL_1)) {
-            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_1, SERVICE_LOCAL_PATH);
-        } else if (remotepath.contains(SERVICE_SHOW_URL_2)) {
-            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_2, SERVICE_LOCAL_PATH);
-        } else if (remotepath.contains(SERVICE_SHOW_URL_3)) {
-            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_3, SERVICE_LOCAL_PATH);
-        } else if (remotepath.contains(SERVICE_SHOW_URL_4)) {
-            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_4, SERVICE_LOCAL_PATH);
+        if (remotepath.contains(SERVICE_SHOW_IMPORT_URL_1)) {
+            localPathByRemote = remotepath.replace(SERVICE_SHOW_IMPORT_URL_1, SERVICE_LOCAL_IMPORT_PATH);
+        } else if (remotepath.contains(SERVICE_SHOW_IMPORT_URL_2)) {
+            localPathByRemote = remotepath.replace(SERVICE_SHOW_IMPORT_URL_2, SERVICE_LOCAL_IMPORT_PATH);
+        } else if (remotepath.contains(SERVICE_SHOW_IMPORT_URL_3)) {
+            localPathByRemote = remotepath.replace(SERVICE_SHOW_IMPORT_URL_3, SERVICE_LOCAL_IMPORT_PATH);
+        } else if (remotepath.contains(SERVICE_SHOW_IMPORT_URL_4)) {
+            localPathByRemote = remotepath.replace(SERVICE_SHOW_IMPORT_URL_4, SERVICE_LOCAL_IMPORT_PATH);
+        }
+        if(isKids > 0){
+            localPathByRemote = localPathByRemote.replace(SERVICE_LOCAL_IMPORT_PATH, SERVICE_LOCAL_KIDS_PATH);
         }
         return localPathByRemote;
     }
@@ -829,7 +838,7 @@ public class GoodsInfoUtils {
 
     public static String changeLocalPathToRemotePath(String localPath) {
         if (StringUtils.isNotBlank(localPath)) {
-            return localPath.replace(SERVICE_LOCAL_PATH, SERVICE_SHOW_URL_3);
+            return localPath.replace(SERVICE_LOCAL_IMPORT_PATH, SERVICE_SHOW_IMPORT_URL_3);
         } else {
             return null;
         }

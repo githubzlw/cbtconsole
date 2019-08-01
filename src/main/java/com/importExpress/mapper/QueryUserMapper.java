@@ -152,4 +152,14 @@ public interface QueryUserMapper {
     void SetShareByOrderno(@Param("orderNo") String orderNo);
 
     List<String> querySalesShop(@Param("list") List<SameGoodsDetails> list);
+
+    void insertLoginLog(@Param("userid") Integer userid, @Param("admid") Integer admid, @Param("site") Integer site);
+
+    void updateUserCheckout(@Param("userid") Integer userid, @Param("type") Integer type);
+
+    List<TimingWarningInfo> queryTimingWarningInfo(@Param("valid") Integer valid, @Param("day") Integer day);
+
+    TimingWarningInfo queryQuotaData(@Param("id") Integer id);
+
+    void udpateQuotaData(@Param("bean") TimingWarningInfo bean);
 }

@@ -866,9 +866,10 @@
             $("#review_remark").val("");
         }
 
-        function openEditReview(country, review_remark, review_score, review_flag, createtime, pid) {
+        function openEditReview(id, country, review_remark, review_score, review_flag, createtime, pid) {
             $("#oldCreateTime").val(createtime);
             $("#goods_pid").val(pid);
+            $("#goods_id").val(id);
 
             $('#edit_score').combobox('setValue', review_score);
             $('#editcountry').combobox('setValue', country);
@@ -896,6 +897,7 @@
         function updateReviewRemark() {
             var oldCreateTime = $("#oldCreateTime").val();
             var goods_pid = $("#goods_pid").val();
+            var id = $("#goods_id").val();
 
             var edit_remark = $("#edit_remark").val();
             var editcountry = $('#editcountry').combobox('getValue');
@@ -923,7 +925,8 @@
                     "edit_score": edit_score,
                     "update_flag": update_flag,
                     "oldCreateTime": oldCreateTime,
-                    "goods_pid": goods_pid
+                    "goods_pid": goods_pid,
+                    "id": id
                 },
                 success: function (data) {
                     var json = eval('(' + data + ')');
@@ -971,10 +974,12 @@
                 success: function (data) {
                     var json = eval('(' + data + ')');
                     if (json.ok) {
-                        showMessage("添加评论成功；1秒后刷新页面");
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 800);
+                        // showMessage("添加评论成功；1秒后刷新页面");
+                        // setTimeout(function () {
+                        //     window.location.reload();
+                        // }, 800);
+                        $('#review_dlg').dialog('close');
+                        alert(json.message);
                     } else {
                         showMessage("添加评论失败");
                     }
@@ -1659,6 +1664,7 @@
         <br>
         <input id="oldCreateTime" type="hidden">
         <input id="goods_pid" type="hidden">
+        <input id="goods_id" type="hidden">
         评论:<textarea id="edit_remark" style="width: 300px; height: 88px;"></textarea><br>
         <br>
         <select class="easyui-combobox" name="edit_score" id="edit_score" style="width:300px;"
@@ -2164,7 +2170,14 @@
                     </c:if> <c:if test="${goods.goodsState >0}">
                     <br>
                     <b style="font-size: 16px;">发布状态:${goods.goodsStateValue}</b>
-                </c:if> <c:if test="${not empty goods.publishtime}">
+                </c:if><c:if test="${goods.valid == 0}">
+                        <br>
+                        <b style="font-size: 16px;color: red;">下架原因:${goods.offReason}</b>
+                    </c:if>
+                    <c:if test="${goods.valid == 2}">
+                        <br>
+                        <b style="font-size: 16px;color: red;">软下架原因:${goods.unsellAbleReasonDesc}</b>
+                    </c:if><c:if test="${not empty goods.publishtime}">
                     <br>
                     <b style="font-size: 16px;">发布时间:${goods.publishtime}</b>
                 </c:if> <c:if test="${not empty goods.updatetime}">
@@ -2183,25 +2196,17 @@
                         <br>
                         <b style="color: red;font-size: 16px;">亚马逊价格:${goods.aliGoodsPrice}</b>
                     </c:if>
-                    <c:if test="${goods.valid == 0}">
-                        <br>
-                        <b style="font-size: 16px;">下架原因:${goods.offReason}</b>
-                    </c:if>
-                    <c:if test="${goods.valid == 2}">
-                        <br>
-                        <b style="font-size: 16px;">软下架原因:${goods.unsellAbleReasonDesc}</b>
-                    </c:if>
                     <c:if test="${goods.weightNotFlag > 0}">
                         <br>
-                        <b style="font-size: 16px;">重量不合理</b>
+                        <b style="font-size: 16px;">标注:重量不合理</b>
                     </c:if>
                     <c:if test="${goods.uglyFlag > 0}">
                         <br>
-                        <b style="font-size: 16px;">难看</b>
+                        <b style="font-size: 16px;">标注:难看</b>
                     </c:if>
                     <c:if test="${goods.repairedFlag > 0}">
                         <br>
-                        <b style="font-size: 16px;color: green;">产品已修复</b>
+                        <b style="font-size: 16px;color: green;">标注:产品已修复</b>
                     </c:if>
                     </span> </div>
                 <br>
@@ -2274,7 +2279,7 @@
                 <span style="font-size: 22px; color: red; margin-top: 15px;">商品评论:</span><br>
                 <c:forEach items="${reviewList}" var="review">
                     <span style="font-size: 15px;  margin-top: 15px;">评论人:${review.review_name};评论时间:${review.createtime};国家:${review.country};评论内容:${review.review_remark};评分:${review.review_score};${review.review_flag};编辑时间:${review.updatetime}</span>
-                    <button onclick="openEditReview('${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}','${review.createtime}','${review.goods_pid}');">
+                    <button onclick="openEditReview('${review.aliId}','${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}','${review.createtime}','${review.goods_pid}');">
                         编辑
                     </button>
                     <br>
