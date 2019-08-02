@@ -546,7 +546,7 @@
             var localUrl = window.location.href;
             var url = "http://192.168.1.29:8081/goodslist?background=1&hotid=";
             if (localUrl.indexOf(".1.27:") > -1 || localUrl.indexOf(".1.9:") > -1) {
-                url = "https://www.kidsproductwholesale.com/goodslist?background=1&hotid=";
+                url = "https://www.import-express.com/goodslist?background=1&hotid=";
                 if (webType == 2) {
                     url = "https://www.kidsproductwholesale.com/goodslist?background=1&hotid=";
                 } else if (webType == 3){
