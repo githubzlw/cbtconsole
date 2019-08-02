@@ -7,6 +7,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<%--<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>--%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -291,6 +292,48 @@
         }
 
 
+        function Down_sample(orderno, email, paytime) {
+            alert(orderno)
+            if(orderno == null || orderno == ""){
+                alert('获取订单号失败');
+                return ;
+            }
+            var s=0;
+            var orderDetail=${orderDetail};
+            var OrderMap = new Array();
+            $('input:checkbox[name=Split_open]').each(function(k) {
+                if ($(this).is(':checked')) {
+                    alert(k)
+                    var arr=$("#Split_openNum"+orderDetail[k].id);
+                    if (arr>orderDetail[k].yourorder){
+                        alert("你输入的拆单数量不能大于订单数量")
+                        return
+                    }
+                    var yourorder=orderDetail[k].yourorder-arr;
+                    OrderMap.push({id:orderDetail[k].id,userid:orderDetail[k].userid,goodsid:orderDetail[k].goodsid,goodsname:orderDetail[k].goodsname,orderid:orderDetail[k].orderid
+                        ,delivery_time:orderDetail[k].delivery_time,checkprice_fee:orderDetail[k].checkprice_fee,checkproduct_fee:orderDetail[k].checkproduct_fee,state:orderDetail[k].state,
+                        fileupload:orderDetail[k].fileupload, yourorder:yourorder,goodsprice:orderDetail[k].goodsprice,freight:orderDetail[k].freight,downSample:arr})
+                }
+            })
+            $.ajax({
+                type:"post",
+                url:"/cbtconsole/orderSplit/DownSample",
+                dataType:"json",
+                contentType : 'application/json;charset=utf-8',
+                data:JSON.stringify(OrderMap),
+                success:function(res){
+                    alert(res)
+                    if(res==0){
+                        alert("删除失败  !")
+                        return;
+                    }else{
+                        alert("删除成功 !");
+                        // window.location.reload();
+                    }
+                }
+
+            })
+        }
     </script>
 
     <link type="text/css" rel="stylesheet"
@@ -726,7 +769,7 @@
                     &nbsp;&nbsp; &nbsp;&nbsp;
                     <c:if test="${order.state!=3 || order.state!=4 }">
                         <input type="button"
-                               style="position: fixed; bottom: 520px; right: 50px; width: 150px; height: 30px;"
+                               style="position: fixed; bottom: 556px; right: 50px; width: 150px; height: 30px;"
                                id="closeOrder"
                                onclick="fnCloseOrder('${order.orderNo}',${order.userid},${order.pay_price},
                                        '${order.currency}',${order.order_ac},'${order.userEmail}','${order.email}',
@@ -741,25 +784,31 @@
                     &nbsp;&nbsp;
                     <c:if test="${isSplitOrder == 0 && order.state != 3 && order.state != 4}">
                         <input type="button"
-                               style="position: fixed; bottom: 490px; right: 50px; width: 150px; height: 30px;"
+                               style="position: fixed; bottom: 524px; right: 50px; width: 150px; height: 30px;"
                                id="split_order_btn"
                                onclick="fnSplitOrder('${order.orderNo}','${order.email}','${param.paytime}')"
                                value="拆单">&nbsp;&nbsp;
                     </c:if>
                     <c:if test="${isSplitOrder == 1}">
                         <input type="button"
-                               style="position: fixed; bottom: 490px; right: 50px; width: 150px; height: 30px;"
+                               style="position: fixed; bottom: 524px; right: 50px; width: 150px; height: 30px;"
                                id="split_order_btn"
                                onclick="fnSplitDropShipOrder('${order.orderNo}','${order.email}','${param.paytime}')"
-                               value="拆单">
+                        value="拆单">
                         &nbsp;&nbsp;
                     </c:if>
+                    <%--<input type="button"--%>
+                           <%--style="position: fixed; bottom: 492px; right: 50px; width: 150px; height: 30px;" id="openout" onclick="Down_sample('${order.orderNo}','${order.email}','${param.paytime}')"--%>
+                            <%--value="拆样">--%>
+                    <input type="button"
+                           style="position: fixed; bottom: 492px; right: 50px; width: 150px; height: 30px;" id="itop" onclick="deliver('${order.orderNo}','${order.userid}','${param.paytime}','${order.product_cost+preferential_price}')"
+                            value="送样">
                 </td>
             </tr>
             <tr>
                 <td>
                     <input type="button"
-                           style="position: fixed; bottom: 458px; right: 50px; width: 150px; height: 30px;" id="open"
+                           style="position: fixed; bottom: 460px; right: 50px; width: 150px; height: 30px;" id="open"
                            onclick="afterReplenishment()" value="售后补货">
                 </td>
                 <td>
@@ -1506,7 +1555,10 @@
                             <input type="text"
                                    id="count_${orderd.goodsid}" style="width:50px;" value="补货数量"
                                    onfocus="if (value =='补货数量'){value =''}"
-                                   onblur="if (value ==''){value='补货数量'}"/>
+                                   onblur="if (value ==''){value='补货数量'}"/><br/>
+                            <input type="checkbox" style="zoom:140%;" name="Split_open">
+                                  <span>拆样，数量</span>
+                            <input type="text" style="width: 20px" id="Split_openNum${orderd.id}" onchange="getNum(${orderd.yourorder},this)" value="1"><span>优先发货</span>
                         </td>
                     </tr>
                 </c:forEach>
