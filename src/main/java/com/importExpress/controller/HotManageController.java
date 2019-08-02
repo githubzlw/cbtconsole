@@ -404,6 +404,11 @@ public class HotManageController {
         }
 
         String categoryIdStr = request.getParameter("categoryId");
+        String webType = request.getParameter("webType");
+        if(StringUtils.isBlank(webType)){
+            webType = "1";
+        }
+        mv.addObject("webType", webType);
 
         if (StringUtils.isBlank(categoryIdStr)) {
             mv.addObject("isShow", 0);
