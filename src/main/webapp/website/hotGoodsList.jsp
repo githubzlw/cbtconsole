@@ -549,7 +549,7 @@
                 url = "https://www.import-express.com/goodslist?background=1&hotid=";
                 if (webType == 2) {
                     url = "https://www.kidsproductwholesale.com/goodslist?background=1&hotid=";
-                } else if (webType == 3) {
+                } else if (webType == 3){
                     url = "https://www.lovelypetsupply.com/goodslist?background=1&hotid=";
                 }
             } else if (localUrl.indexOf(".1.29:") > -1) {
