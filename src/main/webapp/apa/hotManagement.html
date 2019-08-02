@@ -361,8 +361,10 @@
 		$(".refresh_color").css("background","#aaa");
 		$(".refresh_color").attr("disabled",true);
 		var url = "https://www.import-express.com/popProducts/refreshHotJson";
-		if(webType > 1){
+		if(webType == 2){
 		    url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson";
+        } else if(webType == 3){
+		    url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson";
         }
 		$.ajax({
 			type : "POST",

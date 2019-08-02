@@ -1,20 +1,65 @@
 package com.cbt.orderinfo.ctrl;
 
-import ceRong.tools.bean.SearchLog;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.alibaba.trade.param.AlibabaTradeFastCreateOrderResult;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.orderinfo.service.IOrderinfoService;
+import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.RechangeRecord;
 import com.cbt.processes.service.ISpiderServer;
-import com.cbt.util.*;
+import com.cbt.util.FtpConfig;
+import com.cbt.util.GetConfigureInfo;
+import com.cbt.util.GoodsInfoUtils;
+import com.cbt.util.Md5Util;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
+import com.cbt.util.Util;
+import com.cbt.util.Utility;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.bean.SearchResultInfo;
-import com.cbt.website.dao.*;
+import com.cbt.website.dao.ChangUserBalanceDao;
+import com.cbt.website.dao.ChangUserBalanceDaoImpl;
+import com.cbt.website.dao.PaymentDao;
+import com.cbt.website.dao.PaymentDaoImp;
+import com.cbt.website.dao.UserDao;
+import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.dao2.IWebsiteOrderDetailDao;
 import com.cbt.website.dao2.WebsiteOrderDetailDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -29,31 +74,11 @@ import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+
+import ceRong.tools.bean.SearchLog;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import sun.misc.BASE64Decoder;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.math.BigDecimal;
-import java.net.URLDecoder;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.util.*;
 
 @Controller
 @RequestMapping("/order")
@@ -323,12 +348,15 @@ public class OrderInfoController{
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/updateCheckStatus")
-	public void updateCheckStatus(HttpServletRequest request, HttpServletResponse response)throws Exception {
+	@ResponseBody
+	public Map<String,Object> updateCheckStatus(HttpServletRequest request, HttpServletResponse response)throws Exception {
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html;charset=utf-8");
 		Map<String,String> map=new HashMap<String,String>();
+		Map<String,Object> result=new HashMap<String,Object>();
 		int res=0,num=0;
+		List<Tb1688OrderHistory> checkOrder = null;
 		try{
 			map.put("orderid", request.getParameter("orderid"));
 			map.put("goodid", request.getParameter("goodid"));
@@ -342,6 +370,8 @@ public class OrderInfoController{
 			map.put("itemid", request.getParameter("itemid"));
 			map.put("repState", request.getParameter("repState"));
 			map.put("odid",request.getParameter("odid"));
+			map.put("specid",request.getParameter("specid"));
+			map.put("skuid",request.getParameter("skuid"));
 			map.put("warehouseRemark", request.getParameter("warehouseRemark"));
 			int count = Integer.valueOf(request.getParameter("count"));
 			map.put("count", String.valueOf(count));
@@ -352,6 +382,13 @@ public class OrderInfoController{
 			if (res > 0) {
 				//验货无误成功，判断该订单是否全部到库并且验货无误
 				num = iOrderinfoService.checkOrderState(map.get("orderid"));
+				
+				//是否全部验货
+				String tbsourceCount = request.getParameter("tbsourceCount");
+				String sourceCount = request.getParameter("sourceCount");
+				if("1".equals(sourceCount)) {
+					checkOrder = iOrderinfoService.checkOrder(map.get("shipno"),StrUtils.isNum(tbsourceCount) ? Integer.valueOf(tbsourceCount) : 0);
+				}
 			}
 			String goods_pid=request.getParameter("goods_pid");//添加质量差的商品
 			if (!("1".equals(goods_pid)||"".equals(goods_pid)||goods_pid==null)){
@@ -360,10 +397,12 @@ public class OrderInfoController{
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-		PrintWriter out = response.getWriter();
-		out.print(res + "," + num);
-		out.flush();
-		out.close();
+		result.put("res", res);
+		result.put("num", num);
+		result.put("checkOrder", checkOrder);
+		result.put("barcode", request.getParameter("barcode"));
+		result.put("shipno", request.getParameter("shipno"));
+		return result;
 	}
 
 	/**
@@ -388,9 +427,13 @@ public class OrderInfoController{
 			map.put("odid",request.getParameter("odid"));
 			//取消验货数量
 			map.put("barcode",request.getParameter("barcode"));
+			map.put("specid",request.getParameter("specid"));
+			map.put("skuid",request.getParameter("skuid"));
+			map.put("tbskuid",request.getParameter("tbskuid"));
+			map.put("tbspecid",request.getParameter("tbspecid"));
 			map.put("seiUnit",request.getParameter("seiUnit"));
 			String cance_inventory_count = request.getParameter("cance_inventory_count");
-			if (cance_inventory_count == null || "".equals(cance_inventory_count)) {
+			if (cance_inventory_count == null || "".equals(cance_inventory_count) || !com.cbt.util.StrUtils.isMatch(cance_inventory_count, "(\\d+)")) {
 				cance_inventory_count = "0";
 			}
 			map.put("cance_inventory_count",cance_inventory_count);

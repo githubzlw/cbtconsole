@@ -552,7 +552,6 @@
                 } else if (webType == 3){
                     url = "https://www.lovelypetsupply.com/goodslist?background=1&hotid=";
                 }
-
             } else if (localUrl.indexOf(".1.29:") > -1) {
                 url = "http://192.168.1.29:8081/goodslist?background=1&hotid=";
             }else if(localUrl.indexOf("127.0.0.1") > -1 || localUrl.indexOf("localhost") > -1){

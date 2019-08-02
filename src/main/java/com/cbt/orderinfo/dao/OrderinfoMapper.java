@@ -679,11 +679,31 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	int batchUpdateDistribution(@Param("list") List<GoodsDistribution> goodsDistributionList);
-
+	
 	/**
 	 * 根据订单号查询送样订单
 	 * @param orderNo
 	 * @return
 	 */
 	int querySampleOrderInfoByOrderId(String orderNo);
+	/**运单已验货
+	 * @param shipno
+	 * @return
+	 */
+	List<Map<String,Object>> getOrderDataCheck(String shipno);
+	/**运单未验货
+	 * @param shipno
+	 * @return
+	 */
+	int getCheckOrderCount(String shipno);
+	/**
+	 * 根据id获取淘宝订单信息
+	 * @param shipno
+	 * @return
+	 */
+	public List<Tb1688OrderHistory> getTbGoodsData(@Param("checkOrderhid") String checkOrderhid);
+	
+	
+	Map<String,Object> getGoodsBrandAuthorization(String pid);
+	
 }

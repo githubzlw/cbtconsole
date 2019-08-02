@@ -1,15 +1,32 @@
 package com.cbt.warehouse.dao;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-import java.util.Map;
 
 public interface InventoryMapper {
+	/**锁定库存
+	 * @param map
+	 * @return
+	 */
+	int insertLockInventory(Map<String,String> map);
+	/**关联order_details_sku_match inventory_sku获取用户下单从规格id,库存数量
+	 * @param od_id
+	 * @return
+	 */
+	Map<String,Object> getInventoryByOrderDetialsId(String od_id);
+	
+	/**库存关联入库记录 插入storage_outbound_details记录
+	 * @param inventory
+	 * @return
+	 */
+	int insertStorageOutboundDetails(Map<String,String> inventory);
 	/**
 	 * 库存列表查询
 	 * @param map
@@ -112,4 +129,89 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	public int insertChangeBarcode(@Param("id") int id, @Param("old_barcode") String old_barcode, @Param("new_barcode") String new_barcode);
+	
+	
+	
+	/****************************************************************************************/
+	
+	/**库存变更记录表
+	 * @param inventory
+	 * @return
+	 */
+	int addInventoryChangeRecord(Map<String,String> inventory);
+	
+	
+	/**获取库存数量
+	 * @param inventory
+	 * @return
+	 */
+	Map<String,Object>  getInventory(Map<String,String> inventory);
+	
+	/**获取库存数量
+	 * @param inventory
+	 * @return
+	 */
+	Map<String,Object>  getInventoryByOdId(Map<String,String> inventory);
+	
+	/**获取库存数量
+	 * @param inventory
+	 * @return
+	 */
+	Map<String,Object>  getInventoryByid(String id);
+	
+	/**插入库存
+	 * @return
+	 */
+	int addInventory(Map<String,String> inventory);
+	
+	/**更新库存
+	 * @return
+	 */
+	int updateInventory(Map<String,String> inventory);
+	/**更新库存
+	 * @return
+	 */
+	int updateInventoryById(Map<String,String> inventory);
+	
+	
+	/**是否存在库存
+	 * @return
+	 */
+	Integer isExsisInventory(Map<String,String> inventory);
+	
+	
+	/**记录库存存入记录，用来统计当月库存金额
+	 * @param inventory
+	 * @return
+	int insertInventoryDetails(Map<String,String> inventory);
+	 */
+	
+	/**
+	 * @param inventory
+	 * @return
+	 */
+	Map<String,String> getOrderDetails(Map<String,String> map);
+	
+	/**入库
+	 * @param inventory
+	 * @return
+	 */
+	int insertInventoryDetailsSku(Map<String,String> inventory);
+	
+//	int addStorageOutboundDetails(Map<String,String> inventory);
+	
+	/**获取库存的1688数据
+	 * @param itemid
+	 * @param specid
+	 * @param skuid
+	 * @return
+	 */
+	Map<String,Object> getInventoryDetailSku(String inventory_sku_id);
+	
+	/**采购入库关联
+	 * @param map
+	 * @return
+	 */
+	int addIdRelationTable(Map<String,String> map);
+	
 }
