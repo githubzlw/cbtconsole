@@ -317,7 +317,8 @@
 
         //展示类别商品
         function showCategoryGoods(id) {
-            var url = "/cbtconsole/hotManage/queryGoodsByCategoryId?categoryId=" + id;
+            var webType = $("#web_size_type").val();
+            var url = "/cbtconsole/hotManage/queryGoodsByCategoryId?categoryId=" + id + "&webType=" + webType;
             window.open(url);
             //$('#hot_goods_iframe').empty();
             //$('#hot_goods_iframe').attr('src',url);

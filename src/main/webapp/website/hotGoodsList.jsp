@@ -696,13 +696,7 @@
                     <input type="button" class="but_edit_2" value="添加商品" onclick="addGoods('${categoryId}')"/>
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="button" class="but_edit_2" value="批量导入商品" onclick="querySearchGoods('${categoryId}')"/>
-                    <span>网站:
-                        <select id="web_size_type" style="height: 28px;width: 80px;">
-                            <option value="1">import</option>
-                            <option value="2">kids</option>
-                            <option value="3">pets</option>
-                        </select>
-                    </span>
+                    <input type="hidden" id="web_size_type" value="${webType}"/>
                 </div>
             </td>
         </tr>
