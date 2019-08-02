@@ -834,4 +834,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryAllOffLineReason();
     }
 
+    @Override
+    public String queryChTypeBySkuId(String skuId) {
+        return customGoodsMapper.queryChTypeBySkuId(skuId);
+    }
+
 }

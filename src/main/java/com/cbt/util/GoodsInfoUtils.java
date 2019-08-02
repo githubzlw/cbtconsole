@@ -286,6 +286,7 @@ public class GoodsInfoUtils {
             ipes.setPpIds(ites.getSkuPropIds().replace(",", "_"));
             ipes.setPrice(ites.getSkuVal().getActSkuCalPrice());
             ipes.setFianlWeight(ites.getFianlWeight());
+            ipes.setSpecId(ites.getSpecId());
             if (ites.getVolumeWeight() > 0) {
                 ipes.setVolumeWeight(ites.getVolumeWeight());
             } else {
