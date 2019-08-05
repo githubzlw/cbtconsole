@@ -529,6 +529,7 @@
         <th data-options="field:'stateInfo',width:120,align:'center'">操作</th>
         <th data-options="field:'authorizedInfo',width:120,align:'center',formatter:formatAuthorizedInfo">授权操作</th>
         <th data-options="field:'inputShopDescription',width:100,align:'center'">店铺描述</th>
+        <th data-options="field:'opsAction',width:100,align:'center',formatter:formatShopBrand">操作</th>
     </tr>
     </thead>
 </table>
@@ -746,6 +747,10 @@
 			return '未去问是否给授权';
 			break;
 		}
+    }
+
+    function formatShopBrand(val, row, index) {
+        return "<a target='_blank' href='/cbtconsole/ShopUrlC/shopBrandAuthorizationList?shopId=" + row.shopId + "'>设置店铺品牌</a>";
     }
     //授权标记操作
     function formatAuthorizedInfo(val, row, index) {

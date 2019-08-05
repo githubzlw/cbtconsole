@@ -17,6 +17,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.MD5Util;
+import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.ShopBrandAuthorization;
 import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
@@ -72,6 +73,7 @@ public class ShopUrlController {
     private static final String SHOP_GOODS_LOCAL_PATH_K = "K:/shopimages";
     private static final String SHOP_GOODS_SHOW_URL_J = "http://192.168.1.28:8399";
     private static final String SHOP_GOODS_LOCAL_PATH_J = "J:/shopimages";//J:/shopimages
+    private FtpConfig ftpConfig;
 
     @Autowired
     private IShopUrlService shopUrlService;
@@ -3699,7 +3701,7 @@ public class ShopUrlController {
     @RequestMapping("/shopBrandAuthorizationList")
     public ModelAndView shopBrandAuthorizationList(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView mv = new ModelAndView("shopBrandAuthorizationList");
-        if (UserInfoUtils.checkIsLogin(request)) {
+        if (!UserInfoUtils.checkIsLogin(request)) {
             mv.addObject("msgStr", "用户未登录");
             mv.addObject("show", 0);
             return mv;
@@ -3716,14 +3718,9 @@ public class ShopUrlController {
 
         try {
             List<ShopBrandAuthorization> brandAuthorizationList = shopUrlService.queryBrandAuthorizationByShopId(shopId);
-            if (brandAuthorizationList == null || brandAuthorizationList.size() == 0) {
-                mv.addObject("msgStr", "当前店铺无品牌录入!");
-                mv.addObject("show", 0);
-                mv.addObject("brandsNum", 0);
-            } else {
-                mv.addObject("brandAuthorizationList", brandAuthorizationList);
-                mv.addObject("brandsNum", brandAuthorizationList.size());
-            }
+            mv.addObject("brandAuthorizationList", brandAuthorizationList);
+            mv.addObject("brandsNum", brandAuthorizationList.size());
+            mv.addObject("show", 1);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("shopBrandAuthorizationList error:" + e.getMessage());
@@ -3738,11 +3735,10 @@ public class ShopUrlController {
     @RequestMapping(value = "/uploadBrandFile", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     public JsonResult uploadBrandFile(@RequestParam(value = "file", required = false) CommonsMultipartFile mf,
-                                      HttpServletRequest request, @RequestParam(value = "shopId", required = true) String shopId) {
+                                      HttpServletRequest request) {
         JsonResult json = new JsonResult();
 
         String today = DateFormatUtil.formatDateToStringByYear(new Date());
-        System.out.println("shopId:" + shopId);
         String imgUrl = "";
         try {
             Random random = new Random();
@@ -3757,7 +3753,7 @@ public class ShopUrlController {
                 String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
                 String saveFilename = EditorController.makeFileName(String.valueOf(random.nextInt(1000)));
                 // 本地服务器磁盘全路径
-                String localFilePath = "shopbrand/" + today + "/" + shopId + "/desc/" + saveFilename + fileSuffix;
+                String localFilePath = "shopbrand/" + today + "/desc/" + saveFilename + fileSuffix;
                 // 文件流输出到本地服务器指定路径
                 ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
                 // 检查图片分辨率
@@ -3773,6 +3769,89 @@ public class ShopUrlController {
         return json;
     }
 
+
+    @RequestMapping(value = "/saveBrandInfo", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public JsonResult saveBrandInfo(@RequestParam(value = "file", required = false) CommonsMultipartFile mf,
+                                    HttpServletRequest request) {
+        JsonResult json = new JsonResult();
+
+        // 获取配置文件信息
+        if (ftpConfig == null) {
+            ftpConfig = GetConfigureInfo.getFtpConfig();
+        }
+        String shopId = request.getParameter("shopId");
+        String brandId = request.getParameter("brandId");
+        String brandName = request.getParameter("brandName");
+        String inAuthorizeState = request.getParameter("inAuthorizeState");
+        String termOfValidity = request.getParameter("termOfValidity");
+        String certificateFile = request.getParameter("certificateFile");
+        if (StringUtils.isBlank(shopId) || StringUtils.isBlank(brandName)
+                || StringUtils.isBlank(inAuthorizeState)) {
+            json.setOk(false);
+            json.setMessage("请输参数不完整");
+            return json;
+        } else if ("1".equals(inAuthorizeState)) {
+            if (StringUtils.isBlank(termOfValidity)) {
+                json.setOk(false);
+                json.setMessage("请输入有效期");
+                return json;
+            } else if (StringUtils.isBlank(certificateFile)) {
+                json.setOk(false);
+                json.setMessage("请上传文件");
+                return json;
+            }
+        }
+        try {
+            // 上传文件
+            if (certificateFile.contains("192.168.")) {
+                String localFilePath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getLocalDiskPath());
+                File localFile = new File(localFilePath);
+                String remoteShowPath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getRemoteShowPath());
+                String remoteLocalPath = certificateFile.replace(ftpConfig.getLocalShowPath(), FtpConfig.REMOTE_LOCAL_PATH);
+                boolean isSuccess = UploadByOkHttp.uploadFile(localFile, remoteLocalPath, 1);
+                if (!isSuccess) {
+                    isSuccess = UploadByOkHttp.uploadFile(localFile, remoteLocalPath, 1);
+                }
+                if (isSuccess) {
+                    isSuccess = UploadByOkHttp.uploadFile(localFile, remoteLocalPath, 0);
+                    if (!isSuccess) {
+                        isSuccess = UploadByOkHttp.uploadFile(localFile, remoteLocalPath, 0);
+                    }
+                }
+                if (isSuccess) {
+                    ShopBrandAuthorization authorization = new ShopBrandAuthorization();
+                    authorization.setAuthorizeState(Integer.valueOf(inAuthorizeState));
+                    authorization.setBrandName(brandName);
+                    authorization.setShopId(shopId);
+                    String fileName = localFilePath.substring(localFilePath.lastIndexOf("/") + 1);
+                    authorization.setCertificateFile(fileName);
+                    authorization.setLocalPath(localFilePath);
+                    authorization.setRemotePath(remoteShowPath);
+                    if (StringUtils.isBlank(brandId) && Integer.valueOf(brandId) > 0) {
+                        authorization.setId(Integer.valueOf(brandId));
+                        shopUrlService.updateShopBrandAuthorization(authorization);
+                    } else {
+                        // 检查是否已经存在此品牌
+                        int checkCount = shopUrlService.checkBrandAuthorizationByName(shopId, brandName);
+                        if (checkCount > 0) {
+                            json.setOk(false);
+                            json.setMessage("已经存在此店铺品牌");
+                        } else {
+                            shopUrlService.insertIntoShopBrandAuthorization(authorization);
+                            json.setOk(true);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("saveBrandInfo error:" + e.getMessage());
+            e.printStackTrace();
+            LOG.error("saveBrandInfo error：", e);
+        }
+        return json;
+    }
 
     private float genFloatWidthTwoDecimalPlaces(float numVal) {
         BigDecimal bd = new BigDecimal(numVal);

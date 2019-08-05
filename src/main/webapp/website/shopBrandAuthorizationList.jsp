@@ -19,7 +19,69 @@
     <script type="text/javascript">
 
         function saveBrandInfo() {
+            var shopId = $("#in_shop_id").val();
+            var brandId = $("#in_brand_id").val();
+            var brandName = $("#in_brand_name").val();
+            var inAuthorizeState = $("#in_authorize_state").val();
+            var termOfValidity = $("#term_of_validity").val();
+            var certificateFile = $("#certificate_file").val();
+            if (shopId && brandId && brandName && inAuthorizeState) {
+                if (inAuthorizeState == 1 && !(termOfValidity || certificateFile)) {
+                    $.messager.alert("提醒", "请输入有效期或者上传文件", "info");
+                } else {
+                    if(!brandId){
+                        brandId= 0;
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "/cbtconsole/ShopUrlC/saveBrandInfo",
+                        data: {
+                            shopId: shopId,
+                            brandId: brandId,
+                            brandName: brandName,
+                            inAuthorizeState: inAuthorizeState,
+                            termOfValidity: termOfValidity,
+                            certificateFile:certificateFile
+                        },
+                        success: function (data) {
+                            $.messager.progress('close');
+                            if (data.ok) {
+                                closeDialog();
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+                            } else {
+                                $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                            }
+                        },
+                        error: function (res) {
+                            $.messager.alert("提醒", '保存错误，请联系管理员', "error");
+                        }
+                    });
+                }
+            } else {
+                $.message.alert("请输入完整数据");
+                return;
+            }
+        }
 
+        function uploadFile() {
+            $("#file_form").form('submit', {
+                type: "post",  //提交方式
+                url: "/cbtconsole/ShopUrlC/uploadBrandFile", //请求url
+                success: function (data) {
+                    var data = eval('(' + data + ')');
+                    if (data.ok) {
+                        closeDialog();
+                        $("#certificate_file").val(data.data);
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "上传错误，请联系管理员", "error");
+                }
+            });
         }
 
         function enterBrandInfo() {
@@ -42,7 +104,7 @@
 </c:if>
 <c:if test="${show > 0}">
 
-    <div id="enter_div_sty" class="easyui-dialog" data-options="modal:true" style="width: 888px; height: 300px;">
+    <div id="enter_div_sty" class="easyui-dialog" title="店铺品牌" data-options="modal:true" style="width: 888px; height: 300px;">
         <form id="form_enter" action="#" onsubmit="return false">
             <table>
                 <tr>
@@ -55,7 +117,7 @@
                     </tr>--%>
                 <tr id="brand_id_tr">
                     <td>品牌ID</td>
-                    <td><input id="in_brand_id" value="" style="width: 555px; height: 28px;"/></td>
+                    <td><input id="in_brand_id" value="0" style="width: 555px; height: 28px;"/></td>
                 </tr>
                 <tr>
                     <td>品牌名称</td>
@@ -63,11 +125,11 @@
                 </tr>
                 <tr>
                     <td>授权状态</td>
-                    <td><select id="in_authorizeS_state">
+                    <td><select id="in_authorize_state">
                         <option value="0">无授权</option>
-                        <option value="0">已授权</option>
-                        <option value="0">自有品牌</option>
-                        <option value="0">无需授权</option>
+                        <option value="1">已授权</option>
+                        <option value="2">自有品牌</option>
+                        <option value="3">无需授权</option>
                     </select></td>
                 </tr>
                 <tr>
@@ -77,12 +139,11 @@
                                onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></td>
                 </tr>
                 <tr>
-                    <td>授权文件</td>
+                    <td>授权文件<input id="certificate_file" type="hidden" value=""></td>
                     <td>
-                        <form style="margin-left: 44px;" id="singleFileForm" method="post"
-                              enctype="multipart/form-data">
+                        <form id="file_form" onsubmit="return false;">
                             <input id="file" type="file" name="file" multiple="false">
-                            <button>上传</button>
+                            <input type="button" value="上传"/>
                         </form>
                     </td>
                 </tr>
@@ -98,7 +159,7 @@
         </form>
     </div>
 
-    <h1>店铺【${shopId}】品牌数据</h1>
+    <h1 style="text-align: center;">店铺【${shopId}】品牌数据</h1>
     <table id="shop_brand_table" border="1" cellpadding="1"
            cellspacing="0" align="center">
         <thead>

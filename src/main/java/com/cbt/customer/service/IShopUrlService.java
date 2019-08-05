@@ -367,6 +367,14 @@ public interface IShopUrlService {
     ShopBrandAuthorization queryBrandAuthorizationById(Integer brandId);
 
     /**
+     * 检查是否存在店铺品牌名称
+     * @param shopId
+     * @param brandName
+     * @return
+     */
+    int checkBrandAuthorizationByName(String shopId, String brandName);
+
+    /**
      * 插入品牌和授权信息
      * @param shopBrandAuthorization
      * @return

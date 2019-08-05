@@ -1,6 +1,7 @@
 package com.importExpress.mapper;
 
 import com.importExpress.pojo.ShopBrandAuthorization;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -19,6 +20,14 @@ public interface ShopUrlMapper {
      * @return
      */
     ShopBrandAuthorization queryBrandAuthorizationById(Integer id);
+
+     /**
+     * 检查是否存在店铺品牌名称
+     * @param shopId
+     * @param brandName
+     * @return
+     */
+    int checkBrandAuthorizationByName(@Param("shopId") String shopId, @Param("brandName") String brandName);
 
     /**
      * 插入品牌和授权信息

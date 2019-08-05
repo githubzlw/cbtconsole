@@ -111,6 +111,9 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 					String receiver_id = parseObject.getString("receiver_id");
 					bean.setReceiverID(StringUtils.equals(receiver_id, "UDSXBNQ5ARA76") ? "新("+receiver_id+")" : "旧("+receiver_id+")");
 					String mcFee = parseObject.getString("mc_fee");
+					if(StringUtils.isBlank(mcFee)){
+						mcFee = parseObject.getString("payment_fee");
+					}
 					bean.setTransactionFee(mcFee + " " + parseObject.getString("mc_currency"));
 					String mcGross = parseObject.getString("mc_gross");
 					bean.setTrackID(parseObject.getString("ipn_track_id"));
@@ -154,6 +157,9 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 						String name = parseObject.getString("payer_business_name");
 						bean.setUserid(StringUtils.isEmpty(name) ?  parseObject.getString("last_name") : name);
 					}
+				}
+				if("30702".equals(bean.getUserid())){
+					System.err.println();
 				}
 				list.add(bean);
 			}

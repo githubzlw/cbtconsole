@@ -31,6 +31,11 @@
         from shop_brand_authorization where id = #{id}
     </select>
 
+    <select id="checkBrandAuthorizationByName" resultType="java.lang.Integer">
+        select count(0) from shop_brand_authorization
+        where shop_id = #{shopId} and brand_name = #{brandName}
+    </select>
+
     <insert id="insertIntoShopBrandAuthorization" parameterType="com.importExpress.pojo.ShopBrandAuthorization">
         insert into shop_brand_authorization(shop_id,shop_name,brand_name,authorize_state,term_of_validity,
         certificate_file,local_path,remote_path)

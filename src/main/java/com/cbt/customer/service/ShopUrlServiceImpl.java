@@ -282,6 +282,11 @@ public class ShopUrlServiceImpl implements IShopUrlService {
     }
 
     @Override
+    public int checkBrandAuthorizationByName(String shopId, String brandName) {
+        return shopUrlMapper.checkBrandAuthorizationByName(shopId, brandName);
+    }
+
+    @Override
     public int insertIntoShopBrandAuthorization(ShopBrandAuthorization shopBrandAuthorization) {
         return shopUrlMapper.insertIntoShopBrandAuthorization(shopBrandAuthorization);
     }
