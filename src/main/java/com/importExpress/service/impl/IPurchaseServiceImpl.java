@@ -913,6 +913,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		IOrderwsServer server1 = new OrderwsServer();
 		DecimalFormat df = new DecimalFormat("########0.00");
 		List<PurchasesBean> pbList = new ArrayList<PurchasesBean>();
+		boolean unuseInventory = true;
 		try{
 			//获取订单信息
 			OrderBean ob = pruchaseMapper.getOrders(orderno);
@@ -1030,6 +1031,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					fo = orderinfoMapper.getFreightInfo(countryNameCn, isEub);
 				}
 			}
+			
 			for(Map<String, String> map:list){
 				String rkgoodstatus=map.get("rkgoodstatus").toString().trim();
 				if(good==5201314 && (StringUtils.isStrNull(rkgoodstatus) || "0".equals(rkgoodstatus) || "1".equals(rkgoodstatus))){
@@ -1049,6 +1051,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				}
 				String sql = "",tb_remark = "";
 				PurchasesBean purchaseBean = new PurchasesBean();
+				unuseInventory = true;
 				int straight_flag=0;
 				String address="";
 				//获取商品供应商直发地址
@@ -1065,9 +1068,18 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				setInvoiceVaue(purchaseBean, fileByOrderid);
 				String inventoryRemark="";
 				//查询该商品是否有使用库存
-				String useInventory=pruchaseMapper.getUseInventory(purchaseBean.getOd_id());
-				if(StringUtil.isNotBlank(useInventory)){
-					inventoryRemark="该商品使用了【"+useInventory+"】件库存";
+				purchaseBean.setLock_remaining("0");
+				Map<String, Object> useInventoryMap=pruchaseMapper.getUseInventory(purchaseBean.getOd_id());
+				if(useInventoryMap != null) {
+					String useInventory = com.cbt.util.StrUtils.object2Str(useInventoryMap.get("lock_remaining"));
+					if(StringUtil.isNotBlank(useInventory)){
+						inventoryRemark="该商品使用了【"+useInventory+"】件库存";
+						purchaseBean.setLock_remaining(useInventory);
+						unuseInventory = false;
+						String in_id = com.cbt.util.StrUtils.object2Str(useInventoryMap.get("in_id"));
+						purchaseBean.setIn_id(in_id);
+					}
+					
 				}
 				purchaseBean.setInventoryRemark(inventoryRemark);
 				//查看商品关联的1688订单号
@@ -1158,7 +1170,9 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				}
 				purchaseBean.setNewValue(goods_p_url.replace("'", " "));
 				//获取商品库存数据
-				getInventoryCount(map, purchaseBean);
+				if(unuseInventory) {
+					getInventoryCount(map, purchaseBean);
+				}
 				getSourceOfGoods(map, purchaseBean);
 				String cn = map.get("companyname");
 				purchaseBean.setCompanyName(StringUtil.isNotBlank(cn)?cn:"无");
@@ -1620,11 +1634,16 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		if(inventory != null) {
 			purchaseBean.setSkuid((String)inventory.get("skuid"));
 			purchaseBean.setSpecid((String)inventory.get("specid"));
-			purchaseBean.setInventory(com.cbt.util.StrUtils.object2NumStr(inventory.get("can_remaining")));
+			String can_remaining = com.cbt.util.StrUtils.object2NumStr(inventory.get("can_remaining"));
+			purchaseBean.setInventory(can_remaining);
 			purchaseBean.setInventorySkuId(com.cbt.util.StrUtils.object2NumStr(inventory.get("inventory_id")));
+			purchaseBean.setRemaining(can_remaining);
+			purchaseBean.setNew_remaining(can_remaining);
 		}else {
 			purchaseBean.setInventory("0");
 			purchaseBean.setInventorySkuId("0");
+			purchaseBean.setRemaining("0");
+			purchaseBean.setNew_remaining("0");
 		}
 		/*String nm = null;
 		try {
