@@ -388,9 +388,9 @@
     		$(".refresh_color").attr("disabled",true);
             var url = "https://www.import-express.com/popProducts/refreshHotJson?html=1";
             if(webType == 2){
-                url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson";
-            } else if(webType == 3){
-                url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson";
+                url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?html=1";
+            }else if(webType == 3){
+                url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?html=1";
             }
     		$.ajax({
     			type : "POST",
@@ -451,7 +451,7 @@
                             <select id="web_size_type" style="height: 28px;width: 80px;">
                                 <option value="1">import</option>
                                 <option value="2">kids</option>
-                                <option value="3">pets </option>
+                                <option value="3">pets</option>
                             </select>
                         </span>
             <input class="refresh_color" type="button" value="刷新最新热卖商品到线上（原json）" onclick="refreshOnlineGoodsJson()" style="cursor:pointer"/>

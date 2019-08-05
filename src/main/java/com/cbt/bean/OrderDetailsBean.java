@@ -146,6 +146,15 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private int isBenchmark;
 	private String noChnageRemark;
 	private String locationNum;
+	private int downSample;//拆样数量
+
+	public int getDownSample() {
+		return downSample;
+	}
+
+	public void setDownSample(int downSample) {
+		this.downSample = downSample;
+	}
 
 	public String getLocationNum() {
 		return locationNum;

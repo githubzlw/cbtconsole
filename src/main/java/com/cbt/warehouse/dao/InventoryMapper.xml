@@ -343,13 +343,13 @@
     select odsm.goods_pid, odsm.specid,odsm.skuid,isku.can_remaining,isku.id as inventory_id from 
      order_details_sku_match odsm left join inventory_sku isku on (odsm.goods_pid=isku.goods_pid 
     and odsm.specid=isku.specid  and odsm.skuid=isku.skuid )
-    where odsm.order_details_id=#{odid}
+    where odsm.skuid!='' and odsm.specid!='' and odsm.order_details_id=#{odid} limit 1
     </select>
     
     <select id="getInventoryDetailSku" resultType="java.util.Map">
     select 
     1688_orderid,good_name,goods_p_pid,sku,1688_shipno,admid,goods_p_img,goods_p_url,goods_p_skuid,goods_p_specid,goods_p_price
-    from inventory_details_sku where type=0 and inventory_id=#{inventory_sku_id} order by id desc limit 1
+    from inventory_details_sku where type=0 and inventory_id=#{inventory_sku_id} order by id desc 
     limit 1
     </select>
     <insert id="addIdRelationTable">

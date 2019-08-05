@@ -2,6 +2,8 @@ package com.cbt.pojo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 库存表实体类
  * 
@@ -99,7 +101,12 @@ public class Inventory {
 	 *  2019-08-01-sj add
 	 */
 	private String specid;
-	
+	private String final_weight;//商品最终重量
+	private List<String> skuList;//商品详情集合
+	private String entype;//商品详情集合
+	private int is_sold_flag;//商品详情集合
+	private String volume_weight;//商品详情集合
+	private String weight;//商品详情集合
 	public int getType() {
 		return type;
 	}

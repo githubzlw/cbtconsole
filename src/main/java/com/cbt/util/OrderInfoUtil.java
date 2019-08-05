@@ -139,9 +139,9 @@ public class OrderInfoUtil {
                 .add(new BigDecimal(orderBeanTemp.getProcessingfee()))
                 .add(new BigDecimal(orderBeanTemp.getActual_lwh()));
         // 排除计算误差
-        orderBeanTemp.setExtra_freight(new BigDecimal(orderBeanTemp.getExtra_freight())
+        /*orderBeanTemp.setExtra_freight(new BigDecimal(orderBeanTemp.getExtra_freight())
                 .add(new BigDecimal(orderBeanTemp.getPay_price()).subtract(needPay))
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());*/
         return odbeanNew;
     }
 
