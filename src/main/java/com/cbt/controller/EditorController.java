@@ -98,7 +98,7 @@ public class EditorController {
         if (offLineMap.size() == 0) {
             List<Map<String, String>> mapList = customGoodsService.queryAllOffLineReason();
             for (Map<String, String> tempMap : mapList) {
-                offLineMap.put(tempMap.get("unsellablereason_id"), tempMap.get("unsellablereason_name"));
+                offLineMap.put(String.valueOf(tempMap.get("unsellablereason_id")), tempMap.get("unsellablereason_name"));
             }
             mapList.clear();
         }
