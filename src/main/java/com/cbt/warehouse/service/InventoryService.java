@@ -6,6 +6,8 @@ import java.util.Map;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.InventoryData;
+import com.cbt.website.bean.InventoryDetailsWrap;
 
 public interface InventoryService {
 	/**库存减少操作
@@ -29,7 +31,7 @@ public interface InventoryService {
 	 * @param map
 	 * @return
 	 */
-	public List<Inventory> getIinOutInventory(Map<Object, Object> map);
+	public List<InventoryData> getIinOutInventory(Map<Object, Object> map);
 	public int updateSourcesLog(int in_id, String name, String old_sku, String old_url, String new_barcode, String old_barcode, int new_remaining, int old_remaining, String remark);
 	/**
 	 * 手动录入库存
@@ -91,7 +93,7 @@ public interface InventoryService {
 	 * @param map
 	 * @return
 	 */
-	public List<Inventory> getIinOutInventoryCount(Map<Object, Object> map);
+	public int getIinOutInventoryCount(Map<Object, Object> map);
 
 	/**
 	 * 查询分类数据
@@ -135,11 +137,29 @@ public interface InventoryService {
 	 * @return
 	 * @return int
 	 */
-	public int recordLossInventory(Map<Object, Object> map);
+	public int recordLossInventory(Map<String, Object> map);
 	/**
 	 * 库存管理页面统计最近30天新产生的库存
 	 * @return
 	 */
 	public String getNewInventory();
+	
+	/**库存报损调整
+	 * @param map
+	 * @return
+	 */
+	public Map<String,Object> reportLossInventory(Map<String, Object> map);
+	
+	/**库存明细
+	 * @param map
+	 * @return
+	 */
+	List<InventoryDetailsWrap> inventoryDetails(Map<String, Object> map);
+	
+	/**库存明细数量
+	 * @param map
+	 * @return
+	 */
+	int inventoryDetailsCount(Map<String, Object> map);
 
 }

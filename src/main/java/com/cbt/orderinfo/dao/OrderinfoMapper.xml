@@ -1439,7 +1439,7 @@
 	
     </select>
      <select id="getCheckOrderCount" resultType="Integer">
-     select count(id) FROM order_details WHERE (shipno=#{shipno} OR INSTR(re_shipnos ,#{shipno})>0) AND  LENGTH(orderid)&lt;22) 
+     select count(id) FROM order_details WHERE (shipno=#{shipno} OR INSTR(re_shipnos ,#{shipno})>0) AND  LENGTH(orderid)&lt;22
     </select>
  <select id="getTbGoodsData" resultType="com.cbt.bean.Tb1688OrderHistory">
 		select id,odid,tbOr1688,orderid,orderdate,seller,totalprice,orderstatus,itemname,itemid,itemprice,itemqty,sku,shipno,shipper

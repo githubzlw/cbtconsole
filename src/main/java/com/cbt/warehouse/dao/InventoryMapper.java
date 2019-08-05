@@ -8,6 +8,9 @@ import org.apache.ibatis.annotations.Param;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.InventoryData;
+import com.cbt.website.bean.InventoryDetails;
+import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 
 public interface InventoryMapper {
@@ -32,7 +35,7 @@ public interface InventoryMapper {
 	 * @param map
 	 * @return
 	 */
-	public List<Inventory> getIinOutInventory(Map<Object, Object> map);
+	public List<InventoryData> getIinOutInventory(Map<Object, Object> map);
 	public int isExitBarcode(@Param("barcode") String barcode);
 	/**
 	 * 根据ID获取库存
@@ -61,7 +64,7 @@ public interface InventoryMapper {
 	 * @return
 	 * @return int
 	 */
-	public int recordLossInventory(Map<Object, Object> map);
+	public int recordLossInventory(Map<String, Object> map);
 	/**
 	 * 手动录入库存
 	 * @param map
@@ -106,7 +109,7 @@ public interface InventoryMapper {
 	 * @param map
 	 * @return
 	 */
-	public List<Inventory> getIinOutInventoryCount(Map<Object, Object> map);
+	public int getIinOutInventoryCount(Map<Object, Object> map);
 
 	public List<AliCategory> searchAliCategory(@Param("type") String type, @Param("cid") String cid);
 
@@ -139,6 +142,11 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int addInventoryChangeRecord(Map<String,String> inventory);
+	/**库存变更记录表
+	 * @param inventory
+	 * @return
+	 */
+	int addInventoryChangeRecordByInventoryid(Map<String,String> inventory);
 	
 	
 	/**获取库存数量
@@ -197,6 +205,11 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int insertInventoryDetailsSku(Map<String,String> inventory);
+	/**入库
+	 * @param inventory
+	 * @return
+	 */
+	int addInventoryDetailsSku(Map<String,String> inventory);
 	
 //	int addStorageOutboundDetails(Map<String,String> inventory);
 	
@@ -214,4 +227,19 @@ public interface InventoryMapper {
 	 */
 	int addIdRelationTable(Map<String,String> map);
 	
+	/**库存报损记录
+	 * @param record
+	 * @return
+	 */
+	int addLossInventoryRecord(LossInventoryRecord record);
+	/**库存明细
+	 * @param map
+	 * @return
+	 */
+	List<InventoryDetails> inventoryDetails(Map<String, Object> map);
+	/**库存明细数量
+	 * @param map
+	 * @return
+	 */
+	int inventoryDetailsCount(Map<String,Object> map);
 }

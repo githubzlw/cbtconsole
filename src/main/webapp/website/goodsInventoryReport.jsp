@@ -9,7 +9,7 @@
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/report/datechoise.js"></script>
-<title>商品库存盘点</title>
+<title>库存清单</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet" href="script/style.css" type="text/css">
 <link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
@@ -25,6 +25,36 @@
 var updateSourcesUrl = "/cbtconsole/inventory/updateSources"; //盘点库存
 </script>
 <style type="text/css">
+		.wraps em,i{font-style: normal;display: inline-block;float:left;}
+		.clearfix:before,.clearfix:after{content:"";display:table;}
+		.clearfix:after{clear:both;}
+		.clearfix{zoom:1;} 
+		.wraps{border:2px solid #999;width:1047px;margin:0 auto;padding:20px;position: relative;display:none;/* top:500px;z-index: 999;  */   background-color: #e0ecff;}
+		.wraps span{display:inline-block;width:100px;float:left;}
+		.wraps input[type="text"]{border:1px solid #999;background-color: #fff;height:28px;border-radius: 4px;width:205px;float:left;}
+        .wraps input[type="radio"]{width:18px;height:18px;position: relative;top:2px;}
+        .wraps label{margin-right:10px;}
+        .wrap6{overflow:hidden;}
+        .wrap6 span,.wraps .reasons{float:left;position: relative;}
+        .w235{width:300px;}
+        .wraps .wrap{margin-bottom:40px;overflow:hidden;}
+        .wrap7 img{width:250px;height: 250px;}
+        .wrap2 em{width:645px;}
+        .wrap7 {float:right;position: relative;top:-30px;}
+        .left{float:left;}
+        p{text-align: center;}
+        .other{position: absolute;top:15px;right:-222px;}
+        .wrap8{text-align: center;}
+        .submit_button{border:1px solid #999;background-color:#fff;padding:0 80px; line-height:28px;border-radius: 4px;}
+.button_c{
+border-radius: 5px;
+background: #e7f1ff;
+}
+.button_top{
+margin-top: 3px;
+}
+.av_count{margin-left: 70px;}
+.top_title{font-size: 15px;font-weight: bold;}
 .displaynone{display:none;}
 .item_box{display:inline-block;margin-right:52px;}
 .item_box select{width:150px;}
@@ -89,94 +119,28 @@ table.imagetable td {
 %>
 <script type="text/javascript">
 $(function(){
-	setDatagrid();
-	var sku='<%=sku%>';
-    var pid='<%=pid%>';
-    if(sku != null && sku != '' && sku != 'null'){
-	   	 console.log("sku="+sku);
-	   	 $("#sku").val(sku);
-	   	 doQuery(1);
-    }
-    if(pid != null && pid != '' && pid != 'null'){
-        console.log("pid="+pid);
-        $("#goods_pid").val(pid);
-        doQuery(1);
-    }
-	$.ajax({
-		url : "/cbtconsole/inventory/searchAliCategory",
-		data:{
-        	  "type":"type1",
-        	  "cid":"0"
-        	  },
-		type : "post",
-		success :function(data){
-			if(data){
-				var reportDetailList=data.data.aliCategoryList;
-				htm_='';
-				for(var i=0;i<reportDetailList.length;i++){
-                	htm_ += "<option value='"+reportDetailList[i].category+"'> "+reportDetailList[i].category+"";
-                	htm_ += '</option>            ';
-        		}
-				$('#type1').append(htm_);
-			}
-		}
-	});
 	$('#dlg').dialog('close');
 	$('#dlg1').dialog('close');
-    $('#dlg3').dialog('close');
-// 	var opts = $("#easyui-datagrid").datagrid("options");
-// 	opts.url = "/cbtconsole/StatisticalReport/searchGoodsInventoryInfo";
+	$('#dlg2').dialog('close');
+	$('#dlg3').dialog('close'); 
+	$('#dlg4').dialog('close');
+	setDatagrid();
+	//doQuery(1);
 	
+	$("#query_button").click(function(){
+		doQuery(1);
+		
+	});
 })
-
-function selecType2(type,cid){
-		if(type=="type1"){
-			$("#type2").html("");
-			$("#type3").html("");
-			$("#type4").html("");
-			$("#type5").html("");
-		}else if(type=="type2"){
-			$("#type3").html("");
-			$("#type4").html("");
-			$("#type5").html("");
-		}else if(type=="type3"){
-			$("#type4").html("");
-			$("#type5").html("");
-		}else if(type=="type4"){
-			$("#type5").html("");
-		}
-		$.ajax({
-			url : "/cbtconsole/inventory/searchAliCategory",
-			data:{
-	        	  "type":type,
-	        	  "cid":cid
-	        	  },
-			type : "post",
-			async:false,
-			success :function(data){
-				if(data){
-					$("#"+type+"").html("");
-					var reportDetailList=data.data.aliCategoryList;
-					for(var i=0;i<reportDetailList.length;i++){
-	        			htm_='';
-	                	htm_ = '<option value='+reportDetailList[i].category+'> '+reportDetailList[i].category+'';
-	                	htm_ += '</option>            ';
-		        		$('#'+type+'').append(htm_);
-	        		}
-				}
-			}
-		});
-	}
-	
 
 function setDatagrid() {
 		$('#easyui-datagrid').datagrid({
-			title : '商品库存盘点',
+			title : '库存清单',
 			//iconCls : 'icon-ok',
 			width : "100%",
 			fit : true,//自动补全 
 			pageSize : 20,//默认选择的分页是每页20行数据
-			pageList : [ 20],//可以选择的分页集合
+			pageList : [20],//可以选择的分页集合
 			nowrap : false,//设置为true，当数据长度超出列宽时将会自动截取
 			striped : true,//设置为true将交替显示行背景。
 // 			collapsible : true,//显示可折叠按钮
@@ -193,65 +157,30 @@ function setDatagrid() {
 		//行数
 		});
 	}
-	
+
 function doQuery(page) {
-	var have_barcode=$('#have_barcode').combobox('getValue');
-    var valid=$('#valid').combobox('getValue');
-    var goodscatid=$('#goodscatid').combobox('getValue');
-	var flag =$('#flag').val();
-	var type =$('#type').val();
-	var goodinfo =$('#goodinfo').val();
-    var goods_pid =$('#goods_pid').val();
-	var scope =$('#scope').val();
-	var count =$('#count').val();
-	var sku =$('#sku').val()
-	var barcode =$('#barcode').val();
-	var type1 =$('#type1').val();
-	var type_="0";
-	var startdate = $("#startdate").val();
-	var enddate = $("#enddate").val();
-	if(type1!=null){
-		type_=type1;
-	}
+	var goods_name = $('#query_goods_name').val();
+	var goods_pid = $('#query_goods_pid').val();
+    var goodscatid = $('#query_goodscatid').combobox('getValue');
+	var minintentory = $('#query_minintentory').val();
+	var maxintentory = $('#query_maxintentory').val();
+	
 	$("#easyui-datagrid").datagrid("load", {
 	  "page":page,
-  	  "type":type,
-  	  "goodinfo":goodinfo,
-  	  "scope":scope,
-  	  "count":count,
-  	  "type_":type_,
-  	  "sku":sku,
-  	  "barcode":barcode,
-  	  "flag":flag,
-  	  "have_barcode":have_barcode,
-  	  "startdate":startdate,
-  	  "enddate":enddate,
 	  "goods_pid":goods_pid,
-        "valid":valid,
-        "goodscatid":goodscatid
+	  "maxintentory":maxintentory,
+	  "minintentory":minintentory,
+      "goodscatid":goodscatid
 
     });
 }
 
 function doReset(){
-	$("#flag").val("-1");
-	$("#type").val("remaining");
-	$("#scope").val("0");
-	$("#count").val("");
-	$("#goodinfo").val("");
-	$("#sku").val("");
-	$("#barcode").val("");
-	$("#type1").val("0");
-	$("#type2").val("");
-	$("#type3").val("");
-	$("#type4").val("");
-	$("#type5").val("");
-	$("#goods_pid").val();
-	$('#have_barcode').combobox('setValue','全部');
-    $('#valid').combobox('setValue','-1');
-	$("#startdate").val("");
-	$("#enddate").val("");
-    $('#goodscatid').combobox('setValue','全部');
+	$('#query_goods_name').val("");
+	$('#query_goods_pid').val("");
+	$('#query_minintentory').val("");
+	$('#query_maxintentory').val("");
+    $('#query_goodscatid').combobox('setValue','0');
 }
 
 function update_inventory(flag,id,barcode,old_remaining,remark) {
@@ -356,6 +285,39 @@ function topCenter(msg){
 			bottom:''
 		}
 	});
+}
+/* 
+*type： 0-单个产品库存进去  1- 头部按钮进去
+*index 产品库存序号
+*in-id 库存表id
+*/
+function updateInventory(type,index,in_id){
+	$("#index_igoodsID").val('');
+	$("#index_iskuid").val('');
+	$("#index_ispecid").val('');
+	$("#index_igoodsname").html('');
+	$("#index_isku").html('');
+	$("#index_iremaining").html('');
+	$("#index_icanremaining").html('');
+	$("#index_ichangcount").val('');
+	$("#index_iremark").val('');
+	$("#index_iimg").attr('src','');
+	$("#index_in_id").val('0');
+	
+	if(index && index!=''){
+		var trd = $("#datagrid-row-r2-2-"+index);
+		$("#index_igoodsID").val(trd.find(".datagrid-cell-c2-goodsPid").text());
+		$("#index_iskuid").val(trd.find(".emskuid").text());
+		$("#index_ispecid").val(trd.find(".emspecid").text());
+		$("#index_igoodsname").html(trd.find(".datagrid-cell-c2-goodsName").text());
+		$("#index_isku").html(trd.find(".emsku").text());
+		$("#index_iremaining").html(trd.find(".datagrid-cell-c2-remaining").text());
+		$("#index_icanremaining").html(trd.find(".datagrid-cell-c2-canRemaining").text());
+		$("#index_iimg").attr("src",trd.find(".datagrid-cell-c2-carImg img").attr("src"));
+		$("#index_ichangcount").val('0');
+		$("#index_in_id").val(in_id);
+	}
+	$('#dlg4').dialog('open');
 }
 
 //导出报表
@@ -568,7 +530,49 @@ function cance2(){
     $("#dBarcode").val("");
     $("#dAmount").val("");
 }
-
+/*
+ * 库存报损
+ */
+function addLoss(){
+   var igoodsId=$("#index_igoodsID").val();
+   var iskuid= $("#index_iskuid").val();
+   var ispecid= $("#index_ispecid").val();
+   var changeNumber= $("#index_ichangcount").val();
+   var remark=$("#index_iremark").val();
+	var  change_type = "0"; 
+   $(".radio_change").each(function(){
+	   if($(this).is(':checked')){
+		   change_type = $(this).val();
+	   }
+   })
+    var in_id = $("#index_in_id").val();
+    jQuery.ajax({
+        url:"/cbtconsole/inventory/addLoss",
+        data:{
+            "igoodsId":igoodsId,
+            "iskuid":iskuid,
+            "ispecid":ispecid,
+            "changeNumber":changeNumber,
+			"remark":remark,
+			"in_id":in_id,
+			"change_type":change_type
+        },
+        type:"post",
+        success:function(data){
+            var status = data.status
+            if(status == 200){
+                topCenter("操作成功");
+                $('#dlg4').dialog('close');
+                $('#easyui-datagrid').datagrid('reload');
+            }else{
+                topCenter("修改库存失败:"+data.reason);
+            }
+        },
+        error:function(e){
+            topCenter("修改库存失败");
+        }
+    });
+}
 function delInventorySources(){
    var dId=$("#dId").val();
    var dPid= $("#dPid").val();
@@ -613,10 +617,9 @@ function delete_inventory(id,goods_pid,barcode,amount){
     $('#dlg2').dialog('open');
     $("#delRemark").textbox('setValue','');
 }
-
 </script>
 </head>
-<body text="#000000" onload="$('#dlg').dialog('close');$('#dlg1').dialog('close');$('#dlg2').dialog('close');$('#dlg3').dialog('close'); doQuery(1);">
+<body text="#000000" >
     	<div class="mod_pay3" style="display: none;" id="big_img">
 			
 		</div>
@@ -726,7 +729,7 @@ function delete_inventory(id,goods_pid,barcode,amount){
 				</div>
 			</form>
 		</div>
-	<div id="top_toolbar" style="padding: 5px; height: auto">
+	<%-- <div id="top_toolbar" style="padding: 5px; height: auto">
 		<div style="margin-left:10px;">
 			<span style="font-size:13px;font-weight:bold">最近30天新产生的库存(数量/金额):</span><span class="easyui-label" data-options="iconCls:'icon-font',plain:true" id="tj_info_1" style="font-size:20px;width:35px;margin-right:100px">0</span>
 			<span style="font-size:13px;font-weight:bold">最近30天销售掉的库存(数量/金额):</span><span class="easyui-label" data-options="iconCls:'icon-font',plain:true" id="tj_info_2" style="font-size:20px;width:35px;margin-right:100px">0</span>
@@ -796,34 +799,130 @@ function delete_inventory(id,goods_pid,barcode,amount){
 <!-- 		<a href="/cbtconsole/website/inventory_update_log.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">库存盘点记录</a> -->
 		<a href="/cbtconsole/website/inventory_delete_log.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">库存删除记录</a>
 		<a href="/cbtconsole/website/loss_inventory_log.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">库存损耗列表</a>
+	</div> --%>
+	<div class="wraps easyui-dialog" id="dlg4" title="报损调整" style="width:1047px;padding:10px;autoOpen:false;closed:true;">
+			<form  method="post" >
+		<div class="wrap wrap1">
+			<span>产品 ID</span>
+			<input type="text" name="igoodsId" id="index_igoodsID" readonly="readonly">
+			<span style="margin-left: 40px;">SKUID</span>
+			<input type="text" name="iskuid" id="index_iskuid" readonly="readonly">
+			<span style="margin-left: 40px;">SPECID</span>
+			<input type="text" name="ispecid" id="index_ispecid" readonly="readonly">
+		</div>
+		<div class="wrap wrap2">
+			<span>产品名称</span>
+			<em id="index_igoodsname"></em>
+		</div>
+		<div class="wrap-overflow clearfix">
+			<div class="left">
+				<div class="wrap wrap3">
+					<span>产品规格</span>
+					<em class="w235" id="index_isku"></em>
+				</div>
+				<div class="wrap wrap4">
+					<span class="al_count" >当前库存数量</span>
+					<i id="index_iremaining">0</i>
+					<span class="av_count" >当前可用库存数量</span>
+					<i id="index_icanremaining">0</i>
+				</div>
+				<div class="wrap wrap5">
+					<span>调整当前库存数量为</span>
+					<input type="text" name="changeNumber" id="index_ichangcount">
+				</div>
+			</div>
+			<div class="wrap7">
+				<p>产品图</p>
+				<img src="https://img1.import-express.com/importcsvimg/importimg/559138175864/8063cce6-2b0d-47c9-abe5-95e2b7ec1032_179.png" alt="" id="index_iimg">
+			</div>
+		</div>
+		
+		<div class="wrap wrap6">
+			<span>备注原因</span>
+			<div class="reasons w235">
+			<!-- 0  损坏 1 遗失  3 添加 4 补货  5 漏发 7 其他原因 -->
+				<label>
+					<input type="radio" name="change_type" value="0" checked="checked" class="radio_change">
+					损坏
+				</label>
+				<label >
+					<input type="radio" name="change_type" value="1" class="radio_change">
+					遗失
+				</label>
+				<label>
+					<input type="radio" name="change_type" value="3" class="radio_change">
+					添加
+				</label>
+				<label>
+					<input type="radio" name="change_type" value="4" class="radio_change">
+					补货
+				</label>
+				<label>
+					<input type="radio" name="change_type" value="5" class="radio_change">
+					漏发
+				</label>
+				<label>
+					<input type="radio" name="change_type" value="7">
+					其他
+				</label>
+				<input type="text" class="other" name="remark" id="index_iremark" value="">
+			</div>
+		</div>
+		<div class="wrap wrap8">
+		<input type="hidden" value="" name="in_id" id="index_in_id">
+			<input value="保存" type="button" class="submit_button" onclick="addLoss()">
+		</div>
+		</form>
+	</div>
+	<div  id="top_toolbar" style="padding: 5px; height: auto">
+	<div>
+	<span class="top_title">产品检索</span>&nbsp;&nbsp;&nbsp;&nbsp;
+	
+	<!-- <span>产品名称<input type="text" id="query_goods_name" value=""></span>&nbsp;&nbsp; -->
+	<span>产品ID<input type="text" id="query_goods_pid" value=""></span>&nbsp;&nbsp;
+	<select class="easyui-combobox" name="goodscatid" id="query_goodscatid" style="width:15%;" 
+	data-options="label:'产品类别:',Height:'2000px',valueField:'goodsCatid',
+                    textField:'categoryName', value:'0',selected:true,
+                    url: '/cbtconsole/StatisticalReport/getAllInventory',
+                    method:'get'">
+	</select>&nbsp;&nbsp;
+	<span>库存量大于<input type="text" id="query_minintentory" value=""></span>&nbsp;&nbsp;
+	<span>库存量小于<input type="text" id="query_maxintentory" value=""></span>&nbsp;&nbsp;
+	<input type="button" value="查询" class="button_c" id="query_button"/>
+	
+	</div>
+	
+	<br><br>
+	<div>
+	<span class="top_title">库存修正</span>&nbsp;&nbsp;&nbsp;&nbsp;
+	<span><input type="button" class="button_c" id="add_inventory" value="录入库存" onclick="openInventoryEntryView()"></span>&nbsp;&nbsp;
+	<span><input type="button"  class="button_c" id="import" value="导入未匹配产品"></span>&nbsp;&nbsp;
+	<!-- <span><input type="button"  class="button_c" id="update_inventory" value="产品报损调整"></span>&nbsp;&nbsp; -->
+	<span><input type="button"  class="button_c" id="add_inventory_online" value="增加线上产品库存"></span>&nbsp;&nbsp;
+	<span><span class="title_tile">最近盘点时间 </span><span id="intentory_time"></span></span>
+	
+	</div>
+	<br>
 	</div>
 	
 		<table class="easyui-datagrid" id="easyui-datagrid"   style="width:1200px;height:900px">
 		<thead>	
 			<tr>
-				<th data-options="field:'goodscatid',width:50,align:'center'">商品品类</th>
-				<th data-options="field:'onLine',width:50,align:'center'">是否上架</th>
-				<th data-options="field:'good_name',width:50,align:'center'">商品名称</th>
-				<th data-options="field:'barcode',width:80,align:'center'">商品库位</th>
-				<th data-options="field:'sku',width:50,align:'center'">商品规格</th>
-				<th data-options="field:'car_img',width:80,align:'center'">商品图片</th>
-				<th data-options="field:'goods_p_price',width:50,align:'center'">采购价</th>
-				<th data-options="field:'remaining',width:50,align:'center'">首次库存数量</th>
-				<th data-options="field:'inventory_amount',width:60,align:'center'">首次库存金额</th>
-				<th data-options="field:'new_remaining',width:40,align:'center'">盘点后库存数量</th>
-				<th data-options="field:'new_inventory_amount',width:50,align:'center'">盘点后金额</th>
-				<th data-options="field:'can_remaining',width:40,align:'center'">可用库存数量</th>
-				<th data-options="field:'createtime',width:60,align:'center'">首次库存录入时间</th>
-				<th data-options="field:'updatetime',width:60,align:'center'">最后更新库存时间</th>
-				<th data-options="field:'remark',width:60,align:'center'">备注</th>
-				<th data-options="field:'editLink',width:60,align:'center'">产品编辑链接</th>
-				<th data-options="field:'unsellableReason',width:60,align:'center'">下架原因</th>
-				<th data-options="field:'operation',width:50,align:'center'">盘点</th>
+				<th data-options="field:'categoryName',width:80,align:'center'">产品品类</th>
+				<th data-options="field:'goodsPid',width:50,align:'center'" >产品ID</th>
+				<th data-options="field:'goodsName',width:100,align:'Left'">产品名称</th>
+				<th data-options="field:'skuContext',width:100,align:'center'">产品SKU</th>
+				<th data-options="field:'carImg',width:80,align:'center'">商品图片</th>
+				<th data-options="field:'remaining',width:50,align:'center'">库存数量</th>
+				<th data-options="field:'canRemaining',width:50,align:'center'">可用库存</th>
+				<th data-options="field:'barcode',width:50,align:'center'">库位</th>
+				<th data-options="field:'checkTime',width:50,align:'center'">盘点时间</th>
+				<th data-options="field:'operation',width:50,align:'center'">操作</th>
 			</tr>
 		</thead>
 	</table>
 		<script type="text/javascript">
-            initData();
+           // initData();
 		</script>
 </body>
 </html>

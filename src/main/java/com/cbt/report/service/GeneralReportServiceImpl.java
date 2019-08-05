@@ -9,6 +9,8 @@ import com.cbt.util.BigDecimalUtil;
 import com.cbt.warehouse.pojo.JcexPrintInfo;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
+import com.cbt.website.bean.InventoryData;
+
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -948,7 +950,7 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	 * @param list
 	 */
 	@Override
-	public HSSFWorkbook exportGoodsInventory(List<Inventory> list) {
+	public HSSFWorkbook exportGoodsInventory(List<InventoryData> list) {
 		String sheetName = "库存统计报表"; //报表页名
 		ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
 		FileOutputStream fileOut = null;
@@ -972,25 +974,25 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 			//写入报表汇总
 			for (int i = 0; i < list.size(); i++) {
 				row = sheet.createRow(rows++);
-				Inventory bg = list.get(i);
+				InventoryData bg = list.get(i);
 				row.createCell(0).setCellValue((i+1));
 //                row.createCell(1).setCellValue(bg.getGoods_pid());
-				row.createCell(1).setCellValue(bg.getGood_name());
-				row.createCell(2).setCellValue(bg.getGoods_url());
+				row.createCell(1).setCellValue(bg.getGoodsName());
+				row.createCell(2).setCellValue(bg.getGoodsUrl());
 				row.createCell(3).setCellValue(bg.getBarcode());
 				row.createCell(4).setCellValue(bg.getSku());
-				row.createCell(5).setCellValue(bg.getGoods_p_url());
-				row.createCell(6).setCellValue(bg.getGoods_p_price());//采购价
+				row.createCell(5).setCellValue(bg.getGoodsPUrl());
+				row.createCell(6).setCellValue(bg.getGoodsPPrice());//采购价
 //                row.createCell(7).setCellValue(StringUtils.isStrNull(bg.getGoodsprice())?"-":("$"+bg.getGoodsprice()));
-				row.createCell(7).setCellValue(bg.getGoodscatid());//商品类别
+				row.createCell(7).setCellValue(bg.getGoodsCatid());//商品类别
 				row.createCell(8).setCellValue(bg.getRemaining());
-				row.createCell(9).setCellValue(bg.getNew_remaining());
-				row.createCell(10).setCellValue(bg.getInventory_amount());//库存金额
-				row.createCell(11).setCellValue(bg.getNew_inventory_amount());//盘点后库存金额
+//				row.createCell(9).setCellValue(bg.getNew_remaining());
+//				row.createCell(10).setCellValue(bg.getInventory_amount());//库存金额
+//				row.createCell(11).setCellValue(bg.getNew_inventory_amount());//盘点后库存金额
 				row.createCell(12).setCellValue(bg.getCreatetime());//首次盘点时间
 				row.createCell(13).setCellValue(bg.getUpdatetime());//最后盘点时间
 				//是否上架
-				row.createCell(14).setCellValue(bg.getOnLine());
+				row.createCell(14).setCellValue(bg.getOnline());
 			}
 		}catch(Exception e){
 			e.printStackTrace();

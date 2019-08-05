@@ -9,6 +9,8 @@ import com.cbt.pojo.*;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
 import com.cbt.warehouse.pojo.returndisplay;
+import com.cbt.website.bean.InventoryData;
+
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -567,7 +569,7 @@ public interface TaoBaoOrderMapper {
 	 * 获取库存产品所有类别
 	 * @return
 	 */
-	public List<Inventory> getAllInventory();
+	public List<InventoryData> getAllInventory();
 
 	/**
      * 库存商品对应的出入库明细

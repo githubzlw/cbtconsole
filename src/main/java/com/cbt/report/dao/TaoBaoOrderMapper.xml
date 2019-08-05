@@ -1251,8 +1251,12 @@
 	(SELECT DISTINCT sessionid FROM behavior_record WHERE ACTION='Add To Cart' AND view_date_time&lt;#{startTime}) GROUP BY itemId,goods_type) a
 	) b
   </select>
-    <select id="getAllInventory" resultType="com.cbt.pojo.Inventory">
-        SELECT DISTINCT REPLACE(goodscatid,"'","") AS goodscatid FROM inventory WHERE can_remaining>0 AND goodscatid IS NOT NULL AND goodscatid !='' AND goodscatid&lt;>'0' ORDER BY goodscatid ASC
+    <select id="getAllInventory" resultType="com.cbt.website.bean.InventoryData">
+        SELECT DISTINCT REPLACE(goodscatid,"'","") AS goodsCatid ,c.en_name as categoryName
+        FROM inventory_sku i left join 1688_category c on i.goodscatid=c.category_id
+        
+        WHERE i.can_remaining>0 AND i.goodscatid IS NOT NULL 
+        AND i.goodscatid !='' AND i.goodscatid&lt;>'0' ORDER BY i.goodscatid ASC
     </select>
   <select id="searchGoodsInventoryDeleteInfo" resultType="com.cbt.pojo.Inventory">
  	 SELECT ili.admName,ili.create_time,idd.* FROM inventory_log_info ili INNER JOIN inventory_delete_details idd ON ili.in_id=idd.id

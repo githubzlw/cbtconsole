@@ -31,9 +31,12 @@ import com.cbt.pojo.TaoBaoInfoList;
 import com.cbt.report.service.GeneralReportService;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
+import com.cbt.util.StrUtils;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.service.InventoryService;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.InventoryData;
+import com.cbt.website.bean.InventoryDetailsWrap;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
 import com.cbt.website.dao.IExpressTrackDao;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -52,6 +55,75 @@ public class InventoryController {
 	@Autowired
 	private GeneralReportService generalReportService;
 	IExpressTrackDao dao = new ExpressTrackDaoImpl();
+	
+	
+	/**
+	 * 查询库存统计报表
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/inventorydetails")
+	@ResponseBody
+	protected EasyUiJsonResult inventoryDetails(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<String, Object> map = new HashMap<>();
+		String inventory_sku_id = request.getParameter("inid");
+		map.put("inventory_sku_id", inventory_sku_id);
+		
+		String page = request.getParameter("page");
+		page  = StrUtils.isNum(page) ? page : "1";
+		map.put("page", (Integer.valueOf(page) -1 ) * 20);
+		
+		List<InventoryDetailsWrap> toryList = inventoryService.inventoryDetails(map);
+		int toryListCount = inventoryService.inventoryDetailsCount(map);
+		json.setRows(toryList);
+		json.setTotal(toryListCount);
+		return json;
+	}
+	/**
+	 * 库存报损
+	 */
+	@RequestMapping("/addLoss")
+	@ResponseBody
+	public Map<String,Object> addInventoryProblem(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
+		Map<String,Object> result = new HashMap<>();
+		String igoodsId = request.getParameter("igoodsId");
+		String iskuid = request.getParameter("iskuid");
+		String ispecid = request.getParameter("ispecid");
+		iskuid = StringUtil.isBlank(iskuid) ? igoodsId : iskuid;
+		ispecid = StringUtil.isBlank(ispecid) ? igoodsId : ispecid;
+		String change_type = request.getParameter("change_type");
+		String remark = request.getParameter("remark");
+		String strchangeNumber = request.getParameter("changeNumber");
+		String in_id = request.getParameter("in_id");
+		
+		int changeNumber = 0;
+		changeNumber = StrUtils.isMatch(strchangeNumber, "(\\d+)") ? Integer.valueOf(strchangeNumber) : 0;
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("goods_pid", igoodsId);
+		map.put("skuid", iskuid);
+		map.put("specid", ispecid);
+		map.put("change_type", change_type);
+		map.put("remark", remark);
+		map.put("changeNumber",changeNumber );
+		map.put("inventory_sku_id",in_id );
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		if(adm == null) {
+			result.put("status", 500);
+			return result;
+		}
+		map.put("change_adm",String.valueOf(adm.getId()) );
+		Map<String, Object> reportLossInventory = inventoryService.reportLossInventory(map);
+		result.putAll(reportLossInventory);
+		return result;
+	}
 	/**
 	 * 当验货数量大于商品销售数量时，将多余的商品存入库存表中invenntory
 	*
@@ -147,86 +219,35 @@ public class InventoryController {
 			throws ServletException, IOException, ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		Map<Object, Object> map = getObjectByInventory(request);
-		List<Inventory> toryList = inventoryService.getIinOutInventory(map);
-		List<Inventory> toryListCount = inventoryService.getIinOutInventoryCount(map);
+		List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
+		int toryListCount = inventoryService.getIinOutInventoryCount(map);
 		json.setRows(toryList);
-		json.setTotal(toryListCount.size());
+		json.setTotal(toryListCount);
 		return json;
 	}
 
 	private Map<Object, Object> getObjectByInventory(HttpServletRequest request) {
 		Map<Object, Object> map = new HashMap<Object, Object>();
 		int page = Integer.valueOf(request.getParameter("page"));
-		String type = request.getParameter("type");
-		String type11 = request.getParameter("type11");
-		String goodinfo = request.getParameter("goodinfo");
-		String year = request.getParameter("year");
-		String flag = request.getParameter("flag");
-		String mouth = request.getParameter("mouth");
-		String scope = request.getParameter("scope");
-		String scope11 = request.getParameter("scope11");
-		String goodscatid = request.getParameter("goodscatid");
-		String have_barcode=request.getParameter("have_barcode");
-		String barcode = request.getParameter("barcode");
-		String startdate=request.getParameter("startdate");
-		String goods_pid=request.getParameter("goods_pid");
-		String enddate=request.getParameter("enddate");
-		String valid=request.getParameter("valid");
-		goods_pid= StringUtil.isBlank(goods_pid)?null:goods_pid;
-		int count = Integer.valueOf(request.getParameter("count") != null && !"".equals(request.getParameter("count"))? request.getParameter("count").toString() : "0");
-		int count11 = Integer.valueOf(request.getParameter("count11") != null && !"".equals(request.getParameter("count11"))? request.getParameter("count11").toString() : "0");
-		String goodsurl = request.getParameter("goodsurl");
-		String sku = request.getParameter("sku");
-		String buyTime = "";
-		if (year != null && year.equals("0")) {
-			buyTime = null;
-		} else if (year != null && mouth.equals("0")) {
-			buyTime = year;
-		} else if (year != null) {
-			buyTime = year + "-" + mouth;
-		}
-		goodscatid="0".equals(goodscatid)?null:goodscatid;
-		if("全部".equals(goodscatid)){
-			goodscatid="abc";
-		}else if("其他".equals(goodscatid)){
-			goodscatid="bcd";
-		}
-		flag="-1".equals(flag)?null:flag;
-		page=page>0?(page - 1) * 20:page;
-		goodinfo= StringUtils.isStrNull(goodinfo)?null:goodinfo;
-		goodsurl=StringUtils.isStrNull(goodsurl)?null:goodsurl;
-		sku=StringUtils.isStrNull(sku)?null:sku;
-		startdate=StringUtils.isStrNull(startdate)?null:(startdate+" 00:00:00");
-		enddate=StringUtils.isStrNull(enddate)?null:(enddate+" 23:59:59");
-		if(!"全部".equals(have_barcode)){
-			barcode=have_barcode;
-		}else if ("全部".equals(have_barcode) && barcode != null && !"".equals(barcode) && barcode.indexOf("STK") <= -1) {
-			barcode = Utility.getBarcode(barcode);
-		} else if (barcode == null || "".equals(barcode)) {
-			barcode = null;
-		}
-		if (scope != null && scope.equals("0")) {
-			scope = null;
-		}
-		map.put("buyTime", buyTime);
-		map.put("goodinfo", goodinfo);
-		map.put("sku", sku);
-		map.put("goodsurl", goodsurl);
-		map.put("type", type);
-		map.put("type11", type11);
-		map.put("scope11", scope11);
-		map.put("count11", count11);
-		map.put("scope", scope);
-		map.put("count", count);
-		map.put("goodscatid", goodscatid);
-		map.put("barcode", barcode);
+		page = page > 0 ? (page - 1) * 20 : 0;
 		map.put("page", page);
-		map.put("flag", flag);
-		map.put("enddate", enddate);
-		map.put("startdate", startdate);
 		map.put("export", "0");
-		map.put("goods_pid",goods_pid);
-		map.put("valid","-1".equals(valid)?null:valid);
+		
+	    String goods_pid = request.getParameter("goods_pid");
+	    goods_pid= StringUtil.isBlank(goods_pid) ? null : goods_pid;
+	    map.put("goods_pid",goods_pid);
+	    
+		String strmaxintentory = request.getParameter("maxintentory");
+		strmaxintentory = StrUtils.isMatch(strmaxintentory, "\\d+") ? strmaxintentory : "65535";
+		map.put("maxintentory",Integer.valueOf(strmaxintentory));
+		
+		String strminintentory = request.getParameter("minintentory");
+		strminintentory = StrUtils.isMatch(strminintentory, "\\d+") ? strminintentory : "0";
+		map.put("minintentory",Integer.valueOf(strminintentory));
+		
+		String goodscatid = request.getParameter("goodscatid");
+		goodscatid = goodscatid == null ? "0" : goodscatid;
+		map.put("goodscatid", goodscatid);
 		return map;
 	}
 
@@ -245,7 +266,7 @@ public class InventoryController {
 	@ResponseBody
 	protected JsonResult updateSources(HttpServletRequest request, HttpServletResponse response)
 			throws Exception{
-		Map<Object, Object> map = new HashMap<Object, Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		JsonResult json = new JsonResult();
 		TaoBaoInfoList list = new TaoBaoInfoList();
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
@@ -517,7 +538,7 @@ public class InventoryController {
 		map.put("startdate", startdate);
 		map.put("page", -1);
 		map.put("export", "1");
-		List<Inventory> toryList = inventoryService.getIinOutInventory(map);
+		List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
 		HSSFWorkbook wb = generalReportService.exportGoodsInventory(toryList);
 		response.setContentType("application/vnd.ms-excel");
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -24,6 +24,7 @@ import com.cbt.warehouse.pojo.Tb1688Account;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.warehouse.util.ExcelUtil;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.InventoryData;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
@@ -3842,13 +3843,15 @@ public class StatisticalReportController {
     @ResponseBody
     protected com.alibaba.fastjson.JSONArray getAllInventory(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ParseException {
-        List<Inventory> list = taoBaoOrderService.getAllInventory();
-        Inventory i = new Inventory();
-        i.setGoodscatid("全部");
+        List<InventoryData> list = taoBaoOrderService.getAllInventory();
+        InventoryData i = new InventoryData();
+        i.setGoodsCatid("0");
+        i.setCategoryName("All");
         list.add(0, i);
-        Inventory ii = new Inventory();
-        ii.setGoodscatid("其他");
-        list.add(list.size() - 1, ii);
+        InventoryData ii = new InventoryData();
+        ii.setGoodsCatid("-1");
+        ii.setCategoryName("Other");
+        list.add(list.size(), ii);
         com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(list));
         return jsonArr;
     }

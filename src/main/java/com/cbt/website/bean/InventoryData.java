@@ -1,53 +1,36 @@
 package com.cbt.website.bean;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class InventoryData {
+@EqualsAndHashCode(callSuper = true)
+public class InventoryData extends InventorySku{
 	/**
-	 * 库位号
+	 * 规格相关 sku  specid  skuid
 	 */
-	private String barcode;
+	private String skuContext;
 	/**
-	 * 库存数量
+	 * 类别名称
 	 */
-	private String inventoryCount;
+	private String categoryName;
 	/**
-	 * 订单号
+	 * 不可售原因
 	 */
-	private String orderId; 
-	/**
-	 * order_details表id
-	 */
-	private String odId;
-	/**
-	 * 验货数量
-	 */
-	private String storage_count;
-	/**
-	 * 当次验货数量
-	 */
-	private String when_count;
-	/**
-	 * 
-	 */
-	private String admName;
-	/**
-	 * 单位数量
-	 */
-	private String unit;
-	/**
-	 * sku唯一specid
-	 */
-	private String specid;
-	/**
-	 * sku唯一skuid
-	 */
-	private String skuid;
+	private String unsellableReason;
 	
+	/**
+	 * 上次盘点时间
+	 */
+	private String checkTime;
 	
+	/**
+	 * 操作按钮
+	 */
+	private String operation;
 	
-	
-	
-
+	/**
+	 * 上架 下架
+	 */
+	private String online;
 }

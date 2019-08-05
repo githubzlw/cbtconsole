@@ -1,11 +1,14 @@
 package com.cbt.pojo;
 
+import lombok.Data;
+
 /**
  * 库存表实体类
  * 
  * @author whj
  *
  */
+@Data
 public class Inventory {
 	private int id;
 
@@ -85,6 +88,18 @@ public class Inventory {
 	private String editLink;
 	private String name;
 	private int type;
+	private String check_time;
+	/**
+	 * 规格skuid
+	 * 2019-08-01-sj add
+	 */
+	private String skuid;
+	/**
+	 * 规格specid
+	 *  2019-08-01-sj add
+	 */
+	private String specid;
+	
 	public int getType() {
 		return type;
 	}
