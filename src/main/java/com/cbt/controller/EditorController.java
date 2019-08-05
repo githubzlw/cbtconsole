@@ -506,6 +506,15 @@ public class EditorController {
                 JSONArray sku_json = JSONArray.fromObject(goods.getSku());
                 List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
+                for(ImportExSkuShow exSku : cbSkus){
+                    if(StringUtils.isNotBlank(exSku.getSpecId())){
+                        String chType = customGoodsService.queryChTypeBySkuId(exSku.getSpecId());
+                        if(StringUtils.isBlank(chType)){
+                            chType = "";
+                        }
+                        exSku.setChType(chType);
+                    }
+                }
 
                 Collections.sort(cbSkus, Comparator.comparing(ImportExSkuShow::getEnType));
                 mv.addObject("showSku", JSONArray.fromObject(cbSkus));
