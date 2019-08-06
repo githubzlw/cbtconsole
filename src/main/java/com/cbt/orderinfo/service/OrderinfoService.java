@@ -21,14 +21,11 @@ import com.cbt.website.bean.*;
 import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
 import com.importExpress.mapper.IPurchaseMapper;
-import com.importExpress.pojo.SampleOrderBean;
 import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.poi.util.SystemOutLogger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -1322,7 +1319,33 @@ public class OrderinfoService implements IOrderinfoService {
 		return orderinfoMapper.getBuyerAndAll();
 	}
 
-	@Override
+
+	private final static List<String> MSG_COUNTRY_LIST = new ArrayList<String>(){{
+        add("yigo");
+        add("Guam");
+        add("hawaii");
+        add("Honolulu");
+        add("Puerto Rico");
+        add("Virgin Islands");
+        add("Samoa");
+        add("Mariana Islands");
+    }};
+
+    @Override
+    public String checkCountryMsg(String orderid) {
+        OrderBean orders = getOrders(orderid);
+        if (orders != null && orders.getAddress() != null) {
+            String address = orders.getAddress().toString().toLowerCase();
+            for (String country : MSG_COUNTRY_LIST) {
+                if (address.indexOf(country.toLowerCase()) > 0) {
+                    return "请注意国家!<br />USA(" + country + ")";
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
 	public OrderBean getOrders(String orderNo) {
 		OrderBean ob=orderinfoMapper.getOrder(orderNo);
 		if(ob != null){

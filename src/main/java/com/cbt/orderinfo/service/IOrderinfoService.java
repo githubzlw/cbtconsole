@@ -10,7 +10,6 @@ import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.SearchResultInfo;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
-import com.importExpress.pojo.SampleOrderBean;
 import com.importExpress.pojo.SplitGoodsNumBean;
 
 import java.util.Date;
@@ -547,4 +546,6 @@ public interface IOrderinfoService {
 	 * @return
 	 */
 	int querySampleOrderInfoByOrderId(String orderNo);
+
+    String checkCountryMsg(String orderid);
 }

@@ -6203,6 +6203,10 @@ public class WarehouseCtrl {
 				if (moreTime >= 10) {
 					list.get(i).setOverTimeFlag(1);
 				}
+
+				// 国家提醒 orderid yigo /  Guam/ hawaii/Honolulu/Puerto Rico/Virgin Islands/Samoa/Mariana Islands
+                list.get(i).setCountryMsg(orderinfoService.checkCountryMsg(orderid));
+
 			} catch (Exception e) {
 
 				LOG.error("包裹列变获取用户地址信息出错：订单号:【" + orderid + "】", e);
