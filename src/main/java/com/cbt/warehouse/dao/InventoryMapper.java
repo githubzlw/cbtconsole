@@ -10,6 +10,8 @@ import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetails;
+import com.cbt.website.bean.InventoryLog;
+import com.cbt.website.bean.InventorySku;
 import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 
@@ -135,64 +137,15 @@ public interface InventoryMapper {
 	
 	
 	
+	
+	
 	/****************************************************************************************/
 	
 	/**库存变更记录表
 	 * @param inventory
 	 * @return
 	 */
-	int addInventoryChangeRecord(Map<String,String> inventory);
-	/**库存变更记录表
-	 * @param inventory
-	 * @return
-	 */
 	int addInventoryChangeRecordByInventoryid(Map<String,String> inventory);
-	
-	
-	/**获取库存数量
-	 * @param inventory
-	 * @return
-	 */
-	Map<String,Object>  getInventory(Map<String,String> inventory);
-	
-	/**获取库存数量
-	 * @param inventory
-	 * @return
-	 */
-	Map<String,Object>  getInventoryByOdId(Map<String,String> inventory);
-	
-	/**获取库存数量
-	 * @param inventory
-	 * @return
-	 */
-	Map<String,Object>  getInventoryByid(String id);
-	
-	/**插入库存
-	 * @return
-	 */
-	int addInventory(Map<String,String> inventory);
-	
-	/**更新库存
-	 * @return
-	 */
-	int updateInventory(Map<String,String> inventory);
-	/**更新库存
-	 * @return
-	 */
-	int updateInventoryById(Map<String,String> inventory);
-	
-	
-	/**是否存在库存
-	 * @return
-	 */
-	Integer isExsisInventory(Map<String,String> inventory);
-	
-	
-	/**记录库存存入记录，用来统计当月库存金额
-	 * @param inventory
-	 * @return
-	int insertInventoryDetails(Map<String,String> inventory);
-	 */
 	
 	/**
 	 * @param inventory
@@ -204,14 +157,8 @@ public interface InventoryMapper {
 	 * @param inventory
 	 * @return
 	 */
-	int insertInventoryDetailsSku(Map<String,String> inventory);
-	/**入库
-	 * @param inventory
-	 * @return
-	 */
 	int addInventoryDetailsSku(Map<String,String> inventory);
 	
-//	int addStorageOutboundDetails(Map<String,String> inventory);
 	
 	/**获取库存的1688数据
 	 * @param itemid
@@ -242,4 +189,41 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int inventoryDetailsCount(Map<String,Object> map);
+	
+	
+	
+	/*********************************************/
+	
+	/**库存inventory_sku
+	 * @param item
+	 * @return
+	 */
+	int insertInventory(InventorySku item);
+	
+	
+	/**获取库存inventory_sku
+	 * @param item
+	 * @return
+	 */
+	InventorySku getInventory(InventorySku item);
+	
+	/**更新库存
+	 * @param item
+	 * @return
+	 */
+	int updateInventory(InventorySku item);
+	
+	/**库存变更表inventory_sku_log
+	 * @param log
+	 * @return
+	 */
+	int insertInventoryLog(InventoryLog log);
+	
+	/**库存明细inventory_details_sku
+	 * @param detail
+	 * @return
+	 */
+	int insertInventoryDetailsSku(InventoryDetails detail);
+	
+	
 }

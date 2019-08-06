@@ -19,6 +19,32 @@
         <result column="del_adm" property="delAdm" jdbcType="VARCHAR" />
         <result column="del" property="del" jdbcType="INTEGER" />
     </resultMap>
+    <resultMap id="InventorySkuMap" type="com.cbt.website.bean.InventorySku" >
+        <result column="id" property="id" jdbcType="INTEGER" />
+        <result column="goods_url" property="goodsUrl" jdbcType="VARCHAR" />
+        <result column="remaining" property="remaining" jdbcType="INTEGER" />
+        <result column="can_remaining" property="canRemaining" jdbcType="INTEGER" />
+        <result column="good_name" property="goodsName" jdbcType="VARCHAR" />
+        <result column="goods_price" property="goodsPrice" jdbcType="VARCHAR" />
+        <result column="sku" property="sku" jdbcType="VARCHAR" />
+        <result column="barcode" property="barcode" jdbcType="VARCHAR" />
+        <result column="goods_p_url" property="goodsPUrl" jdbcType="VARCHAR" />
+        <result column="goodscatid" property="goodsCatid" jdbcType="VARCHAR" />
+        <result column="car_img" property="carImg" jdbcType="VARCHAR" />
+        <result column="goods_p_price" property="goodsPPrice" jdbcType="VARCHAR" />
+        <result column="flag" property="flag" jdbcType="INTEGER" />
+        <result column="isLock" property="isLock" jdbcType="INTEGER" />
+        <result column="od_id" property="odid" jdbcType="INTEGER" />
+        <result column="goods_pid" property="goodsPid" jdbcType="VARCHAR" />
+        <result column="createtime" property="createtime" jdbcType="VARCHAR" />
+        <result column="updatetime" property="updatetime" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="goods_p_pid" property="goodsPPid" jdbcType="VARCHAR" />
+        <result column="specid" property="specid" jdbcType="VARCHAR" />
+        <result column="skuid" property="skuid" jdbcType="VARCHAR" />
+        <result column="inventory_type" property="inventoryType" jdbcType="INTEGER" />
+        <result column="db_flag" property="dbFlag" jdbcType="INTEGER"/>
+    </resultMap>
     <resultMap id="InventorySkuResultMap" type="com.cbt.website.bean.InventoryData" >
         <result column="id" property="id" jdbcType="INTEGER" />
         <result column="goods_url" property="goodsUrl" jdbcType="VARCHAR" />
@@ -229,52 +255,6 @@
     
     
     <!-- ********************************库存数据*************************** -->
-    <!-- 获取上次库存 -->
-    <select id="getInventory" resultType="java.util.Map">
-    select  id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,barcode,car_urlMD5,goods_pid,sku,
-    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
-    from inventory_sku 
-    where 1=1 
-     and goods_pid=#{goods_pid} 
-    and specid=#{specid} and skuid=#{skuid}
-    </select>
-    <select id="getInventoryByOdId" resultType="java.util.Map">
-    select  id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,barcode,car_urlMD5,goods_pid,sku,
-    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
-    from inventory_sku 
-    where 1=1 
-    and od_id=#{odid}
-    and specid=#{specid} and skuid=#{skuid}
-    </select>
-     <select id="getInventoryByid" resultType="java.util.Map">
-    select  id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,barcode,car_urlMD5,goods_pid,sku,
-    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
-    from inventory_sku 
-    where id=#{id}
-    </select>
-    <!-- 获取库存表id -->
-    <select id="isExsisInventory" resultType="Integer">
-    select  id from inventory_sku where goods_pid=#{goods_pid}  and specid=#{specid} and skuid=#{skuid}
-    </select>
-    
-    <insert id="addInventory">
-    insert into inventory_sku(goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_type,
-    car_img,goods_pid,car_urlMD5,createtime,goods_p_price,goods_p_url,updatetime,specid,skuid,goods_p_pid,od_id,goods_price,db_flag) 
-	values(#{car_url},#{inventory_count},#{inventory_count},#{goodsname},#{car_type},#{barcode},
-	#{goodscatid},#{inventory_type},#{car_img},#{goods_pid},#{car_urlMD5},now(),#{goods_p_price},
-	#{goods_p_url},now(),#{specid},#{skuid},#{tb_1688_itemid},#{odid},#{goodsprice},#{db_flag})
-    </insert>
-    
-    <update id="updateInventory">
-    update inventory_sku set remaining=#{remaining} ,can_remaining=#{can_remaining} ,
-    updatetime=now(),goods_p_url=#{goods_p_url},goods_p_price=#{goods_p_price}  where goods_pid=#{goods_pid} 
-    and specid=#{specid} 
-    and skuid=#{skuid} 
-    </update>
-    <update id="updateInventoryById">
-    update inventory_sku set remaining=#{remaining} ,can_remaining=#{can_remaining} ,
-    updatetime=now(),goods_p_url=#{goods_p_url},goods_p_price=#{goods_p_price}  where id=#{inventory_sku_id}
-    </update>
     
     <!-- 库存记录变更表  -->
    <insert id="addInventoryChangeRecordByInventoryid" parameterType="java.util.Map">
@@ -286,23 +266,8 @@
    barcode,goods_pid,now(),#{log_remark},#{change_type},goods_p_pid,specid,skuid,id 
    from inventory_sku where id=#{inventory_sku_id})
    </insert>
-    <!-- 库存记录变更表  -->
-   <insert id="addInventoryChangeRecord" parameterType="java.util.Map">
-   insert into inventory_sku_log(goods_url,remaining,before_remaining,
-   after_remaining,good_name,sku,barcode,goods_pid,
-   createtime,remark,change_type,goods_p_pid,specid,skuid,inventory_sku_id)
-   values(#{car_url},#{inventory_count},
-   #{before_remaining},#{after_remaining},#{goodsname},#{car_type},#{barcode},#{goods_pid},
-   now(),#{log_remark},#{change_type},#{tb_1688_itemid},#{specid},#{skuid},#{inventory_sku_id})
-   </insert>
-	<!-- 记录库存存入记录，用来统计当月库存金额 -->    
-   <!-- <insert id="insertInventoryDetails" parameterType="java.util.Map">
-   insert into inventory_details (createtime,od_id,inventory_acount,inventory_price,invetory_amount,inventory_barcode,goods_pid,sku,car_urlMD5)
-   values
-   (now(),#{odid},#{inventory_acount},#{inventory_price},
-   #{invetory_amount},#{barcode},#{goods_pid},#{car_type},#{car_urlMD5})
-   </insert>  -->
-    
+  
+
     
     <select id="getOrderDetails" resultType="java.util.Map">
     select od.id as odid,od.goodsid,od.goodsprice,od.yourorder,od.goods_pid,trim(od.car_type) as car_type,od.car_urlMD5,od.goodsname,od.car_url,
@@ -315,15 +280,7 @@
 	where od.orderid=#{orderid} and od.id=#{odid}  limit 1
     </select>
     
-    <insert id="insertInventoryDetailsSku">
-    insert into inventory_details_sku(goods_pid,goods_p_pid,sku,good_skuid,goods_p_skuid,goods_price,
-    goods_p_price,goods_number,1688_orderid,1688_shipno,orderno,od_id,createtime,admid,type,inventory_id,
-    goods_p_url,goods_p_img,good_name,goods_specid,goods_p_specid,goods_img)
-    value(#{goods_pid},#{tb_1688_itemid},#{car_type},#{skuid},#{tbskuid},#{goodsprice},#{goods_p_price},
-    #{yourorder},#{tborderid},#{shipno},#{orderid},#{odid},now(),#{admId},#{type},#{inventory_sku_id},
-    #{goods_p_url},#{goods_p_img},#{goodsname},#{specid},#{thspecid},#{car_img})
-    
-    </insert>
+   
     <insert id="addInventoryDetailsSku">
     insert into inventory_details_sku(goods_pid,goods_p_pid,sku,good_skuid,goods_price,
     goods_p_price,goods_number,od_id,createtime,admid,type,inventory_id,
@@ -396,5 +353,58 @@
      select  count(id)
     from  inventory_details_sku where inventory_id=#{inventory_sku_id}
     </select>
+    
+    <!-- 库存表  -->
+    <insert id="insertInventory" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventorySku">
+    insert into inventory_sku(goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_type,
+    car_img,goods_pid,car_urlMD5,createtime,goods_p_price,goods_p_url,updatetime,specid,skuid,goods_p_pid,od_id,goods_price,db_flag) 
+	values(#{goodsUrl},#{remaining},#{canRemaining},#{goodName},#{sku},#{barcode},
+	#{goodsCatid},#{inventoryType},#{carImg},#{goodsPid},#{carUrlMD5},now(),#{goodsPPrice},
+	#{goodsPUrl},now(),#{specid},#{skuid},#{goodsPPid},#{odid},#{goodsPrice},#{dbFlag})
+    </insert>
+    <!-- 更新库存  -->
+    <update id="updateInventory">
+    update inventory_sku set remaining=#{remaining},can_remaining=#{canRemaining},updatetime=now() where id=#{id}
+    </update>
+    <!-- 获取库存表  -->
+    <select id="getInventory" resultMap="InventorySkuMap">
+    select id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,
+    barcode,car_urlMD5,goods_pid,sku,
+    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
+    from inventory_sku 
+    where 1=1
+    <if test="id>0">
+    and id=#{id}
+    </if>
+    <if test="id==0">
+    <if test="odid>0">
+    and od_id=#{odid}
+    </if>
+    <if test="odid==0">
+    <if test="goodsPid!=null">
+    and goods_pid=#{goodsPid} 
+    and specid=#{specid} and skuid=#{skuid}
+    </if>
+    </if>
+    </if>
+    limit 1
+    </select>
+    <!-- 库存记录变更表  -->
+    <insert id="insertInventoryLog" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventoryLog">
+    insert into inventory_sku_log(goods_url,remaining,before_remaining,
+   after_remaining,good_name,sku,barcode,goods_pid,
+   createtime,remark,change_type,goods_p_pid,specid,skuid,inventory_sku_id)
+   values(#{goodsUrl},#{remaining},#{beforeRemaining},#{afterRemaining},
+   #{goodsName},#{sku},#{barcode},#{goodsPid},now(),#{remark},#{changeType},
+   #{goodsPPid},#{specid},#{skuid},#{inventorySkuId})
+    </insert>
+    <insert id="insertInventoryDetailsSku" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventoryDetails">
+    insert into inventory_details_sku(goods_pid,goods_p_pid,sku,good_skuid,goods_p_skuid,goods_price,
+    goods_p_price,goods_number,1688_orderid,1688_shipno,orderno,od_id,createtime,admid,type,inventory_id,
+    goods_p_url,goods_p_img,good_name,goods_specid,goods_p_specid,goods_img)
+    value(#{goodsPid},#{goodsPPid},#{sku},#{goodsSkuid},#{goodsPSkuid},#{goodsPrice},#{goodsPPrice},
+    #{goodsNumber},#{tbOrderid},#{tbShipno},#{orderno},#{odId},now(),#{admid},#{type},#{inventoryId},
+    #{goodsPUrl},#{goodsPImg},#{goodsName},#{goodsSpecid},#{goodsPSpecid},#{goodsImg})
+    </insert>
     
 </mapper>

@@ -796,27 +796,47 @@ public class InventoryController {
 						typelist.add(skuM);
 					}
 				}
-
-				
-				
 			}
-			
-			
-			
-			
+			result.put("skuList", typelist);
 		}
-		
-		
-		
 		return result;
 	}
 	
 	
 	
 	
+	/**获取库位
+	 * @return
+	 */
+	@RequestMapping("/get/barcode")
+	@ResponseBody
+	public String getBarcode(HttpServletRequest request, HttpServletResponse response) {
+		
+		
+		return "";
+	}
 	
-	
-	
+	/**录入库存
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/input")
+	@ResponseBody
+	public Map<String,Object> inputInventory(HttpServletRequest request, HttpServletResponse response){
+		Map<String,Object> result = new HashMap<>();
+		result.put("status", 200);
+		int isTBOrder = Integer.valueOf(StrUtils.object2NumStr(request.getParameter("isTbOrder")));
+		
+		
+		
+		
+		
+		
+		
+		return result;
+		
+	}
 	
 	
 }

@@ -64,10 +64,10 @@ import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
-import com.importExpress.pojo.SampleOrderBean;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 

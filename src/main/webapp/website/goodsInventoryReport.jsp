@@ -110,6 +110,29 @@ table.imagetable td {
 	border: 1px #aaa solid;
 	color: #fff;
 }
+.form-horizontal .control-label{text-align: left;}
+th{font-weight: normal;}
+th,td{text-align: center;}
+label{font-weight: normal;}
+.remark label{margin-right:32px;}
+button{width: 300px;}
+.container{display: none;}
+table td:last-child{text-align: center;}
+table input[type="radio"]{width:20px;height:20px;}
+
+th{font-weight: normal;}
+th,td{text-align: center;}
+label{font-weight: normal;}
+input[type="file"]{position: absolute;top:0;left:15px;width: 124px;height:34px;opacity: 0;}
+.gain{color:#4395ff;cursor:pointer;}
+table  input[type="checkbox"]{width:20px;height:20px;}
+.remark{margin-top:20px;}
+.remark label{margin-right:32px;}
+button{width: 300px;}
+.transparent,.transparent-bg{width:100%;height:100%;background-color:rgba(0,0,0,0);position: fixed;z-index:1;display: none;text-align: center;}
+.transparent-bg{z-index:2;background-color:rgba(0,0,0,.5);}
+      .transparent img{display: inline-block;z-index:3;position: relative;top:20px;}
+em,i{font-style: normal;}
 
 </style>
 <% 
@@ -124,13 +147,26 @@ $(function(){
 	$('#dlg2').dialog('close');
 	$('#dlg3').dialog('close'); 
 	$('#dlg4').dialog('close');
+	$('#dlg5').dialog('close');
+	$('#dlg6').dialog('close');
 	setDatagrid();
 	//doQuery(1);
 	
-	$("#query_button").click(function(){
+	 $("#query_button").click(function(){
 		doQuery(1);
 		
 	});
+	 $("#luimport").click(function(){
+		 $('#dlg6').dialog('open'); 
+	 })
+	 $('.serial img').click(function(){
+		$('.transparent,.transparent-bg').show();
+		var src = $(this).attr('src');
+		$('.transparent img').attr('src',src);
+	});
+	$('.transparent-bg').click(function(){
+		$('.transparent,.transparent-bg').hide();
+	})
 })
 
 function setDatagrid() {
@@ -349,7 +385,7 @@ function exportData(){
 }
 
 function openInventoryEntryView(){
-	$('#dlg1').dialog('open');
+	$('#dlg5').dialog('open');
 }
 
 function openYmxInventoryEntryView(){
@@ -670,7 +706,7 @@ function delete_inventory(id,goods_pid,barcode,amount){
 		</div>
 		</form>
 	</div>
-	<div id="dlg1" class="easyui-dialog" title="手动录入库存" data-options="modal:true" style="width:400px;height:400px;padding:10px;autoOpen:false;;closed:true;display: none;">
+	<!-- <div id="dlg1" class="easyui-dialog" title="手动录入库存" data-options="modal:true" style="width:400px;height:400px;padding:10px;autoOpen:false;;closed:true;display: none;">
 	<form  method="post" style="height:100%;">
 			<div style="margin-bottom:20px;margin-left:35px;">
 				<input class="easyui-textbox" name="orderNo" id="order_no_id"  style="width:70%;"  data-options="label:'订单号:',required:true">
@@ -696,7 +732,7 @@ function delete_inventory(id,goods_pid,barcode,amount){
 			<a href="javascript:void(0)" class="easyui-linkbutton" onclick="cance1()" style="width:80px">取消</a>
 		</div>
 		</form>
-	</div>
+	</div> -->
 		<div id="dlg3" class="easyui-dialog" title="手动录入亚马逊库存" data-options="modal:true" style="width:400px;height:450px;padding:10px;autoOpen:false;;closed:true;display: none;">
 			<form  method="post" style="height:100%;">
 				<div style="margin-bottom:20px;margin-left:35px;">
@@ -875,6 +911,177 @@ function delete_inventory(id,goods_pid,barcode,amount){
 		</div>
 		</form>
 	</div>
+	
+	<div class="container easyui-dialog" id="dlg5" style="width:1055px;padding:10px;autoOpen:false;closed:true;" title="录入库存">
+		<div class="wrap row">
+			<div class="col-xs-7">	
+			<div class="form-horizontal">
+				<div class="form-group">
+					<label class="col-xs-2 control-label text-left">产品ID:</label>
+					<div class="col-xs-10">
+						<input type="text" class="form-control" id="lu_pid">
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-2 control-label text-left">产品名称:</label>
+					<div class="col-xs-10">
+						<span id="lu_name">产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称</span>
+					</div>
+				</div>		
+			</div>	
+			<table class="table table-bordered table-primary">
+				<thead>
+					<tr>
+						<th>产品规格</th>
+						<th>录入数量</th>
+						<th>库位</th>
+						<th>是否录入</th>
+					</tr>
+				</thead>
+				<tbody id="lu_tr">
+					<tr>
+						<td >
+						<span class="lu_sku"></span><br>
+						<span class="lu_specid"></span><br>
+						<span class="lu_skuid"></span>
+						</td>
+						<td><input type="text" class="form-control lu_count"></td>
+						<td class="lu_barcode"><a href="javascript();">获取库位</a></td>
+						<td><input type="radio" name="entry" class="lu_is"></td>
+					</tr>
+				</tbody>
+			</table>																
+			</div>
+			<div class="col-xs-5">
+				<img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg" alt="" class="img-responsive" id="lu_img">
+			</div>
+		</div>
+		<div class="row remark">
+			<div class="form-horizon col-xs-12">
+				<div class="form-group">
+					<label >备注原因</label>
+					<label>
+						<input type="radio" name="reason" class="lu_reason" value="1" checked="checked"> 添加
+					</label>
+					<label>
+						<input type="radio" name="reason" class="lu_reason" value="2"> 补货
+					</label>
+					<label>
+						<input type="radio" name="reason" class="lu_reason" value="3"> 线下单
+					</label>
+					<label>
+						<input type="radio" name="reason" class="lu_reason" value="4"> 其他
+					</label>
+					<label>
+						<input type="text" class="form-control" id="lu_remark"> 
+					</label>
+				</div>
+			</div>
+			<div class="col-xs-12 text-center">
+				<button class="btn btn-success">保存</button>
+			</div>
+
+		</div>
+	</div>
+	<div class="transparent" >
+		<div class="transparent-bg"></div>
+		<img src="" alt="" class="img-responsive">
+	</div>
+	<div class="container easyui-dialog" id="dlg6" style="width:1055px;padding:10px;autoOpen:false;closed:true;" title="未匹配录入">
+		<div class="row">
+			<div class="form-horizon">
+				<div class="form-group row">
+					<label class="control-label col-xs-2">淘宝订单/运单号</label>
+					<div class="col-xs-5">
+						<input type="text" class="form-control">
+					</div>
+					<div class="col-xs-3">
+						<input type="file">
+						<button class="btn btn-default">选择未匹配订单</button>
+					</div>					
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>产品名称</th>
+						<th>产品规格</th>
+						<th>订单数量</th>
+						<th>实际数量</th>
+						<th>库位</th>
+						<th>是否录入</th>
+					</tr>
+				</thead>
+				<tbody class="lu_tb_tr">
+					<tr>
+						<td>1</td>
+						<td class="lu_tb_name">产品名称产品名称产品名称产品名称</td>
+						<td>12/R12</td>
+						<td >10</td>
+						<td><input type="text" class="form-control"></td>
+						<td>4KR01</td>
+						<td><input type="checkbox"></td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td>产品名称</td>
+						<td>12/R12</td>
+						<td>10</td>
+						<td><input type="text" class="form-control"></td>
+						<td><span class="gain">获取库位</span></td>
+						<td><input type="checkbox"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="row serial">
+			<div class="col-xs-3">
+				<span>序号：<em>1</em></span>
+				<img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg" alt="" class="img-responsive">
+			</div>
+			<div class="col-xs-3">
+				<span>序号：<em>1</em></span>
+				<img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg" alt="" class="img-responsive">
+			</div>
+			<div class="col-xs-3">
+				<span>序号：<em>1</em></span>
+				<img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg" alt="" class="img-responsive">
+			</div>
+			<div class="col-xs-3">
+				<span>序号：<em>1</em></span>
+				<img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg" alt="" class="img-responsive">
+			</div>
+		</div>
+		<div class="row remark">
+			<div class="form-horizon col-xs-12">
+				<div class="form-group">
+					<label >备注原因</label>
+					<label>
+						<input type="radio" name="reason" class="lu_tb_reason" value="1" checked="checked"> 添加
+					</label>
+					<label>
+						<input type="radio" name="reason" class="lu_tb_reason" value="2"> 补货
+					</label>
+					<label>
+						<input type="radio" name="reason" class="lu_tb_reason" value="3"> 线下单
+					</label>
+					<label>
+						<input type="radio" name="reason" class="lu_tb_reason" value="4"> 其他
+					</label>
+					<label>
+						<input type="text" class="form-control" id="lu_tb_remark"> 
+					</label>
+				</div>
+			</div>
+			<div class="col-xs-12 text-center">
+				<button class="btn btn-success">保存</button>
+			</div>
+
+		</div>
+	</div>
 	<div  id="top_toolbar" style="padding: 5px; height: auto">
 	<div>
 	<span class="top_title">产品检索</span>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -897,7 +1104,7 @@ function delete_inventory(id,goods_pid,barcode,amount){
 	<div>
 	<span class="top_title">库存修正</span>&nbsp;&nbsp;&nbsp;&nbsp;
 	<span><input type="button" class="button_c" id="add_inventory" value="录入库存" onclick="openInventoryEntryView()"></span>&nbsp;&nbsp;
-	<span><input type="button"  class="button_c" id="import" value="导入未匹配产品"></span>&nbsp;&nbsp;
+	<span><input type="button"  class="button_c" id="luimport" value="导入未匹配产品"></span>&nbsp;&nbsp;
 	<!-- <span><input type="button"  class="button_c" id="update_inventory" value="产品报损调整"></span>&nbsp;&nbsp; -->
 	<span><input type="button"  class="button_c" id="add_inventory_online" value="增加线上产品库存"></span>&nbsp;&nbsp;
 	<span><span class="title_tile">最近盘点时间 </span><span id="intentory_time"></span></span>

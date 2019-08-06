@@ -2,6 +2,10 @@ package com.cbt.website.bean;
 
 import lombok.Data;
 
+/**inventory_details_sku
+ * @author Administrator
+ *
+ */
 @Data
 public class InventoryDetails {
 	private int id;
@@ -14,6 +18,10 @@ public class InventoryDetails {
 	 */
 	private String goodsPid;
 	/**
+	 * 线上PID
+	 */
+	private String goodsPPid;
+	/**
 	 * sku
 	 */
 	private String sku;
@@ -21,6 +29,16 @@ public class InventoryDetails {
 	 * 线上SKUID 无匹配留空
 	 */
 	private String goodsSkuid;
+	private String goodsPSkuid;
+	private String goodsPPrice;
+	private String goodsPrice;
+	private String tbOrderid;
+	private String tbShipno;
+	private String goodsPUrl;
+	private String goodsUrl;
+	private String goodsName;
+	private String goodsPImg;
+	private int admid;
 	/**
 	 * '0 入库  1 出库 2 报损',
 	 */
@@ -29,6 +47,7 @@ public class InventoryDetails {
 	 * specid
 	 */
 	private String goodsSpecid;
+	private String goodsPSpecid;
 	/**
 	 * 删除备注
 	 */
@@ -57,7 +76,7 @@ public class InventoryDetails {
 	/**
 	 * 入库数量
 	 */
-	private String goodsNumber;
+	private int goodsNumber;
 	/**
 	 * 订单详情id
 	 */
