@@ -27,7 +27,8 @@ public interface ShopUrlMapper {
      * @param brandName
      * @return
      */
-    int checkBrandAuthorizationByName(@Param("shopId") String shopId, @Param("brandName") String brandName);
+    int checkBrandAuthorizationByName(@Param("shopId") String shopId, @Param("brandName") String brandName,
+                                      @Param("brandId") Integer brandId);
 
     /**
      * 插入品牌和授权信息

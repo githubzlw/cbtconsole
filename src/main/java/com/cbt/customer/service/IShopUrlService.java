@@ -370,9 +370,10 @@ public interface IShopUrlService {
      * 检查是否存在店铺品牌名称
      * @param shopId
      * @param brandName
+     * @param brandId
      * @return
      */
-    int checkBrandAuthorizationByName(String shopId, String brandName);
+    int checkBrandAuthorizationByName(String shopId, String brandName, Integer brandId);
 
     /**
      * 插入品牌和授权信息

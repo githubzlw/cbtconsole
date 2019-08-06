@@ -3734,7 +3734,7 @@ public class ShopUrlController {
 
     @RequestMapping(value = "/uploadBrandFile", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
-    public JsonResult uploadBrandFile(@RequestParam(value = "file", required = false) CommonsMultipartFile mf,
+    public JsonResult uploadBrandFile(@RequestParam(value = "file", required = true) CommonsMultipartFile mf,
                                       HttpServletRequest request) {
         JsonResult json = new JsonResult();
 
@@ -3753,7 +3753,7 @@ public class ShopUrlController {
                 String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
                 String saveFilename = EditorController.makeFileName(String.valueOf(random.nextInt(1000)));
                 // 本地服务器磁盘全路径
-                String localFilePath = "shopbrand/" + today + "/desc/" + saveFilename + fileSuffix;
+                String localFilePath = "shopbrand/" + today + "/" + saveFilename + fileSuffix;
                 // 文件流输出到本地服务器指定路径
                 ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
                 // 检查图片分辨率
@@ -3781,7 +3781,7 @@ public class ShopUrlController {
             ftpConfig = GetConfigureInfo.getFtpConfig();
         }
         String shopId = request.getParameter("shopId");
-        String brandId = request.getParameter("brandId");
+        String brandIdStr = request.getParameter("brandId");
         String brandName = request.getParameter("brandName");
         String inAuthorizeState = request.getParameter("inAuthorizeState");
         String termOfValidity = request.getParameter("termOfValidity");
@@ -3802,46 +3802,57 @@ public class ShopUrlController {
                 return json;
             }
         }
+        Integer brandId = null;
+        if(StringUtils.isBlank(brandIdStr) && Integer.valueOf(brandIdStr) > 0){
+            brandId = Integer.valueOf(brandId);
+        }
         try {
+            ShopBrandAuthorization authorization = new ShopBrandAuthorization();
+            authorization.setAuthorizeState(Integer.valueOf(inAuthorizeState));
+            authorization.setBrandName(brandName);
+            authorization.setShopId(shopId);
+
+            authorization.setTermOfValidity(termOfValidity);
             // 上传文件
-            if (certificateFile.contains("192.168.")) {
+            if ("3".equals(inAuthorizeState) && certificateFile.contains("192.168.")) {
                 String localFilePath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getLocalDiskPath());
                 File localFile = new File(localFilePath);
                 String remoteShowPath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getRemoteShowPath());
                 String remoteLocalPath = certificateFile.replace(ftpConfig.getLocalShowPath(), FtpConfig.REMOTE_LOCAL_PATH);
-                boolean isSuccess = UploadByOkHttp.uploadFile(localFile, remoteLocalPath, 1);
+                String destPath = remoteLocalPath.substring(0,remoteLocalPath.lastIndexOf("/"));
+                boolean isSuccess = UploadByOkHttp.uploadFile(localFile, destPath, 1);
                 if (!isSuccess) {
-                    isSuccess = UploadByOkHttp.uploadFile(localFile, remoteLocalPath, 1);
+                    isSuccess = UploadByOkHttp.uploadFile(localFile, destPath , 1);
                 }
                 if (isSuccess) {
-                    isSuccess = UploadByOkHttp.uploadFile(localFile, remoteLocalPath, 0);
+                    isSuccess = UploadByOkHttp.uploadFile(localFile, destPath, 0);
                     if (!isSuccess) {
-                        isSuccess = UploadByOkHttp.uploadFile(localFile, remoteLocalPath, 0);
+                        isSuccess = UploadByOkHttp.uploadFile(localFile, destPath, 0);
                     }
                 }
                 if (isSuccess) {
-                    ShopBrandAuthorization authorization = new ShopBrandAuthorization();
-                    authorization.setAuthorizeState(Integer.valueOf(inAuthorizeState));
-                    authorization.setBrandName(brandName);
-                    authorization.setShopId(shopId);
                     String fileName = localFilePath.substring(localFilePath.lastIndexOf("/") + 1);
                     authorization.setCertificateFile(fileName);
                     authorization.setLocalPath(localFilePath);
                     authorization.setRemotePath(remoteShowPath);
-                    if (StringUtils.isBlank(brandId) && Integer.valueOf(brandId) > 0) {
-                        authorization.setId(Integer.valueOf(brandId));
-                        shopUrlService.updateShopBrandAuthorization(authorization);
-                    } else {
-                        // 检查是否已经存在此品牌
-                        int checkCount = shopUrlService.checkBrandAuthorizationByName(shopId, brandName);
-                        if (checkCount > 0) {
-                            json.setOk(false);
-                            json.setMessage("已经存在此店铺品牌");
-                        } else {
-                            shopUrlService.insertIntoShopBrandAuthorization(authorization);
-                            json.setOk(true);
-                        }
-                    }
+                } else {
+                    json.setOk(false);
+                    json.setMessage("上传文件失败，请重试");
+                    return json;
+                }
+            }
+            if (brandId != null) {
+                authorization.setId(Integer.valueOf(brandId));
+                shopUrlService.updateShopBrandAuthorization(authorization);
+            } else {
+                // 检查是否已经存在此品牌
+                int checkCount = shopUrlService.checkBrandAuthorizationByName(shopId, brandName, brandId);
+                if (checkCount > 0) {
+                    json.setOk(false);
+                    json.setMessage("已经存在此店铺品牌");
+                } else {
+                    shopUrlService.insertIntoShopBrandAuthorization(authorization);
+                    json.setOk(true);
                 }
             }
         } catch (Exception e) {
