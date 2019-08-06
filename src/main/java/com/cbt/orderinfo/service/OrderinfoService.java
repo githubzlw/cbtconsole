@@ -1692,10 +1692,14 @@ public class OrderinfoService implements IOrderinfoService {
 			odb.setShop_id(shop_id);
 			String inventoryRemark="";
 			//查询该商品是否有使用库存
-			String useInventory=pruchaseMapper.getUseInventory(odb.getOid());
-			if(StringUtil.isNotBlank(useInventory)){
-				inventoryRemark="该商品使用了【"+useInventory+"】件库存";
+			Map<String, Object> useInventoryMap=pruchaseMapper.getUseInventory(odb.getOid());
+			if(useInventoryMap != null) {
+				String useInventory = com.cbt.util.StrUtils.object2Str(useInventoryMap.get("lock_remaining"));
+				if(StringUtil.isNotBlank(useInventory)){
+					inventoryRemark="该商品使用了【"+useInventory+"】件库存";
+				}
 			}
+			
 			odb.setInventoryRemark(inventoryRemark);
 			String buy_url = getBuyUrl(odb);
 			buy_url=StringUtil.getNewUrl(buy_url,goods_pid,odb.getCar_urlMD5());
