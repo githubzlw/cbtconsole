@@ -678,6 +678,11 @@ public class InventoryServiceImpl implements  InventoryService{
 	public  int inventoryDetailsCount(Map<String,Object> map){
 		return inventoryMapper.inventoryDetailsCount(map);
 	}
+	@Override
+	public int inputInventory(Map<String, String> inventory) {
+		
+		return 0;
+	}
 	
 	
 }

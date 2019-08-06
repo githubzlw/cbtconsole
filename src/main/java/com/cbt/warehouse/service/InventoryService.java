@@ -10,7 +10,7 @@ import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
 
 public interface InventoryService {
-	/**库存减少操作
+	/**采购使用库存减少操作
 	 * @param inventory
 	 * @return
 	 */
@@ -21,11 +21,16 @@ public interface InventoryService {
 	 */
 	int cancelInventory(Map<String,String> inventory);
 	
-	/**增加库存
+	/**验货增加库存
 	 * @param inventory
 	 * @return
 	 */
 	int addInventory(Map<String,String> inventory);
+	/**人工录入库存
+	 * @param inventory
+	 * @return
+	 */
+	int inputInventory(Map<String,String> inventory);
 	/**
 	 * 库存列表查询
 	 * @param map
