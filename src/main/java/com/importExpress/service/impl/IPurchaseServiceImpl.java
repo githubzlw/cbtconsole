@@ -1170,6 +1170,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				}
 				purchaseBean.setNewValue(goods_p_url.replace("'", " "));
 				//获取商品库存数据
+				purchaseBean.setInventorySkuId("0");
 				if(unuseInventory) {
 					getInventoryCount(map, purchaseBean);
 				}
@@ -2196,7 +2197,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		map.put("specid", (String)taobaoOrderHistory.get("goods_p_specid"));
 		map.put("skuid", (String)taobaoOrderHistory.get("goods_p_skuid"));
 		map.put("goodurl", (String)taobaoOrderHistory.get("goods_p_url"));
-		map.put("taobaoprice", (String)taobaoOrderHistory.get("goods_p_price"));
+		map.put("taobaoprice", com.cbt.util.StrUtils.object2PriceStr(taobaoOrderHistory.get("goods_p_price")));
 		//'0为 未出货，1已出货'
 		map.put("state", "0");
 		//'入库删除标记:0.已入库;1.入库已取消'

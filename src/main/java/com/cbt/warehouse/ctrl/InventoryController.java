@@ -228,6 +228,9 @@ public class InventoryController {
 
 	private Map<Object, Object> getObjectByInventory(HttpServletRequest request) {
 		Map<Object, Object> map = new HashMap<Object, Object>();
+		String inid = request.getParameter("inid");
+		inid = StrUtils.isNum(inid) ? inid : "0";
+		map.put("inid", inid);
 		int page = Integer.valueOf(request.getParameter("page"));
 		page = page > 0 ? (page - 1) * 20 : 0;
 		map.put("page", page);

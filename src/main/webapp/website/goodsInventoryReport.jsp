@@ -134,6 +134,7 @@ $(function(){
 })
 
 function setDatagrid() {
+	var inid = $("#query_in_id").val();
 		$('#easyui-datagrid').datagrid({
 			title : '库存清单',
 			//iconCls : 'icon-ok',
@@ -145,7 +146,7 @@ function setDatagrid() {
 			striped : true,//设置为true将交替显示行背景。
 // 			collapsible : true,//显示可折叠按钮
 			toolbar : "#top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
-			url : '/cbtconsole/inventory/searchGoodsInventoryInfo',//url调用Action方法
+			url : '/cbtconsole/inventory/searchGoodsInventoryInfo?inid='+inid,//url调用Action方法
 			loadMsg : '数据装载中......',
 			singleSelect : false,//为true时只能选择单行
 			fitColumns : true,//允许表格自动缩放，以适应父容器
@@ -877,7 +878,7 @@ function delete_inventory(id,goods_pid,barcode,amount){
 	<div  id="top_toolbar" style="padding: 5px; height: auto">
 	<div>
 	<span class="top_title">产品检索</span>&nbsp;&nbsp;&nbsp;&nbsp;
-	
+	<input type="hidden" value="${param.inid }" id="query_in_id">
 	<!-- <span>产品名称<input type="text" id="query_goods_name" value=""></span>&nbsp;&nbsp; -->
 	<span>产品ID<input type="text" id="query_goods_pid" value=""></span>&nbsp;&nbsp;
 	<select class="easyui-combobox" name="goodscatid" id="query_goodscatid" style="width:15%;" 

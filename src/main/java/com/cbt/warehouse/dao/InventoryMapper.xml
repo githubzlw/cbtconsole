@@ -113,6 +113,7 @@
       left join custom_benchmark_ready c on isku.goods_pid=c.pid
       left join 1688_category cat on isku.goodscatid=cat.category_id
     where 1=1
+    <if test="inid>0">and isku.id=#{inid}</if>
     <if test="goods_pid != null"> and isku.goods_pid=#{goods_pid}</if>
     <if test="maxintentory!=0"> and isku.remaining &lt; #{maxintentory}</if>
     <if test="minintentory != 0"> and isku.remaining > #{minintentory}</if>
@@ -129,6 +130,7 @@
     <select id="getIinOutInventoryCount" resultType="INTEGER">
        select count(id) from inventory_sku  isku
         where 1=1
+        <if test="inid>0">and isku.id=#{inid}</if>
     <if test="goods_pid != null">and isku.goods_pid=#{goods_pid}</if>
     <if test="maxintentory!=0">and isku.remaining &lt; #{maxintentory}</if>
     <if test="minintentory != 0">and isku.remaining > #{minintentory}</if>
