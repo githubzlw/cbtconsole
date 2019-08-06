@@ -25,6 +25,7 @@ public interface ShopUrlMapper {
      * 检查是否存在店铺品牌名称
      * @param shopId
      * @param brandName
+     * @param brandId
      * @return
      */
     int checkBrandAuthorizationByName(@Param("shopId") String shopId, @Param("brandName") String brandName,

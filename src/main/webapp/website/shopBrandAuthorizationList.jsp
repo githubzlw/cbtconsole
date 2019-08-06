@@ -47,6 +47,10 @@
                     if (!brandId) {
                         brandId = 0;
                     }
+                    $.messager.progress({
+                        title: '上传本地图片到服务器',
+                        msg: '请等待...'
+                    });
                     $.ajax({
                         type: "POST",
                         url: "/cbtconsole/ShopUrlC/saveBrandInfo",
@@ -59,6 +63,7 @@
                             certificateFile: certificateFile
                         },
                         success: function (data) {
+                            $.messager.progress('close');
                             if (data.ok) {
                                 closeDialog();
                                 setTimeout(function () {
@@ -69,6 +74,7 @@
                             }
                         },
                         error: function (res) {
+                            $.messager.progress('close');
                             $.messager.alert("提醒", '保存错误，请联系管理员', "error");
                         }
                     });
@@ -87,7 +93,7 @@
                     var data = eval('(' + data + ')');
                     if (data.ok) {
                         $("#file_form").hide();
-                        $("#certificate_file").text(data.data);
+                        $("#certificate_file").val(data.data);
                         $("#certificate_file").show();
                     } else {
                         $.messager.alert("提醒", data.message, "error");
@@ -100,13 +106,12 @@
         }
 
         function updateBrandInfo(brandId, brandName, authorizeState, termOfValidity, certificateFile) {
-
-            $("#form_enter")[0].reset();
+            resetForm();
             $("#in_brand_id").val(brandId);
             $("#in_brand_name").val(brandName);
             $("#in_authorize_state").val(authorizeState);
             $("#term_of_validity").val(termOfValidity);
-            if (certificateFile) {
+            if (authorizeState == 1 && certificateFile) {
                 $("#certificate_file").val(certificateFile);
                 $("#certificate_file").show();
                 $("#file_div").hide();
@@ -115,15 +120,22 @@
         }
 
         function enterBrandInfo() {
-            $("#form_enter")[0].reset();
+            resetForm();
             $('#enter_div_sty').dialog('open');
         }
 
         function closeDialog() {
             $('#enter_div_sty').dialog('close');
-            $("#form_enter")[0].reset();
+            resetForm();
         }
-
+        function resetForm() {
+            $("#in_brand_id").val(0);
+            $("#in_brand_name").val("");
+            $("#in_authorize_state").val(0);
+            $("#term_of_validity").val("");
+            $("#certificate_file").hide();
+            $("#file_div").show();
+        }
 
     </script>
 </head>
@@ -135,68 +147,68 @@
 <c:if test="${show > 0}">
 
     <div id="enter_div_sty" class="easyui-dialog" title="店铺品牌" data-options="modal:true"
-         style="width: 666px; height: 300px;">
-        <form action="#" id="form_enter">
-            <table>
-                <tr>
-                    <td>店铺ID</td>
-                    <td>
-                        <input id="in_shop_id" style="width: 168px; height: 28px;" value="${shopId}"
-                               disabled="disabled"/>
-                    </td>
-                </tr>
-                    <%--<tr id="shop_name_tr">
-                        <td>店铺名称</td>
-                        <td><span id="in_shop_name"></span></td>
-                    </tr>--%>
-                <tr id="brand_id_tr" style="display: none;">
-                    <td>品牌ID</td>
-                    <td><input id="in_brand_id" value="0" style="width: 168px; height: 28px;"/></td>
-                </tr>
-                <tr>
-                    <td>品牌名称</td>
-                    <td><input id="in_brand_name" value="" style="width: 555px; height: 28px;"/></td>
-                </tr>
-                <tr>
-                    <td>授权状态</td>
-                    <td><select id="in_authorize_state" style="width: 168px; height: 28px;">
-                        <option value="0">无授权</option>
-                        <option value="1">已授权</option>
-                        <option value="2">自有品牌</option>
-                        <option value="3">无需授权</option>
-                    </select></td>
-                </tr>
-                <tr>
-                    <td>有效期</td>
-                    <td><input id="term_of_validity" class="Wdate"
-                               style="width: 168px; height: 24px" type="text" value=""
-                               onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></td>
-                </tr>
-                <tr>
-                    <td>授权文件</td>
-                    <td>
-                        <input id="certificate_file" style="display: none;width: 555px; height: 28px;" value="" disabled="disabled"/>
-                        <div id="file_div">
-                            <form id="file_form" method="post" enctype="multipart/form-data">
+         style="width: 699px; height: 300px;">
+        <table>
+            <tr>
+                <td>店铺ID</td>
+                <td>
+                    <input id="in_shop_id" style="width: 168px; height: 28px;" value="${shopId}"
+                           disabled="disabled"/>
+                </td>
+            </tr>
+                <%--<tr id="shop_name_tr">
+                    <td>店铺名称</td>
+                    <td><span id="in_shop_name"></span></td>
+                </tr>--%>
+            <tr id="brand_id_tr" style="display: none;">
+                <td>品牌ID</td>
+                <td><input id="in_brand_id" value="0" style="width: 168px; height: 28px;"/></td>
+            </tr>
+            <tr>
+                <td>品牌名称</td>
+                <td><input id="in_brand_name" value="" style="width: 599px; height: 28px;"/></td>
+            </tr>
+            <tr>
+                <td>授权状态</td>
+                <td><select id="in_authorize_state" style="width: 168px; height: 28px;">
+                    <option value="0">无授权</option>
+                    <option value="1">已授权</option>
+                    <option value="2">自有品牌</option>
+                    <option value="3">无需授权</option>
+                </select></td>
+            </tr>
+            <tr>
+                <td>有效期</td>
+                <td><input id="term_of_validity" class="Wdate"
+                           style="width: 168px; height: 24px" type="text" value=""
+                           onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></td>
+            </tr>
+            <tr>
+                <td>授权文件</td>
+                <td>
+                    <input id="certificate_file" style="display: none;width: 599px; height: 28px;" value=""
+                           disabled="disabled"/>
+                    <div id="file_div">
+                        <form id="file_form" method="post" enctype="multipart/form-data">
                             <input type="button" onclick="uploadFile()" value="上传"/>
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="file" type="file" name="file"
                                                                        multiple="false">
+                            <span style="color: red;">*请在保存之前上传文件(选择文件->上传)</span>
                         </form>
-                        </div>
+                    </div>
 
-                    </td>
-                </tr>
-            </table>
-            <br>
-            <div style="text-align: center;">
-                <br><br>
-                <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
-                   class="easyui-linkbutton" onclick="saveBrandInfo('${shopId}')" style="width: 80px">保存</a>
-                <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
-                   class="easyui-linkbutton" onclick="closeDialog()"
-                   style="width: 80px">取消</a>
-            </div>
-        </form>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <div style="text-align: center;">
+            <br><br>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton" onclick="saveBrandInfo('${shopId}')" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeDialog()"
+               style="width: 80px">取消</a>
+        </div>
     </div>
 
     <p style="text-align: center;">
@@ -213,7 +225,7 @@
                 <%--<th style="width: 130px;">店铺ID</th>--%>
             <th style="width: 100px;">授权状态</th>
             <th style="width: 100px;">有效期</th>
-            <th style="width: 380px;">授权文件</th>
+            <th style="width: 400px;">授权文件</th>
             <th style="width: 170px;">创建时间</th>
             <th style="width: 170px;">更新时间</th>
             <th style="width: 80px;">操作</th>
@@ -250,6 +262,12 @@
                 </td>
                 <td>
                         ${brandInfo.certificateFile}
+                    <c:if test="${brandInfo.authorizeState == 1 && brandInfo.certificateFile !=null}">
+                        <br>
+                        <a target="_blank" href="${brandInfo.remotePath}">查看</a>
+                    </c:if>
+
+
                 </td>
                 <td>
                         ${brandInfo.createTime}
@@ -264,8 +282,9 @@
                         ${brandInfo.updateTime}
                 </td>
                 <td>
-                    <button class="but_color" onclick="updateBrandInfo(${brandInfo.id},'${brandInfo.brandName}',${brandInfo.authorizeState},
-                            '${brandInfo.termOfValidity}','${brandInfo.certificateFile}')">编辑品牌
+                    <button class="but_color"
+                            onclick="updateBrandInfo(${brandInfo.id},'${brandInfo.brandName}',${brandInfo.authorizeState},
+                                    '${brandInfo.termOfValidity}','${brandInfo.certificateFile}')">编辑品牌
                     </button>
                 </td>
             </tr>

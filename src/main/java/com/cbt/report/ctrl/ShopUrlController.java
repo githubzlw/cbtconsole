@@ -212,6 +212,31 @@ public class ShopUrlController {
         List<ShopGoodsSalesAmount> shopGoodsSalesAmountList = customGoodsService.queryShopGoodsSalesAmountAll();
         for (ShopUrl shopUrlBean : findAll) {
             genShopPrice(shopUrlBean, shopGoodsSalesAmountList);
+            List<ShopBrandAuthorization> authorizationList =  shopUrlService.queryBrandAuthorizationByShopId(shopUrlBean.getShopId());
+            if(authorizationList == null || authorizationList.size() == 0){
+                shopUrlBean.setAuthorizedFlag(3);
+            }else{
+                int count = 0;
+                StringBuffer brandNameS = new StringBuffer();
+                for (ShopBrandAuthorization authorization : authorizationList) {
+                    brandNameS.append("," + authorization.getBrandName());
+                    if(authorization.getAuthorizeState() == 3){
+                        count ++;
+                    }
+                }
+                shopUrlBean.setBrandNames(brandNameS.toString().substring(1));
+                shopUrlBean.setAuthorizationList(authorizationList);
+                if(count == authorizationList.size()){
+                    // 3 未授权
+                    shopUrlBean.setAuthorizedFlag(3);
+                }else if(count < authorizationList.size() && count >0){
+                    // 2 部分授权
+                    shopUrlBean.setAuthorizedFlag(2);
+                }else if(count == 0){
+                    // 1已全部授权
+                    shopUrlBean.setAuthorizedFlag(1);
+                }
+            }
         }
         shopGoodsSalesAmountList.clear();
         int total = shopUrlService.total(shopId, shopBrand, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel, shopType, authorizedFlag,
@@ -3753,7 +3778,7 @@ public class ShopUrlController {
                 String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
                 String saveFilename = EditorController.makeFileName(String.valueOf(random.nextInt(1000)));
                 // 本地服务器磁盘全路径
-                String localFilePath = "shopbrand/" + today + "/" + saveFilename + fileSuffix;
+                String localFilePath = "shopbrand/" + saveFilename + fileSuffix;
                 // 文件流输出到本地服务器指定路径
                 ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
                 // 检查图片分辨率
@@ -3814,13 +3839,20 @@ public class ShopUrlController {
 
             authorization.setTermOfValidity(termOfValidity);
             // 上传文件
-            if ("3".equals(inAuthorizeState) && certificateFile.contains("192.168.")) {
+            if ("1".equals(inAuthorizeState) && certificateFile.contains("192.168.")) {
                 String localFilePath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getLocalDiskPath());
-                File localFile = new File(localFilePath);
+
                 String remoteShowPath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getRemoteShowPath());
                 String remoteLocalPath = certificateFile.replace(ftpConfig.getLocalShowPath(), FtpConfig.REMOTE_LOCAL_PATH);
                 String destPath = remoteLocalPath.substring(0,remoteLocalPath.lastIndexOf("/"));
-                boolean isSuccess = UploadByOkHttp.uploadFile(localFile, destPath, 1);
+                // destPath = destPath.replace("/usr/local/goodsimg/importcsvimg","");
+                /*json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);
+                if (!json.isOk()) {
+                    json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);
+                }*/
+
+                File localFile = new File(localFilePath);
+                boolean isSuccess = UploadByOkHttp.uploadFile(localFile, destPath , 1);
                 if (!isSuccess) {
                     isSuccess = UploadByOkHttp.uploadFile(localFile, destPath , 1);
                 }
