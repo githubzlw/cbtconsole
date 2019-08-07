@@ -120,7 +120,7 @@ em,i{font-style: normal;}
 .tc3 .wrap6 span,.wraps.tc3 .reasons{float:left;position: relative;}
 .tc3 .w235{width:235px;}
 .tc3.wraps .wrap{margin-bottom:40px;overflow:hidden;}
-.tc3 .wrap7 img{max-width:380px;width:auto;max-height: 380px;height:auto;}
+.tc3 .wrap7 img{width:250px;height: 250px;}
 .tc3 .wrap2 em{width:645px;}
 .tc3 .wrap7 {float:right;position: relative;top:-30px;}
 .tc3 .left{float:left;}
@@ -139,18 +139,18 @@ em,i{font-style: normal;}
 			<input type="hidden" value="${param.inid }" id="query_in_id">
 		<div class="row">
 			<div class="col-xs-1">
-				<b><b>产品检索</b>
+				<b>产品检索</b>
 			</div>
 			<div class="col-xs-11">
-				<label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label>
+				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
 				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid"></label>
 				<label>产品分类：<input type="text" class="form-control" id="query_goodscatid"></label>
 				<label>库存量大于：<input type="text" class="form-control" id="query_minintentory"></label>
 				<label>库存量小于：<input type="text" class="form-control" id="query_maxintentory"></label>
-				<label class="w200">是否上架： <select class="form-control" id="query_goodscatid" >
-						<option>全部</option>
-						<option>是</option>
-						<option>否</option>
+				<label class="w200">是否上架： <select class="form-control" id="query_line" >
+						<option value="0">全部</option>
+						<option value="1">是</option>
+						<option value="2">否</option>
 				</select>
 				</label>
 				<button class="btn btn-default"  id="query_button">查询</button>
@@ -207,7 +207,7 @@ em,i{font-style: normal;}
 			</table>
 				<div>
 				<span>当前页 :${page } / ${toryListPage},总共 ${toryListCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${page }"><button class="btn btn-default btn_page_qu" onclick="doQuery(1)">查询</button></td>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${page }"><button class="btn btn-default btn_page_qu" onclick="doQuery(1)">查询</button>
 				</div>
 		</div>
 		
@@ -336,7 +336,7 @@ em,i{font-style: normal;}
 						<span  class="lu_tb_specidc">2222222222222</span>
 						</td>
 						<td class="lu_tb_count">10</td>
-						<td><input type="text" class="form-control" class="lu_tb_a_count" value="10"></td>
+						<td><input type="text" class="form-control lu_tb_a_count" value="10"></td>
 						<td class="lu_tb_bar"><a class="gain lu_tb_barcode" onclick="getbarcode()">获取库位</a></td>
 						<td><input type="checkbox" class="lu_tb_checkbox">
 						<input type="hidden" class="lu_tb_pid" value="">
@@ -364,7 +364,7 @@ em,i{font-style: normal;}
 						<input type="radio" name="reason" class="lu_tb_reason" value="4"> 其他
 					</label>
 					<label>
-						<input type="text" class="form-control"  class="lu_tb_remark" value=""> 
+						<input type="text" class="form-control"  id="lu_tb_remark" value=""> 
 					</label>
 				</div>
 			</div>

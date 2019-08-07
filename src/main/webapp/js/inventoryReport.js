@@ -127,20 +127,20 @@ function getTbOrder(){
 					var skuM = data.tbGoodsList[i];
 					tb_h_shipno = skuM.shipno;
 					tb_h_order = skuM.orderid;
-					trHtml = trHtml+'<tr><td class="lu_tb_index'+i+'">'+i+'</td>';
+					trHtml = trHtml+'<tr class="lu_tb_tr_c"><td class="lu_tb_index'+i+'">'+i+'</td>';
 					trHtml = trHtml+'<td class="lu_tb_name lu_tb_name'+i+'">'+skuM.itemname+'</td>';
 					trHtml = trHtml+'<td><img src="'+skuM.imgurl+'" alt="" class="img-responsive"></td>';
-					trHtml = trHtml+'<td class="lu_tb_skuc"><span  class="lu_tb_sku'+i+'">'+skuM.sku+'</span>';
-					trHtml = trHtml+'<span  class="lu_tb_skuid'+i+'">'+skuM.skuID+'</span>';
-					trHtml = trHtml+'<span  class="lu_tb_specidc'+i+'">'+skuM.specId+'</span></td>';
-					trHtml = trHtml+'<td class="lu_tb_count'+i+'">'+skuM.itemqty+'</td>';
-					trHtml = trHtml+'<td><input type="text" class="form-control" class="lu_tb_a_count'+i+'" value="'+skuM.itemqty+'"></td>';
-					trHtml = trHtml+'<td class="lu_tb_bar'+i+'"><a class="gain lu_tb_barcode'+i+'" onclick="getbarcode(this)">获取库位</a></td>';
-					trHtml = trHtml+'<td><input type="checkbox" class="lu_tb_checkbox'+i+'" value="'+i+'">';
-					trHtml = trHtml+'<input type="hidden" class="lu_tb_pid'+i+'" value="'+skuM.itemid+'">';
-					trHtml = trHtml+'<input type="hidden" class="lu_tb_img'+i+'" value="'+skuM.imgurl+'">';
-					trHtml = trHtml+'<input type="hidden" class="lu_tb_url'+i+'" value="'+skuM.itemurl+'"></td>';
-					trHtml = trHtml+'<input type="hidden" class="lu_tb_price'+i+'" value="'+skuM.itemprice+'"></td>';
+					trHtml = trHtml+'<td class="lu_tb_skuc"><span  class="lu_tb_sku lu_tb_sku'+i+'">'+skuM.sku+'</span>';
+					trHtml = trHtml+'<span  class="lu_tb_skuid lu_tb_skuid'+i+'">'+skuM.skuID+'</span>';
+					trHtml = trHtml+'<span  class="lu_tb_specidc lu_tb_specidc'+i+'">'+skuM.specId+'</span></td>';
+					trHtml = trHtml+'<td class="llu_tb_count u_tb_count'+i+'">'+skuM.itemqty+'</td>';
+					trHtml = trHtml+'<td><input type="text" class="form-control lu_tb_a_count lu_tb_a_count'+i+'" value="'+skuM.itemqty+'"></td>';
+					trHtml = trHtml+'<td class="lu_tb_bar lu_tb_bar'+i+'"><a class="gain lu_tb_barcode lu_tb_barcode'+i+'" onclick="getbarcode(this)">获取库位</a></td>';
+					trHtml = trHtml+'<td><input type="checkbox" class="lu_tb_checkbox lu_tb_checkbox'+i+'" value="'+i+'">';
+					trHtml = trHtml+'<input type="hidden" class="lu_tb_pid lu_tb_pid'+i+'" value="'+skuM.itemid+'">';
+					trHtml = trHtml+'<input type="hidden" class="lu_tb_img lu_tb_img'+i+'" value="'+skuM.imgurl+'">';
+					trHtml = trHtml+'<input type="hidden" class="lu_tb_url lu_tb_url'+i+'" value="'+skuM.itemurl+'"></td>';
+					trHtml = trHtml+'<input type="hidden" class="lu_tb_price lu_tb_price'+i+'" value="'+skuM.itemprice+'"></td>';
 				}
 				
 				$("#tb_h_order").val(tb_h_order);
@@ -160,8 +160,9 @@ function doQuery(page) {
     var goodscatid = $('#query_goodscatid').val();
 	var minintentory = $('#query_minintentory').val();
 	var maxintentory = $('#query_maxintentory').val();
+	var queryLine = $('#query_line').val();
 	
-	window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory, "_self");
+	window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine, "_self");
 }
 
 function doReset(){
@@ -338,5 +339,56 @@ function saveInventory(){
 	   		alert("库存录入失败");
 	   	}
 	   });
+}
+function saveTbInventory(){
+	var tb_h_order = $("#tb_h_order").val();
+	var tb_h_shipno = $("#tb_h_shipno").val();
+	var varray = "";
+	$("#lu_tb_tr tr").each(function(){
+		if($(this).find(".lu_tb_checkbox").is(':checked')){
+			
+			var lu_name = $(this).find(".lu_tb_name").html();
+			var lu_pid = $(this).find(".lu_tb_pid").val();
+			var lu_img = $(this).find(".lu_tb_img").val();
+			var lu_url = $(this).find(".lu_tb_url").val();
+			var lu_sku = $(this).find(".lu_tb_sku").html();
+			var lu_specid = $(this).find(".lu_tb_specidc").html();
+			var lu_skuid = $(this).find(".lu_tb_skuid").html();
+			var lu_count = $(this).find(".lu_tb_a_count").val();
+			var lu_barcode = $(this).find(".lu_tb_barcode").html();
+			var lu_price = $(this).find(".lu_tb_price").val();
+			varray  = varray +";"+lu_sku+"|"+lu_specid+"|"+lu_skuid+"|"+lu_count+"|"+lu_barcode+"|"+lu_name+"|"+lu_pid+"|"+lu_img+"|"+lu_url+"|"+lu_price;
+		}
+	})
+	var reasonType = "0";
+	$(".lu_tb_reason").each(function(){
+		if($(this).is(':checked')){
+			reasonType = $(this).val();
+		}
+	})
+	var remark = $("#lu_tb_remark").val();
+	jQuery.ajax({
+		url:"/cbtconsole/inventory/input",
+		data:{
+			"tb_order" : tb_h_order,
+			"tb_shipno" : tb_h_shipno,
+			"varray":varray,
+			"reasonType":reasonType,
+			"isTbOrder":"1",
+			"remark":remark
+		},
+		type:"post",
+		success:function(data){
+			if(data.status==200){
+				alert("库存录入成功");
+				$('.tc,.trnasparent,.tc2').hide();
+			}else{
+				alert("库存录入失败");
+			}
+		},
+		error:function(e){
+			alert("库存录入失败");
+		}
+	});
 }
 

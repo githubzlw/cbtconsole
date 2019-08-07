@@ -150,7 +150,8 @@
     </if>
     <if test="goodscatid ==-1"> and isku.goodscatid='0'</if>
     
-    
+    <if test="isline == 1">and c.valid=1</if>
+    <if test="isline == 2">and c.valid!=1</if>
      limit #{page},20
     </select>
     <select id="getIinOutInventoryCount" resultType="INTEGER">

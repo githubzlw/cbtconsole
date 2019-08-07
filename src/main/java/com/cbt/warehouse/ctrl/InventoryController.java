@@ -254,7 +254,7 @@ public class InventoryController {
 		mv.addObject("toryList", toryList);
 		mv.addObject("toryListCount", toryListCount);
 		
-		int toryListPage = toryListCount / 20 == 0 ? toryListCount / 20 : toryListCount / 20 + 1;
+		int toryListPage = toryListCount % 20 == 0 ? toryListCount / 20 : toryListCount / 20 + 1;
 		mv.addObject("toryListPage", toryListPage);
 		mv.addObject("page", map.get("current_page"));
 		
@@ -285,6 +285,10 @@ public class InventoryController {
 		String strminintentory = request.getParameter("minintentory");
 		strminintentory = StrUtils.isMatch(strminintentory, "\\d+") ? strminintentory : "0";
 		map.put("minintentory",Integer.valueOf(strminintentory));
+		
+		String strisline = request.getParameter("isline");
+		strisline = StrUtils.isMatch(strisline, "\\d+") ? strisline : "0";
+		map.put("isline",Integer.valueOf(strisline));
 		
 		String goodscatid = request.getParameter("goodscatid");
 		goodscatid = goodscatid == null ? "0" : goodscatid;
@@ -888,42 +892,67 @@ public class InventoryController {
 	public Map<String,Object> inputInventory(HttpServletRequest request, HttpServletResponse response){
 		Map<String,Object> result = new HashMap<>();
 		result.put("status", 200);
-		String lu_pid = request.getParameter("lu_pid");
-		String lu_price = request.getParameter("lu_price");
-		String lu_name = request.getParameter("lu_name");
-		String lu_img = request.getParameter("lu_img");
-		String lu_catid = request.getParameter("lu_catid");
+		String isTbOrder = StrUtils.object2NumStr(request.getParameter("isTbOrder")) ;
 		String varray = request.getParameter("varray");
 		String reasonType = request.getParameter("reasonType");
 		String remark = request.getParameter("remark");
 		Map<String,String>  map = new HashMap<>();
-		map.put("isTBOrder",StrUtils.object2NumStr(request.getParameter("isTbOrder")) );
-		map.put("goods_pid",lu_pid );
-		map.put("goods_name", lu_name);
-		map.put("img", lu_img);
-		map.put("goodsCatid", lu_catid);
-		map.put("reasonType", reasonType);
-		map.put("goods_price",lu_price );
+		map.put("isTBOrder",isTbOrder);
 		map.put("remark",remark );
-		map.put("tbOrderid",request.getParameter("tbOrderid"));
-		map.put("tbShipno",request.getParameter("tbShipno"));
-		map.put("goods_purl",request.getParameter("goods_purl"));
-		
+		map.put("reasonType", reasonType);
 		varray = StringUtil.isNotBlank(varray) ? varray : "XXX";
 		varray = varray.startsWith(";") ? varray.substring(1) : varray;
 		String[] varrays = varray.split(";");
-		for(String v : varrays) {
-			String[] vs = v.split("(\\|)");
-			if(vs.length>5) {
-				if(!StrUtils.isNum(vs[3].trim()) || Integer.parseInt(vs[3].trim()) < 1) {
-					continue;
+		
+		if("0".equals(isTbOrder)) {
+			String lu_pid = request.getParameter("lu_pid");
+			String lu_price = request.getParameter("lu_price");
+			String lu_name = request.getParameter("lu_name");
+			String lu_img = request.getParameter("lu_img");
+			String lu_catid = request.getParameter("lu_catid");
+			map.put("goods_pid",lu_pid );
+			map.put("goods_name", lu_name);
+			map.put("img", lu_img);
+			map.put("goodsCatid", lu_catid);
+			map.put("goods_price",lu_price );
+			
+			for(String v : varrays) {
+				String[] vs = v.split("(\\|)");
+				if(vs.length>5) {
+					if(!StrUtils.isNum(vs[3].trim()) || Integer.parseInt(vs[3].trim()) < 1) {
+						continue;
+					}
+					map.put("sku",vs[0].trim());
+					map.put("specid",vs[1].trim());
+					map.put("skuid",vs[2].trim());
+					map.put("count",vs[3].trim());
+					map.put("barcode",vs[4].trim());
+					inventoryService.inputInventory(map);
 				}
-				map.put("sku",vs[0].trim());
-				map.put("specid",vs[1].trim());
-				map.put("skuid",vs[2].trim());
-				map.put("count",vs[3].trim());
-				map.put("barcode",vs[4].trim());
-				inventoryService.inputInventory(map);
+			}
+		}else {
+			map.put("tbOrderid",request.getParameter("tb_order"));
+			map.put("tbShipno",request.getParameter("tb_shipno"));
+
+			for(String v : varrays) {
+				String[] vs = v.split("(\\|)");
+				if(vs.length>8) {
+					if(!StrUtils.isNum(vs[3].trim()) || Integer.parseInt(vs[3].trim()) < 1) {
+						continue;
+					}
+//					lu_sku+"|"+lu_specid+"|"+lu_skuid+"|"+lu_count+"|"+lu_barcode+"|"+lu_name+"|"+lu_pid+"|"+lu_img+"|"+lu_url+"|"+lu_price;
+					map.put("sku",vs[0].trim());
+					map.put("specid",vs[1].trim());
+					map.put("skuid",vs[2].trim());
+					map.put("count",vs[3].trim());
+					map.put("barcode",vs[4].trim());
+					map.put("goods_name", vs[5].trim());
+					map.put("goods_pid",vs[6].trim() );
+					map.put("img", vs[7].trim());
+					map.put("goods_purl",vs[8].trim() );
+					map.put("goods_price",vs[9].trim() );
+					inventoryService.inputInventory(map);
+				}
 			}
 		}
 		return result;
