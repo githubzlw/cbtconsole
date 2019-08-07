@@ -5808,20 +5808,20 @@ public class WarehouseCtrl {
 						if (checkedList.size() > 0
 								&& checkedList.contains(nos[j])) {
 							bf.append(","
-									+ "<a target='_blank' style='color:green;text-decoration:underline' title='"+nos[j]+"' href='/cbtconsole/website/newtrack.jsp?shipno="
+									+ "<a target='_blank' style='color:green;text-decoration:underline' title='"+nos[j]+"' href='/cbtconsole/website/inspection.jsp?shipno="
 									+ nos[j] + "&barcode=" + info.getBarcode()
 									+ "'>" + nos[j]
 									+ "</a>(包裹已验货)");
 						} else if (noCheckedList.size() > 0
 								&& noCheckedList.contains(nos[j])) {
 							bf.append(","
-									+ "<a target='_blank' style='color:red;text-decoration:underline' title='"+nos[j]+"' href='/cbtconsole/website/newtrack.jsp?shipno="
+									+ "<a target='_blank' style='color:red;text-decoration:underline' title='"+nos[j]+"' href='/cbtconsole/website/inspection.jsp?shipno="
 									+ nos[j] + "&barcode=" + info.getBarcode()
 									+ "'>" + nos[j]
 									+ "</a>(包裹未验货)");
 						} else {
 							bf.append(","
-									+ "<a target='_blank' style='color:black;text-decoration:underline' title='"+nos[j]+"' href='/cbtconsole/website/newtrack.jsp?shipno="
+									+ "<a target='_blank' style='color:black;text-decoration:underline' title='"+nos[j]+"' href='/cbtconsole/website/inspection.jsp?shipno="
 									+ nos[j] + "&barcode=" + info.getBarcode()
 									+ "'>" + nos[j]
 									+ "</a>");
@@ -5833,21 +5833,21 @@ public class WarehouseCtrl {
 					info.setShipnos(bf.substring(1, bf.length()).toString());
 				} else if (info.getShipnos() != null) {
 					if (checkedList.size() > 0 && checkedList.contains(info.getShipnos())) {
-						bf.append("<a target='_blank' style='color:green;text-decoration:underline' title='"+info.getShipnos()+"' href='/cbtconsole/website/newtrack.jsp?shipno="
+						bf.append("<a target='_blank' style='color:green;text-decoration:underline' title='"+info.getShipnos()+"' href='/cbtconsole/website/inspection.jsp?shipno="
 								+ info.getShipnos()
 								+ "&barcode="
 								+ info.getBarcode()
 								+ "'>"
 								+ info.getShipnos() + "</a>(包裹已验货)");
 					} else if (noCheckedList.size() > 0 && noCheckedList.contains(info.getShipnos())) {
-						bf.append("<a target='_blank' style='color:red;text-decoration:underline' title='"+info.getShipnos()+"' href='/cbtconsole/website/newtrack.jsp?shipno="
+						bf.append("<a target='_blank' style='color:red;text-decoration:underline' title='"+info.getShipnos()+"' href='/cbtconsole/website/inspection.jsp?shipno="
 								+ info.getShipnos()
 								+ "&barcode="
 								+ info.getBarcode()
 								+ "'>"
 								+ info.getShipnos() + "</a>(包裹未验货)");
 					} else {
-						bf.append("<a target='_blank' style='color:black;text-decoration:underline' title='"+info.getShipnos()+"' href='/cbtconsole/website/newtrack.jsp?shipno="
+						bf.append("<a target='_blank' style='color:black;text-decoration:underline' title='"+info.getShipnos()+"' href='/cbtconsole/website/inspection.jsp?shipno="
 								+ info.getShipnos()
 								+ "&barcode="
 								+ info.getBarcode()

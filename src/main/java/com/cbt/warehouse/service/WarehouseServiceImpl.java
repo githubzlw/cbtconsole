@@ -37,10 +37,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -370,6 +367,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 s.setGoodstatus("已到仓库，已校验有疑问");
             } else if ("5".equals(s.getGoodstatus())) {
                 s.setGoodstatus("已到仓库，已校验数量有误");
+            } else if ("6".equals(s.getGoodstatus())) {
+            	s.setGoodstatus("已到仓库，已校验品牌未授权");
             } else {
                 s.setGoodstatus("已到仓库，验货无误");
             }
@@ -2946,6 +2945,43 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public String getRepathByPid(String pid) {
         String path=this.warehouseMapper.getRepathByPid(pid);
         return path;
+    }
+
+    @Override
+    public List<Inventory> FindAllGoods(int page,int pagesize,String pid) {
+        try {
+            List<Inventory> list=this.warehouseMapper.FindAllGoods(page*pagesize,pagesize,pid);
+            for (int i=0;i<list.size();i++){
+               list.get(i).setSkuList(this.getSkulist(list.get(i).getSku(),list.get(i).getFinal_weight(),list.get(i).getGoods_p_price()));
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public boolean setInventoryCountBySkuAndPid(List<SampleOrderBean> list) {
+        try {
+            for (int i=0;i<list.size();i++) {
+                this.warehouseMapper.setInventoryCountBySkuAndPid(list.get(i));
+            }
+            return true;
+        }  catch (Exception e) {
+        e.printStackTrace();
+            return false;
+    }
+
+    }
+
+    public List<String> getSkulist(String sku,String weight,String price) {
+         String [] arr=sku.split(",");
+         List<String> list = Arrays.asList(arr);
+         List lists=new ArrayList(list);
+         lists.add("重量:"+weight);
+         lists.add("1688采购价:"+price);
+       return lists;
     }
 
 

@@ -98,7 +98,7 @@ public class EditorController {
         if (offLineMap.size() == 0) {
             List<Map<String, String>> mapList = customGoodsService.queryAllOffLineReason();
             for (Map<String, String> tempMap : mapList) {
-                offLineMap.put(tempMap.get("unsellablereason_id"), tempMap.get("unsellablereason_name"));
+                offLineMap.put(String.valueOf(tempMap.get("unsellablereason_id")), tempMap.get("unsellablereason_name"));
             }
             mapList.clear();
         }
@@ -506,6 +506,15 @@ public class EditorController {
                 JSONArray sku_json = JSONArray.fromObject(goods.getSku());
                 List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
+                for(ImportExSkuShow exSku : cbSkus){
+                    if(StringUtils.isNotBlank(exSku.getSpecId())){
+                        String chType = customGoodsService.queryChTypeBySkuId(exSku.getSpecId());
+                        if(StringUtils.isBlank(chType)){
+                            chType = "";
+                        }
+                        exSku.setChType(chType);
+                    }
+                }
 
                 Collections.sort(cbSkus, Comparator.comparing(ImportExSkuShow::getEnType));
                 mv.addObject("showSku", JSONArray.fromObject(cbSkus));

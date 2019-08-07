@@ -157,4 +157,9 @@ public interface QueryUserMapper {
 
     void updateUserCheckout(@Param("userid") Integer userid, @Param("type") Integer type);
 
+    List<TimingWarningInfo> queryTimingWarningInfo(@Param("valid") Integer valid, @Param("day") Integer day);
+
+    TimingWarningInfo queryQuotaData(@Param("id") Integer id);
+
+    void udpateQuotaData(@Param("bean") TimingWarningInfo bean);
 }

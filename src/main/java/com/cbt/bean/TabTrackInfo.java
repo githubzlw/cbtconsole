@@ -15,6 +15,8 @@ public class TabTrackInfo implements Serializable{
 
     private String orderNo;
 
+    private String tarOrderNo;  // 主单号跳转到订单详情的单号 区分dp和普通订单
+
     private String orderList;
 
     private Integer packageNo;

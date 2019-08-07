@@ -192,6 +192,12 @@ public interface IOrderinfoService {
 	 * @return
 	 */
 	public int checkOrderState(String orderid);
+	
+	/**该运单是否全部到货
+	 * @param orderid
+	 * @return
+	 */
+	List<Tb1688OrderHistory> checkOrder(String shipno,int tbsourceCount);
 
 	/**
 	 * 取消验货

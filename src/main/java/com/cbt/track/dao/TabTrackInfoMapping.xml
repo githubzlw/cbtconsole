@@ -517,5 +517,13 @@
         <include refid="getTrackInfo" />
     </select>
 
+    <!--List<String> getIsDropshipOrder(@Param("list") List<TabTrackInfo> list);-->
+    <select id="getIsDropshipOrder" resultType="java.lang.String">
+        SELECT child_order_no FROM dropshiporder
+        WHERE child_order_no IN
+        <foreach collection="list" open="(" close=")" item="item" separator=",">
+            #{item.orderNo}
+        </foreach>
+    </select>
 
 </mapper>

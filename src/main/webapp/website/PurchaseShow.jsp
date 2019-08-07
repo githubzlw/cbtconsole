@@ -786,7 +786,10 @@
     var lock_remaining;
     var in_id;
     //添加货源
-    function goodsResource(exchange_rate,userid,orderNo,od_id,goodid,goodsdata_id,goods_url,googs_img,goods_price,googs_number,currency,shipping,goodssourcetype,cGoodstype,issure,in_idi,remainingi,lock_remainingi,new_remainingi,shop_ids,straight_address){
+    function goodsResource(exchange_rate,userid,orderNo,od_id,goodid,goodsdata_id,goods_url,
+    		googs_img,goods_price,googs_number,currency,shipping,goodssourcetype,
+    		cGoodstype,issure,in_idi,remainingi,
+    		lock_remainingi,new_remainingi,shop_ids,straight_address){
         document.getElementById("url_info").innerHTML="";
         useridd = userid;
         orderNoo = orderNo;
@@ -816,20 +819,20 @@
         $("#shop_id").val(shop_ids);
         $("#straight_address").val(straight_address);
         $("#resource").val(reso);
-        document.getElementById('order_count').innerHTML= googs_numberr;
+        $('#order_count').text(googs_numberr);
         if(in_idi!=null && in_idi!=""){
-            document.getElementById('can_remaining').innerHTML= lock_remainingi;
+        	$("#can_remaining").text(lock_remainingi);
             $("#in_id").val(in_idi);
-            var buycount=document.getElementById("tity_"+orderNo+od_id).innerText;
-            if(buycount != null && buycount != '' && buycount != '0'){
-                document.getElementById("buycount").value=buycount;
+            var buycount=$("#tity_"+orderNo+od_id).text();
+            if(lock_remainingi != null && lock_remainingi != '' && lock_remainingi != '0'){
+            	$("#buycount").val(Number(googs_numberr)-Number(lock_remainingi));
             }else{
-                document.getElementById("buycount").value=Number(googs_numberr)-Number(lock_remainingi);
+            	$("#buycount").val(Number(googs_numberr));
             }
         }else{
-            document.getElementById("buycount").value=googs_numberr;
-            document.getElementById('can_remaining').innerHTML=0;
-            document.getElementById('in_id').innerHTML=0;
+            $("#buycount").val(Number(googs_numberr));
+            $("#can_remaining").text("0");
+            $("#in_id").text("0");
         }
 
         var rmb = document.getElementById("usdprice");
@@ -1958,30 +1961,37 @@
 
     }
 
-    function useInventory(od_id, state, orderid, goodsid) {
+    function useInventory(od_id, state, orderid, goodsid,inventory_count,googs_number,inventorySkuId,goodsUnit,seilUnit) {
         $.ajax({
             type : "post",
             url : '/cbtconsole/purchase/useInventory',
             dataType : "text",
             data : {
                 "od_id" : od_id,
-                "isUse" : state
+                "isUse" : state,
+                "goodsid" : goodsid,
+                "inventory_count" : inventory_count,
+                "googs_number" : googs_number,
+                "orderid" : orderid,
+                "goodsUnit":goodsUnit,
+                "seilUnit":seilUnit,
+                "inventorySkuId" : inventorySkuId
             },
             success : function(data) {
-                document.getElementById("use_" + orderid + od_id).style.display = "none";
+            	$("#use_" + orderid + od_id).hide();
                 if (state == 1) {
                     //使用库存
-                    document.getElementById("inventory_" + orderid+ od_id).innerHTML = "仓库人员库存确认中";
-                    document.getElementById("hyqr" + orderid + od_id).disabled = true;
-                    document.getElementById("hyqr" + orderid + od_id).setAttribute("style","background-color:darkgray;");
-                    document.getElementById("" + orderid + od_id).disabled = true;
-                    document.getElementById("" + orderid + od_id).setAttribute("style","background-color:darkgray;");
+                    $("#inventory_" + orderid+ od_id).html("仓库人员库存确认中");
+                    $("#hyqr" + orderid + od_id).attr("disabled","true");
+                    $("#hyqr" + orderid + od_id).attr("style","background-color:darkgray;");
+                    $("#"+orderid + od_id).attr("style","background-color:darkgray;");
+                    $("#" + orderid + od_id).attr("disabled","true");
                 } else {
-                    document.getElementById("inventory_" + orderid+ od_id).innerHTML = "";
-                    document.getElementById("hyqr" + orderid + od_id).disabled = false;
-                    document.getElementById("hyqr" + orderid + od_id).setAttribute("style", "background-color:");
-                    document.getElementById("" + orderid + od_id).disabled = false;
-                    document.getElementById("" + orderid + od_id).setAttribute("style", "background-color:");
+                    $("#inventory_" + orderid+ od_id).html("");
+                    $("#hyqr" + orderid + od_id).attr("disabled","false");
+                    $("#hyqr" + orderid + od_id).attr("style","background-color:;");
+                    $("#"+orderid + od_id).attr("style","background-color:;");
+                    $("#" + orderid + od_id).attr("disabled","false");
                 }
             }
         });
@@ -2024,18 +2034,18 @@
                         var can_remaining = data.split("&")[0];
                         if (Number(can_remaining) > 0
                             && Number(is_use) == 1) {
-                            document.getElementById("inventory_" + orderid+ goodsid).innerHTML = "仓库人员库存确认中";
-                            document.getElementById("hyqr" + orderid+ odid).disabled = true;
-                            document.getElementById("hyqr" + orderid + odid) .setAttribute("style", "background-color:darkgray;");
-                            document.getElementById("" + orderid + odid).disabled = true;
-                            document.getElementById("" + orderid + odid).setAttribute("style", "background-color:darkgray;");
+                            $("#inventory_" + orderid+ goodsid).html("仓库人员库存确认中");
+                            $("#hyqr" + orderid+ odid).attr("disabled","true");
+                            $("#hyqr" + orderid + odid).attr("style", "background-color:darkgray;");
+                            $("#" + orderid + odid).attr("disabled","true");
+                            $("#" + orderid + odid).attr("style", "background-color:darkgray;");
                         } else if (Number(can_remaining) > 0 && Number(is_use) == 0) {
-                            document.getElementById("inventory_" + orderid+ odid).innerHTML = "";
-                            document.getElementById("hyqr" + orderid+ odid).disabled = true;
-                            document.getElementById("use_" + orderid+ odid).style.display = "block";
-                            document.getElementById("hyqr" + orderid + odid) .setAttribute("style", "background-color:darkgray;");
-                            document.getElementById("" + orderid + odid).disabled = true;
-                            document.getElementById("" + orderid + odid).setAttribute("style","background-color:darkgray;");
+                            $("#inventory_" + orderid+ odid).html( "");
+                            $("#hyqr" + orderid+ odid).attr("disabled","true");
+                            $("#use_" + orderid+ odid).show();
+                            $("#hyqr" + orderid + odid) .attr("style", "background-color:darkgray;");
+                            $("#" + orderid + odid).attr("disabled","true");
+                            $("#" + orderid + odid).attr("style","background-color:darkgray;");
                         }
                     }
                 }
@@ -3071,9 +3081,11 @@
 							<input type="hidden" id="hdgd" value="${pb.goodsdata_id}">
 							<div style="width: 100%; word-wrap: break-word;">
 								<span>Type：</span><font class="dd">${pb.goods_type}</font>
+								&nbsp;&nbsp;(<em>${pb.specid} / ${pb.skuid}</em>)
 							</div>
 							<div style="width: 100%; word-wrap: break-word;">
 								<span>1688抓取规格：</span><font class="dd">${pb.type_name}</font>
+								
 							</div>
 							<div style="width: 100%; word-wrap: break-word;">
 								<c:if test="${pb.purchase_state >3}">
@@ -3152,12 +3164,13 @@
 										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.od_id}">已到仓库，已校验数量有误</a>
 									</h1>
 								</c:if>
+								<c:if test="${pb.rkgoodstatus == '6'}">
+									<h1 style="color: red;">
+										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.od_id}">已到仓库，已校验品牌未授权</a>
+									</h1>
+								</c:if>
 							</div>
 							<span style="color: red; font-size: 25px;" id="inventory_${pb.orderNo}${pb.od_id}"></span>
-							<div id="use_${pb.orderNo}${pb.od_id}" style="display: none">
-								<button onclick="useInventory('${pb.od_id}',1,'${pb.orderNo}','${pb.goodsid}')">使用库存</button>
-								<button onclick="useInventory('${pb.od_id}',0,'${pb.orderNo}','${pb.goodsid}')">不使用库存</button>
-							</div>
 							<div id="hideDetails_${pb.orderNo}${pb.od_id}" style="display: block">
 								<input type="hidden" id="${pb.orderNo}${pbsi.index}_e" value="${pb.oldValue}" /> <input type="hidden" id="${pb.orderNo}${pbsi.index}_eQuantity" value="${pb.purchaseCount}" />
 								<h1 style="color: #F00">${pb.cginfo}</h1>
@@ -3325,14 +3338,18 @@
 							</c:if>
 							<c:if test="${pb.inventory>0}">
 								<div style="width: 100%; word-wrap: break-word;">
-									可使用库存： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.inventory}" /><a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?sku=${pb.cGoodstype}">${pb.inventory}</a></span></font> <br>
+									可使用库存： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.inventory}" />
+									<a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?sku=${pb.specid}">${pb.inventory}</a>
+									<button onclick="useInventory('${pb.od_id}',1,'${pb.orderNo}','${pb.goodsid}',${pb.inventory},${pb.googs_number},${pb.inventorySkuId},${pb.goodsUnit},${pb.seilUnit})">使用库存</button>
+									</span></font> <br>
+								
 								</div>
 							</c:if>
-							<c:if test="${pb.pidInventory>0}">
+							<%-- <c:if test="${pb.pidInventory>0}">
 								<div style="width: 100%; word-wrap: break-word;">
 									产品有库存(规格不匹配)： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.pidInventory}" /><a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?pid=${pb.goods_pid}">${pb.pidInventory}</a></span></font> <br>
 								</div>
-							</c:if>
+							</c:if> --%>
 							<div style="width: 100%; word-wrap: break-word;">
 								物流信息： <font style="font-size:20px;font-weight:bold;color:blue;"> <span>${pb.shipstatus}</span></font> <br>
 							</div>

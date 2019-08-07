@@ -1157,5 +1157,9 @@ public interface IWarehouseService {
     returndisplay FindReturnTime(String orderids);
 
 	String getRepathByPid(String pid);
+
+    List<Inventory> FindAllGoods(int page,int pagesize,String pid);
+
+	boolean setInventoryCountBySkuAndPid(List<SampleOrderBean> list);
 }
  

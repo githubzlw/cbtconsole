@@ -6,6 +6,25 @@ public class ImportExSkuShow {
     private float price;
     private double fianlWeight;
     private String enType;
+    private String chType;
+    private String specId;
+
+    public String getSpecId() {
+        return specId;
+    }
+
+    public void setSpecId(String specId) {
+        this.specId = specId;
+    }
+
+    public String getChType() {
+        return chType;
+    }
+
+    public void setChType(String chType) {
+        this.chType = chType;
+    }
+
     /**
      * 体积重量
      */

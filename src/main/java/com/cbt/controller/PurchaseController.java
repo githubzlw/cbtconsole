@@ -1,15 +1,57 @@
 package com.cbt.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.cbt.auto.ctrl.OrderAutoServlet;
-import com.cbt.bean.*;
+import com.cbt.bean.CustomGoodsBean;
 import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderProductSource;
+import com.cbt.bean.ShippingBean;
+import com.cbt.bean.badGoods;
 import com.cbt.common.StringUtils;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.TaoBaoOrderInfo;
-import com.cbt.util.*;
-import com.cbt.warehouse.pojo.*;
+import com.cbt.util.GetConfigureInfo;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
+import com.cbt.util.SplitPage;
+import com.cbt.util.Util;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
+import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
+import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
+import com.cbt.warehouse.pojo.orderJson;
 import com.cbt.warehouse.service.IWarehouseService;
+import com.cbt.warehouse.service.InventoryService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.UtilAll;
 import com.cbt.website.bean.PrePurchasePojo;
@@ -29,20 +71,6 @@ import com.importExpress.utli.SwitchDomainNameUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 @Controller
 @RequestMapping(value = "/purchase")
 public class PurchaseController {
@@ -53,6 +81,8 @@ public class PurchaseController {
 	private IPurchaseService iPurchaseService;
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
+	@Autowired
+	private InventoryService inventoryService;
 	@Autowired
 	private IWarehouseService iWarehouseService;
 	@RequestMapping(value = "/determineStraighthair")
@@ -196,13 +226,31 @@ public class PurchaseController {
 	@ResponseBody
 	protected void useInventory(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		Map<String, String> map = new HashMap<String, String>();
+		map.put("admId",String.valueOf(adm.getId()));
 		int row=0;
 		String od_id=request.getParameter("od_id");
 		String isUse=request.getParameter("isUse");
-		map.put("od_id", od_id);
+		map.put("odid", od_id);
 		map.put("isUse", isUse);
-		row = iPurchaseService.useInventory(map);
+		map.put("goodsid", request.getParameter("isUse"));
+		map.put("inventory_count", request.getParameter("inventory_count"));
+		map.put("googs_number", request.getParameter("googs_number"));
+		map.put("orderid", request.getParameter("orderid"));
+		map.put("inventory_sku_id", request.getParameter("inventorySkuId"));
+		map.put("seilUnit", request.getParameter("seilUnit"));
+		map.put("goodsUnit", request.getParameter("goodsUnit"));
+		
+		//库存操作
+		row = inventoryService.useInventory(map);
+		if(row > 0) {
+			//采购关联 id_relationtable
+			map.put("inventory_count_use", String.valueOf(row));
+			row = iPurchaseService.addIdRelationTable(map);
+		}
+//		row = iPurchaseService.useInventory(map);
 		PrintWriter out = response.getWriter();
 		out.print(row + "");
 		out.close();

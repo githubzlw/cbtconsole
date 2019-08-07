@@ -1,35 +1,5 @@
 package com.cbt.warehouse.ctrl;
 
-import com.cbt.Specification.bean.AliCategory;
-import com.cbt.bean.OrderDetailsBean;
-import com.cbt.common.StringUtils;
-import com.cbt.common.dynamics.DataSourceSelector;
-import com.cbt.pojo.Inventory;
-import com.cbt.pojo.TaoBaoInfoList;
-import com.cbt.report.ctrl.StatisticalReportController;
-import com.cbt.report.service.GeneralReportService;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.Utility;
-import com.cbt.warehouse.service.InventoryService;
-import com.cbt.warehouse.util.StringUtil;
-import com.cbt.website.userAuth.bean.Admuser;
-import com.cbt.website.util.EasyUiJsonResult;
-import com.cbt.website.util.JsonResult;
-import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -41,10 +11,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cbt.Specification.bean.AliCategory;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.common.StringUtils;
+import com.cbt.pojo.Inventory;
+import com.cbt.pojo.TaoBaoInfoList;
+import com.cbt.report.service.GeneralReportService;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
+import com.cbt.util.Utility;
+import com.cbt.warehouse.service.InventoryService;
+import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.dao.ExpressTrackDaoImpl;
+import com.cbt.website.dao.IExpressTrackDao;
+import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.EasyUiJsonResult;
+import com.cbt.website.util.JsonResult;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+
 /**
  * 有关后台库存逻辑相关控制器  王宏杰  2018-12-07
  */
-@SuppressWarnings("deprecation")
 @Controller
 @RequestMapping("/inventory")
 public class InventoryController {
@@ -52,6 +51,86 @@ public class InventoryController {
 	private InventoryService inventoryService;
 	@Autowired
 	private GeneralReportService generalReportService;
+	IExpressTrackDao dao = new ExpressTrackDaoImpl();
+	/**
+	 * 当验货数量大于商品销售数量时，将多余的商品存入库存表中invenntory
+	*
+	* @param request
+	* @param response
+	* @throws ServletException
+	* @throws IOException
+	*/
+	@RequestMapping("/add")
+	public void addInventory(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	  String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+	  Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+	  String barcode = request.getParameter("barcode");//库存位置
+	  String inventory_count = request.getParameter("inventory_count");//库存数量
+	  String orderid = request.getParameter("orderid");//库存商品的订单号
+	  String odid = request.getParameter("odid");//库存商品编号
+	  String goodid = request.getParameter("goodid");//库存商品编号
+	  String storage_count = request.getParameter("storage_count");//验货数量
+	  String when_count = request.getParameter("when_count");//当次验货数量
+	  String unit = request.getParameter("unit");
+	  String specid = request.getParameter("specid");
+	  String skuid = request.getParameter("skuid");
+	  String tbspecid = request.getParameter("tbspecid");
+	  String tbskuid = request.getParameter("tbskuid");
+	  String shipno = request.getParameter("shipno");
+	  
+	  Map<String,String> inventory = new HashMap<>();
+	  inventory.put("admName",adm.getAdmName());
+	  inventory.put("admId",String.valueOf(adm.getId()));
+	  inventory.put("barcode",barcode );
+	  inventory.put("inventory_count", inventory_count);
+	  inventory.put("odid", odid);
+	  inventory.put("goodid", goodid);
+	  inventory.put("orderid",orderid );
+	  inventory.put("skuid",skuid );
+	  inventory.put("specid",specid );
+	  inventory.put("tbskuid",tbskuid );
+	  inventory.put("tbspecid",tbspecid );
+	  inventory.put("storage_count",storage_count );
+	  inventory.put("when_count",when_count );
+	  inventory.put("unit", unit);
+	  inventory.put("shipno", shipno);
+	  int res = inventoryService.addInventory(inventory);
+//	  dao.addInventory(barcode, inventory_count, orderid, odid, storage_count, when_count, adm.getAdmName(), unit);
+	  PrintWriter out = response.getWriter();
+	  out.print(res);
+	  out.flush();
+	  out.close();
+	}
+	/**
+	 * 当验货数量大于商品销售数量时，将多余的商品存入库存表中invenntory
+	 *
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	@RequestMapping("/addtbinventory")
+	@ResponseBody
+	public Map<String,Object> addtbinventory(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Map<String,Object> result = new HashMap<>();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		String checkOrderhid = request.getParameter("checkOrderhid");//
+		checkOrderhid = org.apache.commons.lang.StringUtils.endsWith(checkOrderhid, ",") ? checkOrderhid.substring(0, checkOrderhid.length()-1) : checkOrderhid;
+		
+		String shipno = request.getParameter("shipno");
+		String barcode = request.getParameter("barcode");
+		barcode = org.apache.commons.lang.StringUtils.endsWith(barcode, ",") ? barcode.substring(0, checkOrderhid.length()-1) : barcode;
+		Map<String,String> inventory = new HashMap<>();
+		inventory.put("admName",adm.getAdmName());
+		inventory.put("admId",String.valueOf(adm.getId()));
+	  	inventory.put("checkOrderhid",checkOrderhid );
+	  	inventory.put("shipno", shipno);
+	  	inventory.put("barcode", barcode);
+		int res = inventoryService.addInventory(inventory);
+		result.put("res", res);
+		return result;
+	}
 
 	/**
 	 * 查询库存统计报表
@@ -312,7 +391,6 @@ public class InventoryController {
 	@RequestMapping(value = "/getNewInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
 	public String getNewInventory(HttpServletRequest request, Model model) {
-		Map<String, Object> map = new HashMap<String, Object>();
 		return inventoryService.getNewInventory() + "";
 	}
 
@@ -524,7 +602,6 @@ public class InventoryController {
 	@RequestMapping(value = "/getSaleInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
 	public String getSaleInventory(HttpServletRequest request, Model model) {
-		Map<String, Object> map = new HashMap<String, Object>();
 		return inventoryService.getSaleInventory() + "";
 	}
 
@@ -537,7 +614,6 @@ public class InventoryController {
 	@RequestMapping(value = "/getLossInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
 	public String getLossInventory(HttpServletRequest request, Model model) {
-		Map<String, Object> map = new HashMap<String, Object>();
 		return inventoryService.getLossInventory() + "";
 	}
 
@@ -550,7 +626,6 @@ public class InventoryController {
 	@RequestMapping(value = "/getDeleteInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
 	public String getDeleteInventory(HttpServletRequest request, Model model) {
-		Map<String, Object> map = new HashMap<String, Object>();
 		return inventoryService.getDeleteInventory() + "";
 	}
 
@@ -618,8 +693,8 @@ public class InventoryController {
 				//如果库存为0则更改库存标识
 				inventoryService.updateIsStockFlag(goods_pid);
 				//记录删除该库存的人
-				String admuserJson = Redis.hget(adm_id, "admuser");
-				Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+//				String admuserJson = Redis.hget(adm_id, "admuser");
+//				Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 				inventoryService.updateSourcesLog(id, admName, "", goods_pid, "",barcode, 0, 0, "库存删除");
 //				sendMQ.closeConn();
 			}catch (Exception e){

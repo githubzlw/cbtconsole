@@ -57,8 +57,8 @@
     <select id="supplierScoringLevel" resultType="java.lang.String">
         select level from supplier_scoring where shop_id = #{shopId}
     </select>
-    <select id="getUseInventory" resultType="java.lang.String">
-        SELECT lock_remaining FROM lock_inventory WHERE od_id=${odid}
+    <select id="getUseInventory" resultType="java.util.Map">
+        SELECT in_id,lock_remaining FROM lock_inventory WHERE od_id=${odid}
     </select>
     <select id="getLastPurchaseSource" resultType="java.lang.String">
         select goods_purl from goods_source where goods_pid=${goodsId} ORDER BY updatetime desc limit 1

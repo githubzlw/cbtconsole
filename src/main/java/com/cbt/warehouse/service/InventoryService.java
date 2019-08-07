@@ -1,13 +1,29 @@
 package com.cbt.warehouse.service;
 
+import java.util.List;
+import java.util.Map;
+
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
 
-import java.util.List;
-import java.util.Map;
-
 public interface InventoryService {
+	/**库存减少操作
+	 * @param inventory
+	 * @return
+	 */
+	int useInventory(Map<String,String> inventory);
+	/**取消库存增加操作
+	 * @param inventory
+	 * @return
+	 */
+	int cancelInventory(Map<String,String> inventory);
+	
+	/**增加库存
+	 * @param inventory
+	 * @return
+	 */
+	int addInventory(Map<String,String> inventory);
 	/**
 	 * 库存列表查询
 	 * @param map
