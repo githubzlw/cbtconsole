@@ -1148,6 +1148,9 @@
     <update id="updateOrderState">
 		UPDATE orderinfo t SET t.state = 1 WHERE t.order_no = #{orderid}
 	</update>
+    <update id="updateOrderDetailsStateByid">
+		UPDATE order_details t SET t.state = 1 WHERE t.id = #{odid}
+	</update>
     <update id="updateOrderRe">
 		UPDATE order_replenishment t SET t.rep_state = 0 WHERE t.orderid = #{orderid} AND t.od_id = #{odid}
 	</update>
