@@ -494,7 +494,7 @@ public class OrderinfoService implements IOrderinfoService {
 					brand_name = (String)goodsBrandAuthorization.get("brand_name");
 					brand_name = brand_name == null ? "" : brand_name;
 					shop_id = goodsBrandAuthorization.get("shop_id") != null ? (String)goodsBrandAuthorization.get("shop_id") : shop_id;
-					brandid = goodsBrandAuthorization.get("brand_id") != null ? (String)goodsBrandAuthorization.get("brand_id") : brandid;
+					brandid = goodsBrandAuthorization.get("brand_id") != null ? goodsBrandAuthorization.get("brand_id").toString() : brandid;
 				}
 				
 				/*if(goods_pid.equals(String.valueOf(map.get("tb_1688_itemid")))){
