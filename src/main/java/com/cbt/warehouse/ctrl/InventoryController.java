@@ -845,16 +845,22 @@ public class InventoryController {
 	public Map<String,Object> getTBorder(HttpServletRequest request, HttpServletResponse response){
 		Map<String,Object> result = new HashMap<>();
 		String order_shipno = request.getParameter("order_shipno");
-		
-		List<Map<String,Object>> tbGoods = inventoryService.getTbGoods(order_shipno);
-		
-		
-		
-		
-		
-//		result.put("skuList", typelist);
-//		result.put("skuListSize", typelist.size());
-		result.put("status", 200);
+		result.put("tbGoodsSize", 0);
+		result.put("status", 500);
+		try {
+			List<Map<String,Object>> tbGoods = inventoryService.getTbGoods(order_shipno);
+			if(tbGoods != null && !tbGoods.isEmpty()) {
+				result.put("tbGoodsList", tbGoods);
+				result.put("tbGoodsSize", tbGoods.size());
+				result.put("status", 200);
+			}else{
+				result.put("tbGoodsSize", 0);
+				result.put("reason", "未查询到数据");
+			}
+			
+		} catch (Exception e) {
+			result.put("reason", "请求出错");
+		}
 		return result;
 	}
 	

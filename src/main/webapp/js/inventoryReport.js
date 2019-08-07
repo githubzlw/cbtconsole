@@ -16,10 +16,17 @@ $(function(){
 	})
 	
 	$('#tc1').click(function(){
-		$("#lu_img").attr("src","");
-		 $("#lu_name").html(""); 
+		$("#lu_img").attr("src","https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg");
+		 $("#lu_name").html("产品名称产品名称产品名称产品名称"); 
 		 $("#lu_catid").val(""); 
-		 $("#lu_tr").html("");
+		 var trHtml=''
+		 trHtml = trHtml+"<tr><td ><span class='lu_sku'>as picture</span><br>";
+		 trHtml = trHtml+"<span class='lu_specid'></span><br>";
+		 trHtml = trHtml+"<span class='lu_skuid'></span></td>";
+		 trHtml = trHtml+"<td><input type='text' class='form-control lu_count'  value='0'></td>";
+		 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this);" class="lu_barcode_a" >获取库位</a></td>';
+		 trHtml = trHtml+'<td><input type="checkbox" name="entry" class="lu_is"></td></tr>';
+		 $("#lu_tr").html(trHtml);
 		$('.tc,.trnasparent,.tc1').show();
 		
 	});
@@ -59,7 +66,7 @@ function getProduct(){
 	       type:"post",
 	       success:function(data){
 	    	   if(data.status== 500){
-	    		   topCenter(data.reason); 
+	    		   alert(data.reason); 
 	    	   }else{
 	    	     $("#lu_img").attr("src",data.goodsImg);
 	    		 $("#lu_name").html(data.goodsName); 
@@ -89,7 +96,7 @@ function getProduct(){
 	    	   }
 	       },
 	   	error:function(e){
-	   		topCenter("库存录入失败");
+	   		alert("库存录入失败");
 	   	}
 	   });
 }
@@ -111,37 +118,38 @@ function getTbOrder(){
 		type:"post",
 		success:function(data){
 			if(data.status== 500){
-				topCenter(data.reason); 
+				alert(data.reason); 
 			}else{
-				$("#lu_img").attr("src",data.goodsImg);
-				$("#lu_name").html(data.goodsName); 
-				$("#lu_catid").val(data.goodsCatid); 
-				$("#lu_price").val(data.goodsPice); 
 				var trHtml = '';
-				if(data.skuListSize > 0){
-					for(var i=0;i<data.skuListSize;i++){
-						var skuM = data.skuList[i];
-						trHtml = trHtml+"<tr><td ><span class='lu_sku'>"+skuM.sku+"</span><br>";
-						trHtml = trHtml+"<span class='lu_specid'>"+skuM.specId+"</span><br>";
-						trHtml = trHtml+"<span class='lu_skuid'>"+skuM.skuId+"</span></td>";
-						trHtml = trHtml+"<td><input type='text' class='form-control lu_count' value='0'></td>";
-						trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this);"  class="lu_barcode_a">获取库位</a></td>';
-						trHtml = trHtml+'<td><input type="checkbox" name="entry" class="lu_is"></td></tr>';
-					}
-				}else{
-					trHtml = trHtml+"<tr><td ><span class='lu_sku'>as picture</span><br>";
-					trHtml = trHtml+"<span class='lu_specid'>"+skuM.goods_pid+"</span><br>";
-					trHtml = trHtml+"<span class='lu_skuid'>"+skuM.goods_pid+"</span></td>";
-					trHtml = trHtml+"<td><input type='text' class='form-control lu_count'  value='0'></td>";
-					trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this);" class="lu_barcode_a" >获取库位</a></td>';
-					trHtml = trHtml+'<td><input type="checkbox" name="entry" class="lu_is"></td></tr>';
+				var tb_h_shipno = '';
+				var tb_h_order = '';
+				for(var i=0;i<data.tbGoodsSize;i++){
+					var skuM = data.tbGoodsList[i];
+					tb_h_shipno = skuM.shipno;
+					tb_h_order = skuM.orderid;
+					trHtml = trHtml+'<tr><td class="lu_tb_index'+i+'">'+i+'</td>';
+					trHtml = trHtml+'<td class="lu_tb_name lu_tb_name'+i+'">'+skuM.itemname+'</td>';
+					trHtml = trHtml+'<td><img src="'+skuM.imgurl+'" alt="" class="img-responsive"></td>';
+					trHtml = trHtml+'<td class="lu_tb_skuc"><span  class="lu_tb_sku'+i+'">'+skuM.sku+'</span>';
+					trHtml = trHtml+'<span  class="lu_tb_skuid'+i+'">'+skuM.skuID+'</span>';
+					trHtml = trHtml+'<span  class="lu_tb_specidc'+i+'">'+skuM.specId+'</span></td>';
+					trHtml = trHtml+'<td class="lu_tb_count'+i+'">'+skuM.itemqty+'</td>';
+					trHtml = trHtml+'<td><input type="text" class="form-control" class="lu_tb_a_count'+i+'" value="'+skuM.itemqty+'"></td>';
+					trHtml = trHtml+'<td class="lu_tb_bar'+i+'"><a class="gain lu_tb_barcode'+i+'" onclick="getbarcode(this)">获取库位</a></td>';
+					trHtml = trHtml+'<td><input type="checkbox" class="lu_tb_checkbox'+i+'" value="'+i+'">';
+					trHtml = trHtml+'<input type="hidden" class="lu_tb_pid'+i+'" value="'+skuM.itemid+'">';
+					trHtml = trHtml+'<input type="hidden" class="lu_tb_img'+i+'" value="'+skuM.imgurl+'">';
+					trHtml = trHtml+'<input type="hidden" class="lu_tb_url'+i+'" value="'+skuM.itemurl+'"></td>';
+					trHtml = trHtml+'<input type="hidden" class="lu_tb_price'+i+'" value="'+skuM.itemprice+'"></td>';
 				}
 				
-				$("#lu_tr").html(trHtml);
+				$("#tb_h_order").val(tb_h_order);
+				$("#tb_h_shipno").val(tb_h_shipno);
+				$("#lu_tb_tr").html(trHtml);
 			}
 		},
 		error:function(e){
-			topCenter("库存录入失败");
+			alert("库存录入失败");
 		}
 	});
 }
@@ -175,18 +183,6 @@ function closeBigImg(){
 	$('#big_img').empty();
 }
 
-function topCenter(msg){
-	$.messager.show({
-		title:'消息',
-		msg:msg,
-		showType:'slide',
-		style:{
-			right:'',
-			top:document.body.scrollTop+document.documentElement.scrollTop,
-			bottom:''
-		}
-	});
-}
 /* 
 *type： 0-单个产品库存进去  1- 头部按钮进去
 *index 产品库存序号
@@ -251,15 +247,14 @@ function addLoss(){
       success:function(data){
           var status = data.status
           if(status == 200){
-              topCenter("操作成功");
-              $('#dlg4').dialog('close');
-              $('#easyui-datagrid').datagrid('reload');
+        	  $('.tc,.trnasparent,.tc3').hide();
+              window.location.reload();
           }else{
-              topCenter("修改库存失败:"+data.reason);
+        	  alert("修改库存失败:"+data.reason);
           }
       },
       error:function(e){
-          topCenter("修改库存失败");
+    	  alert("修改库存失败");
       }
   });
 }

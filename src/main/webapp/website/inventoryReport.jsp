@@ -104,7 +104,7 @@ em,i{font-style: normal;}
 .tc2 .container{margin-top:50px;}
 .tc2 img{max-width: 200px;max-height: 200px;}
 .tc2 td input[type="text"]{max-width:200px;}
-    
+.tc2 .lu_tb_name{max-width: 300px;} 
 /* 产品弹窗 tc3 */
 *{margin:0;padding:0;box-sizing: border-box;}
 .tc3 em,.tc3 i{font-style: normal;display: inline-block;float:left;}
@@ -216,7 +216,7 @@ em,i{font-style: normal;}
 	<div class="trnasparent"></div>
 	<div class="container tc1">
 		<div class="wrap row">
-			<div class="col-xs-7">
+			<div class="col-xs-9">
 				<div class="form-horizontal">
 					<div class="form-group">
 						<label class="col-xs-2 control-label text-left">产品ID:</label>
@@ -257,7 +257,7 @@ em,i{font-style: normal;}
 				</table>
 				</div>
 			</div>
-			<div class="col-xs-5">
+			<div class="col-xs-3">
 				<img
 					src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg"
 					alt="" class="img-responsive" id="lu_img">
@@ -325,7 +325,7 @@ em,i{font-style: normal;}
 						<th>是否录入</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody id="lu_tb_tr">
 					<tr>
 						<td class="lu_tb_index">1</td>
 						<td class="lu_tb_name">产品名称产品名称产品名称产品名称</td>
