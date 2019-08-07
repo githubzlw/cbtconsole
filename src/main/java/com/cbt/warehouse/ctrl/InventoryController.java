@@ -846,9 +846,14 @@ public class InventoryController {
 		Map<String,Object> result = new HashMap<>();
 		String order_shipno = request.getParameter("order_shipno");
 		
+		List<Map<String,Object>> tbGoods = inventoryService.getTbGoods(order_shipno);
 		
-		result.put("skuList", typelist);
-		result.put("skuListSize", typelist.size());
+		
+		
+		
+		
+//		result.put("skuList", typelist);
+//		result.put("skuListSize", typelist.size());
 		result.put("status", 200);
 		return result;
 	}

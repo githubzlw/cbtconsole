@@ -840,8 +840,8 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public List<Map<String, Object>> getTbGoods(String orderShipno) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return inventoryMapper.getTbGoods(orderShipno);
 	}
 	
 	
