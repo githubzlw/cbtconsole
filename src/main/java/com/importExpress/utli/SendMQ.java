@@ -29,6 +29,7 @@ public class SendMQ {
     private final static String COUPON_NAME = "coupon"; //发送优惠卷到线上 （mq 连接27更新线上，连接98更新153）
 //    private final static String COUPON_NAME = "coupon2"; //发送优惠卷信息到镜像服 mq 连接27
     private final static String COUPON_NAME_KIDS = "coupon_kids"; //发送优惠卷到kids线上 （mq 连接27更新线上，连接98更新153）
+    private final static String COUPON_NAME_PETS = "coupon_pets"; //发送优惠卷到pet线上 （mq 连接27更新线上，连接98更新153）
 
     /**  优惠卷json数据*/
     private final static String RECOMMEND_NAME = "recommend";
@@ -116,7 +117,10 @@ public class SendMQ {
      * @throws Exception
      */
     public void sendCouponMsg(String couponJson, int website) throws Exception {
-        if(website == 2){
+        if (website == 3) {
+            channel.queueDeclare(COUPON_NAME_PETS, false, false, false, null);
+            channel.basicPublish("", COUPON_NAME_PETS, null, couponJson.getBytes("UTF-8"));
+        } else if(website == 2){
             channel.queueDeclare(COUPON_NAME_KIDS, false, false, false, null);
             channel.basicPublish("", COUPON_NAME_KIDS, null, couponJson.getBytes("UTF-8"));
         } else if (website == 1){
@@ -125,6 +129,7 @@ public class SendMQ {
         } else if (website == 0) {
             sendCouponMsg(couponJson, 1);
             sendCouponMsg(couponJson, 2);
+            sendCouponMsg(couponJson, 3);
         }
     	System.err.println("Site=" + website + " [x] Sent '" + couponJson + "'");
     }

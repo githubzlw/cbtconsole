@@ -10,7 +10,7 @@ import com.importExpress.pojo.TabCouponNew;
 import com.importExpress.pojo.TabCouponRules;
 import com.importExpress.pojo.TabCouponType;
 import com.importExpress.service.TabCouponService;
-import com.importExpress.utli.SearchFileUtils;
+import com.importExpress.service.impl.TabCouponServiceImpl;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,10 +218,9 @@ public class TabCouponController {
         		value, fromDate, toDate, type, 1, userId, shareFlag, websiteType, couponWebsiteType);
         try {
             resultMap = tabCouponService.addCoupon(couponRedis, tabCouponNew, useridList);
+            // 分享链接地址
         	if (shareFlag == 1) {
-        	    String shareUrl = "/coupon/shareCoupon?couponcode=" + couponCode + "&shareid=" + shareid;
-                resultMap.put("shareUrl", SearchFileUtils.importexpressPath + shareUrl
-                            + "<br /><br />" + "https://www.kidsproductwholesale.com" + shareUrl);
+                resultMap.put("shareUrl", TabCouponServiceImpl.getShareUrl(couponCode, shareid, couponWebsiteType));
             }
         	resultMap.put("state", "true");
 		} catch (Exception e) {
@@ -232,7 +231,8 @@ public class TabCouponController {
 		}
         return resultMap;
     }
-    
+
+
     /**
      * 查询卷码是否重复
      * 		http://127.0.0.1:8086/cbtconsole/coupon/checkcouponcode.do?couponCode=

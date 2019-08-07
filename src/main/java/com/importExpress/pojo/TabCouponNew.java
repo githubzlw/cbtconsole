@@ -1,5 +1,6 @@
 package com.importExpress.pojo;
 
+import com.importExpress.utli.MultiSiteUtil;
 import lombok.Data;
 
 import java.util.Date;
@@ -54,6 +55,17 @@ public class TabCouponNew {
 	private Integer websiteType;  // 关联用户发送邮件网站名
 
     private Integer site;//优惠卷所在网站
+
+    private String siteStr;//优惠卷所在网站 中文
+
+    public void setSite(Integer site) {
+        this.site = site;
+        if (site == 0) {
+            this.siteStr = "线上所有网站";
+        } else {
+            this.siteStr = MultiSiteUtil.getSiteTypeStrByNum(site);
+        }
+    }
 
     public TabCouponNew() {
 		super();
