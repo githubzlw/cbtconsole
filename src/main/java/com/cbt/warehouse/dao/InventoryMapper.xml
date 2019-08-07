@@ -407,4 +407,10 @@
     #{goodsPUrl},#{goodsPImg},#{goodsName},#{goodsSpecid},#{goodsPSpecid},#{goodsImg})
     </insert>
     
+    <select id="getTbGoods" resultType="java.util.Map">
+    select  orderid,shipno,itemname,itemprice,itemqty,sku,skuID,specId,imhurl,itemurl
+    from  taobao_1688_order_history where orderid=#{orderShipno} or shipno=#{orderShipno}
+    
+    </select>
+    
 </mapper>

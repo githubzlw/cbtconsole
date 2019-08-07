@@ -11,9 +11,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -48,7 +51,6 @@ import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.JsonUtils;
 import com.importExpress.utli.MongoDBHelp;
 import com.mongodb.BasicDBObject;
-import com.mysql.fabric.xmlrpc.base.Array;
 
 /**
  * 有关后台库存逻辑相关控制器  王宏杰  2018-12-07
@@ -231,15 +233,45 @@ public class InventoryController {
 		json.setTotal(toryListCount);
 		return json;
 	}
+	
+	/**
+	 * 查询库存统计报表
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/list")
+	protected ModelAndView inventoryInfo(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		
+		ModelAndView mv = new ModelAndView("inventoryReport");
+		Map<Object, Object> map = getObjectByInventory(request);
+		List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
+		int toryListCount = inventoryService.getIinOutInventoryCount(map);
+		mv.addObject("toryList", toryList);
+		mv.addObject("toryListCount", toryListCount);
+		
+		int toryListPage = toryListCount / 20 == 0 ? toryListCount / 20 : toryListCount / 20 + 1;
+		mv.addObject("toryListPage", toryListPage);
+		mv.addObject("page", map.get("current_page"));
+		
+		return mv;
+	}
+	
 
 	private Map<Object, Object> getObjectByInventory(HttpServletRequest request) {
 		Map<Object, Object> map = new HashMap<Object, Object>();
 		String inid = request.getParameter("inid");
 		inid = StrUtils.isNum(inid) ? inid : "0";
 		map.put("inid", inid);
-		int page = Integer.valueOf(request.getParameter("page"));
-		page = page > 0 ? (page - 1) * 20 : 0;
-		map.put("page", page);
+		int page = Integer.valueOf(StrUtils.isNum(request.getParameter("page")) ? request.getParameter("page") : "1");
+		map.put("current_page", page);
+		
+		int pageCount = page > 0 ? (page - 1) * 20 : 0;
+		map.put("page", pageCount);
 		map.put("export", "0");
 		
 	    String goods_pid = request.getParameter("goods_pid");
@@ -733,72 +765,91 @@ public class InventoryController {
 		}
 
 	}
-	@RequestMapping("")
+	@RequestMapping("/get/product")
 	@ResponseBody
 	public Map<String,Object> getProduct(HttpServletRequest request, HttpServletResponse response){
 		Map<String,Object> result = new HashMap<>();
 		String goods_pid = request.getParameter("goods_pid");
-		
-		BasicDBObject find = new BasicDBObject("pid",goods_pid);
+		BasicDBObject find = new BasicDBObject("pid",Long.parseLong(goods_pid));
 		//产品名 图片 sku 类别 url  type
 		List<String> findAnyFromMongo2 = MongoDBHelp.INSTANCE.findAnyFromMongo2("product", find , null, 0, 0);
-		if(findAnyFromMongo2 != null  && !findAnyFromMongo2.isEmpty()) {
-			List<Map<String,String>> typelist = new ArrayList<Map<String,String>>();
-			String string = findAnyFromMongo2.get(0);
-			JSONObject json = JSONObject.parseObject(string);
-			result.put("goodsCatid", json.getString("catid1"));
-			result.put("goods_pid", goods_pid);
-			result.put("goodsName", json.getString("enname"));
-			String sku = json.getString("sku");
-			String entype = json.getString("entype_new");
-			String remotPath = json.getString("remotPath");
-			if(StringUtil.isNotBlank(entype) && StringUtil.isNotBlank(sku)) {
-				Map<String,TypeBean> typeMap = new HashMap<>();
-				List<TypeBean> entypeNew = JsonUtils.jsonToList(entype, TypeBean.class);
-				if (entypeNew != null && entypeNew.size() > 0) {
-					for (TypeBean typeBean : entypeNew) {
-						if (StringUtil.isNotBlank(typeBean.getImg())) {
-							typeBean.setImg(remotPath + typeBean.getImg());
-						}
-						typeMap.put(typeBean.getId(), typeBean);
+		if(findAnyFromMongo2 == null  || findAnyFromMongo2.isEmpty()) {
+			result.put("status", 500);
+			result.put("reason", "未找到产品");
+			return result;
+		}
+		List<Map<String,String>> typelist = new ArrayList<Map<String,String>>();
+		String string = findAnyFromMongo2.get(0);
+		JSONObject json = JSONObject.parseObject(string);
+		result.put("goodsCatid", json.getString("catid1"));
+		result.put("goodsPice", json.getString("price"));
+		result.put("goods_pid", goods_pid);
+		result.put("goodsName", json.getString("enname"));
+		String sku = json.getString("sku");
+		String entype = json.getString("entype_new");
+		String remotPath = json.getString("remotpath");
+		result.put("goodsImg", remotPath+json.getString("custom_main_image"));
+		if(StringUtil.isNotBlank(entype) && StringUtil.isNotBlank(sku)) {
+			Map<String,TypeBean> typeMap = new HashMap<>();
+			List<TypeBean> entypeNew = JsonUtils.jsonToList(entype, TypeBean.class);
+			if (entypeNew != null && entypeNew.size() > 0) {
+				for (TypeBean typeBean : entypeNew) {
+					if (StringUtil.isNotBlank(typeBean.getImg())) {
+						typeBean.setImg(remotPath + typeBean.getImg());
 					}
-				}
-				
-				JSONArray parseArray = JSONArray.parseArray(sku);
-				
-				Map<String,String> skuM = null;
-				boolean isSku = true;
-				for(int i=0,size=parseArray.size();i<size;i++) {
-					JSONObject skubject = JSONObject.parseObject(String.valueOf(parseArray.get(i)));
-					String skuPropIds = skubject.getString("skuPropIds");
-					String specId = skubject.getString("specId");
-					String skuId = skubject.getString("skuId");
-					
-					isSku = true;
-					skuM = new HashMap<>();
-					skuM.put("specId", specId);
-					skuM.put("skuId", skuId);
-					
-					String[] skuPropIdsArray = skuPropIds.split(",");
-					for(String s : skuPropIdsArray) {
-						TypeBean typeBean = typeMap.get(s);
-						if(typeBean == null) {
-							isSku = false;
-							break;
-						}
-						String context= typeBean.getLableType()+":"+typeBean.getValue()+"@"+typeBean.getId();
-						String skuContext = skuM.get("sku");
-						skuContext = StringUtil.isBlank(skuContext) ? context : skuContext + "," + context;
-						
-						skuM.put("sku", skuContext);
-					}
-					if(isSku) {
-						typelist.add(skuM);
-					}
+					typeMap.put(typeBean.getId(), typeBean);
 				}
 			}
-			result.put("skuList", typelist);
+			
+			JSONArray parseArray = JSONArray.parseArray(sku);
+			
+			Map<String,String> skuM = null;
+			boolean isSku = true;
+			for(int i=0,size=parseArray.size();i<size;i++) {
+				JSONObject skubject = JSONObject.parseObject(String.valueOf(parseArray.get(i)));
+				String skuPropIds = skubject.getString("skuPropIds");
+				String specId = skubject.getString("specId");
+				String skuId = skubject.getString("skuId");
+				
+				isSku = true;
+				skuM = new HashMap<>();
+				skuM.put("specId", specId);
+				skuM.put("skuId", skuId);
+				
+				String[] skuPropIdsArray = skuPropIds.split(",");
+				for(String s : skuPropIdsArray) {
+					TypeBean typeBean = typeMap.get(s);
+					if(typeBean == null) {
+						isSku = false;
+						break;
+					}
+					String context= typeBean.getLableType()+":"+typeBean.getValue()+"@"+typeBean.getId();
+					String skuContext = skuM.get("sku");
+					skuContext = StringUtil.isBlank(skuContext) ? context : skuContext + "," + context;
+					
+					skuM.put("sku", skuContext);
+				}
+				if(isSku) {
+					typelist.add(skuM);
+				}
+			}
 		}
+		result.put("skuList", typelist);
+		result.put("skuListSize", typelist.size());
+		result.put("status", 200);
+		return result;
+	}
+	
+	@RequestMapping("get/tborder")
+	@ResponseBody
+	public Map<String,Object> getTBorder(HttpServletRequest request, HttpServletResponse response){
+		Map<String,Object> result = new HashMap<>();
+		String order_shipno = request.getParameter("order_shipno");
+		
+		
+		result.put("skuList", typelist);
+		result.put("skuListSize", typelist.size());
+		result.put("status", 200);
 		return result;
 	}
 	
@@ -826,14 +877,44 @@ public class InventoryController {
 	public Map<String,Object> inputInventory(HttpServletRequest request, HttpServletResponse response){
 		Map<String,Object> result = new HashMap<>();
 		result.put("status", 200);
-		int isTBOrder = Integer.valueOf(StrUtils.object2NumStr(request.getParameter("isTbOrder")));
+		String lu_pid = request.getParameter("lu_pid");
+		String lu_price = request.getParameter("lu_price");
+		String lu_name = request.getParameter("lu_name");
+		String lu_img = request.getParameter("lu_img");
+		String lu_catid = request.getParameter("lu_catid");
+		String varray = request.getParameter("varray");
+		String reasonType = request.getParameter("reasonType");
+		String remark = request.getParameter("remark");
+		Map<String,String>  map = new HashMap<>();
+		map.put("isTBOrder",StrUtils.object2NumStr(request.getParameter("isTbOrder")) );
+		map.put("goods_pid",lu_pid );
+		map.put("goods_name", lu_name);
+		map.put("img", lu_img);
+		map.put("goodsCatid", lu_catid);
+		map.put("reasonType", reasonType);
+		map.put("goods_price",lu_price );
+		map.put("remark",remark );
+		map.put("tbOrderid",request.getParameter("tbOrderid"));
+		map.put("tbShipno",request.getParameter("tbShipno"));
+		map.put("goods_purl",request.getParameter("goods_purl"));
 		
-		
-		
-		
-		
-		
-		
+		varray = StringUtil.isNotBlank(varray) ? varray : "XXX";
+		varray = varray.startsWith(";") ? varray.substring(1) : varray;
+		String[] varrays = varray.split(";");
+		for(String v : varrays) {
+			String[] vs = v.split("(\\|)");
+			if(vs.length>5) {
+				if(!StrUtils.isNum(vs[3].trim()) || Integer.parseInt(vs[3].trim()) < 1) {
+					continue;
+				}
+				map.put("sku",vs[0].trim());
+				map.put("specid",vs[1].trim());
+				map.put("skuid",vs[2].trim());
+				map.put("count",vs[3].trim());
+				map.put("barcode",vs[4].trim());
+				inventoryService.inputInventory(map);
+			}
+		}
 		return result;
 		
 	}

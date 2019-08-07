@@ -166,5 +166,11 @@ public interface InventoryService {
 	 * @return
 	 */
 	int inventoryDetailsCount(Map<String, Object> map);
+	
+	/**获取淘宝订单
+	 * @param orderShipno
+	 * @return
+	 */
+	List<Map<String,Object>> getTbGoods(String orderShipno);
 
 }

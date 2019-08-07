@@ -964,7 +964,13 @@ public class StatisticalReportController {
      */
     @RequestMapping("/goodsInventoryReport")
     public ModelAndView goodsInventoryReport(ModelAndView mav) {
-        mav.setViewName("/goodsInventoryReport");
+    	
+    	
+    	
+    	
+    	
+    	
+        mav.setViewName("/inventoryReport");
         return mav;
     }
 
