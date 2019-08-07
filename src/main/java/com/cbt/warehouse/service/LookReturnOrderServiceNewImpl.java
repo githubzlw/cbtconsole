@@ -674,13 +674,13 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		try {
 			for (int i = 0; i < list.size(); i++) {
 				returndisplay re=this.lookReturnOrderServiceNewMapper.FindOrderByTbid(list.get(i).getTbId());
-				re.setReturnNumber(list.get(i).getReturnNumber());
-				re.setReturnReason(list.get(i).getReturnReason());
-				re.setApplyUser(admName);
-				re.setApplyTime(df.format(new Date()));
-				re.setState(-1);
-				bo=this.lookReturnOrderServiceNewMapper.AddOrder(re);
-			}
+                re.setReturnNumber(list.get(i).getReturnNumber());
+                re.setReturnReason(list.get(i).getReturnReason());
+                re.setApplyUser(admName);
+                re.setApplyTime(df.format(new Date()));
+                re.setState(-1);
+                bo=this.lookReturnOrderServiceNewMapper.AddOrder(re);
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 			bo=false;

@@ -483,4 +483,10 @@ public interface CustomGoodsMapper {
 
     List<Map<String, String>> queryAllOffLineReason();
 
+    /**
+     * 根据skuId查询中文规格信息
+     * @param skuId
+     * @return
+     */
+    String queryChTypeBySkuId(String skuId);
 }

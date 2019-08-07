@@ -3,6 +3,12 @@ package com.cbt.website.bean;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.Data;
+/**
+ * @author Administrator
+ *
+ */
+@Data
 public class SearchResultInfo {
 
 	private String tbOrderIdPositions; //订单所有商品的仓库存放位置
@@ -53,7 +59,11 @@ public class SearchResultInfo {
 	private String invoice;
 
 	private String isDropshipOrder;
+   /**
+	* 店铺id
+	*/
 	private String shop_id;
+	
 	private List<String> bh_shop_id;
 
 
@@ -65,7 +75,27 @@ public class SearchResultInfo {
 	private int order_num;//1688包裹对应的销售订单数量
 	private String isExitPhone;
 	private String source1688_img;
-
+	private String context;//采购备注
+	private String specId;
+	private String skuID;
+	
+	/**
+	 * 品牌名称
+	 */
+	private String brandName;
+	/**
+	 * 品牌授权状态
+	 */
+	private String authorizeState;
+	/**
+	 * 品牌授权说明
+	 */
+	private String authorizeRemark;
+	/**
+	 * 品牌id
+	 */
+	private String brandid;
+	
 	/**
 	 * 称秤体积重量
 	 */

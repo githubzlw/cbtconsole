@@ -485,7 +485,7 @@ public interface IPurchaseMapper {
 	 * @param odid
 	 * @return
 	 */
-	public String getUseInventory(@Param("odid") int odid);
+	public Map<String,Object> getUseInventory(@Param("odid") int odid);
 
 	/**
 	 * 取得最后一次采购来源

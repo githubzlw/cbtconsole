@@ -1,38 +1,5 @@
 package com.cbt.orderinfo.service;
 
-import com.cbt.bean.*;
-import com.cbt.common.StringUtils;
-import com.cbt.email.entity.EmailReceive1;
-import com.cbt.orderinfo.dao.OrderinfoMapper;
-import com.cbt.parse.service.StrUtils;
-import com.cbt.pojo.Admuser;
-import com.cbt.pojo.GoodsDistribution;
-import com.cbt.pojo.Inventory;
-import com.cbt.pojo.TaoBaoOrderInfo;
-import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
-import com.cbt.track.dao.TabTrackInfoMapping;
-import com.cbt.util.DoubleUtil;
-import com.cbt.util.Util;
-import com.cbt.util.Utility;
-import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.util.StringUtil;
-import com.cbt.warehouse.util.UtilAll;
-import com.cbt.website.bean.*;
-import com.cbt.website.dao.UserDao;
-import com.cbt.website.dao.UserDaoImpl;
-import com.importExpress.mapper.IPurchaseMapper;
-import com.importExpress.pojo.SampleOrderBean;
-import com.importExpress.pojo.SplitGoodsNumBean;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
-
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.poi.util.SystemOutLogger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,13 +7,74 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import org.apache.commons.collections.map.HashedMap;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cbt.bean.Address;
+import com.cbt.bean.AutoOrderBean;
+import com.cbt.bean.CodeMaster;
+import com.cbt.bean.Evaluate;
+import com.cbt.bean.Forwarder;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderChange;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.bean.Orderinfo;
+import com.cbt.bean.Payment;
+import com.cbt.bean.ShippingBean;
+import com.cbt.bean.TabTransitFreightinfoUniteNew;
+import com.cbt.bean.Tb1688OrderHistory;
+import com.cbt.bean.TransitPricecost;
+import com.cbt.bean.UserBean;
+import com.cbt.common.StringUtils;
+import com.cbt.email.entity.EmailReceive1;
+import com.cbt.orderinfo.dao.OrderinfoMapper;
+import com.cbt.parse.service.StrUtils;
+import com.cbt.pojo.Admuser;
+import com.cbt.pojo.GoodsDistribution;
+import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
+import com.cbt.track.dao.TabTrackInfoMapping;
+import com.cbt.util.DoubleUtil;
+import com.cbt.util.Util;
+import com.cbt.util.Utility;
+import com.cbt.warehouse.dao.InventoryMapper;
+import com.cbt.warehouse.dao.WarehouseMapper;
+import com.cbt.warehouse.service.InventoryService;
+import com.cbt.warehouse.util.StringUtil;
+import com.cbt.warehouse.util.UtilAll;
+import com.cbt.website.bean.ConfirmUserInfo;
+import com.cbt.website.bean.PaymentBean;
+import com.cbt.website.bean.SearchResultInfo;
+import com.cbt.website.bean.SearchTaobaoInfo;
+import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
+import com.cbt.website.dao.UserDao;
+import com.cbt.website.dao.UserDaoImpl;
+import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.pojo.SplitGoodsNumBean;
+import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 @Service
 public class OrderinfoService implements IOrderinfoService {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderinfoService.class);
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
+	@Autowired
+	private InventoryMapper inventoryMapper;
 	@Autowired
 	private WarehouseMapper warehouseMapper;
 
@@ -55,6 +83,8 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Autowired
 	private TabTrackInfoMapping tabTrackInfoMapping;
+	@Autowired
+	private InventoryService inventoryService;
 
 	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(OrderinfoService.class);
 
@@ -396,6 +426,8 @@ public class OrderinfoService implements IOrderinfoService {
 		List<Tb1688OrderHistory> list=orderinfoMapper.getGoodsData(shipno);
 		for(Tb1688OrderHistory t:list){
 			t.setImgurl(t.getImgurl().replace(".80x80","").replace(".60x60",""));
+			t.setSkuID(StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID());
+			t.setSpecId(StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId());
 		}
 		return list;
 	}
@@ -441,15 +473,31 @@ public class OrderinfoService implements IOrderinfoService {
 					}
 				}
 				//订单收获地址
-				String check="";
-				String address =String.valueOf(map.get("address"));
+				
+//				String address =String.valueOf(map.get("address"));
 				searchresultinfo.setStrcar_type(changetypeName(car_type));
 				searchresultinfo.setIsExitPhone(String.valueOf(map.get("isExitPhone")));
 				searchresultinfo.setTaobao_itemid(resultTaobaoItemId);
 				//获取商品的店铺名称
 				String shop_id="0000";
 				String goods_pid=String.valueOf(map.get("goods_pid"));
-				if(goods_pid.equals(String.valueOf(map.get("tb_1688_itemid")))){
+				
+				//查询产品品牌授权情况
+				Map<String, Object> goodsBrandAuthorization = orderinfoMapper.getGoodsBrandAuthorization(goods_pid);
+				//0-未授权  1-部分授权 2-全部授权   -1 -侵权
+				String authorized_flag = "0";
+				String brand_name = "";
+				String brandid = "0000";
+				if(goodsBrandAuthorization != null) {
+					Object authorizeState = goodsBrandAuthorization.get("authorize_state");
+					authorized_flag = authorizeState == null ? "0" : String.valueOf(authorizeState);
+					brand_name = (String)goodsBrandAuthorization.get("brand_name");
+					brand_name = brand_name == null ? "" : brand_name;
+					shop_id = goodsBrandAuthorization.get("shop_id") != null ? (String)goodsBrandAuthorization.get("shop_id") : shop_id;
+					brandid = goodsBrandAuthorization.get("brand_id") != null ? (String)goodsBrandAuthorization.get("brand_id") : brandid;
+				}
+				
+				/*if(goods_pid.equals(String.valueOf(map.get("tb_1688_itemid")))){
 					//采购货源和推荐货源一致
 					shop_id=orderinfoMapper.getShopId(goods_pid);
 					//是否授权
@@ -462,17 +510,33 @@ public class OrderinfoService implements IOrderinfoService {
 							|| (address.contains("加拿大") || "6".equals(address) || "CANADA".equals(address.toLowerCase())))){
 						check="请核查该商品是否侵权";
 					}
-				}
+				}*/
 				//采购是否该商品授权  1已授权
-				String authorized_flag=String.valueOf(map.get("aFlag"));
+				/*String authorized_flag=String.valueOf(map.get("aFlag"));
 				if("0".equals(authorized_flag)){
 					check="采购已对该商品授权";
 				}else if("2".equals(authorized_flag)){
 					//查询上一次该商品发货的订单信息
 					check= warehouseMapper.getBatckInfo(goods_pid);
 				}
-				check=StringUtil.isBlank(check)?"-":check;
+				check=StringUtil.isBlank(check)?"-":check;*/
+				String check = "未授权品牌，通知采购核查";
+				String authorizeRemark = "未授权";
+				if("2".equals(authorized_flag)){
+					check = "采购已对该品牌授权";
+					authorizeRemark = "已授权";
+				}else if("1".equals(authorized_flag)){
+					check = "采购已对该品牌部分授权";
+					authorizeRemark = "未授权";
+				}else if("-1".equals(authorized_flag)){
+					check = "该品牌侵权";
+					authorizeRemark = "侵权";
+				}
+				searchresultinfo.setBrandid(brandid);
+				searchresultinfo.setAuthorizeRemark(authorizeRemark);
+				searchresultinfo.setAuthorizeState(authorized_flag);
 				searchresultinfo.setAuthorizedFlag(check);
+				searchresultinfo.setBrandName(brand_name);
 				searchresultinfo.setShop_id(shop_id);
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
                 // 2018/11/06 11:39 ly 实秤重量 是否已同步到产品库
@@ -523,6 +587,15 @@ public class OrderinfoService implements IOrderinfoService {
 				searchresultinfo.setDp_city(map.get("dp_city"));
 				searchresultinfo.setDp_country(map.get("dp_country"));
 				searchresultinfo.setDp_province(map.get("dp_province"));
+				//采购备注-2019.07.04-sj
+				searchresultinfo.setContext(map.get("context")!=null?map.get("context") : "");
+				if(StringUtil.isBlank(car_type) || "0".equals(car_type)) {
+					searchresultinfo.setSpecId(map.get("tb_1688_itemid"));
+					searchresultinfo.setSkuID(map.get("tb_1688_itemid"));
+				}else {
+					searchresultinfo.setSpecId(map.get("specid")!=null?map.get("specid") : "");
+					searchresultinfo.setSkuID(map.get("skuid")!=null?map.get("skuid") : "");
+				}
 				info.add(searchresultinfo);
 			}
 			//一个1688包裹对应的采购订单数量
@@ -707,10 +780,9 @@ public class OrderinfoService implements IOrderinfoService {
 		int row=0;
 		int old_itemqty=0;
 		double weights=0.00;
-		int cancelCount=0;
 		try{
 			Map<String,String> inMap=orderinfoMapper.getInspetionMap(map);
-			cancelCount=Integer.valueOf(map.get("cance_inventory_count"));
+//			cancelCount=Integer.valueOf(map.get("cance_inventory_count"));
 			if(inMap != null){
 				old_itemqty=Integer.valueOf(String.valueOf(inMap.get("itemqty")));
 				weights=Double.parseDouble(String.valueOf(inMap.get("weight")))-Double.parseDouble(StringUtil.isBlank(String.valueOf(map.get("weight")))?"0.00":String.valueOf(map.get("weight")));
@@ -723,41 +795,9 @@ public class OrderinfoService implements IOrderinfoService {
 				orderinfoMapper.updateRelationTable(map);
 			}
 			row=orderinfoMapper.updateDetails(map);
+			
 			//如果该商品验货是有录入库存则做想应的减少
-			Map<String,String> inventoryMap=orderinfoMapper.getInventoryMap(map);
-			if(inventoryMap != null){
-				String sku=String.valueOf(inventoryMap.get("car_type"));
-				String car_urlMD5=String.valueOf(inventoryMap.get("car_urlMD5"));
-				String goods_pid=String.valueOf(inventoryMap.get("goods_pid"));
-				String goods_p_price=String.valueOf(inventoryMap.get("goods_p_price"));
-				//销售数量
-				int yourorder=Integer.valueOf(String.valueOf(inventoryMap.get("yourorder")));
-				//库存减少数量
-				int inventory_count=cancelCount;
-				map.put("sku",StringUtils.isStrNull(sku)?"":sku.trim());
-				map.put("car_urlMD5",car_urlMD5);
-				map.put("goods_pid",goods_pid);
-				if(inventory_count>0){
-					//库存减少
-					Inventory in=orderinfoMapper.getInventoryInfo(map);
-					if(in != null && in.getFlag()==1){
-						double amount=in.getNew_inventory_amount()-(inventory_count/Integer.valueOf(map.get("seiUnit")))*Double.valueOf(goods_p_price);
-						map.put("amount",String.valueOf(amount));
-						map.put("new_remaining",String.valueOf(Integer.valueOf(in.getNew_remaining())-inventory_count<0?0:(Integer.valueOf(in.getNew_remaining())-inventory_count)));
-						map.put("can_remaining",String.valueOf(Integer.valueOf(in.getCan_remaining())-inventory_count<0?0:(Integer.valueOf(in.getCan_remaining())-inventory_count)));
-						orderinfoMapper.updateInventory(map);
-					}else if(in != null && in.getFlag()==0){
-						//未盘点
-						map.put("new_remaining",String.valueOf(Integer.valueOf(in.getRemaining())-inventory_count<0?0:(Integer.valueOf(in.getRemaining())-inventory_count)));
-						map.put("can_remaining",String.valueOf(Integer.valueOf(in.getCan_remaining())-inventory_count<0?0:(Integer.valueOf(in.getCan_remaining())-inventory_count)));
-						double amount=in.getInventory_amount()-(inventory_count/Integer.valueOf(String.valueOf(map.get("seiUnit"))))*Double.valueOf(goods_p_price);
-						map.put("amount",String.valueOf(amount));
-						orderinfoMapper.updateInventoryFlag(map);
-					}
-				}
-				//删除验货时的记录storage_outbound_details
-				orderinfoMapper.updateUutboundDetails(map);
-			}
+			inventoryService.cancelInventory(map);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -1652,10 +1692,14 @@ public class OrderinfoService implements IOrderinfoService {
 			odb.setShop_id(shop_id);
 			String inventoryRemark="";
 			//查询该商品是否有使用库存
-			String useInventory=pruchaseMapper.getUseInventory(odb.getOid());
-			if(StringUtil.isNotBlank(useInventory)){
-				inventoryRemark="该商品使用了【"+useInventory+"】件库存";
+			Map<String, Object> useInventoryMap=pruchaseMapper.getUseInventory(odb.getOid());
+			if(useInventoryMap != null) {
+				String useInventory = com.cbt.util.StrUtils.object2Str(useInventoryMap.get("lock_remaining"));
+				if(StringUtil.isNotBlank(useInventory)){
+					inventoryRemark="该商品使用了【"+useInventory+"】件库存";
+				}
 			}
+			
 			odb.setInventoryRemark(inventoryRemark);
 			String buy_url = getBuyUrl(odb);
 			buy_url=StringUtil.getNewUrl(buy_url,goods_pid,odb.getCar_urlMD5());
@@ -1934,6 +1978,40 @@ public class OrderinfoService implements IOrderinfoService {
 	@Override
 	public int querySampleOrderInfoByOrderId(String orderNo) {
 		return orderinfoMapper.querySampleOrderInfoByOrderId(orderNo);
+	}
+	@Override
+	public List<Tb1688OrderHistory> checkOrder(String shipno,int tbsourceCount) {
+		int orderCount = orderinfoMapper.getCheckOrderCount(shipno);
+		if(orderCount == tbsourceCount) {
+			return null;
+		}
+		List<Tb1688OrderHistory> result = new ArrayList<>();
+		List<Tb1688OrderHistory> tb1688Orders = orderinfoMapper.getGoodsData(shipno);
+		List<Map<String, Object>> orderDataCheck = orderinfoMapper.getOrderDataCheck(shipno);
+		boolean isInventory = false;
+		for(Tb1688OrderHistory t : tb1688Orders) {
+			isInventory = false;
+			String tbskuid = StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID();
+			String tbspecid = StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId();
+			
+			for(Map<String, Object> m : orderDataCheck) {
+				String car_type = (String)m.get("car_type");
+				String specid = "";
+				String skuid = "";
+				if(StringUtil.isBlank(car_type) || "0".equals(car_type)) {
+					specid = (String)m.get("tb_1688_itemid");
+					skuid = (String)m.get("tb_1688_itemid");
+				}else {
+					specid = (String)m.get("specid")!=null?(String)m.get("specid") : "";
+					skuid = (String)m.get("skuid")!=null?(String)m.get("skuid") : "";
+				}
+				isInventory = org.apache.commons.lang.StringUtils.equals(tbspecid, specid) ||  org.apache.commons.lang.StringUtils.equals(tbskuid, skuid);
+			}
+			if(!isInventory) {
+				result.add(t);
+			}
+		}
+		return result;
 	}
 }
 

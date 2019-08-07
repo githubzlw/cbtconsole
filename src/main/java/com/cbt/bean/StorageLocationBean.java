@@ -116,7 +116,7 @@ public class StorageLocationBean {
 		this.is_refund = is_refund;
 	}
 	public String getGoodstatus() {
-//		//商品状态：1.到货了;2.该到没到;3.破损;4.有疑问;5.数量不够
+//		//商品状态：1.到货了;2.该到没到;3.破损;4.有疑问;5.数量不够 6:品牌未授权
 //		if("1".equals(goodstatus)){
 //			goodstatus = "已到仓库，校验无误";
 //		}else if("2".equals(goodstatus)){

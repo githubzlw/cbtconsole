@@ -1,7 +1,6 @@
 package com.cbt.bean;
 
 import java.util.Date;
-
 public class Tb1688OrderHistory {
 	private int  id;
 	private int  tbOr1688;   //0： 淘宝  1：1688
@@ -22,6 +21,21 @@ public class Tb1688OrderHistory {
 	private String imgurl;
 	private String username;
 	private Date creatTime;
+	private String specId;
+	private String skuID;
+	
+	public String getSpecId() {
+		return specId;
+	}
+	public void setSpecId(String specId) {
+		this.specId = specId;
+	}
+	public String getSkuID() {
+		return skuID;
+	}
+	public void setSkuID(String skuID) {
+		this.skuID = skuID;
+	}
 	public int getId() {
 		return id;
 	}

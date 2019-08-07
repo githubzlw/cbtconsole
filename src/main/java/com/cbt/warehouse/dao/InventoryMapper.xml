@@ -301,4 +301,129 @@
         values (#{goods_url},#{count},#{count},#{goods_name},#{sku},#{in_barcode},(SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=#{goodscatid}),
         #{inventory_amount},#{car_img},#{goods_pid},#{car_urlMD5},now(),#{goods_p_price},#{remark},1,now(),#{inventory_amount},#{count})
     </insert>
+    
+    
+    <!-- ********************************库存数据*************************** -->
+    <!-- 获取上次库存 -->
+    <select id="getInventory" resultType="java.util.Map">
+    select  id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,barcode,car_urlMD5,goods_pid,sku,
+    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
+    from inventory_sku 
+    where 1=1 
+     and goods_pid=#{goods_pid} 
+    and specid=#{specid} and skuid=#{skuid}
+    </select>
+    <select id="getInventoryByOdId" resultType="java.util.Map">
+    select  id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,barcode,car_urlMD5,goods_pid,sku,
+    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
+    from inventory_sku 
+    where 1=1 
+    and od_id=#{odid}
+    and specid=#{specid} and skuid=#{skuid}
+    </select>
+     <select id="getInventoryByid" resultType="java.util.Map">
+    select  id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,barcode,car_urlMD5,goods_pid,sku,
+    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
+    from inventory_sku 
+    where id=#{id}
+    </select>
+    <!-- 获取库存表id -->
+    <select id="isExsisInventory" resultType="Integer">
+    select  id from inventory_sku where goods_pid=#{goods_pid}  and specid=#{specid} and skuid=#{skuid}
+    </select>
+    
+    <insert id="addInventory">
+    insert into inventory_sku(goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_type,
+    car_img,goods_pid,car_urlMD5,createtime,goods_p_price,goods_p_url,updatetime,specid,skuid,goods_p_pid,od_id,goods_price) 
+	values(#{car_url},#{inventory_count},#{inventory_count},#{goodsname},#{car_type},#{barcode},
+	#{goodscatid},#{inventory_type},#{car_img},#{goods_pid},#{car_urlMD5},now(),#{goods_p_price},
+	#{goods_p_url},now(),#{specid},#{skuid},#{tb_1688_itemid},#{odid},#{goodsprice})
+    </insert>
+    
+    <update id="updateInventory">
+    update inventory_sku set remaining=#{remaining} ,can_remaining=#{can_remaining} ,
+    updatetime=now(),goods_p_url=#{goods_p_url},goods_p_price=#{goods_p_price}  where goods_pid=#{goods_pid} 
+    and specid=#{specid} 
+    and skuid=#{skuid} 
+    </update>
+    <update id="updateInventoryById">
+    update inventory_sku set remaining=#{remaining} ,can_remaining=#{can_remaining} ,
+    updatetime=now(),goods_p_url=#{goods_p_url},goods_p_price=#{goods_p_price}  where id=#{inventory_sku_id}
+    </update>
+    
+    <!-- 库存记录变更表  -->
+   <insert id="addInventoryChangeRecord" parameterType="java.util.Map">
+   insert into inventory_sku_log(goods_url,remaining,before_remaining,
+   after_remaining,good_name,sku,barcode,goods_pid,
+   createtime,remark,change_type,goods_p_pid,specid,skuid,inventory_sku_id)
+   values(#{car_url},#{inventory_count},
+   #{before_remaining},#{after_remaining},#{goodsname},#{car_type},#{barcode},#{goods_pid},
+   now(),#{log_remark},#{change_type},#{tb_1688_itemid},#{specid},#{skuid},#{inventory_sku_id})
+   </insert>
+	<!-- 记录库存存入记录，用来统计当月库存金额 -->    
+   <!-- <insert id="insertInventoryDetails" parameterType="java.util.Map">
+   insert into inventory_details (createtime,od_id,inventory_acount,inventory_price,invetory_amount,inventory_barcode,goods_pid,sku,car_urlMD5)
+   values
+   (now(),#{odid},#{inventory_acount},#{inventory_price},
+   #{invetory_amount},#{barcode},#{goods_pid},#{car_type},#{car_urlMD5})
+   </insert>  -->
+    
+    
+    <select id="getOrderDetails" resultType="java.util.Map">
+    select od.id as odid,od.goodsid,od.goodsprice,od.yourorder,od.goods_pid,trim(od.car_type) as car_type,od.car_urlMD5,od.goodsname,od.car_url,
+    th.orderid as tborderid,od.goodscatid,od.car_img,ops.goods_p_price,th.imgurl as goods_p_img,th.itemurl,
+	ops.goods_p_url,ops.tb_1688_itemid 	
+	from order_details od 
+	inner join order_product_source ops on (od.id=ops.od_id and od.orderid=ops.orderid )
+	inner join id_relationtable ir on ir.odid=od.id
+	inner join taobao_1688_order_history th on  th.orderid=ir.tborderid 
+	where od.orderid=#{orderid} and od.id=#{odid}  limit 1
+    </select>
+    
+    <insert id="insertInventoryDetailsSku">
+    insert into inventory_details_sku(goods_pid,goods_p_pid,sku,good_skuid,goods_p_skuid,goods_price,
+    goods_p_price,goods_number,1688_orderid,1688_shipno,orderno,od_id,createtime,admid,type,inventory_id,
+    goods_p_url,goods_p_img,good_name,goods_specid,goods_p_specid,goods_img)
+    value(#{goods_pid},#{tb_1688_itemid},#{car_type},#{skuid},#{tbskuid},#{goodsprice},#{goods_p_price},
+    #{yourorder},#{tborderid},#{shipno},#{orderid},#{odid},now(),#{admId},#{type},#{inventory_sku_id},
+    #{goods_p_url},#{goods_p_img},#{goodsname},#{specid},#{thspecid},#{car_img})
+    
+    </insert>
+    <insert id="insertStorageOutboundDetails">
+    insert into storage_outbound_details 
+    (orderid,goodsid,in_id,storage_count,type,createtime,admName,when_count,add_inventory) values
+    (#{orderid},#{goodsid},#{inventory_sku_id},#{storage_count},1,now(),#{adminId},#{when_count},#{inventory_count})
+    
+    </insert>
+    
+    <select id="getInventoryByOrderDetialsId" resultType="java.util.Map">
+    select odsm.goods_pid, odsm.specid,odsm.skuid,isku.can_remaining,isku.id as inventory_id from 
+     order_details_sku_match odsm left join inventory_sku isku on (odsm.goods_pid=isku.goods_pid 
+    and odsm.specid=isku.specid  and odsm.skuid=isku.skuid )
+    where odsm.skuid!='' and odsm.specid!='' and odsm.order_details_id=#{odid} limit 1
+    </select>
+    
+    <select id="getInventoryDetailSku" resultType="java.util.Map">
+    select 
+    1688_orderid,good_name,goods_p_pid,sku,1688_shipno,admid,goods_p_img,goods_p_url,goods_p_skuid,goods_p_specid,goods_p_price
+    from inventory_details_sku where type=0 and inventory_id=#{inventory_sku_id} order by id desc 
+    limit 1
+    </select>
+    <insert id="addIdRelationTable">
+    insert into id_relationtable ( orderid,goodid,odid,goodurl,goodstatus,goodarrivecount,
+    barcode,tborderid,position,shipno, username,userid,state,itemid,is_delete,store_name,
+    taobaospec,warehouse_remark,taobaoprice,itemqty,
+   is_replenishment,weight,is_refund,specid,skuid,createtime)
+    values(#{orderid},#{goodid},#{odid},#{goodurl},#{goodstatus},#{goodarrivecount},
+    #{barcode},#{tborderid},#{position},#{shipno},#{username},#{userid},#{state},#{itemid},#{is_delete},#{store_name},
+    #{taobaospec},#{warehouse_remark},#{taobaoprice},#{itemqty},
+    #{is_replenishment},#{weight},#{is_refund},#{specid},#{skuid},now())
+    
+    </insert>
+    <insert id="insertLockInventory">
+    INSERT INTO lock_inventory (in_id,lock_remaining,od_id,createtime,lock_inventory_amount,is_use) values(
+    #{inventory_sku_id},#{inventory_count},#{odid},now(),#{lock_inventory_amount},#{is_use}
+    )
+    </insert>
+    
 </mapper>

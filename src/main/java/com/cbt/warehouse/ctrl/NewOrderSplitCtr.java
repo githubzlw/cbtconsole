@@ -4,7 +4,11 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.Admuser;
+import com.cbt.pojo.Inventory;
 import com.cbt.util.*;
+import com.cbt.warehouse.pojo.SampleOrderBean;
+import com.cbt.warehouse.service.IWarehouseService;
+import com.cbt.website.dao.*;
 import com.cbt.website.dao.IOrderSplitDao;
 import com.cbt.website.dao.OrderInfoDao;
 import com.cbt.website.dao.OrderInfoImpl;
@@ -14,6 +18,7 @@ import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderSplitServer;
 import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.util.JsonResult;
+import com.google.gson.Gson;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
@@ -24,12 +29,17 @@ import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
 import com.importExpress.utli.UserInfoUtils;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletException;
@@ -45,6 +55,8 @@ import java.util.regex.Pattern;
 @Controller
 @RequestMapping("/orderSplit")
 public class NewOrderSplitCtr {
+    @Autowired
+    private Send send;
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NewOrderSplitCtr.class);
     @Autowired
     private SendMailFactory sendMailFactory;
@@ -52,6 +64,8 @@ public class NewOrderSplitCtr {
     private IOrderinfoService iOrderinfoService;
     @Autowired
     private OrderSplitRecordService orderSplitRecordService;
+    @Autowired
+    private IWarehouseService iWarehouseService;
 
     /**
      * 订单拆分(正常订单和Drop Ship订单)
@@ -113,6 +127,53 @@ public class NewOrderSplitCtr {
         }
         // LOG.info("ordersplit end");
         return json;
+    }
+    @RequestMapping(value = "/DownSample")
+    @ResponseBody
+    public JsonResult DownSample(HttpServletRequest request, HttpServletResponse response,@RequestBody List<OrderDetailsBean> odls) {
+        JsonResult json = new JsonResult();
+        for (OrderDetailsBean old:odls){
+            System.out.println(old);
+        }
+        return json;
+    }
+    @RequestMapping(value = "/deliverOrder")
+    public String deliverOrder(HttpServletRequest request, HttpServletResponse response,@RequestParam(value = "page",defaultValue = "0")int page,@RequestParam(value = "pagesize",defaultValue = "30")int pagesize, Model model) {
+        String pid=request.getParameter("pid");
+        String orderno=request.getParameter("orderno");
+        String userid=request.getParameter("userid");
+        if (StringUtils.isBlank(pid)){
+            pid=null;
+        } if (StringUtils.isBlank(orderno)){
+            return "samplelibrary";
+        }
+       Gson gson=new Gson();
+        List<Inventory> odls=new ArrayList<>();
+        odls=this.iWarehouseService.FindAllGoods(page,pagesize,pid);
+        String s2 = gson.toJson(odls);
+        model.addAttribute("orderDetail",odls);
+        request.setAttribute("odls",s2);
+        request.setAttribute("orderno",orderno);
+        request.setAttribute("userid",userid);
+        return "samplelibrary";
+    }
+    @RequestMapping(value = "/saveNewOrder")
+    @ResponseBody
+    public int SaveNewOrder(HttpServletRequest request, HttpServletResponse response,@RequestBody List<SampleOrderBean> list ) {
+        if (list.size()>0) {
+            try {
+                send.deliverMqSend(list);
+                boolean bo=this.iWarehouseService.setInventoryCountBySkuAndPid(list);
+                if (bo){
+                    return 1;
+                }
+                return 0;
+            }catch (Exception e){
+                return 0;
+            }
+
+        }
+        return 0;
     }
 
     @SuppressWarnings("finally")

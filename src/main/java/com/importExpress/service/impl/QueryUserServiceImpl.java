@@ -845,4 +845,19 @@ public class QueryUserServiceImpl implements QueryUserService {
         }
         return result;
     }
+
+    @Override
+    public List<TimingWarningInfo> queryTimingWarningInfo(Integer valid, Integer day) {
+        return queryUserMapper.queryTimingWarningInfo(valid, day);
+    }
+
+    @Override
+    public TimingWarningInfo queryQuotaData(Integer id) {
+        return queryUserMapper.queryQuotaData(id);
+    }
+
+    @Override
+    public void udpateQuotaData(TimingWarningInfo bean) {
+        queryUserMapper.udpateQuotaData(bean);
+    }
 }

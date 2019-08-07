@@ -1,5 +1,7 @@
 package com.cbt.pojo;
 
+import java.util.List;
+
 /**
  * 库存表实体类
  * 
@@ -85,6 +87,117 @@ public class Inventory {
 	private String editLink;
 	private String name;
 	private int type;
+	private String final_weight;//商品最终重量
+	private List<String> skuList;//商品详情集合
+	private String entype;//商品详情集合
+	private int is_sold_flag;//商品详情集合
+	private String volume_weight;//商品详情集合
+	private String weight;//商品详情集合
+
+	public String getEntype() {
+		return entype;
+	}
+
+	public void setEntype(String entype) {
+		this.entype = entype;
+	}
+
+	public int getIs_sold_flag() {
+		return is_sold_flag;
+	}
+
+	public void setIs_sold_flag(int is_sold_flag) {
+		this.is_sold_flag = is_sold_flag;
+	}
+
+	public String getVolume_weight() {
+		return volume_weight;
+	}
+
+	public void setVolume_weight(String volume_weight) {
+		this.volume_weight = volume_weight;
+	}
+
+	public String getWeight() {
+		return weight;
+	}
+
+	public void setWeight(String weight) {
+		this.weight = weight;
+	}
+
+	@Override
+	public String toString() {
+		return "Inventory{" +
+				"id=" + id +
+				", goods_url='" + goods_url + '\'' +
+				", add_goods=" + add_goods +
+				", out_goods=" + out_goods +
+				", remaining='" + remaining + '\'' +
+				", last_add_time='" + last_add_time + '\'' +
+				", last_out_time='" + last_out_time + '\'' +
+				", itemid='" + itemid + '\'' +
+				", sku='" + sku + '\'' +
+				", good_name='" + good_name + '\'' +
+				", barcode='" + barcode + '\'' +
+				", buyCount=" + buyCount +
+				", noInCount=" + noInCount +
+				", last_buy_time='" + last_buy_time + '\'' +
+				", goods_p_url='" + goods_p_url + '\'' +
+				", goodscatid='" + goodscatid + '\'' +
+				", inventory_amount=" + inventory_amount +
+				", car_img='" + car_img + '\'' +
+				", userName='" + userName + '\'' +
+				", goods_p_price='" + goods_p_price + '\'' +
+				", goodsprice='" + goodsprice + '\'' +
+				", flag=" + flag +
+				", new_inventory_amount=" + new_inventory_amount +
+				", new_barcode='" + new_barcode + '\'' +
+				", new_remaining='" + new_remaining + '\'' +
+				", oldUrl='" + oldUrl + '\'' +
+				", operation='" + operation + '\'' +
+				", goods_pid='" + goods_pid + '\'' +
+				", car_urlMD5='" + car_urlMD5 + '\'' +
+				", updatetime='" + updatetime + '\'' +
+				", createtime='" + createtime + '\'' +
+				", remark='" + remark + '\'' +
+				", can_remaining='" + can_remaining + '\'' +
+				", admName='" + admName + '\'' +
+				", create_time='" + create_time + '\'' +
+				", old_inventory='" + old_inventory + '\'' +
+				", new_inventroy='" + new_inventroy + '\'' +
+				", old_barcode='" + old_barcode + '\'' +
+				", goodsid='" + goodsid + '\'' +
+				", onLine='" + onLine + '\'' +
+				", unsellableReason='" + unsellableReason + '\'' +
+				", pid='" + pid + '\'' +
+				", online_flag='" + online_flag + '\'' +
+				", db_flag='" + db_flag + '\'' +
+				", editLink='" + editLink + '\'' +
+				", name='" + name + '\'' +
+				", type=" + type +
+				", final_weight='" + final_weight + '\'' +
+				", skuList=" + skuList +
+				", delRemark='" + delRemark + '\'' +
+				'}';
+	}
+
+	public String getFinal_weight() {
+		return final_weight;
+	}
+
+	public void setFinal_weight(String final_weight) {
+		this.final_weight = final_weight;
+	}
+
+	public List<String> getSkuList() {
+		return skuList;
+	}
+
+	public void setSkuList(List<String> skuList) {
+		this.skuList = skuList;
+	}
+
 	public int getType() {
 		return type;
 	}

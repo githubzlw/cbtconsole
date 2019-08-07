@@ -66,6 +66,7 @@
                            varStatus="nameIndex">
                     <td id="type_name_${type_name.key}">${type_name.value}</td>
                 </c:forEach>
+                <td>规格中文</td>
                 <td>单价</td>
                 <td>重量(KG)</td>
                 <td>体积重量(KG)</td>
@@ -77,13 +78,14 @@
                 <tr>
                     <c:forEach var="tp_ar" items="${fn:split(sku_bean.skuAttrs,';')}">
                         <td id="combine_id_${fn:split(tp_ar,'@')[0]}"
-                            style="width: 100px;">${fn:split(tp_ar,'@')[2]}</td>
+                            style="width: 130px;">${fn:split(tp_ar,'@')[2]}</td>
                     </c:forEach>
-                    <td style="width: 100px;text-align: center;"><span>${sku_bean.price}</span></td>
-                    <td style="width: 100px;">
+                    <td style="width: 160px;text-align: center;"><span>${sku_bean.chType}</span></td>
+                    <td style="width: 80px;text-align: center;"><span>${sku_bean.price}</span></td>
+                    <td style="width: 80px;">
                         <input class="inp_style inp_cmn_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
                                value="${sku_bean.fianlWeight}"/></td>
-                    <td style="width: 100px;">
+                    <td style="width: 80px;">
                         <input class="inp_style inp_vlm_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
                                value="${sku_bean.volumeWeight}"/></td>
                 </tr>
@@ -158,7 +160,7 @@
                 }
                 typeMap[noBlankVal] = tVal;
             }
-            $(this).find("td").eq(3).find("input").addClass("com_" + typeMap[noBlankVal]);
+            $(this).find("td").eq(4).find("input").addClass("com_" + typeMap[noBlankVal]);
             $(this).find("td:last").find("input").addClass("vlm_" + typeMap[noBlankVal]);
         });
         // 取最大值
