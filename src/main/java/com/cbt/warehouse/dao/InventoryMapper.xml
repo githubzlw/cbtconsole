@@ -398,9 +398,11 @@
     
     <select id="getInventoryByOrderDetialsId" resultType="java.util.Map">
     select odsm.goods_pid, odsm.specid,odsm.skuid,isku.can_remaining,isku.id as inventory_id from 
-     order_details_sku_match odsm left join inventory_sku isku on (odsm.goods_pid=isku.goods_pid 
+     order_details_sku_match odsm 
+     left join inventory_sku isku on (odsm.goods_pid=isku.goods_pid 
     and odsm.specid=isku.specid  and odsm.skuid=isku.skuid )
-    where odsm.skuid!='' and odsm.specid!='' and odsm.order_details_id=#{odid} limit 1
+    left join order_details od on od.id=odsm.order_details_id
+    where odsm.skuid!='' and odsm.specid!='' and odsm.order_details_id=#{odid}  and od.checked=0 and state=0 limit 1
     </select>
     
     <select id="getInventoryDetailSku" resultType="java.util.Map">
