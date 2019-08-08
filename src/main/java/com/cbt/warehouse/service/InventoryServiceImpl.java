@@ -34,8 +34,6 @@ public class InventoryServiceImpl implements  InventoryService{
 	private InventoryMapper inventoryMapper;
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
-	@Autowired
-	private IPurchaseMapper pruchaseMapper;
 
 	/**
 	 * 根据ID获取库存
@@ -503,10 +501,12 @@ public class InventoryServiceImpl implements  InventoryService{
 		if(inventory_count < 1 || googs_number * goodsUnit < 1) {
 			return 0;
 		}
+		map.put("useAllInventory", "false");
 		//如果库存大于客户订单下单数量，则全部使用库存，若不够在采购其他的
 		if(googs_number * goodsUnit < inventory_count) {
 			inventory_count = googs_number * goodsUnit;
 			map.put("inventory_count", String.valueOf(inventory_count));
+			map.put("useAllInventory", "true");
 		}
 		//1.如果该商品是有录入库存则做想应的减少
 		String id = map.get("inventory_sku_id");
@@ -556,7 +556,11 @@ public class InventoryServiceImpl implements  InventoryService{
 		if(isReduce) {
 			//采购使用库存锁定库存
 			map.put("is_use", "1");
-//			inventoryMapper.insertLockInventory(map);
+			if("true".equals(map.get("useAllInventory"))) {
+				//如果全部使用库存，订单状态改为验货无误
+				orderinfoMapper.updateOrderDetailsState(map.get("odid"), map.get("orderid"));
+			}
+			inventoryMapper.insertLockInventory(map);
 		}
 		int before_remaining = inventoryMap.getRemaining();
 		int can_remaining = inventoryMap.getCanRemaining();
@@ -604,7 +608,6 @@ public class InventoryServiceImpl implements  InventoryService{
 	
 	
 	@Override
-	@Transactional
 	public Map<String,Object> reportLossInventory(Map<String, Object> map) {
 		Map<String, String> inv = new HashMap<String, String>();
 		Map<String,Object> result = new HashMap<String, Object>();
@@ -635,12 +638,13 @@ public class InventoryServiceImpl implements  InventoryService{
 		
 		inv.put("goods_p_url", inventoryByid.getGoodsPUrl());
 		inv.put("goods_p_price", inventoryByid.getGoodsPPrice());
-		//库存减少
 		if(remaining > changeNumber) {
+			//库存减少
 			inv.put("can_remaining", String.valueOf(can_remaining - change_number));
 			iSku.setCanRemaining(can_remaining - change_number);
 			inv.put("change_type", "2");
 		}else {
+			//库存增加
 			inv.put("can_remaining", String.valueOf(can_remaining + change_number));
 			iSku.setCanRemaining(can_remaining + change_number);
 			inv.put("change_type", "1");
