@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
@@ -28,12 +27,15 @@ import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventorySku;
 import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
+import com.importExpress.mapper.IPurchaseMapper;
 @Service
 public class InventoryServiceImpl implements  InventoryService{
 	@Autowired
 	private InventoryMapper inventoryMapper;
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
+	@Autowired
+	private IPurchaseMapper pruchaseMapper;
 
 	/**
 	 * 根据ID获取库存
@@ -504,6 +506,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		//如果库存大于客户订单下单数量，则全部使用库存，若不够在采购其他的
 		if(googs_number * goodsUnit < inventory_count) {
 			inventory_count = googs_number * goodsUnit;
+			map.put("inventory_count", String.valueOf(inventory_count));
 		}
 		//1.如果该商品是有录入库存则做想应的减少
 		String id = map.get("inventory_sku_id");

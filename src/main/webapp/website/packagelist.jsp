@@ -591,7 +591,9 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 				                                                                                                                                                                     
 		 			<select id="fpxProductCode${obj.shipmentno }" onchange="yfjs(${obj.shipmentno });">                                                   
 	 	 				<option  value="运输方式">运输方式</option>
-					</select>                                                                                                                                                                                                                      
+					</select>
+                     <br /><br />
+                     <span style="color: red; font-size: 22px;">${obj.countryMsg }</span>
 				</td>                                                                                                                    
 				<td style="width: 220px" id="sbxx${obj.orderid }"> <!-- 申报信息 -->  
 							<c:if test="${tid != obj.orderid }">  

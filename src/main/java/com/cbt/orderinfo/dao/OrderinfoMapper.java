@@ -257,6 +257,7 @@ public interface OrderinfoMapper {
 	public int udpateStorage(Map<String, String> map);
 	public int updateDetailsShipno(Map<String, String> map);
 	public int updateOrderState(Map<String, String> map);
+	public int updateOrderDetailsStateByid(Map<String, String> map);
 	public int updateOrderRe(Map<String, String> map);
 	public int updateOrderSource(Map<String, String> map);
 	public String getGoodsPrice(Map<String, String> map);

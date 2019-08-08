@@ -3340,7 +3340,7 @@
 								<div style="width: 100%; word-wrap: break-word;">
 									可使用库存： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.inventory}" />
 									<a target="_blank" href ="/cbtconsole/inventory/list?inid=${pb.inventorySkuId}">${pb.inventory}</a>
-									<button onclick="useInventory('${pb.od_id}',1,'${pb.orderNo}','${pb.goodsid}',${pb.inventory},${pb.googs_number},${pb.inventorySkuId},${pb.goodsUnit},${pb.seilUnit})">使用库存</button>
+									<button onclick="useInventory('${pb.od_id}',1,'${pb.orderNo}','${pb.goodsid}','${pb.inventory}','${pb.googs_number}','${pb.inventorySkuId}','${pb.goodsUnit}','${pb.seilUnit}')">使用库存</button>
 									</span></font> <br>
 								
 								</div>

@@ -92,6 +92,26 @@ public class TabCouponServiceImpl implements TabCouponService {
 		return tabCouponMapper.checkCouponCode(couponCode) > 0;
 	}
 
+
+    /**
+     * 获取分享链接
+     * */
+    public static String getShareUrl(String couponCode, String shareid, Integer websiteType) {
+        String shareUrl = "/coupon/shareCoupon?couponcode=" + couponCode + "&shareid=" + shareid;
+        if (websiteType == 1) {
+            return SearchFileUtils.importexpressPath + shareUrl;
+        } else if (websiteType == 2) {
+            return SearchFileUtils.kidsPath + shareUrl;
+        } else if (websiteType == 3) {
+            return SearchFileUtils.petsPath + shareUrl;
+        } else {
+            return SearchFileUtils.importexpressPath + shareUrl
+                    + "<br /><br />" + SearchFileUtils.kidsPath + shareUrl
+                    + "<br /><br />" + SearchFileUtils.petsPath + shareUrl;
+        }
+    }
+
+
     @Override
     public TabCouponNew queryTabCouponOne(String couponCode) {
         TabCouponNew result = tabCouponMapper.queryTabCouponOne(couponCode);
@@ -105,11 +125,7 @@ public class TabCouponServiceImpl implements TabCouponService {
             String value = result.getValue();
             String[] valueArr = value.split("-");
             if (valueArr != null && valueArr.length > 0) {
-                String shareUrl = "/coupon/shareCoupon?couponcode=" + couponCode + "&shareid=" + valueArr[valueArr.length-1];
-                shareUrl = SearchFileUtils.importexpressPath + shareUrl
-                        + "<br /><br />" + "https://www.kidsproductwholesale.com" + shareUrl;
-
-                result.setShareUrl(shareUrl);
+                result.setShareUrl(getShareUrl(couponCode, valueArr[valueArr.length-1], result.getSite()));
             }
         }
         return result;
