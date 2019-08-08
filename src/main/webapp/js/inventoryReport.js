@@ -1,23 +1,28 @@
 $(function(){
 	var isCheckStart = $("#is_check_start").val();
 	if(isCheckStart == '1'){
-		$(".query_param_ready").attr("readonly","readonly");
-		$(".inreadonly").removeAttr("readonly");
+		$(".p_q_r").attr("readonly","readonly");
+		$(".q_in_r").removeAttr("readonly");
+		$(".p_qs_r").attr("disabled", "disabled");
+		$(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
 	}
 	
 	//开始盘点
 	$("#query_button_check_start").click(function(){
-		$(".query_param_ready").attr("readonly","readonly");
-	/*	$(".inreadonly").removeAttr("readonly");
-		*/
-		
+		$(".p_q_r").attr("readonly","readonly");
+		$(".p_qs_r").attr("disabled", "disabled");
+        $(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
+
+	    $(".q_in_r").removeAttr("readonly");
 		$("#is_check_start").val(1);
 	})
 	//取消盘点
-	$("#query_button_check_start").click(function(){
+	$("#query_button_check_cancel").click(function(){
 		$("#is_check_start").val(0);
-		$(".query_param_ready").removeAttr("readonly");
-		$(".inreadonly").attr("readonly","readonly");
+		$(".p_q_r").removeAttr("readonly");
+		$(".p_qs_r").removeAttr("disabled");
+        $(".p_qs_r").attr("style", "background-color: #fff");//设为灰色，看起来更像不能操作的按钮
+		$(".q_in_r").attr("readonly","readonly");
 		
 		
 	})
@@ -208,7 +213,8 @@ function doQuery(page,flag) {
 	if(flag == 0){
 		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine, "_self");
 	}else{
-		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine, "_self");
+		var checkStart = $("#is_check_start").val();
+		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&checkStart="+checkStart, "_self");
 	}
 }
 

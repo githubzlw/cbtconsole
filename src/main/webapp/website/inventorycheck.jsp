@@ -162,11 +162,11 @@ em,i{font-style: normal;}
 			</div>
 			<div class="col-xs-11">
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
-				<label>产品ID：<input type="text" class="form-control query_param_ready" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
-				<label>产品分类：<input type="text" class="form-control query_param_ready" id="query_goodscatid" value="${queryParam.goodscatid }"></label>
-				<label>库存量大于：<input type="text" class="form-control query_param_ready" id="query_minintentory" value="${queryParam.minintentory }"></label>
-				<label>库存量小于：<input type="text" class="form-control query_param_ready" id="query_maxintentory" value="${queryParam.maxintentory }"></label>
-				<label class="w200">是否上架： <select class="form-control  query_param_s_ready" id="query_line" >
+				<label>产品ID：<input type="text" class="form-control p_q_r" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
+				<label>产品分类：<input type="text" class="form-control p_q_r" id="query_goodscatid" value="${queryParam.goodscatid }"></label>
+				<label>库存量大于：<input type="text" class="form-control p_q_r" id="query_minintentory" value="${queryParam.minintentory }"></label>
+				<label>库存量小于：<input type="text" class="form-control p_q_r" id="query_maxintentory" value="${queryParam.maxintentory }"></label>
+				<label class="w200">是否上架： <select class="form-control  p_qs_r" id="query_line" >
 				<c:if test="${queryParam.isline==0 }">
 						<option value="0" selected="selected">全部</option>
 						<option value="1" >是</option>
@@ -237,7 +237,7 @@ em,i{font-style: normal;}
 						<em class="datagrid-cell-c2-canRemaining" style="display:none;">${tory.canRemaining}</em>
 						</td>
 						<td class="">${tory.goodsPrice}</td>
-						<td class="datagrid-cell-c2-checkRemaining"><input class="datagrid-cell-c2-check-Remaining inreadonly" value="${tory.remaining}" readonly="readonly"></td>
+						<td class="datagrid-cell-c2-checkRemaining"><input class="datagrid-cell-c2-check-Remaining q_in_r" value="${tory.remaining}" readonly="readonly"></td>
 						<td class="">${tory.barcode}</td>
 						<td>
 							${tory.operation}
