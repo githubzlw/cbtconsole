@@ -1,29 +1,106 @@
 $(function(){
-	var isCheckStart = $("#is_check_start").val();
-	if(isCheckStart == '1'){
+	//获取类别
+	jQuery.ajax({
+	       url:"/cbtconsole/inventory/catlist",
+	       data:{},
+	       type:"post",
+	       success:function(data){
+	    	  if(data.status == 200){
+	    		  var catHtml = '<option value="0">全部</option>';
+	    		 for(var i=0;i<catSize;i++){
+	    			 var cat = catList[i];
+	    			 catHtml = catHtml+'<option value="'+cat.catid+'">'+cat.catname+'</option>';
+	    		 }
+	    		 $("#query_catid_select").html(catHtml);
+	    	  }else{
+	    		  alert(data.reason);
+	    	  }
+	       },
+	   	error:function(e){
+	   		alert("获取类别列表失败");
+	   	}
+	   });
+	
+	var isCheckStart = $("#check_id").val();
+	if(isCheckStart != '0'){
 		$(".p_q_r").attr("readonly","readonly");
 		$(".q_in_r").removeAttr("readonly");
+		$(".q_in_barcode").removeAttr("readonly");
 		$(".p_qs_r").attr("disabled", "disabled");
 		$(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
+		$("#query_button_check_start").attr("disabled", "disabled");
+		$("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
+		
+		$(".qbt_check").removeAttr("disabled", "disabled");
+		$(".qbt_check").attr("style", "background-color: #fff;");
+	}else{
+		$(".qbt_check").attr("disabled", "disabled");
+		$(".qbt_check").attr("style", "background-color: #EEEEEE;");
+		
+		$("#query_button_check_start").removeAttr("disabled", "disabled");
+		$("#query_button_check_start").attr("style", "background-color: #fff;");
 	}
 	
 	//开始盘点
 	$("#query_button_check_start").click(function(){
-		$(".p_q_r").attr("readonly","readonly");
-		$(".p_qs_r").attr("disabled", "disabled");
-        $(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
-
-	    $(".q_in_r").removeAttr("readonly");
-		$("#is_check_start").val(1);
+		var checkCategory = $("#query_catid_select").val();
+	    jQuery.ajax({
+		       url:"/cbtconsole/inventory/check/start",
+		       data:{"checkCategory":checkCategory},
+		       type:"post",
+		       success:function(data){
+		    	  if(data.status == 200){
+		    		  $("#check_id").val(data.check_id);
+		    		  $("#query_button_check_start").attr("disabled", "disabled");
+		    		  $("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
+		    			
+		    		  $(".qbt_check").removeAttr("disabled", "disabled");
+		    		 $(".qbt_check").attr("style", "background-color: #fff;");
+		    		 $(".p_q_r").attr("readonly","readonly");
+		    			$(".p_qs_r").attr("disabled", "disabled");
+		    	        $(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
+		    	        $(".q_in_barcode").removeAttr("readonly");
+		    		    $(".q_in_r").removeAttr("readonly");
+		    	  }else{
+		    		  $("#check_id").val(0);
+		    		  alert(data.reason);
+		    	  }
+		       },
+		   	error:function(e){
+		   		alert("开始盘点失败");
+		   	}
+		   });
+		
 	})
 	//取消盘点
 	$("#query_button_check_cancel").click(function(){
-		$("#is_check_start").val(0);
-		$(".p_q_r").removeAttr("readonly");
-		$(".p_qs_r").removeAttr("disabled");
-        $(".p_qs_r").attr("style", "background-color: #fff");//设为灰色，看起来更像不能操作的按钮
-		$(".q_in_r").attr("readonly","readonly");
-		
+		var check_id = $("#check_id").val();
+		jQuery.ajax({
+		       url:"/cbtconsole/inventory/check/cancel",
+		       data:{"check_id":check_id},
+		       type:"post",
+		       success:function(data){
+		    	  if(data.status == 200){
+		    		  $(".qbt_check").attr("disabled", "disabled");
+		    		  $(".qbt_check").attr("style", "background-color: #EEEEEE;");
+		    			$("#query_button_check_start").removeAttr("disabled", "disabled");
+		    			$("#query_button_check_start").attr("style", "background-color: #fff;");
+		    			
+		    			
+		    			$("#check_id").val(0);
+		    			$(".p_q_r").removeAttr("readonly");
+		    			$(".p_qs_r").removeAttr("disabled");
+		    	        $(".p_qs_r").attr("style", "background-color: #fff");
+		    			$(".q_in_r").attr("readonly","readonly");
+		    			$(".q_in_barcode").attr("readonly","readonly");
+		    	  }else{
+		    		  alert(data.reason);
+		    	  }
+		       },
+		   	error:function(e){
+		   		alert("盘点取消失败");
+		   	}
+		   });
 		
 	})
 	
@@ -61,10 +138,6 @@ $(function(){
 		
 	});
 	$('#tc2').click(function(){
-		/*$("#lu_img").attr("src","");
-		$("#lu_name").html(""); 
-		$("#lu_catid").val(""); 
-		$("#lu_tr").html("");*/
 		$('.tc,.trnasparent,.tc2').show();
 		
 	});

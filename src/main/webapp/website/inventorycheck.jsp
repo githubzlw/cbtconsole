@@ -148,10 +148,10 @@ em,i{font-style: normal;}
 			</select>
 			</label>
 				<label><button class="btn btn-default"  id="query_button_check_start">开始盘点</button>
-				<input type="hidden" value="${queryParam.checkStart}" id="is_check_start">
+				<input type="hidden" value="${queryParam.check_id}" id="check_id">
 				</label>
-				<label><button class="btn btn-default"  id="query_button_check_cancel">撤销本次盘点</button></label>
-				<label><button class="btn btn-default"  id="query_button_check_done">完成盘点/打印报表</button></label>
+				<label><button class="btn btn-default qbt_check"  id="query_button_check_cancel">撤销本次盘点</button></label>
+				<label><button class="btn btn-default qbt_check"  id="query_button_check_done">完成盘点/打印报表</button></label>
 			</div>
 			</div>
 			
@@ -196,7 +196,7 @@ em,i{font-style: normal;}
 				<button class="btn btn-success bt_ready" id="tc1">录入新产品</button>
 				<button class="btn btn-success bt_ready" id="tc2">导入未匹配产品</button>
 				<!-- <button class="btn btn-success" id="tc3">增加线上产品库存</button> -->
-				<label><b>最新盘点时间：</b><span id="intentory_time">2019.8.7</span></label>
+				<!-- <label><b>最新盘点时间：</b><span id="intentory_time">2019.8.7</span></label> -->
 			</div>
 		</div>
 		<div class="row mt20">
@@ -238,7 +238,8 @@ em,i{font-style: normal;}
 						</td>
 						<td class="">${tory.goodsPrice}</td>
 						<td class="datagrid-cell-c2-checkRemaining"><input class="datagrid-cell-c2-check-Remaining q_in_r" value="${tory.remaining}" readonly="readonly"></td>
-						<td class="">${tory.barcode}</td>
+						<td class="datagrid-cell-c2-barcode"><input value="${tory.barcode}" class="q_in_barcode_h" type="hidden">
+						<input value="${tory.barcode}" class="q_in_barcode" readonly="readonly" type="text"></td>
 						<td>
 							${tory.operation}
 						</td>

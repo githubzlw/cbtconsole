@@ -187,4 +187,15 @@ public interface InventoryService {
 	 * @return
 	 */
 	InventoryCheck getLastInventoryCheck();
+	
+	/**开始盘点
+	 * @param check
+	 * @return
+	 */
+	int insertInventoryCheck(InventoryCheck check);
+	/**撤销盘点
+	 * @param check
+	 * @return
+	 */
+	int updateInventoryCheckCancel(InventoryCheck check);
 }

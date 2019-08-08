@@ -248,7 +248,11 @@ public class InventoryController {
 	@RequestMapping(value = "/list")
 	protected ModelAndView inventoryInfo(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
-		
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		if(adm == null) {
+			return null;
+		}
 		ModelAndView mv = new ModelAndView("inventoryReport");
 		Map<Object, Object> map = getObjectByInventory(request,false);
 		int toryListCount = inventoryService.getIinOutInventoryCount(map);
@@ -304,9 +308,9 @@ public class InventoryController {
 		goodscatid = goodscatid == null ? "0" : goodscatid;
 		map.put("goodscatid", goodscatid);
 		if(checkFlag) {
-			String checkStart = request.getParameter("checkStart");
-			checkStart = org.apache.commons.lang.StringUtils.equals(checkStart, "1")? checkStart : "0";
-			map.put("checkStart", Integer.valueOf(checkStart));
+			String check_id = request.getParameter("checkStart");
+			check_id = StrUtils.isNum(check_id) && !"0".equals(check_id)? check_id : "0";
+			map.put("check_id", Integer.valueOf(check_id));
 		}
 		
 		return map;
@@ -992,6 +996,11 @@ public class InventoryController {
 	 */
 	@RequestMapping("/check/list")
 	public ModelAndView inventoryCheck(HttpServletRequest request, HttpServletResponse response) {
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		if(adm == null) {
+			return null;
+		}
 		ModelAndView mv = new ModelAndView("inventorycheck");
 		Map<Object, Object> map = getObjectByInventory(request,true);
 		int checkListCount = inventoryService.getIinOutInventoryCount(map);
@@ -1009,6 +1018,84 @@ public class InventoryController {
 		return mv;
 		
 	}
+	/**开始盘点
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/check/start")
+	@ResponseBody
+	public Map<String,Object> checkStart(HttpServletRequest request, HttpServletResponse response) {
+		Map<String,Object> result= new HashMap<>();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		if(adm == null) {
+			result.put("status", 500);
+			result.put("reason", "未登录，请先登录");
+			return result;
+		}
+		
+		result.put("status", 200);
+		InventoryCheck check = new InventoryCheck();
+		String strCat = request.getParameter("checkCategory");
+		strCat = StrUtils.isNum(strCat) ? strCat : "0";
+		check.setCheckCat(Integer.valueOf(strCat));
+		check.setCheckAdm(adm.getId());
+		int insertInventoryCheck = inventoryService.insertInventoryCheck(check);
+		
+		result.put("check_id", insertInventoryCheck);
+		return result;
+	}
+	/**开始盘点
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/check/cancel")
+	@ResponseBody
+	public Map<String,Object> checkCancel(HttpServletRequest request, HttpServletResponse response) {
+		Map<String,Object> result= new HashMap<>();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		if(adm == null) {
+			result.put("status", 500);
+			result.put("reason", "未登录，请先登录");
+			return result;
+		}
+		
+		result.put("status", 200);
+		InventoryCheck check = new InventoryCheck();
+		String check_id = request.getParameter("check_id");
+		check_id = StrUtils.isNum(check_id) ? check_id : "0";
+		check.setId(Integer.valueOf(check_id));
+		check.setCancelAdm(adm.getId());
+		check.setCancelRemark("撤销本次盘点");
+		int checkCancel = inventoryService.updateInventoryCheckCancel(check);
+		result.put("check_cancel", checkCancel);
+		return result;
+	}
+	/**获取列表
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/catlist")
+	@ResponseBody
+	public Map<String,Object> catlist(HttpServletRequest request, HttpServletResponse response) {
+		Map<String,Object> result= new HashMap<>();
+		result.put("status", 200);
+		int catSize = 0;
+		List<Map<String,Object>> catList = new ArrayList<>();
+		if(catList == null || catList.isEmpty()) {
+			result.put("status", 500);
+			result.put("reason", "未获取到类别列表");
+		}else {
+			result.put("catSize", catSize);
+			result.put("catList", catList);
+		}
+		return result;
+	}
+	
 	/**盘点历史记录
 	 * @param request
 	 * @param response

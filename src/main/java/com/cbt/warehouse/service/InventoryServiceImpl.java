@@ -27,7 +27,6 @@ import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventorySku;
 import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
-import com.importExpress.mapper.IPurchaseMapper;
 @Service
 public class InventoryServiceImpl implements  InventoryService{
 	@Autowired
@@ -857,13 +856,6 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public List<InventoryCheckWrap> invetoryCheckList(Map<Object, Object> map) {
-		//获取上次盘点
-		InventoryCheck lastInventoryCheck = inventoryMapper.getLastInventoryCheck();
-		int lastCheckid = 0;
-		if(lastInventoryCheck != null) {
-			lastCheckid = lastInventoryCheck.getId();
-		}
-		
 		//获取库存数据
 		List<InventoryData> iinOutInventory = getIinOutInventory(map);
 		if(iinOutInventory == null || iinOutInventory.isEmpty()) {
@@ -871,7 +863,6 @@ public class InventoryServiceImpl implements  InventoryService{
 		}
 		List<InventoryCheckWrap> result = new ArrayList<>();
 		InventoryCheckWrap wrap = null;
-//		List<Integer> idList = new ArrayList<Integer>();
 		for(InventoryData i : iinOutInventory) {
 			wrap = new InventoryCheckWrap();
 			
@@ -890,12 +881,11 @@ public class InventoryServiceImpl implements  InventoryService{
 			wrap.setOperation(i.getOperation());
 			wrap.setCanRemaining(i.getCanRemaining());
 			
-//			wrap.setInventoryCheckId(inventoryCheckId);
-//			wrap.setLastCheckTime(lastCheckTime);
-//			wrap.setLastCheckRemaining(lastCheckRemaining);
+			wrap.setInventoryCheckId(i.getInventoryCheckId());
+			wrap.setLastCheckTime(i.getCheckTime());
+			wrap.setLastCheckRemaining(i.getCheckRemaining());
 			
 			result.add(wrap);
-//			idList.add(i.getId());
 		}
 		//获取库存上次盘点记录
 		
@@ -907,6 +897,15 @@ public class InventoryServiceImpl implements  InventoryService{
 	@Override
 	public InventoryCheck getLastInventoryCheck() {
 		return inventoryMapper.getLastInventoryCheck();
+	}
+	@Override
+	public int insertInventoryCheck(InventoryCheck check) {
+		inventoryMapper.insertInventoryCheck(check);
+		return check.getId();
+	}
+	@Override
+	public int updateInventoryCheckCancel(InventoryCheck check) {
+		return inventoryMapper.updateInventoryCheckCancel(check);
 	}
 	
 	
