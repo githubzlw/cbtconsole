@@ -135,6 +135,9 @@ public class InventoryServiceImpl implements  InventoryService{
 				
 				t.setOperation(opration.toString());
 			}
+			if(StringUtil.isBlank(t.getCheckTime())) {
+				t.setCheckTime("");
+			}
 			toryList.set(i, t);
 		}
 		return toryList;
@@ -311,7 +314,7 @@ public class InventoryServiceImpl implements  InventoryService{
 				inventory.put("goods_p_pid", t.getItemid());
 				inventory.put("car_type", t.getSku());
 				inventory.put("specid", StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId());
-				inventory.put("skuid",StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID() );
+				inventory.put("skuid",StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID());
 				inventory.put("inventory_count", t.getItemqty());
 				inventory.put("yourorder", t.getItemqty());
 				inventory.put("goods_url", t.getImgurl());
@@ -900,6 +903,10 @@ public class InventoryServiceImpl implements  InventoryService{
 		
 		
 		return result;
+	}
+	@Override
+	public InventoryCheck getLastInventoryCheck() {
+		return inventoryMapper.getLastInventoryCheck();
 	}
 	
 	

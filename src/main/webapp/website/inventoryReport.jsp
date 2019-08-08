@@ -145,8 +145,8 @@ em,i{font-style: normal;}
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
 				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
 				<label>产品分类：<input type="text" class="form-control" id="query_goodscatid" value="${queryParam.goodscatid }"></label>
-				<label>库存量大于：<input type="text" class="form-control" id="query_minintentory" value="${queryParam.minintentory }"></label>
-				<label>库存量小于：<input type="text" class="form-control" id="query_maxintentory" value="${queryParam.maxintentory }"></label>
+				<label>库存量大于：<input type="text" class="form-control" id="query_minintentory" value="${queryParam.qminintentory }"></label>
+				<label>库存量小于：<input type="text" class="form-control" id="query_maxintentory" value="${queryParam.qmaxintentory }"></label>
 				<label class="w200">是否上架： <select class="form-control" id="query_line" >
 						<c:if test="${queryParam.isline==0 }">
 						<option value="0" selected="selected">全部</option>
@@ -176,7 +176,7 @@ em,i{font-style: normal;}
 				<button class="btn btn-success" id="tc1">录入新产品</button>
 				<button class="btn btn-success" id="tc2">导入未匹配产品</button>
 				<!-- <button class="btn btn-success" id="tc3">增加线上产品库存</button> -->
-				<label><b>最新盘点时间：</b><span id="intentory_time">2019.8.7</span></label>
+				<label><b>最新盘点时间：</b><span id="intentory_time">${lastCheckTime}</span></label>
 			</div>
 		</div>
 		<div class="row mt20">
@@ -209,7 +209,10 @@ em,i{font-style: normal;}
 						<td class="datagrid-cell-c2-canRemaining">${tory.canRemaining}</td>
 						<td class="">${tory.barcode}</td>
 						<td><span class="">${tory.checkTime }</span> <br>
-						<button class="btn btn-default">盘点历史</button></td>
+						<c:if test="${tory.checkTime!=''}">
+						<a href="/cbtconsole/inventory/check/info?inid=${tory.id}"><button class="btn btn-default">盘点历史</button></a>
+						</c:if>
+						</td>
 						<td>
 							${tory.operation}
 						</td>

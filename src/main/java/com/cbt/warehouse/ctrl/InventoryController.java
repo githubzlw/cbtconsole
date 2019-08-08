@@ -40,6 +40,7 @@ import com.cbt.util.StrUtils;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.service.InventoryService;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.InventoryCheck;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
@@ -250,9 +251,15 @@ public class InventoryController {
 		
 		ModelAndView mv = new ModelAndView("inventoryReport");
 		Map<Object, Object> map = getObjectByInventory(request,false);
-		List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
 		int toryListCount = inventoryService.getIinOutInventoryCount(map);
-		mv.addObject("toryList", toryList);
+		if(toryListCount > 0) {
+			InventoryCheck lastInventoryCheck = inventoryService.getLastInventoryCheck();
+			if(lastInventoryCheck != null) {
+				mv.addObject("lastCheckTime", lastInventoryCheck.getCheckTime());
+			}
+			List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
+			mv.addObject("toryList", toryList);
+		}
 		mv.addObject("toryListCount", toryListCount);
 		
 		int toryListPage = toryListCount % 20 == 0 ? toryListCount / 20 : toryListCount / 20 + 1;
@@ -280,10 +287,12 @@ public class InventoryController {
 	    map.put("goods_pid",goods_pid);
 	    
 		String strmaxintentory = request.getParameter("maxintentory");
+		map.put("qmaxintentory",strmaxintentory);
 		strmaxintentory = StrUtils.isMatch(strmaxintentory, "\\d+") ? strmaxintentory : "65535";
 		map.put("maxintentory",Integer.valueOf(strmaxintentory));
 		
 		String strminintentory = request.getParameter("minintentory");
+		map.put("qminintentory",strminintentory);
 		strminintentory = StrUtils.isMatch(strminintentory, "\\d+") ? strminintentory : "0";
 		map.put("minintentory",Integer.valueOf(strminintentory));
 		
@@ -999,6 +1008,26 @@ public class InventoryController {
 		
 		return mv;
 		
+	}
+	/**盘点历史记录
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/check/info")
+	public ModelAndView checkInfo(HttpServletRequest request, HttpServletResponse response) {
+		ModelAndView mv = new ModelAndView("inventorycheck");
+		String strInid = request.getParameter("inid");
+		strInid = StrUtils.isNum(strInid) ? strInid : "0";
+	
+		int inid = Integer.valueOf(strInid);
+		
+		
+		
+		
+		
+		
+		return mv;
 	}
 	
 	

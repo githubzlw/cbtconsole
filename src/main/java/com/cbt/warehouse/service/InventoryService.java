@@ -6,6 +6,7 @@ import java.util.Map;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.InventoryCheck;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
@@ -181,4 +182,9 @@ public interface InventoryService {
 	 * @return
 	 */
 	List<InventoryCheckWrap> invetoryCheckList(Map<Object, Object> map);
+	
+	/**最近盘点
+	 * @return
+	 */
+	InventoryCheck getLastInventoryCheck();
 }

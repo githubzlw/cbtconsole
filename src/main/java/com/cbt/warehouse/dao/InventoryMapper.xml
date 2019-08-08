@@ -83,6 +83,9 @@
         <result column="online_flag" property="onlineFlag" jdbcType="INTEGER" />
         <result column="inventory_type" property="inventoryType" jdbcType="INTEGER" />
         <result column="db_flag" property="dbFlag" jdbcType="INTEGER"/>
+        <result column="check_remaining" property="checkRemaining" jdbcType="INTEGER"/>
+        <result column="inventory_check_id" property="inventoryCheckId" jdbcType="INTEGER"/>
+        <result column="check_time" property="checkTime" jdbcType="VARCHAR"/>
     </resultMap>
     <resultMap id="InventoryResultMap" type="com.cbt.pojo.Inventory" >
         <result column="id" property="id" jdbcType="INTEGER" />
@@ -144,8 +147,10 @@
         update custom_benchmark_ready_newest set is_stock_flag=0 where pid=#{goods_pid};
     </update>
     <select id="getIinOutInventory" resultMap="InventorySkuResultMap">
-      select  isku.*,ifnull(c.valid,2) AS online_flag,c.unsellableReason as unsellableReason,cat.en_name as categoryName 
+      select  isku.*,ifnull(c.valid,2) AS online_flag,c.unsellableReason as unsellableReason,
+      cat.en_name as categoryName ,isc.check_time
       from inventory_sku isku 
+      left join inventory_sku_check isc on isku.inventory_check_id=isc.id
       left join custom_benchmark_ready c on isku.goods_pid=c.pid
       left join 1688_category cat on isku.goodscatid=cat.category_id
     where 1=1
@@ -455,7 +460,9 @@
     </insert>
     
     <select id="getInventoryByIds" resultMap="InventorySkuResultMap">
-    select id,last_check_remaining from  inventory_sku where id in 
+    select is.id,is.check_remaining,isc.check_time
+    from  inventory_sku is left join inventory_sku_check isc on is.inventory_check_id =isc.id 
+    where is.id in 
     <foreach collection="list" item="item" separator="," open="(" close=")">
     #{item}
     </foreach>
