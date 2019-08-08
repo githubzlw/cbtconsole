@@ -58,6 +58,7 @@ public class ShippingPackage {
 	private double yfhFreight;
 	private double jcexFreight;
 	private int cacount;
+	private String countryMsg;  // 美国海外国家提醒 yigo /  Guam/ hawaii/Honolulu/Puerto Rico/Virgin Islands/Samoa/Mariana Islands
 	/**
 	 * 客户付的钱-采购金额-预估运费
 	 */
@@ -393,6 +394,12 @@ public class ShippingPackage {
 	public void setOverTimeFlag(int overTimeFlag) {
 		this.OverTimeFlag = overTimeFlag;
 	}
-	 
-	
+
+    public String getCountryMsg() {
+        return countryMsg;
+    }
+
+    public void setCountryMsg(String countryMsg) {
+        this.countryMsg = countryMsg;
+    }
 }

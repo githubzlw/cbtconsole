@@ -27,6 +27,10 @@ public class MultiSiteUtil {
                 && StringUtils.indexOfIgnoreCase(orderNo.trim(), "k") == 7) {
             return 2;
         }
+        if (StringUtils.isNotBlank(orderNo)
+                && StringUtils.indexOfIgnoreCase(orderNo.trim(), "p") == 7) {
+            return 3;
+        }
         return 1;
     }
 
@@ -42,12 +46,16 @@ public class MultiSiteUtil {
      * </pre>
      *
      * @param url
-     * @return 1-非kids网站(importx网站); 2-kids网站;
+     * @return 1-非kids网站(importx网站); 2-kids网站; 3-pets网站;
      */
     public static Integer getSiteTypeNumByUrl(String url){
         if (StringUtils.isNotBlank(url)
                 && StringUtils.containsIgnoreCase(url, "www.kidsproductwholesale.com")) {
             return 2;
+        }
+        if (StringUtils.isNotBlank(url)
+                && StringUtils.containsIgnoreCase(url, "www.lovelypetsupply.com")) {
+            return 3;
         }
         return 1;
     }
@@ -60,6 +68,9 @@ public class MultiSiteUtil {
         if ("k".equalsIgnoreCase(siteType)) {
             return 2;
         }
+        if ("p".equalsIgnoreCase(siteType)) {
+            return 3;
+        }
         return 1;
     }
 
@@ -69,8 +80,12 @@ public class MultiSiteUtil {
      *
      */
     public static String getSiteTypeStrByNum(Integer num){
-        if (num != null && num == 2) {
-            return "kids";
+        if (num != null) {
+            if (num == 2) {
+                return "kids";
+            } else if (num == 3) {
+                return "pets";
+            }
         }
         return "importx";
     }
@@ -82,8 +97,27 @@ public class MultiSiteUtil {
     public static String getSiteTypeStrByType(String siteType){
         if ("k".equalsIgnoreCase(siteType)) {
             return "kids";
+        } else if ("p".equalsIgnoreCase(siteType)) {
+            return "pets";
         }
         return "importx";
     }
+
+    /**
+     *  返回线上网址
+     *
+     */
+    public static String getSiteUrlByNum(Integer num){
+        if (num != null) {
+            if (num == 2) {
+                return SearchFileUtils.kidsPath;
+            } else if (num == 3) {
+                return SearchFileUtils.petsPath;
+            }
+        }
+        return SearchFileUtils.importexpressPath;
+    }
+
+
 
 }
