@@ -56,7 +56,7 @@ function updatecancelChecktatus(isok, orderid, odid, isDropshipOrder, goodid, in
     	//采购货源产品规格id
     	tbspecid= specid !=''? $(".specId_"+specid).html():'';
     	tbskuid=skuid!=''?$(".skuID_"+skuid).html():'';
-    	if((tbspecid!=''&&specid == tbspecid || bskuid!=''&&skuid == tbskuid)){
+    	if((tbspecid!=''&&specid == tbspecid || tbskuid!=''&&skuid == tbskuid)){
     		var skucount = $(".itemqty_"+specid+"_"+skuid).html();
     		if(Number(skucount) > 0){
     			count = skucount;

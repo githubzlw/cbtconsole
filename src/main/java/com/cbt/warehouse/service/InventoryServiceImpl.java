@@ -1,5 +1,6 @@
 package com.cbt.warehouse.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -433,6 +434,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		//如果库存大于客户订单下单数量，则全部使用库存，若不够在采购其他的
 		if(googs_number * goodsUnit < inventory_count) {
 			inventory_count = googs_number * goodsUnit;
+			map.put("inventory_count", String.valueOf(inventory_count));
 		}
 		String id = map.get("inventory_sku_id");
 		//1.如果该商品是有录入库存则做想应的减少
@@ -447,6 +449,10 @@ public class InventoryServiceImpl implements  InventoryService{
 		//2.锁定库存
 		inventoryMapper.insertLockInventory(map);
 		
+		//如果全部使用库存，订单状态改为验货无误
+		if(inventory_count == googs_number * goodsUnit) {
+			orderinfoMapper.updateOrderDetailsState(odid, orderid);
+		}
 //		pruchaseMapper.updateLockInventory(map);
 		
 		int before_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("remaining")));
