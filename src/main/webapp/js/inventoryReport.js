@@ -1,7 +1,32 @@
 $(function(){
+	var isCheckStart = $("#is_check_start").val();
+	if(isCheckStart == '1'){
+		$(".query_param_ready").attr("readonly","readonly");
+		$(".inreadonly").removeAttr("readonly");
+	}
 	
-	 $("#query_button").click(function(){
-		doQuery(1);
+	//开始盘点
+	$("#query_button_check_start").click(function(){
+		$(".query_param_ready").attr("readonly","readonly");
+	/*	$(".inreadonly").removeAttr("readonly");
+		*/
+		
+		$("#is_check_start").val(1);
+	})
+	//取消盘点
+	$("#query_button_check_start").click(function(){
+		$("#is_check_start").val(0);
+		$(".query_param_ready").removeAttr("readonly");
+		$(".inreadonly").attr("readonly","readonly");
+		
+		
+	})
+	
+	$("#query_button").click(function(){
+		doQuery(1,0);
+	});
+	 $("#query_button_check").click(function(){
+		doQuery(1,1);
 	});
 	 $("#luimport").click(function(){
 		 $('#dlg6').dialog('open'); 
@@ -45,8 +70,27 @@ $(function(){
 	});
 	
 })
-function getbarcode(v){
-	$(v).html("STK111")
+/**获取库位
+ * @param v
+ * @param goods_pid
+ * @returns
+ */
+function getbarcode(v,goods_pid){
+	jQuery.ajax({
+	       url:"/cbtconsole/inventory/get/barcode",
+	       data:{
+	           "goods_pid" : goods_pid
+	       	  },
+	       type:"post",
+	       success:function(data){
+	    	  if(data.status == 200){
+	    		  $(v).html(data.barcode)
+	    	  }
+	       },
+	   	error:function(e){
+	   		alert("库存录入失败");
+	   	}
+	   });
 }
 /**
  * 获取产品
@@ -80,7 +124,7 @@ function getProduct(){
 	    				 trHtml = trHtml+"<span class='lu_specid'>"+skuM.specId+"</span><br>";
 	    				 trHtml = trHtml+"<span class='lu_skuid'>"+skuM.skuId+"</span></td>";
 	    				 trHtml = trHtml+"<td><input type='text' class='form-control lu_count' value='0'></td>";
-	    				 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this);"  class="lu_barcode_a">获取库位</a></td>';
+	    				 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this,\''+skuM.goods_pid+'\');"  class="lu_barcode_a">获取库位</a></td>';
 	    				 trHtml = trHtml+'<td><input type="checkbox" name="entry" class="lu_is"></td></tr>';
 	    			 }
 	    		 }else{
@@ -88,7 +132,7 @@ function getProduct(){
     				 trHtml = trHtml+"<span class='lu_specid'>"+skuM.goods_pid+"</span><br>";
     				 trHtml = trHtml+"<span class='lu_skuid'>"+skuM.goods_pid+"</span></td>";
     				 trHtml = trHtml+"<td><input type='text' class='form-control lu_count'  value='0'></td>";
-    				 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this);" class="lu_barcode_a" >获取库位</a></td>';
+    				 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this,\''+skuM.goods_pid+'\');" class="lu_barcode_a" >获取库位</a></td>';
     				 trHtml = trHtml+'<td><input type="checkbox" name="entry" class="lu_is"></td></tr>';
 	    		 }
 	    		 
@@ -135,7 +179,7 @@ function getTbOrder(){
 					trHtml = trHtml+'<span  class="lu_tb_specidc lu_tb_specidc'+i+'">'+skuM.specId+'</span></td>';
 					trHtml = trHtml+'<td class="llu_tb_count u_tb_count'+i+'">'+skuM.itemqty+'</td>';
 					trHtml = trHtml+'<td><input type="text" class="form-control lu_tb_a_count lu_tb_a_count'+i+'" value="'+skuM.itemqty+'"></td>';
-					trHtml = trHtml+'<td class="lu_tb_bar lu_tb_bar'+i+'"><a class="gain lu_tb_barcode lu_tb_barcode'+i+'" onclick="getbarcode(this)">获取库位</a></td>';
+					trHtml = trHtml+'<td class="lu_tb_bar lu_tb_bar'+i+'"><a class="gain lu_tb_barcode lu_tb_barcode'+i+'" onclick="getbarcode(this,\''+skuM.itemid+'\');">获取库位</a></td>';
 					trHtml = trHtml+'<td><input type="checkbox" class="lu_tb_checkbox lu_tb_checkbox'+i+'" value="'+i+'">';
 					trHtml = trHtml+'<input type="hidden" class="lu_tb_pid lu_tb_pid'+i+'" value="'+skuM.itemid+'">';
 					trHtml = trHtml+'<input type="hidden" class="lu_tb_img lu_tb_img'+i+'" value="'+skuM.imgurl+'">';
@@ -153,7 +197,7 @@ function getTbOrder(){
 		}
 	});
 }
-function doQuery(page) {
+function doQuery(page,flag) {
 	var page = $("#current_page").val();
 	var goods_name = $('#query_goods_name').val();
 	var goods_pid = $('#query_goods_pid').val();
@@ -161,8 +205,11 @@ function doQuery(page) {
 	var minintentory = $('#query_minintentory').val();
 	var maxintentory = $('#query_maxintentory').val();
 	var queryLine = $('#query_line').val();
-	
-	window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine, "_self");
+	if(flag == 0){
+		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine, "_self");
+	}else{
+		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine, "_self");
+	}
 }
 
 function doReset(){

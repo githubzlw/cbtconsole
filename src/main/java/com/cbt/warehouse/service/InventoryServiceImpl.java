@@ -19,6 +19,8 @@ import com.cbt.util.StrUtils;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.InventoryCheck;
+import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetails;
 import com.cbt.website.bean.InventoryDetailsWrap;
@@ -842,6 +844,55 @@ public class InventoryServiceImpl implements  InventoryService{
 	public List<Map<String, Object>> getTbGoods(String orderShipno) {
 		
 		return inventoryMapper.getTbGoods(orderShipno);
+	}
+	@Override
+	public List<InventoryCheckWrap> invetoryCheckList(Map<Object, Object> map) {
+		//获取上次盘点
+		InventoryCheck lastInventoryCheck = inventoryMapper.getLastInventoryCheck();
+		int lastCheckid = 0;
+		if(lastInventoryCheck != null) {
+			lastCheckid = lastInventoryCheck.getId();
+		}
+		
+		//获取库存数据
+		List<InventoryData> iinOutInventory = getIinOutInventory(map);
+		if(iinOutInventory == null || iinOutInventory.isEmpty()) {
+			return null;
+		}
+		List<InventoryCheckWrap> result = new ArrayList<>();
+		InventoryCheckWrap wrap = null;
+//		List<Integer> idList = new ArrayList<Integer>();
+		for(InventoryData i : iinOutInventory) {
+			wrap = new InventoryCheckWrap();
+			
+			wrap.setBarcode(i.getBarcode());
+			wrap.setGoodsPid(i.getGoodsPid());
+			wrap.setGoodsImg(i.getCarImg());
+			wrap.setGoodsPrice(i.getGoodsPrice());
+			wrap.setGoodsSku(i.getSku());
+			wrap.setGoodsSkuid(i.getSkuid());
+			wrap.setGoodsSpecid(i.getSpecid());
+			wrap.setInventorySkuId(i.getId());
+			wrap.setRemaining(i.getRemaining());
+			wrap.setCategoryName(i.getCategoryName());
+			wrap.setCatid(i.getGoodsCatid());
+			wrap.setGoodsName(i.getGoodsName());
+			wrap.setOperation(i.getOperation());
+			wrap.setCanRemaining(i.getCanRemaining());
+			
+//			wrap.setInventoryCheckId(inventoryCheckId);
+//			wrap.setLastCheckTime(lastCheckTime);
+//			wrap.setLastCheckRemaining(lastCheckRemaining);
+			
+			result.add(wrap);
+//			idList.add(i.getId());
+		}
+		//获取库存上次盘点记录
+		
+		
+		
+		
+		return result;
 	}
 	
 	

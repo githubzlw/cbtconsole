@@ -143,14 +143,26 @@ em,i{font-style: normal;}
 			</div>
 			<div class="col-xs-11">
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
-				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid"></label>
-				<label>产品分类：<input type="text" class="form-control" id="query_goodscatid"></label>
-				<label>库存量大于：<input type="text" class="form-control" id="query_minintentory"></label>
-				<label>库存量小于：<input type="text" class="form-control" id="query_maxintentory"></label>
+				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
+				<label>产品分类：<input type="text" class="form-control" id="query_goodscatid" value="${queryParam.goodscatid }"></label>
+				<label>库存量大于：<input type="text" class="form-control" id="query_minintentory" value="${queryParam.minintentory }"></label>
+				<label>库存量小于：<input type="text" class="form-control" id="query_maxintentory" value="${queryParam.maxintentory }"></label>
 				<label class="w200">是否上架： <select class="form-control" id="query_line" >
-						<option value="0">全部</option>
-						<option value="1">是</option>
+						<c:if test="${queryParam.isline==0 }">
+						<option value="0" selected="selected">全部</option>
+						<option value="1" >是</option>
 						<option value="2">否</option>
+				</c:if>
+				<c:if test="${queryParam.isline==1 }">
+						<option value="0" >全部</option>
+						<option value="1" selected="selected">是</option>
+						<option value="2" >否</option>
+				</c:if>
+				<c:if test="${queryParam.isline==2 }">
+						<option value="0" >全部</option>
+						<option value="1" >是</option>
+						<option value="2" selected="selected">否</option>
+				</c:if>
 				</select>
 				</label>
 				<button class="btn btn-default"  id="query_button">查询</button>
@@ -206,8 +218,8 @@ em,i{font-style: normal;}
 				</tbody>
 			</table>
 				<div>
-				<span>当前页 :${page } / ${toryListPage},总共 ${toryListCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${page }"><button class="btn btn-default btn_page_qu" onclick="doQuery(1)">查询</button>
+				<span>当前页 :${queryParam.current_page } / ${toryListPage},总共 ${toryListCount }条数据,跳转</span>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-default btn_page_qu" onclick="doQuery(1,0)">查询</button>
 				</div>
 		</div>
 		

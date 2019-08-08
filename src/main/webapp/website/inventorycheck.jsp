@@ -8,7 +8,7 @@
 </style>
 
 
-<title>库存清单</title>
+<title>库存盘点</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet"
 	href="/cbtconsole/css/bootstrap/bootstrap.min.css">
@@ -135,25 +135,56 @@ em,i{font-style: normal;}
 </head>
 <body>
 	<div class="container-fluid report">
-		<h1 class="text-center">库存清单</h1>
-			<input type="hidden" value="${param.inid }" id="query_in_id">
+		<h1 class="text-center">库存盘点</h1>
+			<input type="hidden" value="" id="query_in_id">
+			
+			<div class="row">
+			<div class="col-xs-12">
+			<label class="w200">产品分类： 
+			<select class="form-control" id="query_catid_select" >
+						<option value="0">全部</option>
+						<option value="1">是</option>
+						<option value="2">否</option>
+			</select>
+			</label>
+				<label><button class="btn btn-default"  id="query_button_check_start">开始盘点</button>
+				<input type="hidden" value="${queryParam.checkStart}" id="is_check_start">
+				</label>
+				<label><button class="btn btn-default"  id="query_button_check_cancel">撤销本次盘点</button></label>
+				<label><button class="btn btn-default"  id="query_button_check_done">完成盘点/打印报表</button></label>
+			</div>
+			</div>
+			
+			
 		<div class="row">
 			<div class="col-xs-1">
 				<b>产品检索</b>
 			</div>
 			<div class="col-xs-11">
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
-				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid"></label>
-				<label>产品分类：<input type="text" class="form-control" id="query_goodscatid"></label>
-				<label>库存量大于：<input type="text" class="form-control" id="query_minintentory"></label>
-				<label>库存量小于：<input type="text" class="form-control" id="query_maxintentory"></label>
-				<label class="w200">是否上架： <select class="form-control" id="query_line" >
-						<option value="0">全部</option>
-						<option value="1">是</option>
+				<label>产品ID：<input type="text" class="form-control query_param_ready" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
+				<label>产品分类：<input type="text" class="form-control query_param_ready" id="query_goodscatid" value="${queryParam.goodscatid }"></label>
+				<label>库存量大于：<input type="text" class="form-control query_param_ready" id="query_minintentory" value="${queryParam.minintentory }"></label>
+				<label>库存量小于：<input type="text" class="form-control query_param_ready" id="query_maxintentory" value="${queryParam.maxintentory }"></label>
+				<label class="w200">是否上架： <select class="form-control  query_param_s_ready" id="query_line" >
+				<c:if test="${queryParam.isline==0 }">
+						<option value="0" selected="selected">全部</option>
+						<option value="1" >是</option>
 						<option value="2">否</option>
+				</c:if>
+				<c:if test="${queryParam.isline==1 }">
+						<option value="0" >全部</option>
+						<option value="1" selected="selected">是</option>
+						<option value="2" >否</option>
+				</c:if>
+				<c:if test="${queryParam.isline==2 }">
+						<option value="0" >全部</option>
+						<option value="1" >是</option>
+						<option value="2" selected="selected">否</option>
+				</c:if>
 				</select>
 				</label>
-				<button class="btn btn-default"  id="query_button">查询</button>
+				<button class="btn btn-default bt_ready"  id="query_button_check">查询</button>
 			</div>
 		</div>
 		<div class="row mt20 row2">
@@ -161,8 +192,8 @@ em,i{font-style: normal;}
 				<b>库存修正</b>
 			</div>
 			<div class="col-xs-11">
-				<button class="btn btn-success" id="tc1">录入新产品</button>
-				<button class="btn btn-success" id="tc2">导入未匹配产品</button>
+				<button class="btn btn-success bt_ready" id="tc1">录入新产品</button>
+				<button class="btn btn-success bt_ready" id="tc2">导入未匹配产品</button>
 				<!-- <button class="btn btn-success" id="tc3">增加线上产品库存</button> -->
 				<label><b>最新盘点时间：</b><span id="intentory_time">2019.8.7</span></label>
 			</div>
@@ -176,28 +207,37 @@ em,i{font-style: normal;}
 						<th>产品名称</th>
 						<th>产品SKU</th>
 						<th>产品图片</th>
+						<th>上次盘点数量</th>
+						<th>变更数量</th>
 						<th>库存数量</th>
 						<th>当前价格</th>
-						<th>可用库存</th>
+						<th>盘点数量</th>
 						<th>库位</th>
-						<th>盘点时间</th>
 						<th>操作</th>
 					</tr>
 				</thead>
 				<tbody>
-				<c:forEach items="${toryList }" var="tory" varStatus="index">
+				<c:forEach items="${checkList }" var="tory" varStatus="index">
 					<tr id="datagrid-row-r2-2-${index.index}">
+					 
 						<td >${tory.categoryName}</td>
 						<td class="datagrid-cell-c2-goodsPid">${tory.goodsPid}</td>
 						<td class="datagrid-cell-c2-goodsName">${tory.goodsName}</td>
-						<td>${tory.skuContext}</td>
-						<td class="datagrid-cell-c2-carImg">${tory.carImg }</td>
-						<td class="datagrid-cell-c2-remaining">${tory.remaining}</td>
+						<td><em class="emsku">${tory.goodsSku}</em>
+						<br>
+						<em>Skuid:</em><em class="emskuid">${tory.goodsSkuid}</em>
+						<br>
+						<em>Specid:</em><em class="emspecid">${tory.goodsSpecid}</em></td>
+						
+						<td class="datagrid-cell-c2-carImg">${tory.goodsImg }</td>
+						<td class="datagrid-cell-c2-last-remaining">${tory.lastCheckRemaining}</td>
+						<td class="datagrid-cell-c2-change-remaining">${tory.changeRemaining}</td>
+						<td class="datagrid-cell-c2-remaining">${tory.remaining}
+						<em class="datagrid-cell-c2-canRemaining" style="display:none;">${tory.canRemaining}</em>
+						</td>
 						<td class="">${tory.goodsPrice}</td>
-						<td class="datagrid-cell-c2-canRemaining">${tory.canRemaining}</td>
+						<td class="datagrid-cell-c2-checkRemaining"><input class="datagrid-cell-c2-check-Remaining inreadonly" value="${tory.remaining}" readonly="readonly"></td>
 						<td class="">${tory.barcode}</td>
-						<td><span class="">${tory.checkTime }</span> <br>
-						<button class="btn btn-default">盘点历史</button></td>
 						<td>
 							${tory.operation}
 						</td>
@@ -206,8 +246,8 @@ em,i{font-style: normal;}
 				</tbody>
 			</table>
 				<div>
-				<span>当前页 :${page } / ${toryListPage},总共 ${toryListCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${page }"><button class="btn btn-default btn_page_qu" onclick="doQuery(1)">查询</button>
+				<span>当前页 :${queryParam.current_page } / ${toryListPage},总共 ${checkListCount }条数据,跳转</span>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-default btn_page_qu" onclick="doQuery(1,1)">查询</button>
 				</div>
 		</div>
 		

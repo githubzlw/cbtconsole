@@ -8,6 +8,8 @@ import org.apache.ibatis.annotations.Param;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.InventoryCheck;
+import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetails;
 import com.cbt.website.bean.InventoryLog;
@@ -32,12 +34,7 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int insertStorageOutboundDetails(Map<String,String> inventory);
-	/**
-	 * 库存列表查询
-	 * @param map
-	 * @return
-	 */
-	public List<InventoryData> getIinOutInventory(Map<Object, Object> map);
+	
 	public int isExitBarcode(@Param("barcode") String barcode);
 	/**
 	 * 根据ID获取库存
@@ -139,28 +136,39 @@ public interface InventoryMapper {
 	
 	
 	
-	/****************************************************************************************/
+	/*****************************************新库存系统**********start*************************************/
+	/**
+	 * 库存列表查询
+	 * @param map
+	 * @return
+	 */
+	List<InventoryData> getIinOutInventory(Map<Object, Object> map);
+	/**获取库存列表
+	 * @param list
+	 * @return
+	 */
+	List<InventoryData> getInventoryByIds(List<Integer> list);
 	
-	/**库存变更记录表
+	/**库存变更记录表(关联库存表插入)
 	 * @param inventory
 	 * @return
 	 */
 	int addInventoryChangeRecordByInventoryid(Map<String,String> inventory);
 	
-	/**
+	/**获取订单产品详细数据
 	 * @param inventory
 	 * @return
 	 */
 	Map<String,String> getOrderDetails(Map<String,String> map);
 	
-	/**入库
+	/**插入库存明细表(关联库存表插入)
 	 * @param inventory
 	 * @return
 	 */
 	int addInventoryDetailsSku(Map<String,String> inventory);
 	
 	
-	/**获取库存的1688数据
+	/**获取库存明细表的货源产品详细数据
 	 * @param itemid
 	 * @param specid
 	 * @param skuid
@@ -179,7 +187,7 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int addLossInventoryRecord(LossInventoryRecord record);
-	/**库存明细
+	/**库存明细列表
 	 * @param map
 	 * @return
 	 */
@@ -189,10 +197,6 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int inventoryDetailsCount(Map<String,Object> map);
-	
-	
-	
-	/*********************************************/
 	
 	/**库存inventory_sku
 	 * @param item
@@ -207,7 +211,7 @@ public interface InventoryMapper {
 	 */
 	InventorySku getInventory(InventorySku item);
 	
-	/**更新库存
+	/**更新库存inventory_sku
 	 * @param item
 	 * @return
 	 */
@@ -230,4 +234,36 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	List<Map<String,Object>> getTbGoods(String orderShipno);
+	
+	
+	/**库存盘点 
+	 * @param check
+	 * @return
+	 */
+	int insertInventoryCheck(InventoryCheck check);
+	
+	/**获取最近一次有效盘点
+	 * @return
+	 */
+	InventoryCheck getLastInventoryCheck();
+	
+	/**撤销盘点
+	 * @param check
+	 * @return
+	 */
+	int updateInventoryCheckCancel(InventoryCheck check);
+	
+	/**更新盘点完成标志
+	 * @param id
+	 * @return
+	 */
+	int updateInventoryCheckDone(int id);
+	
+	
+	/**批量更新盘点记录
+	 * @param list
+	 * @return
+	 */
+	int iBatchInventoryCheckRecord(List<InventoryCheckRecord> list);
+	
 }

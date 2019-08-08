@@ -40,6 +40,7 @@ import com.cbt.util.StrUtils;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.service.InventoryService;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
@@ -66,7 +67,7 @@ public class InventoryController {
 	
 	
 	/**
-	 * 查询库存统计报表
+	 * 查询库存明细
 	 * @param request
 	 * @param response
 	 * @return
@@ -98,7 +99,7 @@ public class InventoryController {
 	 */
 	@RequestMapping("/addLoss")
 	@ResponseBody
-	public Map<String,Object> addInventoryProblem(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
+	public Map<String,Object> addInventoryLoss(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 		Map<String,Object> result = new HashMap<>();
 		String igoodsId = request.getParameter("igoodsId");
 		String iskuid = request.getParameter("iskuid");
@@ -226,7 +227,7 @@ public class InventoryController {
 	protected EasyUiJsonResult searchGoodsInventoryInfo(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
-		Map<Object, Object> map = getObjectByInventory(request);
+		Map<Object, Object> map = getObjectByInventory(request,false);
 		List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
 		int toryListCount = inventoryService.getIinOutInventoryCount(map);
 		json.setRows(toryList);
@@ -248,7 +249,7 @@ public class InventoryController {
 			throws ServletException, IOException, ParseException {
 		
 		ModelAndView mv = new ModelAndView("inventoryReport");
-		Map<Object, Object> map = getObjectByInventory(request);
+		Map<Object, Object> map = getObjectByInventory(request,false);
 		List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
 		int toryListCount = inventoryService.getIinOutInventoryCount(map);
 		mv.addObject("toryList", toryList);
@@ -257,12 +258,12 @@ public class InventoryController {
 		int toryListPage = toryListCount % 20 == 0 ? toryListCount / 20 : toryListCount / 20 + 1;
 		mv.addObject("toryListPage", toryListPage);
 		mv.addObject("page", map.get("current_page"));
-		
+		mv.addObject("queryParam",map);
 		return mv;
 	}
 	
 
-	private Map<Object, Object> getObjectByInventory(HttpServletRequest request) {
+	private Map<Object, Object> getObjectByInventory(HttpServletRequest request,boolean checkFlag) {
 		Map<Object, Object> map = new HashMap<Object, Object>();
 		String inid = request.getParameter("inid");
 		inid = StrUtils.isNum(inid) ? inid : "0";
@@ -293,6 +294,12 @@ public class InventoryController {
 		String goodscatid = request.getParameter("goodscatid");
 		goodscatid = goodscatid == null ? "0" : goodscatid;
 		map.put("goodscatid", goodscatid);
+		if(checkFlag) {
+			String checkStart = request.getParameter("checkStart");
+			checkStart = org.apache.commons.lang.StringUtils.equals(checkStart, "1")? checkStart : "0";
+			map.put("checkStart", Integer.valueOf(checkStart));
+		}
+		
 		return map;
 	}
 
@@ -767,8 +774,13 @@ public class InventoryController {
 				e.printStackTrace();
 			}
 		}
-
 	}
+	
+	/**根据产品ID获取数据（产品库存录入）
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/get/product")
 	@ResponseBody
 	public Map<String,Object> getProduct(HttpServletRequest request, HttpServletResponse response){
@@ -844,6 +856,11 @@ public class InventoryController {
 		return result;
 	}
 	
+	/**根据淘宝订单号或运单号获取产品列表数据
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("get/tborder")
 	@ResponseBody
 	public Map<String,Object> getTBorder(HttpServletRequest request, HttpServletResponse response){
@@ -876,10 +893,12 @@ public class InventoryController {
 	 */
 	@RequestMapping("/get/barcode")
 	@ResponseBody
-	public String getBarcode(HttpServletRequest request, HttpServletResponse response) {
+	public Map<String,Object> getBarcode(HttpServletRequest request, HttpServletResponse response) {
+		Map<String,Object> result = new HashMap<>();
+		result.put("status", 200);
+		result.put("barcode", "CR001002003");
 		
-		
-		return "";
+		return result;
 	}
 	
 	/**录入库存
@@ -956,6 +975,29 @@ public class InventoryController {
 			}
 		}
 		return result;
+	}
+	/**库存盘点列表
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/check/list")
+	public ModelAndView inventoryCheck(HttpServletRequest request, HttpServletResponse response) {
+		ModelAndView mv = new ModelAndView("inventorycheck");
+		Map<Object, Object> map = getObjectByInventory(request,true);
+		int checkListCount = inventoryService.getIinOutInventoryCount(map);
+		if(checkListCount == 0) {
+			return mv;
+		}
+		List<InventoryCheckWrap> invetoryCheckList = inventoryService.invetoryCheckList(map);
+		
+		mv.addObject("checkList", invetoryCheckList);
+		mv.addObject("checkListCount", checkListCount);
+		int toryListPage = checkListCount % 20 == 0 ? checkListCount / 20 : checkListCount / 20 + 1;
+		mv.addObject("toryListPage", toryListPage);
+		mv.addObject("queryParam",map);
+		
+		return mv;
 		
 	}
 	

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.cbt.warehouse.dao.InventoryMapper" >
+    <resultMap id="InventoryCheckMap" type="com.cbt.website.bean.InventoryCheck" >
+        <result column="id" property="id" jdbcType="INTEGER" />
+        <result column="check_cat" property="checkCat" jdbcType="INTEGER" />
+        <result column="check_time" property="checkTime" jdbcType="VARCHAR" />
+        <result column="check_adm" property="checkAdm" jdbcType="INTEGER" />
+        <result column="cancel_adm" property="cancelAdm" jdbcType="INTEGER" />
+        <result column="cancel_time" property="cancelTime" jdbcType="VARCHAR" />
+        <result column="cancel_remark" property="cancelRemark" jdbcType="VARCHAR" />
+        <result column="cancle_flag" property="cancleFlag" jdbcType="INTEGER" />
+    </resultMap>
     <resultMap id="inventoryDetailsMap" type="com.cbt.website.bean.InventoryDetails" >
         <result column="id" property="id" jdbcType="INTEGER" />
         <result column="sku" property="sku" jdbcType="VARCHAR" />
@@ -269,7 +279,7 @@
    </insert>
   
 
-    
+    <!-- 获取订单信息  -->
     <select id="getOrderDetails" resultType="java.util.Map">
     select od.id as odid,od.goodsid,od.goodsprice,od.yourorder,od.goods_pid,trim(od.car_type) as car_type,od.car_urlMD5,od.goodsname,od.car_url,
     th.orderid as tborderid,od.goodscatid,od.car_img,ops.goods_p_price,th.imgurl as goods_p_img,th.itemurl,
@@ -281,7 +291,7 @@
 	where od.orderid=#{orderid} and od.id=#{odid}  limit 1
     </select>
     
-   
+   <!-- 插入库存明细 -->
     <insert id="addInventoryDetailsSku">
     insert into inventory_details_sku(goods_pid,goods_p_pid,sku,good_skuid,goods_price,
     goods_p_price,goods_number,od_id,createtime,admid,type,inventory_id,
@@ -292,26 +302,28 @@
     from inventory_sku where id=#{inventory_sku_id})
     
     </insert>
+    
     <insert id="insertStorageOutboundDetails">
     insert into storage_outbound_details 
     (orderid,goodsid,in_id,storage_count,type,createtime,admName,when_count,add_inventory) values
     (#{orderid},#{goodsid},#{inventory_sku_id},#{storage_count},1,now(),#{adminId},#{when_count},#{inventory_count})
     
     </insert>
-    
+    <!-- 订单关联库存，查询是否有可用库存 -->
     <select id="getInventoryByOrderDetialsId" resultType="java.util.Map">
     select odsm.goods_pid, odsm.specid,odsm.skuid,isku.can_remaining,isku.id as inventory_id from 
      order_details_sku_match odsm left join inventory_sku isku on (odsm.goods_pid=isku.goods_pid 
     and odsm.specid=isku.specid  and odsm.skuid=isku.skuid )
     where odsm.skuid!='' and odsm.specid!='' and odsm.order_details_id=#{odid} limit 1
     </select>
-    
+    <!-- 获取库存表货源数据  -->
     <select id="getInventoryDetailSku" resultType="java.util.Map">
     select 
     1688_orderid,good_name,goods_p_pid,sku,1688_shipno,admid,goods_p_img,goods_p_url,goods_p_skuid,goods_p_specid,goods_p_price
     from inventory_details_sku where type=0 and inventory_id=#{inventory_sku_id} order by id desc 
     limit 1
     </select>
+    <!--  -->
     <insert id="addIdRelationTable">
     insert into id_relationtable ( orderid,goodid,odid,goodurl,goodstatus,goodarrivecount,
     barcode,tborderid,position,shipno, username,userid,state,itemid,is_delete,store_name,
@@ -323,12 +335,13 @@
     #{is_replenishment},#{weight},#{is_refund},#{specid},#{skuid},now())
     
     </insert>
+    <!-- 锁定库存 -->
     <insert id="insertLockInventory">
     INSERT INTO lock_inventory (in_id,lock_remaining,od_id,createtime,lock_inventory_amount,is_use) values(
     #{inventory_sku_id},#{inventory_count},#{odid},now(),#{lock_inventory_amount},#{is_use}
     )
     </insert>
-    
+    <!--库存损益表  -->
     <insert id="addLossInventoryRecord" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.LossInventoryRecord">
     insert into loss_inventory_record(inventory_sku_id,goods_pid,skuid,specid,change_number,
     change_type,change_adm,change_time,delete_state,delete_adm,delete_time)
@@ -336,7 +349,7 @@
     (#{inventorySkuId},#{goodsPid},#{skuid},#{specid},#{changeNumber},#{changeType},
     #{changeAdm},now(),#{deleteState},#{deleteAdm},now())
     </insert>
-    
+    <!-- 库存明细列表 -->
     <select id="inventoryDetails" resultMap="inventoryDetailsMap">
     select  id,inventory_id,goods_pid,sku,good_skuid,type,goods_specid,del_remark,del_adm,
     del_datetime,createtime,del,goods_img,goods_number,od_id,orderno
@@ -399,6 +412,7 @@
    #{goodsName},#{sku},#{barcode},#{goodsPid},now(),#{remark},#{changeType},
    #{goodsPPid},#{specid},#{skuid},#{inventorySkuId})
     </insert>
+    <!--  库存明细表-->
     <insert id="insertInventoryDetailsSku" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventoryDetails">
     insert into inventory_details_sku(goods_pid,goods_p_pid,sku,good_skuid,goods_p_skuid,goods_price,
     goods_p_price,goods_number,1688_orderid,1688_shipno,orderno,od_id,createtime,admid,type,inventory_id,
@@ -407,11 +421,48 @@
     #{goodsNumber},#{tbOrderid},#{tbShipno},#{orderno},#{odId},now(),#{admid},#{type},#{inventoryId},
     #{goodsPUrl},#{goodsPImg},#{goodsName},#{goodsSpecid},#{goodsPSpecid},#{goodsImg})
     </insert>
-    
+    <!-- 根据1688订单号或运单号查询产品数据 -->
     <select id="getTbGoods" resultType="java.util.Map">
     select  orderid,shipno,itemname,itemprice,itemqty,sku,skuID,specId,imgurl,itemurl,itemid
     from  taobao_1688_order_history where orderid=#{orderShipno} or shipno=#{orderShipno}
     
     </select>
+    <!-- 开始盘点 -->
+    <insert id="insertInventoryCheck" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventoryCheck">
+    insert into inventory_sku_check(check_cat,check_adm,check_time) values(#{checkCat},#{checkAdm},now())
+    </insert>
+    <!-- 取消盘点 -->
+    <update id="updateInventoryCheckCancel"  parameterType="com.cbt.website.bean.InventoryCheck">
+    update inventory_sku_check set cancel_adm=#{cancelAdm} ,cancel_remark=#{cancelRemark},cancel_time=now(),cancle_flag=1 where id=#{id}
+    </update>
+    <!-- 获取最近一次盘点 -->
+    <select id="getLastInventoryCheck" resultMap="InventoryCheckMap">
+    select  id,check_cat,check_adm,check_time from inventory_sku_check where cancle_flag=0 and check_done=1 order by id desc limit 1
+    </select>
+    <!-- 批量插入盘点记录 -->
+    <insert id="iBatchInventoryCheckRecord">
+    insert into inventory_sku_check_record(inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
+    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,
+    before_barcode,after_barcode,create_time)
+    values
+    <foreach collection="list" separator="," item="item">
+    (#{item.inventoryCheckId},#{item.inventorySkuId},#{item.goodsPid},#{item.goodsSku},#{item.goodsSpecid},
+    #{item.goodsSkuid},#{item.goodsPrice},#{item.inventoryRemaining},#{item.checkRemaining},
+    #{item.beforeBarcode},#{item.afterBarcode},now())
+    </foreach>
+    </insert>
+    
+    <select id="getInventoryByIds" resultMap="InventorySkuResultMap">
+    select id,last_check_remaining from  inventory_sku where id in 
+    <foreach collection="list" item="item" separator="," open="(" close=")">
+    #{item}
+    </foreach>
+    
+    </select>
+    <update id="updateInventoryCheckDone">
+    update inventory_sku_check set check_done=1 where id=#{id}
+    </update>
+    
+    
     
 </mapper>

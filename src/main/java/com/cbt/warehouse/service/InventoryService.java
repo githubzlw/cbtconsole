@@ -6,6 +6,7 @@ import java.util.Map;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
 
@@ -134,6 +135,8 @@ public interface InventoryService {
 	 */
 	public int insertInventoryYmx(Map<String,String> map);
 	public int updateIsStockFlag1(String goods_pid);
+	
+	/*************************************************************************/
 	/**
 	 * 损耗库存记录
 	 * @Title recordLossInventory
@@ -172,5 +175,10 @@ public interface InventoryService {
 	 * @return
 	 */
 	List<Map<String,Object>> getTbGoods(String orderShipno);
-
+	
+	
+	/**盘点列表
+	 * @return
+	 */
+	List<InventoryCheckWrap> invetoryCheckList(Map<Object, Object> map);
 }
