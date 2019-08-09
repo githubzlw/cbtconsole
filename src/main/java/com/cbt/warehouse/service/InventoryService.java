@@ -6,9 +6,13 @@ import java.util.Map;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.InventoryCheck;
+import com.cbt.website.bean.InventoryCheckWrap;
+import com.cbt.website.bean.InventoryData;
+import com.cbt.website.bean.InventoryDetailsWrap;
 
 public interface InventoryService {
-	/**库存减少操作
+	/**采购使用库存减少操作
 	 * @param inventory
 	 * @return
 	 */
@@ -19,17 +23,22 @@ public interface InventoryService {
 	 */
 	int cancelInventory(Map<String,String> inventory);
 	
-	/**增加库存
+	/**验货增加库存
 	 * @param inventory
 	 * @return
 	 */
 	int addInventory(Map<String,String> inventory);
+	/**人工录入库存
+	 * @param inventory
+	 * @return
+	 */
+	int inputInventory(Map<String,String> inventory);
 	/**
 	 * 库存列表查询
 	 * @param map
 	 * @return
 	 */
-	public List<Inventory> getIinOutInventory(Map<Object, Object> map);
+	public List<InventoryData> getIinOutInventory(Map<Object, Object> map);
 	public int updateSourcesLog(int in_id, String name, String old_sku, String old_url, String new_barcode, String old_barcode, int new_remaining, int old_remaining, String remark);
 	/**
 	 * 手动录入库存
@@ -91,7 +100,7 @@ public interface InventoryService {
 	 * @param map
 	 * @return
 	 */
-	public List<Inventory> getIinOutInventoryCount(Map<Object, Object> map);
+	public int getIinOutInventoryCount(Map<Object, Object> map);
 
 	/**
 	 * 查询分类数据
@@ -127,6 +136,8 @@ public interface InventoryService {
 	 */
 	public int insertInventoryYmx(Map<String,String> map);
 	public int updateIsStockFlag1(String goods_pid);
+	
+	/*************************************************************************/
 	/**
 	 * 损耗库存记录
 	 * @Title recordLossInventory
@@ -135,11 +146,45 @@ public interface InventoryService {
 	 * @return
 	 * @return int
 	 */
-	public int recordLossInventory(Map<Object, Object> map);
+	public int recordLossInventory(Map<String, Object> map);
 	/**
 	 * 库存管理页面统计最近30天新产生的库存
 	 * @return
 	 */
 	public String getNewInventory();
-
+	
+	/**库存报损调整
+	 * @param map
+	 * @return
+	 */
+	public Map<String,Object> reportLossInventory(Map<String, Object> map);
+	
+	/**库存明细
+	 * @param map
+	 * @return
+	 */
+	List<InventoryDetailsWrap> inventoryDetails(Map<String, Object> map);
+	
+	/**库存明细数量
+	 * @param map
+	 * @return
+	 */
+	int inventoryDetailsCount(Map<String, Object> map);
+	
+	/**获取淘宝订单
+	 * @param orderShipno
+	 * @return
+	 */
+	List<Map<String,Object>> getTbGoods(String orderShipno);
+	
+	
+	/**盘点列表
+	 * @return
+	 */
+	List<InventoryCheckWrap> invetoryCheckList(Map<Object, Object> map);
+	
+	/**最近盘点
+	 * @return
+	 */
+	InventoryCheck getLastInventoryCheck();
 }

@@ -6,6 +6,8 @@ import com.cbt.report.vo.StatisticalReportVo;
 import com.cbt.warehouse.pojo.JcexPrintInfo;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
+import com.cbt.website.bean.InventoryData;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import java.util.List;
@@ -45,7 +47,7 @@ public interface GeneralReportService {
 
     public HSSFWorkbook exportTaoBaoOrder(List<TaoBaoOrderInfo> list, double pagePrice);
 
-    public HSSFWorkbook exportGoodsInventory(List<Inventory> list);
+    public HSSFWorkbook exportGoodsInventory(List<InventoryData> list);
 
     /**
      * 库存盘点记录导出

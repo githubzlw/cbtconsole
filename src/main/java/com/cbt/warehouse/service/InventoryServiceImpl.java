@@ -1,5 +1,6 @@
 package com.cbt.warehouse.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,14 @@ import com.cbt.util.StrUtils;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.InventoryCheck;
+import com.cbt.website.bean.InventoryCheckWrap;
+import com.cbt.website.bean.InventoryData;
+import com.cbt.website.bean.InventoryDetails;
+import com.cbt.website.bean.InventoryDetailsWrap;
+import com.cbt.website.bean.InventoryLog;
+import com.cbt.website.bean.InventorySku;
+import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 import com.importExpress.mapper.IPurchaseMapper;
 @Service
@@ -25,8 +34,6 @@ public class InventoryServiceImpl implements  InventoryService{
 	private InventoryMapper inventoryMapper;
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
-	@Autowired
-	private IPurchaseMapper pruchaseMapper;
 
 	/**
 	 * 根据ID获取库存
@@ -37,7 +44,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		return inventoryMapper.queryInById(id);
 	}
 	@Override
-	public int recordLossInventory(Map<Object, Object> map) {
+	public int recordLossInventory(Map<String, Object> map) {
 
 		return inventoryMapper.recordLossInventory(map);
 	}
@@ -51,92 +58,87 @@ public class InventoryServiceImpl implements  InventoryService{
 		return inventoryMapper.insertInventoryYmx(map);
 	}
 	@Override
-	public List<Inventory> getIinOutInventory(Map<Object, Object> map) {
-		List<Inventory> toryList=inventoryMapper.getIinOutInventory(map);
-		StringBuilder pids=new StringBuilder();
-		for (Inventory inventory : toryList) {
-			inventory.setGoods_url(StringUtil.isBlank(inventory.getGoods_url())?"":inventory.getGoods_url());
-			inventory.setCar_urlMD5(StringUtil.isBlank(inventory.getCar_urlMD5())?"":inventory.getCar_urlMD5());
-			pids.append("'").append(inventory.getGoods_pid()).append("',");
-			String valid=inventory.getOnLine();
-			String onLine="状态错误";
+	public List<InventoryData> getIinOutInventory(Map<Object, Object> map) {
+		List<InventoryData> toryList = inventoryMapper.getIinOutInventory(map);
+		StringBuilder pids = new StringBuilder();
+		StringBuilder opration = null;
+		for (int i=0,size=toryList.size();i<size;i++) {
+			InventoryData t = toryList.get(i);
+			String goodscatid = t.getGoodsCatid();
+			if(StringUtil.isBlank(goodscatid) || "0".equals(goodscatid)){
+				t.setCategoryName("其他");
+			}
+			t.setSkuContext("<em class='emsku'>"+t.getSku()+"</em><br>skuid:<em class='emskuid'>"+t.getSkuid()+"</em><br>specid:<em class='emspecid'>"+t.getSpecid()+"</em>");
+			
+			String url="";
+			if(!StringUtils.isStrNull(t.getCarUrlMD5()) && t.getCarUrlMD5().startsWith("A")){
+				url="https://www.import-express.com/goodsinfo/a-2"+t.getGoodsPid()+".html";
+			}else if(!StringUtils.isStrNull(t.getCarUrlMD5()) && t.getCarUrlMD5().startsWith("D")){
+				url="https://www.import-express.com/goodsinfo/a-1"+t.getGoodsPid()+".html";
+			}else if(!StringUtils.isStrNull(t.getCarUrlMD5()) && t.getCarUrlMD5().startsWith("N")){
+				url="https://www.import-express.com/goodsinfo/a-3"+t.getGoodsPid()+".html";
+			}else if(!StringUtils.isStrNull(t.getGoodsUrl()) && t.getGoodsUrl().contains("ali")){
+				url="https://www.import-express.com/goodsinfo/a-2"+t.getGoodsPid()+".html";
+			}else if(!StringUtils.isStrNull(t.getCarUrlMD5()) && !StringUtils.isStrNull(t.getGoodsPid())){
+				url="https://www.import-express.com/spider/detail?&source="+t.getCarUrlMD5()+"&item="+t.getGoodsPid()+"";
+			}else {
+				url="https://www.import-express.com/goodsinfo/a-1"+t.getGoodsPid()+".html";
+			}
+			String car_img=t.getCarImg();
+			String imgs[]=car_img.split("kf");
+			if(imgs.length > 1) {
+				String one=imgs[0];
+				String two=imgs[1].replace(".jpg_50x50","");
+				url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
+			}
+			
+			t.setCarImg("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
+					+ "<img   class=\"img-responsive\" src='"+ (car_img.indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":car_img) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ car_img + "')\" height='100' width='100'></a>");
+		
+			
+			
+			
+			t.setGoodsUrl(StringUtil.isBlank(t.getGoodsUrl())?"":t.getGoodsUrl());
+			t.setCarUrlMD5(StringUtil.isBlank(t.getCarUrlMD5())?"":t.getCarUrlMD5());
+			
+			pids.append("'").append(t.getGoodsPid()).append("',");
+			
 			String unsellableReason="--";
+			String onLine="状态错误";
+			int valid= t.getOnlineFlag();
 			if("1".equals(valid)){
 				onLine="上架";
 			}else if("0".equals(valid)){
 				onLine="下架";
-				unsellableReason= Utility.getUnsellableReason(inventory.getUnsellableReason(),unsellableReason);
-				inventory.setUnsellableReason(unsellableReason);
-			}else if("2".equals(valid) && (inventory.getGoods_url().indexOf("aliexpress")>-1 || inventory.getCar_urlMD5().startsWith("A"))){
+				unsellableReason= Utility.getUnsellableReason(t.getUnsellableReason(),unsellableReason);
+				t.setUnsellableReason(unsellableReason);
+			}else if("2".equals(valid) && (t.getGoodsUrl().indexOf("aliexpress")>-1 || t.getCarUrlMD5().startsWith("A"))){
 				onLine="ali产品实时抓取";
 			}else{
 				onLine="商品已删除";
 			}
-			inventory.setOnLine(onLine);
+			t.setOnline(onLine);
+			
 			if("0".equals(map.get("export"))){
-				if (inventory.getFlag() == 1) {
-					if(map.get("flag")==null || "".equals(map.get("flag"))){
-						inventory.setOperation(("<a style='color:red' id='pd_"+inventory.getId()+"' onclick=\"update_inventory("+inventory.getFlag()+","+inventory.getId()+",'" + inventory.getBarcode()+ "','" + inventory.getNew_remaining() + "','" + (StringUtils.isStrNull(inventory.getRemark())?"":inventory.getRemark()) + "')\">盘点</a>|<a onclick=\"delete_inventory("+inventory.getId()+",'"+inventory.getGoods_pid()+"','"+(StringUtils.isStrNull(inventory.getNew_barcode())?inventory.getBarcode():inventory.getNew_barcode())+"','"+(inventory.getNew_inventory_amount()>0?inventory.getNew_inventory_amount():inventory.getInventory_amount())+"')\">删除</a>").replaceAll("\n", ""));
-					}else{
-						inventory.setOperation(("<a id='pd_"+inventory.getId()+"' onclick=\"update_inventory("+inventory.getFlag()+","+inventory.getId()+",'" + inventory.getBarcode()+ "','" + inventory.getNew_remaining() + "','" + (StringUtils.isStrNull(inventory.getRemark())?"":inventory.getRemark()) + "')\">盘点</a>|<a onclick=\"delete_inventory("+inventory.getId()+",'"+inventory.getGoods_pid()+"','"+(StringUtils.isStrNull(inventory.getNew_barcode())?inventory.getBarcode():inventory.getNew_barcode())+"','"+(inventory.getNew_inventory_amount()>0?inventory.getNew_inventory_amount():inventory.getInventory_amount())+"')\">删除</a>").replaceAll("\n", ""));
-					}
-				} else{
-					inventory.setNew_remaining("");
-					if(inventory.getFlag()==0){
-						inventory.setOperation(("<a id='pd_"+inventory.getId()+"' onclick=\"update_inventory("+inventory.getFlag()+","+inventory.getId()+",'" + inventory.getBarcode()+ "','" + inventory.getRemaining() + "','" + (StringUtils.isStrNull(inventory.getRemark())?"":inventory.getRemark())+ "')\">盘点</a>|<a onclick=\"delete_inventory("+inventory.getId()+",'"+inventory.getGoods_pid()+"','"+(StringUtils.isStrNull(inventory.getNew_barcode())?inventory.getBarcode():inventory.getNew_barcode())+"','"+(inventory.getNew_inventory_amount()>0?inventory.getNew_inventory_amount():inventory.getInventory_amount())+"')\">删除</a>|<a onclick=\"problem_inventory("+inventory.getId()+")\">问题库存</a>").replaceAll("\n", ""));
-					}else{
-						inventory.setOperation(("<a id='pd_"+inventory.getId()+"' onclick=\"update_inventory("+inventory.getFlag()+","+inventory.getId()+",'" + inventory.getBarcode()+ "','" + inventory.getRemaining() + "','" + (StringUtils.isStrNull(inventory.getRemark())?"":inventory.getRemark())+ "')\">盘点</a>|<a onclick=\"delete_inventory("+inventory.getId()+",'"+inventory.getGoods_pid()+"','"+(StringUtils.isStrNull(inventory.getNew_barcode())?inventory.getBarcode():inventory.getNew_barcode())+"','"+(inventory.getNew_inventory_amount()>0?inventory.getNew_inventory_amount():inventory.getInventory_amount())+"')\">删除</a>").replaceAll("\n", ""));
-					}
-				}
-				String url="";
-				if(!StringUtils.isStrNull(inventory.getCar_urlMD5()) && inventory.getCar_urlMD5().startsWith("A")){
-					url="https://www.import-express.com/goodsinfo/a-2"+inventory.getGoods_pid()+".html";
-				}else if(!StringUtils.isStrNull(inventory.getCar_urlMD5()) && inventory.getCar_urlMD5().startsWith("D")){
-					url="https://www.import-express.com/goodsinfo/a-1"+inventory.getGoods_pid()+".html";
-				}else if(!StringUtils.isStrNull(inventory.getCar_urlMD5()) && inventory.getCar_urlMD5().startsWith("N")){
-					url="https://www.import-express.com/goodsinfo/a-3"+inventory.getGoods_pid()+".html";
-				}else if(!StringUtils.isStrNull(inventory.getGoods_url()) && inventory.getGoods_url().contains("ali")){
-					url="https://www.import-express.com/goodsinfo/a-2"+inventory.getGoods_pid()+".html";
-				}else if(!StringUtils.isStrNull(inventory.getCar_urlMD5()) && !StringUtils.isStrNull(inventory.getGoods_pid())){
-					url="https://www.import-express.com/spider/detail?&source="+inventory.getCar_urlMD5()+"&item="+inventory.getGoods_pid()+"";
-				}else {
-					url="https://www.import-express.com/goodsinfo/a-1"+inventory.getGoods_pid()+".html";
-				}
-				if("1".equals(inventory.getDb_flag())){
-					inventory.setEditLink("<a target='_blank' href='/cbtconsole/editc/detalisEdit?pid="+inventory.getPid()+"'>产品编辑链接</a>");
-				}else{
-					inventory.setEditLink("--");
-				}
-				if("4".equals(inventory.getOnline_flag())){
-					String car_img=inventory.getCar_img();
-					String imgs[]=car_img.split("kf");
-					String one=imgs[0];
-					String two=imgs[1].replace(".jpg_50x50","");
-					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
-				}else if("1".equals(inventory.getOnline_flag())){
-					url="https://www.aliexpress.com/item/a/"+inventory.getGoods_pid()+".html";
-				}
-				inventory.setCar_img("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
-						+ "<img  src='"+ (inventory.getCar_img().indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":inventory.getCar_img()) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ inventory.getCar_img() + "')\" height='100' width='100'></a>");
-				if(!StringUtils.isStrNull(inventory.getGoods_p_url())){
-					url=inventory.getGoods_p_url();
-					inventory.setGood_name("<a href='"+url+"' target='_blank' title='"+(StringUtils.isStrNull(url)?"未匹配到1688链接":"跳转到1688链接")+"'>"
-							+ inventory.getGood_name().substring(0, inventory.getGood_name().length() / 3) + "</a>");
-				}else{
-					inventory.setGood_name("<span'>"+ inventory.getGood_name().substring(0, inventory.getGood_name().length() / 3) + "</span>");
-
-				}
-				inventory.setSku("<a title='查看出入库明细' href='/cbtconsole/website/in_out_details.jsp?in_id="+inventory.getId()+"' target='_blank'>"+(StringUtils.isStrNull(inventory.getSku())?"无规格":inventory.getSku())+"</a>");
-				if(!StringUtils.isStrNull(inventory.getGoodsid())){
-					inventory.setRemaining("<a title='跳转到入库记录页面' style='color:red;text-decoration-line:underline' target='_blank' href='/cbtconsole/warehouse/getOrderinfoPage.do?goodid="+inventory.getGoodsid()+"'>"+inventory.getRemaining()+"</a>");
-				}else{
-					inventory.setRemaining("<span>"+inventory.getRemaining()+"</span>");
-				}
+				opration = new StringBuilder();
+				//报损/调整
+				opration.append("<button class=\"btn btn-default mt5\" onclick=\"updateInventory('0','"+i+"','"+t.getId()+"')\"> ")
+				.append("报损调整").append("</button>");
+				
+				//产品编辑
+				opration.append("<br><a target='_blank' href='/cbtconsole/editc/detalisEdit?pid=").append(t.getGoodsPid())
+				.append("'><button class=\"btn btn-default mt5\">").append("产品编辑</button></a>");
+				
+				//库存明细
+				opration.append("<br><a target='_blank' href='/cbtconsole/website/inventorydetails.jsp?inid=").append(t.getId())
+				.append("'><button class=\"btn btn-default mt5\">").append("库存明细</button></a>");
+				
+				t.setOperation(opration.toString());
 			}
-			String goodscatid=inventory.getGoodscatid();
-			if(StringUtil.isBlank(goodscatid) || "0".equals(goodscatid)){
-				inventory.setGoodscatid("其他");
+			if(StringUtil.isBlank(t.getCheckTime())) {
+				t.setCheckTime("");
 			}
+			toryList.set(i, t);
 		}
 		return toryList;
 	}
@@ -159,7 +161,7 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 
 	@Override
-	public List<Inventory> getIinOutInventoryCount(Map<Object, Object> map) {
+	public int getIinOutInventoryCount(Map<Object, Object> map) {
 		return inventoryMapper.getIinOutInventoryCount(map);
 	}
 
@@ -312,10 +314,11 @@ public class InventoryServiceImpl implements  InventoryService{
 				inventory.put("goods_p_pid", t.getItemid());
 				inventory.put("car_type", t.getSku());
 				inventory.put("specid", StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId());
-				inventory.put("skuid",StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID() );
+				inventory.put("skuid",StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID());
 				inventory.put("inventory_count", t.getItemqty());
 				inventory.put("yourorder", t.getItemqty());
 				inventory.put("goods_url", t.getImgurl());
+				inventory.put("db_flag", "0");
 				inventory.put("car_img", t.getImgurl());
 				inventory.put("goods_p_price", String.valueOf(t.getItemprice()));
 				inventory.put("goodsprice", String.valueOf(t.getItemprice()));
@@ -328,25 +331,49 @@ public class InventoryServiceImpl implements  InventoryService{
 				result = result + inventoryOperation(inventory,true);
 			}
 		}else {
+			inventory.put("db_flag", "1");
 			result = inventoryOperation(inventory,false);
 		}
 		return result;
 	}
 	
 	private int inventoryOperation(Map<String,String> inventory,boolean isTbOrder) {
-		int inventory_count = Integer.valueOf(inventory.get("inventory_count"));
+		int inventory_count = Integer.valueOf(StrUtils.object2NumStr(inventory.get("inventory_count")));
 		if(inventory_count == 0) {
 			return 0;
 		}
+		InventoryDetails iDetail = new InventoryDetails();
+		iDetail.setGoodsPSkuid(inventory.get("tbskuid"));
+		iDetail.setGoodsPSpecid(inventory.get("tbspecid"));
+		iDetail.setTbShipno(inventory.get("shipno"));
+		
+		InventorySku iSku = new InventorySku();
+		iSku.setBarcode(inventory.get("barcode"));
+		iSku.setDbFlag(Integer.valueOf(StrUtils.object2NumStr(inventory.get("db_flag"))));
 		//inventory_type 0：电商库存  1：亚马逊库存
-		inventory.put("inventory_type", "0");
+		iSku.setInventoryType(0);
 		//获取订单详情中产品数据：产品id、产品名称、产品价格、产品规格等
 		Map<String, String> orderDetails = isTbOrder ? null : inventoryMapper.getOrderDetails(inventory);
+		if(!isTbOrder && orderDetails == null) {
+			return 0;
+		}
 		if(orderDetails != null) {
 			inventory.putAll(orderDetails);
-			
 			//产品sku：若所选产品规格没有值，使用产品id代替规格id
 			String car_type = inventory.get("car_type");
+			iSku.setGoodsPid(orderDetails.get("goods_pid"));
+			iSku.setSku(car_type);
+			iSku.setCarImg(orderDetails.get("car_img"));
+			iSku.setCarUrlMD5(orderDetails.get("car_urlMD5"));
+			iSku.setGoodsCatid(orderDetails.get("goodscatid"));
+			iSku.setGoodsName(orderDetails.get("goodsname"));
+			iSku.setGoodsPPid(orderDetails.get("tb_1688_itemid"));
+			iSku.setGoodsPPrice(orderDetails.get("goods_p_price"));
+			iSku.setGoodsPrice(orderDetails.get("goodsprice"));
+			iSku.setGoodsPUrl(orderDetails.get("goods_p_url"));
+			iSku.setGoodsUrl(orderDetails.get("car_url"));
+			iDetail.setGoodsPImg(orderDetails.get("goods_p_img"));
+			iDetail.setTbOrderid(orderDetails.get("tborderid"));
 			if(StringUtils.isStrNull(car_type) || "0".equals(car_type)) {
 				String skuid = inventory.get("skuid");
 				String specid = inventory.get("specid");
@@ -355,66 +382,112 @@ public class InventoryServiceImpl implements  InventoryService{
 				inventory.put("skuid", skuid);
 				inventory.put("specid", specid);
 			}
+			iSku.setSkuid(inventory.get("skuid"));
+			iSku.setSpecid(inventory.get("specid"));
+		}else {
+			iSku.setSku(inventory.get("car_type"));
+			iSku.setCarImg(inventory.get("car_img"));
+			iSku.setGoodsPid(inventory.get("goods_pid"));
+			iSku.setGoodsName(inventory.get("good_name"));
+			iSku.setGoodsPPid(inventory.get("tb_1688_itemid"));
+			iSku.setGoodsPPrice(inventory.get("goods_p_price"));
+			iSku.setGoodsPrice(inventory.get("goodsprice"));
+			iSku.setGoodsPUrl(inventory.get("goods_p_url"));
+			iSku.setGoodsUrl(inventory.get("goods_url"));
+			iSku.setSkuid(inventory.get("skuid"));
+			iSku.setSpecid(inventory.get("specid"));
+			iSku.setDbFlag(0);
+			iSku.setBarcode(inventory.get("barcode"));
+			iSku.setRemaining(Integer.valueOf(StrUtils.object2NumStr(inventory.get("yourorder"))));
+			
+			iDetail.setGoodsPImg(inventory.get("goods_p_img"));
+			iDetail.setTbOrderid(inventory.get("tborderid"));
+			iDetail.setGoodsNumber(Integer.valueOf(StrUtils.object2NumStr(inventory.get("yourorder"))));
 		}
 		
 		//2.是否存在库存
-		Map<String,Object> isExsisInventory = inventoryMapper.getInventory(inventory);
+		InventorySku isExsisInventory = inventoryMapper.getInventory(iSku);
+		
+		iSku.setOdid(Integer.valueOf(StrUtils.object2NumStr(inventory.get("odid"))));
+		
 		int beforeRemaining = 0;
 		int afterRemaining = inventory_count;
 		Integer inventory_sku_id  = 0;
 		if(isExsisInventory == null) {
-			if(isTbOrder) {
-				String oldbarcode = (String)isExsisInventory.get("barcode");
-				if(StringUtil.isNotBlank(oldbarcode)) {
-					inventory.put("barcode", oldbarcode);
-				}
-			}
-			inventoryMapper.addInventory(inventory);
+			iSku.setRemaining(inventory_count);
+			iSku.setCanRemaining(inventory_count);
+			inventoryMapper.insertInventory(iSku);
 			//3.库存表id
-			inventory_sku_id = inventoryMapper.isExsisInventory(inventory);
+			inventory_sku_id = iSku.getId();
+			inventory.put("inventory_sku_id", String.valueOf(inventory_sku_id));
 		}else {
 			if(isTbOrder) {
-				inventory.put("barcode", (String)isExsisInventory.get("barcode"));
+				iSku.setBarcode(isExsisInventory.getBarcode());
+				inventory.put("barcode", isExsisInventory.getBarcode());
 			}
-			String goods_p_url = (String)isExsisInventory.get("goods_p_url");
-			String goods_p_price = (String)isExsisInventory.get("goods_p_price");
-			int remaining = (int)isExsisInventory.get("remaining");
-			int can_remaining = (int)isExsisInventory.get("can_remaining");
-			inventory_sku_id =  (int)isExsisInventory.get("id");
+			int remaining = isExsisInventory.getRemaining();
+			int can_remaining = isExsisInventory.getCanRemaining();
+			inventory_sku_id =  isExsisInventory.getId();
 			//更改前库存
 			beforeRemaining = remaining;
 			//更改后库存
 			afterRemaining = beforeRemaining + inventory_count;
 					
-			inventory.put("goods_p_url", goods_p_url);
-			
-			inventory.put("goods_p_price", goods_p_price);
-			
 			//可用库存
 			can_remaining = inventory_count + can_remaining;
-			inventory.put("can_remaining", String.valueOf(can_remaining));
 			
 			//更新后库存增加
-			inventory.put("remaining", String.valueOf(afterRemaining));
-			inventoryMapper.updateInventory(inventory);
+			iSku.setRemaining(afterRemaining);
+			iSku.setCanRemaining(can_remaining);
+			iSku.setId(inventory_sku_id);
+			iSku.setGoodsPid(isExsisInventory.getGoodsPid());
+			inventoryMapper.updateInventory(iSku);
 		}
-		inventory.put("inventory_sku_id", String.valueOf(inventory_sku_id));
 		inventory.put("before_remaining", String.valueOf(beforeRemaining));
 		inventory.put("after_remaining", String.valueOf(afterRemaining));
 		
 		//4.插入库存变更记录 change_type 1:入库 2：出库
-		inventory.put("change_type", "1");
-		inventory.put("log_remark", "验货,增加库存");
-		inventoryMapper.addInventoryChangeRecord(inventory);
+		InventoryLog iLog = new InventoryLog();
+		iLog.setAfterRemaining(afterRemaining);
+		iLog.setBeforeRemaining(beforeRemaining);
+		iLog.setRemaining(inventory_count);
+		iLog.setBarcode(inventory.get("barcode"));
+		iLog.setChangeType(1);
+		iLog.setGoodsName(iSku.getGoodsName());
+		iLog.setGoodsPid(iSku.getGoodsPid());
+		iLog.setGoodsPPid(iSku.getGoodsPPid());
+		iLog.setGoodsUrl(iSku.getGoodsUrl());
+		iLog.setInventorySkuId(inventory_sku_id);
+		iLog.setRemark("验货,增加库存");
+		iLog.setSku(iSku.getSku());
+		iLog.setSkuid(iSku.getSkuid());
+		iLog.setSpecid(iSku.getSpecid());
+		inventoryMapper.insertInventoryLog(iLog);
 		
 		//5.库存关联入库记录 插入storage_outbound_details记录storage_outbound_details
 		if(!isTbOrder) {
+			inventory.put("inventory_sku_id", String.valueOf(inventory_sku_id));
 			inventoryMapper.insertStorageOutboundDetails(inventory);
 		}
 		//6.记录库存入库明细操作
 		//入库 0 入库  1 出库
-		inventory.put("type", "0");
-		return inventoryMapper.insertInventoryDetailsSku(inventory);
+		iDetail.setGoodsPPrice(iSku.getGoodsPPrice());
+		iDetail.setType(0);
+		iDetail.setAdmid(Integer.valueOf(StrUtils.object2NumStr(inventory.get("adminId"))));
+		iDetail.setGoodsName(iSku.getGoodsName());
+		iDetail.setGoodsImg(iSku.getCarImg());
+		iDetail.setGoodsNumber(inventory_count);
+		iDetail.setGoodsPid(iSku.getGoodsPid());
+		iDetail.setGoodsPrice(iSku.getGoodsPrice());
+		iDetail.setGoodsUrl(iSku.getGoodsUrl());
+		iDetail.setInventoryId(inventory_sku_id);
+		iDetail.setSku(iSku.getSku());
+		iDetail.setOrderno(inventory.get("orderid"));
+		iDetail.setOdId(Integer.valueOf(StrUtils.object2NumStr(inventory.get("odid"))));
+		iDetail.setGoodsSkuid(iSku.getSkuid());
+		iDetail.setGoodsSpecid(iSku.getSpecid());
+		
+		return inventoryMapper.insertInventoryDetailsSku(iDetail);
 		
 	}
 	@Override
@@ -422,8 +495,8 @@ public class InventoryServiceImpl implements  InventoryService{
 		if(map == null || map.isEmpty()) {
 			return 0;
 		}
-		int inventory_count = Integer.valueOf(map.get("inventory_count"));
-		int googs_number = Integer.valueOf(map.get("googs_number"));
+		int inventory_count = Integer.valueOf(StrUtils.object2NumStr(map.get("inventory_count")));
+		int googs_number = Integer.valueOf(StrUtils.object2NumStr(map.get("googs_number")));
 		int goodsUnit = 1;
 		String strgoodsUnit = map.get("goodsUnit");
 		strgoodsUnit = StrUtils.matchStr(strgoodsUnit, "([1-9]\\d*)");
@@ -431,58 +504,20 @@ public class InventoryServiceImpl implements  InventoryService{
 		if(inventory_count < 1 || googs_number * goodsUnit < 1) {
 			return 0;
 		}
+		map.put("useAllInventory", "false");
 		//如果库存大于客户订单下单数量，则全部使用库存，若不够在采购其他的
 		if(googs_number * goodsUnit < inventory_count) {
 			inventory_count = googs_number * goodsUnit;
 			map.put("inventory_count", String.valueOf(inventory_count));
+			map.put("useAllInventory", "true");
 		}
-		String id = map.get("inventory_sku_id");
 		//1.如果该商品是有录入库存则做想应的减少
-		Map<String, Object> inventoryMap = inventoryMapper.getInventoryByid(id);
-		if(inventoryMap == null){
-			return 0;
-		}
-		String orderid = map.get("orderid");
-		String odid = map.get("odid");
-		map.put("is_use", "1");
+		String id = map.get("inventory_sku_id");
+		InventorySku iSku = new InventorySku();
+		iSku.setId(Integer.valueOf(id));
 		
-		//2.锁定库存
-		inventoryMapper.insertLockInventory(map);
+		int updateInventoryById = reduseInventory(map, iSku, inventory_count, true);
 		
-		//如果全部使用库存，订单状态改为验货无误
-		if(inventory_count == googs_number * goodsUnit) {
-			orderinfoMapper.updateOrderDetailsState(odid, orderid);
-		}
-//		pruchaseMapper.updateLockInventory(map);
-		
-		int before_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("remaining")));
-		int can_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("can_remaining")));
-		
-		int after_remaining = before_remaining - inventory_count;
-		can_remaining = can_remaining - inventory_count;
-		
-		map.put("before_remaining",String.valueOf(before_remaining));
-		map.put("after_remaining",String.valueOf(after_remaining));
-		
-		map.put("inventory_count",String.valueOf(inventory_count));
-		map.put("remaining",String.valueOf(after_remaining));
-		map.put("can_remaining",String.valueOf(can_remaining));
-		map.put("inventory_sku_id",String.valueOf(inventoryMap.get("id")));
-		map.put("specid",String.valueOf(inventoryMap.get("specid")));
-		map.put("skuid",String.valueOf(inventoryMap.get("skuid")));
-		
-		//3.库存减少
-		int updateInventoryById = inventoryMapper.updateInventoryById(map);
-		
-		//4.库存变更记录
-		map.put("log_remark", "订单orderid:"+orderid+"/od_id:"+odid+"采购使用库存数量"+inventory_count+"，库存减少");
-		map.put("change_type", "2");
-		inventoryMapper.addInventoryChangeRecord(map);
-		
-		//入库 0 入库  1 出库
-		//记录库存入库明细操作
-		map.put("type", "1");
-		inventoryMapper.insertInventoryDetailsSku(map);
 		return updateInventoryById > 0 ? inventory_count : 0;
 	}
 	@Override
@@ -490,61 +525,389 @@ public class InventoryServiceImpl implements  InventoryService{
 		if(map == null || map.isEmpty()) {
 			return 0;
 		}
-		int cancelCount = Integer.valueOf(map.get("cance_inventory_count"));
+		int cancelCount = Integer.valueOf(StrUtils.object2NumStr(map.get("cance_inventory_count")));
 		if(cancelCount < 1) {
 			return 0;
 		}
-		//如果该商品验货是有录入库存则做想应的减少
-		Map<String, Object> inventoryMap = inventoryMapper.getInventoryByOdId(map);
-		if(inventoryMap == null){
-			return 0;
-		}
-		String sku = String.valueOf(inventoryMap.get("car_type"));
+		InventorySku iSku = new InventorySku();
+		iSku.setGoodsPid(map.get("specid"));
+		iSku.setSkuid(map.get("skuid"));
+		Map<String, String> orderDetails = inventoryMapper.getOrderDetails(map);
+		iSku.setGoodsPid(orderDetails.get("goods_pid"));
 		
-		int before_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("remaining")));
-		int can_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("can_remaining")));
-		
-		//库存减少数量
-		int inventory_count = cancelCount;
-		
-		int after_remaining = before_remaining - cancelCount;
-		can_remaining = can_remaining - cancelCount;
-		
-		map.put("sku",StringUtils.isStrNull(sku)?"":sku.trim());
-		map.put("car_urlMD5",String.valueOf(inventoryMap.get("car_urlMD5")));
-		map.put("goods_pid",String.valueOf(inventoryMap.get("goods_pid")));
-		map.put("goods_url",String.valueOf(inventoryMap.get("goods_url")));
-		map.put("good_name",String.valueOf(inventoryMap.get("good_name")));
-		map.put("goods_p_pid",String.valueOf(inventoryMap.get("goods_p_pid")));
-		map.put("goods_p_url",String.valueOf(inventoryMap.get("goods_p_url")));
-		map.put("goods_p_price",String.valueOf(inventoryMap.get("goods_p_price")));
-		map.put("inventory_sku_id",String.valueOf(inventoryMap.get("id")));
-		map.put("goodsprice",String.valueOf(inventoryMap.get("goods_price")));
-		
-		map.put("before_remaining",String.valueOf(before_remaining));
-		map.put("after_remaining",String.valueOf(after_remaining));
-		
-		map.put("inventory_count",String.valueOf(inventory_count));
-		map.put("remaining",String.valueOf(after_remaining));
-		map.put("can_remaining",String.valueOf(can_remaining));
-		map.put("specid",String.valueOf(inventoryMap.get("specid")));
-		map.put("skuid",String.valueOf(inventoryMap.get("skuid")));
-		
-		//库存减少
-		inventoryMapper.updateInventoryById(map);
-		String orderid = map.get("orderid");
-		String odid =  map.get("odid");
-		//库存变更记录
-		map.put("log_remark", "订单orderid:"+orderid+"/od_id:"+odid+" 验货取消,取消库存数量:"+inventory_count);
-		map.put("change_type", "2");
-		inventoryMapper.addInventoryChangeRecord(map);
-		
-		//入库 0 入库  1 出库
-		//记录库存入库明细操作
-		map.put("type", "1");
-		inventoryMapper.insertInventoryDetailsSku(map);
+		//库存减少操作
+		reduseInventory(map, iSku, cancelCount, false);
 		
 		//删除验货时的记录storage_outbound_details
 		return orderinfoMapper.updateUutboundDetails(map);
 	}
+	
+	
+	/**库存减少
+	 * @param map
+	 * @param isku
+	 * @param isReduce true 使用库存  false 取消验货库存
+	 * @return
+	 */
+	private int reduseInventory(Map<String, String> map,InventorySku iSku,int inventory_count,boolean isReduce) {
+		
+		//如果该商品验货是有录入库存则做想应的减少
+		InventorySku inventoryMap = inventoryMapper.getInventory(iSku);
+		if(inventoryMap == null){
+			return 0;
+		}
+		if(isReduce) {
+			//采购使用库存锁定库存
+			map.put("is_use", "1");
+			if("true".equals(map.get("useAllInventory"))) {
+				//如果全部使用库存，订单状态改为验货无误
+				orderinfoMapper.updateOrderDetailsState(map.get("odid"), map.get("orderid"));
+			}
+			inventoryMapper.insertLockInventory(map);
+		}
+		int before_remaining = inventoryMap.getRemaining();
+		int can_remaining = inventoryMap.getCanRemaining();
+		
+		int after_remaining = before_remaining - inventory_count;
+		can_remaining = can_remaining - inventory_count;
+		
+		//1.库存减少
+		iSku.setId(inventoryMap.getId());
+		iSku.setRemaining(after_remaining);
+		iSku.setCanRemaining(can_remaining);
+		int updateInventory = inventoryMapper.updateInventory(iSku);
+		
+		//2.库存变更记录
+		InventoryLog iLog = new InventoryLog();
+		iLog.setSku(inventoryMap.getSku());
+		iLog.setAfterRemaining(after_remaining);
+		iLog.setBeforeRemaining(before_remaining);
+		iLog.setRemaining(inventory_count);
+		iLog.setChangeType(2);
+		String orderid = map.get("orderid");
+		String odid =  map.get("odid");
+		if(isReduce) {
+			iLog.setRemark("订单orderid:"+orderid+"/od_id:"+odid+"采购使用库存数量"+inventory_count+"，库存减少");
+		}else {
+			iLog.setRemark("订单orderid:"+orderid+"/od_id:"+odid+" 验货取消,取消库存数量:"+inventory_count);
+		}
+		iLog.setGoodsName(inventoryMap.getGoodsName());
+		iLog.setGoodsPid(inventoryMap.getGoodsPid());
+		iLog.setGoodsPPid(inventoryMap.getGoodsPPid());
+		iLog.setGoodsUrl(inventoryMap.getGoodsUrl());
+		iLog.setInventorySkuId(inventoryMap.getId());
+		iLog.setSkuid(inventoryMap.getSkuid());
+		iLog.setSpecid(inventoryMap.getSpecid());
+		inventoryMapper.insertInventoryLog(iLog);
+		
+		//3.记录库存入库明细操作
+		//入库 0 入库  1 出库
+		map.put("type", "1");
+		map.put("inventory_sku_id", String.valueOf(inventoryMap.getId()));
+		map.put("inventory_count", String.valueOf(inventory_count));
+		inventoryMapper.addInventoryDetailsSku(map);
+		return updateInventory;
+	}
+	
+	
+	@Override
+	public Map<String,Object> reportLossInventory(Map<String, Object> map) {
+		Map<String, String> inv = new HashMap<String, String>();
+		Map<String,Object> result = new HashMap<String, Object>();
+		
+		String inventory_sku_id = (String)map.get("inventory_sku_id" );
+		InventorySku iSku = new InventorySku();
+		iSku.setId(Integer.valueOf(inventory_sku_id));
+		InventorySku inventoryByid = inventoryMapper.getInventory(iSku);
+		if(inventoryByid == null ) {
+			result.put("status", 100);
+			result.put("reason", "库存不存在");
+			return result;
+		}
+		int changeNumber = (int)map.get("changeNumber");
+		if(changeNumber < 1) {
+			result.put("status", 101);
+			result.put("reason", "库存修改数量错误");
+			return result;
+		}
+		int remaining = inventoryByid.getRemaining();
+		int can_remaining = inventoryByid.getCanRemaining();
+		
+		//库存变更数量
+		int change_number = Math.abs(remaining - changeNumber);
+		
+		int before_remaining = remaining;
+		int after_remaining = changeNumber;
+		
+		inv.put("goods_p_url", inventoryByid.getGoodsPUrl());
+		inv.put("goods_p_price", inventoryByid.getGoodsPPrice());
+		if(remaining > changeNumber) {
+			//库存减少
+			inv.put("can_remaining", String.valueOf(can_remaining - change_number));
+			iSku.setCanRemaining(can_remaining - change_number);
+			inv.put("change_type", "2");
+		}else {
+			//库存增加
+			inv.put("can_remaining", String.valueOf(can_remaining + change_number));
+			iSku.setCanRemaining(can_remaining + change_number);
+			inv.put("change_type", "1");
+		}
+		inv.put("remaining", String.valueOf(after_remaining));
+		iSku.setRemaining(after_remaining);
+		
+		//1.损益记录表loss_inventory_record
+		 map.put("change_number", change_number);
+		 
+		 LossInventoryRecord record = new LossInventoryRecord();
+		 record.setChangeAdm(Integer.valueOf(StrUtils.object2NumStr(map.get("change_adm"))));
+		 record.setChangeNumber(change_number);
+		 record.setChangeType(Integer.valueOf(StrUtils.object2NumStr(map.get("change_type"))));
+		 record.setGoodsPid((String)map.get("goods_pid"));
+		 record.setInventorySkuId(Integer.valueOf(inventory_sku_id));
+		 record.setSkuid((String)map.get("skuid"));
+		 record.setSpecid((String)map.get("specid"));
+		 record.setId(0);
+		 inventoryMapper.addLossInventoryRecord(record);
+		 if(record.getId() == 0) {
+			 result.put("status", 102);
+			 result.put("reason", "损益记录表loss_inventory_record错误");
+			 return result;
+		 }
+		 int lossInventoryRecordid = record.getId();
+		//2.库存表更新  inwentory_sku
+		inv.put("inventory_sku_id", inventory_sku_id);
+		int updateInventoryById = inventoryMapper.updateInventory(iSku);
+		if(updateInventoryById == 0) {
+			 result.put("status", 103);
+			 result.put("reason", "库存表更新  inwentory_sku错误");
+			 return result;
+		}
+		
+		//3.库存变更表 inventory_sku_log
+		inv.put("inventory_count", String.valueOf(change_number));
+		inv.put("before_remaining", String.valueOf(before_remaining));
+		inv.put("after_remaining", String.valueOf(after_remaining));
+		inv.put("log_remark", "库存报损,loss_inventory_record_id:"+lossInventoryRecordid);
+		int inventoryChangeRecordid = inventoryMapper.addInventoryChangeRecordByInventoryid(inv);
+		if(inventoryChangeRecordid == 0) {
+			result.put("status", 104);
+			result.put("reason", "库存变更表 inventory_sku_log错误");
+			return result;
+		}
+		
+		
+		//4.库存明细表 inventory_details_sku
+		 inv.put("type", "2");
+		 inv.put("admid", String.valueOf(map.get("change_adm")));
+		 int addInventoryDetailsSku = inventoryMapper.addInventoryDetailsSku(inv);
+		 if(addInventoryDetailsSku == 0) {
+			result.put("status", 105);
+			result.put("reason", "库存明细表 inventory_details_sku错误");
+			return result; 
+		 }
+		 result.put("status", 200);
+		return result;
+	}
+	
+	@Override
+	public List<InventoryDetailsWrap> inventoryDetails(Map<String,Object> map){
+		List<InventoryDetailsWrap> result = new ArrayList<InventoryDetailsWrap>();
+		List<InventoryDetails> inventoryDetails = inventoryMapper.inventoryDetails(map);
+		InventoryDetailsWrap wrap = null;
+		String skuContext = "",orderContext="",delContext="",typeContext="";
+		for(InventoryDetails i : inventoryDetails) {
+			wrap = new InventoryDetailsWrap();
+			wrap.setCreatetime(i.getCreatetime());
+			wrap.setGoodsImg("<img class='img_class' src='"+i.getGoodsImg()+"'>");
+			wrap.setGoodsNumber(i.getGoodsNumber());
+			wrap.setGoodsPid(i.getGoodsPid());
+			wrap.setInventoryId(i.getInventoryId());
+			wrap.setId(i.getId());
+			
+			skuContext = StringUtil.isBlank(i.getSku()) ? "" : "sku:" + i.getSku();
+			skuContext = StringUtil.isBlank(i.getGoodsSkuid()) ? skuContext : skuContext + "<br>Skuid:" + i.getGoodsSkuid();
+			skuContext = StringUtil.isBlank(i.getGoodsSpecid()) ? skuContext : skuContext + "<br>Specid:" + i.getGoodsSpecid();
+			
+			orderContext = StringUtil.isBlank(i.getOrderno()) ? "" : "orderno:" + i.getOrderno();
+			orderContext = orderContext + "<br>od_id:" + i.getOdId();
+			
+			if(i.getDel() == 1) {
+				delContext = "时间:"+i.getDelDatetime()+"<br>删除人员:"+i.getDelAdm();
+				delContext = StringUtil.isBlank(i.getDelRemark()) ? delContext : delContext + "<br>删除原因:" + i.getDelRemark();
+			}
+			// '0 入库  1 出库 2 报损',
+			typeContext = i.getType() == 0 ? "入库" : i.getType() == 1? "出库" : " 报损";
+			wrap.setSkuContext(skuContext);
+			wrap.setDelContext(delContext );
+			wrap.setOrderContext(orderContext);
+			wrap.setTypeContext(typeContext);
+			
+			result.add(wrap);
+		}
+		
+		return result;
+		
+	}
+	@Override
+	public  int inventoryDetailsCount(Map<String,Object> map){
+		return inventoryMapper.inventoryDetailsCount(map);
+	}
+	@Override
+	public int inputInventory(Map<String, String> param) {
+		String goodsUrl = "https://www.import-express.com/goodsinfo/aa-0-0-"+param.get("goods_pid")+".html";
+		InventorySku iSku = new InventorySku();
+		iSku.setBarcode(param.get("barcode"));
+		iSku.setCarImg(param.get("img"));
+		iSku.setCarUrlMD5("");
+		iSku.setGoodsCatid(param.get("goodsCatid"));
+		iSku.setGoodsName(param.get("goods_name"));
+		iSku.setGoodsPid(param.get("goods_pid"));
+		iSku.setGoodsPrice(param.get("goods_price"));
+		iSku.setGoodsUrl(goodsUrl);
+		iSku.setInventoryType(0);
+		iSku.setRemark(param.get("remark"));
+		iSku.setSku(param.get("sku"));
+		iSku.setSkuid(param.get("skuid"));
+		iSku.setSpecid(param.get("specid"));
+		
+		InventoryLog iLog = new InventoryLog();
+		InventoryDetails iDetail = new InventoryDetails();
+		
+		int change_remaining = Integer.valueOf(StrUtils.object2NumStr(param.get("count")));
+		int inventorySkuId = 0;
+		int before_remaining = 0;
+		int after_remaining = change_remaining;
+		//库存inventory_sku
+		InventorySku inventory = inventoryMapper.getInventory(iSku);
+		if(inventory == null) {
+			iSku.setRemaining(change_remaining);
+			iSku.setCanRemaining(change_remaining);
+			inventoryMapper.insertInventory(iSku);
+			inventorySkuId = iSku.getId();
+		}else {
+			before_remaining = inventory.getRemaining();
+			int can_remaining = inventory.getCanRemaining();
+			
+			after_remaining = before_remaining + change_remaining;
+			can_remaining = can_remaining + change_remaining;
+			
+			iSku.setRemaining(after_remaining);
+			iSku.setCanRemaining(can_remaining);
+			iSku.setId(inventory.getId());
+			inventorySkuId = inventory.getId();
+			inventoryMapper.updateInventory(iSku);
+		}
+		
+		iLog.setAfterRemaining(after_remaining);
+		iLog.setBarcode(param.get("barcode"));
+		iLog.setBeforeRemaining(before_remaining);
+		iLog.setChangeType(1);
+		iLog.setGoodsName(param.get("goods_name"));
+		iLog.setGoodsPid(param.get("goods_pid"));
+		iLog.setGoodsUrl(goodsUrl);
+		iLog.setInventorySkuId(inventorySkuId);
+		iLog.setRemaining(change_remaining);
+		//1添加  2补货 3线下单 4其他
+		if("1".equals(param.get("reasonType"))) {
+			iLog.setRemark("录入库存,添加,备注:"+param.get("remark"));
+		}else if("2".equals(param.get("reasonType"))) {
+			iLog.setRemark("录入库存,补货,备注:"+param.get("remark"));
+		}else if("3".equals(param.get("reasonType"))) {
+			iLog.setRemark("录入库存,线下单,备注:"+param.get("remark"));
+		}else{
+			iLog.setRemark("录入库存,其他,备注:"+param.get("remark"));
+		}
+		iLog.setSku(param.get("sku"));
+		iLog.setSkuid(param.get("skuid"));
+		iLog.setSpecid(param.get("specid"));
+		
+		//库存日志inventory_sku_log
+		inventoryMapper.insertInventoryLog(iLog);
+		
+		iDetail.setAdmid(Integer.valueOf(StrUtils.object2NumStr(param.get("admid"))));
+		iDetail.setGoodsImg(param.get("img"));
+		iDetail.setGoodsName(param.get("goods_name"));
+		iDetail.setGoodsNumber(change_remaining);
+		iDetail.setGoodsPid(param.get("goods_pid"));
+		iDetail.setGoodsPrice(param.get("goods_price"));
+		iDetail.setGoodsSkuid(param.get("skuid"));
+		iDetail.setGoodsSpecid(param.get("specid"));
+		iDetail.setType(0);
+		iDetail.setSku(param.get("sku"));
+		iDetail.setInventoryId(inventorySkuId);
+		iDetail.setGoodsUrl(goodsUrl);
+		if("1".equals(param.get("isTBOrder"))) {
+			iDetail.setTbOrderid(param.get("tbOrderid"));
+			iDetail.setTbShipno(param.get("tbShipno"));
+			iDetail.setGoodsPPid(param.get("goods_pid"));
+			iDetail.setGoodsPPrice(param.get("goods_price"));
+			iDetail.setGoodsPSkuid(param.get("skuid"));
+			iDetail.setGoodsPSpecid(param.get("specid"));
+			iDetail.setGoodsPUrl(param.get("goods_purl"));
+			iDetail.setGoodsPImg(param.get("img"));
+		}
+		
+		//库存明细inventory_details_sku
+		return inventoryMapper.insertInventoryDetailsSku(iDetail);
+	}
+	@Override
+	public List<Map<String, Object>> getTbGoods(String orderShipno) {
+		
+		return inventoryMapper.getTbGoods(orderShipno);
+	}
+	@Override
+	public List<InventoryCheckWrap> invetoryCheckList(Map<Object, Object> map) {
+		//获取上次盘点
+		InventoryCheck lastInventoryCheck = inventoryMapper.getLastInventoryCheck();
+		int lastCheckid = 0;
+		if(lastInventoryCheck != null) {
+			lastCheckid = lastInventoryCheck.getId();
+		}
+		
+		//获取库存数据
+		List<InventoryData> iinOutInventory = getIinOutInventory(map);
+		if(iinOutInventory == null || iinOutInventory.isEmpty()) {
+			return null;
+		}
+		List<InventoryCheckWrap> result = new ArrayList<>();
+		InventoryCheckWrap wrap = null;
+//		List<Integer> idList = new ArrayList<Integer>();
+		for(InventoryData i : iinOutInventory) {
+			wrap = new InventoryCheckWrap();
+			
+			wrap.setBarcode(i.getBarcode());
+			wrap.setGoodsPid(i.getGoodsPid());
+			wrap.setGoodsImg(i.getCarImg());
+			wrap.setGoodsPrice(i.getGoodsPrice());
+			wrap.setGoodsSku(i.getSku());
+			wrap.setGoodsSkuid(i.getSkuid());
+			wrap.setGoodsSpecid(i.getSpecid());
+			wrap.setInventorySkuId(i.getId());
+			wrap.setRemaining(i.getRemaining());
+			wrap.setCategoryName(i.getCategoryName());
+			wrap.setCatid(i.getGoodsCatid());
+			wrap.setGoodsName(i.getGoodsName());
+			wrap.setOperation(i.getOperation());
+			wrap.setCanRemaining(i.getCanRemaining());
+			
+//			wrap.setInventoryCheckId(inventoryCheckId);
+//			wrap.setLastCheckTime(lastCheckTime);
+//			wrap.setLastCheckRemaining(lastCheckRemaining);
+			
+			result.add(wrap);
+//			idList.add(i.getId());
+		}
+		//获取库存上次盘点记录
+		
+		
+		
+		
+		return result;
+	}
+	@Override
+	public InventoryCheck getLastInventoryCheck() {
+		return inventoryMapper.getLastInventoryCheck();
+	}
+	
+	
 }

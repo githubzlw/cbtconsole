@@ -1740,6 +1740,7 @@ public class OrderinfoService implements IOrderinfoService {
 			}
 			
 			odb.setInventoryRemark(inventoryRemark);
+
 			String buy_url = getBuyUrl(odb);
 			buy_url=StringUtil.getNewUrl(buy_url,goods_pid,odb.getCar_urlMD5());
 			odb.setGoods_url(buy_url);

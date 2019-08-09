@@ -11,6 +11,7 @@ import com.cbt.warehouse.ctrl.NewOrderDetailsCtr;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.InventoryData;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
 import com.importExpress.mapper.IPurchaseMapper;
@@ -1533,7 +1534,7 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		return taoBaoOrderMapper.getSourceValidationCount(buyer,account,page,startdate,enddate);
 	}
 	@Override
-	public List<Inventory> getAllInventory() {
+	public List<InventoryData> getAllInventory() {
 		return taoBaoOrderMapper.getAllInventory();
 	}
 
