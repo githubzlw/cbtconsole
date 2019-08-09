@@ -215,6 +215,29 @@
         function openUserFollow() {
             
         }
+
+        function recoverOnlineData(userId, website) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/shopCarMarketingCtr/recoverOnlineDataSingle',
+                data: {
+                    "website": website + 1,
+                    "userId": userId
+                },
+                success: function (data) {
+                    var json = eval("(" + data + ")");
+                    if(json.ok){
+                        showMessage("执行成功");
+                    }else{
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
         
 
         function  openSendEmail(userId, website) {
@@ -347,6 +370,8 @@
                         <input class="btn_sty" type="button" value="查看客户信息" onclick="openUserInfo(${userId}, ${param.website})"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="查看EDM跟踪" onclick="openUserFollow(${userId}, ${param.website})"/>
+                        &nbsp;&nbsp;
+                        <input class="btn_sty" style="display: none;" type="button" value="恢复线上数据" onclick="recoverOnlineData(${userId}, ${param.website})"/>
                     </div>
                 </td>
             </tr>
