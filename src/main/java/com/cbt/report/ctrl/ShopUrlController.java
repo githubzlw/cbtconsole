@@ -21,6 +21,7 @@ import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.ShopBrandAuthorization;
 import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -3772,7 +3773,7 @@ public class ShopUrlController {
             GetConfigureInfo.checkFtpConfig(ftpConfig, json);
             String localDiskPath = ftpConfig.getLocalDiskPath();
             if (json.isOk()) {
-                // 得到文件保存的名称mf.getOriginalFilename()
+                /*// 得到文件保存的名称mf.getOriginalFilename()
                 String originalName = mf.getOriginalFilename();
                 // 文件的后缀取出来
                 String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
@@ -3782,8 +3783,10 @@ public class ShopUrlController {
                 // 文件流输出到本地服务器指定路径
                 ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
                 // 检查图片分辨率
-                imgUrl = ftpConfig.getLocalShowPath() + localFilePath;
-                json.setData(imgUrl);
+                imgUrl = ftpConfig.getLocalShowPath() + localFilePath;*/
+
+                String[] imgInfo = SearchFileUtils.comFileUpload(mf, "AuthorizedFile", null, null, null, 0);
+                json.setData(imgInfo);
             }
         } catch (Exception e) {
             json.setOk(false);
@@ -3811,6 +3814,8 @@ public class ShopUrlController {
         String inAuthorizeState = request.getParameter("inAuthorizeState");
         String termOfValidity = request.getParameter("termOfValidity");
         String certificateFile = request.getParameter("certificateFile");
+        String remotePath = request.getParameter("remotePath");
+        String localPath = request.getParameter("localPath");
         if (StringUtils.isBlank(shopId) || StringUtils.isBlank(brandName)
                 || StringUtils.isBlank(inAuthorizeState)) {
             json.setOk(false);
@@ -3821,7 +3826,7 @@ public class ShopUrlController {
                 json.setOk(false);
                 json.setMessage("请输入有效期");
                 return json;
-            } else if (StringUtils.isBlank(certificateFile)) {
+            } else if (StringUtils.isBlank(certificateFile) || StringUtils.isBlank(remotePath) || StringUtils.isBlank(localPath)) {
                 json.setOk(false);
                 json.setMessage("请上传文件");
                 return json;
@@ -3839,19 +3844,20 @@ public class ShopUrlController {
 
             authorization.setTermOfValidity(termOfValidity);
             // 上传文件
-            if ("1".equals(inAuthorizeState) && certificateFile.contains("192.168.")) {
+            /*if ("1".equals(inAuthorizeState) && certificateFile.contains("192.168.")) {
                 String localFilePath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getLocalDiskPath());
 
                 String remoteShowPath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getRemoteShowPath());
                 String remoteLocalPath = certificateFile.replace(ftpConfig.getLocalShowPath(), FtpConfig.REMOTE_LOCAL_PATH);
                 String destPath = remoteLocalPath.substring(0,remoteLocalPath.lastIndexOf("/"));
                 // destPath = destPath.replace("/usr/local/goodsimg/importcsvimg","");
-                /*json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);
+                *//*json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);
                 if (!json.isOk()) {
                     json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);
-                }*/
+                }*//*
 
                 File localFile = new File(localFilePath);
+
                 boolean isSuccess = UploadByOkHttp.uploadFile(localFile, destPath , 1);
                 if (!isSuccess) {
                     isSuccess = UploadByOkHttp.uploadFile(localFile, destPath , 1);
@@ -3872,11 +3878,14 @@ public class ShopUrlController {
                     json.setMessage("上传文件失败，请重试");
                     return json;
                 }
-            }
+            }*/
             if (brandId != null) {
                 authorization.setId(Integer.valueOf(brandId));
                 shopUrlService.updateShopBrandAuthorization(authorization);
             } else {
+                authorization.setCertificateFile(certificateFile);
+                authorization.setRemotePath(remotePath);
+                authorization.setLocalPath(localPath);
                 // 检查是否已经存在此品牌
                 int checkCount = shopUrlService.checkBrandAuthorizationByName(shopId, brandName, brandId);
                 if (checkCount > 0) {

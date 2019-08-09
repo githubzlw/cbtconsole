@@ -40,6 +40,8 @@
             var inAuthorizeState = $("#in_authorize_state").val();
             var termOfValidity = $("#term_of_validity").val();
             var certificateFile = $("#certificate_file").val();
+            var remotePath = $("#remote_path").val();
+            var localPath = $("#local_path").val();
             if (shopId && brandId && brandName && inAuthorizeState) {
                 if (inAuthorizeState == 1 && !(termOfValidity || certificateFile)) {
                     $.messager.alert("提醒", "请输入有效期或者上传文件", "info");
@@ -47,10 +49,6 @@
                     if (!brandId) {
                         brandId = 0;
                     }
-                    $.messager.progress({
-                        title: '上传本地图片到服务器',
-                        msg: '请等待...'
-                    });
                     $.ajax({
                         type: "POST",
                         url: "/cbtconsole/ShopUrlC/saveBrandInfo",
@@ -60,10 +58,11 @@
                             brandName: brandName,
                             inAuthorizeState: inAuthorizeState,
                             termOfValidity: termOfValidity,
-                            certificateFile: certificateFile
+                            certificateFile: certificateFile,
+                            remotePath: remotePath,
+                            localPath:localPath
                         },
                         success: function (data) {
-                            $.messager.progress('close');
                             if (data.ok) {
                                 closeDialog();
                                 setTimeout(function () {
@@ -74,7 +73,6 @@
                             }
                         },
                         error: function (res) {
-                            $.messager.progress('close');
                             $.messager.alert("提醒", '保存错误，请联系管理员', "error");
                         }
                     });
@@ -86,20 +84,29 @@
         }
 
         function uploadFile() {
+            $.messager.progress({
+                        title: '上传本地图片到服务器',
+                        msg: '请等待...'
+                    });
             $("#file_form").form('submit', {
                 type: "post",  //提交方式
                 url: "/cbtconsole/ShopUrlC/uploadBrandFile", //请求url
                 success: function (data) {
+                    $.messager.progress('close');
                     var data = eval('(' + data + ')');
                     if (data.ok) {
                         $("#file_form").hide();
-                        $("#certificate_file").val(data.data);
+                        var rsData = data.data;
+                        $("#certificate_file").val(rsData[2]);
                         $("#certificate_file").show();
+                        $("#remote_path").val(rsData[1]);
+                        $("#local_path").val("http://192.168.1.9/editimg/shopimgzip/research/" + rsData[0]);
                     } else {
                         $.messager.alert("提醒", data.message, "error");
                     }
                 },
                 error: function () {
+                    $.messager.progress('close');
                     $.messager.alert("提醒", "上传错误，请联系管理员", "error");
                 }
             });
@@ -188,6 +195,8 @@
                 <td>
                     <input id="certificate_file" style="display: none;width: 599px; height: 28px;" value=""
                            disabled="disabled"/>
+                    <input type="hidden" id="remote_path" value="" />
+                    <input type="hidden" id="local_path" value=""/>
                     <div id="file_div">
                         <form id="file_form" method="post" enctype="multipart/form-data">
                             <input type="button" onclick="uploadFile()" value="上传"/>
@@ -264,7 +273,7 @@
                         ${brandInfo.certificateFile}
                     <c:if test="${brandInfo.authorizeState == 1 && brandInfo.certificateFile !=null}">
                         <br>
-                        <a target="_blank" href="${brandInfo.remotePath}">查看</a>
+                        <a target="_blank" href="${brandInfo.localPath}">查看</a>
                     </c:if>
 
 
