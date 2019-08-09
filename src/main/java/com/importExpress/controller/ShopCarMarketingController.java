@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Controller
@@ -371,7 +372,7 @@ public class ShopCarMarketingController {
 
                 List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
                 List<GoodsCarActiveSimplBean> activeList = new ArrayList<>();
-                System.err.println("shopMarketing userId:" + userId + "websiteType:" + websiteType);
+                System.err.println("shopMarketing userId:" + userId + ",websiteType:" + websiteType);
                 List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(websiteType) -1);
                 int isUpdatePrice = 0;
                 for (ShopCarMarketing shopCar : shopCarMarketingList) {
@@ -392,13 +393,18 @@ public class ShopCarMarketingController {
                     listActive.clear();
                     // 2.更新redis数据
                     try{
-                        SendMQ sendMQ = new SendMQ();
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("type","4");
                         jsonObject.put("userid",userIdStr);
-                        jsonObject.put("json",com.alibaba.fastjson.JSON.toJSONString(listActive));
-                        sendMQ.sendMsg(jsonObject, "2".equals(websiteType) ? 1 : 0);
-                        sendMQ.closeConn();
+                        System.err.println("activeList:[" + activeList.size() +"]");
+
+                        if(activeList.size() > 0){
+                            jsonObject.put("json",com.alibaba.fastjson.JSON.toJSONString(activeList));
+                            SendMQ sendMQ = new SendMQ();
+                            sendMQ.sendMsg(jsonObject, "2".equals(websiteType) ? 1 : 0);
+                            sendMQ.closeConn();
+                        }
+
                     }catch (Exception e){
                         e.printStackTrace();
                         logger.error("userId:" + userIdStr + ",confirmAndSendEmail SendMQ error:",e);
@@ -1680,4 +1686,111 @@ public class ShopCarMarketingController {
     }
 
 
+    @RequestMapping("/recoverOnlineDataSingle")
+    @ResponseBody
+    public JsonResult recoverOnlineDataSingle(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String userIdStr = request.getParameter("userId");
+        int userId = Integer.valueOf(userIdStr);
+        String websiteType = request.getParameter("website");
+        if (StringUtils.isBlank(websiteType)) {
+            websiteType = "1";
+        }
+        json = dealDataAndUpload(Integer.valueOf(userId), websiteType);
+        return json;
+    }
+
+
+    private JsonResult dealDataAndUpload(int userId, String websiteType) {
+        JsonResult json = new JsonResult();
+        try {
+
+            //获取原的重新生成goods_carconfig数据
+            GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
+            if ("2".equals(websiteType) && (StringUtils.isBlank(carconfigWithBLOBs.getKidscarconfig()) || carconfigWithBLOBs.getKidscarconfig().length() < 10)) {
+                json.setOk(false);
+                json.setMessage("无数据");
+                return json;
+            } else if ("1".equals(websiteType) && (StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10)) {
+                json.setOk(false);
+                json.setMessage("无数据");
+                return json;
+            }
+            List<GoodsCarActiveSimplBean> listActive;
+
+            if ("2".equals(websiteType)) {
+                listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getKidscarconfig()), GoodsCarActiveSimplBean.class);
+            } else {
+                listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
+            }
+            List<GoodsCarActiveSimplBean> activeList = new ArrayList<>();
+            System.err.println("shopMarketing userId:" + userId + ",websiteType:" + websiteType);
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(websiteType) - 1);
+            for (ShopCarMarketing shopCar : shopCarMarketingList) {
+                for (GoodsCarActiveSimplBean simplBean : listActive) {
+                    if (shopCar.getItemid().equals(simplBean.getItemId()) && shopCar.getGoodsType().equals(simplBean.getTypes())) {
+                        genActiveSimpleBeanByShopCar(simplBean, shopCar, activeList);
+                        break;
+                    }
+                }
+            }
+            if (activeList.size() > 0) {
+                listActive.clear();
+                // 2.更新redis数据
+                try {
+
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("type", "4");
+                    jsonObject.put("userid", userId);
+                    System.err.println("activeList:[" + activeList.size() + "]");
+
+                    if (activeList.size() > 0) {
+                        jsonObject.put("json", com.alibaba.fastjson.JSON.toJSONString(activeList));
+                        SendMQ sendMQ = new SendMQ();
+                        sendMQ.sendMsg(jsonObject, "2".equals(websiteType) ? 1 : 0);
+                        sendMQ.closeConn();
+                    }
+                    json.setOk(true);
+                    json.setMessage("更新成功");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("userId:" + userId + ",deleteGoodsCarConfigData SendMQ error:", e);
+                }
+            } else {
+                System.err.println("userId:" + userId + ", activeList size 0---");
+                json.setOk(false);
+                json.setMessage("无更新数据");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("异常");
+        }
+        return json;
+    }
+
+    @RequestMapping("/recoverOnlineDataAll")
+    @ResponseBody
+    public JsonResult recoverOnlineDataAll(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        try {
+            List<Integer> list = shopCarMarketingService.queryReloadConfigUserId();
+            int count = 0;
+            for (Integer userId : list) {
+                count ++;
+                dealDataAndUpload(userId, "1");
+                dealDataAndUpload(userId, "2");
+                if(count % 10 == 0){
+                    try{
+                        TimeUnit.SECONDS.sleep(2);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
 }
