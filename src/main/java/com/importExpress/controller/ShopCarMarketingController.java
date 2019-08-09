@@ -392,13 +392,20 @@ public class ShopCarMarketingController {
                     listActive.clear();
                     // 2.更新redis数据
                     try{
+
+                        activeList.clear();
                         SendMQ sendMQ = new SendMQ();
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("type","4");
                         jsonObject.put("userid",userIdStr);
-                        jsonObject.put("json",com.alibaba.fastjson.JSON.toJSONString(listActive));
-                        sendMQ.sendMsg(jsonObject, "2".equals(websiteType) ? 1 : 0);
-                        sendMQ.closeConn();
+                        System.err.println("activeList:[" + activeList.size() +"]");
+                        jsonObject.put("json",com.alibaba.fastjson.JSON.toJSONString(activeList));
+
+                        if(activeList.size() > 0){
+                            sendMQ.sendMsg(jsonObject, "2".equals(websiteType) ? 1 : 0);
+                            sendMQ.closeConn();
+                        }
+
                     }catch (Exception e){
                         e.printStackTrace();
                         logger.error("userId:" + userIdStr + ",confirmAndSendEmail SendMQ error:",e);
