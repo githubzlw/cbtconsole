@@ -7,6 +7,7 @@ import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
 import com.cbt.website.bean.InventoryCheck;
+import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
@@ -198,4 +199,39 @@ public interface InventoryService {
 	 * @return
 	 */
 	int updateInventoryCheckCancel(InventoryCheck check);
+	
+	/**获取库存表所有类别统计列表
+	 * @return
+	 */
+	List<Map<String,Object>> getInventoryCatList();
+	
+	/**插入盘点记录 inventory_sku_check_record_temp
+	 * @param record
+	 * @return
+	 */
+	int insertInventoryCheckRecord(InventoryCheckRecord record);
+	
+	/**更新盘点记录inventory_sku_check_record_temp
+	 * @param record
+	 * @return
+	 */
+	int updateInventoryCheckRecord(InventoryCheckRecord record);
+	
+	/**完成盘点 将inventory_sku_check_record_temp 本次数据插入inventory_sku_check_record
+	 * @param checkId
+	 * @return
+	 */
+	List<InventoryCheckRecord> doneInventoryCheckRecord(int checkId,int admid);
+	/**获取inventory_sku_check_record盘点历史数据
+	 * @param checkId
+	 * @return
+	 */
+	List<InventoryCheckRecord> getICRHistory(int inid,int page);
+	
+	/**获取inventory_sku_check_record盘点历史数据数量
+	 * @param inid
+	 * @return
+	 */
+	int getICRHistoryCount(int inid);
+	
 }

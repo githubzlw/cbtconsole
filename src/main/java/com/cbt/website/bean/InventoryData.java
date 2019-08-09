@@ -34,13 +34,4 @@ public class InventoryData extends InventorySku{
 	 */
 	private String online;
 	
-	/**
-	 * 盘点库存
-	 */
-	private int checkRemaining;
-	
-	/**
-	 * 盘点表id
-	 */
-	private int inventoryCheckId;
 }

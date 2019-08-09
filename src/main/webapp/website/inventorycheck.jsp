@@ -131,6 +131,8 @@ em,i{font-style: normal;}
 
 
 .report .btn_page_in{width:100px;}
+.w350{width: 350px;}
+.datagrid-cell-c2-goodsName{width:200px;}
 </style>
 </head>
 <body>
@@ -140,18 +142,16 @@ em,i{font-style: normal;}
 			
 			<div class="row">
 			<div class="col-xs-12">
-			<label class="w200">产品分类： 
+			<label class="w350">产品分类： 
 			<select class="form-control" id="query_catid_select" >
-						<option value="0">全部</option>
-						<option value="1">是</option>
-						<option value="2">否</option>
+						
 			</select>
 			</label>
-				<label><button class="btn btn-default"  id="query_button_check_start">开始盘点</button>
+				<label><button class="btn btn-info"  id="query_button_check_start">开始盘点</button>
 				<input type="hidden" value="${queryParam.check_id}" id="check_id">
 				</label>
-				<label><button class="btn btn-default qbt_check"  id="query_button_check_cancel">撤销本次盘点</button></label>
-				<label><button class="btn btn-default qbt_check"  id="query_button_check_done">完成盘点/打印报表</button></label>
+				<label><button class="btn btn-info qbt_check"  id="query_button_check_cancel">撤销本次盘点</button></label>
+				<label><button class="btn btn-info qbt_check"  id="query_button_check_done">完成盘点/打印报表</button></label>
 			</div>
 			</div>
 			
@@ -163,7 +163,12 @@ em,i{font-style: normal;}
 			<div class="col-xs-11">
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
 				<label>产品ID：<input type="text" class="form-control p_q_r" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
-				<label>产品分类：<input type="text" class="form-control p_q_r" id="query_goodscatid" value="${queryParam.goodscatid }"></label>
+				<label>产品分类：
+				<select class="form-control p_q_r" id="query_goodscatid" >
+						
+				</select>
+				<input type="hidden" class="form-control p_q_r" id="query_goodscatid_q" value="${queryParam.goodscatid }">
+				</label>
 				<label>库存量大于：<input type="text" class="form-control p_q_r" id="query_minintentory" value="${queryParam.minintentory }"></label>
 				<label>库存量小于：<input type="text" class="form-control p_q_r" id="query_maxintentory" value="${queryParam.maxintentory }"></label>
 				<label class="w200">是否上架： <select class="form-control  p_qs_r" id="query_line" >
@@ -184,7 +189,7 @@ em,i{font-style: normal;}
 				</c:if>
 				</select>
 				</label>
-				<button class="btn btn-default bt_ready"  id="query_button_check">查询</button>
+				<button class="btn btn-info bt_ready"  id="query_button_check">查询</button>
 				
 			</div>
 		</div>
@@ -233,13 +238,17 @@ em,i{font-style: normal;}
 						<td class="datagrid-cell-c2-carImg">${tory.goodsImg }</td>
 						<td class="datagrid-cell-c2-last-remaining">${tory.lastCheckRemaining}</td>
 						<td class="datagrid-cell-c2-change-remaining">${tory.changeRemaining}</td>
-						<td class="datagrid-cell-c2-remaining">${tory.remaining}
+						<td class="datagrid-cell-c2-remaining"><span class="i_remaining">${tory.remaining}</span>
 						<em class="datagrid-cell-c2-canRemaining" style="display:none;">${tory.canRemaining}</em>
 						</td>
-						<td class="">${tory.goodsPrice}</td>
-						<td class="datagrid-cell-c2-checkRemaining"><input class="datagrid-cell-c2-check-Remaining q_in_r" value="${tory.remaining}" readonly="readonly"></td>
-						<td class="datagrid-cell-c2-barcode"><input value="${tory.barcode}" class="q_in_barcode_h" type="hidden">
-						<input value="${tory.barcode}" class="q_in_barcode" readonly="readonly" type="text"></td>
+						<td class="emprice">${tory.goodsPrice}</td>
+						<td class="datagrid-cell-c2-checkRemaining">
+						<input class="datagrid-cell-c2-check-Remaining q_in_r c_remaining" value="${tory.remaining}" readonly="readonly" onchange="updateCheckRecord(${index.index})" id="iq_in_r${index.index}"></td>
+						<td class="datagrid-cell-c2-barcode">
+						<input value="${tory.barcode}" class="q_in_barcode_h" type="hidden">
+						<input value="0" class="q_record_id" type="hidden">
+						<input value="${tory.inventorySkuId}" class="q_inventory_id" type="hidden">
+						<input value="${tory.barcode}" class="q_in_barcode" readonly="readonly" type="text" onchange="updateCheckRecord(${index.index})"></td>
 						<td>
 							${tory.operation}
 						</td>
@@ -249,7 +258,7 @@ em,i{font-style: normal;}
 			</table>
 				<div>
 				<span>当前页 :${queryParam.current_page } / ${toryListPage},总共 ${checkListCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-default btn_page_qu" onclick="doQuery(1,1)">查询</button>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-success btn_page_qu" onclick="doQuery(1,1)">查询</button>
 				</div>
 		</div>
 		

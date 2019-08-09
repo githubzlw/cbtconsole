@@ -32,6 +32,7 @@ import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.TypeBean;
 import com.cbt.common.StringUtils;
 import com.cbt.pojo.Inventory;
+import com.cbt.pojo.LossInventoryPojo;
 import com.cbt.pojo.TaoBaoInfoList;
 import com.cbt.report.service.GeneralReportService;
 import com.cbt.util.Redis;
@@ -41,6 +42,7 @@ import com.cbt.util.Utility;
 import com.cbt.warehouse.service.InventoryService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.InventoryCheck;
+import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
@@ -1042,10 +1044,81 @@ public class InventoryController {
 		check.setCheckCat(Integer.valueOf(strCat));
 		check.setCheckAdm(adm.getId());
 		int insertInventoryCheck = inventoryService.insertInventoryCheck(check);
-		
 		result.put("check_id", insertInventoryCheck);
 		return result;
 	}
+	
+	/**盘点开始,修改产品库存
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/check/update")
+	@ResponseBody
+	public Map<String,Object> checkUpdate(HttpServletRequest request, HttpServletResponse response) {
+		Map<String,Object> result= new HashMap<>();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		if(adm == null) {
+			result.put("status", 500);
+			result.put("reason", "未登录，请先登录");
+			return result;
+		}
+		
+		result.put("status", 200);
+		
+		String strCheckId = request.getParameter("check_id");
+		strCheckId = StrUtils.isNum(strCheckId) ? strCheckId : "0";
+		String strInventoryId = request.getParameter("in_id");
+		strInventoryId = StrUtils.isNum(strInventoryId) ? strInventoryId : "0";
+		if("0".equals(strInventoryId) || "0".equals(strCheckId)) {
+			result.put("status", 501);
+			result.put("reason", "数据错误,未匹配库存或者未启动盘点");
+			return result;
+		}
+		
+		String strRecordId = request.getParameter("record_id");
+		strRecordId = StrUtils.isNum(strRecordId) ? strRecordId : "0";
+		
+		int recordId = Integer.parseInt(strRecordId);
+		
+		String strInventoryRemaining = request.getParameter("inventory_remaining");
+		strInventoryRemaining = StrUtils.isNum(strInventoryRemaining) ? strInventoryRemaining : "0";
+		
+		String strCheckRemaining = request.getParameter("check_remaining");
+		strCheckRemaining = StrUtils.isNum(strCheckRemaining) ? strCheckRemaining : "0";
+		InventoryCheckRecord record = new InventoryCheckRecord();
+		record.setId(recordId);
+		String goodsPid = request.getParameter("goods_pid");
+		String goodsSku = request.getParameter("goods_sku");
+		String goodsSpecid = request.getParameter("goods_specid");
+		String goodsSkuid = request.getParameter("goods_skuid");
+		String goodsPrice = request.getParameter("goods_price");
+		String beforeBarcode = request.getParameter("before_barcode");
+		String afterBarcode = request.getParameter("after_barcode");
+		record.setAfterBarcode(afterBarcode);
+		record.setBeforeBarcode(beforeBarcode);
+		record.setCheckRemaining(Integer.parseInt(strCheckRemaining));
+		record.setGoodsPid(goodsPid);
+		record.setGoodsPrice(goodsPrice);
+		record.setGoodsSku(goodsSku);
+		record.setGoodsSkuid(goodsSkuid);
+		record.setGoodsSpecid(goodsSpecid);
+		record.setInventorySkuId(Integer.parseInt(strInventoryId));
+		record.setInventoryCheckId(Integer.parseInt(strCheckId));
+		record.setInventoryRemaining(Integer.parseInt(strInventoryRemaining));
+		
+		if(recordId > 0) {
+			inventoryService.updateInventoryCheckRecord(record );
+		}else {
+			recordId = inventoryService.insertInventoryCheckRecord(record);
+		}
+		result.put("recordId", recordId);
+		result.put("status", 200);
+		return result;
+	}
+	
+	
 	/**开始盘点
 	 * @param request
 	 * @param response
@@ -1067,12 +1140,50 @@ public class InventoryController {
 		InventoryCheck check = new InventoryCheck();
 		String check_id = request.getParameter("check_id");
 		check_id = StrUtils.isNum(check_id) ? check_id : "0";
+		if("0".equals(check_id)) {
+			result.put("status", 501);
+			result.put("reason", "未匹配到盘点记录");
+			return result;
+			
+		}
 		check.setId(Integer.valueOf(check_id));
 		check.setCancelAdm(adm.getId());
 		check.setCancelRemark("撤销本次盘点");
 		int checkCancel = inventoryService.updateInventoryCheckCancel(check);
 		result.put("check_cancel", checkCancel);
 		return result;
+	}
+	/**完成盘点
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/check/done")
+	public void checkDone(HttpServletRequest request, HttpServletResponse response) {
+		String check_id = request.getParameter("check_id");
+		check_id = StrUtils.isNum(check_id) ? check_id : "0";
+		int checkId = Integer.parseInt(check_id);
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		if(adm == null) {
+			return ;
+		}
+		try {
+			List<InventoryCheckRecord> dicRecord = inventoryService.doneInventoryCheckRecord(checkId,adm.getId());
+			HSSFWorkbook wb = generalReportService.exportInventoryCheckExcel(dicRecord);
+			response.setContentType("application/vnd.ms-excel");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String filename = "库存盘点数据导出" + sdf.format(new Date());
+			filename = StringUtils.getFileName(filename);
+			response.setHeader("Content-disposition", "attachment;filename=" + filename);
+			OutputStream ouputStream = response.getOutputStream();
+			wb.write(ouputStream);
+			ouputStream.flush();
+			ouputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	/**获取列表
 	 * @param request
@@ -1084,14 +1195,23 @@ public class InventoryController {
 	public Map<String,Object> catlist(HttpServletRequest request, HttpServletResponse response) {
 		Map<String,Object> result= new HashMap<>();
 		result.put("status", 200);
-		int catSize = 0;
-		List<Map<String,Object>> catList = new ArrayList<>();
+		List<Map<String,Object>> ncatList = new ArrayList<>();
+		List<Map<String,Object>> catList = inventoryService.getInventoryCatList();
 		if(catList == null || catList.isEmpty()) {
 			result.put("status", 500);
 			result.put("reason", "未获取到类别列表");
 		}else {
-			result.put("catSize", catSize);
-			result.put("catList", catList);
+			for(Map<String,Object> m : catList) {
+				if(org.apache.commons.lang.StringUtils.equals(StrUtils.object2Str(m.get("catid")), "0")) {
+					continue;
+				}
+				if(StringUtil.isBlank(StrUtils.object2Str(m.get("catname")))) {
+					continue;
+				}
+				ncatList.add(m);
+			}
+			result.put("catSize", ncatList.size());
+			result.put("catList", ncatList);
 		}
 		return result;
 	}
@@ -1103,17 +1223,30 @@ public class InventoryController {
 	 */
 	@RequestMapping("/check/info")
 	public ModelAndView checkInfo(HttpServletRequest request, HttpServletResponse response) {
-		ModelAndView mv = new ModelAndView("inventorycheck");
+		ModelAndView mv = new ModelAndView("inventorycheckinfo");
 		String strInid = request.getParameter("inid");
 		strInid = StrUtils.isNum(strInid) ? strInid : "0";
+		
+		String strPage = request.getParameter(" page");
+		strPage = StrUtils.isNum(strPage) ? strPage : "1";
+		
+		int page = (Integer.parseInt(strPage) - 1) * 50;
 	
 		int inid = Integer.valueOf(strInid);
+		int icrHistoryCount = 0,totalPage = 0;
+		if(inid > 0) {
+			icrHistoryCount = inventoryService.getICRHistoryCount(inid);
+			if(icrHistoryCount > 0) {
+				List<InventoryCheckRecord> icrHistory = inventoryService.getICRHistory(inid,page);
+				mv.addObject("icrHistory", icrHistory);
+				totalPage = icrHistoryCount % 50 == 0 ? icrHistoryCount / 50 : icrHistoryCount / 50 + 1;
+			}
+		}
+		mv.addObject("currentPage", Integer.parseInt(strPage));
 		
-		
-		
-		
-		
-		
+		mv.addObject("inid", inid);
+		mv.addObject("totalPage", totalPage);
+		mv.addObject("totalCount", icrHistoryCount);
 		return mv;
 	}
 	

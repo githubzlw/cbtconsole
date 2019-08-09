@@ -165,7 +165,8 @@ em,i{font-style: normal;}
 				</c:if>
 				</select>
 				</label>
-				<button class="btn btn-default"  id="query_button">查询</button>
+				<button class="btn btn-info"  id="query_button">查询</button>
+				<a href="/cbtconsole/inventory/check/list"><button class="btn btn-info">库存盘点</button></a>
 			</div>
 		</div>
 		<div class="row mt20 row2">
@@ -210,7 +211,7 @@ em,i{font-style: normal;}
 						<td class="">${tory.barcode}</td>
 						<td><span class="">${tory.checkTime }</span> <br>
 						<c:if test="${tory.checkTime!=''}">
-						<a href="/cbtconsole/inventory/check/info?inid=${tory.id}"><button class="btn btn-default">盘点历史</button></a>
+						<a href="/cbtconsole/inventory/check/info?inid=${tory.id}"><button class="btn btn-info">盘点历史</button></a>
 						</c:if>
 						</td>
 						<td>
@@ -222,7 +223,7 @@ em,i{font-style: normal;}
 			</table>
 				<div>
 				<span>当前页 :${queryParam.current_page } / ${toryListPage},总共 ${toryListCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-default btn_page_qu" onclick="doQuery(1,0)">查询</button>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-success btn_page_qu" onclick="doQuery(1,0)">查询</button>
 				</div>
 		</div>
 		
