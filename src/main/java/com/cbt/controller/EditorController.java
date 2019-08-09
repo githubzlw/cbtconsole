@@ -105,13 +105,13 @@ public class EditorController {
 
         // 取出1688商品的全部信息
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-        if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0) {
+        if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
             goods.setOffReason("老数据");
         } else if (goods.getValid() == 2) {
             if (offLineMap.containsKey(goods.getUnsellAbleReason())) {
                 goods.setUnsellAbleReasonDesc(offLineMap.get(goods.getUnsellAbleReason()));
             } else {
-                goods.setUnsellAbleReasonDesc("老数据");
+                goods.setUnsellAbleReasonDesc("未知下架原因");
             }
         }
 

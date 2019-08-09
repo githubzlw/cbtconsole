@@ -14,12 +14,16 @@ import java.util.List;
  * 切换域名
  */
 public class SwitchDomainNameUtil {
-    private static final String OLD_DOMAIN_NAME1 = "import-express";
-    private static final String NEW_DOMAIN_NAME1 = "kidsproductwholesale";
-    private static final String OLD_DOMAIN_NAME2 = "ImportExpress";
-    private static final String NEW_DOMAIN_NAME2 = "KidsProductWholesale";
-    private static final String OLD_DOMAIN_NAME3 = "Import Express";
-    private static final String NEW_DOMAIN_NAME3 = "Kids Product Wholesale";
+    private static final String IMPORT_NAME1 = "import-express";
+    private static final String KIDS_NAME1 = "kidsproductwholesale";
+    private static final String IMPORT_NAME2 = "ImportExpress";
+    private static final String KIDS_NAME2 = "KidsProductWholesale";
+    private static final String IMPORT_NAME3 = "Import Express";
+    private static final String KIDS_NAME3 = "Kids Product Wholesale";
+
+    private static final String KITCHEN_NAME1 = "restaurantkitchenequipments";
+    private static final String KITCHEN_NAME2 = "restaurantKitchenEquipments";
+    private static final String KITCHEN_NAME3 = "Restaurant Kitchen Equipments";
 
 
     /**
@@ -164,12 +168,12 @@ public class SwitchDomainNameUtil {
      */
     public static String checkNullAndReplace(String str) {
         if (StringUtils.isNotBlank(str)) {
-            if (str.contains(OLD_DOMAIN_NAME1)) {
-                return str.replace(OLD_DOMAIN_NAME1, NEW_DOMAIN_NAME1);
-            } else if (str.contains(OLD_DOMAIN_NAME2)) {
-                return str.replace(OLD_DOMAIN_NAME2, NEW_DOMAIN_NAME2);
-            } else if (str.contains(OLD_DOMAIN_NAME3)) {
-                return str.replace(OLD_DOMAIN_NAME3, NEW_DOMAIN_NAME3);
+            if (str.contains(IMPORT_NAME1)) {
+                return str.replace(IMPORT_NAME1, KIDS_NAME1);
+            } else if (str.contains(IMPORT_NAME2)) {
+                return str.replace(IMPORT_NAME2, KIDS_NAME2);
+            } else if (str.contains(IMPORT_NAME3)) {
+                return str.replace(IMPORT_NAME3, KIDS_NAME3);
             } else {
                 return str;
             }
