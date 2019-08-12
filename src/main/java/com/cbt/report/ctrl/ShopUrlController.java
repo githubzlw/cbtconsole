@@ -2,6 +2,8 @@
 package com.cbt.report.ctrl;
 
 import com.cbt.bean.*;
+import com.cbt.bean.TypeBean;
+import com.cbt.controller.EditorController;
 import com.cbt.customer.service.IShopUrlService;
 import com.cbt.parse.service.DownloadMain;
 import com.cbt.parse.service.ImgDownload;
@@ -15,13 +17,15 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.MD5Util;
+import com.cbt.website.util.UploadByOkHttp;
+import com.importExpress.pojo.ShopBrandAuthorization;
 import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.SearchFileUtils;
+import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-
-import org.slf4j.LoggerFactory;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -30,6 +34,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletException;
@@ -68,6 +74,7 @@ public class ShopUrlController {
     private static final String SHOP_GOODS_LOCAL_PATH_K = "K:/shopimages";
     private static final String SHOP_GOODS_SHOW_URL_J = "http://192.168.1.28:8399";
     private static final String SHOP_GOODS_LOCAL_PATH_J = "J:/shopimages";//J:/shopimages
+    private FtpConfig ftpConfig;
 
     @Autowired
     private IShopUrlService shopUrlService;
@@ -106,7 +113,7 @@ public class ShopUrlController {
             }
 
         }*/
-        if(StringUtils.isBlank(shopUserName)){
+        if (StringUtils.isBlank(shopUserName)) {
             shopUserName = "";
         }
         String str = request.getParameter("page");
@@ -127,16 +134,16 @@ public class ShopUrlController {
         String authorizedFlagStr = request.getParameter("authorizedFlag");
         String authorizedFileFlagStr = request.getParameter("authorizedFileFlag");
         String ennameBrandFlagStr = request.getParameter("ennameBrandFlag"); //-1-无筛选;1-店铺英文为空;2-品牌属性为空;3-店铺英文+品牌属性为空;
-        String admName=request.getParameter("admName");
-        String days=request.getParameter("days");
-        String catid=request.getParameter("catid");
+        String admName = request.getParameter("admName");
+        String days = request.getParameter("days");
+        String catid = request.getParameter("catid");
         int authorizedFlag = -1;
         if (StringUtils.isNotBlank(authorizedFlagStr)) {
             authorizedFlag = Integer.valueOf(authorizedFlagStr);
         }
         int authorizedFileFlag = -1;
         if (StringUtils.isNotBlank(authorizedFileFlagStr)) {
-        	authorizedFileFlag = Integer.valueOf(authorizedFileFlagStr);
+            authorizedFileFlag = Integer.valueOf(authorizedFileFlagStr);
         }
         int ennameBrandFlag = -1;
         if (StringUtils.isNotBlank(ennameBrandFlagStr)) {
@@ -192,61 +199,87 @@ public class ShopUrlController {
             page = Integer.parseInt(str);
         }
         int rows = 25;
-        if(StringUtils.isNotBlank(rowStr)){
+        if (StringUtils.isNotBlank(rowStr)) {
             rows = Integer.valueOf(rowStr);
         }
         int start = (page - 1) * rows;
-        String shopids="";
-        if(StringUtil.isNotBlank(admName)){
-            shopids=shopUrlService.getShopList(admName,days);
+        String shopids = "";
+        if (StringUtil.isNotBlank(admName)) {
+            shopids = shopUrlService.getShopList(admName, days);
         }
-        List<ShopUrl> findAll = shopUrlService.findAll(shopId,shopBrand, shopUserName, date, start, rows, timeFrom,
-                timeTo, isOn,state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,ennameBrandFlag,shopids,
+        List<ShopUrl> findAll = shopUrlService.findAll(shopId, shopBrand, shopUserName, date, start, rows, timeFrom,
+                timeTo, isOn, state, isAuto, readyDel, shopType, authorizedFlag, authorizedFileFlag, ennameBrandFlag, shopids,
                 translateDescription, isShopFlag, catid);
-        List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsService.queryShopGoodsSalesAmountAll();
-        for(ShopUrl shopUrlBean :  findAll){
-            genShopPrice(shopUrlBean,shopGoodsSalesAmountList);
+        List<ShopGoodsSalesAmount> shopGoodsSalesAmountList = customGoodsService.queryShopGoodsSalesAmountAll();
+        for (ShopUrl shopUrlBean : findAll) {
+            genShopPrice(shopUrlBean, shopGoodsSalesAmountList);
+            List<ShopBrandAuthorization> authorizationList =  shopUrlService.queryBrandAuthorizationByShopId(shopUrlBean.getShopId());
+            if(authorizationList == null || authorizationList.size() == 0){
+                shopUrlBean.setAuthorizedFlag(3);
+                shopUrlBean.setBrandNames("");
+            }else{
+                int count = 0;
+                StringBuffer brandNameS = new StringBuffer();
+                for (ShopBrandAuthorization authorization : authorizationList) {
+                    brandNameS.append("," + authorization.getBrandName());
+                    if(authorization.getAuthorizeState() == 3){
+                        count ++;
+                    }
+                }
+                shopUrlBean.setBrandNames(brandNameS.toString().substring(1));
+                shopUrlBean.setAuthorizationList(authorizationList);
+                if(count == authorizationList.size()){
+                    // 3 未授权
+                    shopUrlBean.setAuthorizedFlag(3);
+                }else if(count < authorizationList.size() && count >0){
+                    // 2 部分授权
+                    shopUrlBean.setAuthorizedFlag(2);
+                }else if(count == 0){
+                    // 1已全部授权
+                    shopUrlBean.setAuthorizedFlag(1);
+                }
+            }
         }
         shopGoodsSalesAmountList.clear();
-        int total = shopUrlService.total(shopId,shopBrand, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,
-                authorizedFileFlag,ennameBrandFlag,shopids,translateDescription, isShopFlag, catid);
+        int total = shopUrlService.total(shopId, shopBrand, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel, shopType, authorizedFlag,
+                authorizedFileFlag, ennameBrandFlag, shopids, translateDescription, isShopFlag, catid);
         json.setRows(findAll);
         json.setTotal(total);
         return json;
     }
 
-    private void genShopPrice(ShopUrl shopUrlBean,List<ShopGoodsSalesAmount> shopGoodsSalesAmountList){
-		for(ShopGoodsSalesAmount salesAmount : shopGoodsSalesAmountList){
-			if(salesAmount.getShopId().equals(shopUrlBean.getShopId())){
-				shopUrlBean.setShopPrice(salesAmount.getTotalPrice());
-				break;
-			}
-		}
-	}
-    
+    private void genShopPrice(ShopUrl shopUrlBean, List<ShopGoodsSalesAmount> shopGoodsSalesAmountList) {
+        for (ShopGoodsSalesAmount salesAmount : shopGoodsSalesAmountList) {
+            if (salesAmount.getShopId().equals(shopUrlBean.getShopId())) {
+                shopUrlBean.setShopPrice(salesAmount.getTotalPrice());
+                break;
+            }
+        }
+    }
+
     /**
      * 方法描述:查询授权
-     *	http://192.168.1.57:8086/cbtconsole/ShopUrlC/queryAuthorizedFileFlag
+     * http://192.168.1.57:8086/cbtconsole/ShopUrlC/queryAuthorizedFileFlag
      */
     @RequestMapping(value = "/queryAuthorizedFileFlag")
     @ResponseBody
     protected Map<String, Integer> queryAuthorizedFileFlag() {
-    	Map<String, Integer> result = new HashMap<String, Integer>();
-    	try {
-    		//1-已授权但无授权文件
-    		int authorizedFileFlag1 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1,-1,-1,1,-1,null, -1, -1, null);
-    		result.put("authorizedFileFlag1", authorizedFileFlag1);
-    		//2-授权文件到期
-    		int authorizedFileFlag2 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1,-1,-1,2,-1,null, -1, -1, null);
-    		result.put("authorizedFileFlag2", authorizedFileFlag2);
-    		//3-已授权但无授权文件+授权文件到期
-    		int authorizedFileFlag3 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1,-1,-1,3,-1,null, -1, -1, null);
-    		result.put("authorizedFileFlag3", authorizedFileFlag3);
-    		result.put("state", 1);
-		} catch (Exception e) {
-			System.out.println(e);
-			result.put("state", 0);
-		}
+        Map<String, Integer> result = new HashMap<String, Integer>();
+        try {
+            //1-已授权但无授权文件
+            int authorizedFileFlag1 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1, -1, -1, 1, -1, null, -1, -1, null);
+            result.put("authorizedFileFlag1", authorizedFileFlag1);
+            //2-授权文件到期
+            int authorizedFileFlag2 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1, -1, -1, 2, -1, null, -1, -1, null);
+            result.put("authorizedFileFlag2", authorizedFileFlag2);
+            //3-已授权但无授权文件+授权文件到期
+            int authorizedFileFlag3 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1, -1, -1, 3, -1, null, -1, -1, null);
+            result.put("authorizedFileFlag3", authorizedFileFlag3);
+            result.put("state", 1);
+        } catch (Exception e) {
+            System.out.println(e);
+            result.put("state", 0);
+        }
         return result;
     }
 
@@ -328,14 +361,14 @@ public class ShopUrlController {
         }
 
         boolean isBlack = shopUrlService.checkIsBlackShopByShopId(shopId);
-        if(isBlack){
+        if (isBlack) {
             jr.setOk(false);
             jr.setMessage("黑名单店铺，不能执行操作");
             return jr;
         }
 
 
-        if(StringUtils.isBlank(sid)) {
+        if (StringUtils.isBlank(sid)) {
             boolean isExists = shopUrlService.checkExistsShopByShopId(shopId) > 0;
             if (isExists) {
                 jr.setOk(false);
@@ -799,7 +832,7 @@ public class ShopUrlController {
             Map<String, CatidStatisticalResult> catidResultMap = new HashMap<String, CatidStatisticalResult>();
             List<GoodsOfferBean> goodsErrInfos = new ArrayList<GoodsOfferBean>();
             // 计算需要的数据
-            Set<String> catidSet = goodsInfos.stream().map( GoodsOfferBean :: getCatid).collect(Collectors.toSet());
+            Set<String> catidSet = goodsInfos.stream().map(GoodsOfferBean::getCatid).collect(Collectors.toSet());
             for (GoodsOfferBean gdOf : goodsInfos) {
                 // “类别的平均重量” * 运费
                 // “该产品重量” * 运费
@@ -808,7 +841,7 @@ public class ShopUrlController {
                     gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()), Integer.valueOf(gdOf.getCatid())));
                     gdOf.setGoodsWeightfreight(
                             FeightUtils.getCarFeightNew(gdOf.getWeight(), Integer.valueOf(gdOf.getCatid())));
-                    gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()),Integer.valueOf(gdOf.getCatid())));
+                    gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()), Integer.valueOf(gdOf.getCatid())));
                 }
                 // 如果平均运费为0，则说明是第一次的数据，存在空值，不做判断
                 if (gdOf.getAvgWeightfreight() == 0) {
@@ -898,7 +931,7 @@ public class ShopUrlController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("jumpGoodsReady error:" + e.getMessage());
-            LOG.error("jumpGoodsReady error:" + e.getMessage());
+            LOG.error("jumpGoodsReady error:", e);
             mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("show", 0);
         }
@@ -1010,7 +1043,7 @@ public class ShopUrlController {
             json.setOk(false);
             json.setMessage("保存失败，原因：" + e.getMessage());
             System.err.println("saveAndUpdateInfos error:" + e.getMessage());
-            LOG.error("saveAndUpdateInfos error:" + e.getMessage());
+            LOG.error("saveAndUpdateInfos error:", e);
         }
         return json;
     }
@@ -1043,7 +1076,7 @@ public class ShopUrlController {
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             System.err.println("doGoodsClear error:" + e.getMessage());
-            LOG.error("doGoodsClear error:" + e.getMessage());
+            LOG.error("doGoodsClear error:", e);
         }
         return json;
     }
@@ -1180,7 +1213,7 @@ public class ShopUrlController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("beforeOnlineGoodsShow error:" + e.getMessage());
-            LOG.error("beforeOnlineGoodsShow error:" + e.getMessage());
+            LOG.error("beforeOnlineGoodsShow error:", e);
             mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("show", 0);
         }
@@ -1226,7 +1259,7 @@ public class ShopUrlController {
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             System.err.println("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:", e);
         }
         return json;
     }
@@ -1270,7 +1303,7 @@ public class ShopUrlController {
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             System.err.println("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:", e);
         }
         return json;
     }
@@ -1365,9 +1398,9 @@ public class ShopUrlController {
                             tpLcImg.setTotalNum(tpLcImg.getTotalNum() + 1);
                         } else {
                             ShopGoodsPublicImg tpLcImg = new ShopGoodsPublicImg();
-                            if(lcImg.getLpImg().contains(SHOP_GOODS_LOCAL_PATH_K)){
+                            if (lcImg.getLpImg().contains(SHOP_GOODS_LOCAL_PATH_K)) {
                                 tpLcImg.setImgUrl(lcImg.getLpImg().replace(SHOP_GOODS_LOCAL_PATH_K, SHOP_GOODS_SHOW_URL_K));
-                            }else{
+                            } else {
                                 tpLcImg.setImgUrl(lcImg.getLpImg().replace(SHOP_GOODS_LOCAL_PATH_J, SHOP_GOODS_SHOW_URL_J));
                             }
                             tpLcImg.setPids(lcImg.getImgMd5());
@@ -1437,7 +1470,7 @@ public class ShopUrlController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("shopId:" + shopId + ",showShopPublicImg error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",showShopPublicImg error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",showShopPublicImg error:", e);
             mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("show", 0);
         }
@@ -1519,9 +1552,9 @@ public class ShopUrlController {
                         tpLcImg.setTotalNum(tpLcImg.getTotalNum() + 1);
                     } else {
                         ShopGoodsPublicImg tpLcImg = new ShopGoodsPublicImg();
-                        if(lcImg.getLpImg().contains(SHOP_GOODS_LOCAL_PATH_K)){
+                        if (lcImg.getLpImg().contains(SHOP_GOODS_LOCAL_PATH_K)) {
                             tpLcImg.setImgUrl(lcImg.getLpImg().replace(SHOP_GOODS_LOCAL_PATH_K, SHOP_GOODS_SHOW_URL_K));
-                        }else{
+                        } else {
                             tpLcImg.setImgUrl(lcImg.getLpImg().replace(SHOP_GOODS_LOCAL_PATH_J, SHOP_GOODS_SHOW_URL_J));
                         }
                         tpLcImg.setPids(lcImg.getImgMd5());
@@ -1537,7 +1570,7 @@ public class ShopUrlController {
                 }
                 if (newImgsList.size() > 0) {
                     // 选中排列第一
-                    newImgsList.sort(Comparator.comparingInt(ShopGoodsPublicImg :: getTotalNum).reversed());
+                    newImgsList.sort(Comparator.comparingInt(ShopGoodsPublicImg::getTotalNum).reversed());
                 }
                 imgsList.clear();
                 localPidImgs.clear();
@@ -1548,7 +1581,7 @@ public class ShopUrlController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("shopId:" + shopId + ",showShopPublicImg error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",showShopPublicImg error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",showShopPublicImg error:", e);
             mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("show", 0);
         }
@@ -1566,39 +1599,39 @@ public class ShopUrlController {
                 + "&filenames=" + filenames.substring(1);
         BufferedReader in = null;
         //try {
-            URL realUrl = new URL(url);
-            // 打开和URL之间的连接
-            URLConnection connection = realUrl.openConnection();
-            // 设置通用的请求属性
-            connection.setRequestProperty("accept", "*/*");
-            connection.setRequestProperty("connection", "Keep-Alive");
-            connection.setRequestProperty("user-agent",
-                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NTshowShopPublicImgTest 5.1;SV1)");
-            connection.setReadTimeout(20 * 1000);
-            // 建立实际的连接
-            connection.connect();
-            // 获取所有响应头字段
-            Map<String, List<String>> map = connection.getHeaderFields();
-            // 定义 BufferedReader输入流来读取URL的响应
-            in = new BufferedReader(new InputStreamReader(
-                    connection.getInputStream()));
-            String line;
-            while ((line = in.readLine()) != null) {
-                resultStr += line;
-            }
+        URL realUrl = new URL(url);
+        // 打开和URL之间的连接
+        URLConnection connection = realUrl.openConnection();
+        // 设置通用的请求属性
+        connection.setRequestProperty("accept", "*/*");
+        connection.setRequestProperty("connection", "Keep-Alive");
+        connection.setRequestProperty("user-agent",
+                "Mozilla/4.0 (compatible; MSIE 6.0; Windows NTshowShopPublicImgTest 5.1;SV1)");
+        connection.setReadTimeout(20 * 1000);
+        // 建立实际的连接
+        connection.connect();
+        // 获取所有响应头字段
+        Map<String, List<String>> map = connection.getHeaderFields();
+        // 定义 BufferedReader输入流来读取URL的响应
+        in = new BufferedReader(new InputStreamReader(
+                connection.getInputStream()));
+        String line;
+        while ((line = in.readLine()) != null) {
+            resultStr += line;
+        }
         //} catch (Exception e) {
-            //e.printStackTrace();
-            //System.err.println("发送GET请求出现异常！" + e.getMessage());
+        //e.printStackTrace();
+        //System.err.println("发送GET请求出现异常！" + e.getMessage());
         //}
         // 使用finally块来关闭输入流
         //finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
+        try {
+            if (in != null) {
+                in.close();
             }
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
         //}
         if (StringUtils.isNotBlank(resultStr)) {
             try {
@@ -1729,12 +1762,12 @@ public class ShopUrlController {
                                 }
                             }
                             Map<String, String> tempMap = new HashMap();
-                            try{
+                            try {
                                 tempMap = genImgMd5(imgGd.getLocalPath(), tempImgList);
-                            }catch (Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                                 System.err.println("发送GET请求出现异常！" + e.getMessage());
-                                LOG.error("发送GET请求出现异常！" + e.getMessage());
+                                LOG.error("发送GET请求出现异常！", e);
                                 //step v1. @author: cjc @date：2019/3/29 11:55:35   Description : 请求失败就break
                                 break;
                             }
@@ -1865,7 +1898,7 @@ public class ShopUrlController {
             json.setOk(false);
             json.setMessage("保存失败，原因：" + e.getMessage());
             System.err.println("shopId:" + shopId + ",deleteGoodsImgs error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",deleteGoodsImgs error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",deleteGoodsImgs error:", e);
         }
         return json;
     }
@@ -1932,7 +1965,7 @@ public class ShopUrlController {
 
             // 将goods的img属性值取出来,即橱窗图
             request.setAttribute("showimgs", JSONArray.fromObject("[]"));
-            List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(),goods.getLocalpath());
+            List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getLocalpath());
             goods.setShowImages(imgs);
             if (imgs.size() > 0) {
                 String firstImg = imgs.get(0);
@@ -2045,7 +2078,7 @@ public class ShopUrlController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("shopId:" + shopId + ",editGoods error:" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",editGoods error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",editGoods error:", e);
             mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("show", 0);
         }
@@ -2234,9 +2267,9 @@ public class ShopUrlController {
                 JsonResult json = new JsonResult();
                 if (json.isOk()) {
                     String newLocal = "";
-                    if(localpath.contains(SHOP_GOODS_LOCAL_PATH_K)){
+                    if (localpath.contains(SHOP_GOODS_LOCAL_PATH_K)) {
                         newLocal = localpath.replace(SHOP_GOODS_LOCAL_PATH_K, SHOP_GOODS_SHOW_URL_K);
-                    }else{
+                    } else {
                         newLocal = localpath.replace(SHOP_GOODS_LOCAL_PATH_J, SHOP_GOODS_SHOW_URL_J);
                     }
 
@@ -2262,9 +2295,9 @@ public class ShopUrlController {
                             // 检查图片分辨率
                             boolean is = ImageCompression.checkImgResolution(localFilePath, 100, 100);
                             if (is) {
-                                if(localFilePath.contains(SHOP_GOODS_LOCAL_PATH_K)){
+                                if (localFilePath.contains(SHOP_GOODS_LOCAL_PATH_K)) {
                                     msg = localFilePath.replace(SHOP_GOODS_LOCAL_PATH_K, SHOP_GOODS_SHOW_URL_K);
-                                }else{
+                                } else {
                                     msg = localFilePath.replace(SHOP_GOODS_LOCAL_PATH_J, SHOP_GOODS_SHOW_URL_J);
                                 }
                             } else {
@@ -2286,7 +2319,7 @@ public class ShopUrlController {
                 msg = "";
                 err = "上传错误";
                 e.printStackTrace();
-                LOG.error("上传错误：" + e.getMessage());
+                LOG.error("上传错误：", e);
             }
         }
         map.put("err", err);
@@ -2317,9 +2350,9 @@ public class ShopUrlController {
             System.out.println("pid:" + pid + ",localpath:" + localpath);
             try {
                 String newLocal = "";
-                if(localpath.contains(SHOP_GOODS_LOCAL_PATH_K)){
+                if (localpath.contains(SHOP_GOODS_LOCAL_PATH_K)) {
                     newLocal = localpath.replace(SHOP_GOODS_LOCAL_PATH_K, SHOP_GOODS_SHOW_URL_K);
-                }else{
+                } else {
                     newLocal = localpath.replace(SHOP_GOODS_LOCAL_PATH_J, SHOP_GOODS_SHOW_URL_J);
                 }
                 newLocal = newLocal.replace("\\", "/");
@@ -2351,9 +2384,9 @@ public class ShopUrlController {
                         String localFilePath60x60 = allLocalPath + currentTime + ".60x60" + fileSuffix;
                         boolean is60 = ImageCompression.reduceImgByWidth(60, localFilePath, localFilePath60x60);
                         if (is60 && is400) {
-                            if(localFilePath60x60.contains(SHOP_GOODS_LOCAL_PATH_K)){
+                            if (localFilePath60x60.contains(SHOP_GOODS_LOCAL_PATH_K)) {
                                 json.setData(localFilePath60x60.replace(SHOP_GOODS_LOCAL_PATH_K, SHOP_GOODS_SHOW_URL_K));
-                            }else{
+                            } else {
                                 json.setData(localFilePath60x60.replace(SHOP_GOODS_LOCAL_PATH_J, SHOP_GOODS_SHOW_URL_J));
                             }
                             json.setOk(true);
@@ -2385,7 +2418,7 @@ public class ShopUrlController {
                 e.printStackTrace();
                 json.setOk(false);
                 json.setMessage("上传错误:" + e.getMessage());
-                LOG.error("上传错误：" + e.getMessage());
+                LOG.error("上传错误：", e);
             }
         }
         return json;
@@ -2425,10 +2458,10 @@ public class ShopUrlController {
         boolean isSuccess = true;
         try {
             String newLocal = "";
-            if(localpath.contains(SHOP_GOODS_LOCAL_PATH_K)){
-                newLocal = localpath.replace(SHOP_GOODS_LOCAL_PATH_K,SHOP_GOODS_SHOW_URL_K);
-            }else{
-                newLocal = localpath.replace(SHOP_GOODS_LOCAL_PATH_J,SHOP_GOODS_SHOW_URL_J);
+            if (localpath.contains(SHOP_GOODS_LOCAL_PATH_K)) {
+                newLocal = localpath.replace(SHOP_GOODS_LOCAL_PATH_K, SHOP_GOODS_SHOW_URL_K);
+            } else {
+                newLocal = localpath.replace(SHOP_GOODS_LOCAL_PATH_J, SHOP_GOODS_SHOW_URL_J);
             }
             newLocal = newLocal.replace("\\", "/");
             String allLocalPath = "";
@@ -2467,9 +2500,9 @@ public class ShopUrlController {
                             String localFilePath60x60 = allLocalPath + currentTime + ".60x60" + fileSuffix;
                             boolean is60 = ImageCompression.reduceImgByWidth(60, localFilePath, localFilePath60x60);
                             if (is60 && is400) {
-                                if(localFilePath60x60.contains(SHOP_GOODS_LOCAL_PATH_K)){
+                                if (localFilePath60x60.contains(SHOP_GOODS_LOCAL_PATH_K)) {
                                     newImgUrl += ";" + localFilePath60x60.replace(SHOP_GOODS_LOCAL_PATH_K, SHOP_GOODS_SHOW_URL_K);
-                                }else{
+                                } else {
                                     newImgUrl += ";" + localFilePath60x60.replace(SHOP_GOODS_LOCAL_PATH_J, SHOP_GOODS_SHOW_URL_J);
                                 }
 
@@ -2703,7 +2736,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",pid:" + pidStr + ",保存错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",pid:" + pidStr + ",保存错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",pid:" + pidStr + ",保存错误，原因：", e);
         }
         return json;
     }
@@ -2774,7 +2807,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
         }
         return json;
     }
@@ -2824,7 +2857,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
         }
         return json;
     }
@@ -2871,7 +2904,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
         }
         return json;
     }
@@ -2988,7 +3021,7 @@ public class ShopUrlController {
             e.printStackTrace();
             mv.addObject("msgStr", "展示重量异常商品错误，原因：" + e.getMessage());
             mv.addObject("show", 0);
-            LOG.error("shopId:" + shopId + ",展示重量异常商品错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",展示重量异常商品错误，原因：", e);
         }
         return mv;
     }
@@ -3090,7 +3123,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
         }
         return json;
     }
@@ -3199,7 +3232,7 @@ public class ShopUrlController {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：", e);
         }
         return json;
     }
@@ -3316,7 +3349,7 @@ public class ShopUrlController {
             e.printStackTrace();
             mv.addObject("msgStr", "执行错误，原因：" + e.getMessage());
             mv.addObject("show", 0);
-            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：", e);
         }
         return mv;
     }
@@ -3386,7 +3419,7 @@ public class ShopUrlController {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",保存展示重量商品错误，原因：", e);
         }
         return json;
     }
@@ -3430,7 +3463,7 @@ public class ShopUrlController {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行错误，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + ",执行错误，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",执行错误，原因：", e);
         }
         return json;
     }
@@ -3522,7 +3555,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新问题店铺标识失败，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + "，更新问题店铺标识失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，更新问题店铺标识失败，原因：", e);
         }
         return json;
     }
@@ -3575,7 +3608,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新店铺类型失败，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + "，更新店铺类型失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，更新店铺类型失败，原因：", e);
         }
         return json;
     }
@@ -3601,7 +3634,7 @@ public class ShopUrlController {
             json.setMessage("获取shopId失败");
             return json;
         }
-        
+
         String authorizedFlag = request.getParameter("authorizedFlag");
         if (StringUtils.isBlank(authorizedFlag) && "-1|0|1|2".contains(authorizedFlag)) {
             json.setOk(false);
@@ -3617,7 +3650,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新店铺已授权失败，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + "，更新店铺已授权失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，更新店铺已授权失败，原因：", e);
         }
         return json;
     }
@@ -3652,7 +3685,7 @@ public class ShopUrlController {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新标识失败，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + "，更新标识失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，更新标识失败，原因：", e);
         }
         return json;
     }
@@ -3680,20 +3713,198 @@ public class ShopUrlController {
 
 
         try {
-            shopUrlService.reDownShopGoods(shopId,user.getId());
+            shopUrlService.reDownShopGoods(shopId, user.getId());
             json.setOk(true);
         } catch (Exception e) {
             e.getStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，设置重新下载失败，原因：" + e.getMessage());
-            LOG.error("shopId:" + shopId + "，设置重新下载失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，设置重新下载失败，原因：", e);
         }
         return json;
     }
 
 
+    @RequestMapping("/shopBrandAuthorizationList")
+    public ModelAndView shopBrandAuthorizationList(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mv = new ModelAndView("shopBrandAuthorizationList");
+        if (!UserInfoUtils.checkIsLogin(request)) {
+            mv.addObject("msgStr", "用户未登录");
+            mv.addObject("show", 0);
+            return mv;
+        }
+
+        String shopId = request.getParameter("shopId");
+        if (shopId == null || "".equals(shopId)) {
+            mv.addObject("msgStr", "获取shopId失败");
+            mv.addObject("show", 0);
+            return mv;
+        } else {
+            mv.addObject("shopId", shopId);
+        }
+
+        try {
+            List<ShopBrandAuthorization> brandAuthorizationList = shopUrlService.queryBrandAuthorizationByShopId(shopId);
+            mv.addObject("brandAuthorizationList", brandAuthorizationList);
+            mv.addObject("brandsNum", brandAuthorizationList.size());
+            mv.addObject("show", 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("shopBrandAuthorizationList error:" + e.getMessage());
+            LOG.error("shopBrandAuthorizationList error:", e);
+            mv.addObject("msgStr", "执行过程失败，原因：" + e.getMessage());
+            mv.addObject("show", 0);
+        }
+        return mv;
+    }
 
 
+    @RequestMapping(value = "/uploadBrandFile", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public JsonResult uploadBrandFile(@RequestParam(value = "file", required = true) CommonsMultipartFile mf,
+                                      HttpServletRequest request) {
+        JsonResult json = new JsonResult();
+
+        String today = DateFormatUtil.formatDateToStringByYear(new Date());
+        String imgUrl = "";
+        try {
+            Random random = new Random();
+            // 获取配置文件信息
+            FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
+            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
+            String localDiskPath = ftpConfig.getLocalDiskPath();
+            if (json.isOk()) {
+                /*// 得到文件保存的名称mf.getOriginalFilename()
+                String originalName = mf.getOriginalFilename();
+                // 文件的后缀取出来
+                String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
+                String saveFilename = EditorController.makeFileName(String.valueOf(random.nextInt(1000)));
+                // 本地服务器磁盘全路径
+                String localFilePath = "shopbrand/" + saveFilename + fileSuffix;
+                // 文件流输出到本地服务器指定路径
+                ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
+                // 检查图片分辨率
+                imgUrl = ftpConfig.getLocalShowPath() + localFilePath;*/
+
+                String[] imgInfo = SearchFileUtils.comFileUpload(mf, "AuthorizedFile", null, null, null, 0);
+                json.setData(imgInfo);
+            }
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("uploadBrandFile error:" + e.getMessage());
+            e.printStackTrace();
+            LOG.error("uploadBrandFile error：", e);
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/saveBrandInfo", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public JsonResult saveBrandInfo(@RequestParam(value = "file", required = false) CommonsMultipartFile mf,
+                                    HttpServletRequest request) {
+        JsonResult json = new JsonResult();
+
+        // 获取配置文件信息
+        if (ftpConfig == null) {
+            ftpConfig = GetConfigureInfo.getFtpConfig();
+        }
+        String shopId = request.getParameter("shopId");
+        String brandIdStr = request.getParameter("brandId");
+        String brandName = request.getParameter("brandName");
+        String inAuthorizeState = request.getParameter("inAuthorizeState");
+        String termOfValidity = request.getParameter("termOfValidity");
+        String certificateFile = request.getParameter("certificateFile");
+        String remotePath = request.getParameter("remotePath");
+        String localPath = request.getParameter("localPath");
+        if (StringUtils.isBlank(shopId) || StringUtils.isBlank(brandName)
+                || StringUtils.isBlank(inAuthorizeState)) {
+            json.setOk(false);
+            json.setMessage("请输参数不完整");
+            return json;
+        } else if ("1".equals(inAuthorizeState)) {
+            if (StringUtils.isBlank(termOfValidity)) {
+                json.setOk(false);
+                json.setMessage("请输入有效期");
+                return json;
+            } else if (StringUtils.isBlank(certificateFile) || StringUtils.isBlank(remotePath) || StringUtils.isBlank(localPath)) {
+                json.setOk(false);
+                json.setMessage("请上传文件");
+                return json;
+            }
+        }
+        Integer brandId = null;
+        if(StringUtils.isBlank(brandIdStr) && Integer.valueOf(brandIdStr) > 0){
+            brandId = Integer.valueOf(brandId);
+        }
+        try {
+            ShopBrandAuthorization authorization = new ShopBrandAuthorization();
+            authorization.setAuthorizeState(Integer.valueOf(inAuthorizeState));
+            authorization.setBrandName(brandName);
+            authorization.setShopId(shopId);
+
+            authorization.setTermOfValidity(termOfValidity);
+            // 上传文件
+            /*if ("1".equals(inAuthorizeState) && certificateFile.contains("192.168.")) {
+                String localFilePath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getLocalDiskPath());
+
+                String remoteShowPath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getRemoteShowPath());
+                String remoteLocalPath = certificateFile.replace(ftpConfig.getLocalShowPath(), FtpConfig.REMOTE_LOCAL_PATH);
+                String destPath = remoteLocalPath.substring(0,remoteLocalPath.lastIndexOf("/"));
+                // destPath = destPath.replace("/usr/local/goodsimg/importcsvimg","");
+                *//*json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);
+                if (!json.isOk()) {
+                    json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);
+                }*//*
+
+                File localFile = new File(localFilePath);
+
+                boolean isSuccess = UploadByOkHttp.uploadFile(localFile, destPath , 1);
+                if (!isSuccess) {
+                    isSuccess = UploadByOkHttp.uploadFile(localFile, destPath , 1);
+                }
+                if (isSuccess) {
+                    isSuccess = UploadByOkHttp.uploadFile(localFile, destPath, 0);
+                    if (!isSuccess) {
+                        isSuccess = UploadByOkHttp.uploadFile(localFile, destPath, 0);
+                    }
+                }
+                if (isSuccess) {
+                    String fileName = localFilePath.substring(localFilePath.lastIndexOf("/") + 1);
+                    authorization.setCertificateFile(fileName);
+                    authorization.setLocalPath(localFilePath);
+                    authorization.setRemotePath(remoteShowPath);
+                } else {
+                    json.setOk(false);
+                    json.setMessage("上传文件失败，请重试");
+                    return json;
+                }
+            }*/
+            if (brandId != null) {
+                authorization.setId(Integer.valueOf(brandId));
+                shopUrlService.updateShopBrandAuthorization(authorization);
+            } else {
+                authorization.setCertificateFile(certificateFile);
+                authorization.setRemotePath(remotePath);
+                authorization.setLocalPath(localPath);
+                // 检查是否已经存在此品牌
+                int checkCount = shopUrlService.checkBrandAuthorizationByName(shopId, brandName, brandId);
+                if (checkCount > 0) {
+                    json.setOk(false);
+                    json.setMessage("已经存在此店铺品牌");
+                } else {
+                    shopUrlService.insertIntoShopBrandAuthorization(authorization);
+                    json.setOk(true);
+                }
+            }
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("saveBrandInfo error:" + e.getMessage());
+            e.printStackTrace();
+            LOG.error("saveBrandInfo error：", e);
+        }
+        return json;
+    }
 
     private float genFloatWidthTwoDecimalPlaces(float numVal) {
         BigDecimal bd = new BigDecimal(numVal);
@@ -3724,10 +3935,6 @@ public class ShopUrlController {
         }
         return categoryName;
     }
-
-
-
-
 
 
 }

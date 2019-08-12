@@ -1,6 +1,8 @@
 package com.cbt.util;
 
 
+import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.util.JsonResult;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -203,5 +205,37 @@ public class GetConfigureInfo {
 		}
 		return cfg;
 	}
+
+	public static void checkFtpConfig(FtpConfig ftpConfig, JsonResult json) {
+        json.setOk(true);
+        // 判断获取的配置信息是否有效
+        if (ftpConfig == null || !ftpConfig.isOk()) {
+            json.setOk(false);
+            json.setMessage("获取配置文件失败");
+        } else {
+            if (StringUtil.isBlank(ftpConfig.getFtpURL())) {
+                json.setOk(false);
+                json.setMessage("获取ftpURL失败");
+            } else if (StringUtil.isBlank(ftpConfig.getFtpPort())) {
+                json.setOk(false);
+                json.setMessage("获取ftpPort失败");
+            } else if (StringUtil.isBlank(ftpConfig.getFtpUserName())) {
+                json.setOk(false);
+                json.setMessage("获取ftpUserName失败");
+            } else if (StringUtil.isBlank(ftpConfig.getFtpPassword())) {
+                json.setOk(false);
+                json.setMessage("获取ftpPassword失败");
+            } else if (StringUtil.isBlank(ftpConfig.getRemoteShowPath())) {
+                json.setOk(false);
+                json.setMessage("获取remoteShowPath失败");
+            } else if (StringUtil.isBlank(ftpConfig.getLocalDiskPath())) {
+                json.setOk(false);
+                json.setMessage("获取localDiskPath失败");
+            } else if (StringUtil.isBlank(ftpConfig.getLocalShowPath())) {
+                json.setOk(false);
+                json.setMessage("获取localShowPath失败");
+            }
+        }
+    }
 
 }

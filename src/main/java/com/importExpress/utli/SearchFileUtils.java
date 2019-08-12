@@ -242,7 +242,7 @@ public class SearchFileUtils {
             //文件后缀
             String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
             //保存到本地文件名(时间戳加随机数组成)
-            String saveFileName = System.currentTimeMillis() + "." + (String.valueOf(Math.random()).substring(2,7))  + fileSuffix;
+            String saveFileName = System.currentTimeMillis() + "_" + (String.valueOf(Math.random()).substring(2,7))  + fileSuffix;
             //最终本地保存路径
             String targetImgUrl = LOCALPATHZIPIMG + sid + "/" + saveFileName;
             File file2 = new File(LOCALPATHZIPIMG + sid);
@@ -275,12 +275,12 @@ public class SearchFileUtils {
                 }
             }
             // 支持断点续存上传图片
-            ContinueFTP2 f1 = new ContinueFTP2(ftpURL, ftpUserName, ftpPassword, ftpPort, "/stock_picture/researchimg/" + saveFileName, targetImgUrl);
+            ContinueFTP2 f1 = new ContinueFTP2(ftpURL, ftpUserName, ftpPassword, ftpPort, "/stock_picture/researchimg/AuthorizedFile/" + saveFileName, targetImgUrl);
             // 远程上传到图片服务器
             f1.start();
             String[] result = new String[3];
-            result[0] = sid + "/" + saveFileName;
-            result[1] = IMAGESEARCHURL + saveFileName;
+            result[0] = IMAGEHOSTURL + sid + "/" + saveFileName;
+            result[1] = IMAGESEARCHURL + "AuthorizedFile/" + saveFileName;
             result[2] = originalName;
             return result;
         }
