@@ -100,7 +100,7 @@
                         $("#certificate_file").val(rsData[2]);
                         $("#certificate_file").show();
                         $("#remote_path").val(rsData[1]);
-                        $("#local_path").val("http://192.168.1.9/editimg/shopimgzip/research/" + rsData[0]);
+                        $("#local_path").val(rsData[0]);
                     } else {
                         $.messager.alert("提醒", data.message, "error");
                     }

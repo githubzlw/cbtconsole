@@ -216,6 +216,7 @@ public class ShopUrlController {
             List<ShopBrandAuthorization> authorizationList =  shopUrlService.queryBrandAuthorizationByShopId(shopUrlBean.getShopId());
             if(authorizationList == null || authorizationList.size() == 0){
                 shopUrlBean.setAuthorizedFlag(3);
+                shopUrlBean.setBrandNames("");
             }else{
                 int count = 0;
                 StringBuffer brandNameS = new StringBuffer();

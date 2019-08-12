@@ -678,6 +678,7 @@
         var content = '<div style="font-size: 13px;">';
         content += '<span>店铺英文:'+row.inputShopEnName+'</span>';
         content += '<br><span>品牌属性:'+row.inputShopBrand+'</span>';
+        content += '<br><span>品牌名称:<b style="background-color: #94ff84;">['+row.brandNames+']</b></span>';
         content += '<br><span>URL:<a href="'+val+'" target="_blank">'+val+'</a></span>';
         content += '</div>';
         return content;
