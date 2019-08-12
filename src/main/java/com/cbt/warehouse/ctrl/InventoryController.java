@@ -911,8 +911,7 @@ public class InventoryController {
 	public Map<String,Object> getBarcode(HttpServletRequest request, HttpServletResponse response) {
 		Map<String,Object> result = new HashMap<>();
 		result.put("status", 200);
-		result.put("barcode", "CR001002003");
-		
+		result.put("barcode", "<input type='text' placeholder='请输入库位条形码' class='i_barcode_n'> ");
 		return result;
 	}
 	

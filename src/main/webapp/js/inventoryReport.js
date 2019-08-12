@@ -167,7 +167,7 @@ $(function(){
 		 trHtml = trHtml+"<span class='lu_specid'></span><br>";
 		 trHtml = trHtml+"<span class='lu_skuid'></span></td>";
 		 trHtml = trHtml+"<td><input type='text' class='form-control lu_count'  value='0'></td>";
-		 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this);" class="lu_barcode_a" >获取库位</a></td>';
+		 trHtml = trHtml+'<td class="lu_barcode"><input type="text" placeholder="请输入库位条形码" class="lu_barcode_a"></td>';
 		 trHtml = trHtml+'<td><input type="checkbox" name="entry" class="lu_is"></td></tr>';
 		 $("#lu_tr").html(trHtml);
 		$('.tc,.trnasparent,.tc1').show();
@@ -288,7 +288,8 @@ function getProduct(){
 	    				 trHtml = trHtml+"<span class='lu_specid'>"+skuM.specId+"</span><br>";
 	    				 trHtml = trHtml+"<span class='lu_skuid'>"+skuM.skuId+"</span></td>";
 	    				 trHtml = trHtml+"<td><input type='text' class='form-control lu_count' value='0'></td>";
-	    				 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this,\''+skuM.goods_pid+'\');"  class="lu_barcode_a">获取库位</a></td>';
+	    				 trHtml = trHtml+'<td class="lu_barcode"><input type="text" placeholder="请输入库位条形码" class="lu_barcode_a"></td>';
+//	    				 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this,\''+skuM.goods_pid+'\');"  class="lu_barcode_a">获取库位</a></td>';
 	    				 trHtml = trHtml+'<td><input type="checkbox" name="entry" class="lu_is"></td></tr>';
 	    			 }
 	    		 }else{
@@ -296,7 +297,8 @@ function getProduct(){
     				 trHtml = trHtml+"<span class='lu_specid'>"+skuM.goods_pid+"</span><br>";
     				 trHtml = trHtml+"<span class='lu_skuid'>"+skuM.goods_pid+"</span></td>";
     				 trHtml = trHtml+"<td><input type='text' class='form-control lu_count'  value='0'></td>";
-    				 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this,\''+skuM.goods_pid+'\');" class="lu_barcode_a" >获取库位</a></td>';
+    				 trHtml = trHtml+'<td class="lu_barcode"><input type="text" placeholder="请输入库位条形码" class="lu_barcode_a"></td>';
+//    				 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this,\''+skuM.goods_pid+'\');" class="lu_barcode_a" >获取库位</a></td>';
     				 trHtml = trHtml+'<td><input type="checkbox" name="entry" class="lu_is"></td></tr>';
 	    		 }
 	    		 
@@ -343,7 +345,8 @@ function getTbOrder(){
 					trHtml = trHtml+'<span  class="lu_tb_specidc lu_tb_specidc'+i+'">'+skuM.specId+'</span></td>';
 					trHtml = trHtml+'<td class="llu_tb_count u_tb_count'+i+'">'+skuM.itemqty+'</td>';
 					trHtml = trHtml+'<td><input type="text" class="form-control lu_tb_a_count lu_tb_a_count'+i+'" value="'+skuM.itemqty+'"></td>';
-					trHtml = trHtml+'<td class="lu_tb_bar lu_tb_bar'+i+'"><a class="gain lu_tb_barcode lu_tb_barcode'+i+'" onclick="getbarcode(this,\''+skuM.itemid+'\');">获取库位</a></td>';
+					trHtml = trHtml+'<td class="lu_tb_bar lu_tb_bar'+i+'"><input type="text" placeholder="请输入库位条形码" class="lu_tb_barcode"></td>';
+//					trHtml = trHtml+'<td class="lu_tb_bar lu_tb_bar'+i+'"><a class="gain lu_tb_barcode lu_tb_barcode'+i+'" onclick="getbarcode(this,\''+skuM.itemid+'\');">获取库位</a></td>';
 					trHtml = trHtml+'<td><input type="checkbox" class="lu_tb_checkbox lu_tb_checkbox'+i+'" value="'+i+'">';
 					trHtml = trHtml+'<input type="hidden" class="lu_tb_pid lu_tb_pid'+i+'" value="'+skuM.itemid+'">';
 					trHtml = trHtml+'<input type="hidden" class="lu_tb_img lu_tb_img'+i+'" value="'+skuM.imgurl+'">';
@@ -514,7 +517,7 @@ function saveInventory(){
 			var lu_specid = $(this).find(".lu_specid").html();
 			var lu_skuid = $(this).find(".lu_skuid").html();
 			var lu_count = $(this).find(".lu_count").val();
-			var lu_barcode = $(this).find(".lu_barcode_a").html();
+			var lu_barcode = $(this).find(".lu_barcode_a").val();
 			varray  = varray +";"+lu_sku+"|"+lu_specid+"|"+lu_skuid+"|"+lu_count+"|"+lu_barcode;
 		}
 	})
@@ -567,7 +570,7 @@ function saveTbInventory(){
 			var lu_specid = $(this).find(".lu_tb_specidc").html();
 			var lu_skuid = $(this).find(".lu_tb_skuid").html();
 			var lu_count = $(this).find(".lu_tb_a_count").val();
-			var lu_barcode = $(this).find(".lu_tb_barcode").html();
+			var lu_barcode = $(this).find(".lu_tb_barcode").val();
 			var lu_price = $(this).find(".lu_tb_price").val();
 			varray  = varray +";"+lu_sku+"|"+lu_specid+"|"+lu_skuid+"|"+lu_count+"|"+lu_barcode+"|"+lu_name+"|"+lu_pid+"|"+lu_img+"|"+lu_url+"|"+lu_price;
 		}

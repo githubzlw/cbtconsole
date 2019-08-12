@@ -270,7 +270,9 @@ em,i{font-style: normal;}
 						<span class="lu_specid">ssss</span><br>
 						<span class="lu_skuid">cccc</span></td>
 							<td><input type="text" class="form-control lu_count" value="0"></td>
-							<td class="lu_barcode"><a onclick="getbarcode()" class="lu_barcode_a">获取库位</a></td>
+							<td class="lu_barcode">
+							<input type='text' placeholder='请输入库位条形码' class='lu_barcode_a'>
+							<!-- <a onclick="getbarcode()" class="lu_barcode_a">获取库位</a> --></td>
 							<td><input type="checkbox" name="entry" class="lu_is"></td>
 						</tr>
 						
@@ -358,7 +360,9 @@ em,i{font-style: normal;}
 						</td>
 						<td class="lu_tb_count">10</td>
 						<td><input type="text" class="form-control lu_tb_a_count" value="10"></td>
-						<td class="lu_tb_bar"><a class="gain lu_tb_barcode" onclick="getbarcode()">获取库位</a></td>
+						<td class="lu_tb_bar">
+						<input type='text' placeholder='请输入库位条形码' class='lu_tb_barcode'>
+						<!-- <a class="gain lu_tb_barcode" onclick="getbarcode()">获取库位</a> --></td>
 						<td><input type="checkbox" class="lu_tb_checkbox">
 						<input type="hidden" class="lu_tb_pid" value="">
 						<input type="hidden" class="lu_tb_img" value="">

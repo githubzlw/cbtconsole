@@ -10,6 +10,7 @@ $(function(){
 		}
 		var shipno = $("#corder_shipno").val();
 		var barcode = '';
+		
 		$(".corder_i_barcode").each(function(){
 			barcode = barcode+$(this).val()+',';
 		});

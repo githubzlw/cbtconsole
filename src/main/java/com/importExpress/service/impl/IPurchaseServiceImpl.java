@@ -916,6 +916,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		boolean unuseInventory = true;
 		try{
 			//获取订单信息
+			//采购状态：0：未开始采购；1:采购货源确认 2、开始采购 3、已采购，没到货 4 、已入库 5：问题货源 6：已入库，但货有问题  8、出运中， 9、已退货 10、已换货  11：已取消 12替代',
 			OrderBean ob = pruchaseMapper.getOrders(orderno);
 			if(ob != null){
 				String countryNameCn=ob.getCountryNameCN();
@@ -1171,9 +1172,10 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				purchaseBean.setNewValue(goods_p_url.replace("'", " "));
 				//获取商品库存数据
 				purchaseBean.setInventorySkuId("0");
-				if(unuseInventory) {
-					getInventoryCount(map, purchaseBean);
-				}
+				
+				//查找是否有库存可使用
+				getInventoryCount(map, purchaseBean,unuseInventory);
+				
 				getSourceOfGoods(map, purchaseBean);
 				String cn = map.get("companyname");
 				purchaseBean.setCompanyName(StringUtil.isNotBlank(cn)?cn:"无");
@@ -1630,21 +1632,22 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		}
 	}
 
-	private void getInventoryCount(Map<String, String> map, PurchasesBean purchaseBean) {
-		Map<String, Object> inventory = inventoryMapper.getInventoryByOrderDetialsId(String.valueOf(map.get("od_id")));
-		if(inventory != null) {
-			purchaseBean.setSkuid((String)inventory.get("skuid"));
-			purchaseBean.setSpecid((String)inventory.get("specid"));
-			String can_remaining = com.cbt.util.StrUtils.object2NumStr(inventory.get("can_remaining"));
-			purchaseBean.setInventory(can_remaining);
-			purchaseBean.setInventorySkuId(com.cbt.util.StrUtils.object2NumStr(inventory.get("inventory_id")));
-			purchaseBean.setRemaining(can_remaining);
-			purchaseBean.setNew_remaining(can_remaining);
-		}else {
-			purchaseBean.setInventory("0");
-			purchaseBean.setInventorySkuId("0");
-			purchaseBean.setRemaining("0");
-			purchaseBean.setNew_remaining("0");
+	private void getInventoryCount(Map<String, String> map, PurchasesBean purchaseBean,boolean unUseInventory) {
+		purchaseBean.setInventory("0");
+		purchaseBean.setInventorySkuId("0");
+		purchaseBean.setRemaining("0");
+		purchaseBean.setNew_remaining("0");
+		if(unUseInventory) {
+			Map<String, Object> inventory = inventoryMapper.getInventoryByOrderDetialsId(String.valueOf(map.get("od_id")));
+			if(inventory != null) {
+				purchaseBean.setSkuid((String)inventory.get("skuid"));
+				purchaseBean.setSpecid((String)inventory.get("specid"));
+				String can_remaining = com.cbt.util.StrUtils.object2NumStr(inventory.get("remaining"));
+				purchaseBean.setInventory(can_remaining);
+				purchaseBean.setInventorySkuId(com.cbt.util.StrUtils.object2NumStr(inventory.get("inventory_id")));
+				purchaseBean.setRemaining(can_remaining);
+				purchaseBean.setNew_remaining(can_remaining);
+			}
 		}
 		/*String nm = null;
 		try {

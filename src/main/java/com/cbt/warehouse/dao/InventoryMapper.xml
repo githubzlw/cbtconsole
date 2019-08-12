@@ -332,7 +332,7 @@
     </insert>
     <!-- 订单关联库存，查询是否有可用库存 -->
     <select id="getInventoryByOrderDetialsId" resultType="java.util.Map">
-    select odsm.goods_pid, odsm.specid,odsm.skuid,isku.can_remaining,isku.id as inventory_id from 
+    select odsm.goods_pid, odsm.specid,odsm.skuid,isku.can_remaining,isku.remaining,isku.id as inventory_id from 
      order_details_sku_match odsm 
      left join inventory_sku isku on (odsm.goods_pid=isku.goods_pid 
     and odsm.specid=isku.specid  and odsm.skuid=isku.skuid )
@@ -360,8 +360,8 @@
     </insert>
     <!-- 锁定库存 -->
     <insert id="insertLockInventory">
-    INSERT INTO lock_inventory (in_id,lock_remaining,od_id,createtime,lock_inventory_amount,is_use) values(
-    #{inventory_sku_id},#{inventory_count},#{odid},now(),#{lock_inventory_amount},#{is_use}
+    INSERT INTO lock_inventory (in_id,lock_remaining,od_id,createtime,lock_inventory_amount,is_use,is_delete,flag) values(
+    #{inventory_sku_id},#{inventory_count},#{odid},now(),#{lock_inventory_amount},#{is_use},#{is_delete},#{lock_flag}
     )
     </insert>
     <!--库存损益表  -->
@@ -395,7 +395,7 @@
     <insert id="insertInventory" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventorySku">
     insert into inventory_sku(goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_type,
     car_img,goods_pid,car_urlMD5,createtime,goods_p_price,goods_p_url,updatetime,specid,skuid,goods_p_pid,od_id,goods_price,db_flag) 
-	values(#{goodsUrl},#{remaining},#{canRemaining},#{goodName},#{sku},#{barcode},
+	values(#{goodsUrl},#{remaining},#{canRemaining},#{goodsName},#{sku},#{barcode},
 	#{goodsCatid},#{inventoryType},#{carImg},#{goodsPid},#{carUrlMD5},now(),#{goodsPPrice},
 	#{goodsPUrl},now(),#{specid},#{skuid},#{goodsPPid},#{odid},#{goodsPrice},#{dbFlag})
     </insert>

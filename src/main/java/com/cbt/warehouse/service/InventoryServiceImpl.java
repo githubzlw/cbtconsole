@@ -557,12 +557,24 @@ public class InventoryServiceImpl implements  InventoryService{
 			return 0;
 		}
 		if(isReduce) {
+//			订单产品要入库，
+			
+			
+			//如果全部使用库存，订单状态改为验货无误
+			if("true".equals(map.get("useAllInventory"))) {
+				//订单产品要入库， 状态要验货无误
+//				order_details.state=1 order_details.checked=1
+				
+				
+				
+				
+				
+//				orderinfoMapper.updateOrderDetailsState(map.get("odid"), map.get("orderid"));
+			}
 			//采购使用库存锁定库存
 			map.put("is_use", "1");
-			if("true".equals(map.get("useAllInventory"))) {
-				//如果全部使用库存，订单状态改为验货无误
-				orderinfoMapper.updateOrderDetailsState(map.get("odid"), map.get("orderid"));
-			}
+			map.put("is_delete", "0");
+			map.put("lock_flag", "1");
 			inventoryMapper.insertLockInventory(map);
 		}
 		int before_remaining = inventoryMap.getRemaining();
