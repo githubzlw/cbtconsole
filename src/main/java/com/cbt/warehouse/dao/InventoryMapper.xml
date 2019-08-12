@@ -352,6 +352,7 @@
     barcode,tborderid,position,shipno, username,userid,state,itemid,is_delete,store_name,
     taobaospec,warehouse_remark,taobaoprice,itemqty,
    is_replenishment,weight,is_refund,specid,skuid,createtime)
+    
     values(#{orderid},#{goodid},#{odid},#{goodurl},#{goodstatus},#{goodarrivecount},
     #{barcode},#{tborderid},#{position},#{shipno},#{username},#{userid},#{state},#{itemid},#{is_delete},#{store_name},
     #{taobaospec},#{warehouse_remark},#{taobaoprice},#{itemqty},
@@ -405,7 +406,7 @@
     </update>
     <!-- 更新库存  -->
     <update id="updateInventoryCheckFlag">
-    update inventory_sku set remaining=#{remaining},check_remaining=#{checkRemaining},
+    update inventory_sku set remaining=#{remaining},can_remaining=#{canRemaining},check_remaining=#{checkRemaining},
     inventory_check_id=#{inventoryCheckId},
     barcode=#{barcode},
     flag=1,updatetime=now() where id=#{id}

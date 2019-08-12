@@ -950,7 +950,7 @@ public class InventoryController {
 			map.put("goods_price",lu_price );
 			
 			for(String v : varrays) {
-				String[] vs = v.split("(\\|)");
+				String[] vs = v.split("(\\|d\\|)");
 				if(vs.length>5) {
 					if(!StrUtils.isNum(vs[3].trim()) || Integer.parseInt(vs[3].trim()) < 1) {
 						continue;

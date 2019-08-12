@@ -230,12 +230,15 @@ public class PurchaseController {
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("admId",String.valueOf(adm.getId()));
+		map.put("admId",String.valueOf(adm.getId()));
+		map.put("userid",String.valueOf(adm.getId()));
+		map.put("userName",adm.getAdmName());
 		int row=0;
 		String od_id=request.getParameter("od_id");
 		String isUse=request.getParameter("isUse");
 		map.put("odid", od_id);
 		map.put("isUse", isUse);
-		map.put("goodsid", request.getParameter("isUse"));
+		map.put("goodsid", request.getParameter("goodsid"));
 		map.put("inventory_count", request.getParameter("inventory_count"));
 		map.put("googs_number", request.getParameter("googs_number"));
 		map.put("orderid", request.getParameter("orderid"));
