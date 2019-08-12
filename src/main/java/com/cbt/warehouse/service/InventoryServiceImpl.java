@@ -951,16 +951,16 @@ public class InventoryServiceImpl implements  InventoryService{
 			Map<String, String> inventory = new HashMap<>();
 			//4.更新库存变更记录表inventory_sku_log
 			inventory.put("inventory_sku_id", String.valueOf(i.getInventorySkuId()));
-			inventory.put("type", "4");
 			inventory.put("admid", String.valueOf(admid));
 			inventory.put("inventory_count", String.valueOf(inventory_count));
+			inventory.put("log_remark", i.getCreateTime()+"库存盘点");
+			inventory.put("before_remaining", String.valueOf(before_remaining));
+			inventory.put("after_remaining", String.valueOf(after_remaining));
+			inventory.put("change_type", "3");
 			inventoryMapper.addInventoryChangeRecordByInventoryid(inventory);
 			
 			//5.更新库存明细inventory_details_sku
-			inventory.put("change_type", "3");
-			inventory.put("before_remaining", String.valueOf(before_remaining));
-			inventory.put("after_remaining", String.valueOf(after_remaining));
-			inventory.put("log_remark", i.getCreateTime()+"库存盘点");
+			inventory.put("type", "4");
 			inventoryMapper.addInventoryDetailsSku(inventory );
 		}
 		
