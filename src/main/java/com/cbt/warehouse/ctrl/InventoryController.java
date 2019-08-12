@@ -819,7 +819,8 @@ public class InventoryController {
 		String sku = json.getString("sku");
 		String entype = json.getString("entype_new");
 		String remotPath = json.getString("remotpath");
-		result.put("goodsImg", remotPath+json.getString("custom_main_image"));
+		String img = remotPath+json.getString("custom_main_image");
+		result.put("goodsImg", img);
 		if(StringUtil.isNotBlank(entype) && StringUtil.isNotBlank(sku)) {
 			Map<String,TypeBean> typeMap = new HashMap<>();
 			List<TypeBean> entypeNew = JsonUtils.jsonToList(entype, TypeBean.class);
@@ -859,6 +860,8 @@ public class InventoryController {
 					skuContext = StringUtil.isBlank(skuContext) ? context : skuContext + "," + context;
 					
 					skuM.put("sku", skuContext);
+					String skuimg = StringUtil.isBlank(typeBean.getImg()) ? img : typeBean.getImg();
+					skuM.put("skuimg", skuimg);
 				}
 				if(isSku) {
 					typelist.add(skuM);
@@ -961,6 +964,7 @@ public class InventoryController {
 					map.put("skuid",vs[2].trim());
 					map.put("count",vs[3].trim());
 					map.put("barcode",vs[4].trim());
+					map.put("img",vs[6].trim());
 					inventoryService.inputInventory(map);
 				}
 			}
@@ -1001,7 +1005,8 @@ public class InventoryController {
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		if(adm == null) {
-			return null;
+			ModelAndView mv = new ModelAndView("main_menu");
+			return mv;
 		}
 		ModelAndView mv = new ModelAndView("inventorycheck");
 		Map<Object, Object> map = getObjectByInventory(request,true);

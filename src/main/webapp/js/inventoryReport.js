@@ -35,20 +35,26 @@ $(function(){
 			$(".q_in_r").removeAttr("readonly");
 			$(".q_in_barcode").removeAttr("readonly");
 			$(".p_qs_r").attr("disabled", "disabled");
-//		$(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
 			$("#query_button_check_start").attr("disabled", "disabled");
-//		$("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
-			
 			$(".qbt_check").removeAttr("disabled", "disabled");
-//		$(".qbt_check").attr("style", "background-color: #fff;");
 		}else{
 			$(".qbt_check").attr("disabled", "disabled");
-//		$(".qbt_check").attr("style", "background-color: #EEEEEE;");
 			
 			$("#query_button_check_start").removeAttr("disabled", "disabled");
-//		$("#query_button_check_start").attr("style", "background-color: #fff;");
 		}
 		
+		$("#query_catid_select").change(function(){
+			var catid = $(this).val();
+			$("#query_goodscatid").val(catid);//设置value为xx的option选项为默认选中
+			doQuery(1,1);
+		})
+		$("#query_goodscatid").change(function(){
+			var catid = $(this).val();
+			$("#query_catid_select").val(catid);//设置value为xx的option选项为默认选中
+		})
+		 $("#query_button_check").click(function(){
+				doQuery(1,1);
+			});
 	}
 	//开始盘点
 	$("#query_button_check_start").click(function(){
@@ -61,13 +67,10 @@ $(function(){
 		    	  if(data.status == 200){
 		    		  $("#check_id").val(data.check_id);
 		    		  $("#query_button_check_start").attr("disabled", "disabled");
-//		    		  $("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
 		    			
 		    		  $(".qbt_check").removeAttr("disabled", "disabled");
-//		    		 $(".qbt_check").attr("style", "background-color: #fff;");
 		    		 $(".p_q_r").attr("readonly","readonly");
 		    			$(".p_qs_r").attr("disabled", "disabled");
-//		    	        $(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
 		    	        $(".q_in_barcode").removeAttr("readonly");
 		    		    $(".q_in_r").removeAttr("readonly");
 		    	  }else{
@@ -91,13 +94,10 @@ $(function(){
 		       success:function(data){
 		    	  if(data.status == 200){
 		    		  $(".qbt_check").attr("disabled", "disabled");
-//		    		  $(".qbt_check").attr("style", "background-color: #EEEEEE;");
 		    			$("#query_button_check_start").removeAttr("disabled", "disabled");
-//		    			$("#query_button_check_start").attr("style", "background-color: #fff;");
 		    			$("#check_id").val(0);
 		    			$(".p_q_r").removeAttr("readonly");
 		    			$(".p_qs_r").removeAttr("disabled");
-//		    	        $(".p_qs_r").attr("style", "background-color: #fff");
 		    			$(".q_in_r").attr("readonly","readonly");
 		    			$(".q_in_barcode").attr("readonly","readonly");
 		    	  }else{
@@ -113,39 +113,22 @@ $(function(){
 	//完成盘点
 	$("#query_button_check_done").click(function(){
 		var check_id = $("#check_id").val();
-		jQuery.ajax({
-			url:"/cbtconsole/inventory/check/done",
-			data:{"check_id":check_id},
-			type:"post",
-			success:function(data){
-				if(data.status == 200){
-					$(".qbt_check").attr("disabled", "disabled");
-//					$(".qbt_check").attr("style", "background-color: #EEEEEE;");
-					$("#query_button_check_start").removeAttr("disabled", "disabled");
-//					$("#query_button_check_start").attr("style", "background-color: #fff;");
-					$("#check_id").val(0);
-					$(".p_q_r").removeAttr("readonly");
-					$(".p_qs_r").removeAttr("disabled");
-//					$(".p_qs_r").attr("style", "background-color: #fff");
-					$(".q_in_r").attr("readonly","readonly");
-					$(".q_in_barcode").attr("readonly","readonly");
-				}else{
-					alert(data.reason);
-				}
-			},
-			error:function(e){
-				alert("盘点打印失败");
-			}
-		});
 		
+		$(".qbt_check").attr("disabled", "disabled");
+		$("#query_button_check_start").removeAttr("disabled", "disabled");
+		$("#check_id").val(0);
+		$(".p_q_r").removeAttr("readonly");
+		$(".p_qs_r").removeAttr("disabled");
+		$(".q_in_r").attr("readonly","readonly");
+		$(".q_in_barcode").attr("readonly","readonly");
+		
+		window.location.href ="/cbtconsole/inventory/check/done?check_id="+check_id;
 	})
 	
 	$("#query_button").click(function(){
 		doQuery(1,0);
 	});
-	 $("#query_button_check").click(function(){
-		doQuery(1,1);
-	});
+	
 	 $("#luimport").click(function(){
 		 $('#dlg6').dialog('open'); 
 	 })
@@ -286,7 +269,10 @@ function getProduct(){
 	    				 var skuM = data.skuList[i];
 	    				 trHtml = trHtml+"<tr><td ><span class='lu_sku'>"+skuM.sku+"</span><br>";
 	    				 trHtml = trHtml+"<span class='lu_specid'>"+skuM.specId+"</span><br>";
-	    				 trHtml = trHtml+"<span class='lu_skuid'>"+skuM.skuId+"</span></td>";
+	    				 trHtml = trHtml+"<span class='lu_skuid'>"+skuM.skuId+"</span>";
+	    				 
+	    				 trHtml = trHtml+"<input type='hidden' class='lu_sku_img' value='"+skuM.skuimg+"'></td>";
+	    				 
 	    				 trHtml = trHtml+"<td><input type='text' class='form-control lu_count' value='0'></td>";
 	    				 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this,\''+skuM.goods_pid+'\');"  class="lu_barcode_a">获取库位</a></td>';
 	    				 trHtml = trHtml+'<td><input type="checkbox" name="entry" class="lu_is"></td></tr>';
@@ -515,7 +501,8 @@ function saveInventory(){
 			var lu_skuid = $(this).find(".lu_skuid").html();
 			var lu_count = $(this).find(".lu_count").val();
 			var lu_barcode = $(this).find(".lu_barcode_a").html();
-			varray  = varray +";"+lu_sku+"|"+lu_specid+"|"+lu_skuid+"|"+lu_count+"|"+lu_barcode;
+			var lu_sku_img = $(this).find(".lu_sku_img").val();
+			varray  = varray +";"+lu_sku+"|"+lu_specid+"|"+lu_skuid+"|"+lu_count+"|"+lu_barcode+"|"+lu_sku_img;
 		}
 	})
 	var reasonType = "0";

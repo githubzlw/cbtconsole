@@ -395,7 +395,7 @@
     <insert id="insertInventory" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventorySku">
     insert into inventory_sku(goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_type,
     car_img,goods_pid,car_urlMD5,createtime,goods_p_price,goods_p_url,updatetime,specid,skuid,goods_p_pid,od_id,goods_price,db_flag) 
-	values(#{goodsUrl},#{remaining},#{canRemaining},#{goodName},#{sku},#{barcode},
+	values(#{goodsUrl},#{remaining},#{canRemaining},#{goodsName},#{sku},#{barcode},
 	#{goodsCatid},#{inventoryType},#{carImg},#{goodsPid},#{carUrlMD5},now(),#{goodsPPrice},
 	#{goodsPUrl},now(),#{specid},#{skuid},#{goodsPPid},#{odid},#{goodsPrice},#{dbFlag})
     </insert>
@@ -526,7 +526,7 @@
     <select id="getInventoryCheckRecord" resultMap="InventoryCheckRecordMap">
     select id,inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
     goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode
-    from inventory_sku_check_record_temp where id=#{checkId}
+    from inventory_sku_check_record_temp where inventory_check_id=#{checkId}
     </select>
     <!-- 获取盘点历史数据 -->
     <select id="getICRHistory" resultMap="InventoryCheckRecordMap">
@@ -546,7 +546,7 @@
     </select>
     <!-- 删除临时盘点数据 -->
     <delete id="deleteInventoryCheckRecord">
-    delete from inventory_sku_check_record_temp where id=#{checkId}
+    delete from inventory_sku_check_record_temp where inventory_check_id=#{checkId}
     </delete>
     
 </mapper>
