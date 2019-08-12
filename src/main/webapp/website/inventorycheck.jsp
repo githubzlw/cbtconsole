@@ -169,8 +169,8 @@ em,i{font-style: normal;}
 				</select>
 				<input type="hidden" class="form-control p_q_r" id="query_goodscatid_q" value="${queryParam.goodscatid }">
 				</label>
-				<label>库存量大于：<input type="text" class="form-control p_q_r" id="query_minintentory" value="${queryParam.minintentory }"></label>
-				<label>库存量小于：<input type="text" class="form-control p_q_r" id="query_maxintentory" value="${queryParam.maxintentory }"></label>
+				<label>库存量大于：<input type="text" class="form-control p_q_r" id="query_minintentory" value="${queryParam.qminintentory }"></label>
+				<label>库存量小于：<input type="text" class="form-control p_q_r" id="query_maxintentory" value="${queryParam.qmaxintentory }"></label>
 				<label class="w200">是否上架： <select class="form-control  p_qs_r" id="query_line" >
 				<c:if test="${queryParam.isline==0 }">
 						<option value="0" selected="selected">全部</option>
