@@ -502,7 +502,7 @@ function saveInventory(){
 			var lu_count = $(this).find(".lu_count").val();
 			var lu_barcode = $(this).find(".lu_barcode_a").html();
 			var lu_sku_img = $(this).find(".lu_sku_img").val();
-			varray  = varray +";"+lu_sku+"|"+lu_specid+"|"+lu_skuid+"|"+lu_count+"|"+lu_barcode+"|"+lu_sku_img;
+			varray  = varray +";"+lu_sku+"|d|"+lu_specid+"|d|"+lu_skuid+"|d|"+lu_count+"|d|"+lu_barcode+"|d|"+lu_sku_img;
 		}
 	})
 	var reasonType = "0";
@@ -556,7 +556,7 @@ function saveTbInventory(){
 			var lu_count = $(this).find(".lu_tb_a_count").val();
 			var lu_barcode = $(this).find(".lu_tb_barcode").html();
 			var lu_price = $(this).find(".lu_tb_price").val();
-			varray  = varray +";"+lu_sku+"|"+lu_specid+"|"+lu_skuid+"|"+lu_count+"|"+lu_barcode+"|"+lu_name+"|"+lu_pid+"|"+lu_img+"|"+lu_url+"|"+lu_price;
+			varray  = varray +";"+lu_sku+"|d|"+lu_specid+"|d|"+lu_skuid+"|d|"+lu_count+"|d|"+lu_barcode+"|d|"+lu_name+"|d|"+lu_pid+"|d|"+lu_img+"|d|"+lu_url+"|d|"+lu_price;
 		}
 	})
 	var reasonType = "0";
