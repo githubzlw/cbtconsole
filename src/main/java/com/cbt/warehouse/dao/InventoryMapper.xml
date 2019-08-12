@@ -395,7 +395,7 @@
     <insert id="insertInventory" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventorySku">
     insert into inventory_sku(goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_type,
     car_img,goods_pid,car_urlMD5,createtime,goods_p_price,goods_p_url,updatetime,specid,skuid,goods_p_pid,od_id,goods_price,db_flag) 
-	values(#{goodsUrl},#{remaining},#{canRemaining},#{goodName},#{sku},#{barcode},
+	values(#{goodsUrl},#{remaining},#{canRemaining},#{goodsName},#{sku},#{barcode},
 	#{goodsCatid},#{inventoryType},#{carImg},#{goodsPid},#{carUrlMD5},now(),#{goodsPPrice},
 	#{goodsPUrl},now(),#{specid},#{skuid},#{goodsPPid},#{odid},#{goodsPrice},#{dbFlag})
     </insert>
