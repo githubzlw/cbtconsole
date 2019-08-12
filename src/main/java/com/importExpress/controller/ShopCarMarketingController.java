@@ -17,10 +17,7 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.*;
 import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.ShopCarMarketingService;
-import com.importExpress.utli.GoodsPriceUpdateUtil;
-import com.importExpress.utli.SendEmailNew;
-import com.importExpress.utli.SendMQ;
-import com.importExpress.utli.SwitchDomainNameUtil;
+import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.*;
@@ -1788,6 +1785,23 @@ public class ShopCarMarketingController {
                     }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+
+    @RequestMapping("/queryAllWebSizeList")
+    @ResponseBody
+    public JsonResult queryAllWebSizeList(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        try {
+            Map<Integer,String> webSizeMap = new HashMap<>(10);
+            for(WebSizeEnum ws :  WebSizeEnum.values()){
+                webSizeMap.put(ws.getCode(),ws.name());
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

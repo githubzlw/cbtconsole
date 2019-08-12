@@ -14,12 +14,26 @@ import java.util.List;
  * 切换域名
  */
 public class SwitchDomainNameUtil {
-    private static final String OLD_DOMAIN_NAME1 = "import-express";
-    private static final String NEW_DOMAIN_NAME1 = "kidsproductwholesale";
-    private static final String OLD_DOMAIN_NAME2 = "ImportExpress";
-    private static final String NEW_DOMAIN_NAME2 = "KidsProductWholesale";
-    private static final String OLD_DOMAIN_NAME3 = "Import Express";
-    private static final String NEW_DOMAIN_NAME3 = "Kids Product Wholesale";
+
+    // https://www.import-express.com
+    private static final String IMPORT_DOMAIN_NAME_1 = "import-express";
+    private static final String IMPORT_DOMAIN_NAME_2 = "ImportExpress";
+    private static final String IMPORT_DOMAIN_NAME_3 = "Import Express";
+
+    // https://www.kidsproductwholesale.com/
+    private static final String KIDS_DOMAIN_NAME_1 = "kidsproductwholesale";
+    private static final String KIDS_DOMAIN_NAME_2 = "KidsProductWholesale";
+    private static final String KIDS_DOMAIN_NAME_3 = "Kids Product Wholesale";
+
+    // https://www.lovelypetsupply.com/
+    private static final String PETS_DOMAIN_NAME_1 = "lovelypetsupply";
+    private static final String PETS_DOMAIN_NAME_2 = "LovelyPetSupply";
+    private static final String PETS_DOMAIN_NAME_3 = "Lovely Pet Supply";
+
+    // www.restaurantkitchenequipments.com
+    private static final String RESTAURANT_DOMAIN_NAME_1 = "restaurantkitchenequipments";
+    private static final String RESTAURANT_DOMAIN_NAME_2 = "RestaurantKitchenEquipments";
+    private static final String RESTAURANT_DOMAIN_NAME_3 = "Restaurant Kitchen Equipments";
 
 
     /**
@@ -164,12 +178,12 @@ public class SwitchDomainNameUtil {
      */
     public static String checkNullAndReplace(String str) {
         if (StringUtils.isNotBlank(str)) {
-            if (str.contains(OLD_DOMAIN_NAME1)) {
-                return str.replace(OLD_DOMAIN_NAME1, NEW_DOMAIN_NAME1);
-            } else if (str.contains(OLD_DOMAIN_NAME2)) {
-                return str.replace(OLD_DOMAIN_NAME2, NEW_DOMAIN_NAME2);
-            } else if (str.contains(OLD_DOMAIN_NAME3)) {
-                return str.replace(OLD_DOMAIN_NAME3, NEW_DOMAIN_NAME3);
+            if (str.contains(IMPORT_DOMAIN_NAME_1)) {
+                return str.replace(IMPORT_DOMAIN_NAME_1, KIDS_DOMAIN_NAME_1);
+            } else if (str.contains(IMPORT_DOMAIN_NAME_2)) {
+                return str.replace(IMPORT_DOMAIN_NAME_2, KIDS_DOMAIN_NAME_2);
+            } else if (str.contains(IMPORT_DOMAIN_NAME_3)) {
+                return str.replace(IMPORT_DOMAIN_NAME_3, KIDS_DOMAIN_NAME_3);
             } else {
                 return str;
             }
