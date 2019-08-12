@@ -144,7 +144,12 @@ em,i{font-style: normal;}
 			<div class="col-xs-11">
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
 				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
-				<label>产品分类：<input type="text" class="form-control" id="query_goodscatid" value="${queryParam.goodscatid }"></label>
+				<label>产品分类：<input type="hidden" class="form-control" id="query_goodscatid" value="${queryParam.goodscatid }">
+				<select class="form-control p_q_r" id="query_goodscatid-in" >
+						
+				</select>
+				
+				</label>
 				<label>库存量大于：<input type="text" class="form-control" id="query_minintentory" value="${queryParam.qminintentory }"></label>
 				<label>库存量小于：<input type="text" class="form-control" id="query_maxintentory" value="${queryParam.qmaxintentory }"></label>
 				<label class="w200">是否上架： <select class="form-control" id="query_line" >

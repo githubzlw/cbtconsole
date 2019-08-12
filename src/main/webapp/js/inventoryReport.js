@@ -18,6 +18,7 @@ $(function(){
 	    		 }
 	    		 $("#query_catid_select").html(catHtml);
 	    		 $("#query_goodscatid").html(catHtml);
+	    		 $("#query_goodscatid-in").html(catHtml);
 	    	  }else{
 	    		  alert(data.reason);
 	    	  }
@@ -28,25 +29,27 @@ $(function(){
 	   });
 	
 	var isCheckStart = $("#check_id").val();
-	if(isCheckStart != '0'){
-		$(".p_q_r").attr("readonly","readonly");
-		$(".q_in_r").removeAttr("readonly");
-		$(".q_in_barcode").removeAttr("readonly");
-		$(".p_qs_r").attr("disabled", "disabled");
+	if(isCheckStart){
+		if(isCheckStart != '0'){
+			$(".p_q_r").attr("readonly","readonly");
+			$(".q_in_r").removeAttr("readonly");
+			$(".q_in_barcode").removeAttr("readonly");
+			$(".p_qs_r").attr("disabled", "disabled");
 //		$(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
-		$("#query_button_check_start").attr("disabled", "disabled");
+			$("#query_button_check_start").attr("disabled", "disabled");
 //		$("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
-		
-		$(".qbt_check").removeAttr("disabled", "disabled");
+			
+			$(".qbt_check").removeAttr("disabled", "disabled");
 //		$(".qbt_check").attr("style", "background-color: #fff;");
-	}else{
-		$(".qbt_check").attr("disabled", "disabled");
+		}else{
+			$(".qbt_check").attr("disabled", "disabled");
 //		$(".qbt_check").attr("style", "background-color: #EEEEEE;");
-		
-		$("#query_button_check_start").removeAttr("disabled", "disabled");
+			
+			$("#query_button_check_start").removeAttr("disabled", "disabled");
 //		$("#query_button_check_start").attr("style", "background-color: #fff;");
+		}
+		
 	}
-	
 	//开始盘点
 	$("#query_button_check_start").click(function(){
 		var checkCategory = $("#query_catid_select").val();
