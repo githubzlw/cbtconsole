@@ -165,7 +165,7 @@ public class StrUtils {
 		if(str == null){
 			return false;
 		}
-		return Pattern.compile("(\\d+)").matcher(str).matches();
+		return Pattern.compile("(\\d+)").matcher(str.trim()).matches();
 	}
 	
 	

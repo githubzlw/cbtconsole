@@ -19,6 +19,7 @@ import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.InventoryCheck;
+import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetails;
@@ -27,7 +28,6 @@ import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventorySku;
 import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
-import com.importExpress.mapper.IPurchaseMapper;
 @Service
 public class InventoryServiceImpl implements  InventoryService{
 	@Autowired
@@ -122,16 +122,16 @@ public class InventoryServiceImpl implements  InventoryService{
 			if("0".equals(map.get("export"))){
 				opration = new StringBuilder();
 				//报损/调整
-				opration.append("<button class=\"btn btn-default mt5\" onclick=\"updateInventory('0','"+i+"','"+t.getId()+"')\"> ")
+				opration.append("<button class=\"btn btn-info mt5\" onclick=\"updateInventory('0','"+i+"','"+t.getId()+"')\"> ")
 				.append("报损调整").append("</button>");
 				
 				//产品编辑
 				opration.append("<br><a target='_blank' href='/cbtconsole/editc/detalisEdit?pid=").append(t.getGoodsPid())
-				.append("'><button class=\"btn btn-default mt5\">").append("产品编辑</button></a>");
+				.append("'><button class=\"btn btn-warning mt5\">").append("产品编辑</button></a>");
 				
 				//库存明细
 				opration.append("<br><a target='_blank' href='/cbtconsole/website/inventorydetails.jsp?inid=").append(t.getId())
-				.append("'><button class=\"btn btn-default mt5\">").append("库存明细</button></a>");
+				.append("'><button class=\"btn btn-success mt5\">").append("库存明细</button></a>");
 				
 				t.setOperation(opration.toString());
 			}
@@ -857,13 +857,6 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public List<InventoryCheckWrap> invetoryCheckList(Map<Object, Object> map) {
-		//获取上次盘点
-		InventoryCheck lastInventoryCheck = inventoryMapper.getLastInventoryCheck();
-		int lastCheckid = 0;
-		if(lastInventoryCheck != null) {
-			lastCheckid = lastInventoryCheck.getId();
-		}
-		
 		//获取库存数据
 		List<InventoryData> iinOutInventory = getIinOutInventory(map);
 		if(iinOutInventory == null || iinOutInventory.isEmpty()) {
@@ -871,7 +864,6 @@ public class InventoryServiceImpl implements  InventoryService{
 		}
 		List<InventoryCheckWrap> result = new ArrayList<>();
 		InventoryCheckWrap wrap = null;
-//		List<Integer> idList = new ArrayList<Integer>();
 		for(InventoryData i : iinOutInventory) {
 			wrap = new InventoryCheckWrap();
 			
@@ -890,23 +882,103 @@ public class InventoryServiceImpl implements  InventoryService{
 			wrap.setOperation(i.getOperation());
 			wrap.setCanRemaining(i.getCanRemaining());
 			
-//			wrap.setInventoryCheckId(inventoryCheckId);
-//			wrap.setLastCheckTime(lastCheckTime);
-//			wrap.setLastCheckRemaining(lastCheckRemaining);
+			wrap.setInventoryCheckId(i.getInventoryCheckId());
+			wrap.setLastCheckTime(i.getCheckTime());
+			wrap.setLastCheckRemaining(i.getCheckRemaining());
 			
 			result.add(wrap);
-//			idList.add(i.getId());
 		}
-		//获取库存上次盘点记录
-		
-		
-		
 		
 		return result;
 	}
 	@Override
 	public InventoryCheck getLastInventoryCheck() {
 		return inventoryMapper.getLastInventoryCheck();
+	}
+	@Override
+	public int insertInventoryCheck(InventoryCheck check) {
+		inventoryMapper.insertInventoryCheck(check);
+		return check.getId();
+	}
+	@Override
+	public int updateInventoryCheckCancel(InventoryCheck check) {
+		
+		//1.更新盘点记录为inventory_sku_check取消盘点
+		inventoryMapper.updateInventoryCheckCancel(check);
+		
+		//2.清空inventory_sku_check_record_temp本次盘点数据
+		int dicRecord = inventoryMapper.deleteInventoryCheckRecord(check.getId());
+		
+		return dicRecord;
+	}
+	@Override
+	public List<Map<String, Object>> getInventoryCatList() {
+		return inventoryMapper.getInventoryCatList();
+	}
+	@Override
+	public int insertInventoryCheckRecord(InventoryCheckRecord record) {
+		inventoryMapper.insertInventoryCheckRecord(record);
+		return record.getId();
+	}
+	@Override
+	public int updateInventoryCheckRecord(InventoryCheckRecord record) {
+		return inventoryMapper.updateInventoryCheckRecord(record);
+	}
+	@Override
+	public List<InventoryCheckRecord> doneInventoryCheckRecord(int checkId,int admid) {
+		
+		//1.将inventory_sku_check_record_temp 本次盘点数据更新到inventory_sku_check_record
+		inventoryMapper.doneInventoryCheckRecord(checkId);
+		
+		//2.获取inventory_sku_check_record_temp本次盘点数据
+		List<InventoryCheckRecord> iCRList = inventoryMapper.getInventoryCheckRecord(checkId);
+		
+		//3.更新库存表库存inventory_sku
+		for(InventoryCheckRecord i : iCRList) {
+			InventorySku item = new InventorySku();
+			item.setId(i.getInventorySkuId());
+			item.setRemaining(i.getCheckRemaining());
+			item.setInventoryCheckId(checkId);
+			item.setCheckRemaining(i.getCheckRemaining());
+			item.setBarcode(i.getAfterBarcode());
+			inventoryMapper.updateInventoryCheckFlag(item );
+			
+			int before_remaining = i.getInventoryRemaining();
+			
+			int after_remaining = i.getCheckRemaining();
+			int inventory_count = Math.abs(after_remaining - before_remaining );
+			
+			Map<String, String> inventory = new HashMap<>();
+			//4.更新库存变更记录表inventory_sku_log
+			inventory.put("inventory_sku_id", String.valueOf(i.getInventorySkuId()));
+			inventory.put("type", "4");
+			inventory.put("admid", String.valueOf(admid));
+			inventory.put("inventory_count", String.valueOf(inventory_count));
+			inventoryMapper.addInventoryChangeRecordByInventoryid(inventory);
+			
+			//5.更新库存明细inventory_details_sku
+			inventory.put("change_type", "3");
+			inventory.put("before_remaining", String.valueOf(before_remaining));
+			inventory.put("after_remaining", String.valueOf(after_remaining));
+			inventory.put("log_remark", i.getCreateTime()+"库存盘点");
+			inventoryMapper.addInventoryDetailsSku(inventory );
+		}
+		
+		//6.清空inventory_sku_check_record_temp本次盘点数据
+		inventoryMapper.deleteInventoryCheckRecord(checkId);
+		
+		//7.更新盘点完成标志 inventory_sku_check
+		inventoryMapper.updateInventoryCheckDone(checkId);
+		
+		return iCRList;
+	}
+	@Override
+	public List<InventoryCheckRecord> getICRHistory(int inid,int page) {
+		return inventoryMapper.getICRHistory(inid, page);
+	}
+	@Override
+	public int getICRHistoryCount(int inid) {
+		return inventoryMapper.getICRHistoryCount(inid);
 	}
 	
 	

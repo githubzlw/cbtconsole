@@ -1,29 +1,142 @@
 $(function(){
-	var isCheckStart = $("#is_check_start").val();
-	if(isCheckStart == '1'){
-		$(".p_q_r").attr("readonly","readonly");
-		$(".q_in_r").removeAttr("readonly");
-		$(".p_qs_r").attr("disabled", "disabled");
-		$(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
-	}
+	var query_goodscatid_q = $("#query_goodscatid_q").val();
+	//获取类别
+	jQuery.ajax({
+	       url:"/cbtconsole/inventory/catlist",
+	       data:{},
+	       type:"post",
+	       success:function(data){
+	    	  if(data.status == 200){
+	    		  var catHtml = '<option value="0">All Category</option>';
+	    		 for(var i=0;i<data.catSize;i++){
+	    			 var cat = data.catList[i];
+	    			 catHtml = catHtml+'<option value="'+cat.catid+'"';
+	    			 if(query_goodscatid_q == cat.catid){
+	    				 catHtml =  catHtml+' selected="selected"';
+	    			 }
+	    			 catHtml =  catHtml+'>'+cat.catname+'</option>';
+	    		 }
+	    		 $("#query_catid_select").html(catHtml);
+	    		 $("#query_goodscatid").html(catHtml);
+	    		 $("#query_goodscatid-in").html(catHtml);
+	    	  }else{
+	    		  alert(data.reason);
+	    	  }
+	       },
+	   	error:function(e){
+	   		alert("获取类别列表失败");
+	   	}
+	   });
 	
+	var isCheckStart = $("#check_id").val();
+	if(isCheckStart){
+		if(isCheckStart != '0'){
+			$(".p_q_r").attr("readonly","readonly");
+			$(".q_in_r").removeAttr("readonly");
+			$(".q_in_barcode").removeAttr("readonly");
+			$(".p_qs_r").attr("disabled", "disabled");
+//		$(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
+			$("#query_button_check_start").attr("disabled", "disabled");
+//		$("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
+			
+			$(".qbt_check").removeAttr("disabled", "disabled");
+//		$(".qbt_check").attr("style", "background-color: #fff;");
+		}else{
+			$(".qbt_check").attr("disabled", "disabled");
+//		$(".qbt_check").attr("style", "background-color: #EEEEEE;");
+			
+			$("#query_button_check_start").removeAttr("disabled", "disabled");
+//		$("#query_button_check_start").attr("style", "background-color: #fff;");
+		}
+		
+	}
 	//开始盘点
 	$("#query_button_check_start").click(function(){
-		$(".p_q_r").attr("readonly","readonly");
-		$(".p_qs_r").attr("disabled", "disabled");
-        $(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
-
-	    $(".q_in_r").removeAttr("readonly");
-		$("#is_check_start").val(1);
+		var checkCategory = $("#query_catid_select").val();
+	    jQuery.ajax({
+		       url:"/cbtconsole/inventory/check/start",
+		       data:{"checkCategory":checkCategory},
+		       type:"post",
+		       success:function(data){
+		    	  if(data.status == 200){
+		    		  $("#check_id").val(data.check_id);
+		    		  $("#query_button_check_start").attr("disabled", "disabled");
+//		    		  $("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
+		    			
+		    		  $(".qbt_check").removeAttr("disabled", "disabled");
+//		    		 $(".qbt_check").attr("style", "background-color: #fff;");
+		    		 $(".p_q_r").attr("readonly","readonly");
+		    			$(".p_qs_r").attr("disabled", "disabled");
+//		    	        $(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
+		    	        $(".q_in_barcode").removeAttr("readonly");
+		    		    $(".q_in_r").removeAttr("readonly");
+		    	  }else{
+		    		  $("#check_id").val(0);
+		    		  alert(data.reason);
+		    	  }
+		       },
+		   	error:function(e){
+		   		alert("开始盘点失败");
+		   	}
+		   });
+		
 	})
 	//取消盘点
 	$("#query_button_check_cancel").click(function(){
-		$("#is_check_start").val(0);
-		$(".p_q_r").removeAttr("readonly");
-		$(".p_qs_r").removeAttr("disabled");
-        $(".p_qs_r").attr("style", "background-color: #fff");//设为灰色，看起来更像不能操作的按钮
-		$(".q_in_r").attr("readonly","readonly");
+		var check_id = $("#check_id").val();
+		jQuery.ajax({
+		       url:"/cbtconsole/inventory/check/cancel",
+		       data:{"check_id":check_id},
+		       type:"post",
+		       success:function(data){
+		    	  if(data.status == 200){
+		    		  $(".qbt_check").attr("disabled", "disabled");
+//		    		  $(".qbt_check").attr("style", "background-color: #EEEEEE;");
+		    			$("#query_button_check_start").removeAttr("disabled", "disabled");
+//		    			$("#query_button_check_start").attr("style", "background-color: #fff;");
+		    			$("#check_id").val(0);
+		    			$(".p_q_r").removeAttr("readonly");
+		    			$(".p_qs_r").removeAttr("disabled");
+//		    	        $(".p_qs_r").attr("style", "background-color: #fff");
+		    			$(".q_in_r").attr("readonly","readonly");
+		    			$(".q_in_barcode").attr("readonly","readonly");
+		    	  }else{
+		    		  alert(data.reason);
+		    	  }
+		       },
+		   	error:function(e){
+		   		alert("盘点取消失败");
+		   	}
+		   });
 		
+	})
+	//完成盘点
+	$("#query_button_check_done").click(function(){
+		var check_id = $("#check_id").val();
+		jQuery.ajax({
+			url:"/cbtconsole/inventory/check/done",
+			data:{"check_id":check_id},
+			type:"post",
+			success:function(data){
+				if(data.status == 200){
+					$(".qbt_check").attr("disabled", "disabled");
+//					$(".qbt_check").attr("style", "background-color: #EEEEEE;");
+					$("#query_button_check_start").removeAttr("disabled", "disabled");
+//					$("#query_button_check_start").attr("style", "background-color: #fff;");
+					$("#check_id").val(0);
+					$(".p_q_r").removeAttr("readonly");
+					$(".p_qs_r").removeAttr("disabled");
+//					$(".p_qs_r").attr("style", "background-color: #fff");
+					$(".q_in_r").attr("readonly","readonly");
+					$(".q_in_barcode").attr("readonly","readonly");
+				}else{
+					alert(data.reason);
+				}
+			},
+			error:function(e){
+				alert("盘点打印失败");
+			}
+		});
 		
 	})
 	
@@ -61,10 +174,6 @@ $(function(){
 		
 	});
 	$('#tc2').click(function(){
-		/*$("#lu_img").attr("src","");
-		$("#lu_name").html(""); 
-		$("#lu_catid").val(""); 
-		$("#lu_tr").html("");*/
 		$('.tc,.trnasparent,.tc2').show();
 		
 	});
@@ -75,6 +184,56 @@ $(function(){
 	});
 	
 })
+
+
+/**更新盘点
+ * @param index
+ * @returns
+ */
+function updateCheckRecord(index){
+	var tr = $("#datagrid-row-r2-2-"+index);
+	var check_id = $("#check_id").val();
+	var in_id = $("#datagrid-row-r2-2-"+index).find(".q_inventory_id").val();
+	var record_id = $("#datagrid-row-r2-2-"+index).find(".q_record_id").val();
+	
+	var before_barcode= $("#datagrid-row-r2-2-"+index).find(".q_in_barcode_h").val(); 
+	var after_barcode= $("#datagrid-row-r2-2-"+index).find(".q_in_barcode").val(); 
+	var inventory_remaining= $("#datagrid-row-r2-2-"+index).find(".i_remaining").html(); 
+	var check_remaining= $("#datagrid-row-r2-2-"+index).find(".c_remaining").val(); 
+	
+	var goods_pid= $("#datagrid-row-r2-2-"+index).find(".datagrid-cell-c2-goodsPid").html(); 
+	var goods_sku= $("#datagrid-row-r2-2-"+index).find(".emsku").html(); 
+	var goods_specid= $("#datagrid-row-r2-2-"+index).find(".emspecid").html(); 
+	var goods_skuid= $("#datagrid-row-r2-2-"+index).find(".emskuid").html(); 
+	var goods_price= $("#datagrid-row-r2-2-"+index).find(".emprice").html(); 
+	jQuery.ajax({
+	       url:"/cbtconsole/inventory/check/update",
+	       data:{
+	           "check_id" : check_id,
+	           "in_id" : in_id,
+	           "record_id" : record_id,
+	           "inventory_remaining" : inventory_remaining,
+	           "check_remaining" : check_remaining,
+	           "goods_pid" : goods_pid,
+	           "goods_sku" : goods_sku,
+	           "goods_specid" : goods_specid,
+	           "before_barcode" : before_barcode,
+	           "after_barcode" : after_barcode,
+	           "goods_skuid" : goods_skuid,
+	           "goods_price" : goods_price
+	       	  },
+	       type:"post",
+	       success:function(data){
+	    	  if(data.status == 200){
+	    		  $("#datagrid-row-r2-2-"+index).find(".q_record_id").val(data.recordId);
+	    	  }
+	       },
+	   	error:function(e){
+	   		alert("库存录入失败");
+	   	}
+	   });
+}
+
 /**获取库位
  * @param v
  * @param goods_pid

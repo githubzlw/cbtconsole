@@ -113,5 +113,13 @@ public class InventorySku {
 	 * 线上网站是否有该产品1：有，0没有
 	 */
 	private int dbFlag;
+	/**
+	 * 盘点库存
+	 */
+	private int checkRemaining;
 	
+	/**
+	 * 盘点表id
+	 */
+	private int inventoryCheckId;
 }

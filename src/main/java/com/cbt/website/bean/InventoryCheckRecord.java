@@ -59,5 +59,9 @@ public class InventoryCheckRecord {
 	 */
 	private String afterBarcode;
 	
+	/**
+	 * 图片
+	 */
+	private String goodsImg;
 
 }
