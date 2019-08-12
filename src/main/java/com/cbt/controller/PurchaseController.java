@@ -56,6 +56,8 @@ import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.UtilAll;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchasesBean;
+import com.cbt.website.dao.ExpressTrackDaoImpl;
+import com.cbt.website.dao.IExpressTrackDao;
 import com.cbt.website.dao2.Page;
 import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
@@ -85,6 +87,7 @@ public class PurchaseController {
 	private InventoryService inventoryService;
 	@Autowired
 	private IWarehouseService iWarehouseService;
+	IExpressTrackDao dao = new ExpressTrackDaoImpl();
 	@RequestMapping(value = "/determineStraighthair")
 	@ResponseBody
 	protected void determineStraighthair(HttpServletRequest request, HttpServletResponse response)
@@ -228,34 +231,42 @@ public class PurchaseController {
 			throws ServletException, IOException, ParseException {
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("admId",String.valueOf(adm.getId()));
-		map.put("admId",String.valueOf(adm.getId()));
-		map.put("userid",String.valueOf(adm.getId()));
-		map.put("userName",adm.getAdmName());
-		int row=0;
-		String od_id=request.getParameter("od_id");
-		String isUse=request.getParameter("isUse");
-		map.put("odid", od_id);
-		map.put("isUse", isUse);
-		map.put("goodsid", request.getParameter("goodsid"));
-		map.put("inventory_count", request.getParameter("inventory_count"));
-		map.put("googs_number", request.getParameter("googs_number"));
-		map.put("orderid", request.getParameter("orderid"));
-		map.put("inventory_sku_id", request.getParameter("inventorySkuId"));
-		map.put("seilUnit", request.getParameter("seilUnit"));
-		map.put("goodsUnit", request.getParameter("goodsUnit"));
-		
-		//库存操作
-		row = inventoryService.useInventory(map);
-		if(row > 0) {
-			//采购关联 id_relationtable
-			map.put("inventory_count_use", String.valueOf(row));
-			row = iPurchaseService.addIdRelationTable(map);
+		String result = "使用库存发生错误";
+		if(adm != null) {
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("admId",String.valueOf(adm.getId()));
+			map.put("userid",String.valueOf(adm.getId()));
+			map.put("userName",adm.getAdmName());
+			int row=0;
+			String od_id=request.getParameter("od_id");
+			String isUse=request.getParameter("isUse");
+			String orderid = request.getParameter("orderid");
+			map.put("odid", od_id);
+			map.put("isUse", isUse);
+			map.put("goodsid", request.getParameter("goodsid"));
+			map.put("inventory_count", request.getParameter("inventory_count"));
+			map.put("googs_number", request.getParameter("googs_number"));
+			map.put("orderid", orderid);
+			map.put("inventory_sku_id", request.getParameter("inventorySkuId"));
+			map.put("seilUnit", request.getParameter("seilUnit"));
+			map.put("goodsUnit", request.getParameter("goodsUnit"));
+			
+			//库存操作
+			row = inventoryService.useInventory(map);
+			if(row > 0) {
+				//采购关联 id_relationtable //订单产品要入库
+				map.put("inventory_count_use", String.valueOf(row));
+				String barcode = dao.getBarcode(0, adm.getId(), orderid);
+				map.put("barcode", barcode);
+				String position = dao.getPosition(barcode);
+				map.put("position", position);
+				row = iPurchaseService.addIdRelationTable(map);
+				result = "成功使用库存";
+			}
 		}
 //		row = iPurchaseService.useInventory(map);
 		PrintWriter out = response.getWriter();
-		out.print(row + "");
+		out.print(result );
 		out.close();
 	}
 

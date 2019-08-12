@@ -316,4 +316,10 @@ public interface InventoryMapper {
 	 */
 	int updateInventoryCheckFlag(InventorySku item);
 	
+	/**完全使用库存更新订单详情状态
+	 * @param odid
+	 * @return
+	 */
+	int updateOrderDetailsState(int odid);
+	
 }

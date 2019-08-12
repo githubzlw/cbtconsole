@@ -2193,6 +2193,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		if(taobaoOrderHistory == null || taobaoOrderHistory.isEmpty()) {
 			return 0;
 		}
+		
+		int goodsUnit = 1;
+		String strgoodsUnit = map.get("goodsUnit");
+		strgoodsUnit = StrUtils.matchStr(strgoodsUnit, "([1-9]\\d*)");
+		goodsUnit = StrUtils.isNum(strgoodsUnit) ? Integer.valueOf(strgoodsUnit) : goodsUnit;
+		
 		//tbOr1688,orderid,itemname,itemid,sku,shipno,shipper,username,imgurl,itemurl,specId,skuID
 		map.put("tborderid", (String)taobaoOrderHistory.get("1688_orderid"));
 		map.put("shipno", (String)taobaoOrderHistory.get("1688_shipno"));
@@ -2207,7 +2213,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		//'入库删除标记:0.已入库;1.入库已取消'
 		map.put("is_delete", "0");
 		//'商品状态：1.到货了;2.该货没到;3.破损;4.有疑问;5.数量不够 6:品牌未授权'
-		map.put("goodstatus", googs_number == inventory_count_use ? "1" : "5");
+		map.put("goodstatus", googs_number * goodsUnit == inventory_count_use ? "1" : "5");
 		//'商品到货数量'
 		map.put("goodarrivecount", String.valueOf(inventory_count_use));
 		//'记录商品数量'
@@ -2219,12 +2225,6 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		
 		map.put("weight", "0");
 		
-		//待确定
-		map.put("barcode", "");
-		map.put("position", "");
-		
-		map.put("username", "cangku2");
-		map.put("userid", "65");
 		map.put("warehouse_remark", "有库存商品，采购自动匹配入库 inventory_sku_id:"+inventory_sku_id+"/orderid:"+map.get("orderid")+"/od_id:"+map.get("od_id"));
 		
 		int addIdRelationTable = inventoryMapper.addIdRelationTable(map);

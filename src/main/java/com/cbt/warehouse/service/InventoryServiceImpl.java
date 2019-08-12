@@ -560,57 +560,17 @@ public class InventoryServiceImpl implements  InventoryService{
 		String odid =  map.get("odid");
 		if(isReduce) {
 //			订单产品要入库，
-//			id_relationtable.goodstatus=4      warehouse_remark="使用库存"
-			Map<String, String> idRelation = new HashMap<>();
-//			 select id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,
-//		    barcode,car_urlMD5,goods_pid,sku,
-//		    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
-//		    from inventory_sku 
-		    
-		    
-			idRelation.put("goodurl", inventoryMap.getGoodsPUrl());
-			idRelation.put("tborderid", "");
-			idRelation.put("store_name", orderid);
-			idRelation.put("taobaospec", orderid);
-			idRelation.put("shipno", "");
-			idRelation.put("position", orderid);
-			idRelation.put("barcode", orderid);
-			
-			
-			idRelation.put("userid", map.get("userid"));
-			idRelation.put("username", map.get("username"));
-			idRelation.put("weight", orderid);
-			
-			idRelation.put("specid", inventoryMap.getSpecid());
-			idRelation.put("skuid", inventoryMap.getSkuid());
-			
-			idRelation.put("itemqty", String.valueOf(inventory_count));
-			idRelation.put("state", "0");
-			idRelation.put("itemid", inventoryMap.getGoodsPid());
-			idRelation.put("is_delete", "0");
-			idRelation.put("is_replenishment", "1");
-			idRelation.put("is_refund", "0");
-			idRelation.put("orderid", orderid);
-			idRelation.put("odid", odid);
-			idRelation.put("goodid", map.get("goodsid"));
-			idRelation.put("goodarrivecount", String.valueOf(inventory_count));
-			idRelation.put("goodstatus", "4");
-			idRelation.put("warehouse_remark", orderid+"/"+odid+",该产品规格有库存,优先使用库存数量:"+inventory_count);
-			
 			//如果全部使用库存，订单状态改为验货无误
 			if("true".equals(map.get("useAllInventory"))) {
 				//订单产品要入库， 状态要验货无误
-//				order_details.state=1 order_details.checked=1 id_relationtable.goodstatus=1
+//				order_details.state=1 order_details.checked=1 
 				
 				
-				idRelation.put("goodstatus", "1");
 			}
 			//采购使用库存锁定库存
 			map.put("is_use", "1");
 			map.put("is_delete", "0");
 			map.put("lock_flag", "1");
-			//订单产品要入库
-			inventoryMapper.addIdRelationTable(idRelation);
 			//使用库存
 			inventoryMapper.insertLockInventory(map);
 		}
