@@ -144,7 +144,7 @@ em,i{font-style: normal;}
 			<div class="col-xs-11">
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
 				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
-				<label>产品分类：<input type="hidden" class="form-control" id="query_goodscatid" value="${queryParam.goodscatid }">
+				<label>产品分类：<input type="hidden" class="form-control" id="query_goodscatid_q" value="${queryParam.goodscatid }">
 				<select class="form-control p_q_r" id="query_goodscatid-in" >
 						
 				</select>
