@@ -493,6 +493,7 @@ em,i{font-style: normal;}
 			</div>
 		</div>
 		<div class="wrap wrap8">
+		<input type="hidden" value="" id="index_in_id">
 			<button onclick="addLoss()">保存</button>
 		</div>
 	</div>

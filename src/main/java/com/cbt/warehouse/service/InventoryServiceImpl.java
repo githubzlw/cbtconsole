@@ -625,7 +625,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			return result;
 		}
 		int changeNumber = (int)map.get("changeNumber");
-		if(changeNumber < 1) {
+		if(changeNumber < 0) {
 			result.put("status", 101);
 			result.put("reason", "库存修改数量错误");
 			return result;
