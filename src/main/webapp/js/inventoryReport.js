@@ -368,13 +368,15 @@ function doQuery(page,flag) {
 	var page = $("#current_page").val();
 	var goods_name = $('#query_goods_name').val();
 	var goods_pid = $('#query_goods_pid').val();
-    var goodscatid = $('#query_goodscatid').val();
+    var goodscatid = $('#query_goodscatid-in').val();
 	var minintentory = $('#query_minintentory').val();
 	var maxintentory = $('#query_maxintentory').val();
 	var queryLine = $('#query_line').val();
 	if(flag == 0){
+		var goodscatid = $('#query_goodscatid-in').val();
 		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine, "_self");
 	}else{
+		var goodscatid = $('#query_goodscatid').val();
 		var checkStart = $("#is_check_start").val();
 		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&checkStart="+checkStart, "_self");
 	}

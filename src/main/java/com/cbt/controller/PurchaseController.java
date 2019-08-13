@@ -252,15 +252,15 @@ public class PurchaseController {
 			map.put("seilUnit", request.getParameter("seilUnit"));
 			map.put("goodsUnit", request.getParameter("goodsUnit"));
 			
+			//采购关联 id_relationtable //订单产品要入库
+			
+			String barcode = dao.getBarcode(0, adm.getId(), orderid);
+			map.put("barcode", barcode);
+			String position = dao.getPosition(barcode);
+			map.put("position", position);
 			//库存操作
 			row = inventoryService.useInventory(map);
 			if(row > 0) {
-				//采购关联 id_relationtable //订单产品要入库
-				map.put("inventory_count_use", String.valueOf(row));
-				String barcode = dao.getBarcode(0, adm.getId(), orderid);
-				map.put("barcode", barcode);
-				String position = dao.getPosition(barcode);
-				map.put("position", position);
 				row = iPurchaseService.addIdRelationTable(map);
 				result = "成功使用库存";
 			}

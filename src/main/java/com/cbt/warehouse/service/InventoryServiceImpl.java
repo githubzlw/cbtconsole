@@ -517,6 +517,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		if(googs_number * goodsUnit < inventory_count) {
 			inventory_count = googs_number * goodsUnit;
 			map.put("inventory_count", String.valueOf(inventory_count));
+			map.put("inventory_count_use", String.valueOf(inventory_count));
 			map.put("useAllInventory", "true");
 		}
 		//1.如果该商品是有录入库存则做想应的减少
@@ -567,6 +568,8 @@ public class InventoryServiceImpl implements  InventoryService{
 		String orderid = map.get("orderid");
 		String odid =  map.get("odid");
 		if(isReduce) {
+			map.put("goods_pid", inventoryMap.getGoodsPid());
+			map.put("inventory_sku_id", String.valueOf(inventoryMap.getId()));
 			updateOrderState(map);
 		}
 		int before_remaining = inventoryMap.getRemaining();
@@ -1043,11 +1046,9 @@ public class InventoryServiceImpl implements  InventoryService{
 				orderinfoMap.clear();
 				//记录商品入库
 				LOG.info("--------------------开始记录商品入库--------------------");
-				Map<String,String> inMap=orderinfoMapper.queryData(map);
-				if(inMap != null){
-					map.put("goods_pid",inMap.get("goods_pid"));
-					orderinfoMapper.insertGoodsInventory(map);
-				}
+				map.put("old_itemqty",map.get("inventory_count_use"));
+				map.put("remark", "有库存商品，采购自动匹配入库 inventory_sku_id:"+map.get("inventory_sku_id")+"/orderid:"+map.get("orderid")+"/od_id:"+map.get("od_id"));
+				orderinfoMapper.insertGoodsInventory(map);
 				LOG.info("--------------------结束记录商品入库--------------------");
 				sendMQ.closeConn();
 			}
