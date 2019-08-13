@@ -238,13 +238,13 @@ em,i{font-style: normal;}
 						<td class="datagrid-cell-c2-carImg">${tory.goodsImg }</td>
 						<td class="datagrid-cell-c2-last-remaining">${tory.lastCheckRemaining}</td>
 						<td class="datagrid-cell-c2-change-remaining">${tory.changeRemaining}</td>
-						<td class="datagrid-cell-c2-remaining"><span class="i_remaining">${tory.remaining}</span>
-						<em class="datagrid-cell-c2-canRemaining" style="display:none;">${tory.canRemaining}</em>
+						<td class="datagrid-cell-c2-remaining">${tory.remaining}
 						</td>
 						<td class="emprice">${tory.goodsPrice}</td>
 						<td class="datagrid-cell-c2-checkRemaining">
 						<input class="datagrid-cell-c2-check-Remaining q_in_r c_remaining" value="${tory.remaining}" readonly="readonly" onchange="updateCheckRecord(${index.index})" id="iq_in_r${index.index}"></td>
 						<td class="datagrid-cell-c2-barcode">
+						<em class="datagrid-cell-c2-canRemaining" style="display:none;">${tory.canRemaining}</em>
 						<input value="${tory.barcode}" class="q_in_barcode_h" type="hidden">
 						<input value="0" class="q_record_id" type="hidden">
 						<input value="${tory.inventorySkuId}" class="q_inventory_id" type="hidden">
@@ -493,6 +493,7 @@ em,i{font-style: normal;}
 			</div>
 		</div>
 		<div class="wrap wrap8">
+		<input type="hidden" value="" id="index_in_id">
 			<button onclick="addLoss()">保存</button>
 		</div>
 	</div>

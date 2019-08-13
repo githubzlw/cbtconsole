@@ -310,7 +310,7 @@ public class InventoryController {
 		goodscatid = goodscatid == null ? "0" : goodscatid;
 		map.put("goodscatid", goodscatid);
 		if(checkFlag) {
-			String check_id = request.getParameter("checkStart");
+			String check_id = request.getParameter("check_id");
 			check_id = StrUtils.isNum(check_id) && !"0".equals(check_id)? check_id : "0";
 			map.put("check_id", Integer.valueOf(check_id));
 		}
