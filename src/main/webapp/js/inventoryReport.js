@@ -108,6 +108,7 @@ $(function(){
 		   		alert("盘点取消失败");
 		   	}
 		   });
+		doQuery(1,1);
 		
 	})
 	//完成盘点
@@ -356,10 +357,12 @@ function doQuery(page,flag) {
 	var maxintentory = $('#query_maxintentory').val();
 	var queryLine = $('#query_line').val();
 	if(flag == 0){
+		var goodscatid = $('#query_goodscatid-in').val();
 		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine, "_self");
 	}else{
-		var checkStart = $("#is_check_start").val();
-		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&checkStart="+checkStart, "_self");
+		var goodscatid = $('#query_goodscatid').val();
+		var check_id = $("#check_id").val();
+		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&check_id="+check_id, "_self");
 	}
 }
 
