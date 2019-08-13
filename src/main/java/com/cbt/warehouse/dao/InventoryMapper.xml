@@ -549,5 +549,8 @@
     <delete id="deleteInventoryCheckRecord">
     delete from inventory_sku_check_record_temp where id=#{checkId}
     </delete>
+    <update id="updateOrderDetailsState">
+    update order_details state=1,checked=1 set where id=#{odid}
+    </update>
     
 </mapper>

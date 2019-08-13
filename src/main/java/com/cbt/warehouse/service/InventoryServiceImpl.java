@@ -564,8 +564,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			if("true".equals(map.get("useAllInventory"))) {
 				//订单产品要入库， 状态要验货无误
 //				order_details.state=1 order_details.checked=1 
-				
-				
+				inventoryMapper.updateOrderDetailsState(Integer.parseInt(odid));
 			}
 			//采购使用库存锁定库存
 			map.put("is_use", "1");
