@@ -50,7 +50,6 @@ import com.cbt.track.dao.TabTrackInfoMapping;
 import com.cbt.util.DoubleUtil;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
-import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.dao.WarehouseMapper;
 import com.cbt.warehouse.service.InventoryService;
 import com.cbt.warehouse.util.StringUtil;
@@ -67,27 +66,12 @@ import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import org.apache.commons.collections.map.HashedMap;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @Service
 public class OrderinfoService implements IOrderinfoService {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderinfoService.class);
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
-	@Autowired
-	private InventoryMapper inventoryMapper;
 	@Autowired
 	private WarehouseMapper warehouseMapper;
 

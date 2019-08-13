@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +29,19 @@ import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventorySku;
 import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
+import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 @Service
 public class InventoryServiceImpl implements  InventoryService{
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
 	@Autowired
 	private InventoryMapper inventoryMapper;
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
+	@Autowired
+	private IPurchaseMapper pruchaseMapper;
 
 	/**
 	 * 根据ID获取库存
@@ -559,19 +567,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		String orderid = map.get("orderid");
 		String odid =  map.get("odid");
 		if(isReduce) {
-//			订单产品要入库，
-			//如果全部使用库存，订单状态改为验货无误
-			if("true".equals(map.get("useAllInventory"))) {
-				//订单产品要入库， 状态要验货无误
-//				order_details.state=1 order_details.checked=1 
-				inventoryMapper.updateOrderDetailsState(Integer.parseInt(odid));
-			}
-			//采购使用库存锁定库存
-			map.put("is_use", "1");
-			map.put("is_delete", "0");
-			map.put("lock_flag", "1");
-			//使用库存
-			inventoryMapper.insertLockInventory(map);
+			updateOrderState(map);
 		}
 		int before_remaining = inventoryMap.getRemaining();
 		int can_remaining = inventoryMap.getCanRemaining();
@@ -988,5 +984,82 @@ public class InventoryServiceImpl implements  InventoryService{
 		return inventoryMapper.getICRHistoryCount(inid);
 	}
 	
-	
+	/**更新订单相关表状态
+	 * @param map
+	 */
+	private void updateOrderState(Map<String,String> map) {
+		try {
+//			String odid =  map.get("odid");
+//			订单产品要入库，
+			//如果全部使用库存，订单状态改为验货无误
+			if("true".equals(map.get("useAllInventory"))) {
+				SendMQ sendMQ = new SendMQ();
+				//订单产品要入库， 状态要验货无误
+//				order_details.state=1 order_details.checked=1 
+				orderinfoMapper.updateChecked(map);
+				
+				//查询是否是DP订单
+				int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
+				//获取未更新之前，订单状态和客户ID，比较前后状态是否一致，不一致说明订单状态已经修改
+				Map<String,Object> orderinfoMap = pruchaseMapper.queryUserIdAndStateByOrderNo(map.get("orderid"));
+				if (isDropshipOrder == 1) {
+					orderinfoMapper.updateOrderDetails(map);
+					sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+					int counts=orderinfoMapper.getDtailsState(map);
+					if(counts == 0){
+						orderinfoMapper.updateDropshiporder(map);
+						sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+map.get("orderid")+"' " +
+								"and id='"+map.get("odid")+"')"));
+					}
+					//判断主单下所有的子单是否到库
+					counts=orderinfoMapper.getAllChildOrderState(map);
+					if(counts == 0){
+						orderinfoMapper.updateOrderInfoState(map);
+						sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+						//判断订单状态是否一致
+						if(!orderinfoMap.get("old_state").toString().equals("2")){
+							//发送消息给客户
+							NotifyToCustomerUtil.updateOrderState(Integer.valueOf(orderinfoMap.get("user_id").toString()),
+									map.get("orderid"),Integer.valueOf(orderinfoMap.get("old_state").toString()),2);
+						}
+					}
+				}else{
+					// 非dropshi订单
+					orderinfoMapper.updateOrderDetails(map);
+					sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+					//判断订单是否全部到库
+					int counts=orderinfoMapper.getDetailsState(map);
+					if(counts == 0){
+						orderinfoMapper.updateOrderInfoState(map);
+						sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+						//判断订单状态是否一致
+						if(!orderinfoMap.get("old_state").toString().equals("2")){
+							//发送消息给客户
+							NotifyToCustomerUtil.updateOrderState(Integer.valueOf(orderinfoMap.get("user_id").toString()),
+									map.get("orderid"),Integer.valueOf(orderinfoMap.get("old_state").toString()),2);
+						}
+					}
+				}
+				orderinfoMap.clear();
+				//记录商品入库
+				LOG.info("--------------------开始记录商品入库--------------------");
+				Map<String,String> inMap=orderinfoMapper.queryData(map);
+				if(inMap != null){
+					map.put("goods_pid",inMap.get("goods_pid"));
+					orderinfoMapper.insertGoodsInventory(map);
+				}
+				LOG.info("--------------------结束记录商品入库--------------------");
+				sendMQ.closeConn();
+			}
+			//采购使用库存锁定库存
+			map.put("is_use", "1");
+			map.put("is_delete", "0");
+			map.put("lock_flag", "1");
+			//使用库存
+			inventoryMapper.insertLockInventory(map);
+		} catch (Exception e) {
+			LOG.error("新订单相关表状态",e);
+		}
+		
+	}
 }

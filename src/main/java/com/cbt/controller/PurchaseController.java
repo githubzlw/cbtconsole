@@ -236,6 +236,7 @@ public class PurchaseController {
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("admId",String.valueOf(adm.getId()));
 			map.put("userid",String.valueOf(adm.getId()));
+			map.put("user_id",String.valueOf(adm.getId()));
 			map.put("userName",adm.getAdmName());
 			int row=0;
 			String od_id=request.getParameter("od_id");
