@@ -405,7 +405,7 @@
     </update>
     <!-- 更新库存  -->
     <update id="updateInventoryCheckFlag">
-    update inventory_sku set remaining=#{remaining},check_remaining=#{checkRemaining},
+    update inventory_sku set remaining=#{remaining},can_remaining=#{canRemaining},check_remaining=#{checkRemaining},
     inventory_check_id=#{inventoryCheckId},
     barcode=#{barcode},
     flag=1,updatetime=now() where id=#{id}

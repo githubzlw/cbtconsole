@@ -940,6 +940,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			item.setRemaining(i.getCheckRemaining());
 			item.setInventoryCheckId(checkId);
 			item.setCheckRemaining(i.getCheckRemaining());
+			item.setCanRemaining(i.getCheckRemaining());
 			item.setBarcode(i.getAfterBarcode());
 			inventoryMapper.updateInventoryCheckFlag(item );
 			
