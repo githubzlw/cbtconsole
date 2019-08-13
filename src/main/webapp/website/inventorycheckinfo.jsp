@@ -192,7 +192,7 @@ em,i{font-style: normal;}
 			</table>
 				<div>
 				<span>当前页 :${currentPage} / ${totalPage},总共 ${totalCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${currentPage}"><button class="btn btn-success btn_page_qu" onclick="doQuery()">查询</button>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${currentPage}"><button class="btn btn-success btn_page_qu" onclick="doQuery(0)">查询</button>
 				</div>
 		</div>
 		

@@ -226,12 +226,12 @@ public interface InventoryService {
 	 * @param checkId
 	 * @return
 	 */
-	List<InventoryCheckRecord> getICRHistory(int inid,int page);
+	List<InventoryCheckRecord> getICRHistory(int inid,int page,String goodsPid);
 	
 	/**获取inventory_sku_check_record盘点历史数据数量
 	 * @param inid
 	 * @return
 	 */
-	int getICRHistoryCount(int inid);
+	int getICRHistoryCount(int inid,String goodsPid);
 	
 }

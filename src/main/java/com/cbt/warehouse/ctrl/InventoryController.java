@@ -1231,17 +1231,19 @@ public class InventoryController {
 		String strInid = request.getParameter("inid");
 		strInid = StrUtils.isNum(strInid) ? strInid : "0";
 		
-		String strPage = request.getParameter(" page");
+		String strPage = request.getParameter("page");
 		strPage = StrUtils.isNum(strPage) ? strPage : "1";
 		
 		int page = (Integer.parseInt(strPage) - 1) * 50;
-	
+		String goods_pid = request.getParameter("goods_pid");
+		goods_pid = StringUtil.isBlank(goods_pid) ? null : goods_pid;
+		
 		int inid = Integer.valueOf(strInid);
 		int icrHistoryCount = 0,totalPage = 0;
 		if(inid > 0) {
-			icrHistoryCount = inventoryService.getICRHistoryCount(inid);
+			icrHistoryCount = inventoryService.getICRHistoryCount(inid,goods_pid);
 			if(icrHistoryCount > 0) {
-				List<InventoryCheckRecord> icrHistory = inventoryService.getICRHistory(inid,page);
+				List<InventoryCheckRecord> icrHistory = inventoryService.getICRHistory(inid,page,goods_pid);
 				mv.addObject("icrHistory", icrHistory);
 				totalPage = icrHistoryCount % 50 == 0 ? icrHistoryCount / 50 : icrHistoryCount / 50 + 1;
 			}

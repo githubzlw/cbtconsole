@@ -296,13 +296,13 @@ public interface InventoryMapper {
 	 * @param checkId
 	 * @return
 	 */
-	List<InventoryCheckRecord> getICRHistory(@Param("inid")int inid,@Param("page")int page);
+	List<InventoryCheckRecord> getICRHistory(@Param("inid")int inid,@Param("page")int page,@Param("goodsPid")String goodsPid);
 	
 	/**获取inventory_sku_check_record盘点历史数据数量
 	 * @param inid
 	 * @return
 	 */
-	int getICRHistoryCount(int inid);
+	int getICRHistoryCount(@Param("inid")int inid,@Param("goodsPid")String goodsPid);
 	
 	/**清空inventory_sku_check_record_temp本次盘点数据
 	 * @param checkId

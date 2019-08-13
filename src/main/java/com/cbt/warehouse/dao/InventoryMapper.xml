@@ -538,12 +538,18 @@
     from inventory_sku_check_record 
     iscr left join inventory_sku isk on iscr.inventory_sku_id=isk.id
     
-    where iscr.inventory_sku_id=#{inid} limit #{page},50
+    where 1=1
+    <if test="goodsPid !=null">and iscr.goods_pid=#{goodsPid}</if>
+    <if test="inid > 0">and iscr.inventory_sku_id=#{inid} </if>
+    
+    limit #{page},50
     </select>
     <!-- 获取盘点历史数据 -->
     <select id="getICRHistoryCount" resultType="Integer">
     select count(id)
-    from inventory_sku_check_record where inventory_sku_id=#{inid} 
+    from inventory_sku_check_record where  1=1
+    <if test="goodsPid !=null">and iscr.goods_pid=#{goodsPid}</if>
+    <if test="inid > 0">and iscr.inventory_sku_id=#{inid} </if>
     </select>
     <!-- 删除临时盘点数据 -->
     <delete id="deleteInventoryCheckRecord">

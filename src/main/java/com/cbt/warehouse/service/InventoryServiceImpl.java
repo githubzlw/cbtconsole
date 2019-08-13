@@ -980,12 +980,12 @@ public class InventoryServiceImpl implements  InventoryService{
 		return iCRList;
 	}
 	@Override
-	public List<InventoryCheckRecord> getICRHistory(int inid,int page) {
-		return inventoryMapper.getICRHistory(inid, page);
+	public List<InventoryCheckRecord> getICRHistory(int inid,int page,String goodsPid) {
+		return inventoryMapper.getICRHistory(inid, page,goodsPid);
 	}
 	@Override
-	public int getICRHistoryCount(int inid) {
-		return inventoryMapper.getICRHistoryCount(inid);
+	public int getICRHistoryCount(int inid,String goodsPid) {
+		return inventoryMapper.getICRHistoryCount(inid,goodsPid);
 	}
 	
 	/**更新订单相关表状态
