@@ -527,7 +527,7 @@
     <select id="getInventoryCheckRecord" resultMap="InventoryCheckRecordMap">
     select id,inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
     goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode
-    from inventory_sku_check_record_temp where id=#{checkId}
+    from inventory_sku_check_record_temp where inventory_check_id=#{checkId}
     </select>
     <!-- 获取盘点历史数据 -->
     <select id="getICRHistory" resultMap="InventoryCheckRecordMap">
@@ -547,7 +547,7 @@
     </select>
     <!-- 删除临时盘点数据 -->
     <delete id="deleteInventoryCheckRecord">
-    delete from inventory_sku_check_record_temp where id=#{checkId}
+    delete from inventory_sku_check_record_temp where inventory_check_id=#{checkId}
     </delete>
     <update id="updateOrderDetailsState">
     update order_details state=1,checked=1 set where id=#{odid}

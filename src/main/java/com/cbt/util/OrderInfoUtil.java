@@ -167,7 +167,7 @@ public class OrderInfoUtil {
                 orderBean1 = splitDao.getOrders(orderNo_);
             }
             String maxSplitOrderNo = orderBean1.getMaxSplitOrder();
-            if (maxSplitOrderNo.contains("_")) {
+            if (maxSplitOrderNo.contains("_") && !maxSplitOrderNo.contains("_SP")) {
                 int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
                 String[] n = orderNo.split("_");
                 orderNo1 = n[0];
@@ -184,7 +184,7 @@ public class OrderInfoUtil {
                 nwOrderNo = orderNo + "_1";
             }
             String maxSplitOrderNo = orderBean.getMaxSplitOrder();
-            if (maxSplitOrderNo.contains("_")) {
+            if (maxSplitOrderNo.contains("_") && !maxSplitOrderNo.contains("_SP")) {
                 int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
                 if (isSplitNum > 0) {
                     nwOrderNo = orderNo + "_" + (splitIndex + 1) + "_SN";
