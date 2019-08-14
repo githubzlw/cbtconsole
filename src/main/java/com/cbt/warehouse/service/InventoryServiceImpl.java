@@ -1112,7 +1112,7 @@ public class InventoryServiceImpl implements  InventoryService{
 	@Override
 	public int cancelOrderToInventory(String orderNo,int admId,String admName) {
 		// 释放该订单占用的库存
-		int cancelUseInventory = cancelUseInventory(orderNo,admId);
+		int cancelUseInventory = cancelUseInventory(orderNo,admId,null);
 		
 		//对于没有使用库存订单的商品做库存增加到库存表中
 		int addOrderInventory = addOrderInventory(orderNo, admId,admName);
@@ -1159,9 +1159,14 @@ public class InventoryServiceImpl implements  InventoryService{
 	/**取消订单采购使用过的库存
 	 * @return
 	 */
-	private int cancelUseInventory(String orderNo,int admId) {
+	private int cancelUseInventory(String orderNo,int admId,String odid) {
 		//判断订单是否使用了库存
-		List<Map<String,Object>> inventoryUsed = inventoryMapper.getOrderDetailsAndInventoryUsed(orderNo);
+		List<Map<String,Object>> inventoryUsed =  null;
+		if(StringUtil.isNotBlank(orderNo)) {
+			inventoryUsed =  inventoryMapper.getOrderDetailsAndInventoryUsed(orderNo);
+		}else {
+			inventoryUsed =  inventoryMapper.getInventoryUsed(odid);
+		}
 		if(inventoryUsed == null || inventoryUsed.isEmpty()) {
 			return 0;
 		}
@@ -1204,6 +1209,14 @@ public class InventoryServiceImpl implements  InventoryService{
 			inventoryMapper.addInventoryDetailsSku(ilog);
 			
 		}
-		return 0;
+		return 1;
+	}
+	@Override
+	public int cancelToInventory(String[] odidLst, int admid, String admName) {
+		int result  =0;
+		for(String odid : odidLst) {
+			result += cancelUseInventory(null, admid, odid);
+		}
+		return result;
 	}
 }

@@ -78,6 +78,7 @@ $(function(){
 		    		  $(".qbt_check").removeAttr("disabled", "disabled");
 //		    		 $(".qbt_check").attr("style", "background-color: #fff;");
 		    		 $(".p_q_r").attr("readonly","readonly");
+		    		 $("#query_catid_select").attr("readonly","readonly");
 		    			$(".p_qs_r").attr("disabled", "disabled");
 //		    	        $(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
 		    	        $(".q_in_barcode").removeAttr("readonly");
@@ -95,29 +96,30 @@ $(function(){
 	})
 	//取消盘点
 	$("#query_button_check_cancel").click(function(){
+		$(".qbt_check").attr("disabled", "disabled");
+//		    		  $(".qbt_check").attr("style", "background-color: #EEEEEE;");
+		$("#query_button_check_start").removeAttr("disabled", "disabled");
+//		    			$("#query_button_check_start").attr("style", "background-color: #fff;");
+		$(".p_q_r").removeAttr("readonly");
+		$("#query_catid_select").removeAttr("readonly");
+		$(".p_qs_r").removeAttr("disabled");
+//		    	        $(".p_qs_r").attr("style", "background-color: #fff");
+		$(".q_in_r").attr("readonly","readonly");
+		$(".q_in_barcode").attr("readonly","readonly");
 		var check_id = $("#check_id").val();
 		jQuery.ajax({
 		       url:"/cbtconsole/inventory/check/cancel",
 		       data:{"check_id":check_id},
 		       type:"post",
 		       success:function(data){
+		    	   $("#check_id").val(0);
 		    	  if(data.status == 200){
-		    		  $(".qbt_check").attr("disabled", "disabled");
-//		    		  $(".qbt_check").attr("style", "background-color: #EEEEEE;");
-		    			$("#query_button_check_start").removeAttr("disabled", "disabled");
-//		    			$("#query_button_check_start").attr("style", "background-color: #fff;");
-		    			$("#check_id").val(0);
-		    			$(".p_q_r").removeAttr("readonly");
-		    			$(".p_qs_r").removeAttr("disabled");
-//		    	        $(".p_qs_r").attr("style", "background-color: #fff");
-		    			$(".q_in_r").attr("readonly","readonly");
-		    			$(".q_in_barcode").attr("readonly","readonly");
 		    	  }else{
 		    		  alert(data.reason);
 		    	  }
 		       },
 		   	error:function(e){
-		   		alert("盘点取消失败");
+		   		alert("error盘点取消失败");
 		   	}
 		   });
 		doQuery(1,1);
@@ -130,12 +132,14 @@ $(function(){
 		$(".qbt_check").attr("disabled", "disabled");
 		$("#query_button_check_start").removeAttr("disabled", "disabled");
 		$("#check_id").val(0);
+		$("#query_catid_select").removeAttr("readonly");
 		$(".p_q_r").removeAttr("readonly");
 		$(".p_qs_r").removeAttr("disabled");
 		$(".q_in_r").attr("readonly","readonly");
 		$(".q_in_barcode").attr("readonly","readonly");
 		
 		window.location.href ="/cbtconsole/inventory/check/done?check_id="+check_id;
+		doQuery(1,1);
 	})
 	
 	$("#query_button").click(function(){
@@ -194,7 +198,7 @@ function updateCheckRecord(index){
 	
 	var before_barcode= $("#datagrid-row-r2-2-"+index).find(".q_in_barcode_h").val(); 
 	var after_barcode= $("#datagrid-row-r2-2-"+index).find(".q_in_barcode").val(); 
-	var inventory_remaining= $("#datagrid-row-r2-2-"+index).find(".i_remaining").html(); 
+	var inventory_remaining= $("#datagrid-row-r2-2-"+index).find(".datagrid-cell-c2-remaining").html(); 
 	var check_remaining= $("#datagrid-row-r2-2-"+index).find(".c_remaining").val(); 
 	
 	var goods_pid= $("#datagrid-row-r2-2-"+index).find(".datagrid-cell-c2-goodsPid").html(); 
@@ -375,8 +379,8 @@ function doQuery(page,flag) {
 		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine, "_self");
 	}else{
 		var goodscatid = $('#query_goodscatid').val();
-		var checkStart = $("#is_check_start").val();
-		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&checkStart="+checkStart, "_self");
+		var check_id = $("#check_id").val();
+		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&check_id="+check_id, "_self");
 	}
 }
 
@@ -547,7 +551,7 @@ function saveInventory(){
 	       	if(data.status==200){
 				alert("库存录入成功");
 				$('.tc,.trnasparent,.tc1').hide();
-				window.reload();
+				location.reload();
 	       	}else{
 	       		alert("库存录入失败");
 	       	}
@@ -599,7 +603,7 @@ function saveTbInventory(){
 			if(data.status==200){
 				alert("库存录入成功");
 				$('.tc,.trnasparent,.tc2').hide();
-				window.reload();
+				location.reload();
 			}else{
 				alert("库存录入失败");
 			}

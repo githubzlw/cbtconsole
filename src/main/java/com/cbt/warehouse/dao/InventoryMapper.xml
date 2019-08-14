@@ -292,7 +292,7 @@
     <!-- ********************************库存数据*************************** -->
     
     <!-- 库存记录变更表  -->
-   <insert id="addInventorLogByInventoryid" parameterType="java.util.Map">
+   <insert id="addInventoryLogByInventoryid" parameterType="java.util.Map">
    insert into inventory_sku_log(goods_url,remaining,before_remaining,
    after_remaining,good_name,sku,barcode,goods_pid,
    createtime,remark,change_type,goods_p_pid,specid,skuid,inventory_sku_id)
@@ -561,7 +561,7 @@
     <update id="updateOrderDetailsState">
     update order_details state=1,checked=1 set where id=#{odid}
     </update>
-    <select id="getOrderDetailsAndInventoryUsed">
+    <select id="getOrderDetailsAndInventoryUsed" resultType="java.util.Map">
     SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id,
     li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag ,
     ibr.state as barcodeState,ibr.id as barcodeId
@@ -572,6 +572,17 @@
         		left join id_relationtable ir on od.orderid=ir.orderid and od.goodsid=ir.goodid 
         		left join inventory_barcode_record ibr on li.id=ibr.lock_id
         		WHERE li.is_delete=0 AND od.orderid=#{orderid}
+    </select>
+    <select id="getInventoryUsed" resultType="java.util.Map">
+    SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id,
+    li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag ,
+    ibr.state as barcodeState,ibr.id as barcodeId
+    FROM lock_inventory li 
+        		INNER JOIN order_details od ON li.od_id=od.id 
+        		LEFT JOIN inventory_sku i ON li.in_id=i.id 
+        		left join id_relationtable ir on od.orderid=ir.orderid and od.goodsid=ir.goodid 
+        		left join inventory_barcode_record ibr on li.id=ibr.lock_id
+        		WHERE li.is_delete=0 AND od.id=#{odid} limit 1
     </select>
     <select id="getCheckedOrderDetails">
     SELECT od.id,od.orderid,od.goodsid,od.car_url,od.seilUnit,od.goodsname,od.goodscatid,od.car_img,od.goods_pid,od.car_urlMD5,od.yourorder,

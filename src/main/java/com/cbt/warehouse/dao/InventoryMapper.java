@@ -329,6 +329,11 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	List<Map<String,Object>> getOrderDetailsAndInventoryUsed(String orderid);
+	/**获取使用了库存订单详情列表
+	 * @param orderid
+	 * @return
+	 */
+	List<Map<String,Object>> getInventoryUsed(String odid);
 	/**获取已经验货的订单详情列表
 	 * @param orderid
 	 * @return

@@ -964,7 +964,7 @@ public class InventoryController {
 					map.put("skuid",vs[2].trim());
 					map.put("count",vs[3].trim());
 					map.put("barcode",vs[4].trim());
-					map.put("img",vs[6].trim());
+					map.put("img",vs[5].trim());
 					inventoryService.inputInventory(map);
 				}
 			}
@@ -1088,9 +1088,11 @@ public class InventoryController {
 		int recordId = Integer.parseInt(strRecordId);
 		
 		String strInventoryRemaining = request.getParameter("inventory_remaining");
-		strInventoryRemaining = StrUtils.isNum(strInventoryRemaining) ? strInventoryRemaining : "0";
+		strInventoryRemaining = StringUtil.isNotBlank(strInventoryRemaining) ? strInventoryRemaining.trim() : "0";
+		strInventoryRemaining = StrUtils.isNum(strInventoryRemaining) ? strInventoryRemaining.trim() : "0";
 		
 		String strCheckRemaining = request.getParameter("check_remaining");
+		strCheckRemaining = StringUtil.isNotBlank(strCheckRemaining) ? strCheckRemaining.trim() : "0";
 		strCheckRemaining = StrUtils.isNum(strCheckRemaining) ? strCheckRemaining : "0";
 		InventoryCheckRecord record = new InventoryCheckRecord();
 		record.setId(recordId);
@@ -1156,6 +1158,12 @@ public class InventoryController {
 		check.setCancelRemark("撤销本次盘点");
 		int checkCancel = inventoryService.updateInventoryCheckCancel(check);
 		result.put("check_cancel", checkCancel);
+		if(checkCancel == 0) {
+			result.put("status", 502);
+			result.put("reason", "盘点取消失败,未开始实际盘点");
+		}else {
+			result.put("status", 200);
+		}
 		return result;
 	}
 	/**完成盘点

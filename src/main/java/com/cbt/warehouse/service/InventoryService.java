@@ -239,5 +239,10 @@ public interface InventoryService {
 	 * @return
 	 */
 	int cancelOrderToInventory(String orderNo,int admid,String admName);
+	/**拆单取消进入库存
+	 * @param orderNo
+	 * @return
+	 */
+	int cancelToInventory( String[] odidLst,int admid,String admName);
 	
 }
