@@ -8,10 +8,12 @@ import org.apache.ibatis.annotations.Param;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.InventoryBarcodeRecord;
 import com.cbt.website.bean.InventoryCheck;
 import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetails;
+import com.cbt.website.bean.InventoryLock;
 import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventorySku;
 import com.cbt.website.bean.LossInventoryRecord;
@@ -22,7 +24,7 @@ public interface InventoryMapper {
 	 * @param map
 	 * @return
 	 */
-	int insertLockInventory(Map<String,String> map);
+	int insertLockInventory(InventoryLock lock);
 	/**关联order_details_sku_match inventory_sku获取用户下单从规格id,库存数量
 	 * @param od_id
 	 * @return
@@ -153,7 +155,7 @@ public interface InventoryMapper {
 	 * @param inventory
 	 * @return
 	 */
-	int addInventoryChangeRecordByInventoryid(Map<String,String> inventory);
+	int addInventoryLogByInventoryid(Map<String,String> inventory);
 	
 	/**获取订单产品详细数据
 	 * @param inventory
@@ -321,5 +323,34 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int updateOrderDetailsState(int odid);
+	
+	/**获取使用了库存订单详情列表
+	 * @param orderid
+	 * @return
+	 */
+	List<Map<String,Object>> getOrderDetailsAndInventoryUsed(String orderid);
+	/**获取已经验货的订单详情列表
+	 * @param orderid
+	 * @return
+	 */
+	List<Map<String,Object>> getCheckedOrderDetails(String orderid);
+	
+	/**取消库存锁定
+	 * @param id
+	 * @return
+	 */
+	int cancelLockInventory(int id);
+	
+	/**使用库存，标记库位移动
+	 * @return
+	 */
+	int insertInventoryBarcodeRecord(InventoryBarcodeRecord record);
+	
+	/**更新状态
+	 * @param id
+	 * @param state
+	 * @return
+	 */
+	int updateBarcodeRecord(int id,int state);
 	
 }

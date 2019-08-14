@@ -2911,9 +2911,12 @@ public class OrderwsDao implements IOrderwsDao {
     public void cancelInventory(String orderNo) {
         int row = 0;
         Connection conn = DBHelper.getInstance().getConnection();
-        String sql = "SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id,li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag FROM lock_inventory li "
+      /*  String sql = "SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id,li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag FROM lock_inventory li "
                 + "INNER JOIN order_details od ON li.od_id=od.id LEFT JOIN inventory i ON li.in_id=i.id left join id_relationtable ir on od.orderid=ir.orderid and od.goodsid=ir.goodid WHERE li.is_delete=0 AND od.orderid='"
-                + orderNo + "'";
+                + orderNo + "'";*/
+        String sql = "SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id,li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag FROM lock_inventory li "
+        		+ "INNER JOIN order_details od ON li.od_id=od.id LEFT JOIN inventory i ON li.in_id=i.id left join id_relationtable ir on od.orderid=ir.orderid and od.goodsid=ir.goodid WHERE li.is_delete=0 AND od.orderid='"
+        		+ orderNo + "'";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {

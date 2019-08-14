@@ -186,7 +186,8 @@
      limit #{page},20
     </select>
     <select id="getIinOutInventoryCount" resultType="INTEGER">
-       select count(id) from inventory_sku  isku
+       select count(isku.id) from inventory_sku  isku
+       left join custom_benchmark_ready c on isku.goods_pid=c.pid
         where 1=1
         <if test="inid>0">and isku.id=#{inid}</if>
     <if test="goods_pid != null">and isku.goods_pid=#{goods_pid}</if>
@@ -198,6 +199,8 @@
 	    </if>
     </if>
     <if test="goodscatid ==-1">and isku.goodscatid='0'</if>
+    <if test="isline == 1">and c.valid=1</if>
+    <if test="isline == 2">and c.valid!=1</if>
        
     </select>
     <update id="problem_inventory">
@@ -289,7 +292,7 @@
     <!-- ********************************库存数据*************************** -->
     
     <!-- 库存记录变更表  -->
-   <insert id="addInventoryChangeRecordByInventoryid" parameterType="java.util.Map">
+   <insert id="addInventorLogByInventoryid" parameterType="java.util.Map">
    insert into inventory_sku_log(goods_url,remaining,before_remaining,
    after_remaining,good_name,sku,barcode,goods_pid,
    createtime,remark,change_type,goods_p_pid,specid,skuid,inventory_sku_id)
@@ -327,7 +330,7 @@
     <insert id="insertStorageOutboundDetails">
     insert into storage_outbound_details 
     (orderid,goodsid,in_id,storage_count,type,createtime,admName,when_count,add_inventory) values
-    (#{orderid},#{goodsid},#{inventory_sku_id},#{storage_count},1,now(),#{adminId},#{when_count},#{inventory_count})
+    (#{orderid},#{goodsid},#{inventory_sku_id},#{storage_count},#{storage_type},now(),#{adminId},#{when_count},#{inventory_count})
     
     </insert>
     <!-- 订单关联库存，查询是否有可用库存 -->
@@ -360,9 +363,9 @@
     
     </insert>
     <!-- 锁定库存 -->
-    <insert id="insertLockInventory">
+    <insert id="insertLockInventory" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventoryLock">
     INSERT INTO lock_inventory (in_id,lock_remaining,od_id,createtime,lock_inventory_amount,is_use,is_delete,flag) values(
-    #{inventory_sku_id},#{inventory_count},#{odid},now(),#{lock_inventory_amount},#{is_use},#{is_delete},#{lock_flag}
+    #{inId},#{lockRemaining},#{odId},now(),#{lockInventoryAmount},#{isUse},#{isDelete},#{flag}
     )
     </insert>
     <!--库存损益表  -->
@@ -557,6 +560,49 @@
     </delete>
     <update id="updateOrderDetailsState">
     update order_details state=1,checked=1 set where id=#{odid}
+    </update>
+    <select id="getOrderDetailsAndInventoryUsed">
+    SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id,
+    li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag ,
+    ibr.state as barcodeState,ibr.id as barcodeId
+    
+    FROM lock_inventory li 
+        		INNER JOIN order_details od ON li.od_id=od.id 
+        		LEFT JOIN inventory_sku i ON li.in_id=i.id 
+        		left join id_relationtable ir on od.orderid=ir.orderid and od.goodsid=ir.goodid 
+        		left join inventory_barcode_record ibr on li.id=ibr.lock_id
+        		WHERE li.is_delete=0 AND od.orderid=#{orderid}
+    </select>
+    <select id="getCheckedOrderDetails">
+    SELECT od.id,od.orderid,od.goodsid,od.car_url,od.seilUnit,od.goodsname,od.goodscatid,od.car_img,od.goods_pid,od.car_urlMD5,od.yourorder,
+    od.car_type,id.barcode,ca.en_name,
+    ops.goods_p_price,ops.usecount,ops.goods_p_url,ops.goodsid,
+	odsm.specid,odsm.skuid,
+	toh.specId as tbspecid,toh.skuID as tbskuid,toh.shipno,toh.orderid as tborderid,toh.sku,
+	li.lock_remaining
+	
+	FROM order_details od 
+	INNER JOIN order_product_source ops ON od.id=ops.od_id
+	INNER JOIN id_relationtable id ON od.id=id.odid
+	LEFT JOIN 1688_category ca ON od.goodscatid=ca.category_id
+	left join order_details_sku_match odsm on od.id=odsm.order_details_id
+	left join taobao_1688_order_history toh on toh.odid=od.id
+	left join lock_inventory li on li.od_id=od.id
+	WHERE  od.checked=1 AND id.goodstatus=1 and od.orderid=#{orderid}
+    
+   
+    </select>
+    <update id="cancelLockInventory">
+    update locak_inventory set is_delete=1 where id=#{id}
+    </update>
+    
+    <insert id="insertInventoryBarcodeRecord" parameterType="com.cbt.website.bean.InventoryBarcodeRecord">
+    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id) 
+    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId})
+    </insert>
+    
+    <update id="updateBarcodeRecord">
+    update inventory_barcode_record set state=#{state} where id=#{id}
     </update>
     
 </mapper>

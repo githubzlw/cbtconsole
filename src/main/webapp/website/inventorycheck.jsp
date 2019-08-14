@@ -137,7 +137,9 @@ em,i{font-style: normal;}
 </head>
 <body>
 	<div class="container-fluid report">
+	<a href="/cbtconsole/inventory/list" style="font-size: 18px;">&lt;返回</a>
 		<h1 class="text-center">库存盘点</h1>
+		
 			<input type="hidden" value="" id="query_in_id">
 			
 			<div class="row">
@@ -474,19 +476,19 @@ em,i{font-style: normal;}
 					遗失
 				</label>
 				<label>
-					<input type="radio" name="reason" value="2" class="radio_change">
+					<input type="radio" name="reason" value="3" class="radio_change">
 					添加
 				</label>
 				<label>
-					<input type="radio" name="reason" value="3" class="radio_change">
+					<input type="radio" name="reason" value="4" class="radio_change">
 					补货
 				</label>
 				<label>
-					<input type="radio" name="reason" value="4" class="radio_change">
+					<input type="radio" name="reason" value="5" class="radio_change">
 					漏发
 				</label>
 				<label>
-					<input type="radio" name="reason" value="" id="index_iremark">
+					<input type="radio" name="reason" value="7" id="index_iremark">
 					其他
 				</label>
 				<input type="text" class="other">

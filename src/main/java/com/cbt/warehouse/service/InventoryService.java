@@ -234,4 +234,10 @@ public interface InventoryService {
 	 */
 	int getICRHistoryCount(int inid,String goodsPid);
 	
+	/**取消订单进入库存
+	 * @param orderNo
+	 * @return
+	 */
+	int cancelOrderToInventory(String orderNo,int admid,String admName);
+	
 }

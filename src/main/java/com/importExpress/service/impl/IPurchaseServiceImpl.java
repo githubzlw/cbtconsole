@@ -1068,7 +1068,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 //				pruchaseMapper.updateOrderDetailsFlag(straight_flag,String.valueOf(map.get("order_no")),String.valueOf(map.get("od_id")));
 				setInvoiceVaue(purchaseBean, fileByOrderid);
 				
-				
+				//获取商品库存数据
+				purchaseBean.setInventorySkuId("0");
 				String inventoryRemark="";
 				//查询该商品是否有使用库存
 				purchaseBean.setLock_remaining("0");
@@ -1174,9 +1175,6 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					}
 				}
 				purchaseBean.setNewValue(goods_p_url.replace("'", " "));
-				//获取商品库存数据
-				purchaseBean.setInventorySkuId("0");
-				
 				getSourceOfGoods(map, purchaseBean);
 				String cn = map.get("companyname");
 				purchaseBean.setCompanyName(StringUtil.isNotBlank(cn)?cn:"无");

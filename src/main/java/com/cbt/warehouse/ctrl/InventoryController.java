@@ -178,6 +178,7 @@ public class InventoryController {
 	  inventory.put("when_count",when_count );
 	  inventory.put("unit", unit);
 	  inventory.put("shipno", shipno);
+	  inventory.put("storage_type", "1");
 	  int res = inventoryService.addInventory(inventory);
 //	  dao.addInventory(barcode, inventory_count, orderid, odid, storage_count, when_count, adm.getAdmName(), unit);
 	  PrintWriter out = response.getWriter();
