@@ -973,7 +973,7 @@ public class InventoryController {
 			map.put("tbShipno",request.getParameter("tb_shipno"));
 
 			for(String v : varrays) {
-				String[] vs = v.split("(\\|)");
+				String[] vs = v.split("(\\|d\\|)");
 				if(vs.length>8) {
 					if(!StrUtils.isNum(vs[3].trim()) || Integer.parseInt(vs[3].trim()) < 1) {
 						continue;
@@ -1207,6 +1207,9 @@ public class InventoryController {
 			result.put("reason", "未获取到类别列表");
 		}else {
 			for(Map<String,Object> m : catList) {
+				if(m == null || m.isEmpty()) {
+					continue;
+				}
 				if(org.apache.commons.lang.StringUtils.equals(StrUtils.object2Str(m.get("catid")), "0")) {
 					continue;
 				}

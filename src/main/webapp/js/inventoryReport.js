@@ -339,9 +339,9 @@ function getTbOrder(){
 					trHtml = trHtml+'<tr class="lu_tb_tr_c"><td class="lu_tb_index'+i+'">'+i+'</td>';
 					trHtml = trHtml+'<td class="lu_tb_name lu_tb_name'+i+'">'+skuM.itemname+'</td>';
 					trHtml = trHtml+'<td><img src="'+skuM.imgurl+'" alt="" class="img-responsive"></td>';
-					trHtml = trHtml+'<td class="lu_tb_skuc"><span  class="lu_tb_sku lu_tb_sku'+i+'">'+skuM.sku+'</span>';
-					trHtml = trHtml+'<span  class="lu_tb_skuid lu_tb_skuid'+i+'">'+skuM.skuID+'</span>';
-					trHtml = trHtml+'<span  class="lu_tb_specidc lu_tb_specidc'+i+'">'+skuM.specId+'</span></td>';
+					trHtml = trHtml+'<td class="lu_tb_skuc">Sku:<span  class="lu_tb_sku lu_tb_sku'+i+'">'+skuM.sku+'</span><br>';
+					trHtml = trHtml+'Skuid:<span  class="lu_tb_skuid lu_tb_skuid'+i+'">'+skuM.skuID+'</span><br>';
+					trHtml = trHtml+'Specid<span  class="lu_tb_specidc lu_tb_specidc'+i+'">'+skuM.specId+'</span></td>';
 					trHtml = trHtml+'<td class="llu_tb_count u_tb_count'+i+'">'+skuM.itemqty+'</td>';
 					trHtml = trHtml+'<td><input type="text" class="form-control lu_tb_a_count lu_tb_a_count'+i+'" value="'+skuM.itemqty+'"></td>';
 					trHtml = trHtml+'<td class="lu_tb_bar lu_tb_bar'+i+'"><input type="text" placeholder="请输入库位条形码" class="lu_tb_barcode"></td>';
@@ -547,6 +547,7 @@ function saveInventory(){
 	       	if(data.status==200){
 				alert("库存录入成功");
 				$('.tc,.trnasparent,.tc1').hide();
+				window.reload();
 	       	}else{
 	       		alert("库存录入失败");
 	       	}
@@ -598,6 +599,7 @@ function saveTbInventory(){
 			if(data.status==200){
 				alert("库存录入成功");
 				$('.tc,.trnasparent,.tc2').hide();
+				window.reload();
 			}else{
 				alert("库存录入失败");
 			}

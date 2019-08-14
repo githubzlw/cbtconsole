@@ -768,6 +768,9 @@ public class InventoryServiceImpl implements  InventoryService{
 			wrap.setDelContext(delContext );
 			wrap.setOrderContext(orderContext);
 			wrap.setTypeContext(typeContext);
+			if(i.getType() == 4) {
+				wrap.setTypeContext("盘点");
+			}
 			
 			result.add(wrap);
 		}

@@ -354,9 +354,9 @@ em,i{font-style: normal;}
 						<td class="lu_tb_name">产品名称产品名称产品名称产品名称</td>
 						<td><img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg" alt="" class="img-responsive"></td>
 						<td class="lu_tb_skuc">
-						<span  class="lu_tb_sku">xxxxx</span>
-						<span  class="lu_tb_skuid">1111111111111</span>
-						<span  class="lu_tb_specidc">2222222222222</span>
+						Sku:<span  class="lu_tb_sku">xxxxx</span><br>
+						Skuid:<span  class="lu_tb_skuid">1111111111111</span><br>
+						Specid:<span  class="lu_tb_specidc">2222222222222</span>
 						</td>
 						<td class="lu_tb_count">10</td>
 						<td><input type="text" class="form-control lu_tb_a_count" value="10"></td>
