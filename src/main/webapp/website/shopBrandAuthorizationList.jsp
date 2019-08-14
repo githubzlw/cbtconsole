@@ -27,6 +27,17 @@
             color: #fff;
             margin-left: 12px;
         }
+
+        .del_color {
+            margin-bottom: 3px;
+            margin-top: 6px;
+            background: red;
+            /*width: 70px;*/
+            height: 24px;
+            border: 1px #aaa solid;
+            color: #fff;
+            margin-left: 12px;
+        }
     </style>
     <script type="text/javascript">
 
@@ -60,7 +71,7 @@
                             termOfValidity: termOfValidity,
                             certificateFile: certificateFile,
                             remotePath: remotePath,
-                            localPath:localPath
+                            localPath: localPath
                         },
                         success: function (data) {
                             if (data.ok) {
@@ -85,9 +96,9 @@
 
         function uploadFile() {
             $.messager.progress({
-                        title: '上传本地图片到服务器',
-                        msg: '请等待...'
-                    });
+                title: '上传本地图片到服务器',
+                msg: '请等待...'
+            });
             $("#file_form").form('submit', {
                 type: "post",  //提交方式
                 url: "/cbtconsole/ShopUrlC/uploadBrandFile", //请求url
@@ -112,8 +123,9 @@
             });
         }
 
-        function updateBrandInfo(brandId, brandName, authorizeState, termOfValidity, certificateFile) {
-            resetForm();
+        function updateBrandInfo(brandId, brandName, authorizeState, termOfValidity, certificateFile, localPath, remotePath) {
+            // resetForm();
+            $("#brand_id_tr").show();
             $("#in_brand_id").val(brandId);
             $("#in_brand_name").val(brandName);
             $("#in_authorize_state").val(authorizeState);
@@ -122,6 +134,8 @@
                 $("#certificate_file").val(certificateFile);
                 $("#certificate_file").show();
                 $("#file_div").hide();
+                $("#remote_path").val(remotePath);
+                $("#local_path").val(localPath);
             }
             $('#enter_div_sty').dialog('open');
         }
@@ -135,6 +149,7 @@
             $('#enter_div_sty').dialog('close');
             resetForm();
         }
+
         function resetForm() {
             $("#in_brand_id").val(0);
             $("#in_brand_name").val("");
@@ -142,6 +157,33 @@
             $("#term_of_validity").val("");
             $("#certificate_file").hide();
             $("#file_div").show();
+            $("#brand_id_tr").hide();
+            $("#remote_path").val("");
+            $("#local_path").val("");
+        }
+
+        function deleteAuthorizedInfo(brandId, shopId) {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/ShopUrlC/deleteAuthorizedInfo",
+                data: {
+                    shopId: shopId,
+                    brandId: brandId
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        closeDialog();
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        $.messager.alert("提醒", '执行错误:' + data.message, "error");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提醒", '保存错误，请联系管理员', "error");
+                }
+            });
         }
 
     </script>
@@ -154,7 +196,7 @@
 <c:if test="${show > 0}">
 
     <div id="enter_div_sty" class="easyui-dialog" title="店铺品牌" data-options="modal:true"
-         style="width: 699px; height: 300px;">
+         style="width: 699px; height: 330px;">
         <table>
             <tr>
                 <td>店铺ID</td>
@@ -169,7 +211,7 @@
                 </tr>--%>
             <tr id="brand_id_tr" style="display: none;">
                 <td>品牌ID</td>
-                <td><input id="in_brand_id" value="0" style="width: 168px; height: 28px;"/></td>
+                <td><input id="in_brand_id" value="0" style="width: 168px; height: 28px;" disabled="disabled"/></td>
             </tr>
             <tr>
                 <td>品牌名称</td>
@@ -182,6 +224,7 @@
                     <option value="1">已授权</option>
                     <option value="2">自有品牌</option>
                     <option value="3">无需授权</option>
+                    <option value="-1">侵权</option>
                 </select></td>
             </tr>
             <tr>
@@ -195,7 +238,7 @@
                 <td>
                     <input id="certificate_file" style="display: none;width: 599px; height: 28px;" value=""
                            disabled="disabled"/>
-                    <input type="hidden" id="remote_path" value="" />
+                    <input type="hidden" id="remote_path" value=""/>
                     <input type="hidden" id="local_path" value=""/>
                     <div id="file_div">
                         <form id="file_form" method="post" enctype="multipart/form-data">
@@ -265,6 +308,9 @@
                     <c:if test="${brandInfo.authorizeState == 3}">
                         无需授权
                     </c:if>
+                    <c:if test="${brandInfo.authorizeState == -1}">
+                        <b style="color: red">侵权</b>
+                    </c:if>
                 </td>
                 <td>
                         ${brandInfo.termOfValidity}
@@ -293,7 +339,10 @@
                 <td>
                     <button class="but_color"
                             onclick="updateBrandInfo(${brandInfo.id},'${brandInfo.brandName}',${brandInfo.authorizeState},
-                                    '${brandInfo.termOfValidity}','${brandInfo.certificateFile}')">编辑品牌
+                                    '${brandInfo.termOfValidity}','${brandInfo.certificateFile}','${brandInfo.localPath}','${brandInfo.remotePath}')">编辑品牌
+                    </button>
+                    <button class="del_color" onclick="deleteAuthorizedInfo(${brandInfo.id},'${shopId}')">
+                        删除品牌
                     </button>
                 </td>
             </tr>
