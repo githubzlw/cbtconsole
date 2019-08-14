@@ -35,7 +35,7 @@
         select count(0) from shop_brand_authorization
         where shop_id = #{shopId} and brand_name = #{brandName}
         <if test="brandId != null">
-            id != #{brandId}
+            and id != #{brandId}
         </if>
     </select>
 

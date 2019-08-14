@@ -3834,8 +3834,8 @@ public class ShopUrlController {
             }
         }
         Integer brandId = null;
-        if(StringUtils.isBlank(brandIdStr) && Integer.valueOf(brandIdStr) > 0){
-            brandId = Integer.valueOf(brandId);
+        if(StringUtils.isNotBlank(brandIdStr) && Integer.valueOf(brandIdStr) > 0){
+            brandId = Integer.valueOf(brandIdStr);
         }
         try {
             ShopBrandAuthorization authorization = new ShopBrandAuthorization();
@@ -3880,6 +3880,12 @@ public class ShopUrlController {
                     return json;
                 }
             }*/
+            int checkCount = shopUrlService.checkBrandAuthorizationByName(shopId, brandName, brandId);
+            if (checkCount > 0) {
+                json.setOk(false);
+                json.setMessage("已经存在此店铺品牌");
+                return json;
+            }
             if (brandId != null) {
                 authorization.setId(Integer.valueOf(brandId));
                 shopUrlService.updateShopBrandAuthorization(authorization);
@@ -3888,20 +3894,39 @@ public class ShopUrlController {
                 authorization.setRemotePath(remotePath);
                 authorization.setLocalPath(localPath);
                 // 检查是否已经存在此品牌
-                int checkCount = shopUrlService.checkBrandAuthorizationByName(shopId, brandName, brandId);
-                if (checkCount > 0) {
-                    json.setOk(false);
-                    json.setMessage("已经存在此店铺品牌");
-                } else {
-                    shopUrlService.insertIntoShopBrandAuthorization(authorization);
-                    json.setOk(true);
-                }
+                shopUrlService.insertIntoShopBrandAuthorization(authorization);
             }
+            json.setOk(true);
         } catch (Exception e) {
             json.setOk(false);
             json.setMessage("saveBrandInfo error:" + e.getMessage());
             e.printStackTrace();
             LOG.error("saveBrandInfo error：", e);
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/deleteAuthorizedInfo", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public JsonResult deleteAuthorizedInfo(HttpServletRequest request,HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        String shopId = request.getParameter("shopId");
+        String brandIdStr = request.getParameter("brandId");
+        if (StringUtils.isBlank(shopId) || StringUtils.isBlank(brandIdStr)) {
+            json.setOk(false);
+            json.setMessage("请输参数不完整");
+            return json;
+        }
+        try {
+            shopUrlService.deleteShopBrandAuthorizationById(Integer.valueOf(brandIdStr));
+            json.setOk(true);
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("deleteAuthorizedInfo error:" + e.getMessage());
+            e.printStackTrace();
+            LOG.error("deleteAuthorizedInfo error：", e);
         }
         return json;
     }
