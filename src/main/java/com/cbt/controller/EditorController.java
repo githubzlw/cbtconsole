@@ -14,6 +14,7 @@ import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.thread.DeleteImgByMd5Thread;
@@ -59,6 +60,7 @@ public class EditorController {
     private String localIP = "http://27.115.38.42:8083/";
     private String wanlIP = "http://192.168.1.27:8083/";
     private DecimalFormat format = new DecimalFormat("#0.00");
+    private static List<String> kidsCatidList = new ArrayList<>();
 
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 
@@ -696,6 +698,7 @@ public class EditorController {
         String userJson = Redis.hget(sessionId, "admuser");
 
         try {
+
             Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
             if (user == null || user.getId() == 0) {
                 json.setOk(false);
@@ -1230,6 +1233,9 @@ public class EditorController {
         }
 
         try {
+            if (kidsCatidList == null || kidsCatidList.size() == 0) {
+                kidsCatidList = customGoodsService.queryKidsCanUploadCatid();
+            }
             Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
             if (user == null || user.getId() == 0) {
                 json.setOk(false);
@@ -1241,6 +1247,18 @@ public class EditorController {
             if (count > 0) {
                 json.setOk(true);
                 json.setMessage("执行成功");
+                // 判断是否是kids商品，如果是，则删除图片服务器图片
+                CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pidStr, 0);
+                if (kidsCatidList.contains(goods.getCatid1())) {
+                    List<String> imgList = GoodsInfoUtils.getAllImgList(goods);
+                    boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                    if (!isSu) {
+                        isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                    }
+                    if (!isSu) {
+                        LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
+                    }
+                }
             } else {
                 json.setOk(false);
                 json.setMessage("执行失败，请重试！");
@@ -1258,6 +1276,7 @@ public class EditorController {
     @RequestMapping(value = "/setGoodsOnline")
     @ResponseBody
     public JsonResult setGoodsOnline(HttpServletRequest request, HttpServletResponse response) {
+
 
         JsonResult json = new JsonResult();
         String sessionId = request.getSession().getId();
@@ -1281,6 +1300,7 @@ public class EditorController {
             if (count > 0) {
                 json.setOk(true);
                 json.setMessage("执行成功");
+
             } else {
                 json.setOk(false);
                 json.setMessage("执行失败，请重试！");
