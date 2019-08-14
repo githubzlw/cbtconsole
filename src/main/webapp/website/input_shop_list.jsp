@@ -774,12 +774,16 @@
                     countent +='<td style="border: 2px solid #7fe63d;"></td>';
                 }else if(authorizationList[i].authorizeState == 1){
                     countent += '<td style="border: 2px solid #7fe63d;text-align: center;"><b style="background-color: #98f198;">已授权</b></td>';
-                    countent += '<td style="border: 2px solid #7fe63d;text-align: center;">'+authorizationList[i].termOfValidity+'</td>';
+                    if(checkIsValid(authorizationList[i].termOfValidity)){
+                        countent += '<td style="border: 2px solid #7fe63d;text-align: center;"><b style="background-color: red;">'+authorizationList[i].termOfValidity+'</b></td>';
+                    }else{
+                        countent += '<td style="border: 2px solid #7fe63d;text-align: center;">'+authorizationList[i].termOfValidity+'</td>';
+                    }
                 }else if(authorizationList[i].authorizeState == 2){
-                    countent += '<td style="border: 2px solid #7fe63d;text-align: center;">自有品牌</td>';
+                    countent += '<td style="border: 2px solid #7fe63d;text-align: center;"><b style="background-color: #98f198;">自有品牌</b></td>';
                     countent +='<td style="border: 2px solid #7fe63d;"></td>';
                 }else if(authorizationList[i].authorizeState == 3){
-                    countent += '<td style="border: 2px solid #7fe63d;text-align: center;">无需授权</td>';
+                    countent += '<td style="border: 2px solid #7fe63d;text-align: center;"><b style="background-color: #98f198;">无需授权</b></td>';
                     countent +='<td style="border: 2px solid #7fe63d;"></td>';
                 }
                 countent += '</tr>';
@@ -788,6 +792,19 @@
         countent +='</table>';
         countent +='<button class="but_color" onclick="openBrandInfo(\''+row.shopId+'\')">设置店铺品牌</button>';
         return countent;
+    }
+
+    function checkIsValid(dayTime){
+        var noValid = true;
+        var date = new Date(dayTime);
+        var today = new Date();
+        var num = today.getTime() - date.getTime();
+        if(num > 0 &&　num <= 24 * 60 * 60 * 1000){
+            noValid = true;
+        }else if(num < 0){
+            noValid = true;
+        }
+        return noValid;
     }
 
     //授权标记操作
