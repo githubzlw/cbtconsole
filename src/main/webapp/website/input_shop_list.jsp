@@ -516,19 +516,21 @@
     <tr>
         <th data-options="field:'shopId',width:120,align:'center'">店铺ID</th>
         <%--<th data-options="field:'inputShopName',width:50,align:'center'">店铺名称</th>--%>
-        <th data-options="field:'shopUrl',width:140,align:'center',formatter:formatShopInfo">店铺信息</th>
+        <th data-options="field:'shopUrl',width:120,align:'center',formatter:formatShopInfo">店铺信息</th>
         <%--<th data-options="field:'inputShopEnName',width:100,align:'center'">店铺英文</th>
         <th data-options="field:'inputShopBrand',width:80,align:'center'">品牌属性</th>--%>
-        <th data-options="field:'onLineNum',width:140,align:'center',formatter:formatShopNum">已在线商品/状态</th>
+        <th data-options="field:'onLineNum',width:120,align:'center',formatter:formatShopNum">已在线商品/状态</th>
         <%--<th data-options="field:'isValidView',width:40,align:'center'">是否启用</th>--%>
-        <th data-options="field:'onlineStatusView',width:120,align:'center',formatter:formatState">启用/店铺上线/授权</th>
-        <th data-options="field:'updatetime',width:120,align:'center',formatter:formatUpdateInfo">更新信息</th>
+        <th data-options="field:'onlineStatusView',width:80,align:'center',formatter:formatState">启用/店铺上线/授权</th>
+        <th data-options="field:'updatetime',width:80,align:'center',formatter:formatUpdateInfo">更新信息</th>
         <%--<th data-options="field:'admUser',width:50,align:'center'">编辑者</th>--%>
         <%--<th data-options="field:'isAuto',width:50,align:'center',formatter:formatAuto">录入来源</th>--%>
         <%--<th data-options="field:'authorizedFlag',width:50,align:'center',formatter:formatAuthorizedFlag">授权标识</th>--%>
+        <%--<th data-options="field:'authorizedInfo',width:120,align:'center',formatter:formatAuthorizedInfo">授权操作</th>--%>
+        <th data-options="field:'authorizedInfo',width:200,align:'center',formatter:formatAuthorizedInfo">店铺品牌信息</th>
+        <th data-options="field:'inputShopDescription',width:90,align:'center'">店铺描述</th>
         <th data-options="field:'stateInfo',width:120,align:'center'">操作</th>
-        <th data-options="field:'authorizedInfo',width:120,align:'center',formatter:formatAuthorizedInfo">授权操作</th>
-        <th data-options="field:'inputShopDescription',width:100,align:'center'">店铺描述</th>
+        <%--<th data-options="field:'opsAction',width:100,align:'center',formatter:formatShopBrand">操作</th>--%>
     </tr>
     </thead>
 </table>
@@ -676,6 +678,7 @@
         var content = '<div style="font-size: 13px;">';
         content += '<span>店铺英文:'+row.inputShopEnName+'</span>';
         content += '<br><span>品牌属性:'+row.inputShopBrand+'</span>';
+        content += '<br><span>品牌名称:<b style="background-color: #94ff84;">['+row.brandNames+']</b></span>';
         content += '<br><span>URL:<a href="'+val+'" target="_blank">'+val+'</a></span>';
         content += '</div>';
         return content;
@@ -697,18 +700,14 @@
         if (row.isShopFlag == 1) {
             content += '<br><span>是否店铺上线 :是</span>';
         } else {
-            content += '<br><span style="color: red;">是否店铺上线:否</span>';
+            content += '<br><b style="color: red;">是否店铺上线:否</b>';
         }
         if(row.authorizedFlag == 1){
-            content += '<br><span>授权:已授权</span>';
+            content += '<br><b style="color:green;">授权:已授权</b>';
         }else if(row.authorizedFlag == 2){
-            content += '<br><span>授权:暂不给授权但可卖</span>';
+            content += '<br><b style="color:#46b7e4;">授权:部分授权</b>';
         }else if(row.authorizedFlag == 3){
-            content += '<br><span style="color:red;">授权:不给授权</span>';
-        }else if(row.authorizedFlag == 0){
-            content += '<br><span>授权:未问是否给授权</span>';
-        }else{
-            content += '<br><span>授权:</span>';
+            content += '<br><b style="color:red;">授权:未授权</b>';
         }
         content += '</div>';
         return content;
@@ -747,9 +746,70 @@
 			break;
 		}
     }
-    //授权标记操作
+
+    function openBrandInfo(shopId) {
+        var url = '/cbtconsole/ShopUrlC/shopBrandAuthorizationList?shopId=' + shopId;
+        var param = "height=660,width=1430,top=190,left=230,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        window.open(url, "windows", param);
+    }
+
+    function formatShopBrand(val, row, index) {
+        // return "<a target='_blank' href='/cbtconsole/ShopUrlC/shopBrandAuthorizationList?shopId=" + row.shopId + "'>设置店铺品牌</a>";
+        return '<button class="but_color" onclick="openBrandInfo(\''+row.shopId+'\')">设置店铺品牌</button>';
+    }
+
     function formatAuthorizedInfo(val, row, index) {
-    	if(row.shopId != null){ /* 已授权店铺才有操作 */
+        var countent = '<table border="2" cellspacing="1" cellpadding="1">';
+        var authorizationList = row.authorizationList;
+        if (authorizationList) {
+            countent += '<tr style="border: 1px solid #7fe63d;">'
+                +'<td style="border: 2px solid #7fe63d;width: 180px;">品牌名称</td>'
+                +'<td style="border: 2px solid #7fe63d;width: 80px;text-align: center;">授权状态</td>'
+                +'<td style="border: 2px solid #7fe63d;width: 100px;text-align: center;">有效期</td></tr>';
+            for (var i=0;i< authorizationList.length;i++) {
+                countent += '<tr style="border: 1px solid #7fe63d;">';
+                countent += '<td style="border: 2px solid #7fe63d;">'+authorizationList[i].brandName+'</td>';
+                if(authorizationList[i].authorizeState == 0){
+                    countent += '<td style="border: 2px solid #7fe63d;text-align: center;"><b style="background-color: #ef8197;">无授权</b></td>';
+                    countent +='<td style="border: 2px solid #7fe63d;"></td>';
+                }else if(authorizationList[i].authorizeState == 1){
+                    countent += '<td style="border: 2px solid #7fe63d;text-align: center;"><b style="background-color: #98f198;">已授权</b></td>';
+                    if(checkIsValid(authorizationList[i].termOfValidity)){
+                        countent += '<td style="border: 2px solid #7fe63d;text-align: center;"><b style="background-color: red;">'+authorizationList[i].termOfValidity+'</b></td>';
+                    }else{
+                        countent += '<td style="border: 2px solid #7fe63d;text-align: center;">'+authorizationList[i].termOfValidity+'</td>';
+                    }
+                }else if(authorizationList[i].authorizeState == 2){
+                    countent += '<td style="border: 2px solid #7fe63d;text-align: center;"><b style="background-color: #98f198;">自有品牌</b></td>';
+                    countent +='<td style="border: 2px solid #7fe63d;"></td>';
+                }else if(authorizationList[i].authorizeState == 3){
+                    countent += '<td style="border: 2px solid #7fe63d;text-align: center;"><b style="background-color: #98f198;">无需授权</b></td>';
+                    countent +='<td style="border: 2px solid #7fe63d;"></td>';
+                }
+                countent += '</tr>';
+            }
+        }
+        countent +='</table>';
+        countent +='<button class="but_color" onclick="openBrandInfo(\''+row.shopId+'\')">设置店铺品牌</button>';
+        return countent;
+    }
+
+    function checkIsValid(dayTime){
+        var noValid = true;
+        var date = new Date(dayTime);
+        var today = new Date();
+        var num = today.getTime() - date.getTime();
+        if(num > 0 &&　num <= 24 * 60 * 60 * 1000){
+            noValid = true;
+        }else if(num < 0){
+            noValid = true;
+        }
+        return noValid;
+    }
+
+    //授权标记操作
+    /*function formatAuthorizedInfo(val, row, index) {
+    	if(row.shopId != null){ /!* 已授权店铺才有操作 *!/
     		var temHtml = "<button class=\"but_authorized\" onclick=\"setAuthorizedFlag('" + row.shopId + "', '3')\">不给授权</button>";
     		temHtml += "<button class=\"but_authorized\" onclick=\"setAuthorizedFlag('" + row.shopId + "', '1')\">已给授权</button>";
     		temHtml += "<button class=\"but_authorized2\" onclick=\"setAuthorizedFlag('" + row.shopId + "', '2')\">暂不给授权但可卖</button><br />";
@@ -767,7 +827,7 @@
 		    return temHtml;
     	}
     	return "";
-    }
+    }*/
 
     var delreply = function (id) {
         $.messager.confirm('提示', '确定删除该数据吗?', function (r) {

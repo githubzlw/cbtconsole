@@ -367,7 +367,9 @@ public class NewFtpUtil {
 			while ((c = raf.read(bytes)) != -1) {
 				out.write(bytes, 0, c);
 			}
-		} finally {
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
 			try {
 				out.close();
 				is.close();

@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.cbt.warehouse.dao.InventoryMapper" >
+    <resultMap id="InventoryCheckRecordMap" type="com.cbt.website.bean.InventoryCheckRecord" >
+        <result column="id" property="id" jdbcType="INTEGER" />
+        <result column="inventory_check_id" property="inventoryCheckId" jdbcType="INTEGER" />
+        <result column="inventory_sku_id" property="inventorySkuId" jdbcType="INTEGER" />
+        <result column="goods_pid" property="goodsPid" jdbcType="VARCHAR" />
+        <result column="goods_sku" property="goodsSku" jdbcType="VARCHAR" />
+        <result column="goods_specid" property="goodsSpecid" jdbcType="VARCHAR" />
+        <result column="goods_skuid" property="goodsSkuid" jdbcType="VARCHAR" />
+        <result column="goods_price" property="goodsPrice" jdbcType="VARCHAR" />
+        <result column="inventory_remaining" property="inventoryRemaining" jdbcType="INTEGER" />
+        <result column="check_remaining" property="checkRemaining" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+        <result column="before_barcode" property="beforeBarcode" jdbcType="VARCHAR" />
+        <result column="after_barcode" property="afterBarcode" jdbcType="VARCHAR" />
+        <result column="goods_img" property="goodsImg" jdbcType="VARCHAR" />
+    </resultMap>
     <resultMap id="InventoryCheckMap" type="com.cbt.website.bean.InventoryCheck" >
         <result column="id" property="id" jdbcType="INTEGER" />
         <result column="check_cat" property="checkCat" jdbcType="INTEGER" />
@@ -185,7 +201,7 @@
        
     </select>
     <update id="problem_inventory">
-        update inventory set flag=2 where id=${in_id}
+        update inventory set flag=2 where id=#{in_id}
     </update>
     <select id="searchAliCategory" resultMap="AliCategoryMap">
         <if test="type=='type1'">
@@ -253,8 +269,8 @@
         WHERE ili.remark='库存删除'  AND DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(idd.createtime)
     </select>
     <delete id="deleteInventory">
-        INSERT INTO inventory_delete_details SELECT *,#{dRemark} FROM inventory WHERE id= ${id};
-        delete from inventory where id=${id};
+        INSERT INTO inventory_delete_details SELECT *,#{dRemark} FROM inventory WHERE id= #{id};
+        delete from inventory where id=#{id};
     </delete>
     <update id="updateIsStockFlag2">
         update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
@@ -379,13 +395,20 @@
     <insert id="insertInventory" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventorySku">
     insert into inventory_sku(goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_type,
     car_img,goods_pid,car_urlMD5,createtime,goods_p_price,goods_p_url,updatetime,specid,skuid,goods_p_pid,od_id,goods_price,db_flag) 
-	values(#{goodsUrl},#{remaining},#{canRemaining},#{goodName},#{sku},#{barcode},
+	values(#{goodsUrl},#{remaining},#{canRemaining},#{goodsName},#{sku},#{barcode},
 	#{goodsCatid},#{inventoryType},#{carImg},#{goodsPid},#{carUrlMD5},now(),#{goodsPPrice},
 	#{goodsPUrl},now(),#{specid},#{skuid},#{goodsPPid},#{odid},#{goodsPrice},#{dbFlag})
     </insert>
     <!-- 更新库存  -->
     <update id="updateInventory">
     update inventory_sku set remaining=#{remaining},can_remaining=#{canRemaining},updatetime=now() where id=#{id}
+    </update>
+    <!-- 更新库存  -->
+    <update id="updateInventoryCheckFlag">
+    update inventory_sku set remaining=#{remaining},can_remaining=#{canRemaining},check_remaining=#{checkRemaining},
+    inventory_check_id=#{inventoryCheckId},
+    barcode=#{barcode},
+    flag=1,updatetime=now() where id=#{id}
     </update>
     <!-- 获取库存表  -->
     <select id="getInventory" resultMap="InventorySkuMap">
@@ -458,7 +481,7 @@
     #{item.beforeBarcode},#{item.afterBarcode},now())
     </foreach>
     </insert>
-    
+    <!--  -->
     <select id="getInventoryByIds" resultMap="InventorySkuResultMap">
     select is.id,is.check_remaining,isc.check_time
     from  inventory_sku is left join inventory_sku_check isc on is.inventory_check_id =isc.id 
@@ -466,12 +489,64 @@
     <foreach collection="list" item="item" separator="," open="(" close=")">
     #{item}
     </foreach>
-    
+    <!-- 更新盘点记录完结 -->
     </select>
     <update id="updateInventoryCheckDone">
     update inventory_sku_check set check_done=1 where id=#{id}
     </update>
+    <!-- 获取库存类别列表 -->
+    <select id="getInventoryCatList" resultType="java.util.Map">
+     select  isu.goodscatid as catid,c.en_name as catname
+    from  inventory_sku isu 
+    left join 1688_category c on isu.goodscatid=c.category_id group by isu.goodscatid
+    </select>
+    <!-- 完结盘点 -->
+    <insert id="doneInventoryCheckRecord">
+    insert into inventory_sku_check_record(inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
+    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode) 
+    (select inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
+    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode 
+    from inventory_sku_check_record_temp where inventory_check_id=#{checkId})
+    </insert>
+    <!-- 更新阿盘点数据 -->
+    <update id="updateInventoryCheckRecord">
+    update inventory_sku_check_record_temp set 
+    check_remaining=#{checkRemaining},after_barcode=#{afterBarcode},create_time=now() where id=#{id}
+    where id=#{id}
+    </update>
+    <!-- 插入本次盘点数据 -->
+    <insert id="insertInventoryCheckRecord" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventoryCheckRecord">
+    insert into inventory_sku_check_record_temp(inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
+    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode) 
+    values(#{inventoryCheckId},#{inventorySkuId},#{goodsPid},#{goodsSku},
+    #{goodsSpecid},#{goodsSkuid},#{goodsPrice},#{inventoryRemaining},
+    #{checkRemaining},now(),#{beforeBarcode},#{afterBarcode})
+    </insert>
+    <!-- 获取本次盘点数据 -->
+    <select id="getInventoryCheckRecord" resultMap="InventoryCheckRecordMap">
+    select id,inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
+    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode
+    from inventory_sku_check_record_temp where inventory_check_id=#{checkId}
+    </select>
+    <!-- 获取盘点历史数据 -->
+    <select id="getICRHistory" resultMap="InventoryCheckRecordMap">
+    select iscr.id,iscr.inventory_check_id,iscr.inventory_sku_id,iscr.goods_pid,iscr.goods_sku,
+    iscr.goods_specid,iscr.goods_skuid,iscr.goods_price,iscr.inventory_remaining,
+    iscr.check_remaining,iscr.create_time,iscr.before_barcode,iscr.after_barcode,isk.car_img as goods_img
     
+    from inventory_sku_check_record 
+    iscr left join inventory_sku isk on iscr.inventory_sku_id=isk.id
     
+    where iscr.inventory_sku_id=#{inid} limit #{page},50
+    </select>
+    <!-- 获取盘点历史数据 -->
+    <select id="getICRHistoryCount" resultType="Integer">
+    select count(id)
+    from inventory_sku_check_record where inventory_sku_id=#{inid} 
+    </select>
+    <!-- 删除临时盘点数据 -->
+    <delete id="deleteInventoryCheckRecord">
+    delete from inventory_sku_check_record_temp where inventory_check_id=#{checkId}
+    </delete>
     
 </mapper>

@@ -9,6 +9,7 @@ import com.cbt.util.BigDecimalUtil;
 import com.cbt.warehouse.pojo.JcexPrintInfo;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
+import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryData;
 
 import org.apache.poi.hssf.usermodel.*;
@@ -83,6 +84,7 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	String[] excelTota21 = { "序号","商品名称","网站链接","商品库位","商品规格","采购价","首次库存数量","首次库存金额","盘点后库存数量","盘点后库存金额","可用库存数量","首次录入时间","最后更新库存时间","删除人","删除时间","删除备注"};
 	String[] excelTota22 = { "序号","盘点前库存","盘点后库存","盘点前库位","盘点后库位","商品规格","损耗单价","损耗库存金额","损耗时间","损耗人","损耗原因"};
 	String[] excelTota23 = { "序号","支付月份","用户ID","用户邮箱","VIP等级","订单数量","实际重量（kg）","预估重量(kg)","实际支付金额(RMB)","实际采购金额(RMB)","实际运费(RMB)","客户付的运费(RMB)","用户利润(RMB)","用户利润率(%)","预计运费(RMB)","用户利润预估(RMB)","用户预估利润率(%)"};
+	String[] excelTota24 = { "序号","盘点前库存","盘点后库存","盘点前库位","盘点后库位","商品ID","商品规格","specid","skuid","时间","盘点记录id","库存id"};
 
 	@Override
 	public HSSFWorkbook exportUserProfitByMonth(List<OrderSalesAmountPojo> list) {
@@ -1151,5 +1153,45 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 		}
 		return wb;
 	}
-
+	@Override
+	public HSSFWorkbook exportInventoryCheckExcel(List<InventoryCheckRecord> list) {
+		String sheetName = "库存盘点日志报表"; //报表页名
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(sheetName);
+		int rows =0;  //记录行数
+		HSSFRow row = sheet.createRow(rows++);
+		HSSFCellStyle style = wb.createCellStyle();
+		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+		HSSFCell hcell = row.createCell(0); //添加标题
+		hcell.setCellValue("商品盘点信息统计");
+		row = sheet.createRow(rows++);  //到下一行添加数据
+		for (int i = 0; i < excelTota24.length; i++) {
+			HSSFCell cell = row.createCell(i);
+			cell.setCellValue(excelTota24[i]);
+			cell.setCellStyle(style);
+		}
+		try{
+			//写入报表汇总
+			//{ "序号","盘点前库存","盘点后库存","盘点前库位","盘点后库位","商品ID","商品规格","specid","skuid","时间","盘点记录id","库存id"};
+			for (int i = 0; i < list.size(); i++) {
+				row = sheet.createRow(rows++);
+				InventoryCheckRecord bg = list.get(i);
+				row.createCell(0).setCellValue((i+1));
+				row.createCell(1).setCellValue(bg.getInventoryRemaining());
+				row.createCell(2).setCellValue(bg.getCheckRemaining());
+				row.createCell(3).setCellValue(bg.getBeforeBarcode());
+				row.createCell(4).setCellValue(bg.getAfterBarcode());
+				row.createCell(5).setCellValue(bg.getGoodsPid());
+				row.createCell(6).setCellValue(bg.getGoodsSku());
+				row.createCell(7).setCellValue(bg.getGoodsSpecid());
+				row.createCell(8).setCellValue(bg.getGoodsSpecid());
+				row.createCell(9).setCellValue(bg.getCreateTime());
+				row.createCell(10).setCellValue(bg.getInventoryCheckId());
+				row.createCell(11).setCellValue(bg.getInventorySkuId());
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return wb;
+	}
 }

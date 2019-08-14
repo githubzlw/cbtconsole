@@ -131,6 +131,8 @@ em,i{font-style: normal;}
 
 
 .report .btn_page_in{width:100px;}
+.w350{width: 350px;}
+.datagrid-cell-c2-goodsName{width:200px;}
 </style>
 </head>
 <body>
@@ -140,18 +142,16 @@ em,i{font-style: normal;}
 			
 			<div class="row">
 			<div class="col-xs-12">
-			<label class="w200">产品分类： 
+			<label class="w350">产品分类： 
 			<select class="form-control" id="query_catid_select" >
-						<option value="0">全部</option>
-						<option value="1">是</option>
-						<option value="2">否</option>
+						
 			</select>
 			</label>
-				<label><button class="btn btn-default"  id="query_button_check_start">开始盘点</button>
-				<input type="hidden" value="${queryParam.checkStart}" id="is_check_start">
+				<label><button class="btn btn-info"  id="query_button_check_start">开始盘点</button>
+				<input type="hidden" value="${queryParam.check_id}" id="check_id">
 				</label>
-				<label><button class="btn btn-default"  id="query_button_check_cancel">撤销本次盘点</button></label>
-				<label><button class="btn btn-default"  id="query_button_check_done">完成盘点/打印报表</button></label>
+				<label><button class="btn btn-info qbt_check"  id="query_button_check_cancel">撤销本次盘点</button></label>
+				<label><button class="btn btn-info qbt_check"  id="query_button_check_done">完成盘点/打印报表</button></label>
 			</div>
 			</div>
 			
@@ -163,9 +163,14 @@ em,i{font-style: normal;}
 			<div class="col-xs-11">
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
 				<label>产品ID：<input type="text" class="form-control p_q_r" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
-				<label>产品分类：<input type="text" class="form-control p_q_r" id="query_goodscatid" value="${queryParam.goodscatid }"></label>
-				<label>库存量大于：<input type="text" class="form-control p_q_r" id="query_minintentory" value="${queryParam.minintentory }"></label>
-				<label>库存量小于：<input type="text" class="form-control p_q_r" id="query_maxintentory" value="${queryParam.maxintentory }"></label>
+				<label>产品分类：
+				<select class="form-control p_q_r" id="query_goodscatid" >
+						
+				</select>
+				<input type="hidden" class="form-control p_q_r" id="query_goodscatid_q" value="${queryParam.goodscatid }">
+				</label>
+				<label>库存量大于：<input type="text" class="form-control p_q_r" id="query_minintentory" value="${queryParam.qminintentory }"></label>
+				<label>库存量小于：<input type="text" class="form-control p_q_r" id="query_maxintentory" value="${queryParam.qmaxintentory }"></label>
 				<label class="w200">是否上架： <select class="form-control  p_qs_r" id="query_line" >
 				<c:if test="${queryParam.isline==0 }">
 						<option value="0" selected="selected">全部</option>
@@ -184,7 +189,7 @@ em,i{font-style: normal;}
 				</c:if>
 				</select>
 				</label>
-				<button class="btn btn-default bt_ready"  id="query_button_check">查询</button>
+				<button class="btn btn-info bt_ready"  id="query_button_check">查询</button>
 				
 			</div>
 		</div>
@@ -196,7 +201,7 @@ em,i{font-style: normal;}
 				<button class="btn btn-success bt_ready" id="tc1">录入新产品</button>
 				<button class="btn btn-success bt_ready" id="tc2">导入未匹配产品</button>
 				<!-- <button class="btn btn-success" id="tc3">增加线上产品库存</button> -->
-				<label><b>最新盘点时间：</b><span id="intentory_time">2019.8.7</span></label>
+				<!-- <label><b>最新盘点时间：</b><span id="intentory_time">2019.8.7</span></label> -->
 			</div>
 		</div>
 		<div class="row mt20">
@@ -234,11 +239,16 @@ em,i{font-style: normal;}
 						<td class="datagrid-cell-c2-last-remaining">${tory.lastCheckRemaining}</td>
 						<td class="datagrid-cell-c2-change-remaining">${tory.changeRemaining}</td>
 						<td class="datagrid-cell-c2-remaining">${tory.remaining}
-						<em class="datagrid-cell-c2-canRemaining" style="display:none;">${tory.canRemaining}</em>
 						</td>
-						<td class="">${tory.goodsPrice}</td>
-						<td class="datagrid-cell-c2-checkRemaining"><input class="datagrid-cell-c2-check-Remaining q_in_r" value="${tory.remaining}" readonly="readonly"></td>
-						<td class="">${tory.barcode}</td>
+						<td class="emprice">${tory.goodsPrice}</td>
+						<td class="datagrid-cell-c2-checkRemaining">
+						<input class="datagrid-cell-c2-check-Remaining q_in_r c_remaining" value="${tory.remaining}" readonly="readonly" onchange="updateCheckRecord(${index.index})" id="iq_in_r${index.index}"></td>
+						<td class="datagrid-cell-c2-barcode">
+						<em class="datagrid-cell-c2-canRemaining" style="display:none;">${tory.canRemaining}</em>
+						<input value="${tory.barcode}" class="q_in_barcode_h" type="hidden">
+						<input value="0" class="q_record_id" type="hidden">
+						<input value="${tory.inventorySkuId}" class="q_inventory_id" type="hidden">
+						<input value="${tory.barcode}" class="q_in_barcode" readonly="readonly" type="text" onchange="updateCheckRecord(${index.index})"></td>
 						<td>
 							${tory.operation}
 						</td>
@@ -248,7 +258,7 @@ em,i{font-style: normal;}
 			</table>
 				<div>
 				<span>当前页 :${queryParam.current_page } / ${toryListPage},总共 ${checkListCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-default btn_page_qu" onclick="doQuery(1,1)">查询</button>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-success btn_page_qu" onclick="doQuery(1,1)">查询</button>
 				</div>
 		</div>
 		
@@ -483,6 +493,7 @@ em,i{font-style: normal;}
 			</div>
 		</div>
 		<div class="wrap wrap8">
+		<input type="hidden" value="" id="index_in_id">
 			<button onclick="addLoss()">保存</button>
 		</div>
 	</div>

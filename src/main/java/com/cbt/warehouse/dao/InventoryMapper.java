@@ -138,7 +138,7 @@ public interface InventoryMapper {
 	
 	/*****************************************新库存系统**********start*************************************/
 	/**
-	 * 库存列表查询
+	 * 库存列表查询inventory_sku
 	 * @param map
 	 * @return
 	 */
@@ -161,14 +161,14 @@ public interface InventoryMapper {
 	 */
 	Map<String,String> getOrderDetails(Map<String,String> map);
 	
-	/**插入库存明细表(关联库存表插入)
+	/**插入库存明细表(关联库存表插入)inventory_details_sku
 	 * @param inventory
 	 * @return
 	 */
 	int addInventoryDetailsSku(Map<String,String> inventory);
 	
 	
-	/**获取库存明细表的货源产品详细数据
+	/**获取库存明细表的货源产品详细数据inventory_details_sku
 	 * @param itemid
 	 * @param specid
 	 * @param skuid
@@ -182,17 +182,17 @@ public interface InventoryMapper {
 	 */
 	int addIdRelationTable(Map<String,String> map);
 	
-	/**库存报损记录
+	/**库存报损记录loss_inventory_record
 	 * @param record
 	 * @return
 	 */
 	int addLossInventoryRecord(LossInventoryRecord record);
-	/**库存明细列表
+	/**库存明细列表inventory_details_sku
 	 * @param map
 	 * @return
 	 */
 	List<InventoryDetails> inventoryDetails(Map<String, Object> map);
-	/**库存明细数量
+	/**库存明细数量inventory_details_sku
 	 * @param map
 	 * @return
 	 */
@@ -229,41 +229,91 @@ public interface InventoryMapper {
 	 */
 	int insertInventoryDetailsSku(InventoryDetails detail);
 	
-	/**获取淘宝订单
+	/**获取淘宝订单 taobao_1688_history
 	 * @param orderShipno
 	 * @return
 	 */
 	List<Map<String,Object>> getTbGoods(String orderShipno);
 	
 	
-	/**库存盘点 
+	/**开始库存盘点  inventory_sku_check
 	 * @param check
 	 * @return
 	 */
 	int insertInventoryCheck(InventoryCheck check);
 	
-	/**获取最近一次有效盘点
+	/**获取最近一次有效盘点 inventory_sku_check
 	 * @return
 	 */
 	InventoryCheck getLastInventoryCheck();
 	
-	/**撤销盘点
+	/**撤销盘点 inventory_sku_check
 	 * @param check
 	 * @return
 	 */
 	int updateInventoryCheckCancel(InventoryCheck check);
 	
-	/**更新盘点完成标志
+	/**更新盘点完成标志 inventory_sku_check
 	 * @param id
 	 * @return
 	 */
 	int updateInventoryCheckDone(int id);
-	
 	
 	/**批量更新盘点记录
 	 * @param list
 	 * @return
 	 */
 	int iBatchInventoryCheckRecord(List<InventoryCheckRecord> list);
+	/**获取库存表所有类别统计列表inventory_sku & 1688_category
+	 * @return
+	 */
+	List<Map<String,Object>> getInventoryCatList();
+	
+	/**插入盘点记录 inventory_sku_check_record_temp
+	 * @param record
+	 * @return
+	 */
+	int insertInventoryCheckRecord(InventoryCheckRecord record);
+	
+	/**更新盘点记录inventory_sku_check_record_temp
+	 * @param record
+	 * @return
+	 */
+	int updateInventoryCheckRecord(InventoryCheckRecord record);
+	
+	/**完成盘点 将inventory_sku_check_record_temp 本次数据插入inventory_sku_check_record
+	 * @param checkId
+	 * @return
+	 */
+	int doneInventoryCheckRecord(int checkId);
+	
+	/**获取inventory_sku_check_record_temp本次盘点数据
+	 * @param checkId
+	 * @return
+	 */
+	List<InventoryCheckRecord> getInventoryCheckRecord(int checkId);
+	/**获取inventory_sku_check_record盘点历史数据
+	 * @param checkId
+	 * @return
+	 */
+	List<InventoryCheckRecord> getICRHistory(@Param("inid")int inid,@Param("page")int page);
+	
+	/**获取inventory_sku_check_record盘点历史数据数量
+	 * @param inid
+	 * @return
+	 */
+	int getICRHistoryCount(int inid);
+	
+	/**清空inventory_sku_check_record_temp本次盘点数据
+	 * @param checkId
+	 * @return
+	 */
+	int deleteInventoryCheckRecord(int checkId);
+	
+	/**盘点更新库存
+	 * @param item
+	 * @return
+	 */
+	int updateInventoryCheckFlag(InventorySku item);
 	
 }

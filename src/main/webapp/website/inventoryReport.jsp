@@ -144,7 +144,12 @@ em,i{font-style: normal;}
 			<div class="col-xs-11">
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
 				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
-				<label>产品分类：<input type="text" class="form-control" id="query_goodscatid" value="${queryParam.goodscatid }"></label>
+				<label>产品分类：<input type="hidden" class="form-control" id="query_goodscatid_q" value="${queryParam.goodscatid }">
+				<select class="form-control p_q_r" id="query_goodscatid-in" >
+						
+				</select>
+				
+				</label>
 				<label>库存量大于：<input type="text" class="form-control" id="query_minintentory" value="${queryParam.qminintentory }"></label>
 				<label>库存量小于：<input type="text" class="form-control" id="query_maxintentory" value="${queryParam.qmaxintentory }"></label>
 				<label class="w200">是否上架： <select class="form-control" id="query_line" >
@@ -165,7 +170,8 @@ em,i{font-style: normal;}
 				</c:if>
 				</select>
 				</label>
-				<button class="btn btn-default"  id="query_button">查询</button>
+				<button class="btn btn-info"  id="query_button">查询</button>
+				<a href="/cbtconsole/inventory/check/list"><button class="btn btn-info">库存盘点</button></a>
 			</div>
 		</div>
 		<div class="row mt20 row2">
@@ -210,7 +216,7 @@ em,i{font-style: normal;}
 						<td class="">${tory.barcode}</td>
 						<td><span class="">${tory.checkTime }</span> <br>
 						<c:if test="${tory.checkTime!=''}">
-						<a href="/cbtconsole/inventory/check/info?inid=${tory.id}"><button class="btn btn-default">盘点历史</button></a>
+						<a href="/cbtconsole/inventory/check/info?inid=${tory.id}"><button class="btn btn-info">盘点历史</button></a>
 						</c:if>
 						</td>
 						<td>
@@ -222,7 +228,7 @@ em,i{font-style: normal;}
 			</table>
 				<div>
 				<span>当前页 :${queryParam.current_page } / ${toryListPage},总共 ${toryListCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-default btn_page_qu" onclick="doQuery(1,0)">查询</button>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-success btn_page_qu" onclick="doQuery(1,0)">查询</button>
 				</div>
 		</div>
 		
@@ -457,6 +463,7 @@ em,i{font-style: normal;}
 			</div>
 		</div>
 		<div class="wrap wrap8">
+		<input type="hidden" value="" id="index_in_id">
 			<button onclick="addLoss()">保存</button>
 		</div>
 	</div>

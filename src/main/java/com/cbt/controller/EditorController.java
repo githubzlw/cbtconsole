@@ -1577,7 +1577,7 @@ public class EditorController {
                 }
                 // 检查配置文件信息是否正常读取
                 JsonResult json = new JsonResult();
-                checkFtpConfig(ftpConfig, json);
+                GetConfigureInfo.checkFtpConfig(ftpConfig, json);
                 String localDiskPath = ftpConfig.getLocalDiskPath();
                 if (json.isOk()) {
                     for (MultipartFile mf : fileList) {
@@ -1658,7 +1658,7 @@ public class EditorController {
             if (ftpConfig == null) {
                 ftpConfig = GetConfigureInfo.getFtpConfig();
             }
-            checkFtpConfig(ftpConfig, json);
+            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
             String localDiskPath = ftpConfig.getLocalDiskPath();
             List<String> imgList = new ArrayList<>();
             if (json.isOk()) {
@@ -1749,7 +1749,7 @@ public class EditorController {
                 ftpConfig = GetConfigureInfo.getFtpConfig();
             }
             // 检查配置文件信息是否正常读取
-            checkFtpConfig(ftpConfig, json);
+            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
             if (!json.isOk()) {
                 return json;
             }
@@ -1855,7 +1855,7 @@ public class EditorController {
                             continue;
                         } else if (imgUrl.contains("alicdn.com")) {
                             // 检查配置文件信息是否正常读取
-                            checkFtpConfig(ftpConfig, json);
+                            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
                             if (json.isOk()) {
                                 String localDiskPath = ftpConfig.getLocalDiskPath();
                                 if (!(imgUrl == null || "".equals(imgUrl.trim()) || imgUrl.length() < 10)) {
@@ -1960,7 +1960,7 @@ public class EditorController {
                 ftpConfig = GetConfigureInfo.getFtpConfig();
             }
             // 检查配置文件信息是否正常读取
-            checkFtpConfig(ftpConfig, json);
+            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
             if (!json.isOk()) {
                 return json;
             }
@@ -2067,7 +2067,7 @@ public class EditorController {
                         ftpConfig = GetConfigureInfo.getFtpConfig();
                     }
                     // 检查配置文件信息是否正常读取
-                    checkFtpConfig(ftpConfig, json);
+                    GetConfigureInfo.checkFtpConfig(ftpConfig, json);
                     if (!json.isOk()) {
                         return json;
                     }
@@ -2275,7 +2275,7 @@ public class EditorController {
                 ftpConfig = GetConfigureInfo.getFtpConfig();
             }
             // 检查配置文件信息是否正常读取
-            checkFtpConfig(ftpConfig, json);
+            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
             if (json.isOk()) {
                 String localDiskPath = ftpConfig.getLocalDiskPath();
                 for (Element imgEl : imgEls) {
@@ -2800,42 +2800,12 @@ public class EditorController {
      * @Method: makeFileName
      * @Description: 生成上传文件的文件名，文件名以：uuid+"_"+文件的原始名称
      */
-    private String makeFileName(String filename) { // 2.jpg
+    public static String makeFileName(String filename) { // 2.jpg
         // 为防止文件覆盖的现象发生，要为上传文件产生一个唯一的文件名
         return UUID.randomUUID().toString() + "_" + filename;
     }
 
-    private void checkFtpConfig(FtpConfig ftpConfig, JsonResult json) {
-        json.setOk(true);
-        // 判断获取的配置信息是否有效
-        if (ftpConfig == null || !ftpConfig.isOk()) {
-            json.setOk(false);
-            json.setMessage("获取配置文件失败");
-        } else {
-            if (StringUtil.isBlank(ftpConfig.getFtpURL())) {
-                json.setOk(false);
-                json.setMessage("获取ftpURL失败");
-            } else if (StringUtil.isBlank(ftpConfig.getFtpPort())) {
-                json.setOk(false);
-                json.setMessage("获取ftpPort失败");
-            } else if (StringUtil.isBlank(ftpConfig.getFtpUserName())) {
-                json.setOk(false);
-                json.setMessage("获取ftpUserName失败");
-            } else if (StringUtil.isBlank(ftpConfig.getFtpPassword())) {
-                json.setOk(false);
-                json.setMessage("获取ftpPassword失败");
-            } else if (StringUtil.isBlank(ftpConfig.getRemoteShowPath())) {
-                json.setOk(false);
-                json.setMessage("获取remoteShowPath失败");
-            } else if (StringUtil.isBlank(ftpConfig.getLocalDiskPath())) {
-                json.setOk(false);
-                json.setMessage("获取localDiskPath失败");
-            } else if (StringUtil.isBlank(ftpConfig.getLocalShowPath())) {
-                json.setOk(false);
-                json.setMessage("获取localShowPath失败");
-            }
-        }
-    }
+
 
 
     @RequestMapping(value = "/goodsEditLog")
