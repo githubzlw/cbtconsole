@@ -178,6 +178,7 @@ public class InventoryController {
 	  inventory.put("when_count",when_count );
 	  inventory.put("unit", unit);
 	  inventory.put("shipno", shipno);
+	  inventory.put("storage_type", "1");
 	  int res = inventoryService.addInventory(inventory);
 //	  dao.addInventory(barcode, inventory_count, orderid, odid, storage_count, when_count, adm.getAdmName(), unit);
 	  PrintWriter out = response.getWriter();
@@ -914,8 +915,7 @@ public class InventoryController {
 	public Map<String,Object> getBarcode(HttpServletRequest request, HttpServletResponse response) {
 		Map<String,Object> result = new HashMap<>();
 		result.put("status", 200);
-		result.put("barcode", "CR001002003");
-		
+		result.put("barcode", "<input type='text' placeholder='请输入库位条形码' class='i_barcode_n'> ");
 		return result;
 	}
 	
@@ -964,7 +964,7 @@ public class InventoryController {
 					map.put("skuid",vs[2].trim());
 					map.put("count",vs[3].trim());
 					map.put("barcode",vs[4].trim());
-					map.put("img",vs[6].trim());
+					map.put("img",vs[5].trim());
 					inventoryService.inputInventory(map);
 				}
 			}
@@ -973,7 +973,7 @@ public class InventoryController {
 			map.put("tbShipno",request.getParameter("tb_shipno"));
 
 			for(String v : varrays) {
-				String[] vs = v.split("(\\|)");
+				String[] vs = v.split("(\\|d\\|)");
 				if(vs.length>8) {
 					if(!StrUtils.isNum(vs[3].trim()) || Integer.parseInt(vs[3].trim()) < 1) {
 						continue;
@@ -1088,9 +1088,11 @@ public class InventoryController {
 		int recordId = Integer.parseInt(strRecordId);
 		
 		String strInventoryRemaining = request.getParameter("inventory_remaining");
-		strInventoryRemaining = StrUtils.isNum(strInventoryRemaining) ? strInventoryRemaining : "0";
+		strInventoryRemaining = StringUtil.isNotBlank(strInventoryRemaining) ? strInventoryRemaining.trim() : "0";
+		strInventoryRemaining = StrUtils.isNum(strInventoryRemaining) ? strInventoryRemaining.trim() : "0";
 		
 		String strCheckRemaining = request.getParameter("check_remaining");
+		strCheckRemaining = StringUtil.isNotBlank(strCheckRemaining) ? strCheckRemaining.trim() : "0";
 		strCheckRemaining = StrUtils.isNum(strCheckRemaining) ? strCheckRemaining : "0";
 		InventoryCheckRecord record = new InventoryCheckRecord();
 		record.setId(recordId);
@@ -1156,6 +1158,12 @@ public class InventoryController {
 		check.setCancelRemark("撤销本次盘点");
 		int checkCancel = inventoryService.updateInventoryCheckCancel(check);
 		result.put("check_cancel", checkCancel);
+		if(checkCancel == 0) {
+			result.put("status", 502);
+			result.put("reason", "盘点取消失败,未开始实际盘点");
+		}else {
+			result.put("status", 200);
+		}
 		return result;
 	}
 	/**完成盘点
@@ -1207,6 +1215,9 @@ public class InventoryController {
 			result.put("reason", "未获取到类别列表");
 		}else {
 			for(Map<String,Object> m : catList) {
+				if(m == null || m.isEmpty()) {
+					continue;
+				}
 				if(org.apache.commons.lang.StringUtils.equals(StrUtils.object2Str(m.get("catid")), "0")) {
 					continue;
 				}
@@ -1232,17 +1243,19 @@ public class InventoryController {
 		String strInid = request.getParameter("inid");
 		strInid = StrUtils.isNum(strInid) ? strInid : "0";
 		
-		String strPage = request.getParameter(" page");
+		String strPage = request.getParameter("page");
 		strPage = StrUtils.isNum(strPage) ? strPage : "1";
 		
 		int page = (Integer.parseInt(strPage) - 1) * 50;
-	
+		String goods_pid = request.getParameter("goods_pid");
+		goods_pid = StringUtil.isBlank(goods_pid) ? null : goods_pid;
+		
 		int inid = Integer.valueOf(strInid);
 		int icrHistoryCount = 0,totalPage = 0;
 		if(inid > 0) {
-			icrHistoryCount = inventoryService.getICRHistoryCount(inid);
+			icrHistoryCount = inventoryService.getICRHistoryCount(inid,goods_pid);
 			if(icrHistoryCount > 0) {
-				List<InventoryCheckRecord> icrHistory = inventoryService.getICRHistory(inid,page);
+				List<InventoryCheckRecord> icrHistory = inventoryService.getICRHistory(inid,page,goods_pid);
 				mv.addObject("icrHistory", icrHistory);
 				totalPage = icrHistoryCount % 50 == 0 ? icrHistoryCount / 50 : icrHistoryCount / 50 + 1;
 			}

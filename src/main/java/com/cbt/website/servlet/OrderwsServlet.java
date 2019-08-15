@@ -22,6 +22,8 @@ import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.processes.dao.IUserDao;
 import com.cbt.processes.service.*;
 import com.cbt.util.*;
+import com.cbt.warehouse.service.InventoryService;
+import com.cbt.warehouse.service.InventoryServiceImpl;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.OrderBuy;
 import com.cbt.website.bean.PaymentConfirm;
@@ -52,6 +54,7 @@ import java.util.*;
  * @author ylm 后台订单操作
  */
 public class OrderwsServlet extends HttpServlet {
+	private InventoryService inventoryService = new InventoryServiceImpl();
 
 	private static final long serialVersionUID = 1L;
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderwsServlet.class);
@@ -1671,7 +1674,8 @@ public class OrderwsServlet extends HttpServlet {
 				res = orderwsServer.closeOrder(orderNo);
 				if(res>0){
 					//释放该订单占用的库存
-					orderwsServer.cancelInventory(mainOrderNo);
+					inventoryService.cancelOrderToInventory(mainOrderNo, adminId, "");
+//					orderwsServer.cancelInventory(mainOrderNo);
 				}
 				// 修改dropshiporder表状态
 				orderwsServer.closeDropshipOrderByMainOrderNo(mainOrderNo);
@@ -1866,7 +1870,8 @@ public class OrderwsServlet extends HttpServlet {
 			res = orderwsServer.closeOrder(orderNo);
 			if(res>0){
 				//释放该订单占用的库存
-				orderwsServer.cancelInventory(orderNo);
+				inventoryService.cancelOrderToInventory(orderNo, adminId, "");
+//				orderwsServer.cancelInventory(orderNo);
 			}
 			int userId = Integer.parseInt(request.getParameter("userId"));
 
