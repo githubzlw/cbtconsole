@@ -1986,7 +1986,7 @@
                     $("#hyqr" + orderid + od_id).attr("style","background-color:darkgray;");
                     $("#"+orderid + od_id).attr("style","background-color:darkgray;");
                     $("#" + orderid + od_id).attr("disabled","true");
-                    window.reload();
+                    location.reload() 
                 } else {
                     $("#inventory_" + orderid+ od_id).html("使用库存出现错误");
                     $("#hyqr" + orderid + od_id).attr("disabled","false");

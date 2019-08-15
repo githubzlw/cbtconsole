@@ -321,7 +321,7 @@
     goods_p_price,goods_number,od_id,createtime,admid,type,inventory_id,
     goods_p_url,good_name,goods_specid,goods_img)
     
-    (select  goods_pid,goods_p_pid,sku,skuid,goods_price,goods_p_price,#{inventory_count},od_id,now(),
+    (select  goods_pid,goods_p_pid,sku,skuid,goods_price,goods_p_price,#{inventory_count},#{od_id},now(),
     #{admid},#{type},id,goods_p_url,good_name,specid,car_img
     from inventory_sku where id=#{inventory_sku_id})
     
@@ -622,7 +622,7 @@
    
     </select>
     <update id="cancelLockInventory">
-    update locak_inventory set is_delete=1 where id=#{id}
+    update lock_inventory set is_delete=1 where id=#{id}
     </update>
     
     <insert id="insertInventoryBarcodeRecord" parameterType="com.cbt.website.bean.InventoryBarcodeRecord">

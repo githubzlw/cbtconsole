@@ -522,10 +522,10 @@ public class InventoryServiceImpl implements  InventoryService{
 		//如果库存大于客户订单下单数量，则全部使用库存，若不够在采购其他的
 		if(googs_number * goodsUnit < inventory_count) {
 			inventory_count = googs_number * goodsUnit;
-			map.put("inventory_count", String.valueOf(inventory_count));
-			map.put("inventory_count_use", String.valueOf(inventory_count));
 			map.put("useAllInventory", "true");
 		}
+		map.put("inventory_count", String.valueOf(inventory_count));
+		map.put("inventory_count_use", String.valueOf(inventory_count));
 		//1.如果该商品是有录入库存则做想应的减少
 		String id = map.get("inventory_sku_id");
 		InventorySku iSku = new InventorySku();
