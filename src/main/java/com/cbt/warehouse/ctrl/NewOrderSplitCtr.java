@@ -568,12 +568,19 @@ public class NewOrderSplitCtr {
                 json.setMessage("订单状态非审核状态，不能拆单");
                 return json;
             }
+
             // 1.获取原来数据,并进行数据处理
             List<OrderDetailsBean> odbList = iOrderinfoService.getOrdersDetails(orderNo);
             List<OrderDetailsBean> nwOrderDetails = new ArrayList<>(splitIdList.size());
             // 生成新的OrderDetailsBean数据
             Map<Integer, OrderDetailsBean> oldOrderDeatisMap = new HashMap<>(odbList.size());
+
             double oldTotalGoodsCost = 0;
+            // 计算商品总价
+            for (OrderDetailsBean orderDetail : odbList) {
+                oldTotalGoodsCost += Double.valueOf(orderDetail.getGoodsprice()) * orderDetail.getYourorder();
+            }
+
             double newTotalGoodsCost = 0;
             for (SplitGoodsNumBean goodsNumBean : splitIdList) {
                 goodsNumBean.setAdminId(admuser.getId());
@@ -583,7 +590,7 @@ public class NewOrderSplitCtr {
                         // 保存商品价格和数量信息，放入日志
                         goodsNumBean.setGoodsPrice(Double.valueOf(orderDetail.getGoodsprice()));
                         goodsNumBean.setOldNum(orderDetail.getYourorder());
-                        oldTotalGoodsCost += goodsNumBean.getGoodsPrice() * goodsNumBean.getOldNum();
+
                         newTotalGoodsCost += goodsNumBean.getGoodsPrice() * goodsNumBean.getNum();
                         // 执行修改产品数量操作
                         orderDetail.setYourorder(goodsNumBean.getOldNum() - goodsNumBean.getNum());
@@ -596,6 +603,7 @@ public class NewOrderSplitCtr {
                     }
                 }
             }
+
             // 记录日志
             iOrderinfoService.insertIntoOrderSplitNumLog(splitIdList);
             // 计算拆分产品总价占原总价的百分比
