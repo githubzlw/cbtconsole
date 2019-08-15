@@ -29,6 +29,7 @@ import com.cbt.website.bean.InventoryDetailsWrap;
 import com.cbt.website.bean.InventoryLock;
 import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventorySku;
+import com.cbt.website.bean.InventoryWrap;
 import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 import com.importExpress.mapper.IPurchaseMapper;
@@ -668,7 +669,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		
 		int before_remaining = remaining;
 		int after_remaining = changeNumber;
-		
+		int lossChangeType = Integer.valueOf(StrUtils.object2NumStr(map.get("change_type")));
 		inv.put("goods_p_url", inventoryByid.getGoodsPUrl());
 		inv.put("goods_p_price", inventoryByid.getGoodsPPrice());
 		if(remaining > changeNumber) {
@@ -691,7 +692,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		 LossInventoryRecord record = new LossInventoryRecord();
 		 record.setChangeAdm(Integer.valueOf(StrUtils.object2NumStr(map.get("change_adm"))));
 		 record.setChangeNumber(change_number);
-		 record.setChangeType(Integer.valueOf(StrUtils.object2NumStr(map.get("change_type"))));
+		 record.setChangeType(lossChangeType);
 		 record.setGoodsPid((String)map.get("goods_pid"));
 		 record.setInventorySkuId(Integer.valueOf(inventory_sku_id));
 		 record.setSkuid((String)map.get("skuid"));
@@ -1160,6 +1161,21 @@ public class InventoryServiceImpl implements  InventoryService{
 			inventory.put("goodid", StrUtils.object2Str(c.get("goodsid"))); 
 			inventory.put("storage_type", "3"); 
 			addInventory(inventory);
+			int odId = Integer.parseInt(StrUtils.object2NumStr(c.get("od_id")));
+			Map<String, Object> addInventory = inventoryMapper.getAddInventory(odId);
+			if(addInventory != null) {
+				//插入库位移库数据
+				InventoryBarcodeRecord record = new InventoryBarcodeRecord();
+				record.setAdmid(admId);
+				record.setInventoryBarcode(StrUtils.object2Str(addInventory.get("barcode")));
+				record.setInventoryId(Integer.parseInt(StrUtils.object2NumStr(addInventory.get("id"))));
+				record.setLockId(0);
+				record.setState(2);
+				record.setRemark(StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"取消订单");
+				record.setOrderBarcode(StrUtils.object2Str(c.get("barcode")));
+				record.setOdId(odId);
+				inventoryMapper.insertInventoryBarcodeRecord(record );
+			}
 		}
 		return checkedOrderDetails.size();
 	}
@@ -1231,5 +1247,13 @@ public class InventoryServiceImpl implements  InventoryService{
 			addOrderInventory(null, admid, admName, odid);
 		}
 		return result;
+	}
+	@Override
+	public List<InventoryWrap> inventoryBarcodeList(Map<String, Object> map) {
+		return inventoryMapper.inventoryBarcodeList(map);
+	}
+	@Override
+	public int inventoryBarcodeListCount(Map<String, Object> map) {
+		return inventoryMapper.inventoryBarcodeListCount(map);
 	}
 }

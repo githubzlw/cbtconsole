@@ -11,6 +11,7 @@ import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
+import com.cbt.website.bean.InventoryWrap;
 
 public interface InventoryService {
 	/**采购使用库存减少操作
@@ -244,5 +245,13 @@ public interface InventoryService {
 	 * @return
 	 */
 	int cancelToInventory( String[] odidLst,int admid,String admName);
+	/**移库位
+	 * @return
+	 */
+	List<InventoryWrap> inventoryBarcodeList(Map<String, Object> map);
+	/**移库位
+	 * @return
+	 */
+	int inventoryBarcodeListCount(Map<String, Object> map);
 	
 }

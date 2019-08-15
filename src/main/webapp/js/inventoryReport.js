@@ -52,6 +52,7 @@ $(function(){
 		$("#query_catid_select").change(function(){
 			var catid = $(this).val();
 			$("#query_goodscatid").val(catid);//设置value为xx的option选项为默认选中
+			$("#current_page").val(1)
 			doQuery(1,1);
 		})
 		$("#query_goodscatid").change(function(){
@@ -59,6 +60,7 @@ $(function(){
 			$("#query_catid_select").val(catid);//设置value为xx的option选项为默认选中
 		})
 		 $("#query_button_check").click(function(){
+			 $("#current_page").val(1)
 				doQuery(1,1);
 			});
 	}
@@ -122,6 +124,7 @@ $(function(){
 		   		alert("error盘点取消失败");
 		   	}
 		   });
+		$("#current_page").val(1)
 		doQuery(1,1);
 		
 	})
@@ -139,10 +142,12 @@ $(function(){
 		$(".q_in_barcode").attr("readonly","readonly");
 		
 		window.location.href ="/cbtconsole/inventory/check/done?check_id="+check_id;
+		$("#current_page").val(1)
 		doQuery(1,1);
 	})
 	
 	$("#query_button").click(function(){
+		$("#current_page").val(1)
 		doQuery(1,0);
 	});
 	
