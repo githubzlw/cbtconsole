@@ -95,17 +95,20 @@ public class InventoryServiceImpl implements  InventoryService{
 				url="https://www.import-express.com/goodsinfo/a-1"+t.getGoodsPid()+".html";
 			}
 			String car_img=t.getCarImg();
-			String imgs[]=car_img.split("kf");
-			if(imgs.length > 1) {
-				String one=imgs[0];
-				String two=imgs[1].replace(".jpg_50x50","");
-				url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
+			if(StringUtil.isNotBlank(car_img)) {
+				
+				String imgs[]=car_img.split("kf");
+				if(imgs.length > 1) {
+					String one=imgs[0];
+					String two=imgs[1].replace(".jpg_50x50","");
+					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
+				}
+				
+				t.setCarImg("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
+						+ "<img   class=\"img-responsive\" src='"+ (car_img.indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":car_img) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ car_img + "')\" height='100' width='100'></a>");
+				
+				
 			}
-			
-			t.setCarImg("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
-					+ "<img   class=\"img-responsive\" src='"+ (car_img.indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":car_img) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ car_img + "')\" height='100' width='100'></a>");
-		
-			
 			
 			
 			t.setGoodsUrl(StringUtil.isBlank(t.getGoodsUrl())?"":t.getGoodsUrl());
@@ -1211,6 +1214,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			//库存记录表 inventory_details_sku
 			ilog.put("admid",String.valueOf(admId));
 			ilog.put("type","0");
+			ilog.put("od_id", StrUtils.object2NumStr(i.get("od_id")));
 			inventoryMapper.addInventoryDetailsSku(ilog);
 			
 		}
