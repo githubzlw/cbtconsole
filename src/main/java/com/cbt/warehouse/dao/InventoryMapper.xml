@@ -561,8 +561,8 @@
     <update id="updateOrderDetailsState">
     update order_details state=1,checked=1 set where id=#{odid}
     </update>
-    <select id="getOrderDetailsAndInventoryUsed" resultType="java.util.Map">
-    SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id,
+    <select id="getInventoryUsedByOrderno" resultType="java.util.Map">
+    SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id as li_id,
     li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag ,
     ibr.state as barcodeState,ibr.id as barcodeId
     
@@ -573,8 +573,8 @@
         		left join inventory_barcode_record ibr on li.id=ibr.lock_id
         		WHERE li.is_delete=0 AND od.orderid=#{orderid}
     </select>
-    <select id="getInventoryUsed" resultType="java.util.Map">
-    SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id,
+    <select id="getInventoryUsedByOdid" resultType="java.util.Map">
+    SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id as li_id,
     li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag ,
     ibr.state as barcodeState,ibr.id as barcodeId
     FROM lock_inventory li 
@@ -584,13 +584,13 @@
         		left join inventory_barcode_record ibr on li.id=ibr.lock_id
         		WHERE li.is_delete=0 AND od.id=#{odid} limit 1
     </select>
-    <select id="getCheckedOrderDetails">
-    SELECT od.id,od.orderid,od.goodsid,od.car_url,od.seilUnit,od.goodsname,od.goodscatid,od.car_img,od.goods_pid,od.car_urlMD5,od.yourorder,
+    <select id="getCheckedOrderDetailsByOrderno" resultType="java.util.Map">
+    SELECT od.id as od_id,od.orderid,od.goodsid,od.car_url,od.seilUnit,od.goodsname,od.goodscatid,od.car_img,od.goods_pid,od.car_urlMD5,od.yourorder,
     od.car_type,id.barcode,ca.en_name,
     ops.goods_p_price,ops.usecount,ops.goods_p_url,ops.goodsid,
 	odsm.specid,odsm.skuid,
 	toh.specId as tbspecid,toh.skuID as tbskuid,toh.shipno,toh.orderid as tborderid,toh.sku,
-	li.lock_remaining
+	li.lock_remaining,li.id as li_id,li.in_id
 	
 	FROM order_details od 
 	INNER JOIN order_product_source ops ON od.id=ops.od_id
@@ -601,6 +601,24 @@
 	left join lock_inventory li on li.od_id=od.id
 	WHERE  od.checked=1 AND id.goodstatus=1 and od.orderid=#{orderid}
     
+   
+    </select>
+    <select id="getCheckedOrderDetailsByOdid" resultType="java.util.Map">
+    SELECT od.id as od_id,od.orderid,od.goodsid,od.car_url,od.seilUnit,od.goodsname,od.goodscatid,od.car_img,od.goods_pid,od.car_urlMD5,od.yourorder,
+    od.car_type,id.barcode,ca.en_name,
+    ops.goods_p_price,ops.usecount,ops.goods_p_url,ops.goodsid,
+	odsm.specid,odsm.skuid,
+	toh.specId as tbspecid,toh.skuID as tbskuid,toh.shipno,toh.orderid as tborderid,toh.sku,
+	li.lock_remaining,li.id as li_id,li.in_id
+	
+	FROM order_details od 
+	INNER JOIN order_product_source ops ON od.id=ops.od_id
+	INNER JOIN id_relationtable id ON od.id=id.odid
+	LEFT JOIN 1688_category ca ON od.goodscatid=ca.category_id
+	left join order_details_sku_match odsm on od.id=odsm.order_details_id
+	left join taobao_1688_order_history toh on toh.odid=od.id
+	left join lock_inventory li on li.od_id=od.id
+	WHERE  od.checked=1 AND id.goodstatus=1 and od.id=#{odid}
    
     </select>
     <update id="cancelLockInventory">

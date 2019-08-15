@@ -328,17 +328,22 @@ public interface InventoryMapper {
 	 * @param orderid
 	 * @return
 	 */
-	List<Map<String,Object>> getOrderDetailsAndInventoryUsed(String orderid);
+	List<Map<String,Object>> getInventoryUsedByOrderno(String orderid);
 	/**获取使用了库存订单详情列表
 	 * @param orderid
 	 * @return
 	 */
-	List<Map<String,Object>> getInventoryUsed(String odid);
+	List<Map<String,Object>> getInventoryUsedByOdid(String odid);
 	/**获取已经验货的订单详情列表
 	 * @param orderid
 	 * @return
 	 */
-	List<Map<String,Object>> getCheckedOrderDetails(String orderid);
+	List<Map<String,Object>> getCheckedOrderDetailsByOrderno(String orderid);
+	/**获取已经验货的订单详情列表
+	 * @param orderid
+	 * @return
+	 */
+	List<Map<String,Object>> getCheckedOrderDetailsByOdid(String odid);
 	
 	/**取消库存锁定
 	 * @param id

@@ -1115,15 +1115,20 @@ public class InventoryServiceImpl implements  InventoryService{
 		int cancelUseInventory = cancelUseInventory(orderNo,admId,null);
 		
 		//对于没有使用库存订单的商品做库存增加到库存表中
-		int addOrderInventory = addOrderInventory(orderNo, admId,admName);
+		int addOrderInventory = addOrderInventory(orderNo, admId,admName,null);
 		
 		return cancelUseInventory + addOrderInventory;
 	}
 	/**
 	 * @return
 	 */
-	private int addOrderInventory(String orderNo,int admId,String admName) {
-		List<Map<String,Object>> checkedOrderDetails = inventoryMapper.getCheckedOrderDetails(orderNo);
+	private int addOrderInventory(String orderNo,int admId,String admName,String odid) {
+		List<Map<String,Object>> checkedOrderDetails = null;
+		if(StringUtil.isBlank(orderNo)) {
+			checkedOrderDetails = inventoryMapper.getCheckedOrderDetailsByOdid(odid);
+		}else {
+			checkedOrderDetails = inventoryMapper.getCheckedOrderDetailsByOrderno(orderNo);
+		}
 		if(checkedOrderDetails == null || checkedOrderDetails.isEmpty()) {
 			return 0;
 		}
@@ -1142,10 +1147,10 @@ public class InventoryServiceImpl implements  InventoryService{
 			inventory.put("car_type", StrUtils.object2Str(c.get("car_type")));
 			inventory.put("skuid", StrUtils.object2Str(c.get("skuid")));
 			inventory.put("specid", StrUtils.object2Str(c.get("specid")));
-			inventory.put("odid", StrUtils.object2Str(c.get("id")));
+			inventory.put("odid", StrUtils.object2Str(c.get("od_id")));
 			inventory.put("adminId", String.valueOf(admId));
 			inventory.put("admName", admName);
-			inventory.put("log_remark", orderNo+"/"+StrUtils.object2Str(c.get("id"))+"订单取消,已经验货的产品进入库存");
+			inventory.put("log_remark", StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"订单取消,已经验货的产品进入库存");
 			inventory.put("unit", StrUtils.object2NumStr(c.get("seilUnit")));
 			inventory.put("storage_count",String.valueOf(yourder * seilUnit) );
 			inventory.put("when_count",String.valueOf(yourder * seilUnit) );
@@ -1163,9 +1168,9 @@ public class InventoryServiceImpl implements  InventoryService{
 		//判断订单是否使用了库存
 		List<Map<String,Object>> inventoryUsed =  null;
 		if(StringUtil.isNotBlank(orderNo)) {
-			inventoryUsed =  inventoryMapper.getOrderDetailsAndInventoryUsed(orderNo);
+			inventoryUsed =  inventoryMapper.getInventoryUsedByOrderno(orderNo);
 		}else {
-			inventoryUsed =  inventoryMapper.getInventoryUsed(odid);
+			inventoryUsed =  inventoryMapper.getInventoryUsedByOdid(odid);
 		}
 		if(inventoryUsed == null || inventoryUsed.isEmpty()) {
 			return 0;
@@ -1178,7 +1183,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			}
 			
 			//更新lock_inventory状态is_delete=1
-			inventoryMapper.cancelLockInventory(Integer.parseInt(StrUtils.object2NumStr(i.get("id"))));
+			inventoryMapper.cancelLockInventory(Integer.parseInt(StrUtils.object2NumStr(i.get("li_id"))));
 			
 			int canRemaining = Integer.parseInt(StrUtils.object2NumStr(i.get("can_remaining")));
 			int remaining = Integer.parseInt(StrUtils.object2NumStr(i.get("remaining")));
@@ -1198,7 +1203,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			ilog.put("inventory_count",StrUtils.object2NumStr(i.get("lock_remaining")));
 			ilog.put("before_remaining",StrUtils.object2NumStr(i.get("remaining")));
 			ilog.put("after_remaining",String.valueOf(remaining + lockRemaining));
-			ilog.put("log_remark","订单"+orderNo+"/"+StrUtils.object2NumStr(i.get("od_id"))+"取消,使用过的库存还原");
+			ilog.put("log_remark","订单"+StrUtils.object2Str(i.get("orderid"))+"/"+StrUtils.object2NumStr(i.get("od_id"))+"取消,使用过的库存还原");
 			ilog.put("change_type","1");
 			ilog.put("inventory_sku_id",StrUtils.object2NumStr(i.get("in_id")));
 			inventoryMapper.addInventoryLogByInventoryid(ilog);
@@ -1213,9 +1218,13 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public int cancelToInventory(String[] odidLst, int admid, String admName) {
+		if(odidLst == null) {
+			return 0;
+		}
 		int result  =0;
 		for(String odid : odidLst) {
 			result += cancelUseInventory(null, admid, odid);
+			addOrderInventory(null, admid, admName, odid);
 		}
 		return result;
 	}
