@@ -1,14 +1,47 @@
 package com.cbt.warehouse.ctrl;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.Inventory;
-import com.cbt.util.*;
+import com.cbt.util.BigDecimalUtil;
+import com.cbt.util.GetConfigureInfo;
+import com.cbt.util.OrderInfoConstantUtil;
+import com.cbt.util.OrderInfoUtil;
+import com.cbt.util.Redis;
+import com.cbt.util.Send;
+import com.cbt.util.SerializeUtil;
+import com.cbt.util.UUIDUtil;
+import com.cbt.util.Utility;
 import com.cbt.warehouse.pojo.SampleOrderBean;
 import com.cbt.warehouse.service.IWarehouseService;
-import com.cbt.website.dao.*;
+import com.cbt.warehouse.service.InventoryService;
 import com.cbt.website.dao.IOrderSplitDao;
 import com.cbt.website.dao.OrderInfoDao;
 import com.cbt.website.dao.OrderInfoImpl;
@@ -22,35 +55,14 @@ import com.google.gson.Gson;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
-import com.importExpress.pojo.OrderSplitMain;
 import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
 import com.importExpress.utli.UserInfoUtils;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import net.sf.json.JSONArray;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import net.sf.json.JSONArray;
 
 @Controller
 @RequestMapping("/orderSplit")
@@ -66,6 +78,8 @@ public class NewOrderSplitCtr {
     private OrderSplitRecordService orderSplitRecordService;
     @Autowired
     private IWarehouseService iWarehouseService;
+    @Autowired
+    private InventoryService inventoryService;
 
     /**
      * 订单拆分(正常订单和Drop Ship订单)
@@ -265,7 +279,8 @@ public class NewOrderSplitCtr {
                         json.setData(nwOrderNo);
                         if ("0".equals(state)) {
                             // 拆单取消后取消的商品如果有使用库存则还原库存
-                            dao.cancelInventory(odidLst);
+                        	inventoryService.cancelToInventory(odidLst, 0, "");
+//                            dao.cancelInventory(odidLst);
                         }
                     }
                 } else {
@@ -361,11 +376,12 @@ public class NewOrderSplitCtr {
                         //判断该订单是否为测试订单如果是则不入库存
 //						boolean flag=splitDao.checkTestOrder(odidLst[0]);
 //						if(flag){}
-                        if ("0".equals(state)) {
+                        /*if ("0".equals(state)) {
+                        	inventoryService.cancelToInventory(odidLst, admuser.getId(), admuser.getAdmName());
                             for (String odid : odidLst) {
                                 splitDao.addInventory(odid, "拆单取消库存");
                             }
-                        }
+                        }*/
                     } else {
                         json.setOk(false);
                         if (nwOrderDetails.size() == 0 || nwOrderDetails.size() != odidLst.length) {
@@ -489,7 +505,8 @@ public class NewOrderSplitCtr {
                 // 新增客户余额变更记录表recharge_record;新增支付记录payment
                 splitDao.cancelNewOrder(orderBeanTemp.getUserid(), nwOrderNo);
                 // 拆单取消后取消的商品如果有使用库存则还原库存
-                splitDao.cancelInventory(odidLst);
+                inventoryService.cancelToInventory(odidLst, admuser.getId(), admuser.getAdmName());
+//                splitDao.cancelInventory(odidLst);
                 // 5.如果是取消商品进余额，则调用统一接口进行客户余额变更
                 /*ChangUserBalanceDao balanceDao = new ChangUserBalanceDaoImpl();
                 balanceDao.changeBalance(orderBeanTemp.getUserid(), genFloatWidthTwoDecimalPlaces(totalPayPriceNew), 1,

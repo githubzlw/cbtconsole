@@ -137,7 +137,9 @@ em,i{font-style: normal;}
 </head>
 <body>
 	<div class="container-fluid report">
+	<a href="/cbtconsole/inventory/list" style="font-size: 18px;">&lt;返回</a>
 		<h1 class="text-center">库存盘点</h1>
+		
 			<input type="hidden" value="" id="query_in_id">
 			
 			<div class="row">
@@ -300,7 +302,7 @@ em,i{font-style: normal;}
 						<span class="lu_specid">ssss</span><br>
 						<span class="lu_skuid">cccc</span></td>
 							<td><input type="text" class="form-control lu_count" value="0"></td>
-							<td class="lu_barcode"><a onclick="getbarcode()" class="lu_barcode_a">获取库位</a></td>
+							<td class="lu_barcode"><input type="text" placeholder="请输入库位条形码" class="lu_barcode_a"></td>
 							<td><input type="checkbox" name="entry" class="lu_is"></td>
 						</tr>
 						
@@ -382,13 +384,13 @@ em,i{font-style: normal;}
 						<td class="lu_tb_name">产品名称产品名称产品名称产品名称</td>
 						<td><img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg" alt="" class="img-responsive"></td>
 						<td class="lu_tb_skuc">
-						<span  class="lu_tb_sku">xxxxx</span>
-						<span  class="lu_tb_skuid">1111111111111</span>
-						<span  class="lu_tb_specidc">2222222222222</span>
+						Sku:<span  class="lu_tb_sku">xxxxx</span><br>
+						Skuid:<span  class="lu_tb_skuid">1111111111111</span><br>
+						Specid:<span  class="lu_tb_specidc">2222222222222</span>
 						</td>
 						<td class="lu_tb_count">10</td>
 						<td><input type="text" class="form-control lu_tb_a_count" value="10"></td>
-						<td class="lu_tb_bar"><a class="gain lu_tb_barcode" onclick="getbarcode()">获取库位</a></td>
+						<td class="lu_tb_bar"><input type="text" placeholder="请输入库位条形码" class="lu_tb_barcode"></td>
 						<td><input type="checkbox" class="lu_tb_checkbox">
 						<input type="hidden" class="lu_tb_pid" value="">
 						<input type="hidden" class="lu_tb_img" value="">
@@ -474,19 +476,19 @@ em,i{font-style: normal;}
 					遗失
 				</label>
 				<label>
-					<input type="radio" name="reason" value="2" class="radio_change">
+					<input type="radio" name="reason" value="3" class="radio_change">
 					添加
 				</label>
 				<label>
-					<input type="radio" name="reason" value="3" class="radio_change">
+					<input type="radio" name="reason" value="4" class="radio_change">
 					补货
 				</label>
 				<label>
-					<input type="radio" name="reason" value="4" class="radio_change">
+					<input type="radio" name="reason" value="5" class="radio_change">
 					漏发
 				</label>
 				<label>
-					<input type="radio" name="reason" value="" id="index_iremark">
+					<input type="radio" name="reason" value="7" id="index_iremark">
 					其他
 				</label>
 				<input type="text" class="other">

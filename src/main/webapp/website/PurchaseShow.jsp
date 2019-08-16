@@ -1981,13 +1981,14 @@
             	$("#use_" + orderid + od_id).hide();
                 if (state == 1) {
                     //使用库存
-                    $("#inventory_" + orderid+ od_id).html("仓库人员库存确认中");
+                   // $("#inventory_" + orderid+ od_id).html("仓库人员库存确认中");
                     $("#hyqr" + orderid + od_id).attr("disabled","true");
                     $("#hyqr" + orderid + od_id).attr("style","background-color:darkgray;");
                     $("#"+orderid + od_id).attr("style","background-color:darkgray;");
                     $("#" + orderid + od_id).attr("disabled","true");
+                    location.reload() 
                 } else {
-                    $("#inventory_" + orderid+ od_id).html("");
+                    $("#inventory_" + orderid+ od_id).html("使用库存出现错误");
                     $("#hyqr" + orderid + od_id).attr("disabled","false");
                     $("#hyqr" + orderid + od_id).attr("style","background-color:;");
                     $("#"+orderid + od_id).attr("style","background-color:;");
@@ -2034,7 +2035,7 @@
                         var can_remaining = data.split("&")[0];
                         if (Number(can_remaining) > 0
                             && Number(is_use) == 1) {
-                            $("#inventory_" + orderid+ goodsid).html("仓库人员库存确认中");
+                           // $("#inventory_" + orderid+ goodsid).html("仓库人员库存确认中");
                             $("#hyqr" + orderid+ odid).attr("disabled","true");
                             $("#hyqr" + orderid + odid).attr("style", "background-color:darkgray;");
                             $("#" + orderid + odid).attr("disabled","true");

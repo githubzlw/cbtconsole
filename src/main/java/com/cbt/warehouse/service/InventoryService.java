@@ -226,12 +226,23 @@ public interface InventoryService {
 	 * @param checkId
 	 * @return
 	 */
-	List<InventoryCheckRecord> getICRHistory(int inid,int page);
+	List<InventoryCheckRecord> getICRHistory(int inid,int page,String goodsPid);
 	
 	/**获取inventory_sku_check_record盘点历史数据数量
 	 * @param inid
 	 * @return
 	 */
-	int getICRHistoryCount(int inid);
+	int getICRHistoryCount(int inid,String goodsPid);
+	
+	/**取消订单进入库存
+	 * @param orderNo
+	 * @return
+	 */
+	int cancelOrderToInventory(String orderNo,int admid,String admName);
+	/**拆单取消进入库存
+	 * @param orderNo
+	 * @return
+	 */
+	int cancelToInventory( String[] odidLst,int admid,String admName);
 	
 }
