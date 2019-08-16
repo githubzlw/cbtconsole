@@ -309,9 +309,9 @@
     th.orderid as tborderid,od.goodscatid,od.car_img,ops.goods_p_price,th.imgurl as goods_p_img,th.itemurl,
 	ops.goods_p_url,ops.tb_1688_itemid 	
 	from order_details od 
-	inner join order_product_source ops on (od.id=ops.od_id and od.orderid=ops.orderid )
-	inner join id_relationtable ir on ir.odid=od.id
-	inner join taobao_1688_order_history th on  th.orderid=ir.tborderid 
+	left join order_product_source ops on (od.id=ops.od_id and od.orderid=ops.orderid )
+	left join id_relationtable ir on ir.odid=od.id
+	left join taobao_1688_order_history th on  th.orderid=ir.tborderid 
 	where od.id=#{odid}  limit 1
     </select>
     
@@ -567,7 +567,7 @@
     ibr.state as barcodeState,ibr.id as barcodeId
     
     FROM lock_inventory li 
-        		INNER JOIN order_details od ON li.od_id=od.id 
+        		left JOIN order_details od ON li.od_id=od.id 
         		LEFT JOIN inventory_sku i ON li.in_id=i.id 
         		left join id_relationtable ir on od.orderid=ir.orderid and od.goodsid=ir.goodid 
         		left join inventory_barcode_record ibr on li.id=ibr.lock_id
@@ -578,7 +578,7 @@
     li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag ,
     ibr.state as barcodeState,ibr.id as barcodeId
     FROM lock_inventory li 
-        		INNER JOIN order_details od ON li.od_id=od.id 
+        		left JOIN order_details od ON li.od_id=od.id 
         		LEFT JOIN inventory_sku i ON li.in_id=i.id 
         		left join id_relationtable ir on od.orderid=ir.orderid and od.goodsid=ir.goodid 
         		left join inventory_barcode_record ibr on li.id=ibr.lock_id
@@ -593,8 +593,8 @@
 	li.lock_remaining,li.id as li_id,li.in_id
 	
 	FROM order_details od 
-	INNER JOIN order_product_source ops ON od.id=ops.od_id
-	INNER JOIN id_relationtable id ON od.id=id.odid
+	left JOIN order_product_source ops ON od.id=ops.od_id
+	left JOIN id_relationtable id ON od.id=id.odid
 	LEFT JOIN 1688_category ca ON od.goodscatid=ca.category_id
 	left join order_details_sku_match odsm on od.id=odsm.order_details_id
 	left join taobao_1688_order_history toh on toh.odid=od.id
@@ -612,8 +612,8 @@
 	li.lock_remaining,li.id as li_id,li.in_id
 	
 	FROM order_details od 
-	INNER JOIN order_product_source ops ON od.id=ops.od_id
-	INNER JOIN id_relationtable id ON od.id=id.odid
+	left JOIN order_product_source ops ON od.id=ops.od_id
+	left JOIN id_relationtable id ON od.id=id.odid
 	LEFT JOIN 1688_category ca ON od.goodscatid=ca.category_id
 	left join order_details_sku_match odsm on od.id=odsm.order_details_id
 	left join taobao_1688_order_history toh on toh.odid=od.id
