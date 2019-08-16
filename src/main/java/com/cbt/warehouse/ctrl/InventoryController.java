@@ -121,10 +121,31 @@ public class InventoryController {
 	protected Map<String,Object> barcodeUpdate(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
 		Map<String,Object> result = new HashMap<>();
+		result.put("status", 200);
+		String stribid = request.getParameter("ibid");
+		stribid = StrUtils.isNum(stribid) ? stribid : "0";
 		
-		request.getParameter("");
+		String strliid = request.getParameter("liid");
+		strliid = StrUtils.isNum(strliid) ? strliid : "0";
 		
+		String strinorout= request.getParameter("inorout");
+		strinorout = StrUtils.isNum(strinorout) ? strinorout : "0";
 		
+		String orderbarcode = request.getParameter("orderbarcode");
+		orderbarcode = StringUtil.isBlank(orderbarcode) ? orderbarcode : orderbarcode.trim();
+		String inbarcode = request.getParameter("inbarcode");
+		inbarcode = StringUtil.isBlank(inbarcode) ? inbarcode : inbarcode.trim();
+		Map<String,Object> map = new HashMap<>();
+		map.put("ibid", Integer.parseInt(stribid));
+		map.put("liid", Integer.parseInt(strliid));
+		map.put("inorout", Integer.parseInt(strinorout));
+		map.put("inbarcode", inbarcode);
+		map.put("orderbarcode", orderbarcode);
+		int updateBarcode = inventoryService.updateBarcode(map);
+		if(updateBarcode < 1) {
+			result.put("status", 500);
+			result.put("reason", "数据错误:"+stribid+"/"+strliid+"/"+strinorout+"/"+inbarcode+"/"+orderbarcode);
+		}
 		return result;
 	}
 	

@@ -20,10 +20,6 @@
 	width: 70%;
 }
 
-.report select.form-control {
-	width: 48%;
-}
-
 .report {
 	font-size: 16px;
 	color: #333;
@@ -211,20 +207,31 @@ em,i{font-style: normal;}
 					
 					</td>
 					<td style="width: 400px;">
-					分配的订单库位:
-					<input value="${b.orderBarcode }" type="text">
+					<c:if test="${b.ibState== 0}">
+					库存库位:<span class="in_barcode_${index.index}">${b.inBarcode }</span>
 					<br>
+					分配的订单库位:
+					<input value="${b.orderBarcode }" type="text" class="order_barcode_${index.index}">
+					</c:if>
+					<c:if test="${b.ibState== 2}">
+					库存库位:<input value="${b.inBarcode }" type="text" class="in_barcode_${index.index}">
+					<br>
+					分配的订单库位:<span class="order_barcode_${index.index}">${b.orderBarcode }</span>
+					</c:if>
+					<c:if test="${b.ibState== 1 || b.ibState==3}">
 					库存库位:${b.inBarcode }
+					<br>
+					分配的订单库位:${b.orderBarcode }
+					</c:if>
+					<br>
 					</td>
 					<td>
-					<c:if test="${b.ibState== 0}">采购使用库存,等待仓库移出库存</c:if>
-					<c:if test="${b.ibState== 1}">已完成移出库存</c:if>
-					<c:if test="${b.ibState== 2}">订单取消，等待仓库移入库存</c:if>
-					<c:if test="${b.ibState== 3}">已完成移入库存</c:if>
+					${b.stateContext }
 					</td>
 					<td>
-					<c:if test="${b.ibState== 0}"><button class="btn btn-default">确定移出库存</button></c:if>
-					<c:if test="${b.ibState== 2}"><button class="btn btn-default">确定移入库存</button></c:if>
+					<c:if test="${b.ibState== 0}"><button class="btn btn-default" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },0)">确定移出库存</button></c:if>
+					<c:if test="${b.ibState== 2}"><button class="btn btn-default" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },2)">确定移入库存</button></c:if>
+					<button class="btn btn-default" onclick="cancelInOut()">取消操作</button>
 					</td>
 					</tr>
 					</c:forEach>
@@ -232,10 +239,17 @@ em,i{font-style: normal;}
 			</table>
 				<div>
 				<span>当前页 :${currentPage } / ${barcodeListPage},总共 ${barcodeCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.currentPage}"><button class="btn btn-success btn_page_qu" onclick="doQuery()">查询</button>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.currentPage}">
+				<button class="btn btn-success btn_page_qu" onclick="doQuery()">查询</button>
+				<button class="btn btn-success btn_page_up" onclick="doBeforePage()">上一页</button>
+				<button class="btn btn-success btn_page_down" onclick="doNextPage()">下一页</button>
+				
+				<input type="hidden" value="${barcodeListPage}" id="total_page">
+				
 				</div>
 		</div>
-		
+		<br>
+		<br>
 	</div>
 <div class="tc">
 	<div class="trnasparent"></div>
@@ -260,6 +274,69 @@ function doQuery(){
 	var state = $('#query_state').val();
 	var orderid = $('#query_orderid').val();
 	window.open("/cbtconsole/inventory/barcode?page="+page+"&orderid="+orderid+"&state="+state, "_self");
+}
+function doBeforePage(){
+	var page = Number($("#current_page").val());
+	var tpage = Number($("#total_page").val());
+	page = page -1;
+	if(page < 1){
+		$("#current_page").val(1);
+	}else if(page > tpage){
+		$("#current_page").val(tpage);
+	}else{
+		$("#current_page").val(page);
+	}
+	doQuery();
+}
+function doNextPage(){
+	var page = Number($("#current_page").val());
+	var tpage = Number($("#total_page").val());
+	page = page+1;
+	if(page < 1){
+		$("#current_page").val(1);
+	}else if(page > tpage){
+		$("#current_page").val(tpage);
+	}else{
+		$("#current_page").val(page);
+	}
+	doQuery();
+}
+
+function inoutInventory(index,ibid,liid,inorout){
+	//移出库存库位
+	var inbarcode = "";
+	var orderbarcode = "";
+	if(inorout == 0){
+		inbarcode = $(".in_barcode_"+index).text();
+		orderbarcode = $(".order_barcode_"+index).val();
+	}else{
+		inbarcode = $(".in_barcode_"+index).val();
+		orderbarcode = $(".order_barcode_"+index).text();;
+	}
+	
+	
+	jQuery.ajax({
+	       url:"/cbtconsole/inventory/barcode/update",
+	       data:{
+	    	   "ibid":ibid,
+	    	   "liid":liid,
+	    	   "inbarcode":inbarcode,
+	    	   "orderbarcode":orderbarcode,
+	    	   "inorout":inorout
+	    	   
+	       },
+	       type:"post",
+	       success:function(data){
+	    	  if(data.status == 200){
+	    		 location.reload();
+	    	  }else{
+	    		  alert(data.reason);
+	    	  }
+	       },
+	   	error:function(e){
+	   		alert("获取类别列表失败");
+	   	}
+	   });
 }
 </script>
 </html>

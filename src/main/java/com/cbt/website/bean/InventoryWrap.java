@@ -8,6 +8,7 @@ public class InventoryWrap {
 	 * inventory_sku id
 	 */
 	private int inid;
+	private int liid;
 	/**
 	 * 
 	 */
@@ -98,5 +99,7 @@ public class InventoryWrap {
 	private String odSkuid;
 	
 	private String orderid;
+	
+	private String stateContext;
 
 }

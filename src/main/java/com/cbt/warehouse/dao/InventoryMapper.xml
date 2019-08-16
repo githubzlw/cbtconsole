@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.cbt.warehouse.dao.InventoryMapper" >
     <resultMap id="InventoryWrapMap" type="com.cbt.website.bean.InventoryWrap" >
+        <result column="li_id" property="liid" jdbcType="INTEGER" />
         <result column="in_id" property="inid" jdbcType="INTEGER" />
         <result column="lock_remaining" property="lockRemaining" jdbcType="INTEGER" />
         <result column="od_id" property="odid" jdbcType="INTEGER" />
@@ -662,7 +663,7 @@
     </update>
     
     <select id="inventoryBarcodeList" resultMap="InventoryWrapMap">
-    select li.in_id,li.lock_remaining,li.od_id,li.flag,li.is_delete,li.is_use,li.createtime,
+    select li.in_id,li.lock_remaining,li.od_id,li.flag,li.is_delete,li.is_use,li.createtime,li.id as li_id,
     ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
     isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,
     od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,
@@ -694,5 +695,19 @@
 		
 		where sm.is_match=1 and sm.order_details_id=#{odid} limit 1
     </select>
+    
+    <!-- 更新库位 -->
+    <update id="updateBarcode">
+    update inventory_barcode_record set 
+    <if test="inorout==0">state=1,order_barcode=#{orderbarcode}</if>
+    <if test="inorout==2">state=3,in_barcode=#{inBarcode}</if>
+    where id=#{ibid};
+    
+    update lock_inventory set 
+    <if test="inorout==0">flag = 1</if>
+    <if test="inorout==2">is_delete = 0</if>
+    where id=#{liid};
+    
+    </update>
     
 </mapper>

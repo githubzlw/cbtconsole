@@ -378,5 +378,9 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	Map<String,Object> getAddInventory(int odid);
-	
+	/**更新库位变换
+	 * @param map
+	 * @return
+	 */
+	int  updateBarcode(Map<String,Object> map);
 }

@@ -254,4 +254,10 @@ public interface InventoryService {
 	 */
 	int inventoryBarcodeListCount(Map<String, Object> map);
 	
+	/**更新库位变换
+	 * @param map
+	 * @return
+	 */
+	int  updateBarcode(Map<String,Object> map);
+	
 }

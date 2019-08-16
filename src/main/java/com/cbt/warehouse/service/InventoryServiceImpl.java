@@ -1250,10 +1250,31 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public List<InventoryWrap> inventoryBarcodeList(Map<String, Object> map) {
-		return inventoryMapper.inventoryBarcodeList(map);
+		List<InventoryWrap> inventoryBarcodeList = inventoryMapper.inventoryBarcodeList(map);
+		if(inventoryBarcodeList == null || inventoryBarcodeList.isEmpty()) {
+			return null;
+		}
+		for(InventoryWrap i : inventoryBarcodeList) {
+			if(i.getIbState() == 0) {
+				i.setStateContext("采购使用库存,等待仓库移出库存");
+			}else if(i.getIbState() == 1) {
+				i.setStateContext("已完成移出库存");
+			}else if(i.getIbState() == 2) {
+				i.setStateContext("订单取消，等待仓库移入库存");
+			}else if(i.getIbState() == 3) {
+				i.setStateContext("已完成移入库存");
+				
+			}
+		}
+		return inventoryBarcodeList;
 	}
 	@Override
 	public int inventoryBarcodeListCount(Map<String, Object> map) {
 		return inventoryMapper.inventoryBarcodeListCount(map);
+	}
+	@Override
+	public int updateBarcode(Map<String, Object> map) {
+		
+		return inventoryMapper.updateBarcode(map);
 	}
 }
