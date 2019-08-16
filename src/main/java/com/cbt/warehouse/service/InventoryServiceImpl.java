@@ -1159,6 +1159,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			inventory.put("when_count",String.valueOf(yourder * seilUnit) );
 			inventory.put("goodid", StrUtils.object2Str(c.get("goodsid"))); 
 			inventory.put("storage_type", "3"); 
+			inventory.put("orderid", StrUtils.object2Str(c.get("orderid"))); 
 			addInventory(inventory);
 		}
 		return checkedOrderDetails.size();
