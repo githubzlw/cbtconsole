@@ -340,7 +340,7 @@
 	inner join order_product_source ops on (od.id=ops.od_id and od.orderid=ops.orderid )
 	inner join id_relationtable ir on ir.odid=od.id
 	inner join taobao_1688_order_history th on  th.orderid=ir.tborderid 
-	where od.orderid=#{orderid} and od.id=#{odid}  limit 1
+	where od.id=#{odid}  limit 1
     </select>
     
    <!-- 插入库存明细 -->
