@@ -41,10 +41,10 @@ public class SwitchDomainNameUtil {
      *
      * @param shopCarMarketingList
      */
-    public static void changeShopCarMarketingList(List<ShopCarMarketing> shopCarMarketingList) {
+    public static void changeShopCarMarketingList(List<ShopCarMarketing> shopCarMarketingList, int webSite) {
         if (shopCarMarketingList != null && !shopCarMarketingList.isEmpty()) {
             for (ShopCarMarketing shopCarMarketing : shopCarMarketingList) {
-                changeShopCarMarketingSingle(shopCarMarketing);
+                changeShopCarMarketingSingle(shopCarMarketing, webSite);
             }
         }
     }
@@ -55,12 +55,12 @@ public class SwitchDomainNameUtil {
      *
      * @param goods
      */
-    public static void changeCustomGoodsPublishBean(CustomGoodsPublish goods) {
-        goods.setRemotpath(checkNullAndReplace(goods.getRemotpath()));
-        goods.setCustomMainImage(checkNullAndReplace(goods.getCustomMainImage()));
-        goods.setShowMainImage(checkNullAndReplace(goods.getShowMainImage()));
-        goods.setImg(checkNullAndReplace(goods.getImg()));
-        goods.setEninfo(checkNullAndReplace(goods.getEninfo()));
+    public static void changeCustomGoodsPublishBean(CustomGoodsPublish goods, int webSite) {
+        goods.setRemotpath(checkNullAndReplace(goods.getRemotpath(), webSite));
+        goods.setCustomMainImage(checkNullAndReplace(goods.getCustomMainImage(), webSite));
+        goods.setShowMainImage(checkNullAndReplace(goods.getShowMainImage(), webSite));
+        goods.setImg(checkNullAndReplace(goods.getImg(), webSite));
+        goods.setEninfo(checkNullAndReplace(goods.getEninfo(), webSite));
     }
 
     /**
@@ -68,10 +68,10 @@ public class SwitchDomainNameUtil {
      *
      * @param infoList
      */
-    public static void changeShopRecommendInfoList(List<ShopRecommendInfo> infoList) {
+    public static void changeShopRecommendInfoList(List<ShopRecommendInfo> infoList, int webSite) {
         if (infoList != null && !infoList.isEmpty()) {
             for (ShopRecommendInfo info : infoList) {
-                changeShopRecommendInfoBean(info);
+                changeShopRecommendInfoBean(info, webSite);
             }
         }
     }
@@ -81,10 +81,10 @@ public class SwitchDomainNameUtil {
      *
      * @param recommendInfo
      */
-    public static void changeShopRecommendInfoBean(ShopRecommendInfo recommendInfo) {
-        recommendInfo.setShopUrl(checkNullAndReplace(recommendInfo.getShopUrl()));
-        recommendInfo.setCoverImg(checkNullAndReplace(recommendInfo.getCoverImg()));
-        changeShopRecommendGoodsList(recommendInfo.getGoodsList());
+    public static void changeShopRecommendInfoBean(ShopRecommendInfo recommendInfo, int webSite) {
+        recommendInfo.setShopUrl(checkNullAndReplace(recommendInfo.getShopUrl(), webSite));
+        recommendInfo.setCoverImg(checkNullAndReplace(recommendInfo.getCoverImg(), webSite));
+        changeShopRecommendGoodsList(recommendInfo.getGoodsList(), webSite);
     }
 
     /**
@@ -92,10 +92,10 @@ public class SwitchDomainNameUtil {
      *
      * @param goodsList
      */
-    public static void changeShopRecommendGoodsList(List<ShopRecommendGoods> goodsList) {
+    public static void changeShopRecommendGoodsList(List<ShopRecommendGoods> goodsList, int webSite) {
         if (goodsList != null && !goodsList.isEmpty()) {
             for (ShopRecommendGoods gd : goodsList) {
-                changeShopRecommendGoodsBean(gd);
+                changeShopRecommendGoodsBean(gd, webSite);
             }
         }
     }
@@ -105,10 +105,10 @@ public class SwitchDomainNameUtil {
      *
      * @param recommendGoods
      */
-    public static void changeShopRecommendGoodsBean(ShopRecommendGoods recommendGoods) {
-        recommendGoods.setGoodsImg(checkNullAndReplace(recommendGoods.getGoodsImg()));
-        recommendGoods.setMainImg(checkNullAndReplace(recommendGoods.getMainImg()));
-        recommendGoods.setOnlineUrl(checkNullAndReplace(recommendGoods.getOnlineUrl()));
+    public static void changeShopRecommendGoodsBean(ShopRecommendGoods recommendGoods, int webSite) {
+        recommendGoods.setGoodsImg(checkNullAndReplace(recommendGoods.getGoodsImg(), webSite));
+        recommendGoods.setMainImg(checkNullAndReplace(recommendGoods.getMainImg(), webSite));
+        recommendGoods.setOnlineUrl(checkNullAndReplace(recommendGoods.getOnlineUrl(), webSite));
     }
 
     /**
@@ -116,8 +116,8 @@ public class SwitchDomainNameUtil {
      *
      * @param shopCarMarketing
      */
-    public static void changeShopCarMarketingSingle(ShopCarMarketing shopCarMarketing) {
-        shopCarMarketing.setGoogsImg(checkNullAndReplace(shopCarMarketing.getGoogsImg()));
+    public static void changeShopCarMarketingSingle(ShopCarMarketing shopCarMarketing, int webSite) {
+        shopCarMarketing.setGoogsImg(checkNullAndReplace(shopCarMarketing.getGoogsImg(), webSite));
     }
 
     /**
@@ -125,9 +125,9 @@ public class SwitchDomainNameUtil {
      *
      * @param orderDetailsBeanList
      */
-    public static void changeOrderDetailsList(List<OrderDetailsBean> orderDetailsBeanList) {
+    public static void changeOrderDetailsList(List<OrderDetailsBean> orderDetailsBeanList, int webSite) {
         for (OrderDetailsBean orderDetails : orderDetailsBeanList) {
-            changeOrderDetailsSingle(orderDetails);
+            changeOrderDetailsSingle(orderDetails, webSite);
         }
     }
 
@@ -137,11 +137,11 @@ public class SwitchDomainNameUtil {
      *
      * @param orderDetailsBean
      */
-    public static void changeOrderDetailsSingle(OrderDetailsBean orderDetailsBean) {
-        orderDetailsBean.setGoods_img(checkNullAndReplace(orderDetailsBean.getGoods_img()));
-        orderDetailsBean.setCar_img(checkNullAndReplace(orderDetailsBean.getCar_img()));
-        orderDetailsBean.setGoods_url(checkNullAndReplace(orderDetailsBean.getGoods_url()));
-        orderDetailsBean.setMatch_url(checkNullAndReplace(orderDetailsBean.getMatch_url()));
+    public static void changeOrderDetailsSingle(OrderDetailsBean orderDetailsBean, int webSite) {
+        orderDetailsBean.setGoods_img(checkNullAndReplace(orderDetailsBean.getGoods_img(), webSite));
+        orderDetailsBean.setCar_img(checkNullAndReplace(orderDetailsBean.getCar_img(), webSite));
+        orderDetailsBean.setGoods_url(checkNullAndReplace(orderDetailsBean.getGoods_url(), webSite));
+        orderDetailsBean.setMatch_url(checkNullAndReplace(orderDetailsBean.getMatch_url(), webSite));
     }
 
 
@@ -150,9 +150,9 @@ public class SwitchDomainNameUtil {
      *
      * @param purchasesBeanList
      */
-    public static void changePurchasesBeanList(List<PurchasesBean> purchasesBeanList) {
+    public static void changePurchasesBeanList(List<PurchasesBean> purchasesBeanList, int webSite) {
         for (PurchasesBean purchasesBean : purchasesBeanList) {
-            changePurchasesBeanSingle(purchasesBean);
+            changePurchasesBeanSingle(purchasesBean, webSite);
         }
     }
 
@@ -162,11 +162,11 @@ public class SwitchDomainNameUtil {
      *
      * @param purchasesBean
      */
-    public static void changePurchasesBeanSingle(PurchasesBean purchasesBean) {
-        purchasesBean.setGoods_url(checkNullAndReplace(purchasesBean.getGoods_url()));
-        purchasesBean.setGoogs_img(checkNullAndReplace(purchasesBean.getGoogs_img()));
-        purchasesBean.setImportExUrl(checkNullAndReplace(purchasesBean.getImportExUrl()));
-        purchasesBean.setImg_type(checkNullAndReplace(purchasesBean.getImg_type()));
+    public static void changePurchasesBeanSingle(PurchasesBean purchasesBean, int webSite) {
+        purchasesBean.setGoods_url(checkNullAndReplace(purchasesBean.getGoods_url(), webSite));
+        purchasesBean.setGoogs_img(checkNullAndReplace(purchasesBean.getGoogs_img(), webSite));
+        purchasesBean.setImportExUrl(checkNullAndReplace(purchasesBean.getImportExUrl(), webSite));
+        purchasesBean.setImg_type(checkNullAndReplace(purchasesBean.getImg_type(), webSite));
     }
 
 
@@ -174,19 +174,45 @@ public class SwitchDomainNameUtil {
      * 判断是否为空和包含的域名修改
      *
      * @param str
+     * @param webSite : 1 import 2 kids 3 pets 4 restaurant
      * @return
      */
-    public static String checkNullAndReplace(String str) {
+    public static String checkNullAndReplace(String str, int webSite) {
         if (StringUtils.isNotBlank(str)) {
-            if (str.contains(IMPORT_DOMAIN_NAME_1)) {
-                return str.replace(IMPORT_DOMAIN_NAME_1, KIDS_DOMAIN_NAME_1);
-            } else if (str.contains(IMPORT_DOMAIN_NAME_2)) {
-                return str.replace(IMPORT_DOMAIN_NAME_2, KIDS_DOMAIN_NAME_2);
-            } else if (str.contains(IMPORT_DOMAIN_NAME_3)) {
-                return str.replace(IMPORT_DOMAIN_NAME_3, KIDS_DOMAIN_NAME_3);
+            if (webSite == 2) {
+                if (str.contains(IMPORT_DOMAIN_NAME_1)) {
+                    return str.replace(IMPORT_DOMAIN_NAME_1, KIDS_DOMAIN_NAME_1);
+                } else if (str.contains(IMPORT_DOMAIN_NAME_2)) {
+                    return str.replace(IMPORT_DOMAIN_NAME_2, KIDS_DOMAIN_NAME_2);
+                } else if (str.contains(IMPORT_DOMAIN_NAME_3)) {
+                    return str.replace(IMPORT_DOMAIN_NAME_3, KIDS_DOMAIN_NAME_3);
+                } else {
+                    return str;
+                }
+            } else if (webSite == 3) {
+                if (str.contains(IMPORT_DOMAIN_NAME_1)) {
+                    return str.replace(IMPORT_DOMAIN_NAME_1, PETS_DOMAIN_NAME_1);
+                } else if (str.contains(IMPORT_DOMAIN_NAME_2)) {
+                    return str.replace(IMPORT_DOMAIN_NAME_2, PETS_DOMAIN_NAME_2);
+                } else if (str.contains(IMPORT_DOMAIN_NAME_3)) {
+                    return str.replace(IMPORT_DOMAIN_NAME_3, PETS_DOMAIN_NAME_3);
+                } else {
+                    return str;
+                }
+            } else if (webSite == 3) {
+                if (str.contains(IMPORT_DOMAIN_NAME_1)) {
+                    return str.replace(IMPORT_DOMAIN_NAME_1, RESTAURANT_DOMAIN_NAME_1);
+                } else if (str.contains(IMPORT_DOMAIN_NAME_2)) {
+                    return str.replace(IMPORT_DOMAIN_NAME_2, RESTAURANT_DOMAIN_NAME_2);
+                } else if (str.contains(IMPORT_DOMAIN_NAME_3)) {
+                    return str.replace(IMPORT_DOMAIN_NAME_3, RESTAURANT_DOMAIN_NAME_3);
+                } else {
+                    return str;
+                }
             } else {
                 return str;
             }
+
         } else {
             return str;
         }
@@ -197,10 +223,10 @@ public class SwitchDomainNameUtil {
      *
      * @param objectList
      */
-    public static void changeObjectList(List<Object[]> objectList) {
+    public static void changeObjectList(List<Object[]> objectList, int webSite) {
         if (objectList != null && !objectList.isEmpty()) {
             for (Object[] obj : objectList) {
-                changeObjectSingle(obj);
+                changeObjectSingle(obj, webSite);
             }
         }
     }
@@ -210,12 +236,12 @@ public class SwitchDomainNameUtil {
      *
      * @param obj
      */
-    public static void changeObjectSingle(Object[] obj) {
+    public static void changeObjectSingle(Object[] obj, int webSite) {
         if (obj[5] != null) {
-            obj[5] = checkNullAndReplace(obj[5].toString());
+            obj[5] = checkNullAndReplace(obj[5].toString(), webSite);
         }
         if (obj[7] != null) {
-            obj[7] = checkNullAndReplace(obj[7].toString());
+            obj[7] = checkNullAndReplace(obj[7].toString(), webSite);
         }
     }
 }

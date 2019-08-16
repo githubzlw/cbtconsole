@@ -440,7 +440,7 @@ public class ShopRecommendController {
             // 排序
             upList.sort(Comparator.comparingInt(ShopRecommendInfo::getSort));
             // 域名转换
-            SwitchDomainNameUtil.changeShopRecommendInfoList(upList);
+            SwitchDomainNameUtil.changeShopRecommendInfoList(upList,1);
 
             File file = GoodsInfoUpdateOnlineUtil.writeDataToLocal("shopRecommend.json", upList.toString());
             boolean isSuccess = okHttpUtils.postFileNoParam(GoodsInfoUpdateOnlineUtil.ONLINE_SHOP_RECOMMEND_URL, file);

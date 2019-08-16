@@ -188,9 +188,7 @@ public class NewOrderDetailsCtr {
 			List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
 
 			// 域名切换
-			if(MultiSiteUtil.getSiteTypeNum(orderNo) == 2){
-				SwitchDomainNameUtil.changeOrderDetailsList(odb);
-			}
+			SwitchDomainNameUtil.changeOrderDetailsList(odb, MultiSiteUtil.getSiteTypeNum(orderNo));
 
 			List<GoodsDistribution> distributionList = new ArrayList<>();
 			List<GoodsDistribution> updistributionList = new ArrayList<>();
@@ -1695,7 +1693,8 @@ public class NewOrderDetailsCtr {
 					sbBuffer.append("<br><br>Sincerely,");
 					if(isKidFlag){
 						sbBuffer.append("<br>Kids-Product-Wholesale Team");
-						SendEmail.send(confirmEmail, null, toEmail, SwitchDomainNameUtil.checkNullAndReplace(sbBuffer.toString()),
+						SendEmail.send(confirmEmail, null, toEmail, SwitchDomainNameUtil.checkNullAndReplace(sbBuffer.toString(),
+								MultiSiteUtil.getSiteTypeNum(orderNo)),
 							"Your KidsProductWholesale Order " + orderNo + " transaction is closed!", "", orderNo, 2);
 					} else{
 						sbBuffer.append("<br>Import-Express Team");
@@ -1990,11 +1989,7 @@ public class NewOrderDetailsCtr {
                     model.put("email", confirmEmail);
                     model.put("name", toEmail);
                     model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
-                    if(isKidFlag){
-                    	model.put("accountLink", SwitchDomainNameUtil.checkNullAndReplace(AppConfig.center_path));
-					} else{
-                    	model.put("accountLink", AppConfig.center_path);
-					}
+                    model.put("accountLink", SwitchDomainNameUtil.checkNullAndReplace(AppConfig.center_path, MultiSiteUtil.getSiteTypeNum(orderNo)));
                     model.put("orderNo", orderNo);
                     net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
                     String modeStr = jsonObject.toString();
