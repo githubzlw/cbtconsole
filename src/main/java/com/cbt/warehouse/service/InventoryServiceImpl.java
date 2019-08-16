@@ -1263,7 +1263,8 @@ public class InventoryServiceImpl implements  InventoryService{
 				i.setStateContext("订单取消，等待仓库移入库存");
 			}else if(i.getIbState() == 3) {
 				i.setStateContext("已完成移入库存");
-				
+			}else if(i.getIbState() == 4) {
+				i.setStateContext("仓库取消了移库请求");
 			}
 		}
 		return inventoryBarcodeList;
@@ -1276,5 +1277,10 @@ public class InventoryServiceImpl implements  InventoryService{
 	public int updateBarcode(Map<String, Object> map) {
 		
 		return inventoryMapper.updateBarcode(map);
+	}
+	@Override
+	public int updateRemark(Map<String, Object> map) {
+		
+		return inventoryMapper.updateRemark(map);
 	}
 }

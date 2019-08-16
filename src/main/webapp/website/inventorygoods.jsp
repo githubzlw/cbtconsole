@@ -128,6 +128,7 @@ em,i{font-style: normal;}
 .c_img{width: 100px;height: 100px;}
 .report .btn_page_in{width:100px;}
 .query_state{width: 500px;}
+.btn-cancel{margin-top: 10px;}
 </style>
 </head>
 <body>
@@ -227,11 +228,14 @@ em,i{font-style: normal;}
 					</td>
 					<td>
 					${b.stateContext }
+					<br>
+					<br>
+					<c:if test="${b.ibState== 4}">取消原因:${b.ibRemark }</c:if>
 					</td>
 					<td>
-					<c:if test="${b.ibState== 0}"><button class="btn btn-default" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },0)">确定移出库存</button></c:if>
-					<c:if test="${b.ibState== 2}"><button class="btn btn-default" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },2)">确定移入库存</button></c:if>
-					<button class="btn btn-default" onclick="cancelInOut()">取消操作</button>
+					<c:if test="${b.ibState== 0}"><button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },0)">移出库存</button></c:if>
+					<c:if test="${b.ibState== 2}"><button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },2)">移入库存</button></c:if>
+					<c:if test="${b.ibState== 0 || b.ibState== 2}"><button class="btn btn-info btn-cancel" onclick="cancelInOut(${index.index},${b.ibid},${b.liid },${b.ibState})"> 取消操作 </button></c:if>
 					</td>
 					</tr>
 					</c:forEach>
@@ -253,7 +257,18 @@ em,i{font-style: normal;}
 	</div>
 <div class="tc">
 	<div class="trnasparent"></div>
-	
+	<div class="tc1">
+	<h3>取消原因</h3>
+		<textarea rows="5" cols="100" id="tc_remark"></textarea>
+		<input type="hidden" value="" id="tc_liid">
+		<input type="hidden" value="" id="tc_ibid">
+		<input type="hidden" value="" id="tc_ibState">
+		<input type="hidden" value="" id="tc_in_barcode">
+		<input type="hidden" value="" id="tc_order_barcode">
+		
+		<br>
+		<button class="btn btn-success" onclick="cancelMove()">确定</button>
+	</div>
 	
 </div>
 
@@ -267,8 +282,68 @@ $(function(){
 		$("#current_page").val(1);
 		doQuery();
 	})
+	$('.trnasparent').click(function(){
+		$('.tc,.trnasparent,.tc1').hide();
+		$("#tc_liid").val('');
+		$("#tc_ibid").val('');
+		$("#tc_ibState").val('');
+		$("#tc_in_barcode").val('');
+		$("#tc_order_barcode").val('');
+	});
 })
 
+function cancelMove(){
+	var liid = $("#tc_liid").val();
+	var ibid = $("#tc_ibid").val();
+	var ibState = $("#tc_ibState").val();
+	var inbarcode = $("#tc_in_barcode").val();
+	var orderbarcode = $("#tc_order_barcode").val();
+	var remark = $("#tc_remark").val();
+	
+	$.ajax({
+	       url:"/cbtconsole/inventory/barcode/remark",
+	       data:{
+	    	   "ibid":ibid,
+	    	   "liid":liid,
+	    	   "ibState":ibState,
+	    	   "inbarcode":inbarcode,
+	    	   "orderbarcode":orderbarcode,
+	    	   "remark":remark
+	    	   
+	       },
+	       type:"post",
+	       success:function(data){
+	    	  if(data.status == 200){
+	    		 location.reload();
+	    	  }else{
+	    		  alert(data.reason);
+	    	  }
+	       },
+	   	error:function(e){
+	   		alert("获取类别列表失败");
+	   	}
+	   });
+	
+}
+
+function cancelInOut(index,ibid,liid,ibState){
+	$("#tc_liid").val(liid);
+	$("#tc_ibid").val(ibid);
+	$("#tc_ibState").val(ibState);
+	var inbarcode = "";
+	var orderbarcode = "";
+	if(ibState == 0){
+		inbarcode = $(".in_barcode_"+index).text();
+		orderbarcode = $(".order_barcode_"+index).val();
+	}else{
+		inbarcode = $(".in_barcode_"+index).val();
+		orderbarcode = $(".order_barcode_"+index).text();
+	}
+	$("#tc_in_barcode").val(inbarcode);
+	$("#tc_order_barcode").val(orderbarcode);
+	
+	$('.tc,.trnasparent,.tc1').show();
+}
 function doQuery(){
 	var page = $("#current_page").val();
 	var state = $('#query_state').val();
@@ -311,10 +386,8 @@ function inoutInventory(index,ibid,liid,inorout){
 		orderbarcode = $(".order_barcode_"+index).val();
 	}else{
 		inbarcode = $(".in_barcode_"+index).val();
-		orderbarcode = $(".order_barcode_"+index).text();;
+		orderbarcode = $(".order_barcode_"+index).text();
 	}
-	
-	
 	jQuery.ajax({
 	       url:"/cbtconsole/inventory/barcode/update",
 	       data:{

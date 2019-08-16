@@ -709,5 +709,8 @@
     where id=#{liid};
     
     </update>
+    <update id="updateRemark">
+    update inventory_barcode_record set  remark=#{remark},state=4 where id=#{ibid};
+    </update>
     
 </mapper>

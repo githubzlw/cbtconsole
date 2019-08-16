@@ -383,4 +383,9 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int  updateBarcode(Map<String,Object> map);
+	/**更新库位变换
+	 * @param map
+	 * @return
+	 */
+	int  updateRemark(Map<String,Object> map);
 }

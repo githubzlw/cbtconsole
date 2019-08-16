@@ -150,6 +150,53 @@ public class InventoryController {
 	}
 	
 	/**
+	 * 仓库取消了移库请求
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/barcode/remark")
+	@ResponseBody
+	protected Map<String,Object> barcodeRemark(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		Map<String,Object> result = new HashMap<>();
+		result.put("status", 200);
+		String stribid = request.getParameter("ibid");
+		stribid = StrUtils.isNum(stribid) ? stribid : "0";
+		
+		String strliid = request.getParameter("liid");
+		strliid = StrUtils.isNum(strliid) ? strliid : "0";
+		
+		String stribState= request.getParameter("ibState");
+		stribState = StrUtils.isNum(stribState) ? stribState : "0";
+		
+		String orderbarcode = request.getParameter("orderbarcode");
+		orderbarcode = StringUtil.isBlank(orderbarcode) ? orderbarcode : orderbarcode.trim();
+		String inbarcode = request.getParameter("inbarcode");
+		inbarcode = StringUtil.isBlank(inbarcode) ? inbarcode : inbarcode.trim();
+		String remark = request.getParameter("remark");
+		remark = StringUtil.isBlank(remark) ? remark : remark.trim();
+		
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("ibid", Integer.parseInt(stribid));
+		map.put("liid", Integer.parseInt(strliid));
+		map.put("ibState", Integer.parseInt(stribState));
+		map.put("inbarcode", inbarcode);
+		map.put("orderbarcode", orderbarcode);
+		map.put("remark", remark);
+		int updateBarcode = inventoryService.updateRemark(map);
+		if(updateBarcode < 1) {
+			result.put("status", 500);
+			result.put("reason", "数据错误:"+stribid+"/"+strliid+"/"+stribState+"/"+inbarcode+"/"+orderbarcode);
+		}
+		return result;
+	}
+	
+	/**
 	 * 查询库存明细
 	 * @param request
 	 * @param response
@@ -159,6 +206,7 @@ public class InventoryController {
 	 * @throws ParseException
 	 */
 	@RequestMapping(value = "/inventorydetails")
+	@ResponseBody
 	protected EasyUiJsonResult inventoryDetails(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
