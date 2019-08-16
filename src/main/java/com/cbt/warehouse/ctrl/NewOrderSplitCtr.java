@@ -376,12 +376,12 @@ public class NewOrderSplitCtr {
                         //判断该订单是否为测试订单如果是则不入库存
 //						boolean flag=splitDao.checkTestOrder(odidLst[0]);
 //						if(flag){}
-                        if ("0".equals(state)) {
+                        /* if ("0".equals(state)) {
                         	inventoryService.cancelToInventory(odidLst, admuser.getId(), admuser.getAdmName());
-                          /*  for (String odid : odidLst) {
+                           for (String odid : odidLst) {
                                 splitDao.addInventory(odid, "拆单取消库存");
-                            }*/
-                        }
+                            }
+                        }*/
                     } else {
                         json.setOk(false);
                         if (nwOrderDetails.size() == 0 || nwOrderDetails.size() != odidLst.length) {
