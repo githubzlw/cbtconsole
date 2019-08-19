@@ -690,7 +690,8 @@
     </select>
     
     <select id="getAddInventory" resultType="java.util.Map">
-    	select  sm.order_details_id,isk.id as in_id,isk.barcode from  order_details_sku_match sm left join inventory_sku isk 
+    	select  sm.order_details_id,isk.id as in_id,isk.barcode 
+    	from  order_details_sku_match sm left join inventory_sku isk 
 		
 		on sm.specid=isk.specid and sm.skuid=isk.skuid and sm.goods_pid=isk.goods_pid
 		

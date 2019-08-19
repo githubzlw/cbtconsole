@@ -345,7 +345,7 @@ public class InventoryServiceImpl implements  InventoryService{
 				inventory.put("tborderid", t.getOrderid());
 				inventory.put("tbspecid", StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId());
 				inventory.put("tbskuid", StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID());
-				result = result + inventoryOperation(inventory,true);
+				result = inventoryOperation(inventory,true);
 			}
 		}else {
 			inventory.put("db_flag", "1");
@@ -507,8 +507,8 @@ public class InventoryServiceImpl implements  InventoryService{
 		iDetail.setOdId(Integer.valueOf(StrUtils.object2NumStr(inventory.get("odid"))));
 		iDetail.setGoodsSkuid(iSku.getSkuid());
 		iDetail.setGoodsSpecid(iSku.getSpecid());
-		
-		return inventoryMapper.insertInventoryDetailsSku(iDetail);
+		inventoryMapper.insertInventoryDetailsSku(iDetail);
+		return inventory_sku_id;
 		
 	}
 	@Override
@@ -1164,7 +1164,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			inventory.put("goodid", StrUtils.object2Str(c.get("goodsid"))); 
 			inventory.put("storage_type", "3"); 
 			inventory.put("orderid", StrUtils.object2Str(c.get("orderid"))); 
-			addInventory(inventory);
+			int in_id = addInventory(inventory);
 			int odId = Integer.parseInt(StrUtils.object2NumStr(c.get("od_id")));
 			Map<String, Object> addInventory = inventoryMapper.getAddInventory(odId);
 			if(addInventory != null) {
@@ -1172,10 +1172,12 @@ public class InventoryServiceImpl implements  InventoryService{
 				InventoryBarcodeRecord record = new InventoryBarcodeRecord();
 				record.setAdmid(admId);
 				record.setInventoryBarcode(StrUtils.object2Str(addInventory.get("barcode")));
-				record.setInventoryId(Integer.parseInt(StrUtils.object2NumStr(addInventory.get("id"))));
+				
+				int inid = Integer.parseInt(StrUtils.object2NumStr(addInventory.get("id")));
+				record.setInventoryId(inid == 0 ? in_id : inid);
 				record.setLockId(0);
 				record.setState(1);
-				record.setRemark(StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"取消订单");
+				record.setRemark(StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"订单取消商品");
 				record.setOrderBarcode(StrUtils.object2Str(c.get("barcode")));
 				record.setOdId(odId);
 				inventoryMapper.insertInventoryBarcodeRecord(record );
@@ -1261,10 +1263,10 @@ public class InventoryServiceImpl implements  InventoryService{
 		for(InventoryWrap i : inventoryBarcodeList) {
 			if(i.getIbState() == 0) {
 				i.setStateContext("采购使用库存,等待仓库移出库存");
-			}else if(i.getIbState() == 2) {
-				i.setStateContext("已完成移出库存");
 			}else if(i.getIbState() == 1) {
 				i.setStateContext("订单取消，等待仓库移入库存");
+			}else if(i.getIbState() == 2) {
+				i.setStateContext("已完成移出库存");
 			}else if(i.getIbState() == 3) {
 				i.setStateContext("已完成移入库存");
 			}else if(i.getIbState() == 4) {
