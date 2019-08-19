@@ -32,6 +32,8 @@ import com.cbt.website.bean.InventorySku;
 import com.cbt.website.bean.InventoryWrap;
 import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
+import com.cbt.website.dao.ExpressTrackDaoImpl;
+import com.cbt.website.dao.IExpressTrackDao;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -45,7 +47,8 @@ public class InventoryServiceImpl implements  InventoryService{
 	private OrderinfoMapper orderinfoMapper;
 	@Autowired
 	private IPurchaseMapper pruchaseMapper;
-
+	
+	IExpressTrackDao dao = new ExpressTrackDaoImpl();
 	/**
 	 * 根据ID获取库存
 	 */
@@ -1171,7 +1174,7 @@ public class InventoryServiceImpl implements  InventoryService{
 				record.setInventoryBarcode(StrUtils.object2Str(addInventory.get("barcode")));
 				record.setInventoryId(Integer.parseInt(StrUtils.object2NumStr(addInventory.get("id"))));
 				record.setLockId(0);
-				record.setState(2);
+				record.setState(1);
 				record.setRemark(StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"取消订单");
 				record.setOrderBarcode(StrUtils.object2Str(c.get("barcode")));
 				record.setOdId(odId);
@@ -1199,7 +1202,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			int lockInventoryFlag = Integer.parseInt(StrUtils.object2NumStr(i.get("li_flag")));
 			if(lockInventoryFlag == 1) {
 			     //仓库已经移库，需要操作还原库位, 库位变更记录表
-				inventoryMapper.updateBarcodeRecord(Integer.parseInt(StrUtils.object2NumStr(i.get("barcodeId"))), 2);
+				inventoryMapper.updateBarcodeRecord(Integer.parseInt(StrUtils.object2NumStr(i.get("barcodeId"))), 1);
 			}
 			
 			//更新lock_inventory状态is_delete=1
@@ -1258,14 +1261,16 @@ public class InventoryServiceImpl implements  InventoryService{
 		for(InventoryWrap i : inventoryBarcodeList) {
 			if(i.getIbState() == 0) {
 				i.setStateContext("采购使用库存,等待仓库移出库存");
-			}else if(i.getIbState() == 1) {
-				i.setStateContext("已完成移出库存");
 			}else if(i.getIbState() == 2) {
+				i.setStateContext("已完成移出库存");
+			}else if(i.getIbState() == 1) {
 				i.setStateContext("订单取消，等待仓库移入库存");
 			}else if(i.getIbState() == 3) {
 				i.setStateContext("已完成移入库存");
 			}else if(i.getIbState() == 4) {
-				i.setStateContext("仓库取消了移库请求");
+				i.setStateContext("仓库取消了出库请求");
+			}else if(i.getIbState() == 5) {
+				i.setStateContext("仓库取消了入库请求");
 			}
 		}
 		return inventoryBarcodeList;
@@ -1276,11 +1281,14 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public int updateBarcode(Map<String, Object> map) {
-		
+		String position = dao.getPosition((String)map.get("orderbarcode"));
+		map.put("position", position);
 		return inventoryMapper.updateBarcode(map);
 	}
 	@Override
 	public int updateRemark(Map<String, Object> map) {
+		int state = (int)map.get("state");
+		
 		
 		return inventoryMapper.updateRemark(map);
 	}

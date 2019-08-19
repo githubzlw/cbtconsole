@@ -180,14 +180,19 @@ public class InventoryController {
 		String remark = request.getParameter("remark");
 		remark = StringUtil.isBlank(remark) ? remark : remark.trim();
 		
-		
+		int ibState = Integer.parseInt(stribState);
 		Map<String,Object> map = new HashMap<>();
 		map.put("ibid", Integer.parseInt(stribid));
 		map.put("liid", Integer.parseInt(strliid));
-		map.put("ibState", Integer.parseInt(stribState));
+		map.put("ibState", ibState);
 		map.put("inbarcode", inbarcode);
 		map.put("orderbarcode", orderbarcode);
 		map.put("remark", remark);
+		if(ibState == 0) {
+			map.put("state", 4);
+		}else if(ibState == 1){
+			map.put("state", 5);
+		}
 		int updateBarcode = inventoryService.updateRemark(map);
 		if(updateBarcode < 1) {
 			result.put("status", 500);

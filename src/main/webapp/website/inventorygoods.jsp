@@ -214,12 +214,12 @@ em,i{font-style: normal;}
 					分配的订单库位:
 					<input value="${b.orderBarcode }" type="text" class="order_barcode_${index.index}">
 					</c:if>
-					<c:if test="${b.ibState== 2}">
+					<c:if test="${b.ibState== 1}">
 					库存库位:<input value="${b.inBarcode }" type="text" class="in_barcode_${index.index}">
 					<br>
 					分配的订单库位:<span class="order_barcode_${index.index}">${b.orderBarcode }</span>
 					</c:if>
-					<c:if test="${b.ibState== 1 || b.ibState==3}">
+					<c:if test="${b.ibState== 2 || b.ibState==3}">
 					库存库位:${b.inBarcode }
 					<br>
 					分配的订单库位:${b.orderBarcode }
@@ -230,12 +230,12 @@ em,i{font-style: normal;}
 					${b.stateContext }
 					<br>
 					<br>
-					<c:if test="${b.ibState== 4}">取消原因:${b.ibRemark }</c:if>
+					<c:if test="${b.ibState== 4 || b.ibState== 5}">取消原因:${b.ibRemark }</c:if>
 					</td>
 					<td>
 					<c:if test="${b.ibState== 0}"><button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },0)">移出库存</button></c:if>
-					<c:if test="${b.ibState== 2}"><button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },2)">移入库存</button></c:if>
-					<c:if test="${b.ibState== 0 || b.ibState== 2}"><button class="btn btn-info btn-cancel" onclick="cancelInOut(${index.index},${b.ibid},${b.liid },${b.ibState})"> 取消操作 </button></c:if>
+					<c:if test="${b.ibState== 1}"><button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },1)">移入库存</button></c:if>
+					<c:if test="${b.ibState== 0 || b.ibState== 1}"><button class="btn btn-info btn-cancel" onclick="cancelInOut(${index.index},${b.ibid},${b.liid },${b.ibState})"> 取消操作 </button></c:if>
 					</td>
 					</tr>
 					</c:forEach>

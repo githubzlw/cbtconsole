@@ -654,8 +654,8 @@
     </update>
     
     <insert id="insertInventoryBarcodeRecord" parameterType="com.cbt.website.bean.InventoryBarcodeRecord">
-    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id) 
-    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId})
+    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id,createtime,updatetime) 
+    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId},now(),now())
     </insert>
     
     <update id="updateBarcodeRecord">
@@ -663,7 +663,7 @@
     </update>
     
     <select id="inventoryBarcodeList" resultMap="InventoryWrapMap">
-    select li.in_id,li.lock_remaining,li.od_id,li.flag,li.is_delete,li.is_use,li.createtime,li.id as li_id,
+    select li.in_id,li.lock_remaining,li.od_id,li.flag,li.is_delete,li.is_use,ib.updatetime as createtime,li.id as li_id,
     ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
     isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,
     od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,
@@ -677,6 +677,7 @@
     where 1=1
     <if test="orderid!=null">and od.orderid=#{orderid}</if>
     <if test="state!=-1">and ib.state=#{state}</if>
+    order by ib.state asc,ib.createtime desc
     limit #{page},20
     </select>
     <select id="inventoryBarcodeListCount" resultType="Integer">
@@ -698,19 +699,27 @@
     
     <!-- 更新库位 -->
     <update id="updateBarcode">
-    update inventory_barcode_record set 
-    <if test="inorout==0">state=1,order_barcode=#{orderbarcode}</if>
-    <if test="inorout==2">state=3,in_barcode=#{inBarcode}</if>
+    update inventory_barcode_record set updatetime=now()
+    <if test="inorout==0">,state=2,order_barcode=#{orderbarcode}</if>
+    <if test="inorout==1">,state=3,in_barcode=#{inbarcode}</if>
     where id=#{ibid};
     
     update lock_inventory set 
     <if test="inorout==0">flag = 1</if>
-    <if test="inorout==2">is_delete = 0</if>
+    <if test="inorout==1">is_delete = 0</if>
     where id=#{liid};
     
+    <if test="inorout==0">
+    update id_relationtable set barcode=#{orderbarcode},position=#{position} 
+    where odid =(select od_id from lock_inventory where id=#{liid} limit 1);
+    </if>
+    <if test="inorout==1">
+    update inventory_sku set barcode=#{inbarcode}
+    where id =(select in_id from lock_inventory where id=#{liid} limit 1);
+    </if>
     </update>
     <update id="updateRemark">
-    update inventory_barcode_record set  remark=#{remark},state=4 where id=#{ibid};
+    update inventory_barcode_record set  updatetime=now(),remark=#{remark},state=#{state} where id=#{ibid};
     </update>
     
 </mapper>
