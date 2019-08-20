@@ -31,6 +31,7 @@
         <result column="od_specid" property="odSpecid" jdbcType="VARCHAR" />
         <result column="od_skuid" property="odSkuid" jdbcType="VARCHAR" />
         <result column="orderid" property="orderid" jdbcType="VARCHAR" />
+        <result column="goodsid" property="goodsid" jdbcType="VARCHAR" />
     </resultMap>
     <resultMap id="InventoryCheckRecordMap" type="com.cbt.website.bean.InventoryCheckRecord" >
         <result column="id" property="id" jdbcType="INTEGER" />
@@ -671,7 +672,7 @@
     ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
     isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,
     isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,isku.remaining,isku.can_remaining,
-    od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,od.yourorder,od.seilUnit,
+    od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,od.yourorder,od.seilUnit,od.goodsid,
     ods.specid as od_specid,ods.skuid as od_skuid
     
     from inventory_barcode_record ib  
@@ -727,7 +728,7 @@
     
     update lock_inventory set 
     <if test="inorout==0">flag = 1</if>
-    <if test="inorout==1">is_delete = 0</if>
+    <if test="inorout==1">is_delete = 1</if>
     where id=#{liid};
     
     <if test="inorout==0">

@@ -120,6 +120,8 @@ public class InventoryController {
 	@ResponseBody
 	protected Map<String,Object> barcodeUpdate(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		Map<String,Object> result = new HashMap<>();
 		result.put("status", 200);
 		String stribid = request.getParameter("ibid");
@@ -141,6 +143,7 @@ public class InventoryController {
 		map.put("inorout", Integer.parseInt(strinorout));
 		map.put("inbarcode", inbarcode);
 		map.put("orderbarcode", orderbarcode);
+		map.put("admid",adm!=null? adm.getId() : 0);
 		int updateBarcode = inventoryService.updateBarcode(map);
 		if(updateBarcode < 1) {
 			result.put("status", 500);
@@ -162,6 +165,9 @@ public class InventoryController {
 	@ResponseBody
 	protected Map<String,Object> barcodeRemark(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		
 		Map<String,Object> result = new HashMap<>();
 		result.put("status", 200);
 		String stribid = request.getParameter("ibid");
@@ -187,6 +193,7 @@ public class InventoryController {
 		map.put("ibState", ibState);
 		map.put("inbarcode", inbarcode);
 		map.put("orderbarcode", orderbarcode);
+		map.put("admid",adm!=null? adm.getId() : 0);
 		map.put("remark", remark);
 		if(ibState == 0) {
 			map.put("state", 4);
