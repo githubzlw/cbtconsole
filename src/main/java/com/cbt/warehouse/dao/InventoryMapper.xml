@@ -680,7 +680,7 @@
     left join inventory_sku isk on ib.in_id=isk.id
     left join order_details od on ib.od_id=od.id
     left join order_details_sku_match ods on ib.od_id=ods.order_details_id
-    where id.id=#{id}
+    where ib.id=#{id}
     limit 1
     </select>
     <select id="inventoryBarcodeList" resultMap="InventoryWrapMap">
