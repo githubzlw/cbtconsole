@@ -8,6 +8,16 @@ import org.apache.ibatis.annotations.Param;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.InventoryBarcodeRecord;
+import com.cbt.website.bean.InventoryCheck;
+import com.cbt.website.bean.InventoryCheckRecord;
+import com.cbt.website.bean.InventoryData;
+import com.cbt.website.bean.InventoryDetails;
+import com.cbt.website.bean.InventoryLock;
+import com.cbt.website.bean.InventoryLog;
+import com.cbt.website.bean.InventorySku;
+import com.cbt.website.bean.InventoryWrap;
+import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 
 public interface InventoryMapper {
@@ -15,7 +25,7 @@ public interface InventoryMapper {
 	 * @param map
 	 * @return
 	 */
-	int insertLockInventory(Map<String,String> map);
+	int insertLockInventory(InventoryLock lock);
 	/**关联order_details_sku_match inventory_sku获取用户下单从规格id,库存数量
 	 * @param od_id
 	 * @return
@@ -27,12 +37,7 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int insertStorageOutboundDetails(Map<String,String> inventory);
-	/**
-	 * 库存列表查询
-	 * @param map
-	 * @return
-	 */
-	public List<Inventory> getIinOutInventory(Map<Object, Object> map);
+	
 	public int isExitBarcode(@Param("barcode") String barcode);
 	/**
 	 * 根据ID获取库存
@@ -61,7 +66,7 @@ public interface InventoryMapper {
 	 * @return
 	 * @return int
 	 */
-	public int recordLossInventory(Map<Object, Object> map);
+	public int recordLossInventory(Map<String, Object> map);
 	/**
 	 * 手动录入库存
 	 * @param map
@@ -106,7 +111,7 @@ public interface InventoryMapper {
 	 * @param map
 	 * @return
 	 */
-	public List<Inventory> getIinOutInventoryCount(Map<Object, Object> map);
+	public int getIinOutInventoryCount(Map<Object, Object> map);
 
 	public List<AliCategory> searchAliCategory(@Param("type") String type, @Param("cid") String cid);
 
@@ -132,75 +137,41 @@ public interface InventoryMapper {
 	
 	
 	
-	/****************************************************************************************/
-	
-	/**库存变更记录表
-	 * @param inventory
-	 * @return
-	 */
-	int addInventoryChangeRecord(Map<String,String> inventory);
 	
 	
-	/**获取库存数量
-	 * @param inventory
-	 * @return
-	 */
-	Map<String,Object>  getInventory(Map<String,String> inventory);
-	
-	/**获取库存数量
-	 * @param inventory
-	 * @return
-	 */
-	Map<String,Object>  getInventoryByOdId(Map<String,String> inventory);
-	
-	/**获取库存数量
-	 * @param inventory
-	 * @return
-	 */
-	Map<String,Object>  getInventoryByid(String id);
-	
-	/**插入库存
-	 * @return
-	 */
-	int addInventory(Map<String,String> inventory);
-	
-	/**更新库存
-	 * @return
-	 */
-	int updateInventory(Map<String,String> inventory);
-	/**更新库存
-	 * @return
-	 */
-	int updateInventoryById(Map<String,String> inventory);
-	
-	
-	/**是否存在库存
-	 * @return
-	 */
-	Integer isExsisInventory(Map<String,String> inventory);
-	
-	
-	/**记录库存存入记录，用来统计当月库存金额
-	 * @param inventory
-	 * @return
-	int insertInventoryDetails(Map<String,String> inventory);
-	 */
-	
+	/*****************************************新库存系统**********start*************************************/
 	/**
+	 * 库存列表查询inventory_sku
+	 * @param map
+	 * @return
+	 */
+	List<InventoryData> getIinOutInventory(Map<Object, Object> map);
+	/**获取库存列表
+	 * @param list
+	 * @return
+	 */
+	List<InventoryData> getInventoryByIds(List<Integer> list);
+	
+	/**库存变更记录表(关联库存表插入)
+	 * @param inventory
+	 * @return
+	 */
+	int addInventoryLogByInventoryid(Map<String,String> inventory);
+	
+	/**获取订单产品详细数据
 	 * @param inventory
 	 * @return
 	 */
 	Map<String,String> getOrderDetails(Map<String,String> map);
 	
-	/**入库
+	/**插入库存明细表(关联库存表插入)inventory_details_sku
 	 * @param inventory
 	 * @return
 	 */
-	int insertInventoryDetailsSku(Map<String,String> inventory);
+	int addInventoryDetailsSku(Map<String,String> inventory);
 	
-//	int addStorageOutboundDetails(Map<String,String> inventory);
 	
-	/**获取库存的1688数据
+	/**获取库存明细表的货源产品详细数据inventory_details_sku
 	 * @param itemid
 	 * @param specid
 	 * @param skuid
@@ -214,4 +185,213 @@ public interface InventoryMapper {
 	 */
 	int addIdRelationTable(Map<String,String> map);
 	
+	/**库存报损记录loss_inventory_record
+	 * @param record
+	 * @return
+	 */
+	int addLossInventoryRecord(LossInventoryRecord record);
+	/**库存明细列表inventory_details_sku
+	 * @param map
+	 * @return
+	 */
+	List<InventoryDetails> inventoryDetails(Map<String, Object> map);
+	/**库存明细数量inventory_details_sku
+	 * @param map
+	 * @return
+	 */
+	int inventoryDetailsCount(Map<String,Object> map);
+	
+	/**库存inventory_sku
+	 * @param item
+	 * @return
+	 */
+	int insertInventory(InventorySku item);
+	
+	
+	/**获取库存inventory_sku
+	 * @param item
+	 * @return
+	 */
+	InventorySku getInventory(InventorySku item);
+	
+	/**更新库存inventory_sku
+	 * @param item
+	 * @return
+	 */
+	int updateInventory(InventorySku item);
+	
+	/**库存变更表inventory_sku_log
+	 * @param log
+	 * @return
+	 */
+	int insertInventoryLog(InventoryLog log);
+	
+	/**库存明细inventory_details_sku
+	 * @param detail
+	 * @return
+	 */
+	int insertInventoryDetailsSku(InventoryDetails detail);
+	
+	/**获取淘宝订单 taobao_1688_history
+	 * @param orderShipno
+	 * @return
+	 */
+	List<Map<String,Object>> getTbGoods(String orderShipno);
+	
+	
+	/**开始库存盘点  inventory_sku_check
+	 * @param check
+	 * @return
+	 */
+	int insertInventoryCheck(InventoryCheck check);
+	
+	/**获取最近一次有效盘点 inventory_sku_check
+	 * @return
+	 */
+	InventoryCheck getLastInventoryCheck();
+	
+	/**撤销盘点 inventory_sku_check
+	 * @param check
+	 * @return
+	 */
+	int updateInventoryCheckCancel(InventoryCheck check);
+	
+	/**更新盘点完成标志 inventory_sku_check
+	 * @param id
+	 * @return
+	 */
+	int updateInventoryCheckDone(int id);
+	
+	/**批量更新盘点记录
+	 * @param list
+	 * @return
+	 */
+	int iBatchInventoryCheckRecord(List<InventoryCheckRecord> list);
+	/**获取库存表所有类别统计列表inventory_sku & 1688_category
+	 * @return
+	 */
+	List<Map<String,Object>> getInventoryCatList();
+	
+	/**插入盘点记录 inventory_sku_check_record_temp
+	 * @param record
+	 * @return
+	 */
+	int insertInventoryCheckRecord(InventoryCheckRecord record);
+	
+	/**更新盘点记录inventory_sku_check_record_temp
+	 * @param record
+	 * @return
+	 */
+	int updateInventoryCheckRecord(InventoryCheckRecord record);
+	
+	/**完成盘点 将inventory_sku_check_record_temp 本次数据插入inventory_sku_check_record
+	 * @param checkId
+	 * @return
+	 */
+	int doneInventoryCheckRecord(int checkId);
+	
+	/**获取inventory_sku_check_record_temp本次盘点数据
+	 * @param checkId
+	 * @return
+	 */
+	List<InventoryCheckRecord> getInventoryCheckRecord(int checkId);
+	/**获取inventory_sku_check_record盘点历史数据
+	 * @param checkId
+	 * @return
+	 */
+	List<InventoryCheckRecord> getICRHistory(@Param("inid")int inid,@Param("page")int page,@Param("goodsPid")String goodsPid);
+	
+	/**获取inventory_sku_check_record盘点历史数据数量
+	 * @param inid
+	 * @return
+	 */
+	int getICRHistoryCount(@Param("inid")int inid,@Param("goodsPid")String goodsPid);
+	
+	/**清空inventory_sku_check_record_temp本次盘点数据
+	 * @param checkId
+	 * @return
+	 */
+	int deleteInventoryCheckRecord(int checkId);
+	
+	/**盘点更新库存
+	 * @param item
+	 * @return
+	 */
+	int updateInventoryCheckFlag(InventorySku item);
+	
+	/**完全使用库存更新订单详情状态
+	 * @param odid
+	 * @return
+	 */
+	int updateOrderDetailsState(int odid);
+	
+	/**获取使用了库存订单详情列表
+	 * @param orderid
+	 * @return
+	 */
+	List<Map<String,Object>> getInventoryUsedByOrderno(String orderid);
+	/**获取使用了库存订单详情列表
+	 * @param orderid
+	 * @return
+	 */
+	List<Map<String,Object>> getInventoryUsedByOdid(String odid);
+	/**获取已经验货的订单详情列表
+	 * @param orderid
+	 * @return
+	 */
+	List<Map<String,Object>> getCheckedOrderDetailsByOrderno(String orderid);
+	/**获取已经验货的订单详情列表
+	 * @param orderid
+	 * @return
+	 */
+	List<Map<String,Object>> getCheckedOrderDetailsByOdid(String odid);
+	
+	/**取消库存锁定
+	 * @param id
+	 * @return
+	 */
+	int cancelLockInventory(int id);
+	
+	/**使用库存，标记库位移动
+	 * @return
+	 */
+	int insertInventoryBarcodeRecord(InventoryBarcodeRecord record);
+	
+	/**更新状态
+	 * @param id
+	 * @param state
+	 * @return
+	 */
+	int updateBarcodeRecord(@Param("id")int id,@Param("state")int state);
+	
+	/**获取库位变更
+	 * @param id
+	 * @return
+	 */
+	InventoryWrap getInventoryBarcode(int id);
+	
+	/**移库位
+	 * @return
+	 */
+	List<InventoryWrap> inventoryBarcodeList(Map<String, Object> map);
+	/**移库位
+	 * @return
+	 */
+	int inventoryBarcodeListCount(Map<String, Object> map);
+	
+	/**订单取消进入库存的数据
+	 * @param odid
+	 * @return
+	 */
+	Map<String,Object> getAddInventory(int odid);
+	/**更新库位变换
+	 * @param map
+	 * @return
+	 */
+	int  updateBarcode(Map<String,Object> map);
+	/**更新库位变换
+	 * @param map
+	 * @return
+	 */
+	int  updateRemark(Map<String,Object> map);
 }

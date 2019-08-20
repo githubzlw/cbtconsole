@@ -916,6 +916,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		boolean unuseInventory = true;
 		try{
 			//获取订单信息
+			//采购状态：0：未开始采购；1:采购货源确认 2、开始采购 3、已采购，没到货 4 、已入库 5：问题货源 6：已入库，但货有问题  8、出运中， 9、已退货 10、已换货  11：已取消 12替代',
 			OrderBean ob = pruchaseMapper.getOrders(orderno);
 			if(ob != null){
 				String countryNameCn=ob.getCountryNameCN();
@@ -1066,14 +1067,39 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				purchaseBean.setStraight_address(StringUtils.isStrNull(map.get("shopAddress"))?"":String.valueOf(map.get("shopAddress")));
 //				pruchaseMapper.updateOrderDetailsFlag(straight_flag,String.valueOf(map.get("order_no")),String.valueOf(map.get("od_id")));
 				setInvoiceVaue(purchaseBean, fileByOrderid);
+				
+				//获取商品库存数据
+				purchaseBean.setInventorySkuId("0");
 				String inventoryRemark="";
 				//查询该商品是否有使用库存
 				purchaseBean.setLock_remaining("0");
+				 /*SELECT li.in_id,li.lock_remaining,li.id as li_id,ib.state as ib_state,ib.remark as ib_remark
+			        ib.order_barcode as ib_order_barcode
+			         FROM lock_inventory li 
+			        left join inventory_barcode_record ib on li.id=ib.lock_id  WHERE li.od_id=${odid}*/
+				 
 				Map<String, Object> useInventoryMap=pruchaseMapper.getUseInventory(purchaseBean.getOd_id());
 				if(useInventoryMap != null) {
 					String useInventory = com.cbt.util.StrUtils.object2Str(useInventoryMap.get("lock_remaining"));
 					if(StringUtil.isNotBlank(useInventory)){
 						inventoryRemark="该商品使用了【"+useInventory+"】件库存";
+						int ibState = Integer.parseInt(com.cbt.util.StrUtils.object2NumStr(useInventoryMap.get("ib_state")));
+						if(ibState == 0) {
+							inventoryRemark += ",仓库未确认库存,未完成移出库存操作";
+						}else if(ibState == 1){
+							inventoryRemark += ",仓库未确认商品取消,未完成移入库存操作";
+						}else if(ibState == 2){
+							inventoryRemark += ",仓库已确认库存,并完成移出库存";
+						}else if(ibState == 3){
+							inventoryRemark += ",仓库已确认商品取消,并完成移入库存";
+						}else if(ibState == 4){
+							inventoryRemark += ",仓库拒绝采购使用库存商品请求";
+						}else if(ibState == 5){
+							inventoryRemark += ",仓库拒绝商品进入库存请求";
+						}
+						if(ibState > 3 && StringUtil.isNotBlank(com.cbt.util.StrUtils.object2Str(useInventoryMap.get("ib_remark")))) {
+							inventoryRemark +=",原因:"+com.cbt.util.StrUtils.object2Str(useInventoryMap.get("ib_remark"));
+						}
 						purchaseBean.setLock_remaining(useInventory);
 						unuseInventory = false;
 						String in_id = com.cbt.util.StrUtils.object2Str(useInventoryMap.get("in_id"));
@@ -1082,6 +1108,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					
 				}
 				purchaseBean.setInventoryRemark(inventoryRemark);
+				//查找是否有库存可使用
+				getInventoryCount(map, purchaseBean,unuseInventory);
 				//查看商品关联的1688订单号
 				String shipnos=map.get("shipnos");
 				//获取淘宝订单号
@@ -1169,10 +1197,6 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					}
 				}
 				purchaseBean.setNewValue(goods_p_url.replace("'", " "));
-				//获取商品库存数据
-				if(unuseInventory) {
-					getInventoryCount(map, purchaseBean);
-				}
 				getSourceOfGoods(map, purchaseBean);
 				String cn = map.get("companyname");
 				purchaseBean.setCompanyName(StringUtil.isNotBlank(cn)?cn:"无");
@@ -1629,21 +1653,22 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		}
 	}
 
-	private void getInventoryCount(Map<String, String> map, PurchasesBean purchaseBean) {
+	private void getInventoryCount(Map<String, String> map, PurchasesBean purchaseBean,boolean unUseInventory) {
+		purchaseBean.setInventory("0");
+		purchaseBean.setInventorySkuId("0");
+		purchaseBean.setRemaining("0");
+		purchaseBean.setNew_remaining("0");
 		Map<String, Object> inventory = inventoryMapper.getInventoryByOrderDetialsId(String.valueOf(map.get("od_id")));
 		if(inventory != null) {
 			purchaseBean.setSkuid((String)inventory.get("skuid"));
 			purchaseBean.setSpecid((String)inventory.get("specid"));
-			String can_remaining = com.cbt.util.StrUtils.object2NumStr(inventory.get("can_remaining"));
+			String can_remaining = com.cbt.util.StrUtils.object2NumStr(inventory.get("remaining"));
 			purchaseBean.setInventory(can_remaining);
-			purchaseBean.setInventorySkuId(com.cbt.util.StrUtils.object2NumStr(inventory.get("inventory_id")));
-			purchaseBean.setRemaining(can_remaining);
-			purchaseBean.setNew_remaining(can_remaining);
-		}else {
-			purchaseBean.setInventory("0");
-			purchaseBean.setInventorySkuId("0");
-			purchaseBean.setRemaining("0");
-			purchaseBean.setNew_remaining("0");
+			if(unUseInventory) {
+				purchaseBean.setInventorySkuId(com.cbt.util.StrUtils.object2NumStr(inventory.get("inventory_id")));
+				purchaseBean.setRemaining(can_remaining);
+				purchaseBean.setNew_remaining(can_remaining);
+			}
 		}
 		/*String nm = null;
 		try {
@@ -2188,6 +2213,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		if(taobaoOrderHistory == null || taobaoOrderHistory.isEmpty()) {
 			return 0;
 		}
+		
+		int goodsUnit = 1;
+		String strgoodsUnit = map.get("goodsUnit");
+		strgoodsUnit = StrUtils.matchStr(strgoodsUnit, "([1-9]\\d*)");
+		goodsUnit = StrUtils.isNum(strgoodsUnit) ? Integer.valueOf(strgoodsUnit) : goodsUnit;
+		
 		//tbOr1688,orderid,itemname,itemid,sku,shipno,shipper,username,imgurl,itemurl,specId,skuID
 		map.put("tborderid", (String)taobaoOrderHistory.get("1688_orderid"));
 		map.put("shipno", (String)taobaoOrderHistory.get("1688_shipno"));
@@ -2196,13 +2227,13 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		map.put("specid", (String)taobaoOrderHistory.get("goods_p_specid"));
 		map.put("skuid", (String)taobaoOrderHistory.get("goods_p_skuid"));
 		map.put("goodurl", (String)taobaoOrderHistory.get("goods_p_url"));
-		map.put("taobaoprice", (String)taobaoOrderHistory.get("goods_p_price"));
+		map.put("taobaoprice", com.cbt.util.StrUtils.object2PriceStr(taobaoOrderHistory.get("goods_p_price")));
 		//'0为 未出货，1已出货'
 		map.put("state", "0");
 		//'入库删除标记:0.已入库;1.入库已取消'
 		map.put("is_delete", "0");
 		//'商品状态：1.到货了;2.该货没到;3.破损;4.有疑问;5.数量不够 6:品牌未授权'
-		map.put("goodstatus", googs_number == inventory_count_use ? "1" : "5");
+		map.put("goodstatus", googs_number * goodsUnit == inventory_count_use ? "1" : "5");
 		//'商品到货数量'
 		map.put("goodarrivecount", String.valueOf(inventory_count_use));
 		//'记录商品数量'
@@ -2214,12 +2245,6 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		
 		map.put("weight", "0");
 		
-		//待确定
-		map.put("barcode", "");
-		map.put("position", "");
-		
-		map.put("username", "cangku2");
-		map.put("userid", "65");
 		map.put("warehouse_remark", "有库存商品，采购自动匹配入库 inventory_sku_id:"+inventory_sku_id+"/orderid:"+map.get("orderid")+"/od_id:"+map.get("od_id"));
 		
 		int addIdRelationTable = inventoryMapper.addIdRelationTable(map);

@@ -1,15 +1,29 @@
 package com.cbt.report.service;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
 import com.cbt.bean.ExpbuyGoods;
-import com.cbt.pojo.*;
+import com.cbt.pojo.BuyReconciliationPojo;
+import com.cbt.pojo.GeneralReport;
+import com.cbt.pojo.GeneralReportExample;
+import com.cbt.pojo.Inventory;
+import com.cbt.pojo.InventoryDetailsPojo;
+import com.cbt.pojo.LossInventoryPojo;
+import com.cbt.pojo.OfflinePaymentApplicationPojo;
+import com.cbt.pojo.OrderSalesAmountPojo;
+import com.cbt.pojo.ReportSalesInfo;
+import com.cbt.pojo.SalesReport;
+import com.cbt.pojo.StatisticalReportPojo;
+import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.report.vo.StatisticalReportVo;
 import com.cbt.warehouse.pojo.JcexPrintInfo;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-
-import java.util.List;
-import java.util.Map;
+import com.cbt.website.bean.InventoryCheckRecord;
+import com.cbt.website.bean.InventoryData;
 
 public interface GeneralReportService {
 
@@ -45,7 +59,7 @@ public interface GeneralReportService {
 
     public HSSFWorkbook exportTaoBaoOrder(List<TaoBaoOrderInfo> list, double pagePrice);
 
-    public HSSFWorkbook exportGoodsInventory(List<Inventory> list);
+    public HSSFWorkbook exportGoodsInventory(List<InventoryData> list);
 
     /**
      * 库存盘点记录导出
@@ -111,5 +125,11 @@ public interface GeneralReportService {
      * @return
      */
     public HSSFWorkbook exportJcexPrintInfo(List<JcexPrintInfo> list);
+    /**
+     * 库存盘点记录导出
+     * @param list
+     * @return
+     */
+    public HSSFWorkbook exportInventoryCheckExcel(List<InventoryCheckRecord> list);
 
 }
