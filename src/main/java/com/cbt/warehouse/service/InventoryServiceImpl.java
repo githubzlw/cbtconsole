@@ -1038,10 +1038,16 @@ public class InventoryServiceImpl implements  InventoryService{
 				int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
 				//获取未更新之前，订单状态和客户ID，比较前后状态是否一致，不一致说明订单状态已经修改
 				Map<String,Object> orderinfoMap = pruchaseMapper.queryUserIdAndStateByOrderNo(map.get("orderid"));
+				
+				orderinfoMapper.updateOrderDetails(map);
+				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+				
+				int counts=orderinfoMapper.getDtailsState(map);
+				
 				if (isDropshipOrder == 1) {
-					orderinfoMapper.updateOrderDetails(map);
-					sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
-					int counts=orderinfoMapper.getDtailsState(map);
+//					orderinfoMapper.updateOrderDetails(map);
+//					sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+//					int counts=orderinfoMapper.getDtailsState(map);
 					if(counts == 0){
 						orderinfoMapper.updateDropshiporder(map);
 						sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+map.get("orderid")+"' " +
@@ -1049,7 +1055,7 @@ public class InventoryServiceImpl implements  InventoryService{
 					}
 					//判断主单下所有的子单是否到库
 					counts=orderinfoMapper.getAllChildOrderState(map);
-					if(counts == 0){
+					/*if(counts == 0){
 						orderinfoMapper.updateOrderInfoState(map);
 						sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 						//判断订单状态是否一致
@@ -1058,14 +1064,14 @@ public class InventoryServiceImpl implements  InventoryService{
 							NotifyToCustomerUtil.updateOrderState(Integer.valueOf(orderinfoMap.get("user_id").toString()),
 									map.get("orderid"),Integer.valueOf(orderinfoMap.get("old_state").toString()),2);
 						}
-					}
+					}*/
 				}else{
 					// 非dropshi订单
-					orderinfoMapper.updateOrderDetails(map);
-					sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+//					orderinfoMapper.updateOrderDetails(map);
+//					sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 					//判断订单是否全部到库
-					int counts=orderinfoMapper.getDetailsState(map);
-					if(counts == 0){
+//					int counts=orderinfoMapper.getDetailsState(map);
+					/*if(counts == 0){
 						orderinfoMapper.updateOrderInfoState(map);
 						sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 						//判断订单状态是否一致
@@ -1074,6 +1080,16 @@ public class InventoryServiceImpl implements  InventoryService{
 							NotifyToCustomerUtil.updateOrderState(Integer.valueOf(orderinfoMap.get("user_id").toString()),
 									map.get("orderid"),Integer.valueOf(orderinfoMap.get("old_state").toString()),2);
 						}
+					}*/
+				}
+				if(counts == 0){
+					orderinfoMapper.updateOrderInfoState(map);
+					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+					//判断订单状态是否一致
+					if(!orderinfoMap.get("old_state").toString().equals("2")){
+						//发送消息给客户
+						NotifyToCustomerUtil.updateOrderState(Integer.valueOf(orderinfoMap.get("user_id").toString()),
+								map.get("orderid"),Integer.valueOf(orderinfoMap.get("old_state").toString()),2);
 					}
 				}
 				orderinfoMap.clear();
@@ -1288,10 +1304,10 @@ public class InventoryServiceImpl implements  InventoryService{
 		return inventoryMapper.updateBarcode(map);
 	}
 	@Override
-	public int updateRemark(Map<String, Object> map) {
-		int state = (int)map.get("state");
-		int ibState = (int)map.get("ibState");
-		int ibid = (int)map.get("ibid");
+	public int updateRemark(Map<String, Object> mapParam) {
+		int state = (int)mapParam.get("state");
+		int ibState = (int)mapParam.get("ibState");
+		int ibid = (int)mapParam.get("ibid");
 		
 //		map.put("ibid", Integer.parseInt(stribid));
 //		map.put("liid", Integer.parseInt(strliid));
@@ -1346,10 +1362,85 @@ public class InventoryServiceImpl implements  InventoryService{
 				inventoryMapper.cancelLockInventory(wrap.getLiid());
 			}
 			//订单入库记录
+//			不同意就是采购中
+			//完全使用库存 更改状态为确认价格中
+			if(wrap.getOdSeilUnit() * wrap.getOdYourOrder() == lockRemaining) {
+				/*SendMQ sendMQ = new SendMQ();
+				//订单产品要入库， 状态要验货无误
+//				order_details.state=1 order_details.checked=1 
+				orderinfoMapper.updateChecked(map);
+				
+				//查询是否是DP订单
+				int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
+				//获取未更新之前，订单状态和客户ID，比较前后状态是否一致，不一致说明订单状态已经修改
+				Map<String,Object> orderinfoMap = pruchaseMapper.queryUserIdAndStateByOrderNo(map.get("orderid"));
+				
+				orderinfoMapper.updateOrderDetails(map);
+				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+				
+				int counts=orderinfoMapper.getDtailsState(map);
+				
+				if (isDropshipOrder == 1) {
+//					orderinfoMapper.updateOrderDetails(map);
+//					sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+//					int counts=orderinfoMapper.getDtailsState(map);
+					if(counts == 0){
+						orderinfoMapper.updateDropshiporder(map);
+						sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+map.get("orderid")+"' " +
+								"and id='"+map.get("odid")+"')"));
+					}
+					//判断主单下所有的子单是否到库
+					counts=orderinfoMapper.getAllChildOrderState(map);
+					if(counts == 0){
+						orderinfoMapper.updateOrderInfoState(map);
+						sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+						//判断订单状态是否一致
+						if(!orderinfoMap.get("old_state").toString().equals("2")){
+							//发送消息给客户
+							NotifyToCustomerUtil.updateOrderState(Integer.valueOf(orderinfoMap.get("user_id").toString()),
+									map.get("orderid"),Integer.valueOf(orderinfoMap.get("old_state").toString()),2);
+						}
+					}
+				}else{
+					// 非dropshi订单
+//					orderinfoMapper.updateOrderDetails(map);
+//					sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+					//判断订单是否全部到库
+//					int counts=orderinfoMapper.getDetailsState(map);
+					if(counts == 0){
+						orderinfoMapper.updateOrderInfoState(map);
+						sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+						//判断订单状态是否一致
+						if(!orderinfoMap.get("old_state").toString().equals("2")){
+							//发送消息给客户
+							NotifyToCustomerUtil.updateOrderState(Integer.valueOf(orderinfoMap.get("user_id").toString()),
+									map.get("orderid"),Integer.valueOf(orderinfoMap.get("old_state").toString()),2);
+						}
+					}
+				}
+				if(counts == 0){
+					orderinfoMapper.updateOrderInfoState(map);
+					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+					//判断订单状态是否一致
+					if(!orderinfoMap.get("old_state").toString().equals("2")){
+						//发送消息给客户
+						NotifyToCustomerUtil.updateOrderState(Integer.valueOf(orderinfoMap.get("user_id").toString()),
+								map.get("orderid"),Integer.valueOf(orderinfoMap.get("old_state").toString()),2);
+					}
+				}
+				orderinfoMap.clear();
+				sendMQ.closeConn();*/
+				
+			}else {
+				//更改状态为采购中，验货，数量不够
+				
+				
+			}
 			
 			//订单验货状态
 			
+			
 		}
-		return inventoryMapper.updateRemark(map);
+		return inventoryMapper.updateRemark(mapParam);
 	}
 }

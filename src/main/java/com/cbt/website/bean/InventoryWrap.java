@@ -98,6 +98,10 @@ public class InventoryWrap {
 	 */
 	private String odSkuid;
 	
+	private int odYourOrder;
+	
+	private int odSeilUnit;
+	
 	private String orderid;
 	
 	private String stateContext;
