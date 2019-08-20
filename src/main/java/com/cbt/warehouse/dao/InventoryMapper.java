@@ -362,7 +362,7 @@ public interface InventoryMapper {
 	 * @param state
 	 * @return
 	 */
-	int updateBarcodeRecord(int id,int state);
+	int updateBarcodeRecord(@Param("id")int id,@Param("state")int state);
 	
 	/**获取库位变更
 	 * @param id
