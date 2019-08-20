@@ -175,85 +175,9 @@ function topCenter(msg){
 </script>
 </head>
 <body text="#000000" >
-	<!-- <div class="wraps easyui-dialog" id="dlg4" title="报损调整" style="width:1047px;padding:10px;autoOpen:false;closed:true;">
-			<form  method="post" >
-		<div class="wrap wrap1">
-			<span>产品 ID</span>
-			<input type="text" name="igoodsId" id="index_igoodsID" readonly="readonly">
-			<span style="margin-left: 40px;">SKUID</span>
-			<input type="text" name="iskuid" id="index_iskuid" readonly="readonly">
-			<span style="margin-left: 40px;">SPECID</span>
-			<input type="text" name="ispecid" id="index_ispecid" readonly="readonly">
-		</div>
-		<div class="wrap wrap2">
-			<span>产品名称</span>
-			<em id="index_igoodsname"></em>
-		</div>
-		<div class="wrap-overflow clearfix">
-			<div class="left">
-				<div class="wrap wrap3">
-					<span>产品规格</span>
-					<em class="w235" id="index_isku"></em>
-				</div>
-				<div class="wrap wrap4">
-					<span class="al_count" >当前库存数量</span>
-					<i id="index_iremaining">0</i>
-					<span class="av_count" >当前可用库存数量</span>
-					<i id="index_icanremaining">0</i>
-				</div>
-				<div class="wrap wrap5">
-					<span>调整当前库存数量为</span>
-					<input type="text" name="changeNumber" id="index_ichangcount">
-				</div>
-			</div>
-			<div class="wrap7">
-				<p>产品图</p>
-				<img src="https://img1.import-express.com/importcsvimg/importimg/559138175864/8063cce6-2b0d-47c9-abe5-95e2b7ec1032_179.png" alt="" id="index_iimg">
-			</div>
-		</div>
-		
-		<div class="wrap wrap6">
-			<span>备注原因</span>
-			<div class="reasons w235">
-			0  损坏 1 遗失  3 添加 4 补货  5 漏发 7 其他原因
-				<label>
-					<input type="radio" name="change_type" value="0" checked="checked" class="radio_change">
-					损坏
-				</label>
-				<label >
-					<input type="radio" name="change_type" value="1" class="radio_change">
-					遗失
-				</label>
-				<label>
-					<input type="radio" name="change_type" value="3" class="radio_change">
-					添加
-				</label>
-				<label>
-					<input type="radio" name="change_type" value="4" class="radio_change">
-					补货
-				</label>
-				<label>
-					<input type="radio" name="change_type" value="5" class="radio_change">
-					漏发
-				</label>
-				<label>
-					<input type="radio" name="change_type" value="7">
-					其他
-				</label>
-				<input type="text" class="other" name="remark" id="index_iremark" value="">
-			</div>
-		</div>
-		<div class="wrap wrap8">
-		<input type="hidden" value="" name="in_id" id="index_in_id">
-			<input value="保存" type="button" class="submit_button" onclick="addLoss()">
-		</div>
-		</form>
-	</div> -->
 	<div  id="top_toolbar" style="padding: 5px; height: auto;display:none;" >
 	<div>
 	<span><!-- 库存ID --><input type="hidden" id="query_in_id" value="${param.inid}"></span>&nbsp;&nbsp;
-	<!-- <span>产品ID<input type="text" id="query_goods_pid" value=""></span>&nbsp;&nbsp;
-	<input type="button" value="查询" class="button_c" id="query_button"/> -->
 	</div>
 	</div>
 	

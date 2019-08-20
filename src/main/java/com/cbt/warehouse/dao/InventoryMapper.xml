@@ -1,6 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.cbt.warehouse.dao.InventoryMapper" >
+    <resultMap id="InventoryWrapMap" type="com.cbt.website.bean.InventoryWrap" >
+        <result column="seilUnit" property="odSeilUnit" jdbcType="INTEGER" />
+        <result column="yourorder" property="odYourOrder" jdbcType="INTEGER" />
+        <result column="li_id" property="liid" jdbcType="INTEGER" />
+        <result column="remaining" property="remaining" jdbcType="INTEGER" />
+        <result column="can_remaining" property="canRemaining" jdbcType="INTEGER" />
+        <result column="in_id" property="inid" jdbcType="INTEGER" />
+        <result column="lock_remaining" property="lockRemaining" jdbcType="INTEGER" />
+        <result column="od_id" property="odid" jdbcType="INTEGER" />
+        <result column="flag" property="flag" jdbcType="INTEGER" />
+        <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
+        <result column="is_use" property="isUse" jdbcType="INTEGER" />
+        <result column="ib_id" property="ibid" jdbcType="INTEGER" />
+        <result column="ib_state" property="ibState" jdbcType="INTEGER" />
+        <result column="createtime" property="createtime" jdbcType="VARCHAR" />
+        <result column="in_barcode" property="inBarcode" jdbcType="VARCHAR" />
+        <result column="order_barcode" property="orderBarcode" jdbcType="VARCHAR" />
+        <result column="ib_remark" property="ibRemark" jdbcType="VARCHAR" />
+        <result column="isk_car_img" property="iskSCarImg" jdbcType="VARCHAR" />
+        <result column="isk_goods_pid" property="iskSGoodsPid" jdbcType="VARCHAR" />
+        <result column="isk_goods_name" property="iskGoodsName" jdbcType="VARCHAR" />
+        <result column="isk_sku" property="iskSku" jdbcType="VARCHAR" />
+        <result column="isk_skuid" property="iskSkuid" jdbcType="VARCHAR" />
+        <result column="isk_specid" property="iskSpecid" jdbcType="VARCHAR" />
+        <result column="goods_pid" property="goodsPid" jdbcType="VARCHAR" />
+        <result column="od_car_img" property="odCarImg" jdbcType="VARCHAR" />
+        <result column="od_sku" property="odSku" jdbcType="VARCHAR" />
+        <result column="od_specid" property="odSpecid" jdbcType="VARCHAR" />
+        <result column="od_skuid" property="odSkuid" jdbcType="VARCHAR" />
+        <result column="orderid" property="orderid" jdbcType="VARCHAR" />
+    </resultMap>
     <resultMap id="InventoryCheckRecordMap" type="com.cbt.website.bean.InventoryCheckRecord" >
         <result column="id" property="id" jdbcType="INTEGER" />
         <result column="inventory_check_id" property="inventoryCheckId" jdbcType="INTEGER" />
@@ -183,6 +214,7 @@
     
     <if test="isline == 1">and c.valid=1</if>
     <if test="isline == 2">and c.valid!=1</if>
+    order by createtime desc
      limit #{page},20
     </select>
     <select id="getIinOutInventoryCount" resultType="INTEGER">
@@ -386,7 +418,7 @@
     <if test="inventory_sku_id > 0">
     and inventory_id=#{inventory_sku_id}
     </if>
-    
+    order by createtime desc
     limit #{page},20
     
     </select>
@@ -544,7 +576,7 @@
     where 1=1
     <if test="goodsPid !=null">and iscr.goods_pid=#{goodsPid}</if>
     <if test="inid > 0">and iscr.inventory_sku_id=#{inid} </if>
-    
+    order by iscr.create_time desc
     limit #{page},50
     </select>
     <!-- 获取盘点历史数据 -->
@@ -626,12 +658,89 @@
     </update>
     
     <insert id="insertInventoryBarcodeRecord" parameterType="com.cbt.website.bean.InventoryBarcodeRecord">
-    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id) 
-    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId})
+    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id,createtime,updatetime) 
+    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId},now(),now())
     </insert>
     
     <update id="updateBarcodeRecord">
     update inventory_barcode_record set state=#{state} where id=#{id}
+    </update>
+    
+    <select id="getInventoryBarcode" resultMap="InventoryWrapMap">
+    select li.in_id,li.lock_remaining,li.od_id,li.flag,li.is_delete,li.is_use,ib.updatetime as createtime,li.id as li_id,
+    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
+    isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,
+    isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,isku.remaining,isku.can_remaining,
+    od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,od.yourorder,od.seilUnit,
+    ods.specid as od_specid,ods.skuid as od_skuid
+    
+    from inventory_barcode_record ib  
+    left join  lock_inventory li on li.id=ib.lock_id
+    left join inventory_sku isk on ib.in_id=isk.id
+    left join order_details od on ib.od_id=od.id
+    left join order_details_sku_match ods on ib.od_id=ods.order_details_id
+    where id.id=#{id}
+    limit 1
+    </select>
+    <select id="inventoryBarcodeList" resultMap="InventoryWrapMap">
+    select li.in_id,li.lock_remaining,li.od_id,li.flag,li.is_delete,li.is_use,ib.updatetime as createtime,li.id as li_id,
+    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
+    isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,
+    od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,
+    ods.specid as od_specid,ods.skuid as od_skuid
+    
+    from inventory_barcode_record ib  
+    left join  lock_inventory li on li.id=ib.lock_id
+    left join inventory_sku isk on li.in_id=isk.id
+    left join order_details od on ib.od_id=od.id
+    left join order_details_sku_match ods on od.id=ods.order_details_id
+    where 1=1
+    <if test="orderid!=null">and od.orderid=#{orderid}</if>
+    <if test="state!=-1">and ib.state=#{state}</if>
+    order by ib.state asc,ib.createtime desc
+    limit #{page},20
+    </select>
+    <select id="inventoryBarcodeListCount" resultType="Integer">
+    select count(ib.id)  
+     from inventory_barcode_record ib  
+    left join order_details od on ib.od_id=od.id
+     where 1=1
+     <if test="orderid!=null">and od.orderid=#{orderid}</if>
+    <if test="state!=-1">and ib.state=#{state}</if>
+    </select>
+    
+    <select id="getAddInventory" resultType="java.util.Map">
+    	select  sm.order_details_id,isk.id as in_id,isk.barcode 
+    	from  order_details_sku_match sm left join inventory_sku isk 
+		
+		on sm.specid=isk.specid and sm.skuid=isk.skuid and sm.goods_pid=isk.goods_pid
+		
+		where sm.is_match=1 and sm.order_details_id=#{odid} limit 1
+    </select>
+    
+    <!-- 更新库位 -->
+    <update id="updateBarcode">
+    update inventory_barcode_record set updatetime=now()
+    <if test="inorout==0">,state=2,order_barcode=#{orderbarcode}</if>
+    <if test="inorout==1">,state=3,in_barcode=#{inbarcode}</if>
+    where id=#{ibid};
+    
+    update lock_inventory set 
+    <if test="inorout==0">flag = 1</if>
+    <if test="inorout==1">is_delete = 0</if>
+    where id=#{liid};
+    
+    <if test="inorout==0">
+    update id_relationtable set barcode=#{orderbarcode},position=#{position} 
+    where odid =(select od_id from lock_inventory where id=#{liid} limit 1);
+    </if>
+    <if test="inorout==1">
+    update inventory_sku set barcode=#{inbarcode}
+    where id =(select in_id from lock_inventory where id=#{liid} limit 1);
+    </if>
+    </update>
+    <update id="updateRemark">
+    update inventory_barcode_record set  updatetime=now(),remark=#{remark},state=#{state} where id=#{ibid};
     </update>
     
 </mapper>

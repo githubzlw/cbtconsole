@@ -1073,11 +1073,33 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				String inventoryRemark="";
 				//查询该商品是否有使用库存
 				purchaseBean.setLock_remaining("0");
+				 /*SELECT li.in_id,li.lock_remaining,li.id as li_id,ib.state as ib_state,ib.remark as ib_remark
+			        ib.order_barcode as ib_order_barcode
+			         FROM lock_inventory li 
+			        left join inventory_barcode_record ib on li.id=ib.lock_id  WHERE li.od_id=${odid}*/
+				 
 				Map<String, Object> useInventoryMap=pruchaseMapper.getUseInventory(purchaseBean.getOd_id());
 				if(useInventoryMap != null) {
 					String useInventory = com.cbt.util.StrUtils.object2Str(useInventoryMap.get("lock_remaining"));
 					if(StringUtil.isNotBlank(useInventory)){
 						inventoryRemark="该商品使用了【"+useInventory+"】件库存";
+						int ibState = Integer.parseInt(com.cbt.util.StrUtils.object2NumStr(useInventoryMap.get("ib_state")));
+						if(ibState == 0) {
+							inventoryRemark += ",仓库未确认库存,未完成移出库存操作";
+						}else if(ibState == 1){
+							inventoryRemark += ",仓库未确认商品取消,未完成移入库存操作";
+						}else if(ibState == 2){
+							inventoryRemark += ",仓库已确认库存,并完成移出库存";
+						}else if(ibState == 3){
+							inventoryRemark += ",仓库已确认商品取消,并完成移入库存";
+						}else if(ibState == 4){
+							inventoryRemark += ",仓库拒绝采购使用库存商品请求";
+						}else if(ibState == 5){
+							inventoryRemark += ",仓库拒绝商品进入库存请求";
+						}
+						if(ibState > 3 && StringUtil.isNotBlank(com.cbt.util.StrUtils.object2Str(useInventoryMap.get("ib_remark")))) {
+							inventoryRemark +=",原因:"+com.cbt.util.StrUtils.object2Str(useInventoryMap.get("ib_remark"));
+						}
 						purchaseBean.setLock_remaining(useInventory);
 						unuseInventory = false;
 						String in_id = com.cbt.util.StrUtils.object2Str(useInventoryMap.get("in_id"));

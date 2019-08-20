@@ -195,7 +195,7 @@ public class NewOrderSplitCtr {
         JsonResult json = new JsonResult();
         IOrderSplitDao dao = new OrderSplitDaoImpl();
         String nwOrderNo = "";
-
+        
         /*
          * 1.所有 有 采购链接的 商品 就 直接 转入一个 新订单，并且转状态到 采购中 2.已支付的产品金额按产品直接拆分 3.客户是以前付过
          * 运费的，我们就按照 体积重量，直接拆分 这 两个订单 体积重量 = 长* 宽*高 (厘米)/5000 和 实际重量对比 取 大值
@@ -376,9 +376,9 @@ public class NewOrderSplitCtr {
                         //判断该订单是否为测试订单如果是则不入库存
 //						boolean flag=splitDao.checkTestOrder(odidLst[0]);
 //						if(flag){}
-                        /*if ("0".equals(state)) {
+                        /* if ("0".equals(state)) {
                         	inventoryService.cancelToInventory(odidLst, admuser.getId(), admuser.getAdmName());
-                            for (String odid : odidLst) {
+                           for (String odid : odidLst) {
                                 splitDao.addInventory(odid, "拆单取消库存");
                             }
                         }*/
