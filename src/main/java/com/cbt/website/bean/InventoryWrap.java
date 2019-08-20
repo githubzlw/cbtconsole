@@ -102,4 +102,6 @@ public class InventoryWrap {
 	
 	private String stateContext;
 
+	private int remaining;
+	private int canRemaining;
 }

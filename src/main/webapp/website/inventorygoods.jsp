@@ -235,7 +235,7 @@ em,i{font-style: normal;}
 					<td>
 					<c:if test="${b.ibState== 0}"><button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },0)">移出库存</button></c:if>
 					<c:if test="${b.ibState== 1}"><button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },1)">移入库存</button></c:if>
-					<c:if test="${b.ibState== 0 || b.ibState== 1}"><br><br><button class="btn btn-info btn-cancel" onclick="cancelInOut(${index.index},${b.ibid},${b.liid },${b.ibState})"> 取消操作 </button></c:if>
+					<c:if test="${b.ibState== 0}"><br><br><button class="btn btn-info btn-cancel" onclick="cancelInOut(${index.index},${b.ibid},${b.liid },${b.ibState})"> 取消操作 </button></c:if>
 					</td>
 					</tr>
 					</c:forEach>

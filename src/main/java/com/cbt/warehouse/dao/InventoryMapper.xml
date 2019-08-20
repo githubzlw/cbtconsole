@@ -3,6 +3,8 @@
 <mapper namespace="com.cbt.warehouse.dao.InventoryMapper" >
     <resultMap id="InventoryWrapMap" type="com.cbt.website.bean.InventoryWrap" >
         <result column="li_id" property="liid" jdbcType="INTEGER" />
+        <result column="remaining" property="remaining" jdbcType="INTEGER" />
+        <result column="can_remaining" property="canRemaining" jdbcType="INTEGER" />
         <result column="in_id" property="inid" jdbcType="INTEGER" />
         <result column="lock_remaining" property="lockRemaining" jdbcType="INTEGER" />
         <result column="od_id" property="odid" jdbcType="INTEGER" />
@@ -662,6 +664,22 @@
     update inventory_barcode_record set state=#{state} where id=#{id}
     </update>
     
+    <select id="getInventoryBarcode" resultMap="InventoryWrapMap">
+    select li.in_id,li.lock_remaining,li.od_id,li.flag,li.is_delete,li.is_use,ib.updatetime as createtime,li.id as li_id,
+    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
+    isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,
+    isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,isku.remaining,isku.can_remaining,
+    od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,
+    ods.specid as od_specid,ods.skuid as od_skuid
+    
+    from inventory_barcode_record ib  
+    left join  lock_inventory li on li.id=ib.lock_id
+    left join inventory_sku isk on ib.in_id=isk.id
+    left join order_details od on ib.od_id=od.id
+    left join order_details_sku_match ods on ib.od_id=ods.order_details_id
+    where id.id=#{id}
+    limit 1
+    </select>
     <select id="inventoryBarcodeList" resultMap="InventoryWrapMap">
     select li.in_id,li.lock_remaining,li.od_id,li.flag,li.is_delete,li.is_use,ib.updatetime as createtime,li.id as li_id,
     ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,

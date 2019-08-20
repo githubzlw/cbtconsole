@@ -1264,7 +1264,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			if(i.getIbState() == 0) {
 				i.setStateContext("采购使用库存,等待仓库移出库存");
 			}else if(i.getIbState() == 1) {
-				i.setStateContext("订单取消，等待仓库移入库存");
+				i.setStateContext("商品取消，等待仓库移入库存");
 			}else if(i.getIbState() == 2) {
 				i.setStateContext("已完成移出库存");
 			}else if(i.getIbState() == 3) {
@@ -1290,8 +1290,66 @@ public class InventoryServiceImpl implements  InventoryService{
 	@Override
 	public int updateRemark(Map<String, Object> map) {
 		int state = (int)map.get("state");
+		int ibState = (int)map.get("ibState");
+		int ibid = (int)map.get("ibid");
 		
+//		map.put("ibid", Integer.parseInt(stribid));
+//		map.put("liid", Integer.parseInt(strliid));
+//		map.put("ibState", ibState);
+//		map.put("inbarcode", inbarcode);
+//		map.put("orderbarcode", orderbarcode);
+//		map.put("remark", remark);
+		if(state < 4 || state > 5) {
+			return 0;
+		}
+		InventoryWrap wrap = inventoryMapper.getInventoryBarcode(ibid);
+		if(wrap == null) {
+			return 0;
+		}
 		
+		int lockRemaining = wrap.getLockRemaining();
+		int remaining = wrap.getRemaining();
+		int canRemaining = wrap.getCanRemaining();
+		
+		InventorySku isku = new InventorySku();
+		isku.setId(wrap.getInid());
+		if(state==4) {
+			isku.setRemaining(remaining + lockRemaining);
+			isku.setCanRemaining(canRemaining + lockRemaining);
+			
+			//库存数量要改变
+			inventoryMapper.updateInventory(isku );
+			
+			//库存明细
+			Map<String, String> inventory = new HashMap<>();
+//		#{inventory_count},#{od_id} #{admid},#{type} #{inventory_sku_id})
+			inventory.put("inventory_count", String.valueOf(lockRemaining));
+			inventory.put("od_id", String.valueOf(wrap.getOdid()));
+//			inventory.put("admid", );
+			inventory.put("type", "0");
+			inventory.put("inventory_sku_id",String.valueOf(wrap.getInid()) );
+			inventoryMapper.addInventoryDetailsSku(inventory );
+			
+//			#{inventory_count},#{before_remaining},#{after_remaining},
+//			   #{log_remark},#{change_type},
+//			   from inventory_sku where id=#{inventory_sku_id})
+			inventory.put("before_remaining", String.valueOf(remaining));
+			inventory.put("after_remaining", String.valueOf(remaining + lockRemaining));
+			inventory.put("change_type", "1");
+			inventory.put("log_remark","仓库拒绝采购使用库存的请求，还原库存");
+			
+			//库存日志记录
+			inventoryMapper.addInventoryLogByInventoryid(inventory);
+			
+			//采购使用库存请求被仓库拒绝，库存锁定lock_inventory表 状态要解除，还原库存
+			if(ibState == 0) {
+				inventoryMapper.cancelLockInventory(wrap.getLiid());
+			}
+			//订单入库记录
+			
+			//订单验货状态
+			
+		}
 		return inventoryMapper.updateRemark(map);
 	}
 }
