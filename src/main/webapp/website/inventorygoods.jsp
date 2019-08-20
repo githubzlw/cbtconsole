@@ -242,7 +242,7 @@ em,i{font-style: normal;}
 				</tbody>
 			</table>
 				<div>
-				<span>当前页 :${currentPage } / ${barcodeListPage},总共 ${barcodeCount }条数据,跳转</span>
+				<span>当前页 :${queryParam.currentPage } / ${barcodeListPage},总共 ${barcodeCount }条数据,跳转</span>
 				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.currentPage}">
 				<button class="btn btn-success btn_page_qu" onclick="doQuery()">查询</button>
 				<button class="btn btn-success btn_page_up" onclick="doBeforePage()">上一页</button>

@@ -78,7 +78,7 @@ public class InventoryController {
 	 * @throws ParseException
 	 */
 	@RequestMapping(value = "/barcode")
-	protected ModelAndView inventoryChange(HttpServletRequest request, HttpServletResponse response)
+	protected ModelAndView barcodeList(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
 		ModelAndView mv = new ModelAndView("inventorygoods");
 		
