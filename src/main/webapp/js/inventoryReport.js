@@ -124,6 +124,7 @@ $(function(){
 		   		alert("error盘点取消失败");
 		   	}
 		   });
+		$("#current_page").val(1)
 		doQuery(1,1);
 		
 	})
@@ -617,4 +618,29 @@ function saveTbInventory(){
 		}
 	});
 }
-
+function doBeforePage(p,flag){
+	var page = Number($("#current_page").val());
+	var tpage = Number($("#total_page").val());
+	page = page -1;
+	if(page < 1){
+		$("#current_page").val(1);
+	}else if(page > tpage){
+		$("#current_page").val(tpage);
+	}else{
+		$("#current_page").val(page);
+	}
+	doQuery(p,flag);
+}
+function doNextPage(p,flag){
+	var page = Number($("#current_page").val());
+	var tpage = Number($("#total_page").val());
+	page = page+1;
+	if(page < 1){
+		$("#current_page").val(1);
+	}else if(page > tpage){
+		$("#current_page").val(tpage);
+	}else{
+		$("#current_page").val(page);
+	}
+	doQuery(p,flag);
+}

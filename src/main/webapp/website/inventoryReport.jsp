@@ -228,10 +228,17 @@ em,i{font-style: normal;}
 			</table>
 				<div>
 				<span>当前页 :${queryParam.current_page } / ${toryListPage},总共 ${toryListCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }"><button class="btn btn-success btn_page_qu" onclick="doQuery(1,0)">查询</button>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${queryParam.current_page }">
+				<button class="btn btn-success btn_page_qu" onclick="doQuery(1,0)">查询</button>
+				<button class="btn btn-success btn_page_up" onclick="doBeforePage(1,0)">上一页</button>
+				<button class="btn btn-success btn_page_down" onclick="doNextPage(1,0)">下一页</button>
+				
+				<input type="hidden" value="${toryListPage}" id="total_page">
 				</div>
 		</div>
-		
+		<br>
+		<br>
+		<br>
 	</div>
 <div class="tc">
 	<div class="trnasparent"></div>
@@ -468,7 +475,7 @@ em,i{font-style: normal;}
 		</div>
 		<div class="wrap wrap8">
 		<input type="hidden" value="" id="index_in_id">
-			<button onclick="addLoss()">保存</button>
+			<button onclick="addLoss()" class="btn btn-info">保存</button>
 		</div>
 	</div>
 </div>

@@ -16,6 +16,7 @@ import com.cbt.website.bean.InventoryDetails;
 import com.cbt.website.bean.InventoryLock;
 import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventorySku;
+import com.cbt.website.bean.InventoryWrap;
 import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 
@@ -363,4 +364,34 @@ public interface InventoryMapper {
 	 */
 	int updateBarcodeRecord(int id,int state);
 	
+	/**获取库位变更
+	 * @param id
+	 * @return
+	 */
+	InventoryWrap getInventoryBarcode(int id);
+	
+	/**移库位
+	 * @return
+	 */
+	List<InventoryWrap> inventoryBarcodeList(Map<String, Object> map);
+	/**移库位
+	 * @return
+	 */
+	int inventoryBarcodeListCount(Map<String, Object> map);
+	
+	/**订单取消进入库存的数据
+	 * @param odid
+	 * @return
+	 */
+	Map<String,Object> getAddInventory(int odid);
+	/**更新库位变换
+	 * @param map
+	 * @return
+	 */
+	int  updateBarcode(Map<String,Object> map);
+	/**更新库位变换
+	 * @param map
+	 * @return
+	 */
+	int  updateRemark(Map<String,Object> map);
 }

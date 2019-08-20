@@ -32,7 +32,6 @@ import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.TypeBean;
 import com.cbt.common.StringUtils;
 import com.cbt.pojo.Inventory;
-import com.cbt.pojo.LossInventoryPojo;
 import com.cbt.pojo.TaoBaoInfoList;
 import com.cbt.report.service.GeneralReportService;
 import com.cbt.util.Redis;
@@ -46,6 +45,7 @@ import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
+import com.cbt.website.bean.InventoryWrap;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
 import com.cbt.website.dao.IExpressTrackDao;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -68,6 +68,145 @@ public class InventoryController {
 	private GeneralReportService generalReportService;
 	IExpressTrackDao dao = new ExpressTrackDaoImpl();
 	
+	/**
+	 * 仓库操作库存移库位
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/barcode")
+	protected ModelAndView barcodeList(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		ModelAndView mv = new ModelAndView("inventorygoods");
+		
+		Map<String, Object> map = new HashMap<>();
+		String state = request.getParameter("state");
+		state = StrUtils.isNum(state) ? state : "-1";
+		String orderid = request.getParameter("orderid");
+		orderid = StringUtil.isBlank(orderid) ? null : orderid;
+		String page = request.getParameter("page");
+		page = StrUtils.isNum(page) ? page : "1";
+		map.put("currentPage", Integer.parseInt(page));
+		map.put("page", (Integer.parseInt(page) - 1)*20);
+		map.put("state", state);
+		map.put("orderid", orderid);
+		
+		int count = inventoryService.inventoryBarcodeListCount(map);
+		if(count > 0) {
+			List<InventoryWrap> barcodeList = inventoryService.inventoryBarcodeList(map);
+			mv.addObject("barcodeList", barcodeList);
+		}
+		mv.addObject("barcodeCount", count);
+		
+		int barcodeListPage = count % 20 == 0 ? count / 20 : count / 20 + 1;
+		mv.addObject("barcodeListPage", barcodeListPage);
+		mv.addObject("queryParam",map);
+		
+		return mv;
+	}
+	/**
+	 * 仓库操作库存移库位
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/barcode/update")
+	@ResponseBody
+	protected Map<String,Object> barcodeUpdate(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		Map<String,Object> result = new HashMap<>();
+		result.put("status", 200);
+		String stribid = request.getParameter("ibid");
+		stribid = StrUtils.isNum(stribid) ? stribid : "0";
+		
+		String strliid = request.getParameter("liid");
+		strliid = StrUtils.isNum(strliid) ? strliid : "0";
+		
+		String strinorout= request.getParameter("inorout");
+		strinorout = StrUtils.isNum(strinorout) ? strinorout : "0";
+		
+		String orderbarcode = request.getParameter("orderbarcode");
+		orderbarcode = StringUtil.isBlank(orderbarcode) ? orderbarcode : orderbarcode.trim();
+		String inbarcode = request.getParameter("inbarcode");
+		inbarcode = StringUtil.isBlank(inbarcode) ? inbarcode : inbarcode.trim();
+		Map<String,Object> map = new HashMap<>();
+		map.put("ibid", Integer.parseInt(stribid));
+		map.put("liid", Integer.parseInt(strliid));
+		map.put("inorout", Integer.parseInt(strinorout));
+		map.put("inbarcode", inbarcode);
+		map.put("orderbarcode", orderbarcode);
+		map.put("admid",adm!=null? adm.getId() : 0);
+		int updateBarcode = inventoryService.updateBarcode(map);
+		if(updateBarcode < 1) {
+			result.put("status", 500);
+			result.put("reason", "数据错误:"+stribid+"/"+strliid+"/"+strinorout+"/"+inbarcode+"/"+orderbarcode);
+		}
+		return result;
+	}
+	
+	/**
+	 * 仓库取消了移库请求
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/barcode/remark")
+	@ResponseBody
+	protected Map<String,Object> barcodeRemark(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		
+		Map<String,Object> result = new HashMap<>();
+		result.put("status", 200);
+		String stribid = request.getParameter("ibid");
+		stribid = StrUtils.isNum(stribid) ? stribid : "0";
+		
+		String strliid = request.getParameter("liid");
+		strliid = StrUtils.isNum(strliid) ? strliid : "0";
+		
+		String stribState= request.getParameter("ibState");
+		stribState = StrUtils.isNum(stribState) ? stribState : "0";
+		
+		String orderbarcode = request.getParameter("orderbarcode");
+		orderbarcode = StringUtil.isBlank(orderbarcode) ? orderbarcode : orderbarcode.trim();
+		String inbarcode = request.getParameter("inbarcode");
+		inbarcode = StringUtil.isBlank(inbarcode) ? inbarcode : inbarcode.trim();
+		String remark = request.getParameter("remark");
+		remark = StringUtil.isBlank(remark) ? remark : remark.trim();
+		
+		int ibState = Integer.parseInt(stribState);
+		Map<String,Object> map = new HashMap<>();
+		map.put("ibid", Integer.parseInt(stribid));
+		map.put("liid", Integer.parseInt(strliid));
+		map.put("ibState", ibState);
+		map.put("inbarcode", inbarcode);
+		map.put("orderbarcode", orderbarcode);
+		map.put("admid",adm!=null? adm.getId() : 0);
+		map.put("remark", remark);
+		if(ibState == 0) {
+			map.put("state", 4);
+		}else if(ibState == 1){
+			map.put("state", 5);
+		}
+		int updateBarcode = inventoryService.updateRemark(map);
+		if(updateBarcode < 1) {
+			result.put("status", 500);
+			result.put("reason", "数据错误:"+stribid+"/"+strliid+"/"+stribState+"/"+inbarcode+"/"+orderbarcode);
+		}
+		return result;
+	}
 	
 	/**
 	 * 查询库存明细
@@ -97,6 +236,7 @@ public class InventoryController {
 		json.setTotal(toryListCount);
 		return json;
 	}
+
 	/**
 	 * 库存报损
 	 */

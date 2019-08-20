@@ -1877,7 +1877,8 @@ public class NewOrderDetailsCtr {
 
 		JsonResult json = new JsonResult();
 
-
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		// jxw 2017-4-25添加订单状态判断,修改订单状态为-1(后台取消),操作人目前是adminId
 		boolean isCheck = CheckCanUpdateUtil.updateOnlineOrderInfoByLocal(orderNo, -1, adminId);
 
@@ -1910,9 +1911,7 @@ public class NewOrderDetailsCtr {
 //				        boolean flag=orderwsServer.checkTestOrder(orderNo);
                         if (res > 0) {
                             // 释放该订单占用的库存
-                        	String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-    						Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-    						inventoryService.cancelOrderToInventory(orderNo, adminId, adm.getAdmName());
+    						inventoryService.cancelOrderToInventory(orderNo, adminId, adm==null?"" : adm.getAdmName());
     						
 //                            orderwsServer.cancelInventory(orderNo);
 //                            //对于没有使用库存订单的商品做库存增加到库存表中
@@ -1956,6 +1955,9 @@ public class NewOrderDetailsCtr {
 								new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
 								" system closeOrder:" + orderNo, orderNo, String.valueOf(adminId), 0, order_ac, 1);*/
 						// zlw add end
+						
+						 // 释放该订单占用的库存
+						inventoryService.cancelOrderToInventory(orderNo, adminId, adm == null ? "" : adm.getAdmName());
 
 						// 执行取消完成后，插入退款数据
 						OrderCancelApproval cancelApproval = new OrderCancelApproval();
