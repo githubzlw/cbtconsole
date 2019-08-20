@@ -1,5 +1,6 @@
 package com.cbt.bean;
 
+import com.importExpress.pojo.ShopBrandAuthorization;
 import com.importExpress.pojo.ShopUrlAuthorizedInfoPO;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,6 +38,25 @@ public class ShopUrl {
 	private int isAuto;
 
 	private int urlType;
+
+	private String brandNames;
+	private List<ShopBrandAuthorization> authorizationList;
+
+	public List<ShopBrandAuthorization> getAuthorizationList() {
+		return authorizationList;
+	}
+
+	public void setAuthorizationList(List<ShopBrandAuthorization> authorizationList) {
+		this.authorizationList = authorizationList;
+	}
+
+	public String getBrandNames() {
+		return brandNames;
+	}
+
+	public void setBrandNames(String brandNames) {
+		this.brandNames = brandNames;
+	}
 
 	/**
 	 * 授权标识  0未授权 1已授权

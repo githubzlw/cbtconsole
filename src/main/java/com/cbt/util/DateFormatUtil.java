@@ -83,4 +83,13 @@ public class DateFormatUtil {
 		return null;
 	}
 
+	public static String formatDateToStringByYear(Date date) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM");
+		return df.format(date);
+	}
+
+	public static void main(String[] args) {
+		System.err.println(formatDateToStringByYear(new Date()));
+	}
+
 }

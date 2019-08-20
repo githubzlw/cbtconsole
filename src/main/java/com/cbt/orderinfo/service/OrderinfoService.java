@@ -50,7 +50,6 @@ import com.cbt.track.dao.TabTrackInfoMapping;
 import com.cbt.util.DoubleUtil;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
-import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.dao.WarehouseMapper;
 import com.cbt.warehouse.service.InventoryService;
 import com.cbt.warehouse.util.StringUtil;
@@ -67,27 +66,12 @@ import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import org.apache.commons.collections.map.HashedMap;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @Service
 public class OrderinfoService implements IOrderinfoService {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderinfoService.class);
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
-	@Autowired
-	private InventoryMapper inventoryMapper;
 	@Autowired
 	private WarehouseMapper warehouseMapper;
 
@@ -1737,9 +1721,27 @@ public class OrderinfoService implements IOrderinfoService {
 				if(StringUtil.isNotBlank(useInventory)){
 					inventoryRemark="该商品使用了【"+useInventory+"】件库存";
 				}
+				int ibState = Integer.parseInt(com.cbt.util.StrUtils.object2NumStr(useInventoryMap.get("ib_state")));
+				if(ibState == 0) {
+					inventoryRemark += ",仓库未确认库存,未完成移出库存操作";
+				}else if(ibState == 1){
+					inventoryRemark += ",仓库未确认商品取消,未完成移入库存操作";
+				}else if(ibState == 2){
+					inventoryRemark += ",仓库已确认库存,并完成移出库存";
+				}else if(ibState == 3){
+					inventoryRemark += ",仓库已确认商品取消,并完成移入库存";
+				}else if(ibState == 4){
+					inventoryRemark += ",仓库拒绝采购使用库存商品请求";
+				}else if(ibState == 5){
+					inventoryRemark += ",仓库拒绝商品进入库存请求";
+				}
+				if(ibState > 3 && StringUtil.isNotBlank(com.cbt.util.StrUtils.object2Str(useInventoryMap.get("ib_remark")))) {
+					inventoryRemark +=",原因:"+com.cbt.util.StrUtils.object2Str(useInventoryMap.get("ib_remark"));
+				}
 			}
 			
 			odb.setInventoryRemark(inventoryRemark);
+
 			String buy_url = getBuyUrl(odb);
 			buy_url=StringUtil.getNewUrl(buy_url,goods_pid,odb.getCar_urlMD5());
 			odb.setGoods_url(buy_url);

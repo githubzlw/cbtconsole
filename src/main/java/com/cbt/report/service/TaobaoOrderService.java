@@ -8,6 +8,7 @@ import com.cbt.bean.Orderinfo;
 import com.cbt.pojo.*;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
+import com.cbt.website.bean.InventoryData;
 
 import java.util.List;
 import java.util.Map;
@@ -557,7 +558,7 @@ public interface TaobaoOrderService {
     * 获取库存产品所有类别
     * @return
     */
-   public List<Inventory> getAllInventory();
+   public List<InventoryData> getAllInventory();
 
    public List<Inventory> searchGoodsInventoryDeleteInfo(Map<Object, Object> map);
 

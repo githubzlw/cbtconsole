@@ -1981,13 +1981,14 @@
             	$("#use_" + orderid + od_id).hide();
                 if (state == 1) {
                     //使用库存
-                    $("#inventory_" + orderid+ od_id).html("仓库人员库存确认中");
+                   // $("#inventory_" + orderid+ od_id).html("仓库人员库存确认中");
                     $("#hyqr" + orderid + od_id).attr("disabled","true");
                     $("#hyqr" + orderid + od_id).attr("style","background-color:darkgray;");
                     $("#"+orderid + od_id).attr("style","background-color:darkgray;");
                     $("#" + orderid + od_id).attr("disabled","true");
+                    location.reload() 
                 } else {
-                    $("#inventory_" + orderid+ od_id).html("");
+                    $("#inventory_" + orderid+ od_id).html("使用库存出现错误");
                     $("#hyqr" + orderid + od_id).attr("disabled","false");
                     $("#hyqr" + orderid + od_id).attr("style","background-color:;");
                     $("#"+orderid + od_id).attr("style","background-color:;");
@@ -2034,7 +2035,7 @@
                         var can_remaining = data.split("&")[0];
                         if (Number(can_remaining) > 0
                             && Number(is_use) == 1) {
-                            $("#inventory_" + orderid+ goodsid).html("仓库人员库存确认中");
+                           // $("#inventory_" + orderid+ goodsid).html("仓库人员库存确认中");
                             $("#hyqr" + orderid+ odid).attr("disabled","true");
                             $("#hyqr" + orderid + odid).attr("style", "background-color:darkgray;");
                             $("#" + orderid + odid).attr("disabled","true");
@@ -3339,7 +3340,7 @@
 							<c:if test="${pb.inventory>0}">
 								<div style="width: 100%; word-wrap: break-word;">
 									可使用库存： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.inventory}" />
-									<a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?sku=${pb.specid}">${pb.inventory}</a>
+									<a target="_blank" href ="/cbtconsole/inventory/list?inid=${pb.inventorySkuId}">${pb.inventory}</a>
 									<button onclick="useInventory('${pb.od_id}',1,'${pb.orderNo}','${pb.goodsid}','${pb.inventory}','${pb.googs_number}','${pb.inventorySkuId}','${pb.goodsUnit}','${pb.seilUnit}')">使用库存</button>
 									</span></font> <br>
 								

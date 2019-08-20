@@ -13,6 +13,16 @@ public class TypeBean {
 	private String id;// id
 	private String lableType;
 	private String typeId;
+	private String sell;
+	
+
+	public String getSell() {
+		return sell;
+	}
+
+	public void setSell(String sell) {
+		this.sell = sell;
+	}
 
 	public String getId() {
 		return id;

@@ -707,4 +707,10 @@ public interface OrderinfoMapper {
 	
 	Map<String,Object> getGoodsBrandAuthorization(String pid);
 	
+	/**取消状态
+	 * @param odid
+	 * @return
+	 */
+	int  cancelOrderState(int odid);
+	
 }

@@ -1453,4 +1453,8 @@
 	left join shop_brand_authorization sa on cb.brand_id=sa.brand_id  
 	and cb.shop_id =sa.shop_id   where cb.pid=#{pid} limit 1
 	</select>
+	<update id="cancelOrderState">
+	update order_details set state=0,checked=0 where id=#{odid};
+	update id_relationtable set goodstatus=5 where odid=#{odid};
+	</update>
 </mapper>
