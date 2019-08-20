@@ -109,4 +109,10 @@ public interface ShopCarMarketingMapper {
      * @return
      */
     List<ShopCarMarketing> selectByUserIdAndType(@Param("userId") int userId, @Param("website") int website);
+
+    /**
+     * 查询所有需要更新的数据
+     * @return
+     */
+    List<Integer> queryReloadConfigUserId();
 }

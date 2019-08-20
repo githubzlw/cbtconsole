@@ -157,4 +157,9 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
         return shopCarMarketingMapper.selectByUserIdAndType(userId, website);
     }
 
+    @Override
+    public List<Integer> queryReloadConfigUserId() {
+        return shopCarMarketingMapper.queryReloadConfigUserId();
+    }
+
 }
