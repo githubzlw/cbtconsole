@@ -103,6 +103,7 @@ public class InventoryWrap {
 	private int odSeilUnit;
 	
 	private String orderid;
+	private String goodsid;
 	
 	private String stateContext;
 
