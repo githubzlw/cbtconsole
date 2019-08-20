@@ -3,10 +3,16 @@ package com.importExpress.utli;
 import com.cbt.pojo.Admuser;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
+import com.cbt.website.bean.ConfirmUserInfo;
+import com.cbt.website.dao.UserDao;
+import com.cbt.website.dao.UserDaoImpl;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserInfoUtils {
+    private static List<ConfirmUserInfo> allAdminList = new ArrayList<ConfirmUserInfo>();
 
 
     /**
@@ -36,5 +42,22 @@ public class UserInfoUtils {
         } else {
             return true;
         }
+    }
+
+
+    public static List<ConfirmUserInfo> queryAllAdminList() {
+        if (allAdminList == null || allAdminList.isEmpty()) {
+            UserDao dao = new UserDaoImpl();
+            List<ConfirmUserInfo> admList = dao.getAllUserHasOffUser();
+            for (ConfirmUserInfo userInfo : admList) {
+                String userName = userInfo.getConfirmusername();
+                if (userInfo.getRole() == 0) {
+                    allAdminList.add(userInfo);
+                } else {
+                    allAdminList.add(userInfo);
+                }
+            }
+        }
+        return allAdminList;
     }
 }

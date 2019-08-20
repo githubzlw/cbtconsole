@@ -306,5 +306,10 @@ public class ShopUrlServiceImpl implements IShopUrlService {
         return shopUrlMapper.deleteShopBrandAuthorizationByShopId(shopId);
     }
 
+    @Override
+    public int reUpdateShopAdminId(String shopId, int adminId, String adminName) {
+        return dao.reUpdateShopAdminId(shopId, adminId, adminName);
+    }
+
 
 }

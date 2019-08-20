@@ -3,13 +3,13 @@ package com.cbt.report.ctrl;
 
 import com.cbt.bean.*;
 import com.cbt.bean.TypeBean;
-import com.cbt.controller.EditorController;
 import com.cbt.customer.service.IShopUrlService;
 import com.cbt.parse.service.DownloadMain;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.thread.ShopGoodsDealThread;
 import com.cbt.website.thread.ShopGoodsSyncThread;
@@ -17,7 +17,6 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.MD5Util;
-import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.ShopBrandAuthorization;
 import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
@@ -75,6 +74,7 @@ public class ShopUrlController {
     private static final String SHOP_GOODS_SHOW_URL_J = "http://192.168.1.28:8399";
     private static final String SHOP_GOODS_LOCAL_PATH_J = "J:/shopimages";//J:/shopimages
     private FtpConfig ftpConfig;
+    private static List<ConfirmUserInfo> allAdminList = UserInfoUtils.queryAllAdminList();
 
     @Autowired
     private IShopUrlService shopUrlService;
@@ -249,6 +249,16 @@ public class ShopUrlController {
     }
 
     private void genShopPrice(ShopUrl shopUrlBean, List<ShopGoodsSalesAmount> shopGoodsSalesAmountList) {
+
+        if (shopUrlBean.getAdminId() > 0) {
+            for (ConfirmUserInfo adm : allAdminList) {
+                if (shopUrlBean.getAdminId() == adm.getId() && StringUtils.isBlank(shopUrlBean.getAdmUser())) {
+                    shopUrlBean.setAdmUser(adm.getConfirmusername());
+                    shopUrlService.reUpdateShopAdminId(shopUrlBean.getShopId(),adm.getId(),adm.getConfirmusername());
+                    break;
+                }
+            }
+        }
         for (ShopGoodsSalesAmount salesAmount : shopGoodsSalesAmountList) {
             if (salesAmount.getShopId().equals(shopUrlBean.getShopId())) {
                 shopUrlBean.setShopPrice(salesAmount.getTotalPrice());
@@ -3921,6 +3931,35 @@ public class ShopUrlController {
         }
         try {
             shopUrlService.deleteShopBrandAuthorizationById(Integer.valueOf(brandIdStr));
+            json.setOk(true);
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("deleteAuthorizedInfo error:" + e.getMessage());
+            e.printStackTrace();
+            LOG.error("deleteAuthorizedInfo error：", e);
+        }
+        return json;
+    }
+
+    @RequestMapping(value = "/reUpdateShopAdminId", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public JsonResult reUpdateShopAdminId(HttpServletRequest request,HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if(admuser == null || admuser.getId() == 0){
+            json.setOk(false);
+            json.setMessage("请登录后重试");
+            return json;
+        }
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            json.setOk(false);
+            json.setMessage("获取店铺失败");
+            return json;
+        }
+        try {
+            shopUrlService.reUpdateShopAdminId(shopId,admuser.getId(),admuser.getAdmName());
             json.setOk(true);
         } catch (Exception e) {
             json.setOk(false);

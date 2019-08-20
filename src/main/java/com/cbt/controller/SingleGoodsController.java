@@ -15,6 +15,7 @@ import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.KjPidBean;
 import com.importExpress.utli.EasyUiTreeUtils;
+import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -45,8 +46,7 @@ public class SingleGoodsController {
     private static final String REMOTE_SHOW_URL = "http://117.144.21.74:9090/";
     private static final String LOCAL_FILE_PATH = "G:/img_unzip/";
 
-    private List<ConfirmUserInfo> allAdms = new ArrayList<ConfirmUserInfo>();
-    private List<Admuser> adminList = null;
+    private static List<Admuser> adminList = null;
 
     @Autowired
     private CustomGoodsService ctmGdService;
@@ -350,11 +350,8 @@ public class SingleGoodsController {
     public JsonResult getAdminList(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
         try {
-            if(allAdms == null || allAdms.size() == 0){
-                queryAllAdms();
-            }
             json.setOk(true);
-            json.setData(allAdms);
+            json.setData(UserInfoUtils.queryAllAdminList());
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("获取用户列表失败，原因 :" + e.getMessage());
@@ -382,32 +379,7 @@ public class SingleGoodsController {
         }
     }
 
-    private void queryAllAdms() {
-        if (allAdms != null) {
-            allAdms.clear();
-        }
-        UserDao dao = new UserDaoImpl();
-        List<ConfirmUserInfo> admList = dao.getAllUserHasOffUser();
-        for (ConfirmUserInfo userInfo : admList) {
-            String userName = userInfo.getConfirmusername();
-            if (userInfo.getRole() == 0) {
-                allAdms.add(userInfo);
-            }else{
-                allAdms.add(userInfo);
-            } /*else if (userInfo.getRole() == 2) {
-                if(!(userName.contains("cangku1") || userName.contains("nihaisheng"))){
-                    allAdms.add(userInfo);
-                }
-            }else if(userInfo.getRole() == 3){
-                if(!(userName.contains("Sale1") || userName.contains("Sale2") || userName.contains("Sale3")
-                        || userName.contains("Sale4") || userName.contains("Sale5") || userName.contains("testPur"))){
-                    allAdms.add(userInfo);
-                }
-            }else if(userInfo.getRole() == 1){
-                allAdms.add(userInfo);
-            }*/
-        }
-    }
+
 
 
     @RequestMapping("/queryOffShelfList")
