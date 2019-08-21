@@ -854,18 +854,29 @@ public class GoodsInfoUtils {
      * @param gd
      * @return
      */
-    public static List<String> getAllImgList(CustomGoodsPublish gd){
+    public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids){
 		List<String> changeImglist = new ArrayList<>();
 		// 主图
-		String orMainImg220x220;
-		if (gd.getCustomMainImage().contains("http://") || gd.getCustomMainImage().contains("https://")) {
-			orMainImg220x220 = gd.getCustomMainImage().trim();
-		} else {
-			orMainImg220x220 = gd.getRemotpath().trim() + gd.getCustomMainImage().trim();
-		}
-		List<String> mainImgList = getMainImgByPath(orMainImg220x220);
-		changeImglist.addAll(mainImgList);
-		mainImgList.clear();
+		String orMainImg220x220 = null;
+        if (StringUtils.isNotBlank(gd.getShowMainImage())) {
+            if (gd.getShowMainImage().contains("http://") || gd.getShowMainImage().contains("https://")) {
+                orMainImg220x220 = gd.getShowMainImage().trim();
+            } else {
+                orMainImg220x220 = gd.getRemotpath().trim() + gd.getShowMainImage().trim();
+            }
+        } else if (StringUtils.isNotBlank(gd.getCustomMainImage())) {
+            if (gd.getCustomMainImage().contains("http://") || gd.getCustomMainImage().contains("https://")) {
+                orMainImg220x220 = gd.getCustomMainImage().trim();
+            } else {
+                orMainImg220x220 = gd.getRemotpath().trim() + gd.getCustomMainImage().trim();
+            }
+        }
+
+        if (StringUtils.isNotBlank(orMainImg220x220)) {
+            List<String> mainImgList = getMainImgByPath(orMainImg220x220);
+            changeImglist.addAll(mainImgList);
+            mainImgList.clear();
+        }
 
 		// 橱窗图
 		List<String> imgList = deal1688GoodsImg(gd.getImg(), gd.getRemotpath(), 1);
@@ -883,7 +894,12 @@ public class GoodsInfoUtils {
 			changeImglist.addAll(entypeImgList);
 			entypeImgList.clear();
 		}
-		return changeImglist;
+		List<String> nwList = new ArrayList<>();
+        for(String imgL : changeImglist){
+            nwList.add(changeRemotePathToLocal(imgL, isKids));
+        }
+        changeImglist.clear();
+        return nwList;
 	}
 
 	public static List<String> getMainImgByPath(String remotPathImg) {

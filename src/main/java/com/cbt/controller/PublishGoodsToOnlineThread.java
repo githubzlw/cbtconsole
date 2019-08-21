@@ -54,9 +54,6 @@ public class PublishGoodsToOnlineThread extends Thread {
         List<String> imgList = new ArrayList<String>();
 
         try {
-            if (kidsCatidList == null || kidsCatidList.size() == 0) {
-                kidsCatidList = customGoodsService.queryKidsCanUploadCatid();
-            }
             customGoodsService.insertIntoGoodsImgUpLog(pid, "", adminId, "test");
 
             LOG.info("Pid : " + pid + " Execute Start");
@@ -71,7 +68,7 @@ public class PublishGoodsToOnlineThread extends Thread {
             // 根据pid获取商品信息
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
             int isKids = 0;
-            if (kidsCatidList.contains(goods.getCatid1())) {
+            if (checkIsKidsCatid(goods.getCatid1())) {
                 isKids = 1;
             }
 
@@ -316,5 +313,19 @@ public class PublishGoodsToOnlineThread extends Thread {
         }
     }
 
+
+    private boolean checkIsKidsCatid(String catid) {
+        boolean isCheck = false;
+        if (kidsCatidList == null || kidsCatidList.size() == 0) {
+            kidsCatidList = customGoodsService.queryKidsCanUploadCatid();
+        }
+        for (String tempCatid : kidsCatidList) {
+            if (tempCatid.equals(catid)) {
+                isCheck = true;
+                break;
+            }
+        }
+        return isCheck;
+    }
 
 }

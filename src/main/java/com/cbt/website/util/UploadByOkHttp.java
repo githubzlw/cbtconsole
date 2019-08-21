@@ -14,6 +14,7 @@ public class UploadByOkHttp {
     private static final String ACCESS_URL_OLD = "http://104.247.194.50:3009/uploadImage";
     private static final String ACCESS_URL_NEW = "http://108.61.142.103:3009/uploadImage";
     private static final String TOKEN = "cerong2018jack";
+    private static final String DELETE_URL_NEW = "http://108.61.142.103:3008/image/delete";
 
     private static OkHttpClient initClient(){
 		OkHttpClient client = new OkHttpClient.Builder().connectTimeout(300, TimeUnit.SECONDS)
@@ -214,7 +215,7 @@ public class UploadByOkHttp {
 			json.put("paths", jarr);
 			RequestBody formBody = RequestBody.create(contentType, json.toString());
 
-			Request request = new Request.Builder().url(ACCESS_URL_NEW).post(formBody).build();
+			Request request = new Request.Builder().url(DELETE_URL_NEW).post(formBody).build();
 			// client = new OkHttpClient();
 			OkHttpClient client = initClient();
 			Response response = client.newCall(request).execute();

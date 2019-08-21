@@ -1233,9 +1233,7 @@ public class EditorController {
         }
 
         try {
-            if (kidsCatidList == null || kidsCatidList.size() == 0) {
-                kidsCatidList = customGoodsService.queryKidsCanUploadCatid();
-            }
+
             Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
             if (user == null || user.getId() == 0) {
                 json.setOk(false);
@@ -1248,9 +1246,9 @@ public class EditorController {
                 json.setOk(true);
                 json.setMessage("执行成功");
                 // 判断是否是kids商品，如果是，则删除图片服务器图片
-                CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pidStr, 0);
-                if (kidsCatidList.contains(goods.getCatid1())) {
-                    List<String> imgList = GoodsInfoUtils.getAllImgList(goods);
+                /*CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pidStr, 0);
+                if (checkIsKidsCatid(goods.getCatid1())) {
+                    List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
                     boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
                     if (!isSu) {
                         isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
@@ -1258,7 +1256,7 @@ public class EditorController {
                     if (!isSu) {
                         LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
                     }
-                }
+                }*/
             } else {
                 json.setOk(false);
                 json.setMessage("执行失败，请重试！");
@@ -3645,4 +3643,17 @@ public class EditorController {
         return isOk;
     }
 
+    private boolean checkIsKidsCatid(String catid) {
+        boolean isCheck = false;
+        if (kidsCatidList == null || kidsCatidList.size() == 0) {
+            kidsCatidList = customGoodsService.queryKidsCanUploadCatid();
+        }
+        for (String tempCatid : kidsCatidList) {
+            if (tempCatid.equals(catid)) {
+                isCheck = true;
+                break;
+            }
+        }
+        return isCheck;
+    }
 }
