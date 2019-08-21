@@ -49,10 +49,11 @@
 	width: 200px;
 }
 
-.report th, .report td {
+/* .report th, .report td {
 	text-align: center;
-}
-
+} */
+.datagrid-cell-c2-goodsName{width:300px;}
+.datagrid-cell-c2-goodsSku{width: 350px;}
 .mt5 {
 	margin-top: 5px;
 }
@@ -129,7 +130,8 @@ em,i{font-style: normal;}
 .tc3 .wrap8{text-align: center;}
 .tc3 .wrap8 button{border:1px solid #999;background-color:#fff;padding:0 80px; line-height:28px;border-radius: 4px;}
 
-
+.datagrid-cell-c2-remarkContext{width:400px;}
+.li_more_s{display: none;}
 .report .btn_page_in{width:100px;}
 </style>
 </head>
@@ -195,6 +197,7 @@ em,i{font-style: normal;}
 						<th>产品SKU</th>
 						<th>产品图片</th>
 						<th>库存数量</th>
+						<th>库存备注</th>
 						<th>当前价格</th>
 						<th>可用库存</th>
 						<th>库位</th>
@@ -208,10 +211,11 @@ em,i{font-style: normal;}
 						<td >${tory.categoryName}</td>
 						<td class="datagrid-cell-c2-goodsPid">${tory.goodsPid}</td>
 						<td class="datagrid-cell-c2-goodsName">${tory.goodsName}</td>
-						<td>${tory.skuContext}</td>
+						<td align="left" class="datagrid-cell-c2-goodsSku">${tory.skuContext}</td>
 						<td class="datagrid-cell-c2-carImg">${tory.carImg }</td>
 						<td class="datagrid-cell-c2-remaining">${tory.remaining}</td>
-						<td class="">${tory.goodsPrice}</td>
+						<td class="datagrid-cell-c2-remarkContext">${tory.remarkContext}</td>
+						<td class="datagrid-cell-c2-goodsPrice">${tory.goodsPrice}</td>
 						<td class="datagrid-cell-c2-canRemaining">${tory.canRemaining}</td>
 						<td class="">${tory.barcode}</td>
 						<td><span class="">${tory.checkTime }</span> <br>

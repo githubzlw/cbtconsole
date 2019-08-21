@@ -45,9 +45,9 @@
 	width: 200px;
 }
 
-.report th, .report td {
+/* .report th, .report td {
 	text-align: center;
-}
+} */
 
 .mt5 {
 	margin-top: 5px;
@@ -129,6 +129,7 @@ em,i{font-style: normal;}
 .report .btn_page_in{width:100px;}
 .query_state{width: 500px;}
 .btn-cancel{margin-top: 10px;}
+.datagrid-cell-c2-goodsSku{width: 350px;}
 </style>
 </head>
 <body>
@@ -184,7 +185,7 @@ em,i{font-style: normal;}
 					订单:<img alt="" src="${b.odCarImg }" class="c_img"><br>
 					库存:<img alt="" src="${b.iskSCarImg }" class="c_img">
 					</td>
-					<td>订单:
+					<td class="datagrid-cell-c2-goodsSku">订单:
 					<br>
 					Sku:${b.odSku }
 					<br>

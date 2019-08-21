@@ -73,11 +73,17 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public List<InventoryData> getIinOutInventory(Map<Object, Object> map) {
+		
 		List<InventoryData> toryList = inventoryMapper.getIinOutInventory(map);
+		if(toryList == null || toryList.isEmpty()) {
+			return null;
+		}
+		List<Integer> list = new ArrayList<>();
 		StringBuilder pids = new StringBuilder();
 		StringBuilder opration = null;
 		for (int i=0,size=toryList.size();i<size;i++) {
 			InventoryData t = toryList.get(i);
+			list.add(t.getId());
 			String goodscatid = t.getGoodsCatid();
 			if(StringUtil.isBlank(goodscatid) || "0".equals(goodscatid)){
 				t.setCategoryName("其他");
@@ -111,10 +117,7 @@ public class InventoryServiceImpl implements  InventoryService{
 				t.setCarImg("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
 						+ "<img   class=\"img-responsive\" src='"+ (car_img.indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":car_img) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ car_img + "')\" height='100' width='100'></a>");
 				
-				
 			}
-			
-			
 			t.setGoodsUrl(StringUtil.isBlank(t.getGoodsUrl())?"":t.getGoodsUrl());
 			t.setCarUrlMD5(StringUtil.isBlank(t.getCarUrlMD5())?"":t.getCarUrlMD5());
 			
@@ -155,11 +158,32 @@ public class InventoryServiceImpl implements  InventoryService{
 			if(StringUtil.isBlank(t.getCheckTime())) {
 				t.setCheckTime("");
 			}
+			t.setRemarkContext(getRemark(t.getId()));
 			toryList.set(i, t);
 		}
 		return toryList;
 	}
 
+	private String getRemark(int skuId) {
+		List<Map<String,Object>> inventoryRemark = inventoryMapper.getInventoryRemark(skuId);
+		if(inventoryRemark == null || inventoryRemark.isEmpty()) {
+			return "";
+		}
+		String remark = "";
+		int remarkIndex = 0;
+		for(Map<String,Object> m : inventoryRemark) {
+			String iRemark = StrUtils.object2Str(m.get("remark"));
+			if(StringUtil.isNotBlank(iRemark) && remarkIndex < 20) {
+				int changeType = Integer.parseInt(StrUtils.object2NumStr(m.get("change_type")));
+				remark = remark+"<li "+(remarkIndex > 2 ? "class=\"li_more_s\"" : "")+">";
+				remark = changeType == 3 ? remark : remark+StrUtils.object2Str(m.get("createtime"))+":";
+				remark = remark+iRemark+"</li>";
+				remarkIndex = remarkIndex + 1;
+			}
+		}
+		remark = remarkIndex > 3 ? remark + "<a onclick=\"vMoreLi(this)\">View More</a>" : remark ;
+		return remark;
+	}
 	@Override
 	public int problem_inventory(Map<Object, Object> map) {
 		return inventoryMapper.problem_inventory(map);
