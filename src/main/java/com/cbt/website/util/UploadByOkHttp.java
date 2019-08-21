@@ -1,9 +1,12 @@
 package com.cbt.website.util;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.util.GoodsInfoUtils;
 import okhttp3.*;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -11,6 +14,13 @@ public class UploadByOkHttp {
     private static final String ACCESS_URL_OLD = "http://104.247.194.50:3009/uploadImage";
     private static final String ACCESS_URL_NEW = "http://108.61.142.103:3009/uploadImage";
     private static final String TOKEN = "cerong2018jack";
+    private static final String DELETE_URL_NEW = "http://108.61.142.103:3008/image/delete";
+
+    private static OkHttpClient initClient(){
+		OkHttpClient client = new OkHttpClient.Builder().connectTimeout(300, TimeUnit.SECONDS)
+                    .readTimeout(150, TimeUnit.SECONDS).writeTimeout(150, TimeUnit.SECONDS).build();
+		return client;
+	}
 
     public static boolean doUpload(Map<String, String> uploadMap, int isKids) {
         boolean isSuccess = false;
@@ -106,8 +116,7 @@ public class UploadByOkHttp {
                     .addFormDataPart("token", TOKEN).addFormDataPart("destPath", destPath).build();
             Request request = new Request.Builder().url(accessUrl).post(formBody).build();
             // client = new OkHttpClient();
-            OkHttpClient client = new OkHttpClient.Builder().connectTimeout(180, TimeUnit.SECONDS)
-                    .readTimeout(60, TimeUnit.SECONDS).writeTimeout(120, TimeUnit.SECONDS).build();
+            OkHttpClient client = initClient();
             Response response = client.newCall(request).execute();
             String rs = response.body().string();
             System.out.println(rs);
@@ -124,23 +133,78 @@ public class UploadByOkHttp {
 
     }
 
-    public static boolean uploadFileBatch(File originFile, String destPath, int isKids) {
+    /**
+     * 上传kids
+     * @param originFile
+     * @param destPath
+     * @return
+     */
+    public static boolean uploadFileBatchNew(File originFile, String destPath) {
         boolean isUpload = false;
 
-        try {
-            String accessUrl = ACCESS_URL_OLD;
-            if (isKids > 0) {
-                accessUrl = ACCESS_URL_NEW;
-                destPath = destPath.replace(GoodsInfoUtils.SERVICE_LOCAL_IMPORT_PATH, GoodsInfoUtils.SERVICE_LOCAL_KIDS_PATH);
+        String accessUrl = ACCESS_URL_NEW;
+            if(!destPath.contains(GoodsInfoUtils.SERVICE_LOCAL_KIDS_PATH)){
+                isUpload = false;
+                System.err.println("destPath:" + destPath + " not kids -----");
+                return isUpload;
             }
+            return uploadFileBatch(originFile,destPath, accessUrl);
+    }
+
+
+    /**
+     * 上传import
+     * @param originFile
+     * @param destPath
+     * @return
+     */
+    public static boolean uploadFileBatchOld(File originFile, String destPath) {
+        boolean isUpload = false;
+
+        String accessUrl = ACCESS_URL_OLD;
+        if (!destPath.contains(GoodsInfoUtils.SERVICE_LOCAL_IMPORT_PATH)) {
+            isUpload = false;
+            System.err.println("destPath:" + destPath + " not import -----");
+            return isUpload;
+        }
+        return uploadFileBatch(originFile, destPath, accessUrl);
+    }
+
+    /**
+     * 上传kids和import
+     * @param originFile
+     * @param destPath
+     * @return
+     */
+    public static boolean uploadFileBatchAll(File originFile, String destPath) {
+        boolean isUpload = false;
+
+        // KIDS配置
+        String accessUrl = ACCESS_URL_NEW;
+        if (!destPath.contains(GoodsInfoUtils.SERVICE_LOCAL_KIDS_PATH)) {
+            isUpload = false;
+            System.err.println("destPath:" + destPath + " not kids -----");
+            return isUpload;
+        }
+        isUpload = uploadFileBatch(originFile, destPath, accessUrl);
+        if(isUpload){
+            // import配置
+            destPath = destPath.replace(GoodsInfoUtils.SERVICE_LOCAL_KIDS_PATH, GoodsInfoUtils.SERVICE_LOCAL_IMPORT_PATH);
+            accessUrl = ACCESS_URL_OLD;
+            isUpload = uploadFileBatch(originFile, destPath, accessUrl);
+        }
+        return isUpload;
+    }
+
+
+    public static boolean uploadFileBatch(File originFile, String destPath, String accessUrl) {
+        boolean isUpload = false;
+        try {
             if (originFile.exists() && originFile.isDirectory()) {
-
                 File[] childFiles = originFile.listFiles();
-
                 String imageType;
                 MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder();
                 multipartBodyBuilder.setType(MultipartBody.FORM);
-
                 int count = 0;
                 for (File chFile : childFiles) {
                     if (chFile.isFile()) {
@@ -149,7 +213,6 @@ public class UploadByOkHttp {
                             imageType = "image/png";
                         }
                         count++;
-                        //System.out.println("upload file:[" + chFile.getAbsolutePath().replace("\\", "/") +  "]");
                         multipartBodyBuilder.addFormDataPart("userPhoto", chFile.getName(),
                                 RequestBody.create(MediaType.parse(imageType), chFile));
                     }
@@ -159,8 +222,7 @@ public class UploadByOkHttp {
                         .addFormDataPart("destPath", destPath).build();
                 Request request = new Request.Builder().url(accessUrl).post(formBody).build();
                 // client = new OkHttpClient();
-                OkHttpClient client = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS)
-                        .readTimeout(300, TimeUnit.SECONDS).writeTimeout(300, TimeUnit.SECONDS).build();
+                OkHttpClient client = initClient();
                 Response response = client.newCall(request).execute();
                 String rs = response.body().string();
                 System.out.println(rs);
@@ -173,13 +235,55 @@ public class UploadByOkHttp {
                 System.err.println("file" + originFile.getAbsolutePath() + " is not exist or is not directory");
                 isUpload = false;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             isUpload = false;
         }
         return isUpload;
     }
+    /**
+     * 删除图片
+     * @param list : 图片本地路径集合
+     * @return
+     */
+    public static boolean deleteRemoteImgByList(List<String> list){
+
+		boolean isUpload = false;
+		if(list == null || list.size() == 0){
+			return isUpload;
+		}
+		try {
+			MediaType contentType =  MediaType.parse("application/json; charset=utf-8");
+
+			JSONArray jarr = new JSONArray();
+			for(String tempStr : list){
+				jarr.add(tempStr);
+			}
+			JSONObject json = new JSONObject();
+
+			json.put("token", TOKEN);
+			json.put("crud", "d");
+			json.put("paths", jarr);
+			RequestBody formBody = RequestBody.create(contentType, json.toString());
+
+			Request request = new Request.Builder().url(DELETE_URL_NEW).post(formBody).build();
+			// client = new OkHttpClient();
+			OkHttpClient client = initClient();
+			Response response = client.newCall(request).execute();
+			String rs = response.body().string();
+			if (!rs.contains("ERR") && (rs.contains("OK") || rs.contains("ok"))) {
+				isUpload = true;
+				System.out.println("delete result[" + rs + "]");
+			} else {
+				isUpload = false;
+				System.err.println("delete result[" + rs + "]");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			isUpload = false;
+		}
+		return isUpload;
+	}
 
 
     public static void main(String[] args) {
@@ -202,7 +306,7 @@ public class UploadByOkHttp {
         File testFile = new File("G:/singleimg/singleimg135/571374457941");
         String filePath = "/usr/local/goodsimg/importcsvimg/test/789456";
 
-        uploadFileBatch(testFile, filePath, 0);
+        uploadFileBatchOld(testFile, filePath);
     }
 
 }

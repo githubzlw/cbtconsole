@@ -54,9 +54,6 @@ public class PublishGoodsToOnlineThread extends Thread {
         List<String> imgList = new ArrayList<String>();
 
         try {
-            if (kidsCatidList == null || kidsCatidList.size() == 0) {
-                kidsCatidList = customGoodsService.queryKidsCanUploadCatid();
-            }
             customGoodsService.insertIntoGoodsImgUpLog(pid, "", adminId, "test");
 
             LOG.info("Pid : " + pid + " Execute Start");
@@ -71,7 +68,7 @@ public class PublishGoodsToOnlineThread extends Thread {
             // 根据pid获取商品信息
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
             int isKids = 0;
-            if (kidsCatidList.contains(goods.getCatid1())) {
+            if (checkIsKidsCatid(goods.getCatid1())) {
                 isKids = 1;
             }
 
@@ -221,29 +218,27 @@ public class PublishGoodsToOnlineThread extends Thread {
                                     String destPath = GoodsInfoUtils.changeRemotePathToLocal(goods.getShowMainImage().substring(0, goods.getShowMainImage().lastIndexOf("/")), isKids);
                                     //上传
                                     File upFile = new File(localDownImgPre);
+                                    boolean isUpload = false;
                                     if (upFile.exists() && upFile.isDirectory()) {
-                                        boolean isUpload;
-                                        isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, isKids);
-                                        if (isUpload) {
-                                            System.err.println("this pid:" + pid + ",上传产品主图成功");
-                                        } else {
-                                            // 重试一次
-                                            isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, isKids);
-                                            if (isUpload) {
-                                                System.err.println("this pid:" + pid + ",上传产品主图成功");
-                                                if (isKids > 0) {
-                                                    // kids的维护import
-                                                    boolean isImport = UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
-                                                    if (!isImport) {
-                                                        UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
-                                                    }
-                                                }
-                                            } else {
-                                                System.err.println("this pid:" + pid + ",上传产品主图失败");
-                                                // 记录上传失败日志
-                                                customGoodsService.insertIntoGoodsImgUpLog(pid, localDownImgPre, adminId, "to " + destPath + "error");
-                                                isSuccess = false;
+                                        if (isKids > 0) {
+                                            isUpload = UploadByOkHttp.uploadFileBatchAll(upFile, destPath);
+                                            if (!isUpload) {
+                                                isUpload = UploadByOkHttp.uploadFileBatchAll(upFile, destPath);
                                             }
+                                        } else {
+                                            isUpload = UploadByOkHttp.uploadFileBatchOld(upFile, destPath);
+                                            if (!isUpload) {
+                                                isUpload = UploadByOkHttp.uploadFileBatchOld(upFile, destPath);
+                                            }
+                                        }
+                                        if (isUpload) {
+                                            System.err.println("this pid:" + pid + ",上传产品主图成功<:<:<:");
+                                            isSuccess = true;
+                                        } else {
+                                            System.err.println("this pid:" + pid + ",上传产品主图失败");
+                                            // 记录上传失败日志
+                                            customGoodsService.insertIntoGoodsImgUpLog(pid, localDownImgPre, adminId, "to " + destPath + "error");
+                                            isSuccess = false;
                                         }
                                     } else {
                                         System.err.println("this pid:" + pid + ",下载图片文件夹[" + localDownImgPre + "] 不存在----");
@@ -316,5 +311,19 @@ public class PublishGoodsToOnlineThread extends Thread {
         }
     }
 
+
+    private boolean checkIsKidsCatid(String catid) {
+        boolean isCheck = false;
+        if (kidsCatidList == null || kidsCatidList.size() == 0) {
+            kidsCatidList = customGoodsService.queryKidsCanUploadCatid();
+        }
+        for (String tempCatid : kidsCatidList) {
+            if (tempCatid.equals(catid)) {
+                isCheck = true;
+                break;
+            }
+        }
+        return isCheck;
+    }
 
 }

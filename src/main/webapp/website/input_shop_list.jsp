@@ -709,8 +709,31 @@
         }else if(row.authorizedFlag == 3){
             content += '<br><b style="color:red;">授权:未授权</b>';
         }
+        content += '<button class="but_color" style="display: none;" onclick="reUpdateShopAdminId(\''+row.shopId+'\')">设置当前店铺为自己</button>';
         content += '</div>';
         return content;
+    }
+
+    function reUpdateShopAdminId(shopId) {
+        $.ajax({
+            url: '/cbtconsole/ShopUrlC/reUpdateShopAdminId',
+            type: "post",
+            data: {shopId: shopId},
+            success: function (res) {
+                if (!res.ok) {
+                    $.messager.alert('提示', '操作失败');
+                } else {
+                    $.messager.alert('提示', '操作成功');
+                    var number = $('#easyui-datagrid').datagrid('options').pageNumber;
+                    setTimeout(function () {
+                        doQuery(number);
+                    }, 2000)
+                }
+            },
+            error: function () {
+                $.messager.alert('提示', '操作失败');
+            }
+        });
     }
 
     function formatUpdateInfo(val, row, index) {
