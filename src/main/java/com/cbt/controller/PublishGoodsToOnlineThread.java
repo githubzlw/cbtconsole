@@ -219,28 +219,33 @@ public class PublishGoodsToOnlineThread extends Thread {
                                     //上传
                                     File upFile = new File(localDownImgPre);
                                     if (upFile.exists() && upFile.isDirectory()) {
-                                        boolean isUpload;
-                                        isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, isKids);
-                                        if (isUpload) {
-                                            System.err.println("this pid:" + pid + ",上传产品主图成功");
-                                        } else {
-                                            // 重试一次
+                                        boolean isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, isKids);
+                                        if (!isUpload) {
                                             isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, isKids);
-                                            if (isUpload) {
-                                                System.err.println("this pid:" + pid + ",上传产品主图成功");
-                                                if (isKids > 0) {
-                                                    // kids的维护import
-                                                    boolean isImport = UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
-                                                    if (!isImport) {
-                                                        UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
-                                                    }
+                                        }
+                                        // 重试一次
+                                        if (isUpload) {
+                                            if (isKids > 0) {
+                                                // kids的维护import
+                                                isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
+                                                if (!isUpload) {
+                                                    isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
                                                 }
+                                            }
+                                            if (isUpload) {
+                                                System.err.println("this pid:" + pid + ",上传产品主图成功<:<:<:");
+                                                isSuccess = true;
                                             } else {
                                                 System.err.println("this pid:" + pid + ",上传产品主图失败");
                                                 // 记录上传失败日志
                                                 customGoodsService.insertIntoGoodsImgUpLog(pid, localDownImgPre, adminId, "to " + destPath + "error");
                                                 isSuccess = false;
                                             }
+                                        } else {
+                                            System.err.println("this pid:" + pid + ",上传产品主图失败");
+                                            // 记录上传失败日志
+                                            customGoodsService.insertIntoGoodsImgUpLog(pid, localDownImgPre, adminId, "to " + destPath + "error");
+                                            isSuccess = false;
                                         }
                                     } else {
                                         System.err.println("this pid:" + pid + ",下载图片文件夹[" + localDownImgPre + "] 不存在----");
