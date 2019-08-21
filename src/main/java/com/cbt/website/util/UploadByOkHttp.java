@@ -133,23 +133,78 @@ public class UploadByOkHttp {
 
     }
 
-    public static boolean uploadFileBatch(File originFile, String destPath, int isKids) {
+    /**
+     * 上传kids
+     * @param originFile
+     * @param destPath
+     * @return
+     */
+    public static boolean uploadFileBatchNew(File originFile, String destPath) {
         boolean isUpload = false;
 
-        try {
-            String accessUrl = ACCESS_URL_OLD;
-            if (isKids > 0) {
-                accessUrl = ACCESS_URL_NEW;
-                destPath = destPath.replace(GoodsInfoUtils.SERVICE_LOCAL_IMPORT_PATH, GoodsInfoUtils.SERVICE_LOCAL_KIDS_PATH);
+        String accessUrl = ACCESS_URL_NEW;
+            if(!destPath.contains(GoodsInfoUtils.SERVICE_LOCAL_KIDS_PATH)){
+                isUpload = false;
+                System.err.println("destPath:" + destPath + " not kids -----");
+                return isUpload;
             }
+            return uploadFileBatch(originFile,destPath, accessUrl);
+    }
+
+
+    /**
+     * 上传import
+     * @param originFile
+     * @param destPath
+     * @return
+     */
+    public static boolean uploadFileBatchOld(File originFile, String destPath) {
+        boolean isUpload = false;
+
+        String accessUrl = ACCESS_URL_OLD;
+        if (!destPath.contains(GoodsInfoUtils.SERVICE_LOCAL_IMPORT_PATH)) {
+            isUpload = false;
+            System.err.println("destPath:" + destPath + " not import -----");
+            return isUpload;
+        }
+        return uploadFileBatch(originFile, destPath, accessUrl);
+    }
+
+    /**
+     * 上传kids和import
+     * @param originFile
+     * @param destPath
+     * @return
+     */
+    public static boolean uploadFileBatchAll(File originFile, String destPath) {
+        boolean isUpload = false;
+
+        // KIDS配置
+        String accessUrl = ACCESS_URL_NEW;
+        if (!destPath.contains(GoodsInfoUtils.SERVICE_LOCAL_KIDS_PATH)) {
+            isUpload = false;
+            System.err.println("destPath:" + destPath + " not kids -----");
+            return isUpload;
+        }
+        isUpload = uploadFileBatch(originFile, destPath, accessUrl);
+        if(isUpload){
+            // import配置
+            destPath = destPath.replace(GoodsInfoUtils.SERVICE_LOCAL_KIDS_PATH, GoodsInfoUtils.SERVICE_LOCAL_IMPORT_PATH);
+            accessUrl = ACCESS_URL_OLD;
+            isUpload = uploadFileBatch(originFile, destPath, accessUrl);
+        }
+        return isUpload;
+    }
+
+
+    public static boolean uploadFileBatch(File originFile, String destPath, String accessUrl) {
+        boolean isUpload = false;
+        try {
             if (originFile.exists() && originFile.isDirectory()) {
-
                 File[] childFiles = originFile.listFiles();
-
                 String imageType;
                 MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder();
                 multipartBodyBuilder.setType(MultipartBody.FORM);
-
                 int count = 0;
                 for (File chFile : childFiles) {
                     if (chFile.isFile()) {
@@ -158,7 +213,6 @@ public class UploadByOkHttp {
                             imageType = "image/png";
                         }
                         count++;
-                        //System.out.println("upload file:[" + chFile.getAbsolutePath().replace("\\", "/") +  "]");
                         multipartBodyBuilder.addFormDataPart("userPhoto", chFile.getName(),
                                 RequestBody.create(MediaType.parse(imageType), chFile));
                     }
@@ -181,15 +235,12 @@ public class UploadByOkHttp {
                 System.err.println("file" + originFile.getAbsolutePath() + " is not exist or is not directory");
                 isUpload = false;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             isUpload = false;
         }
         return isUpload;
     }
-
-
     /**
      * 删除图片
      * @param list : 图片本地路径集合
@@ -255,7 +306,7 @@ public class UploadByOkHttp {
         File testFile = new File("G:/singleimg/singleimg135/571374457941");
         String filePath = "/usr/local/goodsimg/importcsvimg/test/789456";
 
-        uploadFileBatch(testFile, filePath, 0);
+        uploadFileBatchOld(testFile, filePath);
     }
 
 }

@@ -218,29 +218,22 @@ public class PublishGoodsToOnlineThread extends Thread {
                                     String destPath = GoodsInfoUtils.changeRemotePathToLocal(goods.getShowMainImage().substring(0, goods.getShowMainImage().lastIndexOf("/")), isKids);
                                     //上传
                                     File upFile = new File(localDownImgPre);
+                                    boolean isUpload = false;
                                     if (upFile.exists() && upFile.isDirectory()) {
-                                        boolean isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, isKids);
-                                        if (!isUpload) {
-                                            isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, isKids);
+                                        if (isKids > 0) {
+                                            isUpload = UploadByOkHttp.uploadFileBatchAll(upFile, destPath);
+                                            if (!isUpload) {
+                                                isUpload = UploadByOkHttp.uploadFileBatchAll(upFile, destPath);
+                                            }
+                                        } else {
+                                            isUpload = UploadByOkHttp.uploadFileBatchOld(upFile, destPath);
+                                            if (!isUpload) {
+                                                isUpload = UploadByOkHttp.uploadFileBatchOld(upFile, destPath);
+                                            }
                                         }
-                                        // 重试一次
                                         if (isUpload) {
-                                            if (isKids > 0) {
-                                                // kids的维护import
-                                                isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
-                                                if (!isUpload) {
-                                                    isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
-                                                }
-                                            }
-                                            if (isUpload) {
-                                                System.err.println("this pid:" + pid + ",上传产品主图成功<:<:<:");
-                                                isSuccess = true;
-                                            } else {
-                                                System.err.println("this pid:" + pid + ",上传产品主图失败");
-                                                // 记录上传失败日志
-                                                customGoodsService.insertIntoGoodsImgUpLog(pid, localDownImgPre, adminId, "to " + destPath + "error");
-                                                isSuccess = false;
-                                            }
+                                            System.err.println("this pid:" + pid + ",上传产品主图成功<:<:<:");
+                                            isSuccess = true;
                                         } else {
                                             System.err.println("this pid:" + pid + ",上传产品主图失败");
                                             // 记录上传失败日志
