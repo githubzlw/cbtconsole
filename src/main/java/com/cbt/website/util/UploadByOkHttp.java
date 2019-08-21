@@ -1,9 +1,12 @@
 package com.cbt.website.util;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.util.GoodsInfoUtils;
 import okhttp3.*;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -11,6 +14,13 @@ public class UploadByOkHttp {
     private static final String ACCESS_URL_OLD = "http://104.247.194.50:3009/uploadImage";
     private static final String ACCESS_URL_NEW = "http://108.61.142.103:3009/uploadImage";
     private static final String TOKEN = "cerong2018jack";
+    private static final String DELETE_URL_NEW = "http://108.61.142.103:3008/image/delete";
+
+    private static OkHttpClient initClient(){
+		OkHttpClient client = new OkHttpClient.Builder().connectTimeout(300, TimeUnit.SECONDS)
+                    .readTimeout(150, TimeUnit.SECONDS).writeTimeout(150, TimeUnit.SECONDS).build();
+		return client;
+	}
 
     public static boolean doUpload(Map<String, String> uploadMap, int isKids) {
         boolean isSuccess = false;
@@ -106,8 +116,7 @@ public class UploadByOkHttp {
                     .addFormDataPart("token", TOKEN).addFormDataPart("destPath", destPath).build();
             Request request = new Request.Builder().url(accessUrl).post(formBody).build();
             // client = new OkHttpClient();
-            OkHttpClient client = new OkHttpClient.Builder().connectTimeout(180, TimeUnit.SECONDS)
-                    .readTimeout(60, TimeUnit.SECONDS).writeTimeout(120, TimeUnit.SECONDS).build();
+            OkHttpClient client = initClient();
             Response response = client.newCall(request).execute();
             String rs = response.body().string();
             System.out.println(rs);
@@ -159,8 +168,7 @@ public class UploadByOkHttp {
                         .addFormDataPart("destPath", destPath).build();
                 Request request = new Request.Builder().url(accessUrl).post(formBody).build();
                 // client = new OkHttpClient();
-                OkHttpClient client = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS)
-                        .readTimeout(300, TimeUnit.SECONDS).writeTimeout(300, TimeUnit.SECONDS).build();
+                OkHttpClient client = initClient();
                 Response response = client.newCall(request).execute();
                 String rs = response.body().string();
                 System.out.println(rs);
@@ -180,6 +188,51 @@ public class UploadByOkHttp {
         }
         return isUpload;
     }
+
+
+    /**
+     * 删除图片
+     * @param list : 图片本地路径集合
+     * @return
+     */
+    public static boolean deleteRemoteImgByList(List<String> list){
+
+		boolean isUpload = false;
+		if(list == null || list.size() == 0){
+			return isUpload;
+		}
+		try {
+			MediaType contentType =  MediaType.parse("application/json; charset=utf-8");
+
+			JSONArray jarr = new JSONArray();
+			for(String tempStr : list){
+				jarr.add(tempStr);
+			}
+			JSONObject json = new JSONObject();
+
+			json.put("token", TOKEN);
+			json.put("crud", "d");
+			json.put("paths", jarr);
+			RequestBody formBody = RequestBody.create(contentType, json.toString());
+
+			Request request = new Request.Builder().url(DELETE_URL_NEW).post(formBody).build();
+			// client = new OkHttpClient();
+			OkHttpClient client = initClient();
+			Response response = client.newCall(request).execute();
+			String rs = response.body().string();
+			if (!rs.contains("ERR") && (rs.contains("OK") || rs.contains("ok"))) {
+				isUpload = true;
+				System.out.println("delete result[" + rs + "]");
+			} else {
+				isUpload = false;
+				System.err.println("delete result[" + rs + "]");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			isUpload = false;
+		}
+		return isUpload;
+	}
 
 
     public static void main(String[] args) {

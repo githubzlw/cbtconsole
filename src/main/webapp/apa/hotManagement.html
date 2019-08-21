@@ -165,6 +165,8 @@
                 content = '童装爆款';
             }else if (val == 20) {
                 content = '家具落地页';
+            }else if (val == 21) {
+                content = '厨房用具';
             }
             return content;
         }
@@ -366,7 +368,9 @@
 		    url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson";
         } else if(webType == 3){
 		    url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson";
-        }
+        }else if(webType == 4){
+                url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson";
+            }
 		$.ajax({
 			type : "POST",
 			url : url,
@@ -392,6 +396,8 @@
                 url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?html=1";
             }else if(webType == 3){
                 url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?html=1";
+            }else if(webType == 4){
+                url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson?html=1";
             }
     		$.ajax({
     			type : "POST",
@@ -438,6 +444,7 @@
                     <option value="18">移动端-童装</option>
                     <option value="19">童装爆款</option>
                     <option value="20">家具落地页</option>
+                    <option value="21">厨房用具</option>
 			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>是否启用: <select
             id="query_is_on"
             style="font-size: 16px; height: 24px; width: 120px;">
@@ -453,6 +460,7 @@
                                 <option value="1">import</option>
                                 <option value="2">kids</option>
                                 <option value="3">pets</option>
+                                <option value="4">pets</option>
                             </select>
                         </span>
             <input class="refresh_color" type="button" value="刷新最新热卖商品到线上（原json）" onclick="refreshOnlineGoodsJson()" style="cursor:pointer"/>
@@ -538,6 +546,7 @@
                     <option value="18">移动端-童装</option>
                     <option value="19">童装爆款</option>
                     <option value="20">家具落地页</option>
+                    <option value="21">厨房用具</option>
                 </select></td>
             </tr>
             <tr>

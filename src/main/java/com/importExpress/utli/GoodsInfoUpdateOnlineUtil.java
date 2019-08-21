@@ -39,11 +39,11 @@ public class GoodsInfoUpdateOnlineUtil {
     /**
      * 刷新产品表数据
      */
-    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b004";
+    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://52.34.56.133:18001/invokejob/b004";
     /**
      * 刷新solr的
      */
-    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b006";
+    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://52.34.56.133:18001/invokejob/b006";
 
     /**
      * 生成events文件路径

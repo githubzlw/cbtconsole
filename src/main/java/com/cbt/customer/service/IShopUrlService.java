@@ -403,4 +403,14 @@ public interface IShopUrlService {
      */
     int deleteShopBrandAuthorizationByShopId(String shopId);
 
+
+    /**
+     * 更新新的负责人ID
+     * @param shopId
+     * @param adminId
+     * @param adminName
+     * @return
+     */
+    int reUpdateShopAdminId(String shopId, int adminId, String adminName);
+
 }

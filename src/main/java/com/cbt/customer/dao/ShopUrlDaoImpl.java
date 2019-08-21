@@ -3290,4 +3290,25 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         return count;
     }
 
+    @Override
+    public int reUpdateShopAdminId(String shopId, int adminId, String adminName) {
+        Connection conn = DBHelper.getInstance().getConnection5();
+        Statement stmt = null;
+        String upShopSql = "update shop_url_bak set admin_id = " + adminId + ",admuser='" + adminName
+                + "' where shop_id = '" + shopId + "' ";
+        int count = 0;
+        try {
+            stmt = conn.createStatement();
+            count = stmt.executeUpdate(upShopSql);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("shopId:" + shopId + ",reUpdateShopAdminId error: " + e.getMessage());
+            LOG.error("shopId:" + shopId + ",reUpdateShopAdminId error: " + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return count;
+    }
+
 }

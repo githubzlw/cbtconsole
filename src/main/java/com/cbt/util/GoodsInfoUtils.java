@@ -9,6 +9,10 @@ import com.cbt.website.util.JsonResult;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
@@ -844,4 +848,163 @@ public class GoodsInfoUtils {
             return null;
         }
     }
+
+    /**
+     * 全部图片数据
+     * @param gd
+     * @return
+     */
+    public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids){
+		List<String> changeImglist = new ArrayList<>();
+		// 主图
+		String orMainImg220x220 = null;
+        if (StringUtils.isNotBlank(gd.getShowMainImage())) {
+            if (gd.getShowMainImage().contains("http://") || gd.getShowMainImage().contains("https://")) {
+                orMainImg220x220 = gd.getShowMainImage().trim();
+            } else {
+                orMainImg220x220 = gd.getRemotpath().trim() + gd.getShowMainImage().trim();
+            }
+        } else if (StringUtils.isNotBlank(gd.getCustomMainImage())) {
+            if (gd.getCustomMainImage().contains("http://") || gd.getCustomMainImage().contains("https://")) {
+                orMainImg220x220 = gd.getCustomMainImage().trim();
+            } else {
+                orMainImg220x220 = gd.getRemotpath().trim() + gd.getCustomMainImage().trim();
+            }
+        }
+
+        if (StringUtils.isNotBlank(orMainImg220x220)) {
+            List<String> mainImgList = getMainImgByPath(orMainImg220x220);
+            changeImglist.addAll(mainImgList);
+            mainImgList.clear();
+        }
+
+		// 橱窗图
+		List<String> imgList = deal1688GoodsImg(gd.getImg(), gd.getRemotpath(), 1);
+		changeImglist.addAll(imgList);
+		imgList.clear();
+
+		// 详情图
+		List<String> detailsImgList = genDetailsImgList(gd.getEninfo(), gd.getRemotpath());
+		if (detailsImgList != null && detailsImgList.size() > 0) {
+			changeImglist.addAll(detailsImgList);
+		}
+		// 规格图片
+		List<String> entypeImgList = genEntypeImgList(gd);
+		if (entypeImgList != null && entypeImgList.size() > 0) {
+			changeImglist.addAll(entypeImgList);
+			entypeImgList.clear();
+		}
+		List<String> nwList = new ArrayList<>();
+        for(String imgL : changeImglist){
+            nwList.add(changeRemotePathToLocal(imgL, isKids));
+        }
+        changeImglist.clear();
+        return nwList;
+	}
+
+	public static List<String> getMainImgByPath(String remotPathImg) {
+		String changeRemote;
+		if (remotPathImg.contains("http:")) {
+			changeRemote = remotPathImg.replace("http:", "https:");
+		} else {
+			changeRemote = remotPathImg;
+		}
+		List<String> imgList = new ArrayList<String>();
+		if (changeRemote.contains("220x220")) {
+			imgList.add(changeRemote);
+			imgList.add(changeRemote.replace("220x220", "285x285"));
+		} else if (changeRemote.contains("400x400")) {
+			imgList.add(changeRemote);
+			imgList.add(changeRemote.replace("400x400", "220x220"));
+			imgList.add(changeRemote.replace("400x400", "285x285"));
+		}
+		return imgList;
+	}
+
+	// 处理1688商品的规格图片数据
+	public static List<String> deal1688GoodsImg(String img, String remotPath, int is400) {
+
+		String changeRemote;
+		if (remotPath.contains("http:")) {
+			changeRemote = remotPath.replace("http:", "https:");
+		} else {
+			changeRemote = remotPath;
+		}
+		List<String> imgList = new ArrayList<String>();
+
+		if (StringUtils.isNotBlank(img)) {
+			img = img.replace("[", "").replace("]", "").trim();
+			String[] imgs = img.split(",\\s*");
+
+			for (int i = 0; i < imgs.length; i++) {
+				if (!imgs[i].isEmpty()) {
+					if (imgs[i].indexOf("http://") > -1 || imgs[i].indexOf("https://") > -1) {
+						imgList.add(imgs[i].replace("http:", "https:"));
+						if (is400 > 0) {
+							imgList.add(imgs[i].replace("http:", "https:").replace("60x60", "400x400"));
+						}
+					} else {
+						imgList.add(changeRemote + imgs[i]);
+						if (is400 > 0) {
+							imgList.add(changeRemote + imgs[i].replace("60x60", "400x400"));
+						}
+					}
+				}
+			}
+		}
+		return imgList;
+	}
+
+	public static List<String> genDetailsImgList(String detailStr, String remotPath) {
+		String changeRemote;
+		// 详情数据的获取和解析img数据
+		List<String> imgList = new ArrayList<String>();
+		if (StringUtils.isNotBlank(detailStr)) {
+			if (remotPath.contains("http:")) {
+				changeRemote = remotPath.replace("http:", "https:");
+			} else {
+				changeRemote = remotPath;
+			}
+
+			Document nwDoc = Jsoup.parseBodyFragment(detailStr);
+			Elements imgEls = nwDoc.getElementsByTag("img");
+			if (imgEls.size() > 0) {
+				for (Element imel : imgEls) {
+					String imgUrl = imel.attr("src");
+					if (StringUtils.isBlank(imgUrl)) {
+						continue;
+					} else if (imgUrl.contains("http")) {
+						if (imgUrl.length() > 500) {
+							continue;
+						} else {
+							imgList.add(imgUrl.replace("http:", "https:"));
+						}
+					} else {
+						if (imgUrl.length() > 500) {
+							continue;
+						} else {
+							imgList.add(changeRemote + imgUrl);
+						}
+					}
+				}
+				imgEls.clear();
+			}
+		}
+
+		return imgList;
+	}
+
+	public static List<String> genEntypeImgList(CustomGoodsPublish gd) {
+		List<TypeBean> typeList = deal1688GoodsType(gd, true);
+		List<String> imgList = new ArrayList<>();
+		for (TypeBean typeBean : typeList) {
+			if (StringUtils.isNotBlank(typeBean.getImg()) && typeBean.getImg().length() > 10) {
+				if (typeBean.getImg().contains("http://") || typeBean.getImg().contains("https://")) {
+					imgList.add(typeBean.getImg().replace("60x60", "400x400"));
+				}
+			}
+		}
+		typeList.clear();
+		return imgList;
+	}
 }
