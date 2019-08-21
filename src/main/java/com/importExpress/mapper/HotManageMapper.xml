@@ -15,6 +15,7 @@
         <result column="create_time" property="createTime"/>
         <result column="update_admin_id" property="updateAdminId"/>
         <result column="update_time" property="updateTime"/>
+        <result column="web_site" property="webSite"/>
     </resultMap>
 
 
@@ -83,13 +84,13 @@
             parameterType="com.cbt.warehouse.pojo.HotCategory">
         select a.id,a.category_name,a.show_name,a.show_img,a.is_on,a.sorting,a.hot_type,
         a.admin_id,b.admName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.update_admin_id,
-        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.web_site
         from hot_category a left join admuser b on a.admin_id =b.id
-        where 1=1
-        <if test=" isOn > -1">
+        where 1=1 and web_site = #{webSite}
+        <if test="isOn > -1">
             and is_on = #{isOn}
         </if>
-        <if test=" hotType > 0">
+        <if test="hotType > 0">
             and hot_type = #{hotType}
         </if>
         order by hot_type,is_on desc,sorting desc
@@ -103,7 +104,7 @@
             parameterType="com.cbt.warehouse.pojo.HotCategory">
         select count(0)
         from hot_category
-        where 1=1
+        where 1=1 and web_site = #{webSite}
         <if test=" isOn > -1">
             and is_on = #{isOn}
         </if>
@@ -115,7 +116,7 @@
     <select id="getCategoryById" resultMap="hotCategoryResultMap">
         select a.id,a.category_name,a.show_name,a.show_img,a.is_on,a.sorting,a.hot_type,
         a.admin_id,b.admName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.update_admin_id,
-        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.web_site
         from hot_category a left join admuser b on a.admin_id =b.id
         where a.id = #{id}
     </select>
@@ -125,7 +126,8 @@
         select count(0)
         from hot_category
         where 1=1 and hot_type = #{hotType} and (show_img = #{showImg} or show_name = #{showName})
-        <if test=" id > 0">
+        and web_site = #{webSite}
+        <if test="id > 0">
             and id != #{id}
         </if>
     </select>

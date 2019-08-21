@@ -104,6 +104,11 @@ public class HotManageController {
         if (StringUtils.isNotBlank(hotTypeStr)) {
             hotType = Integer.valueOf(hotTypeStr);
         }
+        int webSite = 1;
+        String webSiteStr = request.getParameter("webSite");
+        if(StringUtils.isNotBlank(webSiteStr) && Integer.valueOf(webSiteStr) > 0){
+            webSite = Integer.valueOf(webSiteStr);
+        }
         HotCategory param = new HotCategory();
         try {
 
@@ -111,6 +116,7 @@ public class HotManageController {
             param.setIsOn(isOn);
             param.setStartNum(startNum);
             param.setLimitNum(limitNum);
+            param.setWebSite(webSite);
 
             List<HotCategory> res = hotManageService.queryForList(param);
             int count = hotManageService.queryForListCount(param);
@@ -221,6 +227,16 @@ public class HotManageController {
             enter_sort = Integer.valueOf(enter_sortStr);
         }
 
+        int webSite =0;
+        String webSiteStr = request.getParameter("webSite");
+        if(StringUtils.isNotBlank(webSiteStr) && Integer.valueOf(webSiteStr) > 0){
+            webSite = Integer.valueOf(webSiteStr);
+        }else {
+            json.setOk(false);
+            json.setMessage("获取网站类别失败");
+            return json;
+        }
+
         HotCategory param = new HotCategory();
         try {
             param.setHotType(hot_type);
@@ -231,6 +247,7 @@ public class HotManageController {
             param.setShowImg(show_img);
             param.setSorting(enter_sort);
             param.setUpdateAdminId(user.getId());
+            param.setWebSite(webSite);
             int isCheck = hotManageService.checkHotCategoryIsExists(param);
             if (isCheck > 0) {
                 json.setOk(false);
@@ -318,6 +335,16 @@ public class HotManageController {
             enter_sort = Integer.valueOf(enter_sortStr);
         }
 
+        int webSite =0;
+        String webSiteStr = request.getParameter("webSite");
+        if(StringUtils.isNotBlank(webSiteStr) && Integer.valueOf(webSiteStr) > 0){
+            webSite = Integer.valueOf(webSiteStr);
+        }else {
+            json.setOk(false);
+            json.setMessage("获取网站类别失败");
+            return json;
+        }
+
         HotCategory param = new HotCategory();
         try {
             param.setId(Integer.valueOf(category_id));
@@ -328,6 +355,7 @@ public class HotManageController {
             param.setShowImg(show_img);
             param.setSorting(enter_sort);
             param.setUpdateAdminId(user.getId());
+            param.setWebSite(webSite);
             int isCheck = hotManageService.checkHotCategoryIsExists(param);
             if (isCheck > 0) {
                 json.setOk(false);
@@ -1174,9 +1202,9 @@ public class HotManageController {
     private void insertCategoryOnline(HotCategory param) {
         String show_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getShowName());
         String category_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getCategoryName());
-        String sql = "insert into hot_category(category_name,show_name,show_img,is_on,sorting,hot_type,admin_id)" +
+        String sql = "insert into hot_category(category_name,show_name,show_img,is_on,sorting,hot_type,admin_id,web_site)" +
                 " values('" + category_name + "','" + show_name + "','" + param.getShowImg() + "'," + param.getIsOn()
-                + "," + param.getSorting() + "," + param.getHotType() + "," + param.getAdminId() + ")";
+                + "," + param.getSorting() + "," + param.getHotType() + "," + param.getAdminId() + "," + param.getWebSite() +")";
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
@@ -1187,6 +1215,7 @@ public class HotManageController {
                 " category_name='" + category_name + "',show_name='" + show_name + "',show_img='" + param.getShowImg()
                 + "',is_on=" + param.getIsOn()
                 + ",sorting=" + param.getSorting() + ",hot_type=" + param.getHotType() + ",update_admin_id=" + param.getAdminId()
+                + ",web_site=" + param.getWebSite()
                 + " where id = " + param.getId();
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }

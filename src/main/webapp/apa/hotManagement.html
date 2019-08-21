@@ -73,9 +73,10 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            loadWebSize();
             closeDialog();
             setDatagrid();
-            loadWebSize();
+
         });
 
         function loadWebSize() {
@@ -106,6 +107,7 @@
         }
 
         function setDatagrid() {
+            var webSite = $("#web_size_type").val();
             $('#hot_easyui-datagrid').datagrid({
                 title: '热卖类别管理',
                 width: "100%",
@@ -115,6 +117,9 @@
                 toolbar: "#hot_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
                 url: '/cbtconsole/hotManage/queryForList',//url调用Action方法
                 loadMsg: '数据装载中......',
+                queryParams:{
+                    webSite:webSite
+                },
                 singleSelect: true,//为true时只能选择单行
                 fitColumns: true,//允许表格自动缩放，以适应父容器
                 rownumbers: true,
@@ -140,9 +145,11 @@
         function doQuery() {
             var isOn = $("#query_is_on").val();
             var hotType = $("#query_hot_type").val();
+            var webSite = $("#web_size_type").val();
             $("#hot_easyui-datagrid").datagrid("load", {
                 "isOn": isOn,
-                "hotType": hotType
+                "hotType": hotType,
+                "webSite": webSite
             });
         }
 
@@ -194,7 +201,7 @@
             }else if (val == 20) {
                 content = '家具落地页';
             }else if (val == 21) {
-                content = '厨房用具';
+                content = '商品厨房';
             }
             return content;
         }
@@ -223,7 +230,6 @@
         }
 
         function enterCategory(id, type) {
-            $("#add_or_edit").val(type);
             if (id > 0 && type > 0) {
                 $("#category_id").val(id);
                 getCategory(id);
@@ -288,6 +294,7 @@
 
             var category_id = $("#category_id").val();
             var add_or_edit = $("#add_or_edit").val();
+            var hot_web_site= $("#web_size_type").val();
 
             if (add_or_edit == 1) {
                 //编辑状态
@@ -301,7 +308,8 @@
                         show_img: show_img,
                         hot_type: hot_type,
                         is_on: is_on,
-                        enter_sort: enter_sort
+                        enter_sort: enter_sort,
+                        webSite: hot_web_site
                     },
                     success: function (data) {
                         $.messager.progress('close');
@@ -327,7 +335,8 @@
                         show_img: show_img,
                         hot_type: hot_type,
                         is_on: is_on,
-                        enter_sort: enter_sort
+                        enter_sort: enter_sort,
+                        webSite: hot_web_site
                     },
                     success: function (data) {
                         $.messager.progress('close');
@@ -384,20 +393,19 @@
             });
 
         }
-        refreshOnlineGoodsHtml
 
         function refreshOnlineGoodsJson(){
         var webType = $("#web_size_type").val();
 		$("#gen_show_notice").show();
 		$(".refresh_color").css("background","#aaa");
 		$(".refresh_color").attr("disabled",true);
-		var url = "https://www.import-express.com/popProducts/refreshHotJson";
+		var url = "https://www.import-express.com/popProducts/refreshHotJson?webType="+webType;
 		if(webType == 2){
-		    url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson";
+		    url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?webType="+webType;
         } else if(webType == 3){
-		    url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson";
+		    url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?webType="+webType;
         }else if(webType == 4){
-		    url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson";
+		    url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson?webType="+webType;
         }
 		$.ajax({
 			type : "POST",
@@ -419,13 +427,13 @@
     		var webType = $("#web_size_type").val();
     		$(".refresh_color").css("background","#aaa");
     		$(".refresh_color").attr("disabled",true);
-            var url = "https://www.import-express.com/popProducts/refreshHotJson?html=1";
+            var url = "https://www.import-express.com/popProducts/refreshHotJson?html=1&webType="+webType;
             if(webType == 2){
-                url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?html=1";
+                url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?html=1&webType="+webType;
             }else if(webType == 3){
-                url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?html=1";
+                url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?html=1&webType="+webType;
             }else if(webType == 4){
-                url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson?html=1";
+                url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson?html=1&webType="+webType;
             }
     		$.ajax({
     			type : "POST",
@@ -472,7 +480,7 @@
                     <option value="18">移动端-童装</option>
                     <option value="19">童装爆款</option>
                     <option value="20">家具落地页</option>
-                    <option value="21">厨房用具</option>
+                    <option value="21">商品厨房</option>
 			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>是否启用: <select
             id="query_is_on"
             style="font-size: 16px; height: 24px; width: 120px;">
@@ -484,11 +492,10 @@
             <input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;
             <span><input type="button" class="but_color" value="录入类别" onclick="enterCategory(0,0)"/></span>&nbsp;&nbsp;&nbsp;&nbsp;
             <span>网站:
-                            <select id="web_size_type" style="height: 28px;width: 120px;">
+                            <select id="web_size_type" style="height: 28px;width: 120px;" onchange="doQuery()">
                                 <option value="1">import</option>
                                 <option value="2">kids</option>
                                 <option value="3">pets</option>
-                                <option value="4">pets</option>
                             </select>
                         </span>
             <input class="refresh_color" type="button" value="刷新最新热卖商品到线上（原json）" onclick="refreshOnlineGoodsJson()" style="cursor:pointer"/>
@@ -574,11 +581,11 @@
                     <option value="18">移动端-童装</option>
                     <option value="19">童装爆款</option>
                     <option value="20">家具落地页</option>
-                    <option value="21">厨房用具</option>
+                    <option value="21">商品厨房</option>
                 </select></td>
             </tr>
             <tr>
-                <td>是否启用：</td>
+                <td>是否启用:</td>
                 <td><select id="is_on" style="width: 100px;height: 28px;">
                     <option value="0">关闭</option>
                     <option value="1">启用</option>
