@@ -49,10 +49,10 @@
 	width: 200px;
 }
 
-.report th, .report td {
+/* .report th, .report td {
 	text-align: center;
-}
-
+} */
+.datagrid-cell-c2-goodsSku{width: 350px;}
 .mt5 {
 	margin-top: 5px;
 }
@@ -132,7 +132,7 @@ em,i{font-style: normal;}
 
 .report .btn_page_in{width:100px;}
 .w350{width: 350px;}
-.datagrid-cell-c2-goodsName{width:200px;}
+.datagrid-cell-c2-goodsName{width:300px;}
 </style>
 </head>
 <body>
@@ -231,7 +231,7 @@ em,i{font-style: normal;}
 						<td >${tory.categoryName}</td>
 						<td class="datagrid-cell-c2-goodsPid">${tory.goodsPid}</td>
 						<td class="datagrid-cell-c2-goodsName">${tory.goodsName}</td>
-						<td><em class="emsku">${tory.goodsSku}</em>
+						<td  class="datagrid-cell-c2-goodsSku"><em class="emsku">${tory.goodsSku}</em>
 						<br>
 						<em>Skuid:</em><em class="emskuid">${tory.goodsSkuid}</em>
 						<br>

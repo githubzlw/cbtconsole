@@ -743,5 +743,9 @@
     <update id="updateRemark">
     update inventory_barcode_record set  updatetime=now(),remark=#{remark},state=#{state} where id=#{ibid};
     </update>
+    <select id="getInventoryRemark" resultType="java.util.Map">
+    select createtime,remark,inventory_sku_id,change_type  from inventory_sku_log where inventory_sku_id=#{skuId} 
+    order by createtime desc limit 20
+    </select>
     
 </mapper>
