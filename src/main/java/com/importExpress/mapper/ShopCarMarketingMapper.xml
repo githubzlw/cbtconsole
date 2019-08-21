@@ -1865,4 +1865,8 @@
         </if>
     </select>
 
+
+    <select id="queryReloadConfigUserId" resultType="java.lang.Integer">
+        select userid  from shop_car_marking_config
+    </select>
 </mapper>
