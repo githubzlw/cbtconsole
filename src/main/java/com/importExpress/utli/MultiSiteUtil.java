@@ -20,7 +20,7 @@ public class MultiSiteUtil {
      * </pre>
      *
      * @param orderNo
-     * @return 1-非kids网站(importx网站); 2-kids网站;
+     * @return 1-非kids网站(importx网站); 2-kids网站; 3 pets网站
      */
     public static Integer getSiteTypeNum(String orderNo){
         if (StringUtils.isNotBlank(orderNo)

@@ -30,7 +30,18 @@ public class HotCategory implements Serializable {
     private String updateTime;// 更新时间
     private int startNum;
     private int limitNum;
+    /**
+     * 网站类别 1import 2 kids 3 pets 4 restaurant
+     */
+    private int webSite;
 
+    public int getWebSite() {
+        return webSite;
+    }
+
+    public void setWebSite(int webSite) {
+        this.webSite = webSite;
+    }
 
     public int getId() {
         return id;

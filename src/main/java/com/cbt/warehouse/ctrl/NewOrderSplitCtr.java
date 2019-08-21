@@ -752,11 +752,7 @@ public class NewOrderSplitCtr {
                 String url = UUIDUtil.getAutoLoginPath("/individual/getCenter", uuid);
                 request.setAttribute("autoUrl", url);
                 String autoUrl = "http://www.import-express.com" + url;
-                if(isKidFlag){
-                    model.put("autoUrl", SwitchDomainNameUtil.checkNullAndReplace(autoUrl));
-                } else{
-                    model.put("autoUrl", autoUrl);
-                }
+                model.put("autoUrl", SwitchDomainNameUtil.checkNullAndReplace(autoUrl,MultiSiteUtil.getSiteTypeNum(orderNo)));
                 // 获取用户email
                 IOrderSplitServer splitServer = new OrderSplitServer();
                 request.setAttribute("email", splitServer.getUserEmailByUserName(oldOrderBean.getUserid()));
@@ -795,10 +791,8 @@ public class NewOrderSplitCtr {
                 // 发送邮件开始
                 request.setAttribute("details", oldOrderDetails);
                 request.setAttribute("details_", nwOrderDetails);
-                if(isKidFlag){
-                    SwitchDomainNameUtil.changeObjectList(oldOrderDetails);
-                    SwitchDomainNameUtil.changeObjectList(nwOrderDetails);
-                }
+                SwitchDomainNameUtil.changeObjectList(oldOrderDetails, MultiSiteUtil.getSiteTypeNum(orderNo));
+                    SwitchDomainNameUtil.changeObjectList(nwOrderDetails, MultiSiteUtil.getSiteTypeNum(orderNo));
                 model.put("details", oldOrderDetails);
                 model.put("details_", nwOrderDetails);
                 if (state == 1) {
@@ -890,11 +884,7 @@ public class NewOrderSplitCtr {
                 request.setAttribute("autoUrl", url);
                 // 获取用户email
                 request.setAttribute("email", splitServer.getUserEmailByUserName(orderBeans.get(0).getUserid()));
-                if(isKidFlag){
-                    model.put("autoUrl", SwitchDomainNameUtil.checkNullAndReplace(url));
-                } else{
-                    model.put("autoUrl", url);
-                }
+                model.put("autoUrl", SwitchDomainNameUtil.checkNullAndReplace(url, MultiSiteUtil.getSiteTypeNum(orderNo)));
                 model.put("email", splitServer.getUserEmailByUserName(orderBeans.get(0).getUserid()));
                 List<Object[]> orderDetails = new ArrayList<Object[]>();
                 if (state == 1) {
@@ -923,10 +913,8 @@ public class NewOrderSplitCtr {
 
                 request.setAttribute("details", details);
                 request.setAttribute("details_", details_);
-                if(isKidFlag){
-                    SwitchDomainNameUtil.changeObjectList(details);
-                    SwitchDomainNameUtil.changeObjectList(details_);
-                }
+                SwitchDomainNameUtil.changeObjectList(details, MultiSiteUtil.getSiteTypeNum(orderNo));
+                SwitchDomainNameUtil.changeObjectList(details_, MultiSiteUtil.getSiteTypeNum(orderNo));
                 model.put("details", details);
                 model.put("details_", details_);
                 if (state == 1) {
@@ -997,11 +985,7 @@ public class NewOrderSplitCtr {
                 request.setAttribute("currency", orderBeans.get(0).getCurrency());
                 model.put("currency", orderBeans.get(0).getCurrency());
                 String liveChatLink = "http://chat32.live800.com/live800/chatClient/chatbox.jsp?companyID=496777&configID=70901&lan=en&jid=4818862369&enterurl=http%3A%2F%2Fwww.import-express.com%2Fcbtconsole%2Fapa%2Fcontact.html&amp;timestamp=1441622560799&amp;pagereferrer=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2F&amp;firstEnterUrl=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2Fcbtconsole%2Fapa%2Fcontact%2Ehtml&amp;pagetitle=Customer+Service";
-                if(isKidFlag){
-                    model.put("here", SwitchDomainNameUtil.checkNullAndReplace(liveChatLink));
-                }else {
-                    model.put("here", liveChatLink);
-                }
+                model.put("here", SwitchDomainNameUtil.checkNullAndReplace(liveChatLink, MultiSiteUtil.getSiteTypeNum(orderNo)));
             }
             net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
             String modeStr = jsonObject.toString();

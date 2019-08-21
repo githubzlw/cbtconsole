@@ -34,4 +34,9 @@ public class InventoryData extends InventorySku{
 	 */
 	private String online;
 	
+	/**
+	 * 历史备注信息
+	 */
+	private String remarkContext;
+	
 }
