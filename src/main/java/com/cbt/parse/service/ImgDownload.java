@@ -158,8 +158,8 @@ public class ImgDownload {
 		} else {
 			// 判断父目录是否存在，不存在则创建
 			if (!file.getParentFile().exists()) {
-				//file.getParentFile().mkdirs();
-				return false;
+				file.getParentFile().mkdirs();
+				// return false;
 			}
 		}
 		FileOutputStream fops = new FileOutputStream(file);

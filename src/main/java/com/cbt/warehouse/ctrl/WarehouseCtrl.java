@@ -8732,7 +8732,7 @@ public class WarehouseCtrl {
 					ftpConfig = GetConfigureInfo.getFtpConfig();
 				}
 				String imgUploadPath = ftpConfig.getLocalDiskPath();
-				String imgPath = imgUploadPath + localFilePath;
+				String imgPath = imgUploadPath.replace("\\","/") + localFilePath;
 				System.out.println("新上传的文件名："+(tims+old_name));
 				System.out.println("新上传的文件路径："+imgPath);
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
