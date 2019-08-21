@@ -63,12 +63,41 @@
             closeDialog('shop_cart_div', 'hop_cart_form');
             imgLazyLoad();
             var website = '${param.website}';
-            if (website == '1') {
-                $("#select_web_site").val(1);
-            } else {
-                $("#select_web_site").val(0);
+            if (!website) {
+                website = 0;
             }
+            loadWebSize(website);
         });
+
+        function loadWebSize(website) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
+                data: {},
+                success: function (data) {
+                    var json = eval("(" + data + ")");
+                    if (json.ok) {
+
+                        var data = json.data;
+                        var content = '';
+                        for(var key in data){
+                            content += '<option value="'+key+'">'+data[key]+'</option>'
+                        }
+                        $("#select_web_site").empty();
+                        $("#select_web_site").append(content);
+                        if(website > 0){
+                            $("#select_web_site").val(website);
+                        }
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
 
         function imgLazyLoad() {
             $('img.img_sty').lazyload({effect: "fadeIn", threshold: 88});

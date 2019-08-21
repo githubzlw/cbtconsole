@@ -12,10 +12,41 @@
     <script type="text/javascript">
         $(function () {
             var website = '${website}';
-            if(website > 0){
-                $("#website_type").val(2);
+            if(!website){
+               website = 0;
             }
+            loadWebSize(website);
         });
+        
+        function loadWebSize(website) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
+                data: {},
+                success: function (data) {
+                    var json = eval("(" + data + ")");
+                    if (json.ok) {
+
+                        var data = json.data;
+                        var content = '';
+                        for(var key in data){
+                            content += '<option value="'+key+'">'+data[key]+'</option>'
+                        }
+                        $("#website_type").empty();
+                        $("#website_type").append(content);
+                        if(website > 0){
+                            $("#website_type").val(website);
+                        }
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
     </script>
 </head>
 <body>

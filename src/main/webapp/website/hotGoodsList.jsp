@@ -551,6 +551,8 @@
                     url = "https://www.kidsproductwholesale.com/goodslist?background=1&hotid=";
                 } else if (webType == 3){
                     url = "https://www.lovelypetsupply.com/goodslist?background=1&hotid=";
+                } else if (webType == 4){
+                    url = "https://www.restaurantkitchenequipments.com/goodslist?background=1&hotid=";
                 }
             } else if (localUrl.indexOf(".1.29:") > -1) {
                 url = "http://192.168.1.29:8081/goodslist?background=1&hotid=";

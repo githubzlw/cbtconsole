@@ -17,10 +17,7 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.*;
 import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.ShopCarMarketingService;
-import com.importExpress.utli.GoodsPriceUpdateUtil;
-import com.importExpress.utli.SendEmailNew;
-import com.importExpress.utli.SendMQ;
-import com.importExpress.utli.SwitchDomainNameUtil;
+import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.*;
@@ -213,7 +210,7 @@ public class ShopCarMarketingController {
             4.【为客户选择最佳运输天数】
          */
         String type = request.getParameter("type");
-        if (StringUtils.isBlank(type)) {
+        if (StringUtils.isBlank(type) || Integer.valueOf(type) <= 0) {
             json.setOk(false);
             json.setMessage("获取发送类别失败");
             return json;
@@ -348,25 +345,29 @@ public class ShopCarMarketingController {
 
                 //获取原来的重新生成goods_carconfig数据
                 GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
-                if ("2".equals(websiteType)) {
+                if ("1".equals(websiteType)) {
                     if (StringUtils.isBlank(carconfigWithBLOBs.getKidscarconfig()) || carconfigWithBLOBs.getKidscarconfig().length() < 10) {
                         json.setOk(false);
                         json.setMessage("客户购物车信息为空");
                         return json;
                     }
-                } else {
+                } else if ("2".equals(websiteType)) {
                     if (StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10) {
                         json.setOk(false);
                         json.setMessage("客户购物车信息为空");
                         return json;
                     }
+                }else{
+                    json.setOk(false);
+                    json.setMessage("获取网站类别异常");
+                    return json;
                 }
 
-                List<GoodsCarActiveSimplBean> listActive;
+                List<GoodsCarActiveSimplBean> listActive = new ArrayList<>();
 
                 if ("2".equals(websiteType)) {
                     listActive =(List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getKidscarconfig()), GoodsCarActiveSimplBean.class);
-                }else{
+                }else if ("1".equals(websiteType)){
                     listActive =(List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
                 }
 
@@ -401,7 +402,7 @@ public class ShopCarMarketingController {
                         if(activeList.size() > 0){
                             jsonObject.put("json",com.alibaba.fastjson.JSON.toJSONString(activeList));
                             SendMQ sendMQ = new SendMQ();
-                            sendMQ.sendMsg(jsonObject, "2".equals(websiteType) ? 1 : 0);
+                            sendMQ.sendMsg(jsonObject, Integer.valueOf(websiteType) - 1);
                             sendMQ.closeConn();
                         }
 
@@ -470,7 +471,8 @@ public class ShopCarMarketingController {
 
     private boolean genHtmlEamil(int userId,Map<String,String> paramMap) {
         boolean isSuccess = false;
-        boolean isKidFlag =  "2".equals(paramMap.get("websiteType"));
+        int websiteType = Integer.valueOf(paramMap.get("websiteType"));
+        boolean isKidFlag =  websiteType == 2;
         try {
             Map<String, Object> modelM = new HashMap<String, Object>();
 
@@ -486,8 +488,8 @@ public class ShopCarMarketingController {
             }
 
             if (isKidFlag) {
-                modelM.put("emailFollowUrl", SwitchDomainNameUtil.checkNullAndReplace(EMAIL_FOLLOW_URL + followCode));
-                modelM.put("carUrl", SwitchDomainNameUtil.checkNullAndReplace(AUTO_LOGIN_URL + "?userId=" + userId + "&uuid=" + followCode));
+                modelM.put("emailFollowUrl", SwitchDomainNameUtil.checkNullAndReplace(EMAIL_FOLLOW_URL + followCode, websiteType));
+                modelM.put("carUrl", SwitchDomainNameUtil.checkNullAndReplace(AUTO_LOGIN_URL + "?userId=" + userId + "&uuid=" + followCode, websiteType));
             } else {
                 modelM.put("emailFollowUrl", EMAIL_FOLLOW_URL + followCode);
                 modelM.put("carUrl", AUTO_LOGIN_URL + "?userId=" + userId + "&uuid=" + followCode);
@@ -569,8 +571,8 @@ public class ShopCarMarketingController {
                 modelM.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
                 // 域名转换
                 if(isKidFlag){
-                    SwitchDomainNameUtil.changeShopCarMarketingList(resultList);
-                    SwitchDomainNameUtil.changeShopCarMarketingList(sourceList);
+                    SwitchDomainNameUtil.changeShopCarMarketingList(resultList, websiteType);
+                    SwitchDomainNameUtil.changeShopCarMarketingList(sourceList, websiteType);
                 }
                 modelM.put("updateList", resultList);
                 modelM.put("sourceList", sourceList);
@@ -583,32 +585,48 @@ public class ShopCarMarketingController {
             modelM.put("adminEmail", paramMap.get("adminEmail"));
             modelM.put("whatsApp", paramMap.get("whatsApp"));
             modelM.put("websiteType", paramMap.get("websiteType"));
+            TemplateType emailHtml = TemplateType.SHOPPING_CART_NO_CHANGE_IMPORT;
             if ("1".equals(paramMap.get("type"))) {
-                if (isKidFlag) {
-                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
-                            TemplateType.SHOPPING_CART_NO_CHANGE_KID);
-
-                } else {
-                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
-                            TemplateType.SHOPPING_CART_NO_CHANGE_IMPORT);
+                switch (paramMap.get("websiteType")) {
+                    case "2":
+                        emailHtml = TemplateType.SHOPPING_CART_NO_CHANGE_KID;
+                        break;
+                    case "3":
+                        emailHtml = TemplateType.SHOPPING_CART_NO_CHANGE_PET;
+                        break;
+                    case "4":
+                        emailHtml = TemplateType.SHOPPING_CART_NO_CHANGE_RESTAURANT;
+                        break;
+                    default:
+                        emailHtml = TemplateType.SHOPPING_CART_NO_CHANGE_IMPORT;
                 }
             } else if ("2".equals(paramMap.get("type"))) {
-                if (isKidFlag) {
-                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
-                            TemplateType.SHOPPING_CART_UPDATE_PRICE_KID);
-                } else {
-
-                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
-                            TemplateType.SHOPPING_CART_UPDATE_PRICE_IMPORT);
+                switch (paramMap.get("websiteType")) {
+                    case "2":
+                        emailHtml = TemplateType.SHOPPING_CART_UPDATE_PRICE_KID;
+                        break;
+                    case "3":
+                        emailHtml = TemplateType.SHOPPING_CART_UPDATE_PRICE_PET;
+                        break;
+                    case "4":
+                        emailHtml = TemplateType.SHOPPING_CART_UPDATE_PRICE_RESTAURANT;
+                        break;
+                    default:
+                        emailHtml = TemplateType.SHOPPING_CART_UPDATE_PRICE_IMPORT;
                 }
             } else if ("3".equals(paramMap.get("type"))) {
-                if (isKidFlag) {
-                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
-                            TemplateType.SHOPPING_CART_FREIGHT_COUPON_KID);
-                } else {
-
-                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
-                            TemplateType.SHOPPING_CART_FREIGHT_COUPON_IMPORT);
+                switch (paramMap.get("websiteType")) {
+                    case "2":
+                        emailHtml = TemplateType.SHOPPING_CART_FREIGHT_COUPON_KID;
+                        break;
+                    case "3":
+                        emailHtml = TemplateType.SHOPPING_CART_FREIGHT_COUPON_PET;
+                        break;
+                    case "4":
+                        emailHtml = TemplateType.SHOPPING_CART_FREIGHT_COUPON_RESTAURANT;
+                        break;
+                    default:
+                        emailHtml = TemplateType.SHOPPING_CART_FREIGHT_COUPON_IMPORT;
                 }
             } else if ("4".equals(paramMap.get("type"))) {
                 modelM.put("oldMethod", paramMap.get("oldMethod"));
@@ -618,15 +636,23 @@ public class ShopCarMarketingController {
                 modelM.put("newTransport", paramMap.get("newTransport"));
                 modelM.put("newPrice", paramMap.get("newPrice"));
                 modelM.put("savePrice", paramMap.get("savePrice"));
-                if (isKidFlag) {
-                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
-                            TemplateType.SHOPPING_CART_BEST_TRANSPORT_KID);
-                } else {
 
-                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
-                            TemplateType.SHOPPING_CART_BEST_TRANSPORT_IMPORT);
+                switch (paramMap.get("websiteType")) {
+                    case "2":
+                        emailHtml = TemplateType.SHOPPING_CART_BEST_TRANSPORT_KID;
+                        break;
+                    case "3":
+                        emailHtml = TemplateType.SHOPPING_CART_BEST_TRANSPORT_PET;
+                        break;
+                    case "4":
+                        emailHtml = TemplateType.SHOPPING_CART_BEST_TRANSPORT_RESTAURANT;
+                        break;
+                    default:
+                        emailHtml = TemplateType.SHOPPING_CART_BEST_TRANSPORT_IMPORT;
                 }
             }
+            sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
+                            emailHtml);
             // 发送成功后，更新redis的跟踪码信息
             try {
                 LocalDateTime dateTime = LocalDateTime.now();
@@ -967,8 +993,8 @@ public class ShopCarMarketingController {
             mv.addObject("website", checkWebsite);
             mv.addObject("success", 1);
             for (Integer website : resultMap.keySet()) {
-                if (checkWebsite == website) {
-                    dealShopCarGoodsByType(resultMap.get(website), carUserStatistic, userId, mv, website);
+                if (checkWebsite == website + 1) {
+                    dealShopCarGoodsByType(resultMap.get(website), carUserStatistic, userId, mv, website + 1);
                     break;
                 }
             }
@@ -1000,11 +1026,7 @@ public class ShopCarMarketingController {
             carInfo.setShowImg(carInfo.getRemotePath() + carInfo.getMainImg());
             carInfo.setCartGoodsImg(carInfo.getCartGoodsImg().replace("60x60.", "400x400."));
             onlineUrl = "https://www.import-express.com/goodsinfo/cbtconsole-1" + carInfo.getPid() + ".html";
-            if (website > 0) {
-                carInfo.setOnlineUrl(SwitchDomainNameUtil.checkNullAndReplace(onlineUrl));
-            } else {
-                carInfo.setOnlineUrl(onlineUrl);
-            }
+            carInfo.setOnlineUrl(SwitchDomainNameUtil.checkNullAndReplace(onlineUrl, website));
 
             //格式化规格
             String tempType = "";
@@ -1092,7 +1114,7 @@ public class ShopCarMarketingController {
 
         String url = GET_MIN_FREIGHT_URL;
         if(website > 0){
-            url = SwitchDomainNameUtil.checkNullAndReplace(GET_MIN_FREIGHT_URL);
+            url = SwitchDomainNameUtil.checkNullAndReplace(GET_MIN_FREIGHT_URL,website);
         }
         RequestBody formBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
         Request request = new Request.Builder().addHeader("Accept","*/*")
@@ -1512,7 +1534,7 @@ public class ShopCarMarketingController {
         }
 
         String typeStr = request.getParameter("type");
-        if (StringUtils.isBlank(typeStr)) {
+        if (StringUtils.isBlank(typeStr) || Integer.valueOf(typeStr) <= 0) {
             mv.addObject("message", "获取发送类型失败");
             mv.addObject("success", 0);
             return mv;
@@ -1521,7 +1543,7 @@ public class ShopCarMarketingController {
         }
 
         String websiteStr = request.getParameter("website");
-        if (StringUtils.isBlank(websiteStr)) {
+        if (StringUtils.isBlank(websiteStr) || Integer.valueOf(websiteStr) <= 0) {
             mv.addObject("message", "获取网站类型失败");
             mv.addObject("success", 0);
             return mv;
@@ -1560,7 +1582,7 @@ public class ShopCarMarketingController {
             }
 
             //查询当前客户存在的购物车数据
-            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(Integer.valueOf(userIdStr),Integer.valueOf(websiteStr) );
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(Integer.valueOf(userIdStr),Integer.valueOf(websiteStr)-1 );
             //格式化处理规格数据
             double productCost = 0;
             double actualCost = 0;
@@ -1788,6 +1810,23 @@ public class ShopCarMarketingController {
                     }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+
+    @RequestMapping("/queryAllWebSizeList")
+    @ResponseBody
+    public JsonResult queryAllWebSizeList(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        try {
+            Map<Integer,String> webSizeMap = new HashMap<>(10);
+            for(WebSizeEnum ws :  WebSizeEnum.values()){
+                webSizeMap.put(ws.getCode(),ws.name());
+            }
+            json.setData(webSizeMap);
         } catch (Exception e) {
             e.printStackTrace();
         }

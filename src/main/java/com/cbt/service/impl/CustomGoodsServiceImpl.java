@@ -250,8 +250,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         if(bean != null){
             bean.setOnlineUrl(GoodsInfoUtils.genOnlineUrl(bean));
         }
-        if(type == 1){
-            SwitchDomainNameUtil.changeCustomGoodsPublishBean(bean);
+        if(type >0){
+            SwitchDomainNameUtil.changeCustomGoodsPublishBean(bean,type + 1);
         }
         return bean;
     }

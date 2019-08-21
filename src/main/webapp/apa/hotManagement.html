@@ -75,7 +75,35 @@
         $(document).ready(function () {
             closeDialog();
             setDatagrid();
+            loadWebSize();
         });
+
+        function loadWebSize() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
+                data: {},
+                success: function (data) {
+                    var json = eval("(" + data + ")");
+                    if (json.ok) {
+
+                        var data = json.data;
+                        var content = '';
+                        for(var key in data){
+                            content += '<option value="'+key+'">'+data[key]+'</option>'
+                        }
+                        $("#web_size_type").empty();
+                        $("#web_size_type").append(content);
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
 
         function setDatagrid() {
             $('#hot_easyui-datagrid').datagrid({
@@ -369,8 +397,8 @@
         } else if(webType == 3){
 		    url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson";
         }else if(webType == 4){
-                url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson";
-            }
+		    url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson";
+        }
 		$.ajax({
 			type : "POST",
 			url : url,
@@ -456,7 +484,7 @@
             <input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;
             <span><input type="button" class="but_color" value="录入类别" onclick="enterCategory(0,0)"/></span>&nbsp;&nbsp;&nbsp;&nbsp;
             <span>网站:
-                            <select id="web_size_type" style="height: 28px;width: 80px;">
+                            <select id="web_size_type" style="height: 28px;width: 120px;">
                                 <option value="1">import</option>
                                 <option value="2">kids</option>
                                 <option value="3">pets</option>
