@@ -346,13 +346,13 @@ public class ShopCarMarketingController {
                 //获取原来的重新生成goods_carconfig数据
                 GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
                 if ("1".equals(websiteType)) {
-                    if (StringUtils.isBlank(carconfigWithBLOBs.getKidscarconfig()) || carconfigWithBLOBs.getKidscarconfig().length() < 10) {
+                    if (StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10) {
                         json.setOk(false);
                         json.setMessage("客户购物车信息为空");
                         return json;
                     }
                 } else if ("2".equals(websiteType)) {
-                    if (StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10) {
+                    if (StringUtils.isBlank(carconfigWithBLOBs.getKidscarconfig()) || carconfigWithBLOBs.getKidscarconfig().length() < 10) {
                         json.setOk(false);
                         json.setMessage("客户购物车信息为空");
                         return json;

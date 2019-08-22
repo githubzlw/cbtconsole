@@ -471,10 +471,10 @@ em,i{font-style: normal;}
 					漏发
 				</label>
 				<label>
-					<input type="radio" name="reason" value="7" id="index_iremark">
+					<input type="radio" name="reason" value="7" class="radio_change">
 					其他
 				</label>
-				<input type="text" class="other">
+				<input type="text" class="other" id="index_iremark">
 			</div>
 		</div>
 		<div class="wrap wrap8">
