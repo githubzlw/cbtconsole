@@ -85,5 +85,9 @@ public class InventoryDetails {
 	 * 网站订单号
 	 */
 	private String orderno;
+	/**
+	 * 备注
+	 */
+	private String remark;
 
 }

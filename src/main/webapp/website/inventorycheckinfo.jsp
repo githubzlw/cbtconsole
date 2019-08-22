@@ -192,7 +192,11 @@ em,i{font-style: normal;}
 			</table>
 				<div>
 				<span>当前页 :${currentPage} / ${totalPage},总共 ${totalCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${currentPage}"><button class="btn btn-success btn_page_qu" onclick="doQuery(0)">查询</button>
+				<input type="hidden" class="form-control btn_page_in" id="current_page" value="${totalPage}">
+				<input type="text" class="form-control btn_page_in" id="total_page" value="${currentPage}">
+				<button class="btn btn-success btn_page_qu" onclick="doQuery(0)">查询</button>
+				<button class="btn btn-success btn_page_up" onclick="doBeforePage()">上一页</button>
+				<button class="btn btn-success btn_page_down" onclick="doNextPage()">下一页</button>
 				</div>
 		</div>
 		
@@ -215,6 +219,32 @@ function doQuery(isQuery){
 	}
 		href = href+"&goods_pid="+goods_pid;
 	window.open(href, "_self");
+}
+function doBeforePage(){
+	var page = Number($("#current_page").val());
+	var tpage = Number($("#total_page").val());
+	page = page -1;
+	if(page < 1){
+		$("#current_page").val(1);
+	}else if(page > tpage){
+		$("#current_page").val(tpage);
+	}else{
+		$("#current_page").val(page);
+	}
+	doQuery(0);
+}
+function doNextPage(){
+	var page = Number($("#current_page").val());
+	var tpage = Number($("#total_page").val());
+	page = page+1;
+	if(page < 1){
+		$("#current_page").val(1);
+	}else if(page > tpage){
+		$("#current_page").val(tpage);
+	}else{
+		$("#current_page").val(page);
+	}
+	doQuery(0);
 }
 
 
