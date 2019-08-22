@@ -724,6 +724,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		 record.setSkuid((String)map.get("skuid"));
 		 record.setSpecid((String)map.get("specid"));
 		 record.setId(0);
+		 record.setRemark(StrUtils.object2Str(map.get("remark")));
 		 inventoryMapper.addLossInventoryRecord(record);
 		 if(record.getId() == 0) {
 			 result.put("status", 102);
@@ -744,7 +745,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		inv.put("inventory_count", String.valueOf(change_number));
 		inv.put("before_remaining", String.valueOf(before_remaining));
 		inv.put("after_remaining", String.valueOf(after_remaining));
-		inv.put("log_remark", "库存报损,loss_inventory_record_id:"+lossInventoryRecordid);
+		inv.put("log_remark", "库存报损,"+lossInventoryRecordid+"备注:"+StrUtils.object2Str(map.get("remark")));
 		int inventoryChangeRecordid = inventoryMapper.addInventoryLogByInventoryid(inv);
 		if(inventoryChangeRecordid == 0) {
 			result.put("status", 104);

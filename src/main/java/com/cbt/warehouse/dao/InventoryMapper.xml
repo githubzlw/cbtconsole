@@ -404,10 +404,10 @@
     <!--库存损益表  -->
     <insert id="addLossInventoryRecord" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.LossInventoryRecord">
     insert into loss_inventory_record(inventory_sku_id,goods_pid,skuid,specid,change_number,
-    change_type,change_adm,change_time,delete_state,delete_adm,delete_time)
+    change_type,change_adm,change_time,delete_state,delete_adm,delete_time,remark)
     values
     (#{inventorySkuId},#{goodsPid},#{skuid},#{specid},#{changeNumber},#{changeType},
-    #{changeAdm},now(),#{deleteState},#{deleteAdm},now())
+    #{changeAdm},now(),#{deleteState},#{deleteAdm},now(),#{remark})
     </insert>
     <!-- 库存明细列表 -->
     <select id="inventoryDetails" resultMap="inventoryDetailsMap">
