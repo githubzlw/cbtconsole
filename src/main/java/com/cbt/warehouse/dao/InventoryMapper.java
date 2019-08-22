@@ -400,4 +400,6 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	List<Map<String,Object>> getInventoryRemark(int skuId);
+	
+	int updateidRelationState(@Param("id")int id,@Param("type")int type);
 }
