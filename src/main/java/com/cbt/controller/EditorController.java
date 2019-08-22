@@ -1247,20 +1247,15 @@ public class EditorController {
 
             int count = customGoodsService.setGoodsValid(pidStr, user.getAdmName(), user.getId(), -1, reason);
             if (count > 0) {
-                json.setOk(true);
-                json.setMessage("执行成功");
                 // 判断是否是kids商品，如果是，则删除图片服务器图片
-                /*CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pidStr, 0);
-                if (checkIsKidsCatid(goods.getCatid1())) {
-                    List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
-                    boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
-                    if (!isSu) {
-                        isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
-                    }
-                    if (!isSu) {
-                        LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
-                    }
-                }*/
+                boolean isSu = deleteImgByUrl(pidStr);
+                if (isSu) {
+                    json.setOk(true);
+                    json.setMessage("执行成功");
+                } else {
+                    json.setOk(false);
+                    json.setMessage("执行失败，请重试！");
+                }
             } else {
                 json.setOk(false);
                 json.setMessage("执行失败，请重试！");
@@ -1300,9 +1295,15 @@ public class EditorController {
 
             int count = customGoodsService.setGoodsValid(pidStr, user.getAdmName(), user.getId(), 1, "");
             if (count > 0) {
-                json.setOk(true);
-                json.setMessage("执行成功");
-
+                // 判断是否是kids商品，如果是，则删除图片服务器图片
+                boolean isSu = deleteImgByUrl(pidStr);
+                if (isSu) {
+                    json.setOk(true);
+                    json.setMessage("执行成功");
+                } else {
+                    json.setOk(false);
+                    json.setMessage("执行失败，请重试！");
+                }
             } else {
                 json.setOk(false);
                 json.setMessage("执行失败，请重试！");
@@ -3631,6 +3632,27 @@ public class EditorController {
         }
     }
 
+
+    private boolean deleteImgByUrl(String pid) {
+        boolean isSu = false;
+        CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+        if (checkIsKidsCatid(goods.getCatid1()) && goods.getValid() == 0) {
+            // 接口调用
+            isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
+                    /*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
+                    boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                    if (!isSu) {
+                        isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                    }
+                    if (!isSu) {
+                        LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
+                    }*/
+
+        } else {
+            isSu = true;
+        }
+        return isSu;
+    }
 
     private boolean checkListContains(List<String> list, String str) {
         boolean isOk = false;
