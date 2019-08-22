@@ -689,8 +689,27 @@ public class NewOrderSplitCtr {
         String orderNo = request.getParameter("orderno");
         String websiteType = request.getParameter("websiteType");
         // boolean isKidFlag = "2".equals(websiteType);
-        boolean isKidFlag = MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
+        int isWebSiteFlag = MultiSiteUtil.getSiteTypeNum(orderNo);
         try {
+            String webSiteTitle = "Import Express";
+            TemplateType  webType= TemplateType.DISMANTLING_IMPORT;
+            switch (isWebSiteFlag) {
+                case 2:
+                    webSiteTitle = "Kids Product Wholesale";
+                    webType = TemplateType.DISMANTLING_KID;
+                    break;
+                case 3:
+                    webSiteTitle = "Lovely Pet Supply";
+                    webType = TemplateType.DISMANTLING_PET;
+                    break;
+                case 4:
+                    webSiteTitle = "Restaurant Kitchen Equipments";
+                    webType = TemplateType.DISMANTLING_RESTAURANT;
+                    break;
+                default:
+                    webSiteTitle = "Import Express";
+            }
+
             String remark = StringUtils.isNotBlank(request.getParameter("remark ")) ? request.getParameter("remark") : "";
             model.put("remark", remark);
             // 判断是否开启线下同步线上配置
@@ -917,6 +936,7 @@ public class NewOrderSplitCtr {
                 SwitchDomainNameUtil.changeObjectList(details_, MultiSiteUtil.getSiteTypeNum(orderNo));
                 model.put("details", details);
                 model.put("details_", details_);
+
                 if (state == 1) {
                     request.setAttribute("expect_arrive_time_", expect_arrive_time_);
                     request.setAttribute("expect_arrive_time", expect_arrive_time);
@@ -926,11 +946,8 @@ public class NewOrderSplitCtr {
                     model.put("expect_arrive_time", expect_arrive_time);
                     model.put("orderbean", obBean);
                     model.put("orderbean_", obBean_);
-                    if(isKidFlag){
-                        model.put("title", "Kids Product Wholesale Split Order Reminder");
-                    }else{
-                        model.put("title", "Import Express Split Order Reminder");
-                    }
+
+                    model.put("title", webSiteTitle + " Split Order Reminder");
                     model.put("message", "");
                 } else {
                     //针对取消的订单计算折扣金额
@@ -975,11 +992,7 @@ public class NewOrderSplitCtr {
                             + totalExtraFree + "(totalExtraFree)" + "-" + totalDisCount + "(totalDisCount)");
                     request.setAttribute("orderbean_", obBean_);
                     model.put("orderbean_", obBean_);
-                    if(isKidFlag){
-                        model.put("title", "Your Kids Product Wholesale order was partially cancelled");
-                    } else{
-                        model.put("title", "Your Import Express order was partially cancelled");
-                    }
+                    model.put("title", "Your "+webSiteTitle+" order was partially cancelled");
                     model.put("message", obBean_.getOrderNo());
                 }
                 request.setAttribute("currency", orderBeans.get(0).getCurrency());
@@ -992,14 +1005,8 @@ public class NewOrderSplitCtr {
             try {
                 // 邮件替换头部
                 model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
-                if(isKidFlag){
-                    sendMailFactory.sendMail(String.valueOf(model.get("email")), email,
-                        "Due to supply reasons, we can only send your order partially at first.", model, TemplateType.DISMANTLING_KID);
-                } else{
-                    sendMailFactory.sendMail(String.valueOf(model.get("email")), email,
-                        "Due to supply reasons, we can only send your order partially at first.",
-                            model, TemplateType.DISMANTLING_IMPORT);
-                }
+                sendMailFactory.sendMail(String.valueOf(model.get("email")), email,
+                        "Due to supply reasons, we can only send your order partially at first.", model, webType);
             } catch (Exception e) {
                 e.printStackTrace();
                 LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + modeStr + " e.message:", e);

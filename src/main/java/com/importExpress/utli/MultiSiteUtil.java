@@ -119,5 +119,8 @@ public class MultiSiteUtil {
     }
 
 
+    public static void main(String[] args) {
+        System.err.println(getSiteTypeNum("2190822P588"));
+    }
 
 }
