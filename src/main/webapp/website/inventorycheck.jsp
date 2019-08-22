@@ -127,7 +127,7 @@ em,i{font-style: normal;}
 .tc3 p{text-align: center;}
 .tc3 .other{position: absolute;top:15px;right:-222px;}
 .tc3 .wrap8{text-align: center;}
-.tc3 .wrap8 button{border:1px solid #999;background-color:#fff;padding:0 80px; line-height:28px;border-radius: 4px;}
+.tc3 .wrap8 button{border:1px solid #999;padding:0 80px; line-height:28px;border-radius: 4px;}
 
 
 .report .btn_page_in{width:100px;}
@@ -501,7 +501,7 @@ em,i{font-style: normal;}
 		</div>
 		<div class="wrap wrap8">
 		<input type="hidden" value="" id="index_in_id">
-			<button onclick="addLoss()">保存</button>
+			<button onclick="addLoss()" class="btn btn-success">保存</button>
 		</div>
 	</div>
 </div>

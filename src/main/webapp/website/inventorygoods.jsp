@@ -146,7 +146,7 @@ em,i{font-style: normal;}
 				<select class="form-control query_state" id="query_state" >
 						<option value="-1">全部</option>
 						<option value="0">待移出库存</option>
-						<option value="2">待移入库存</option>
+						<option value="1">待移入库存</option>
 						
 				</select>
 				
