@@ -49,10 +49,10 @@
 	width: 200px;
 }
 
-.report th, .report td {
+/* .report th, .report td {
 	text-align: center;
-}
-
+} */
+.datagrid-cell-c2-goodsSku{width: 350px;}
 .mt5 {
 	margin-top: 5px;
 }
@@ -127,12 +127,12 @@ em,i{font-style: normal;}
 .tc3 p{text-align: center;}
 .tc3 .other{position: absolute;top:15px;right:-222px;}
 .tc3 .wrap8{text-align: center;}
-.tc3 .wrap8 button{border:1px solid #999;background-color:#fff;padding:0 80px; line-height:28px;border-radius: 4px;}
+.tc3 .wrap8 button{border:1px solid #999;padding:0 80px; line-height:28px;border-radius: 4px;}
 
 
 .report .btn_page_in{width:100px;}
 .w350{width: 350px;}
-.datagrid-cell-c2-goodsName{width:200px;}
+.datagrid-cell-c2-goodsName{width:300px;}
 </style>
 </head>
 <body>
@@ -231,7 +231,7 @@ em,i{font-style: normal;}
 						<td >${tory.categoryName}</td>
 						<td class="datagrid-cell-c2-goodsPid">${tory.goodsPid}</td>
 						<td class="datagrid-cell-c2-goodsName">${tory.goodsName}</td>
-						<td><em class="emsku">${tory.goodsSku}</em>
+						<td  class="datagrid-cell-c2-goodsSku"><em class="emsku">${tory.goodsSku}</em>
 						<br>
 						<em>Skuid:</em><em class="emskuid">${tory.goodsSkuid}</em>
 						<br>
@@ -501,7 +501,7 @@ em,i{font-style: normal;}
 		</div>
 		<div class="wrap wrap8">
 		<input type="hidden" value="" id="index_in_id">
-			<button onclick="addLoss()">保存</button>
+			<button onclick="addLoss()" class="btn btn-success">保存</button>
 		</div>
 	</div>
 </div>

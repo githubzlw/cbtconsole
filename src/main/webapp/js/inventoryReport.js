@@ -188,8 +188,28 @@ $(function(){
 		$('.tc,.trnasparent,.tc3').hide();
 	});
 	
+$(".datagrid-cell-c2-remarkContext").each(function(){
+	var indexi = 0;
+	$(this).find("li").each(function(){
+		if(indexi > 3){
+			$(this).hide();
+		}
+		indexi = indexi +1;
+		
+	});
+})	
+	
 })
-
+function vMoreLi(t){
+	$(t).parent().find(".li_more_s").show();
+	$(t).html("View Less");
+	$(t).attr("onClick","vLessLi(this)");
+}
+function vLessLi(t){
+	$(t).parent().find(".li_more_s").hide();
+	$(t).html("View More");
+	$(t).attr("onClick","vMoreLi(this)");
+}
 
 /**更新盘点
  * @param index

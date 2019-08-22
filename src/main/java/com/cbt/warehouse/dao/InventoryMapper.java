@@ -394,4 +394,12 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int  updateRemark(Map<String,Object> map);
+	
+	/**获取库存变更备注
+	 * @param list
+	 * @return
+	 */
+	List<Map<String,Object>> getInventoryRemark(int skuId);
+	
+	int updateidRelationState(@Param("id")int id,@Param("type")int type);
 }

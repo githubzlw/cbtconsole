@@ -597,6 +597,7 @@
     <select id="getInventoryUsedByOrderno" resultType="java.util.Map">
     SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id as li_id,
     li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag ,
+    ir.id as ir_id,ir.goodstatus as ir_goodstatus,ir.itemqty,
     ibr.state as barcodeState,ibr.id as barcodeId
     
     FROM lock_inventory li 
@@ -609,6 +610,7 @@
     <select id="getInventoryUsedByOdid" resultType="java.util.Map">
     SELECT i.goods_p_price,od.car_img,i.barcode as i_barcode,ir.barcode,od.orderid,od.goodsid,li.in_id,li.id as li_id,
     li.od_id,i.remaining,li.lock_remaining,i.can_remaining,i.flag,li.flag as li_flag ,
+    ir.id as ir_id,ir.goodstatus as ir_goodstatus,ir.itemqty,
     ibr.state as barcodeState,ibr.id as barcodeId
     FROM lock_inventory li 
         		left JOIN order_details od ON li.od_id=od.id 
@@ -672,7 +674,7 @@
     ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
     isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,
     isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,isk.remaining,isk.can_remaining,
-    od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,od.yourorder,od.seilUnit,od.goodsid,
+    od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,od.yourorder,od.goodsid,
     ods.specid as od_specid,ods.skuid as od_skuid
     
     from inventory_barcode_record ib  
@@ -742,6 +744,16 @@
     </update>
     <update id="updateRemark">
     update inventory_barcode_record set  updatetime=now(),remark=#{remark},state=#{state} where id=#{ibid};
+    </update>
+    <select id="getInventoryRemark" resultType="java.util.Map">
+    select createtime,remark,inventory_sku_id,change_type  from inventory_sku_log where inventory_sku_id=#{skuId} 
+    order by createtime desc limit 20
+    </select>
+    
+    <update id="updateidRelationState">update id_relationtable set 
+    <if test="type==0">goodstatus=5</if>
+    <if test="type!=0">is_delete=1</if>
+    where id=#{id}
     </update>
     
 </mapper>

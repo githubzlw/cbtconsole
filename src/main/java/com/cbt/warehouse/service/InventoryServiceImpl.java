@@ -73,11 +73,17 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public List<InventoryData> getIinOutInventory(Map<Object, Object> map) {
+		
 		List<InventoryData> toryList = inventoryMapper.getIinOutInventory(map);
+		if(toryList == null || toryList.isEmpty()) {
+			return null;
+		}
+		List<Integer> list = new ArrayList<>();
 		StringBuilder pids = new StringBuilder();
 		StringBuilder opration = null;
 		for (int i=0,size=toryList.size();i<size;i++) {
 			InventoryData t = toryList.get(i);
+			list.add(t.getId());
 			String goodscatid = t.getGoodsCatid();
 			if(StringUtil.isBlank(goodscatid) || "0".equals(goodscatid)){
 				t.setCategoryName("其他");
@@ -111,10 +117,7 @@ public class InventoryServiceImpl implements  InventoryService{
 				t.setCarImg("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
 						+ "<img   class=\"img-responsive\" src='"+ (car_img.indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":car_img) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ car_img + "')\" height='100' width='100'></a>");
 				
-				
 			}
-			
-			
 			t.setGoodsUrl(StringUtil.isBlank(t.getGoodsUrl())?"":t.getGoodsUrl());
 			t.setCarUrlMD5(StringUtil.isBlank(t.getCarUrlMD5())?"":t.getCarUrlMD5());
 			
@@ -155,11 +158,32 @@ public class InventoryServiceImpl implements  InventoryService{
 			if(StringUtil.isBlank(t.getCheckTime())) {
 				t.setCheckTime("");
 			}
+			t.setRemarkContext(getRemark(t.getId()));
 			toryList.set(i, t);
 		}
 		return toryList;
 	}
 
+	private String getRemark(int skuId) {
+		List<Map<String,Object>> inventoryRemark = inventoryMapper.getInventoryRemark(skuId);
+		if(inventoryRemark == null || inventoryRemark.isEmpty()) {
+			return "";
+		}
+		String remark = "";
+		int remarkIndex = 0;
+		for(Map<String,Object> m : inventoryRemark) {
+			String iRemark = StrUtils.object2Str(m.get("remark"));
+			if(StringUtil.isNotBlank(iRemark) && remarkIndex < 20) {
+				int changeType = Integer.parseInt(StrUtils.object2NumStr(m.get("change_type")));
+				remark = remark+"<li "+(remarkIndex > 2 ? "class=\"li_more_s\"" : "")+">";
+				remark = changeType == 3 ? remark : remark+StrUtils.object2Str(m.get("createtime"))+":";
+				remark = remark+iRemark+"</li>";
+				remarkIndex = remarkIndex + 1;
+			}
+		}
+		remark = remarkIndex > 3 ? remark + "<a onclick=\"vMoreLi(this)\">View More</a>" : remark ;
+		return remark;
+	}
 	@Override
 	public int problem_inventory(Map<Object, Object> map) {
 		return inventoryMapper.problem_inventory(map);
@@ -1170,7 +1194,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			
 			int lock_remaining = Integer.parseInt(StrUtils.object2NumStr(c.get("lock_remaining")));
 			int yourder =  Integer.parseInt(StrUtils.object2NumStr(c.get("yourorder")));
-			int seilUnit =  Integer.parseInt(StrUtils.object2NumStr(c.get("seilUnit")));
+			int seilUnit =  1;//Integer.parseInt(StrUtils.object2NumStr(c.get("seilUnit")));
 			inventory.put("inventory_count", String.valueOf(yourder * seilUnit - lock_remaining));
 			inventory.put("tbskuid", StrUtils.object2Str(c.get("tbskuid")));
 			inventory.put("tbspecid", StrUtils.object2Str(c.get("tbspecid")));
@@ -1183,29 +1207,31 @@ public class InventoryServiceImpl implements  InventoryService{
 			inventory.put("adminId", String.valueOf(admId));
 			inventory.put("admName", admName);
 			inventory.put("log_remark", StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"订单取消,已经验货的产品进入库存");
-			inventory.put("unit", StrUtils.object2NumStr(c.get("seilUnit")));
-			inventory.put("storage_count",String.valueOf(yourder * seilUnit) );
+			inventory.put("unit", String.valueOf(seilUnit));
+			inventory.put("storage_count",String.valueOf(yourder) );
 			inventory.put("when_count",String.valueOf(yourder * seilUnit) );
 			inventory.put("goodid", StrUtils.object2Str(c.get("goodsid"))); 
 			inventory.put("storage_type", "3"); 
 			inventory.put("orderid", StrUtils.object2Str(c.get("orderid"))); 
 			int in_id = addInventory(inventory);
-			int odId = Integer.parseInt(StrUtils.object2NumStr(c.get("od_id")));
-			Map<String, Object> addInventory = inventoryMapper.getAddInventory(odId);
-			if(addInventory != null) {
-				//插入库位移库数据
-				InventoryBarcodeRecord record = new InventoryBarcodeRecord();
-				record.setAdmid(admId);
-				record.setInventoryBarcode(StrUtils.object2Str(addInventory.get("barcode")));
-				
-				int inid = Integer.parseInt(StrUtils.object2NumStr(addInventory.get("id")));
-				record.setInventoryId(inid == 0 ? in_id : inid);
-				record.setLockId(0);
-				record.setState(1);
-				record.setRemark(StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"订单取消商品");
-				record.setOrderBarcode(StrUtils.object2Str(c.get("barcode")));
-				record.setOdId(odId);
-				inventoryMapper.insertInventoryBarcodeRecord(record );
+			if(lock_remaining == 0) {
+				int odId = Integer.parseInt(StrUtils.object2NumStr(c.get("od_id")));
+				Map<String, Object> addInventory = inventoryMapper.getAddInventory(odId);
+				if(addInventory != null) {
+					//插入库位移库数据
+					InventoryBarcodeRecord record = new InventoryBarcodeRecord();
+					record.setAdmid(admId);
+					record.setInventoryBarcode(StrUtils.object2Str(addInventory.get("barcode")));
+					
+					int inid = Integer.parseInt(StrUtils.object2NumStr(addInventory.get("id")));
+					record.setInventoryId(inid == 0 ? in_id : inid);
+					record.setLockId(0);
+					record.setState(1);
+					record.setRemark(StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"订单取消商品");
+					record.setOrderBarcode(StrUtils.object2Str(c.get("barcode")));
+					record.setOdId(odId);
+					inventoryMapper.insertInventoryBarcodeRecord(record );
+				}
 			}
 		}
 		return checkedOrderDetails.size();
@@ -1239,6 +1265,13 @@ public class InventoryServiceImpl implements  InventoryService{
 			int remaining = Integer.parseInt(StrUtils.object2NumStr(i.get("remaining")));
 			int lockRemaining = Integer.parseInt(StrUtils.object2NumStr(i.get("lock_remaining")));
 			int inventorySkuId = Integer.parseInt(StrUtils.object2NumStr(i.get("in_id")));
+			
+			//更新id_relationtable 若完全使用库存 则is_delete=1 不完全使用库存 goodstatus=5
+//			ir.id as ir_id,ir.goodstatus as ir_goodstatus,ir.itemqty,
+			int itemqty = Integer.parseInt(StrUtils.object2NumStr(i.get("itemqty")));
+			int goodstatus = Integer.parseInt(StrUtils.object2NumStr(i.get("ir_goodstatus")));
+			int ir_id = Integer.parseInt(StrUtils.object2NumStr(i.get("ir_id")));
+			inventoryMapper.updateidRelationState(ir_id,itemqty == lockRemaining ? 1 : 0);
 			
 			//库存还原inventory_sku
 			InventorySku isku = new InventorySku();
@@ -1317,7 +1350,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		}
 		int lockRemaining = wrap.getLockRemaining();
 		//如果全部使用库存，订单状态改为验货无误
-		if(wrap.getOdSeilUnit() * wrap.getOdYourOrder() == lockRemaining) {
+		if(/*wrap.getOdSeilUnit() * */wrap.getOdYourOrder() == lockRemaining) {
 			Map<String,String> map = new HashMap<>();
 			map.put("orderid",wrap.getOrderid());
 			map.put("odid",String.valueOf(wrap.getOdid()));
@@ -1348,7 +1381,6 @@ public class InventoryServiceImpl implements  InventoryService{
 			map.put("orderNumRemarks", "使用库存"+lockRemaining);
 			updateOrderState(map);
 		}
-		
 		return inventoryMapper.updateBarcode(mapParam);
 	}
 	@Override
@@ -1399,7 +1431,7 @@ public class InventoryServiceImpl implements  InventoryService{
 				//订单入库记录
 				//完全使用库存 更改状态为确认价格中
 				//更改状态为采购中，验货，数量不够
-				if(wrap.getOdSeilUnit() * wrap.getOdYourOrder() != lockRemaining) {
+				if(wrap.getOdYourOrder() != lockRemaining) {
 //					order_details.state=0 order_details.checked=0  id_relationtable.goodstatus=5   order_product_source.purchase_state  order_product_source.is_replenishment
 					orderinfoMapper.cancelOrderState(wrap.getOdid());
 				}

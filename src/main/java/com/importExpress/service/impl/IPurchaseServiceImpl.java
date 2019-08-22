@@ -1100,7 +1100,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 						if(ibState > 3 && StringUtil.isNotBlank(com.cbt.util.StrUtils.object2Str(useInventoryMap.get("ib_remark")))) {
 							inventoryRemark +=",原因:"+com.cbt.util.StrUtils.object2Str(useInventoryMap.get("ib_remark"));
 						}
-						purchaseBean.setLock_remaining(useInventory);
+						purchaseBean.setLock_remaining(ibState == 4 ? "0":useInventory);
 						unuseInventory = false;
 						String in_id = com.cbt.util.StrUtils.object2Str(useInventoryMap.get("in_id"));
 						purchaseBean.setIn_id(in_id);
