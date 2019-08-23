@@ -712,6 +712,7 @@ tr .td_class{width:230px;}
 				<th data-options="field:'goodsPriceUrl',width:50,align:'center'">购物车总额</th>
 				<th data-options="field:'available',width:25,align:'center'">余额</th>
 				<th data-options="field:'userLogin',width:80,align:'center'">用户登陆</th>
+				<th data-options="field:'webSite',width:80,align:'center'">Web</th>
 				<th data-options="field:'userManager',width:80,align:'center'">用户管理</th>
 				<th data-options="field:'grade',width:50">用户等级</th>
 				<th data-options="field:'admuser',width:85,align:'center'">负责人</th>
