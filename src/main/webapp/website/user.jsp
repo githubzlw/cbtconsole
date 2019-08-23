@@ -262,8 +262,11 @@ tr .td_class{width:230px;}
                         $("#user_login_from").attr("action", "https://www.import-express.com/user/loginNew")
                     } else if (site == 2) {
                         $("#user_login_from").attr("action", "https://www.kidsproductwholesale.com/user/loginNew")
+                    } else if (site == 4) {
+                        $("#user_login_from").attr("action", "https://www.lovelypetsupply.com/user/loginNew")
                     }
                     $("#user_login_from").submit();
+                    $('#user_login_message').window('close');
                 }else{
                     alert(data.message);
                 }
@@ -614,7 +617,7 @@ tr .td_class{width:230px;}
     </div>
     <div id="user_login_message" class="easyui-window" title="选择登陆网站"
          data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
-         style="width:400px;height:200px;display: none;font-size: 16px;">
+         style="width:400px;height:240px;display: none;font-size: 16px;">
         <div style="margin-left:20px;">
             <input type="hidden" name="userid">
             <br />
@@ -623,6 +626,9 @@ tr .td_class{width:230px;}
             <br /><br />
             <input type='radio' name='site' value='2'/>
             <span>kidsproductwholesale</span>
+            <br /><br />
+            <input type='radio' name='site' value='4'/>
+            <span>lovelypetsupply</span>
             <br /><br />
         </div>
         <div style="margin-left: 260px;">
