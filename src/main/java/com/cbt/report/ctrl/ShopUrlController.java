@@ -3896,13 +3896,13 @@ public class ShopUrlController {
                 json.setMessage("已经存在此店铺品牌");
                 return json;
             }
+            authorization.setCertificateFile(certificateFile);
+            authorization.setRemotePath(remotePath);
+            authorization.setLocalPath(localPath);
             if (brandId != null) {
                 authorization.setId(Integer.valueOf(brandId));
                 shopUrlService.updateShopBrandAuthorization(authorization);
             } else {
-                authorization.setCertificateFile(certificateFile);
-                authorization.setRemotePath(remotePath);
-                authorization.setLocalPath(localPath);
                 // 检查是否已经存在此品牌
                 shopUrlService.insertIntoShopBrandAuthorization(authorization);
             }
