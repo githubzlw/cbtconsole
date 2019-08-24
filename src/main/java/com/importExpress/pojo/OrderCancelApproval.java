@@ -29,6 +29,33 @@ public class OrderCancelApproval {
     private String approvalRemark;
     private String cancelRemark;
     private Integer orderState;
+    /**
+     * 1 PayPal或者Stripe 2 余额
+     */
+    private int refundMethod;
+    private String refundMethodDesc;
+
+    public String getRefundMethodDesc() {
+        return refundMethodDesc;
+    }
+
+    public void setRefundMethodDesc(String refundMethodDesc) {
+        this.refundMethodDesc = refundMethodDesc;
+
+    }
+
+    public int getRefundMethod() {
+        return refundMethod;
+    }
+
+    public void setRefundMethod(int refundMethod) {
+        this.refundMethod = refundMethod;
+        if(refundMethod == 1){
+            refundMethodDesc = "PayPal者Stripe";
+        } else if(refundMethod == 2){
+            refundMethodDesc = "余额";
+        }
+    }
 
     /**
      * 剩余金额

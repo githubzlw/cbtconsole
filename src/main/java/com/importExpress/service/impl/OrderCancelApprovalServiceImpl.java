@@ -63,9 +63,9 @@ public class OrderCancelApprovalServiceImpl implements OrderCancelApprovalServic
     @Override
     public int insertIntoOrderCancelApprovalAmount(OrderCancelApprovalAmount approvalAmount) {
         // mq更新
-        String sql = "insert into order_cancel_approval_amount(approval_id,order_no,pay_type,pay_amount) " +
+        String sql = "insert into order_cancel_approval_amount(approval_id,order_no,pay_type,pay_amount,refund_method) " +
                 "values(" + approvalAmount.getApprovalId() + ",'" + approvalAmount.getOrderNo() + "',"
-                + approvalAmount.getPayType() + "," + approvalAmount.getPayAmount() + ")";
+                + approvalAmount.getPayType() + "," + approvalAmount.getPayAmount() + "," + approvalAmount.getRefundMethod() + ")";
         NotifyToCustomerUtil.sendSqlByMq(sql);
         return approvalMapper.insertIntoOrderCancelApprovalAmount(approvalAmount);
     }
