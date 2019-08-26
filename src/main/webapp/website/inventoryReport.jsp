@@ -451,7 +451,7 @@ em,i{font-style: normal;}
 			<span>备注原因</span>
 			<div class="reasons w235">
 				<label>
-					<input type="radio" name="reason" value="0" class="radio_change">
+					<input type="radio" name="reason" value="0" class="radio_change" checked="checked">
 					损坏
 				</label>
 				<label >
