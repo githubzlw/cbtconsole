@@ -1,6 +1,8 @@
 package com.importExpress.utli;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.cbt.parse.service.DownloadMain;
 import okhttp3.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,8 +22,24 @@ public class OKHttpUtils {
 
     /**
      * 产品上下架图片处理接口
+     * 接口地址（get或者post都可以）
+     * 	后台下架
+     * 		http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do?pid=12312313&valid=0&unsellableReason=6&method=2
+     * 	后台上架
+     * 		http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do?pid=12312313&valid=1&unsellableReason=45&method=2
+     *
+     * 参数
+     * 	method 更新方式 1-添加到上下架列表 后续定时走; 2- 实时更新;
+     * 	valid	更新产品表上下架值 按照上面地址提供
+     * 	unsellableReason  更新产品表原因值 按照上面地址提供
+     *
+     * 返回值
+     * 	state
+     * 		true-更新成功；
+     * 		false-更新失败
+     * 			失败时候 message 是失败原因；
      */
-    private static final String IMG_ONLINE_AND_DELETE_URL = "http://192.168.1.48:18079/syncsku/cbt/updateNeedOffShell.do?";
+    private static final String IMG_ONLINE_AND_DELETE_URL = "http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do";
 
     static {
 		/*client = new OkHttpClient().Builder().connectTimeout(600, TimeUnit.SECONDS).readTimeout(300, TimeUnit.SECONDS)
@@ -49,20 +67,24 @@ public class OKHttpUtils {
     public static boolean optionGoodsInterface(String pid, int valid, int unsellableReason, int method) {
         boolean isSu = false;
         try {
-            RequestBody formBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+            /*RequestBody formBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
 //					.addFormDataPart("image", originFile.getName(),
                     .addFormDataPart("pid", pid)
                     .addFormDataPart("valid", String.valueOf(valid))
                     .addFormDataPart("unsellableReason", String.valueOf(unsellableReason))
                     .addFormDataPart("method", String.valueOf(method))
-                    .build();
-            Request request = new Request.Builder().url(IMG_ONLINE_AND_DELETE_URL).post(formBody).build();
+                    .build();*/
+            // Request request = new Request.Builder().addHeader("Accept", "*/*").addHeader("Connection", "close").addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").url(IMG_ONLINE_AND_DELETE_URL).post(formBody).build();
             // client = new OkHttpClient();
-            OkHttpClient client = getClientInstence();
+            /*OkHttpClient client = getClientInstence();
             Response response = client.newCall(request).execute();
-            String rs = response.body().string();
+            String rs = response.body().string();*/
+            String url = IMG_ONLINE_AND_DELETE_URL + "?pid=" + pid + "&valid=" + valid
+                    + "&unsellableReason=" + unsellableReason + "&method=" + method;
+            String rs = DownloadMain.getContentClient(url, null);
+            JSONObject json = JSON.parseObject(rs);
             System.out.println(rs);
-            if (rs.contains("OK")) {
+            if (json.containsKey("state") && json.getBooleanValue("state")) {
                 isSu = true;
             } else {
                 isSu = false;
