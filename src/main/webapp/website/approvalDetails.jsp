@@ -40,6 +40,7 @@
         <td style="width: 150px;">订单号</td>
         <td style="width: 80px;">审批金额</td>
         <td style="width: 80px;">审批状态</td>
+        <td style="width: 80px;">退款方式</td>
         <td style="width: 60px;">操作人</td>
         <td style="width: 160px;">审批时间</td>
         <td style="width: 300px;">备注</td>
@@ -53,6 +54,7 @@
             <td style="width: 150px;">${approvalDt.orderNo}</td>
             <td style="width: 80px;">${approvalDt.payPrice}<em>USD</em></td>
             <td style="width: 80px;">${approvalDt.dealStateDesc}</td>
+            <td style="width: 80px;">${approvalDt.refundMethodDesc}</td>
             <td style="width: 60px;">${approvalDt.adminName}</td>
             <td style="width: 160px;">${approvalDt.createTime}</td>
             <td style="width: 300px;">${approvalDt.remark}</td>

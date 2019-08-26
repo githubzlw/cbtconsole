@@ -9,6 +9,7 @@ import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.GoodsInfoUtils;
 import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.utli.ImageCompressionByNoteJs;
+import com.importExpress.utli.OKHttpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -263,8 +264,18 @@ public class PublishGoodsToOnlineThread extends Thread {
                                         .replace(goods.getRemotpath(), "");
                                 goods.setShowMainImage(nwMainImg);
                                 System.err.println("nwMainImg:[" + nwMainImg + "]");
-                                customGoodsService.publish(goods);
-                                customGoodsService.updateGoodsState(pid, 4);
+
+                                if(goods.getValid() == 0 &&  checkIsKidsCatid(goods.getCatid1())){
+                                    // 如果kids并且下架，则执行图片上传
+                                    // isSuccess = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
+                                }
+                                if(isSuccess){
+                                    customGoodsService.publish(goods);
+                                    customGoodsService.updateGoodsState(pid, 4);
+                                }else{
+                                    customGoodsService.updateGoodsState(pid, 3);
+                                }
+
                             } else {
                                 customGoodsService.updateGoodsState(pid, 3);
                             }
