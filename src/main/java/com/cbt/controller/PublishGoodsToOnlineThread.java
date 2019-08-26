@@ -267,7 +267,7 @@ public class PublishGoodsToOnlineThread extends Thread {
 
                                 if(goods.getValid() == 0 &&  checkIsKidsCatid(goods.getCatid1())){
                                     // 如果kids并且下架，则执行图片上传
-                                    isSuccess = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
+                                    // isSuccess = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
                                 }
                                 if(isSuccess){
                                     customGoodsService.publish(goods);

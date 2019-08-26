@@ -3638,7 +3638,8 @@ public class EditorController {
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
         if (checkIsKidsCatid(goods.getCatid1()) && goods.getValid() == 0) {
             // 接口调用
-            isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
+            isSu = true;
+            //isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
                     /*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
                     boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
                     if (!isSu) {
