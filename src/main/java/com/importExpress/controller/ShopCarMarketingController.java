@@ -167,9 +167,24 @@ public class ShopCarMarketingController {
             json.setMessage("获取修改价格失败");
             return json;
         }
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
         try {
             int count = 0;
-            count = shopCarMarketingService.updateGoodsCarPrice(Integer.valueOf(goodsIdStr), Integer.valueOf(userIdStr), Double.valueOf(goodsPriceStr), Double.valueOf(newPriceStr));
+            ShopCarMarketing shopCarMarketing = new ShopCarMarketing();
+            shopCarMarketing.setId(Integer.valueOf(goodsIdStr));
+            shopCarMarketing.setUserid(Integer.valueOf(userIdStr));
+            shopCarMarketing.setGoogsPrice(goodsPriceStr);
+            shopCarMarketing.setPriceNew(newPriceStr);
+            shopCarMarketing.setAdminId(user.getId());
+            shopCarMarketing.setItemid(pid);
+
+            shopCarMarketingService.insertIntoPriceLog(shopCarMarketing);
+            count = shopCarMarketingService.updateGoodsCarPrice(shopCarMarketing.getId(), shopCarMarketing.getUserid(), Double.valueOf(goodsPriceStr), Double.valueOf(newPriceStr));
             if (count > 0) {
                 //更新成功后，发布邮件的时候全部更新线上
                 json.setOk(true);

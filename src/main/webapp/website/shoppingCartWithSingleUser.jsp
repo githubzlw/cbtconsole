@@ -103,8 +103,12 @@
             $('img.img_sty').lazyload({effect: "fadeIn", threshold: 88});
         }
 
-        function updateGoodsPrice(goodsId, userId, goodsPrice, obj) {
+        function updateGoodsPrice(pid, goodsId, userId, goodsPrice, obj) {
             setChooseTr(obj);
+            if (pid == null || pid == "") {
+                $.messager.alert("提醒", "获取pid失败", "info");
+                return false;
+            }
             var newPrice = $(obj).parent().find("input").val();
             if (goodsId == null || goodsId == "" || goodsId == 0) {
                 $.messager.alert("提醒", "获取goodsId失败", "info");
@@ -123,6 +127,7 @@
                 dataType: 'text',
                 url: '/cbtconsole/shopCarMarketingCtr/updateCarGoodsPriceByUserId',
                 data: {
+                    "pid" : pid,
                     "goodsId": goodsId,
                     "userId": userId,
                     "goodsPrice": goodsPrice,
@@ -484,11 +489,11 @@
                         <input type="number" value="" style="width: 120px;"/>
                         <c:if test="${good.cartOldPrice > 0}">
                             <br><input class="btn_sty" type="button" value="修改价格"
-                                       onclick="updateGoodsPrice(${good.id},${userId},${good.cartOldPrice},this)"/>
+                                       onclick="updateGoodsPrice('${good.pid}',${good.id},${userId},${good.cartOldPrice},this)"/>
                         </c:if>
                         <c:if test="${good.cartOldPrice == 0}">
                             <br><input class="btn_sty" type="button" value="修改价格"
-                                       onclick="updateGoodsPrice(${good.id},${userId},${good.cartGoodsPrice},this)"/>
+                                       onclick="updateGoodsPrice('${good.pid}',${good.id},${userId},${good.cartGoodsPrice},this)"/>
                         </c:if>
                     </td>
                 </tr>
