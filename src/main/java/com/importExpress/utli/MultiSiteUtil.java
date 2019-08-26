@@ -117,6 +117,23 @@ public class MultiSiteUtil {
         }
         return SearchFileUtils.importexpressPath;
     }
+    public static String getSiteTypeStrBySit(Integer num){
+        String webName = "importX";
+        switch (num){
+            case 2:
+                webName = "kids";
+                break;
+            case 3:
+                webName = "importX/kids";
+                break;
+            case 4:
+                webName = "pets";
+                break;
+           default:
+               break;
+        }
+        return webName;
+    }
 
 
     public static void main(String[] args) {

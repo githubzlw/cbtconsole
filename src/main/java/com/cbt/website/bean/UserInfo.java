@@ -1,5 +1,8 @@
 package com.cbt.website.bean;
 
+import lombok.Data;
+
+@Data
 public class UserInfo {
 
 	private int userid;
@@ -33,6 +36,11 @@ public class UserInfo {
 	private String goodsPriceUrl;
 	private String businessName;
 	private String car_info;
+	/**
+	 * 网站标识
+	 */
+	private int site;
+	private String webSite;
 	
 	public String getCar_info() {
 		return car_info;

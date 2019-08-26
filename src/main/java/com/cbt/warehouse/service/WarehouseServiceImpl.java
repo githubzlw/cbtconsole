@@ -21,9 +21,7 @@ import com.cbt.website.bean.*;
 import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
 import com.importExpress.mapper.IPurchaseMapper;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SearchFileUtils;
-import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -954,20 +952,26 @@ public class WarehouseServiceImpl implements IWarehouseService {
         for (int i = 0; i < userInfos.size(); i++) {
             UserInfo userInfo = userInfos.get(i);
             StringBuffer admuser = new StringBuffer();
+
             admuser.append("<select "+("0".equals(map.get("roleType"))?"":"disabled='disabled'")+" id='admuser_" + userInfo.getUserid()
                     + "'><option value='0'>未分配</option>");
+            String loginType = "";
             if (!StringUtils.isStrNull(userInfo.getPass())) {
-                userInfo.setLoginStyle("网站登录");
+                loginType = "网站登录";
             } else if (StringUtils.isStrNull(userInfo.getPass())
                     && !StringUtils.isStrNull(userInfo.getBind_google())) {
-                userInfo.setLoginStyle("google登录");
+                loginType = "google登录";
             } else {
-                userInfo.setLoginStyle("facebook登录");
+                loginType = "facebook登录";
             }
+            userInfo.setLoginStyle(loginType);
             userInfo.setUserLogin("<button onclick=\"userlogin("
                     + userInfo.getUserid() + ",\'" + userInfo.getUserName()
                     + "\',\'" + userInfo.getCurrency()
                     + "\')\">模拟用户登录接口</button>");
+            int site = userInfo.getSite();
+            String siteTypeStrBySit = MultiSiteUtil.getSiteTypeStrBySit(site);
+            userInfo.setWebSite(siteTypeStrBySit);
             userInfo.setUserManager("<button onclick=\"useraddress("
                     + userInfo.getUserid() + ",\'" + userInfo.getUserName()
                     + "\',\'" + userInfo.getCurrency()
