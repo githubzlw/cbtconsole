@@ -501,8 +501,10 @@ public class InventoryServiceImpl implements  InventoryService{
 		iLog.setInventorySkuId(inventory_sku_id);
 		if(StringUtil.isBlank(inventory.get("log_remark"))) {
 			iLog.setRemark("验货,增加库存");
+			iDetail.setRemark("odid:"+StrUtils.object2NumStr(inventory.get("odid"))+"验货,增加库存");
 		}else {
 			iLog.setRemark(inventory.get("log_remark"));
+			iDetail.setRemark(inventory.get("log_remark"));
 		}
 		iLog.setSku(iSku.getSku());
 		iLog.setSkuid(iSku.getSkuid());
@@ -645,8 +647,10 @@ public class InventoryServiceImpl implements  InventoryService{
 		iLog.setChangeType(2);
 		if(isReduce) {
 			iLog.setRemark("订单orderid:"+orderid+"/od_id:"+odid+"采购使用库存数量"+inventory_count+"，库存减少");
+			map.put("sku_details_remark", "订单orderid:"+orderid+"/od_id:"+odid+"采购使用库存数量"+inventory_count+"，库存减少");
 		}else {
 			iLog.setRemark("订单orderid:"+orderid+"/od_id:"+odid+" 验货取消,取消库存数量:"+inventory_count);
+			map.put("sku_details_remark", "订单orderid:"+orderid+"/od_id:"+odid+" 验货取消,取消库存数量:"+inventory_count);
 		}
 		iLog.setGoodsName(inventoryMap.getGoodsName());
 		iLog.setGoodsPid(inventoryMap.getGoodsPid());
@@ -746,6 +750,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		inv.put("before_remaining", String.valueOf(before_remaining));
 		inv.put("after_remaining", String.valueOf(after_remaining));
 		inv.put("log_remark", "库存报损,"+lossInventoryRecordid+"备注:"+StrUtils.object2Str(map.get("remark")));
+		inv.put("sku_details_remark", "库存报损,"+lossInventoryRecordid+"备注:"+StrUtils.object2Str(map.get("remark")));
 		int inventoryChangeRecordid = inventoryMapper.addInventoryLogByInventoryid(inv);
 		if(inventoryChangeRecordid == 0) {
 			result.put("status", 104);
@@ -781,6 +786,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			wrap.setGoodsPid(i.getGoodsPid());
 			wrap.setInventoryId(i.getInventoryId());
 			wrap.setId(i.getId());
+			wrap.setRemark(i.getRemark());
 			
 			skuContext = StringUtil.isBlank(i.getSku()) ? "" : "sku:" + i.getSku();
 			skuContext = StringUtil.isBlank(i.getGoodsSkuid()) ? skuContext : skuContext + "<br>Skuid:" + i.getGoodsSkuid();
@@ -795,13 +801,10 @@ public class InventoryServiceImpl implements  InventoryService{
 			}
 			// '0 入库  1 出库 2 报损',
 			typeContext = i.getType() == 0 ? "入库" : i.getType() == 1? "出库" : " 报损";
+			wrap.setTypeContext(i.getType() == 4 ? "盘点" : typeContext);
 			wrap.setSkuContext(skuContext);
 			wrap.setDelContext(delContext );
 			wrap.setOrderContext(orderContext);
-			wrap.setTypeContext(typeContext);
-			if(i.getType() == 4) {
-				wrap.setTypeContext("盘点");
-			}
 			
 			result.add(wrap);
 		}
@@ -871,12 +874,16 @@ public class InventoryServiceImpl implements  InventoryService{
 		//1添加  2补货 3线下单 4其他
 		if("1".equals(param.get("reasonType"))) {
 			iLog.setRemark("录入库存,添加,备注:"+param.get("remark"));
+			iDetail.setRemark("录入库存,添加,备注:"+param.get("remark"));
 		}else if("2".equals(param.get("reasonType"))) {
 			iLog.setRemark("录入库存,补货,备注:"+param.get("remark"));
+			iDetail.setRemark("录入库存,补货,备注:"+param.get("remark"));
 		}else if("3".equals(param.get("reasonType"))) {
 			iLog.setRemark("录入库存,线下单,备注:"+param.get("remark"));
+			iDetail.setRemark("录入库存,线下单,备注:"+param.get("remark"));
 		}else{
 			iLog.setRemark("录入库存,其他,备注:"+param.get("remark"));
+			iDetail.setRemark("录入库存,其他,备注:"+param.get("remark"));
 		}
 		iLog.setSku(param.get("sku"));
 		iLog.setSkuid(param.get("skuid"));
@@ -907,7 +914,6 @@ public class InventoryServiceImpl implements  InventoryService{
 			iDetail.setGoodsPUrl(param.get("goods_purl"));
 			iDetail.setGoodsPImg(param.get("img"));
 		}
-		
 		//库存明细inventory_details_sku
 		return inventoryMapper.insertInventoryDetailsSku(iDetail);
 	}
@@ -1024,6 +1030,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			
 			//5.更新库存明细inventory_details_sku
 			inventory.put("type", "4");
+			inventory.put("sku_details_remark", "库存盘点");
 			inventoryMapper.addInventoryDetailsSku(inventory );
 		}
 		
@@ -1290,12 +1297,13 @@ public class InventoryServiceImpl implements  InventoryService{
 			ilog.put("log_remark","订单"+StrUtils.object2Str(i.get("orderid"))+"/"+StrUtils.object2NumStr(i.get("od_id"))+"取消,使用过的库存还原");
 			ilog.put("change_type","1");
 			ilog.put("inventory_sku_id",StrUtils.object2NumStr(i.get("in_id")));
+			ilog.put("od_id", StrUtils.object2NumStr(i.get("od_id")));
 			inventoryMapper.addInventoryLogByInventoryid(ilog);
 			
 			//库存记录表 inventory_details_sku
 			ilog.put("admid",String.valueOf(admId));
 			ilog.put("type","0");
-			ilog.put("od_id", StrUtils.object2NumStr(i.get("od_id")));
+			ilog.put("sku_details_remark","订单"+StrUtils.object2Str(i.get("orderid"))+"/"+StrUtils.object2NumStr(i.get("od_id"))+"取消,使用过的库存还原");
 			inventoryMapper.addInventoryDetailsSku(ilog);
 			
 		}
@@ -1417,6 +1425,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			inventory.put("admid", StrUtils.object2NumStr(mapParam.get("admid")));
 			inventory.put("type", "0");
 			inventory.put("inventory_sku_id",String.valueOf(wrap.getInid()) );
+			inventory.put("sku_details_remark","仓库拒绝采购使用库存的请求，还原库存");
 			inventoryMapper.addInventoryDetailsSku(inventory );
 			
 			//库存日志#{inventory_count},#{before_remaining},#{after_remaining}, #{log_remark},#{change_type},#{inventory_sku_id}

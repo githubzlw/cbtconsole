@@ -190,6 +190,7 @@ function topCenter(msg){
 				<th data-options="field:'goodsNumber',width:50,align:'center'">数量</th>
 				<th data-options="field:'orderContext',width:50,align:'center'">订单信息</th>
 				<th data-options="field:'typeContext',width:50,align:'center'">类型</th>
+				<th data-options="field:'remark',width:50,align:'center'">备注说明</th>
 				<th data-options="field:'createtime',width:50,align:'center'">时间</th>
 				<th data-options="field:'delContext',width:50,align:'center'">删除</th>
 			</tr>

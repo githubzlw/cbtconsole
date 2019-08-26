@@ -1976,8 +1976,26 @@ public class NewOrderDetailsCtr {
 				}
                 if (json.isOk()) {
                 	String websiteType= request.getParameter("websiteType");
-					// boolean isKidFlag =  "2".equals(websiteType);
-                	boolean isKidFlag =  MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
+                	int isWebSiteFlag = MultiSiteUtil.getSiteTypeNum(orderNo);
+                	String webSiteTitle = "ImportExpress";
+					TemplateType  webType= TemplateType.CANCEL_ORDER_IMPORT;
+					switch (isWebSiteFlag) {
+						case 2:
+							webSiteTitle = "KidsProductWholesale";
+							webType = TemplateType.CANCEL_ORDER_KID;
+							break;
+						case 3:
+							webSiteTitle = "LovelyPetSupply";
+							webType = TemplateType.CANCEL_ORDER_PET;
+							break;
+						case 4:
+							webSiteTitle = "RestaurantKitchenEquipments";
+							webType = TemplateType.CANCEL_ORDER_RESTAURANT;
+							break;
+						default:
+							webSiteTitle = "ImportExpress";
+					}
+
                     // ssd add start
                     // 发送取消订单的提醒邮件
 //                    StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
@@ -2006,13 +2024,8 @@ public class NewOrderDetailsCtr {
                     net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
                     String modeStr = jsonObject.toString();
                     try {
-						if (isKidFlag) {
-							sendMailFactory.sendMail(toEmail, null, "Your kidsProductWholesale Order " + orderNo + " transaction is closed!",
-									model, TemplateType.CANCEL_ORDER_KID);
-						} else {
-							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
-									model, TemplateType.CANCEL_ORDER_IMPORT);
-						}
+						sendMailFactory.sendMail(toEmail, null, "Your "+webSiteTitle+" Order " + orderNo + " transaction is closed!",
+									model, webType);
                     } catch (Exception e) {
                         e.printStackTrace();
                         LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + modeStr + " e.message:" + e.getMessage());

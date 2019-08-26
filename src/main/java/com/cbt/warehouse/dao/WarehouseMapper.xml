@@ -2212,7 +2212,7 @@
 		select distinct user_ex.otherphone,user.businessName,user.grade AS gid,user.id as userid,name as userName,user.email,pass,bind_facebook,bind_google,user.createtime as creattime,user.currency,address,address2,phone_number,statename,zip_code,  zone.country as zone,admuser.admName as adminname,
 		(select grade from user_grade ug where user.grade=ug.id) grade, (SELECT distinct shopCarinfo FROM goods_carconfig WHERE userid=user.id limit 1) car_info,
 		(select sum(payment_amount)from payment where payment.userid = user.id and paystatus=1) pay,user.available_m as available,
-        (SELECT IFNULL(sum(googs_price * googs_number), 0) AS total_price FROM	shop_car_marketing WHERE userid = user.id) as goodsPrice
+        (SELECT IFNULL(sum(googs_price * googs_number), 0) AS total_price FROM	shop_car_marketing WHERE userid = user.id) as goodsPrice,user.site as site
 		from user INNER JOIN  zone ON zone.id = user.countryId
 		left join admin_r_user on user.id=admin_r_user.userid
 		left join admuser on admin_r_user.adminid=admuser.id

@@ -526,7 +526,7 @@
         <%--<th data-options="field:'admUser',width:50,align:'center'">编辑者</th>--%>
         <%--<th data-options="field:'isAuto',width:50,align:'center',formatter:formatAuto">录入来源</th>--%>
         <%--<th data-options="field:'authorizedFlag',width:50,align:'center',formatter:formatAuthorizedFlag">授权标识</th>--%>
-        <%--<th data-options="field:'authorizedInfo',width:120,align:'center',formatter:formatAuthorizedInfo">授权操作</th>--%>
+        <th data-options="field:'authorizedOldInfo',width:80,align:'center',formatter:formatOldAuthorizedInfo">原授权操作</th>
         <th data-options="field:'authorizedInfo',width:200,align:'center',formatter:formatAuthorizedInfo">店铺品牌信息</th>
         <th data-options="field:'inputShopDescription',width:90,align:'center'">店铺描述</th>
         <th data-options="field:'stateInfo',width:120,align:'center'">操作</th>
@@ -834,9 +834,10 @@
     }
 
     //授权标记操作
-    /*function formatAuthorizedInfo(val, row, index) {
-    	if(row.shopId != null){ /!* 已授权店铺才有操作 *!/
-    		var temHtml = "<button class=\"but_authorized\" onclick=\"setAuthorizedFlag('" + row.shopId + "', '3')\">不给授权</button>";
+    function formatOldAuthorizedInfo(val, row, index) {
+    	if(row.shopId != null){ /* 已授权店铺才有操作 */
+    		var temHtml = "";
+            /*temHtml += "<button class=\"but_authorized\" onclick=\"setAuthorizedFlag('" + row.shopId + "', '3')\">不给授权</button>";
     		temHtml += "<button class=\"but_authorized\" onclick=\"setAuthorizedFlag('" + row.shopId + "', '1')\">已给授权</button>";
     		temHtml += "<button class=\"but_authorized2\" onclick=\"setAuthorizedFlag('" + row.shopId + "', '2')\">暂不给授权但可卖</button><br />";
     		if (row.authorizedFlag == 1) {
@@ -849,11 +850,17 @@
 				    	temHtml += "<br />有效期至:" + formatterData(row.authorizedInfo.endTime) + " remark:" + row.authorizedInfo.remark;
 					}
 				}
-    		}
+    		}*/
+    		if(row.authorizedInfo.fileUrl){
+    		    temHtml += "<br />之前上传的授权文件:<a target=\"_blank\" href=\"" + row.authorizedInfo.fileUrl + "\">" + row.authorizedInfo.fileName + "(" + row.authorizedInfo.admuser + ")</a>"
+                if (row.authorizedInfo.endTime) {
+                    temHtml += "<br />有效期至:" + formatterData(row.authorizedInfo.endTime) + " remark:" + row.authorizedInfo.remark;
+                }
+            }
 		    return temHtml;
     	}
     	return "";
-    }*/
+    }
 
     var delreply = function (id) {
         $.messager.confirm('提示', '确定删除该数据吗?', function (r) {
