@@ -76,6 +76,7 @@
         <result column="del_remark" property="delRemark" jdbcType="VARCHAR" />
         <result column="del_adm" property="delAdm" jdbcType="VARCHAR" />
         <result column="del" property="del" jdbcType="INTEGER" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
     </resultMap>
     <resultMap id="InventorySkuMap" type="com.cbt.website.bean.InventorySku" >
         <result column="id" property="id" jdbcType="INTEGER" />
@@ -352,10 +353,10 @@
     <insert id="addInventoryDetailsSku">
     insert into inventory_details_sku(goods_pid,goods_p_pid,sku,good_skuid,goods_price,
     goods_p_price,goods_number,od_id,createtime,admid,type,inventory_id,
-    goods_p_url,good_name,goods_specid,goods_img)
+    goods_p_url,good_name,goods_specid,goods_img,remark)
     
     (select  goods_pid,goods_p_pid,sku,skuid,goods_price,goods_p_price,#{inventory_count},#{od_id},now(),
-    #{admid},#{type},id,goods_p_url,good_name,specid,car_img
+    #{admid},#{type},id,goods_p_url,good_name,specid,car_img,#{sku_details_remark}
     from inventory_sku where id=#{inventory_sku_id})
     
     </insert>
@@ -412,7 +413,7 @@
     <!-- 库存明细列表 -->
     <select id="inventoryDetails" resultMap="inventoryDetailsMap">
     select  id,inventory_id,goods_pid,sku,good_skuid,type,goods_specid,del_remark,del_adm,
-    del_datetime,createtime,del,goods_img,goods_number,od_id,orderno
+    del_datetime,createtime,del,goods_img,goods_number,od_id,orderno,remark
     
     
     from  inventory_details_sku where 1=1
@@ -483,10 +484,10 @@
     <insert id="insertInventoryDetailsSku" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventoryDetails">
     insert into inventory_details_sku(goods_pid,goods_p_pid,sku,good_skuid,goods_p_skuid,goods_price,
     goods_p_price,goods_number,1688_orderid,1688_shipno,orderno,od_id,createtime,admid,type,inventory_id,
-    goods_p_url,goods_p_img,good_name,goods_specid,goods_p_specid,goods_img)
+    goods_p_url,goods_p_img,good_name,goods_specid,goods_p_specid,goods_img,remark)
     value(#{goodsPid},#{goodsPPid},#{sku},#{goodsSkuid},#{goodsPSkuid},#{goodsPrice},#{goodsPPrice},
     #{goodsNumber},#{tbOrderid},#{tbShipno},#{orderno},#{odId},now(),#{admid},#{type},#{inventoryId},
-    #{goodsPUrl},#{goodsPImg},#{goodsName},#{goodsSpecid},#{goodsPSpecid},#{goodsImg})
+    #{goodsPUrl},#{goodsPImg},#{goodsName},#{goodsSpecid},#{goodsPSpecid},#{goodsImg},#{remark})
     </insert>
     <!-- 根据1688订单号或运单号查询产品数据 -->
     <select id="getTbGoods" resultType="java.util.Map">
