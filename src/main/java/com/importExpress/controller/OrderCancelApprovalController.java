@@ -531,11 +531,11 @@ public class OrderCancelApprovalController {
                 }
             } else if (approvalBean.getRefundMethod() == 2) {
                 // 余额退款
-                if(orderBalance - approvalBean.getAgreeAmount() < -0.01){
+                if(totalAmount - approvalBean.getAgreeAmount() < -0.01){
                     // 获取数据异常
                     json.setOk(false);
-                    json.setMessage("退款失败,[订单号：" + refundOrderNo + ",余额总额："
-                            + BigDecimalUtil.truncateDouble(orderBalance, 2)
+                    json.setMessage("退款失败,[订单号：" + refundOrderNo + ",订单总额："
+                            + BigDecimalUtil.truncateDouble(totalAmount, 2)
                             + "，小于退款总额：" + BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) + "]");
                 } else {
                     OrderCancelApprovalAmount approvalAmount = new OrderCancelApprovalAmount();
