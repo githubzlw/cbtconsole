@@ -1878,4 +1878,9 @@
     <select id="queryReloadConfigUserId" resultType="java.lang.Integer">
         select userid  from shop_car_marking_config
     </select>
+
+    <insert id="insertIntoPriceLog" parameterType="com.importExpress.pojo.ShopCarMarketing">
+        insert into shop_car_marketing_price_log(shop_mark_id,user_id,pid,goods_price,goods_price_new,admin_id)
+        values(#{id}, #{userid} , #{itemid} , #{googsPrice} , #{priceNew} , #{adminId} )
+    </insert>
 </mapper>

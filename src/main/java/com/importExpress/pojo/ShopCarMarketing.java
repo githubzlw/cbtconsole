@@ -150,6 +150,26 @@ public class ShopCarMarketing {
 
     private List<String> typeList;
 
+    private String priceNew;
+
+    private int adminId;
+
+    public int getAdminId() {
+        return adminId;
+    }
+
+    public void setAdminId(int adminId) {
+        this.adminId = adminId;
+    }
+
+    public String getPriceNew() {
+        return priceNew;
+    }
+
+    public void setPriceNew(String priceNew) {
+        this.priceNew = priceNew;
+    }
+
     public double getTotalPrice() {
         return totalPrice;
     }

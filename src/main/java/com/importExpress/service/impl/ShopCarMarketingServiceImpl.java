@@ -162,4 +162,9 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
         return shopCarMarketingMapper.queryReloadConfigUserId();
     }
 
+    @Override
+    public int insertIntoPriceLog(ShopCarMarketing shopCarMarketing) {
+        return shopCarMarketingMapper.insertIntoPriceLog(shopCarMarketing);
+    }
+
 }

@@ -114,8 +114,9 @@ public class EditorController {
                 goods.setOffReason("老数据");
             }
         } else if (goods.getValid() == 2) {
-            if (offLineMap.containsKey(goods.getUnsellAbleReason())) {
-                goods.setUnsellAbleReasonDesc(offLineMap.get(goods.getUnsellAbleReason()));
+            String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()),"");
+            if (StringUtils.isNotBlank(rsStr)) {
+                goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
             } else {
                 goods.setUnsellAbleReasonDesc("未知下架原因");
             }
@@ -3638,8 +3639,7 @@ public class EditorController {
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
         if (checkIsKidsCatid(goods.getCatid1()) && goods.getValid() == 0) {
             // 接口调用
-            isSu = true;
-            //isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
+            isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
                     /*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
                     boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
                     if (!isSu) {
