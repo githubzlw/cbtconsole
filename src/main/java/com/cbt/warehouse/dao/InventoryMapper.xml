@@ -701,7 +701,7 @@
     where 1=1
     <if test="orderid!=null">and od.orderid=#{orderid}</if>
     <if test="state!=-1">and ib.state=#{state}</if>
-    order by ib.state asc,ib.createtime desc
+    order by ib.state asc,ib.updatetime desc
     limit #{page},20
     </select>
     <select id="inventoryBarcodeListCount" resultType="Integer">
