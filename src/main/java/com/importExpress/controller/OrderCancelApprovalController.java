@@ -272,6 +272,13 @@ public class OrderCancelApprovalController {
                 }
             }
 
+            String refundMethodStr = request.getParameter("refundMethod");
+            if (StringUtils.isBlank(refundMethodStr) || Integer.valueOf(refundMethodStr) == 0) {
+                json.setOk(false);
+                json.setMessage("获取退款方式失败,请重试");
+                return json;
+            }
+
 
             String remark = request.getParameter("remark");
             if (StringUtils.isBlank(remark)) {
@@ -302,6 +309,7 @@ public class OrderCancelApprovalController {
                 approvalBean.setAgreeAmount(refundAmount);
                 approvalBean.setUserId(userId);
                 approvalBean.setAdminId(user.getId());
+                approvalBean.setRefundMethod(Integer.valueOf(refundMethodStr));
 
                 OrderCancelApprovalDetails approvalDetails = new OrderCancelApprovalDetails();
                 approvalDetails.setApprovalId(approvalId);
@@ -314,6 +322,7 @@ public class OrderCancelApprovalController {
                 approvalDetails.setPayPrice(refundAmount);
                 approvalDetails.setAdminId(user.getId());
                 approvalDetails.setRemark(remark);
+                approvalDetails.setRefundMethod(Integer.valueOf(refundMethodStr));
 
                 if (dealState < 2) {
                     approvalService.updateOrderCancelApprovalState(approvalBean);
@@ -419,71 +428,131 @@ public class OrderCancelApprovalController {
                 }
             }
             list.clear();
-            // 判断支付总额是否 大于等于 审批总额
-            if (totalAmount - approvalBean.getAgreeAmount() < -0.01) {
-                // 获取数据异常
-                json.setOk(false);
-                json.setMessage("退款失败,[订单号：" + refundOrderNo + ",支付总额："
-                        + BigDecimalUtil.truncateDouble(totalAmount, 2)
-                        + "，小于退款总额：" + BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) + "]");
-            } else {
-                // 优先PayPal TT stripe支付值退款
-                if (orderPay > 0) {
-                    if (orderPay - approvalBean.getAgreeAmount() >= -0.01) {
-                        json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(approvalBean.getAgreeAmount()));
-                    } else {
-                        json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(orderPay));
-                        approvalBean.setRemainAmount(approvalBean.getAgreeAmount() - orderPay);
-                    }
+
+            OrderCancelApproval approvalOld = approvalService.queryForSingle(approvalBean.getId());
+            if (approvalBean.getRefundMethod() == 1) {
+                // PayPal或者Stripe退款
+                // 判断支付总额是否 大于等于 审批总额
+                if (totalAmount - approvalBean.getAgreeAmount() < -0.01) {
+                    // 获取数据异常
+                    json.setOk(false);
+                    json.setMessage("退款失败,[订单号：" + refundOrderNo + ",支付总额："
+                            + BigDecimalUtil.truncateDouble(totalAmount, 2)
+                            + "，小于退款总额：" + BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) + "]");
                 } else {
-                    // 余额退款的，放在后面一起执行
-                    json.setOk(true);
-                    json.setTotal(0L);
-                    approvalBean.setRemainAmount(approvalBean.getAgreeAmount());
+                    // 优先PayPal TT stripe支付值退款
+                    if (orderPay > 0) {
+                        if (orderPay - approvalBean.getAgreeAmount() >= -0.01) {
+                            json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(approvalBean.getAgreeAmount()));
+                        } else {
+                            json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(orderPay));
+                            approvalBean.setRemainAmount(approvalBean.getAgreeAmount() - orderPay);
+                        }
+                    } else {
+                        // 余额退款的，放在后面一起执行
+                        json.setOk(true);
+                        json.setTotal(0L);
+                        approvalBean.setRemainAmount(approvalBean.getAgreeAmount());
+                    }
+
+                    if (json.isOk()) {
+                        OrderCancelApprovalAmount approvalAmount = new OrderCancelApprovalAmount();
+                        approvalAmount.setApprovalId(approvalBean.getId());
+                        approvalAmount.setOrderNo(approvalBean.getOrderNo());
+                        if (orderPay > 0) {
+                            if (orderPay - approvalBean.getAgreeAmount() >= -0.01) {
+                                approvalAmount.setPayAmount(approvalBean.getAgreeAmount());
+                            } else {
+                                approvalAmount.setPayAmount(orderPay);
+                            }
+                        } else {
+                            approvalAmount.setPayAmount(approvalBean.getAgreeAmount());
+                        }
+                        approvalAmount.setPayType(json.getTotal().intValue());
+                        // 如果是PayPal全款退，则直接插入数据
+                        if (orderPay > 0) {
+                            approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
+                        }
+                        if (approvalOld.getDealState() == 1 || approvalOld.getDealState() == 2) {
+                            approvalBean.setDealState(2);
+                            approvalService.updateOrderCancelApprovalState(approvalBean);
+                            approvalDetails.setDealState(2);
+                            approvalService.insertIntoApprovalDetails(approvalDetails);
+                        }
+
+                        approvalBean.setDealState(3);
+                        approvalDetails.setDealState(3);
+                        if (orderPay > 0) {
+                            if (orderPay - approvalBean.getAgreeAmount() >= -0.01) {
+                                approvalDetails.setRemark(approvalDetails.getRemark() + ",执行“API退款”成功！(API退款：" +
+                                        BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2)
+                                        + ")<br>" + json.getMessage());
+                            } else {
+                                approvalDetails.setRemark(approvalDetails.getRemark() + ",执行“API退款”成功！(API退款：" +
+                                        BigDecimalUtil.truncateDouble(orderPay, 2) + "，余额退款:"
+                                        + BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount() - orderPay, 2)
+                                        + ")<br>" + json.getMessage());
+                            }
+                        } else {
+                            approvalDetails.setRemark(approvalDetails.getRemark() + ",执行“余额退款”成功！(余额退款：" +
+                                    BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) + ")");
+                        }
+                        approvalService.updateOrderCancelApprovalState(approvalBean);
+                        approvalService.insertIntoApprovalDetails(approvalDetails);
+                        //使用MQ更新线上状态
+                        updateOnlineDealState(approvalBean);
+                        // 添加一笔负的到账
+                        approvalService.insertIntoPaymentByApproval(approvalBean.getUserId(), approvalBean.getOrderNo());
+                        // 退给客户余额，如果有
+                        if (approvalBean.getRemainAmount() > 0) {
+                            UserDao dao = new UserDaoImpl();
+                            dao.updateUserAvailable(approvalBean.getUserId(),
+                                    new BigDecimal(approvalBean.getRemainAmount()).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
+                                    " system closeOrder:" + approvalBean.getOrderNo(), approvalBean.getOrderNo(),
+                                    String.valueOf(approvalBean.getAdminId()), 0, 0, 1);
+                            // 插入退款金额
+                            approvalAmount.setPayAmount(approvalBean.getRemainAmount());
+                            approvalAmount.setPayType(2);
+                            approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
+                        }
+                    } else {
+                        if (approvalOld.getDealState() == 1 || approvalOld.getDealState() == 2) {
+                            approvalBean.setDealState(2);
+                            approvalService.updateOrderCancelApprovalState(approvalBean);
+                            approvalDetails.setDealState(2);
+                            approvalDetails.setRemark(approvalDetails.getRemark() + "[退款失败，请重试]");
+                            approvalService.insertIntoApprovalDetails(approvalDetails);
+                        }
+                        logger.error("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());
+                        System.err.println("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());
+                        json.setOk(false);
+                        json.setMessage("原因:[" + json.getMessage() + "],联系IT人员查看");
+                    }
                 }
-                OrderCancelApproval approvalOld = approvalService.queryForSingle(approvalBean.getId());
-                if (json.isOk()) {
+            } else if (approvalBean.getRefundMethod() == 2) {
+                // 余额退款
+                if(totalAmount - approvalBean.getAgreeAmount() < -0.01){
+                    // 获取数据异常
+                    json.setOk(false);
+                    json.setMessage("退款失败,[订单号：" + refundOrderNo + ",订单总额："
+                            + BigDecimalUtil.truncateDouble(totalAmount, 2)
+                            + "，小于退款总额：" + BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) + "]");
+                } else {
                     OrderCancelApprovalAmount approvalAmount = new OrderCancelApprovalAmount();
                     approvalAmount.setApprovalId(approvalBean.getId());
                     approvalAmount.setOrderNo(approvalBean.getOrderNo());
-                    if (orderPay > 0) {
-                        if (orderPay - approvalBean.getAgreeAmount() >= -0.01) {
-                            approvalAmount.setPayAmount(approvalBean.getAgreeAmount());
-                        } else {
-                            approvalAmount.setPayAmount(orderPay);
-                        }
-                    } else {
-                        approvalAmount.setPayAmount(approvalBean.getAgreeAmount());
-                    }
-                    approvalAmount.setPayType(json.getTotal().intValue());
-                    // 如果是PayPal全款退，则直接插入数据
-                    if (orderPay > 0) {
-                        approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
-                    }
+                    approvalAmount.setPayAmount(approvalBean.getAgreeAmount());
+                    approvalAmount.setPayType(2);
                     if (approvalOld.getDealState() == 1 || approvalOld.getDealState() == 2) {
                         approvalBean.setDealState(2);
                         approvalService.updateOrderCancelApprovalState(approvalBean);
                         approvalDetails.setDealState(2);
                         approvalService.insertIntoApprovalDetails(approvalDetails);
                     }
-
                     approvalBean.setDealState(3);
                     approvalDetails.setDealState(3);
-                    if (orderPay > 0) {
-                        if (orderPay - approvalBean.getAgreeAmount() >= -0.01) {
-                            approvalDetails.setRemark(approvalDetails.getRemark() + ",执行“API退款”成功！(API退款：" +
-                                    BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2)
-                                    + ")<br>" + json.getMessage());
-                        } else {
-                            approvalDetails.setRemark(approvalDetails.getRemark() + ",执行“API退款”成功！(API退款：" +
-                                    BigDecimalUtil.truncateDouble(orderPay, 2) + "，余额退款:"
-                                    + BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount() - orderPay, 2)
-                                    + ")<br>" + json.getMessage());
-                        }
-                    } else {
-                        approvalDetails.setRemark(approvalDetails.getRemark() + ",执行“余额退款”成功！(余额退款：" +
-                                BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) + ")");
-                    }
+                    approvalDetails.setRemark(approvalDetails.getRemark() + ",执行“余额退款”成功！(余额退款：" +
+                            BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) + ")");
                     approvalService.updateOrderCancelApprovalState(approvalBean);
                     approvalService.insertIntoApprovalDetails(approvalDetails);
                     //使用MQ更新线上状态
@@ -491,32 +560,20 @@ public class OrderCancelApprovalController {
                     // 添加一笔负的到账
                     approvalService.insertIntoPaymentByApproval(approvalBean.getUserId(), approvalBean.getOrderNo());
                     // 退给客户余额，如果有
-                    if (approvalBean.getRemainAmount() > 0) {
-                        UserDao dao = new UserDaoImpl();
-                        dao.updateUserAvailable(approvalBean.getUserId(),
-                                new BigDecimal(approvalBean.getRemainAmount()).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
-                                " system closeOrder:" + approvalBean.getOrderNo(), approvalBean.getOrderNo(),
-                                String.valueOf(approvalBean.getAdminId()), 0, 0, 1);
-                        // 插入退款金额
-                        approvalAmount.setPayAmount(approvalBean.getRemainAmount());
-                        approvalAmount.setPayType(2);
-                        approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
-                    }
-                } else {
-                    if (approvalOld.getDealState() == 1 || approvalOld.getDealState() == 2) {
-                        approvalBean.setDealState(2);
-                        approvalService.updateOrderCancelApprovalState(approvalBean);
-                        approvalDetails.setDealState(2);
-                        approvalDetails.setRemark(approvalDetails.getRemark() + "[退款失败，请重试]");
-                        approvalService.insertIntoApprovalDetails(approvalDetails);
-                    }
-                    logger.error("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());
-                    System.err.println("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());
-                    json.setOk(false);
-                    json.setMessage("原因:[" + json.getMessage() + "],联系IT人员查看");
+                    UserDao dao = new UserDaoImpl();
+                    dao.updateUserAvailable(approvalBean.getUserId(),
+                            new BigDecimal(approvalBean.getAgreeAmount()).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
+                            " system closeOrder:" + approvalBean.getOrderNo(), approvalBean.getOrderNo(),
+                            String.valueOf(approvalBean.getAdminId()), 0, 0, 1);
+                    // 插入退款金额
+                    approvalAmount.setPayAmount(approvalBean.getAgreeAmount());
+                    approvalAmount.setPayType(2);
+                    approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
                 }
+            } else {
+                json.setOk(false);
+                json.setMessage("退款方式异常");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("userId:" + approvalBean.getUserId() + ",rdId:" + approvalBean.getId() + ",refundByPayPalApi error :" + e.getMessage());
@@ -527,12 +584,13 @@ public class OrderCancelApprovalController {
         return json;
     }
 
+
     private void updateOnlineDealState(OrderCancelApproval approvalBean) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, -8);
         String sql = "update order_cancel_approval set deal_state =" + approvalBean.getDealState()
-                + " ,agree_amount = " + approvalBean.getAgreeAmount() + ",update_time = '"
-                + DATE_FORMAT.format(calendar.getTime()) + "' where user_id = " + approvalBean.getUserId()
+                + " ,agree_amount = " + approvalBean.getAgreeAmount() + ",refund_method = " + approvalBean.getRefundMethod()
+                + ",update_time = '" + DATE_FORMAT.format(calendar.getTime()) + "' where user_id = " + approvalBean.getUserId()
                 + " and order_no = '" + approvalBean.getOrderNo() + "'";
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }

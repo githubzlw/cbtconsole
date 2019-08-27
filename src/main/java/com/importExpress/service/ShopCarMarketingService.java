@@ -109,4 +109,11 @@ public interface ShopCarMarketingService {
      * @return
      */
     List<Integer> queryReloadConfigUserId();
+
+    /**
+     * 插入购物车营销价格修改日志
+     * @param shopCarMarketing
+     * @return
+     */
+    int insertIntoPriceLog(ShopCarMarketing shopCarMarketing);
 }

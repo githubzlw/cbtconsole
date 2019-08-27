@@ -133,7 +133,7 @@
             if (authorizeState == 1 && certificateFile) {
                 $("#certificate_file").val(certificateFile);
                 $("#certificate_file").show();
-                $("#file_div").hide();
+                // $("#file_div").hide();
                 $("#remote_path").val(remotePath);
                 $("#local_path").val(localPath);
             }
@@ -196,7 +196,7 @@
 <c:if test="${show > 0}">
 
     <div id="enter_div_sty" class="easyui-dialog" title="店铺品牌" data-options="modal:true"
-         style="width: 699px; height: 330px;">
+         style="width: 744px; height: 366px;">
         <table>
             <tr>
                 <td>店铺ID</td>

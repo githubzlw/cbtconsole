@@ -232,9 +232,18 @@
     group_buy_id, skuid_1688, isFreeShipProduct, sampleFee, sampleMoq, website
   </sql>
     <select id="selectByUserIdAndType" resultMap="BaseResultMap" >
-        select <include refid="Base_Column_List"/>
-        from shop_car_marketing
-        where userid = #{userId} and website = #{website}
+        select a.id, a.goodsdata_id, a.userid, a.sessionid, a.catid, a.itemId, a.shopId, a.goods_url, a.goods_title,
+            a.googs_seller, a.googs_img, a.googs_price, a.googs_number, a.googs_size, a.googs_color, a.freight,
+            a.delivery_time, a.norm_most, a.norm_least, a.state, a.remark, a.datatime, a.flag, a.pWprice, a.true_shipping,
+            a.freight_free, a.width, a.seilUnit, a.goodsUnit, a.bulk_volume, a.total_weight, a.per_weight,
+            a.goods_email, a.free_shopping_company, a.free_sc_days, a.preferential, a.deposit_rate, a.guid,
+            a.goods_type, a.feeprice, a.currency, a.goods_class, a.extra_freight, a.source_url, a.isshipping_promote,
+            a.method_feight, a.price1, a.price2, a.price3, a.notfreeprice, a.theproductfrieght, a.isvolume,
+            a.freeprice, a.firstprice, a.firstnumber, a.updatetime, a.addPrice, a.isFeight, a.isBattery, a.aliPosttime,
+            a.price4, goodsUrlMD5, a.bizPriceDiscount, a.spiderPrice, a.priceListSize, a.comparealiPrice,
+            a.group_buy_id, a.skuid_1688, a.isFreeShipProduct, a.sampleFee, a.sampleMoq, a.website
+        from shop_car_marketing a, custom_benchmark_ready b
+        where a.userid = #{userId} and a.website = #{website} and a.itemId = b.pid and b.valid in(1,2)
     </select>
 
     <select id="selectByExample" resultMap="BaseResultMap"
@@ -1869,4 +1878,9 @@
     <select id="queryReloadConfigUserId" resultType="java.lang.Integer">
         select userid  from shop_car_marking_config
     </select>
+
+    <insert id="insertIntoPriceLog" parameterType="com.importExpress.pojo.ShopCarMarketing">
+        insert into shop_car_marketing_price_log(shop_mark_id,user_id,pid,goods_price,goods_price_new,admin_id)
+        values(#{id}, #{userid} , #{itemid} , #{googsPrice} , #{priceNew} , #{adminId} )
+    </insert>
 </mapper>

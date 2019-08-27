@@ -187,6 +187,7 @@
                 <td style="width: 260px;">
                     <c:if test="${aproval.approval1 != null}">
                         <span>审批情况：${aproval.approval1.dealStateDesc}</span><br>
+                        <span>退款方式：[${aproval.approval1.refundMethodDesc}]</span><br>
                         <span>理由：[${aproval.approval1.remark}]</span><br>
                         <span>操作时间：${aproval.approval1.createTime}</span><br>
                     </c:if>
@@ -194,6 +195,7 @@
                 <td style="width: 260px;">
                     <c:if test="${aproval.approval2 != null}">
                         <span>审批情况：${aproval.approval2.dealStateDesc}</span><br>
+                        <span>退款方式：[${aproval.approval2.refundMethodDesc}]</span><br>
                         <span>理由：[${aproval.approval2.remark}]</span><br>
                         <span>操作时间：${aproval.approval2.createTime}</span><br>
                     </c:if>
@@ -201,6 +203,7 @@
                 <td style="width: 260px;">
                     <c:if test="${aproval.approval3 != null}">
                         <span>审批情况：${aproval.approval3.dealStateDesc}</span><br>
+                        <span>退款方式：[${aproval.approval3.refundMethodDesc}]</span><br>
                         <span>理由：[${aproval.approval3.remark}]</span><br>
                         <span>操作时间：${aproval.approval3.createTime}</span><br>
                     </c:if>
@@ -208,7 +211,7 @@
                 <td style="width: 100px;">
                     <c:if test="${aproval.dealState == 0}">
                         <input type="button" value="确认" class="btn_sty"
-                               onclick="beforeAddRemark(${aproval.id},${aproval.dealState},${aproval.userId},${aproval.payPrice},'${aproval.orderNo}',${operatorId},1,this)"/>
+                               onclick="beforeAddRemark(${aproval.refundMethod},${aproval.id},${aproval.dealState},${aproval.userId},${aproval.payPrice},'${aproval.orderNo}',${operatorId},1,this)"/>
                         <%--<br>
                         <input type="button" value="驳回" class="refuse_sty"
                                onclick="beforeAddRemark(${aproval.id},4,${aproval.userId},${aproval.payPrice},'${aproval.orderNo}',${operatorId},-1,this)"/>--%>
@@ -219,10 +222,10 @@
                         <c:if test="${roleType == 0}">
                             <br><br>
                             <input type="button" value="确认" class="btn_sty"
-                                   onclick="beforeAddRemark(${aproval.id},${aproval.dealState},${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},1,this)"/>
+                                   onclick="beforeAddRemark(${aproval.refundMethod},${aproval.id},${aproval.dealState},${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},1,this)"/>
                             <br>
                             <input type="button" value="驳回" class="refuse_sty"
-                                   onclick="beforeAddRemark(${aproval.id},4,${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},-1,this)"/>
+                                   onclick="beforeAddRemark(${aproval.refundMethod},${aproval.id},4,${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},-1,this)"/>
                         </c:if>
                     </c:if>
                     <c:if test="${aproval.dealState >= 3}">
@@ -280,6 +283,17 @@
             <td><input type="number" id="approval_amount" value="0" style="width: 265px;"/></td>
         </tr>
         <tr>
+            <td>
+                退款方式:
+            </td>
+            <td>
+                <select id="refund_method" style="width: 265px;">
+                    <option value="1">PayPal或者Stripe</option>
+                    <option value="2">余额</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
             <td colspan="2">
                 <br>
                 <span><input type="checkbox" onclick="addToRemark(this)" value="产品缺失"/>产品缺失</span>
@@ -319,7 +333,7 @@
 </body>
 <script>
 
-    function beforeAddRemark(approvalId, dealState, userId, amount, orderNo, operatorId, actionFlag, obj) {
+    function beforeAddRemark(refundMethod ,approvalId, dealState, userId, amount, orderNo, operatorId, actionFlag, obj) {
         //背景色变色
         setChooseTr(obj);
 
@@ -334,7 +348,7 @@
             if (dealState == 0) {
                 if (roleType == 3 || roleType == 4) {
                     //销售同意退款
-                    showDivSecvlid(approvalId, dealState + 1, userId, amount, orderNo, operatorId);
+                    showDivSecvlid(approvalId, dealState + 1, userId, amount, orderNo, operatorId, refundMethod);
                 } else {
                     alert("需要销售同意，您无权限操作！");
                     hideDivRemark();
@@ -344,7 +358,7 @@
                 if (roleType == 0) {
                     //主管同意退款
                     if (operatorId == 1 || operatorId == 6 || operatorId == 8 || operatorId == 83) {
-                        showDivSecvlid(approvalId, dealState + 1, userId, amount, orderNo, operatorId);
+                        showDivSecvlid(approvalId, dealState + 1, userId, amount, orderNo, operatorId, refundMethod);
                     } else {
                         alert("需要Ling或Mandy或Emma同意，您无权限操作！");
                     }
@@ -361,7 +375,7 @@
         } else if (dealState == 2) {
             if (roleType == 0) {
                 //执行退款操作
-                showDivSecvlid(approvalId, 3, userId, amount, orderNo, operatorId);
+                showDivSecvlid(approvalId, 3, userId, amount, orderNo, operatorId, refundMethod);
             } else {
                 alert("无权限操作！");
                 hideDivRemark();
@@ -382,6 +396,7 @@
         var refundAmount = $("#approval_amount").val();
         var secvlidPwd = $("#second_pwd").val();
         var remark = $("#approval_remark").val();
+        var refundMethod = $("#refund_method").val();
         if (orderNo == null || orderNo == "") {
             alert("获取订单号失败");
             return false;
@@ -413,7 +428,8 @@
                     "operatorId": operatorId,
                     "refundAmount": refundAmount,
                     "remark": remark,
-                    "secvlidPwd": secvlidPwd
+                    "secvlidPwd": secvlidPwd,
+                    "refundMethod":refundMethod
                 },
                 success: function (data) {
                     //$.messager.progress('close');
@@ -487,7 +503,7 @@
     }
 
 
-    function showDivSecvlid(approvalId, dealState, userId, amount, orderNo, operatorId) {
+    function showDivSecvlid(approvalId, dealState, userId, amount, orderNo, operatorId, refundMethod) {
         if (dealState == 0 || dealState == 1) {
             $("#second_admid").css("display", "none");
             $("#second_pwd_tr").css("display", "none");
@@ -499,6 +515,9 @@
         $("#approval_order_no").val(orderNo);
         $("#select_op_id").val(operatorId);
         $("#option_admin_id").val(operatorId);
+        if(refundMethod > 0){
+            $("#refund_method").val(refundMethod);
+        }
         $("#div_secvlid").show();
     }
 
