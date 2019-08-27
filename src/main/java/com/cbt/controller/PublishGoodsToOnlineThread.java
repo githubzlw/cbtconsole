@@ -286,6 +286,10 @@ public class PublishGoodsToOnlineThread extends Thread {
                             // 如果kids并且下架，则执行图片上传
                             isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
                         }
+                        if(!isUp){
+                            // 重试一次
+                             isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
+                        }
                         if (isUp) {
                             isSuccess = true;
                         } else {
