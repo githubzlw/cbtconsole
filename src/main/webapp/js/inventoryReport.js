@@ -142,8 +142,8 @@ $(function(){
 		$(".q_in_barcode").attr("readonly","readonly");
 		
 		window.location.href ="/cbtconsole/inventory/check/done?check_id="+check_id;
-		$("#current_page").val(1)
-		doQuery(1,1);
+		/*$("#current_page").val(1)
+		doQuery(1,1);*/
 	})
 	
 	$("#query_button").click(function(){
