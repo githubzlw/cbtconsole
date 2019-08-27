@@ -6,6 +6,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.service.SendChaPsendEmailService;
 import com.importExpress.utli.FreightUtlity;
+import com.importExpress.utli.SwitchDomainNameUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,13 +60,11 @@ public class SendChaPsendEmailServiceImple implements SendChaPsendEmailService {
                 Map<String,Object> map = new HashedMap();
                 //href="http://www.import-express.com/orderInfo/getChangeProduct?flag=1&orderNo=QC26660789904597_1"
                 String href = "";
-                if (websiteType == 1) {
-                    map.put("clickHereForDetails", "http://www.import-express.com/orderInfo/getChangeProduct?flag=1&orderNo=" + orderNo);
-                } else if (websiteType == 2) {
-                    map.put("clickHereForDetails", "http://www.kidsproductwholesale.com/orderInfo/getChangeProduct?flag=1&orderNo=" + orderNo);
-                }
+                String urlStr = "http://www.import-express.com/orderInfo/getChangeProduct?flag=1&orderNo=" + orderNo;
+                urlStr = SwitchDomainNameUtil.checkNullAndReplace(urlStr,websiteType);
+                map.put("clickHereForDetails", urlStr);
                 //标题
-                map.put("title",title);
+                map.put("title",SwitchDomainNameUtil.checkNullAndReplace(title,websiteType));
                 //客户邮件
                 map.put("email",email);
                 //邮件信息
