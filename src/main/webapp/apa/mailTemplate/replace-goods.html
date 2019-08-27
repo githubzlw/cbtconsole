@@ -185,7 +185,18 @@
           <div class="content">
             <span class="brand">
               <a href="https://www.kidsproductwholesale.com/">
-                <img src="https://img1.kidsproductwholesale.com/importcsvimg/webpic/newindex/img/kids_logo.png">
+                <img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/newindex/img/kids_logo.png">
+              </a>
+            </span>
+          </div>
+        </td>
+      </tr>
+      <tr class="header-background2" th:if="${websiteType} eq 3">
+        <td class="header container" align="center">
+          <div class="content">
+            <span class="brand">
+              <a href="https://www.lovelypetsupply.com/">
+                <img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/wh89/pet/pet_logo.png">
               </a>
             </span>
           </div>
@@ -222,12 +233,14 @@
                               <p class="thanks_so">Thanks so much,</p>
                               <p th:if="${websiteType} eq 1">ImportExpress</p>
                               <p th:if="${websiteType} eq 2">kidsProductWholesale</p>
+                              <p th:if="${websiteType} eq 3">LovelyPetSupply</p>
                               <div class="please_note">
                                 <h3>PLEASE NOTE:</h3>
                                 <p>This email message was sent from a notification-only address that cannot accept incoming email. PLEASE DO NOT REPLY to this message. If you have any question or concern, access
                                   your account
                                     <a th:if="${websiteType} eq 1" href="https://www.import-express.com/user/loginNew">here</a>
                                     <a th:if="${websiteType} eq 2" href="https://www.kidsproductwholesale.com/user/loginNew">here</a>
+                                    <a th:if="${websiteType} eq 2" href="https://www.lovelypetsupply.com/user/loginNew">here</a>
                                     .
                                 </p>
                               </div>

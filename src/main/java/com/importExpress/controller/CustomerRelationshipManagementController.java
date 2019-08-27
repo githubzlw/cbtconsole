@@ -179,7 +179,7 @@ public class CustomerRelationshipManagementController {
         String userId=request.getParameter("userId");
         String title = request.getParameter("title");
         String reason3 = request.getParameter("reason3");
-        Integer websiteType = StringUtils.isBlank(request.getParameter("websiteType"))?1:Integer.parseInt(request.getParameter("websiteType"));
+        Integer websiteType = MultiSiteUtil.getSiteTypeNum(orderNo);
         JsonResult result = sendChaPsendEmailService.sendChaPsendEmail(emailInfo,  email,  copyEmail,  orderNo,  userId,  title ,  reason3, websiteType);
         return result;
     }

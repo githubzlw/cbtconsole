@@ -709,7 +709,7 @@
         }else if(row.authorizedFlag == 3){
             content += '<br><b style="color:red;">授权:未授权</b>';
         }
-        content += '<button class="but_color" style="display: none;" onclick="reUpdateShopAdminId(\''+row.shopId+'\')">设置当前店铺为自己</button>';
+        // content += '<button class="but_color" onclick="reUpdateShopAdminId(\''+row.shopId+'\')">设置当前店铺为自己</button>';
         content += '</div>';
         return content;
     }
