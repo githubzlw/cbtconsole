@@ -31,6 +31,7 @@ import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventorySku;
 import com.cbt.website.bean.InventoryWrap;
 import com.cbt.website.bean.LossInventoryRecord;
+import com.cbt.website.bean.LossInventoryWrap;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
 import com.cbt.website.dao.IExpressTrackDao;
@@ -749,8 +750,9 @@ public class InventoryServiceImpl implements  InventoryService{
 		inv.put("inventory_count", String.valueOf(change_number));
 		inv.put("before_remaining", String.valueOf(before_remaining));
 		inv.put("after_remaining", String.valueOf(after_remaining));
-		inv.put("log_remark", "库存报损,"+lossInventoryRecordid+"备注:"+StrUtils.object2Str(map.get("remark")));
-		inv.put("sku_details_remark", "库存报损,"+lossInventoryRecordid+"备注:"+StrUtils.object2Str(map.get("remark")));
+		String remark = "库存报损,"+lossInventoryRecordid+"/"+lossChangeType+"备注:"+StrUtils.object2Str(map.get("remark"));
+		inv.put("log_remark", remark);
+		inv.put("sku_details_remark", remark);
 		int inventoryChangeRecordid = inventoryMapper.addInventoryLogByInventoryid(inv);
 		if(inventoryChangeRecordid == 0) {
 			result.put("status", 104);
@@ -1448,5 +1450,42 @@ public class InventoryServiceImpl implements  InventoryService{
 			}
 		}
 		return inventoryMapper.updateRemark(mapParam);
+	}
+	@Override
+	public List<LossInventoryWrap> inventoryLossList(Map<String, Object> map) {
+		List<LossInventoryWrap> inventoryLossList = inventoryMapper.inventoryLossList(map);
+		for(LossInventoryWrap l : inventoryLossList) {
+			//0  损坏 1 遗失  3 添加 4 补货  5 漏发 7 其他原因
+			String changeContext = "";
+			switch (l.getChangeType()) {
+			case 0:
+				changeContext = "损坏";
+				break;
+			case 1:
+				changeContext = "遗失";
+				break;
+			case 3:
+				changeContext = "添加";
+				break;
+			case 4:
+				changeContext = "补货";
+				break;
+			case 5:
+				changeContext = "漏发";
+				break;
+
+			default:
+				changeContext = "其他原因";
+				break;
+			}
+			l.setChangeContext(changeContext);
+		}
+		
+		return inventoryLossList;
+	}
+	@Override
+	public int inventoryLossListCount(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return inventoryMapper.inventoryLossListCount(map);
 	}
 }

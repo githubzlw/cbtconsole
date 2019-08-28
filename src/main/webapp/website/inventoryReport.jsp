@@ -172,8 +172,9 @@ em,i{font-style: normal;}
 				</c:if>
 				</select>
 				</label>
-				<button class="btn btn-info"  id="query_button">查询</button>
-				<a href="/cbtconsole/inventory/check/list"><button class="btn btn-info">库存盘点</button></a>
+				<label><button class="btn btn-info"  id="query_button">查询</button></label>
+				<label><a href="/cbtconsole/inventory/check/list"><button class="btn btn-success">库存盘点</button></a></label>
+				<label><a href="/cbtconsole/inventory/loss/list"><button class="btn btn-success button_loss"  id="query_button_loss">库存损益</button></a></label>
 			</div>
 		</div>
 		<div class="row mt20 row2">
