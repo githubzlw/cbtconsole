@@ -4,6 +4,7 @@ package com.cbt.customer.service;
 import com.cbt.bean.*;
 import com.cbt.customer.dao.IShopUrlDao;
 import com.cbt.customer.dao.ShopUrlDaoImpl;
+import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.mapper.ShopUrlMapper;
 import com.importExpress.pojo.ShopBrandAuthorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -267,8 +268,8 @@ public class ShopUrlServiceImpl implements IShopUrlService {
     }
 
     @Override
-    public int reDownShopGoods(String shopId, int adminId) {
-        return dao.reDownShopGoods(shopId, adminId);
+    public int reDownShopGoods(String shopId, Admuser admuser) {
+        return dao.reDownShopGoods(shopId, admuser);
     }
 
     @Override
