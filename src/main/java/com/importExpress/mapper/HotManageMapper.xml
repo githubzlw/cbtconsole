@@ -86,7 +86,7 @@
         a.admin_id,b.admName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.update_admin_id,
         DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.web_site
         from hot_category a left join admuser b on a.admin_id =b.id
-        where 1=1 and web_site = #{webSite}
+        where 1=1
         <if test="isOn > -1">
             and is_on = #{isOn}
         </if>
@@ -104,7 +104,7 @@
             parameterType="com.cbt.warehouse.pojo.HotCategory">
         select count(0)
         from hot_category
-        where 1=1 and web_site = #{webSite}
+        where 1=1
         <if test=" isOn > -1">
             and is_on = #{isOn}
         </if>
@@ -126,7 +126,6 @@
         select count(0)
         from hot_category
         where 1=1 and hot_type = #{hotType} and (show_img = #{showImg} or show_name = #{showName})
-        and web_site = #{webSite}
         <if test="id > 0">
             and id != #{id}
         </if>
