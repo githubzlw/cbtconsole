@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.cbt.warehouse.dao.InventoryMapper" >
+    <resultMap id="InventoryLossMap" type="com.cbt.website.bean.LossInventoryWrap" >
+    	<result column="id" property="id" jdbcType="INTEGER" />
+        <result column="img" property="img" jdbcType="VARCHAR" />
+        <result column="url" property="url" jdbcType="VARCHAR" />
+        <result column="inventory_sku_id" property="inventorySkuId" jdbcType="INTEGER" />
+        <result column="goods_pid" property="goodsPid" jdbcType="VARCHAR" />
+        <result column="skuid" property="skuid" jdbcType="VARCHAR"/>
+        <result column="specid" property="specid" jdbcType="INTEGER" />
+        <result column="change_number" property="changeNumber" jdbcType="INTEGER" />
+        <result column="change_type" property="changeType" jdbcType="INTEGER" />
+        <result column="change_adm" property="changeAdm" jdbcType="INTEGER" />
+        <result column="change_time" property="changeTime" jdbcType="VARCHAR" />
+        <result column="delete_state" property="deleteState" jdbcType="INTEGER" />
+        <result column="delete_adm" property="deleteAdm" jdbcType="INTEGER" />
+        <result column="delete_time" property="deleteTime" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+    </resultMap>
     <resultMap id="InventoryWrapMap" type="com.cbt.website.bean.InventoryWrap" >
         <result column="seilUnit" property="odSeilUnit" jdbcType="INTEGER" />
         <result column="yourorder" property="odYourOrder" jdbcType="INTEGER" />
@@ -756,5 +773,31 @@
     <if test="type!=0">is_delete=1</if>
     where id=#{id}
     </update>
+    
+    <select id="inventoryLossList" resultMap="InventoryLossMap">
+    select lr.inventory_sku_id,lr.goods_pid,lr.skuid,lr.specid,lr.change_number,
+    lr.change_type,lr.change_adm,lr.change_time,lr.delete_state,lr.delete_adm,
+    lr.delete_time,lr.remark,isk.car_img as img,isk.goods_url as url
+    
+    
+    from loss_inventory_record lr left join 
+    inventory_sku isk on lr.inventory_sku_id=isk.id
+	 where 1=1
+	 <if test="type!=-1">and lr.change_type=#{type}</if>
+	 <if test="startdate!=''">and lr.change_time>#{startdate}</if>
+	 <if test="enddate!=''">and lr.change_time$lt;#{enddate}</if>
+	 order by change_time desc
+	 limit #{page},20
+    
+    </select>
+    <select id="inventoryLossListCount" resultType="Integer">
+     select count(id)
+    from loss_inventory_record 
+	 where 1=1
+	 <if test="type!=-1">and change_type=#{type}</if>
+	 <if test="startdate!=''">and change_time>#{startdate}</if>
+	 <if test="enddate!=''">and change_time&lt;#{enddate}</if>
+    
+    </select>
     
 </mapper>

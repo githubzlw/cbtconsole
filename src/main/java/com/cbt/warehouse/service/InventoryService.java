@@ -12,6 +12,7 @@ import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
 import com.cbt.website.bean.InventoryWrap;
+import com.cbt.website.bean.LossInventoryWrap;
 
 public interface InventoryService {
 	/**采购使用库存减少操作
@@ -264,5 +265,11 @@ public interface InventoryService {
 	 * @return
 	 */
 	int  updateRemark(Map<String,Object> map);
+	
+	/**报损列表
+	 * @return
+	 */
+	List<LossInventoryWrap> inventoryLossList(Map<String,Object> map);
+	int inventoryLossListCount(Map<String,Object> map);
 	
 }
