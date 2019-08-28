@@ -293,6 +293,10 @@ public class PublishGoodsToOnlineThread extends Thread {
                             // 重试一次
                              isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
                         }
+                        if(!isUp){
+                            // 重试一次
+                             isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
+                        }
                         if (isUp) {
                             isSuccess = true;
                         } else {
