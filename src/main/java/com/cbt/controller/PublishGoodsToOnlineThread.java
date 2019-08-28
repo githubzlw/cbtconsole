@@ -75,6 +75,9 @@ public class PublishGoodsToOnlineThread extends Thread {
             if (checkIsKidsCatid(goods.getCatid1())) {
                 isKids = 1;
             }
+            if(StringUtils.isNotBlank(goods.getEninfo()) && goods.getEninfo().length() > 20){
+                goods.setIsShowDetImgFlag(1);
+            }
 
             goods.setEntypeNew(ChangeEntypeUtils.getEntypeNew(goods.getEntype(), goods.getSku(), ""));
 

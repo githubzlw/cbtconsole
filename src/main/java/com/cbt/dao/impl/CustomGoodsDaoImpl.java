@@ -699,7 +699,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
 
         String upsql = "update custom_benchmark_ready set valid=1,keyword=?,eninfo=?,enname=?,"
                 + "weight=?,img=?,endetail=?,revise_weight=?,final_weight=?, "
-                + "price=?,wprice=?,range_price=?,sku=?,cur_time=now(),bm_flag=1,goodsstate=4";
+                + "price=?,wprice=?,range_price=?,sku=?,is_show_det_img_flag = ?,cur_time=now(),bm_flag=1,goodsstate=4";
         if (bean.getIsEdited() == 1) {
             upsql += ",finalName=?";
         } else if (bean.getIsEdited() == 2) {
@@ -713,7 +713,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         upsql += " where pid=?";
         Connection conn = null;
         conn = DBHelper.getInstance().getConnection();
-        String upLocalSql = "update custom_benchmark_ready set img=?,eninfo=?,custom_main_image=?,unsellableReason=45 where pid = ?";
+        String upLocalSql = "update custom_benchmark_ready set img=?,eninfo=?,custom_main_image=?,is_show_det_img_flag = ?,unsellableReason=45 where pid = ?";
         ResultSet rs = null;
         PreparedStatement stmt = null;
         PreparedStatement stmt2 = null;
@@ -735,6 +735,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 stmt2.setString(i++, bean.getWprice());
                 stmt2.setString(i++, bean.getRangePrice());
                 stmt2.setString(i++, bean.getSku());
+                stmt2.setInt(i++, bean.getIsShowDetImgFlag());
                 if (bean.getIsEdited() == 1) {
                     stmt2.setString(i++, bean.getEnname());
                 } else if (bean.getIsEdited() == 2) {
@@ -763,7 +764,8 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 stmt.setString(1, bean.getImg());
                 stmt.setString(2, bean.getEninfo());
                 stmt.setString(3, bean.getShowMainImage().replace(bean.getRemotpath(),""));
-                stmt.setString(4, bean.getPid());
+                stmt.setInt(4, bean.getIsShowDetImgFlag());
+                stmt.setString(5, bean.getPid());
                 result = stmt.executeUpdate();
             }
 
