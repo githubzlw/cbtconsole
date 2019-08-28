@@ -18,6 +18,7 @@ import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventorySku;
 import com.cbt.website.bean.InventoryWrap;
 import com.cbt.website.bean.LossInventoryRecord;
+import com.cbt.website.bean.LossInventoryWrap;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 
 public interface InventoryMapper {
@@ -402,4 +403,9 @@ public interface InventoryMapper {
 	List<Map<String,Object>> getInventoryRemark(int skuId);
 	
 	int updateidRelationState(@Param("id")int id,@Param("type")int type);
+	/**报损列表
+	 * @return
+	 */
+	List<LossInventoryWrap> inventoryLossList(Map<String,Object> map);
+	int inventoryLossListCount(Map<String,Object> map);
 }

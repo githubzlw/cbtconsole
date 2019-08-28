@@ -75,6 +75,9 @@ public class PublishGoodsToOnlineThread extends Thread {
             if (checkIsKidsCatid(goods.getCatid1())) {
                 isKids = 1;
             }
+            if(StringUtils.isNotBlank(goods.getEninfo()) && goods.getEninfo().length() > 20){
+                goods.setIsShowDetImgFlag(1);
+            }
 
             goods.setEntypeNew(ChangeEntypeUtils.getEntypeNew(goods.getEntype(), goods.getSku(), ""));
 
@@ -285,6 +288,14 @@ public class PublishGoodsToOnlineThread extends Thread {
                         if (goods.getValid() == 0 && checkIsKidsCatid(goods.getCatid1())) {
                             // 如果kids并且下架，则执行图片上传
                             isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
+                        }
+                        if(!isUp){
+                            // 重试一次
+                             isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
+                        }
+                        if(!isUp){
+                            // 重试一次
+                             isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
                         }
                         if (isUp) {
                             isSuccess = true;

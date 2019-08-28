@@ -46,6 +46,7 @@ import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
 import com.cbt.website.bean.InventoryWrap;
+import com.cbt.website.bean.LossInventoryWrap;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
 import com.cbt.website.dao.IExpressTrackDao;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -237,6 +238,40 @@ public class InventoryController {
 		return json;
 	}
 
+	/**
+	 * 库存报损列表
+	 */
+	@RequestMapping("/loss/list")
+	public ModelAndView inventoryLossList(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
+		ModelAndView result = new ModelAndView("inventoryloss");
+		String strPage = request.getParameter("page");
+		int page = 0;
+		page = StrUtils.isMatch(strPage, "(\\d+)") ? Integer.valueOf(strPage) : 1;
+		String strtype = request.getParameter("type");
+		int type = 0;
+		type = StrUtils.isMatch(strtype, "(\\d+)") ? Integer.valueOf(strtype) : -1;
+		String enddate = request.getParameter("enddate");
+		enddate = StringUtil.isBlank(enddate) ? "" : enddate;
+		String startdate = request.getParameter("startdate");
+		startdate = StringUtil.isBlank(startdate) ? "" : startdate;
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("startdate",startdate);
+		map.put("enddate",enddate);
+		map.put("type",type );
+		map.put("currentPage",page );
+		map.put("page",(page - 1) * 20 );
+		int lossListCount = inventoryService.inventoryLossListCount(map);
+		if(lossListCount > 0) {
+			List<LossInventoryWrap> inventoryLossList = inventoryService.inventoryLossList(map);
+			result.addObject("lossList", inventoryLossList);
+		}
+		int lossListPage = lossListCount % 20 == 0 ? lossListCount / 20 : lossListCount / 20 + 1;
+		result.addObject("queryParam", map);
+		result.addObject("lossListPage", lossListPage);
+		result.addObject("lossCount", lossListCount);
+		return result;
+	}
 	/**
 	 * 库存报损
 	 */

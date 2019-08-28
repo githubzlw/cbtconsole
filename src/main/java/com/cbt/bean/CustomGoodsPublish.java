@@ -129,6 +129,16 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private String onlineUrl;
     private String pathCatid;
 
+    private int isShowDetImgFlag;
+
+    public int getIsShowDetImgFlag() {
+        return isShowDetImgFlag;
+    }
+
+    public void setIsShowDetImgFlag(int isShowDetImgFlag) {
+        this.isShowDetImgFlag = isShowDetImgFlag;
+    }
+
     public String getPathCatid() {
         return pathCatid;
     }
