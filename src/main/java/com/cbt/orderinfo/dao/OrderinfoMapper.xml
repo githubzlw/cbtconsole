@@ -1450,7 +1450,7 @@
 	</select>
 	<select id="getGoodsBrandAuthorization" resultType="java.util.Map">
 	select cb.pid,cb.brand_id,sa.shop_id,sa.authorize_state,sa.brand_name    from custom_benchmark_ready cb 
-	left join shop_brand_authorization sa on cb.brand_id=sa.brand_id  
+	left join shop_brand_authorization sa on cb.brand_id=sa.id  
 	and cb.shop_id =sa.shop_id   where cb.pid=#{pid} limit 1
 	</select>
 	<update id="cancelOrderState">
