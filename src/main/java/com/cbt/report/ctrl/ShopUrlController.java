@@ -3729,7 +3729,7 @@ public class ShopUrlController {
 
 
         try {
-            shopUrlService.reDownShopGoods(shopId, user.getId());
+            shopUrlService.reDownShopGoods(shopId, user);
             json.setOk(true);
         } catch (Exception e) {
             e.getStackTrace();
