@@ -126,6 +126,12 @@ public class QuestionAndAnswerServiceImpl implements QuestionAndAnswerService {
 					model.put("itemUrl",urlTem);
 					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From kidsproductwholesale", model, TemplateType.BUSINESS_INQUIRIES_KIDS);
 				}
+				if ("3".equals(Website)){
+					model.put("websiteType",3);
+					urlTem = "https://www.lovelypetsupply.com/goodsinfo/...-1"+url+".html";
+					model.put("itemUrl",urlTem);
+					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From lovelypetsupply", model, TemplateType.BUSINESS_INQUIRIES_PET);
+				}
 
             };
         }.start();

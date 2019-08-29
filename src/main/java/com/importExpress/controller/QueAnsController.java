@@ -226,10 +226,15 @@ public class QueAnsController {
 		dateFormat.setLenient(false);
 		String date = dateFormat.format(now);
 		String Website="0";
-		String reg=".*kidsproductwholesale.*";  //判断字符串中是否含有ll
+		String reg=".*kidsproductwholesale.*";  //判断是否童装网站
+		String regPet=".*import.*";  //判断是否主站
 		boolean isValid=purl.matches(reg);
+		boolean isValidPet=purl.matches(regPet);
 		if (isValid){
 			Website="1";
+		}
+		if (!isValid && !isValidPet){
+			Website="3";
 		}
 		//给客户发送邮件
 		QueAns q=questionAndAnswerService.getQueAnsinfo(qid);
