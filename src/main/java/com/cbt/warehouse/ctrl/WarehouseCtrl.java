@@ -7341,6 +7341,8 @@ public class WarehouseCtrl {
                             modelM.put("toHref", "https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         } else if (websiteType == 2) {
                             modelM.put("toHref", "https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                        } else if (websiteType == 3) {
+                            modelM.put("toHref", "https://www.lovelypetsupply.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         }
                         sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
 						//插入发送邮件记录
