@@ -1,6 +1,7 @@
 package com.cbt.customer.dao;
 
 import com.cbt.bean.*;
+import com.cbt.website.userAuth.bean.Admuser;
 
 import java.util.List;
 import java.util.Map;
@@ -453,10 +454,10 @@ public interface IShopUrlDao {
     /**
      * 重新进行店铺商品下载
      * @param shopId
-     * @param adminId
+     * @param admuser
      * @return
      */
-    int reDownShopGoods(String shopId, int adminId);
+    int reDownShopGoods(String shopId, Admuser admuser);
 
     /**
      * 更新新的负责人ID

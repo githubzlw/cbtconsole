@@ -2,6 +2,7 @@ package com.cbt.customer.service;
 
 
 import com.cbt.bean.*;
+import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.ShopBrandAuthorization;
 
 import java.util.List;
@@ -347,10 +348,10 @@ public interface IShopUrlService {
     /**
      * 重新进行店铺商品下载
      * @param shopId
-     * @param adminId
+     * @param admuser
      * @return
      */
-    int reDownShopGoods(String shopId, int adminId);
+    int reDownShopGoods(String shopId, Admuser admuser);
 
     /**
      * 根据店铺ID查询店铺品牌和授权信息
