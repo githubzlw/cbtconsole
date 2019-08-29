@@ -576,6 +576,9 @@ public interface IWarehouseService {
 	//批量插入出货包裹
 	int batchInsertSP(List<Map<String, String>> list);
 
+	//批量插入出货包裹日志
+	int batchInsertSPLog(List<Map<String, String>> list);
+
 	//删除出货
 	int deleteShippingPackage(Map<String, String> map);
 

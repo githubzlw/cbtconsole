@@ -1909,6 +1909,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
+    public int batchInsertSPLog(List<Map<String, String>> list) {
+        return warehouseMapper.batchInsertSPLog(list);
+    }
+
+    @Override
     public int deleteShippingPackage(Map<String, String> map) {
         return warehouseMapper.deleteShippingPackage(map);
     }
