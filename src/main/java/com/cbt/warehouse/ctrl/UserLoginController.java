@@ -14,11 +14,16 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.service.QueryUserService;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
@@ -48,6 +53,36 @@ public class UserLoginController {
         }
 
     }
+    @RequestMapping("/checkUserInfo.do")
+	public String login(@RequestParam("userName") String username, 
+			@RequestParam("passWord") String password){
+		Subject currentUser = SecurityUtils.getSubject();
+		JsonResult json = new JsonResult();
+		json.setOk(true);
+		if (!currentUser.isAuthenticated()) {
+        	// 把用户名和密码封装为 UsernamePasswordToken 对象
+            UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+            // rememberme
+            token.setRememberMe(true);
+            try {
+            	System.out.println("1. " + token.hashCode());
+            	// 执行登录. 
+                currentUser.login(token);
+                json.setOk(true);
+            } 
+            // ... catch more exceptions here (maybe custom ones specific to your application?
+            // 所有认证时异常的父类. 
+            catch (AuthenticationException e) {
+                //unexpected condition?  error?
+            	System.out.println("登录失败: " + e.getMessage());
+            	json.setOk(false);
+                json.setMessage("校检用户信息失败，原因：" + e.getMessage());
+                LOG.error("校检用户信息失败，原因：", e);
+            }
+        }
+		
+		 return "redirect:/website/main_menu.jsp";
+	}
 
     /**
      * 判断用户信息
@@ -56,7 +91,7 @@ public class UserLoginController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/checkUserInfo.do")
+    @RequestMapping(value = "/checkUserInfoss.do")
     @ResponseBody
     public JsonResult checkUserInfo(HttpServletRequest request, HttpServletResponse response) {
 
@@ -255,7 +290,7 @@ public class UserLoginController {
         return json;
     }
 
-    @RequestMapping(value = "/autoLoginByCookie")
+    @RequestMapping(value = "/autoLoginByCookiei")
     @ResponseBody
     public JsonResult autoLoginByCookie(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();

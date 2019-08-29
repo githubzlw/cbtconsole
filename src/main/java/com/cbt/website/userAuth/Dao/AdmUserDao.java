@@ -35,6 +35,12 @@ public interface AdmUserDao {
 	 * @return
 	 */
 	public List<Admuser> queryForList() throws Exception;
+	/**
+	 * 获取所有用户信息
+	 * 
+	 * @return
+	 */
+	public Admuser queryForListByName(String name);
 
 	/**
 	 * 根据角色查询用户信息

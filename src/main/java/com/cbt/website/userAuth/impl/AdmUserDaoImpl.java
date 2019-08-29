@@ -505,4 +505,48 @@ public class AdmUserDaoImpl implements AdmUserDao {
         return admuser;
     }
 
+	@Override
+	public Admuser queryForListByName(String name) {
+		 	String sql = "select * from admuser where status=1 and admName=? limit 1";
+	        Connection conn = DBHelper.getInstance().getConnection();
+	        PreparedStatement stmt = null;
+	        ResultSet rs = null;
+	        Admuser admuser = null;
+	        try {
+	            stmt = conn.prepareStatement(sql.toString());
+	            stmt.setString(1, name);
+	            rs = stmt.executeQuery();
+	            if (rs.next()) {
+	            	admuser = new Admuser();
+	                admuser.setId(rs.getInt("id"));
+	                admuser.setAdmName(rs.getString("admName"));
+	                admuser.setEmail(rs.getString("email"));
+	                admuser.setPassword(rs.getString("password"));
+	                admuser.setTitle(rs.getString("title"));
+	                admuser.setRoletype(rs.getString("roleType"));
+	                admuser.setStatus(rs.getString("status"));
+	                admuser.setEmialpass(rs.getString("emailpass"));
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (rs != null) {
+	                try {
+	                    rs.close();
+	                } catch (SQLException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	            if (stmt != null) {
+	                try {
+	                    stmt.close();
+	                } catch (SQLException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	            DBHelper.getInstance().closeConnection(conn);
+	        }
+	        return admuser;
+	}
+
 }
