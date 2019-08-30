@@ -1197,6 +1197,9 @@ public class InventoryController {
 		mv.addObject("toryListPage", toryListPage);
 		mv.addObject("queryParam",map);
 		
+		//是否有待操作的移库请求，只有处理完才可以盘点
+		int unDoneInventoryBarcode = inventoryService.getUnDoneInventoryBarcode();
+		mv.addObject("isBarcodeDone",unDoneInventoryBarcode);
 		return mv;
 		
 	}

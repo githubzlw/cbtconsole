@@ -806,5 +806,8 @@
     
     from inventory_details_sku where od_id=#{odid} and type=0 order by id desc limit 1 
     </select>
+    <select id="getUnDoneInventoryBarcode" resultType="Integer">
+    select count(*) from  inventory_barcode_record where state=0 or state=1
+    </select>
     
 </mapper>

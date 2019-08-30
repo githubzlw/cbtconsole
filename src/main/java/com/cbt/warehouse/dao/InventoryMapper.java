@@ -415,4 +415,9 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	Map<String,Object> getInventoryDetailByOdid(int odid);
+	
+	/**未完成移库请求数量
+	 * @return
+	 */
+	int getUnDoneInventoryBarcode();
 }

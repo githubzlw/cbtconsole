@@ -505,10 +505,14 @@ em,i{font-style: normal;}
 		</div>
 	</div>
 </div>
-
+<input type="hidden" value="${isBarcodeDone}" id="isBarcodeDone">
 </body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/inventoryReport.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
 </html>
 
 

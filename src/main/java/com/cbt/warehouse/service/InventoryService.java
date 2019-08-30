@@ -271,5 +271,9 @@ public interface InventoryService {
 	 */
 	List<LossInventoryWrap> inventoryLossList(Map<String,Object> map);
 	int inventoryLossListCount(Map<String,Object> map);
+	/**未完成移库请求数量
+	 * @return
+	 */
+	int getUnDoneInventoryBarcode();
 	
 }
