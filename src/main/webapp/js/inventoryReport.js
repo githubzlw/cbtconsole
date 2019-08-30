@@ -615,13 +615,21 @@ function addLoss(){
  var ispecid= $("#index_ispecid").val();
  var changeNumber= $("#index_ichangcount").val();
  var remark=$("#index_iremark").val();
-	var  change_type = "0"; 
+ var  change_type = "0";
+ var index_icanremaining = $("#index_icanremaining").text().trim();
+ var index_iremaining = $("#index_iremaining").text().trim();
+ var in_id = $("#index_in_id").val();
+ if(index_iremaining != index_icanremaining){
+	 $.MsgBox.Confirm("温馨提示", "请先完成该产品的移库处理操作后再来！点击'确定'跳转移库列表", function(){
+		 window.location.href = "/cbtconsole/inventory/barcode?inid="+in_id;
+	 });
+	 return ;
+ }
  $(".radio_change").each(function(){
 	   if($(this).is(':checked')){
 		   change_type = $(this).val();
 	   }
  })
-  var in_id = $("#index_in_id").val();
   jQuery.ajax({
       url:"/cbtconsole/inventory/addLoss",
       data:{

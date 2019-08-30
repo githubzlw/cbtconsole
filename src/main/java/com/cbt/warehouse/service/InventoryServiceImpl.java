@@ -489,7 +489,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		inventory.put("before_remaining", String.valueOf(beforeRemaining));
 		inventory.put("after_remaining", String.valueOf(afterRemaining));
 		
-		//4.插入库存变更记录 change_type 1:入库 2：出库
+		//4.插入库存变更记录 change_type 0：默认 1：增加  2：减少，3：盘点  4占用 5-取消占用
 		InventoryLog iLog = new InventoryLog();
 		iLog.setAfterRemaining(afterRemaining);
 		iLog.setBeforeRemaining(beforeRemaining);
@@ -519,9 +519,9 @@ public class InventoryServiceImpl implements  InventoryService{
 			inventoryMapper.insertStorageOutboundDetails(inventory);
 		}
 		//6.记录库存入库明细操作
-		//入库 0 入库  1 出库
+		//0 入库  1 出库 2 报损 4盘点  5-入库完成 6-出库完成 7-移库取消
 		iDetail.setGoodsPPrice(iSku.getGoodsPPrice());
-		iDetail.setType(0);
+		iDetail.setType(5);
 		iDetail.setAdmid(Integer.valueOf(StrUtils.object2NumStr(inventory.get("adminId"))));
 		iDetail.setGoodsName(iSku.getGoodsName());
 		iDetail.setGoodsImg(iSku.getCarImg());
@@ -689,13 +689,16 @@ public class InventoryServiceImpl implements  InventoryService{
 		iLog.setAfterRemaining(after_remaining);
 		iLog.setBeforeRemaining(before_remaining);
 		iLog.setRemaining(inventory_count);
-		iLog.setChangeType(2);
 		if(isReduce) {
 			iLog.setRemark("订单orderid:"+orderid+"/od_id:"+odid+"采购使用库存数量"+inventory_count+",库存减少");
+			iLog.setChangeType(4);
 			map.put("sku_details_remark", "订单orderid:"+orderid+"/od_id:"+odid+"采购使用库存数量"+inventory_count+",库存减少");
+			map.put("type", "1");
 		}else {
 			iLog.setRemark("订单orderid:"+orderid+"/od_id:"+odid+" 验货取消,取消库存数量:"+inventory_count);
+			iLog.setChangeType(2);
 			map.put("sku_details_remark", "订单orderid:"+orderid+"/od_id:"+odid+" 验货取消,取消库存数量:"+inventory_count);
+			map.put("type", "6");
 		}
 		iLog.setGoodsName(inventoryMap.getGoodsName());
 		iLog.setGoodsPid(inventoryMap.getGoodsPid());
@@ -708,7 +711,6 @@ public class InventoryServiceImpl implements  InventoryService{
 		
 		//3.记录库存入库明细操作
 		//入库 0 入库  1 出库
-		map.put("type", "1");
 		map.put("inventory_sku_id", String.valueOf(inventoryMap.getId()));
 		map.put("inventory_count", String.valueOf(inventory_count));
 		inventoryMapper.addInventoryDetailsSku(map);
@@ -804,10 +806,9 @@ public class InventoryServiceImpl implements  InventoryService{
 			return result;
 		}
 		
-		
 		//4.库存明细表 inventory_details_sku
-		 inv.put("type", "2");
 		 inv.put("admid", String.valueOf(map.get("change_adm")));
+		 inv.put("type", "2");
 		 int addInventoryDetailsSku = inventoryMapper.addInventoryDetailsSku(inv);
 		 if(addInventoryDetailsSku == 0) {
 			result.put("status", 105);

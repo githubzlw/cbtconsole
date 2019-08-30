@@ -88,12 +88,15 @@ public class InventoryController {
 		state = StrUtils.isNum(state) ? state : "-1";
 		String orderid = request.getParameter("orderid");
 		orderid = StringUtil.isBlank(orderid) ? null : orderid;
+		String inid = request.getParameter("inid");
+		inid = StrUtils.isNum(inid) ? inid : "0";
 		String page = request.getParameter("page");
 		page = StrUtils.isNum(page) ? page : "1";
 		map.put("currentPage", Integer.parseInt(page));
 		map.put("page", (Integer.parseInt(page) - 1)*20);
 		map.put("state", state);
 		map.put("orderid", orderid);
+		map.put("inid", inid);
 		
 		int count = inventoryService.inventoryBarcodeListCount(map);
 		if(count > 0) {
