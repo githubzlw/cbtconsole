@@ -13,6 +13,7 @@ import com.importExpress.pojo.OrderShare;
 import com.importExpress.pojo.TimingWarningInfo;
 import com.importExpress.pojo.UserBean;
 import com.importExpress.service.QueryUserService;
+import com.importExpress.utli.DESUtils;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -788,6 +790,13 @@ public class QueryUserController {
         }
         UserBean bean = queryUserService.insertLoginLog(userid, user.getId(), site);
         result.put("bean", bean);
+        result.put("webSiteUrl", MultiSiteUtil.getWebSiteUrl(site));
+        try{
+            String encode = URLEncoder.encode(DESUtils.encode(userid + ""));
+            result.put("encode", encode);
+        }catch(Exception e){
+            LOG.error(" 加密用户名错误 USERID:{}", userid);
+        }
         result.put("state", "true");
         return result;
     }

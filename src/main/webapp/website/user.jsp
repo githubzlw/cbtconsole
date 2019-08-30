@@ -256,16 +256,15 @@ tr .td_class{width:230px;}
             },
             success:function(data){
                 if(data.state == "true"){
-                    $("#user_login_from input[name=email]").val(data.bean.email);
-                    $("#user_login_from input[name=pass]").val(data.bean.pass);
-                    if (site == 1) {
-                        $("#user_login_from").attr("action", "https://www.import-express.com/user/loginNew")
-                    } else if (site == 2) {
-                        $("#user_login_from").attr("action", "https://www.kidsproductwholesale.com/user/loginNew")
-                    } else if (site == 4) {
-                        $("#user_login_from").attr("action", "https://www.lovelypetsupply.com/user/loginNew")
+                    if (data.bean.pass != undefined && data.bean.pass != '') {  // 有密码的账号 模拟post请求登陆
+                        $("#user_login_from input[name=email]").val(data.bean.email);
+                        $("#user_login_from input[name=pass]").val(data.bean.pass);
+                        $("#user_login_from").attr("action", data.webSiteUrl + "/user/loginNew")
+                        $("#user_login_from").submit();
+                    } else if (data.encode != undefined) {  // 没有密码的第三方登陆 使用模拟登陆接口
+                        window.open(data.webSiteUrl + "/simulateLogin/login?userName="
+                            + data.encode + "&password=" + data.bean.name.replace(/\s+/g,'') + "&currency=" + data.bean.currency, "_blank");
                     }
-                    $("#user_login_from").submit();
                     $('#user_login_message').window('close');
                 }else{
                     alert(data.message);
@@ -627,7 +626,7 @@ tr .td_class{width:230px;}
             <input type='radio' name='site' value='2'/>
             <span>kidsproductwholesale</span>
             <br /><br />
-            <input type='radio' name='site' value='4'/>
+            <input type='radio' name='site' value='3'/>
             <span>lovelypetsupply</span>
             <br /><br />
         </div>
