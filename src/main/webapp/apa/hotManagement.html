@@ -295,10 +295,9 @@
             }
 
             var category_id = $("#category_id").val();
-            var add_or_edit = $("#add_or_edit").val();
             var hot_web_site= $("#web_size_type").val();
 
-            if (add_or_edit == 1) {
+            if (category_id > 0) {
                 //编辑状态
                 $.ajax({
                     type: "POST",
@@ -316,7 +315,7 @@
                     success: function (data) {
                         $.messager.progress('close');
                         if (data.ok) {
-                            window.location.reload();
+                            $('#hot_easyui-datagrid').datagrid('reload');
                         } else {
                             $.messager.alert("提醒", '执行错误:' + data.message, "info");
                         }
@@ -382,7 +381,7 @@
                             success: function (data) {
                                 if (data.ok) {
                                     $.messager.alert("提醒", '删除成功', "info");
-                                    window.location.reload();
+                                    $('#hot_easyui-datagrid').datagrid('reload');
                                 } else {
                                     $.messager.alert("提醒", '执行错误:' + data.message, "info");
                                 }

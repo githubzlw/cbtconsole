@@ -85,8 +85,10 @@ public class ProblemFeedBackController {
 					modelM.put("websiteType", websiteType);
 					if (websiteType == 1) {
                         modelM.put("toHref", "https://www.import-express.com/Goods/getShopCar");
-                    } else {
+                    } else if (websiteType == 2){
                         modelM.put("toHref", "https://www.kidsproductwholesale.com/Goods/getShopCar");
+                    } else if (websiteType == 3){
+                        modelM.put("toHref", "https://www.lovelypetsupply.com/Goods/getShopCar");
                     }
 					sendMailFactory.sendMail(String.valueOf(modelM.get("first_name")), null, "Shopping Question Reply", modelM, TemplateType.SHOPPING_REPLY);
 					json.setOk(true);

@@ -673,6 +673,11 @@ public class OrderInfoController{
 				modelM.put("accountLink","https://www.kidsproductwholesale.com/orderInfo/emailLink?orderNo="+orderNo+"");
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE_KIDS);
 			}
+			if (MultiSiteUtil.getSiteTypeNum(orderNo)==3){
+				modelM.put("websiteType",3);
+				modelM.put("accountLink","https://www.lovelypetsupply.com/orderInfo/emailLink?orderNo="+orderNo+"");
+				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE_PET);
+			}
 //			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
 			SendMQ sendMQ=new SendMQ();
 			iOrderinfoService.updateOrderinfoUpdateState(orderNo);

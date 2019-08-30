@@ -339,6 +339,9 @@ public interface WarehouseMapper {
 	//批量插入出货包裹
 	int batchInsertSP(List<Map<String, String>> list);
 
+	//批量插入出货包裹日志
+	int batchInsertSPLog(List<Map<String, String>> list);
+
 	//批量修改出货包裹
 	int batchUpdateShippingPackage(List<Map<String, String>> list);
 

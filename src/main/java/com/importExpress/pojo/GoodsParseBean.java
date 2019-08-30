@@ -9,7 +9,34 @@ public class GoodsParseBean {
     private String wholesale_price;
     private String price_1688;
     private String weight_1688;
+    private String enInfo;
+    private String remotePath;
+    private String catid1;
 
+    public String getCatid1() {
+        return catid1;
+    }
+
+    public void setCatid1(String catid1) {
+        this.catid1 = catid1;
+    }
+
+    public String getRemotePath() {
+        return remotePath;
+    }
+
+    public void setRemotePath(String remotePath) {
+        this.remotePath = remotePath;
+    }
+
+
+    public String getEnInfo() {
+        return enInfo;
+    }
+
+    public void setEnInfo(String enInfo) {
+        this.enInfo = enInfo;
+    }
 
     public String getPid() {
         return pid;

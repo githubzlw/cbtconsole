@@ -11,12 +11,12 @@ import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
-import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsMd5Bean;
+import com.importExpress.pojo.GoodsParseBean;
 import com.importExpress.thread.DeleteImgByMd5Thread;
 import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
@@ -108,13 +108,13 @@ public class EditorController {
         // 取出1688商品的全部信息
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
         if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
-            if(goods.getGoodsState() == 3){
+            if (goods.getGoodsState() == 3) {
                 goods.setOffReason(null);
-            }else{
+            } else {
                 goods.setOffReason("老数据");
             }
         } else if (goods.getValid() == 2) {
-            String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()),"");
+            String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()), "");
             if (StringUtils.isNotBlank(rsStr)) {
                 goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
             } else {
@@ -513,10 +513,10 @@ public class EditorController {
                 JSONArray sku_json = JSONArray.fromObject(goods.getSku());
                 List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
-                for(ImportExSkuShow exSku : cbSkus){
-                    if(StringUtils.isNotBlank(exSku.getSpecId())){
+                for (ImportExSkuShow exSku : cbSkus) {
+                    if (StringUtils.isNotBlank(exSku.getSpecId())) {
                         String chType = customGoodsService.queryChTypeBySkuId(exSku.getSpecId());
-                        if(StringUtils.isBlank(chType)){
+                        if (StringUtils.isBlank(chType)) {
                             chType = "";
                         }
                         exSku.setChType(chType);
@@ -807,16 +807,21 @@ public class EditorController {
                 cgp.setEndetail("[]");
             }
             if (StringUtils.isNotBlank(contentStr)) {
-                if(contentStr.contains("data:image/png;base64")){
+                if (contentStr.contains("data:image/png;base64")) {
                     json.setOk(false);
                     json.setMessage("详情存在截屏图片，不能保存！");
                     return json;
-                } else{
+                } else {
+                    // 检查详情中是否含有非本地上传和我司网站的图片
                     // 产品详情
                     String eninfo = contentStr.replaceAll(remotepath, "");
                     //解析和上传阿里商品的图片
-                    eninfo = uploadAliImgToLocal(pidStr, eninfo);
-                    cgp.setEninfo(eninfo);
+                    json = uploadAliImgToLocal(pidStr, eninfo);
+                    if (json.isOk()) {
+                        cgp.setEninfo(json.getData().toString());
+                    } else {
+                        return json;
+                    }
                 }
             } else {
                 json.setOk(false);
@@ -1856,14 +1861,16 @@ public class EditorController {
         return json;
     }
 
-    private String uploadAliImgToLocal(String pid, String eninfo) {
 
+    private JsonResult uploadAliImgToLocal(String pid, String eninfo) {
+
+        JsonResult json = new JsonResult();
         String tempEninfo = "";
         try {
             // 详情数据的获取和解析img数据
             if (StringUtils.isNotBlank(eninfo)) {
                 //循环上传图片到本地
-                JsonResult json = new JsonResult();
+
                 // 获取配置文件信息
                 if (ftpConfig == null) {
                     ftpConfig = GetConfigureInfo.getFtpConfig();
@@ -1877,7 +1884,10 @@ public class EditorController {
                         String imgUrl = imel.attr("src");
                         if (imgUrl == null || "".equals(imgUrl)) {
                             continue;
-                        } else if (imgUrl.contains("alicdn.com")) {
+                        } else if (imgUrl.contains("http://") || imgUrl.contains("https://")) {
+                            if (imgUrl.contains("192.168.") || imgUrl.contains(".import-express.")) {
+                                continue;
+                            }
                             // 检查配置文件信息是否正常读取
                             GetConfigureInfo.checkFtpConfig(ftpConfig, json);
                             if (json.isOk()) {
@@ -1901,7 +1911,7 @@ public class EditorController {
                                     boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
                                     if (is) {
                                         // 判断图片的分辨率是否小于100*100
-                                        boolean checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 100, 100);
+                                        boolean checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 40, 40);
                                         if (checked) {
                                             // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
                                             checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
@@ -1921,33 +1931,44 @@ public class EditorController {
                                             }
                                         } else {
                                             // 判断分辨率不通过删除图片
-                                            File file = new File(localFilePath);
+                                            File file = new File(localDiskPath + localFilePath);
                                             if (file.exists()) {
                                                 file.delete();
                                             }
                                             json.setOk(false);
-                                            json.setMessage("图片分辨率小于100*100，终止执行");
+                                            json.setMessage("[" + imgUrl + "]图片分辨率小于40*40，终止执行");
+                                            break;
                                         }
                                     } else {
                                         json.setOk(false);
                                         json.setMessage("下载网路图片到本地失败，请重试");
+                                        break;
                                     }
                                 }
                             }
                         }
                     }
+                    json.setOk(true);
                     tempEninfo = nwDoc.toString();
                 } else {
+                    json.setOk(true);
                     tempEninfo = eninfo;
                 }
             } else {
                 tempEninfo = "";
+                json.setOk(true);
             }
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("pid:" + pid + ",uploadAliImgToLocal error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("pid:" + pid + ",uploadAliImgToLocal error:" + e.getMessage());
+            json.setData(null);
         }
-        return tempEninfo;
+        if (json.isOk()) {
+            json.setData(tempEninfo);
+        }
+        return json;
 
     }
 
@@ -2252,7 +2273,7 @@ public class EditorController {
                 sendMQ.sendMsg(new RunSqlModel(sql));
                 sendMQ.closeConn();
             }
-            json.setOk(index>0?true:false);
+            json.setOk(index > 0 ? true : false);
             json.setMessage("线上产品单页对应评论数据已增加, 后台对应新增评论10分钟后会显示. ");
         } catch (Exception e) {
             json.setOk(false);
@@ -2828,8 +2849,6 @@ public class EditorController {
         // 为防止文件覆盖的现象发生，要为上传文件产生一个唯一的文件名
         return UUID.randomUUID().toString() + "_" + filename;
     }
-
-
 
 
     @RequestMapping(value = "/goodsEditLog")
@@ -3609,6 +3628,169 @@ public class EditorController {
             json.setMessage("changeChineseImgToEnglishImg error:" + e.getMessage());
         }
         return json;
+    }
+
+
+    @RequestMapping(value = "/checkEnInfoAndUploadImg")
+    @ResponseBody
+    public JsonResult checkEnInfoAndUploadImg(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        try {
+            int limitNum = 100;
+            int maxId = customGoodsService.queryMaxIdFromCustomGoods();
+            int fc = maxId / limitNum;
+            if (maxId % limitNum > 0) {
+                fc++;
+            }
+            int count = 0;
+            List<GoodsParseBean> list;
+            for (int i = 1; i <= fc; i++) {
+                list = customGoodsService.queryCustomGoodsByLimit((i - 1) * limitNum, i * limitNum);
+                if (list != null && list.size() > 0) {
+                    for (GoodsParseBean gd : list) {
+                        praseEninfoAndUpdate(gd);
+                        if(gd.getAliUpdate() > 0){
+                            count ++;
+                            // break;
+                        }
+                    }
+                }
+                if(count > 0){
+                    // break;
+                }
+                list.clear();
+            }
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+    private void praseEninfoAndUpdate(GoodsParseBean gd) {
+        try {
+            // 获取配置文件信息
+            if (ftpConfig == null) {
+                ftpConfig = GetConfigureInfo.getFtpConfig();
+            }
+            JsonResult json = new JsonResult();
+            // 检查配置文件信息是否正常读取
+            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
+            //解析eninfo数据
+            Document nwDoc = Jsoup.parseBodyFragment(gd.getEnInfo());
+            Elements imgEls = nwDoc.getElementsByTag("img");
+            if (imgEls.size() > 0) {
+                int count = 0;
+                int isKids = checkIsKidsCatid(gd.getCatid1()) ? 1 : 0;
+                String servicePrePath = GoodsInfoUtils.changeRemotePathToLocal(gd.getRemotePath() + gd.getPid() + "/desc/", isKids);
+                String localPrePath = ftpConfig.getLocalDiskPath() + "checkImg/" + gd.getPid() + "/desc/";
+                String remotePrePath = GoodsInfoUtils.changeLocalPathToRemotePath(servicePrePath).replace("kidsproductwholesale","import-express");
+                Random random = new Random();
+                for (Element imel : imgEls) {
+                    String imgUrl = imel.attr("src");
+                    if (imgUrl == null || "".equals(imgUrl)) {
+                        continue;
+                    } else if (imgUrl.contains("http://") || imgUrl.contains("https://")) {
+                        if (imgUrl.contains("192.168.") || imgUrl.contains(".import-express.")) {
+                            continue;
+                        }
+                        count++;
+                        if (json.isOk()) {
+                            String localDiskPath = ftpConfig.getLocalDiskPath();
+                            if (!(imgUrl == null || "".equals(imgUrl.trim()) || imgUrl.length() < 10)) {
+                                // 得到文件保存的名称
+                                if (imgUrl.indexOf("?") > -1) {
+                                    imgUrl = imgUrl.substring(0, imgUrl.indexOf("?"));
+                                }
+                                // 兼容没有http头部的src
+                                if (imgUrl.indexOf("//") == 0) {
+                                    imgUrl = "http:" + imgUrl;
+                                }
+                                // 文件的后缀取出来
+                                String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
+                                // 生成唯一文件名称
+                                String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                                // 本地服务器磁盘全路径
+                                String localFilePath = "checkImg/" + gd.getPid() + "/desc/" + saveFilename + fileSuffix;
+                                // 下载网络图片到本地
+                                boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
+                                if (is) {
+                                    // 判断图片的分辨率是否小于100*100
+                                    boolean checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 40, 40);
+                                    if (checked) {
+                                        // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
+                                        checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
+                                        if (checked) {
+                                            String newLocalPath = "checkImg/" + gd.getPid() + "/desc/" + saveFilename + "_700" + fileSuffix;
+                                            checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
+                                                    localDiskPath + newLocalPath);
+                                            if (checked) {
+                                                imel.attr("src", remotePrePath + saveFilename + "_700" + fileSuffix);
+                                            } else {
+                                                json.setOk(false);
+                                                json.setMessage("压缩图片到700*700失败，终止执行");
+                                                count--;
+                                                imel.remove();
+                                            }
+                                        } else {
+                                            imel.attr("src", remotePrePath + saveFilename + fileSuffix);
+                                        }
+                                    } else {
+                                        // 判断分辨率不通过删除图片
+                                        File file = new File(localDiskPath + localFilePath);
+                                        if (file.exists()) {
+                                            file.delete();
+                                        }
+                                        imel.remove();
+                                        count--;
+                                    }
+                                } else {
+                                    json.setOk(false);
+                                    json.setMessage("下载网路图片到本地失败，请重试");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (count > 0) {
+                    gd.setAliUpdate(1);
+                    // 上传下载下来的文件
+                    File tempFile = new File(localPrePath);
+                    boolean isUpload = false;
+                    if (tempFile.exists() && tempFile.isDirectory()) {
+                        if (tempFile.listFiles().length > 0) {
+                            if (isKids > 0) {
+                                isUpload = UploadByOkHttp.uploadFileBatchAll(tempFile, servicePrePath);
+                                if (!isUpload) {
+                                    isUpload = UploadByOkHttp.uploadFileBatchAll(tempFile, servicePrePath);
+                                }
+                            } else {
+                                isUpload = UploadByOkHttp.uploadFileBatchOld(tempFile, servicePrePath);
+                                if (!isUpload) {
+                                    isUpload = UploadByOkHttp.uploadFileBatchOld(tempFile, servicePrePath);
+                                }
+                            }
+
+                        }
+                    }
+                    if (isUpload) {
+                        // 上传成功，更新数据
+                        CustomGoodsPublish gcp = new CustomGoodsPublish();
+                        gcp.setPid(gd.getPid());
+                        gcp.setEninfo(nwDoc.html());
+
+                        customGoodsService.updatePidEnInfo(gcp);
+                    }
+                }
+                imgEls.clear();
+            }
+            nwDoc = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
