@@ -162,6 +162,7 @@ em,i{font-style: normal;}
 						<th>产品信息</th>
 						<th>产品图片</th>
 						<th>产品Sku</th>
+						<th>数量</th>
 						<th>订单信息</th>
 						<th>库位</th>
 						<th>状态</th>
@@ -208,6 +209,7 @@ em,i{font-style: normal;}
 					订单号:${b.orderid} / ${b.odid }
 					
 					</td>
+					<td>${b.changeNum }</td>
 					<td style="width: 400px;">
 					<c:if test="${b.ibState== 0}">
 					库存库位:<span class="in_barcode_${index.index}">${b.inBarcode }</span>

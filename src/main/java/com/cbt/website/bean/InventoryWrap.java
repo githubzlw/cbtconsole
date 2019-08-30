@@ -109,4 +109,6 @@ public class InventoryWrap {
 
 	private int remaining;
 	private int canRemaining;
+	
+	private int changeNum;
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.StringRedisConnection.StringTuple;
 import org.springframework.stereotype.Service;
 
 import com.cbt.Specification.bean.AliCategory;
@@ -579,7 +580,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			return 0;
 		}
 		InventorySku iSku = new InventorySku();
-		iSku.setGoodsPid(map.get("specid"));
+		iSku.setSpecid(map.get("specid"));
 		iSku.setSkuid(map.get("skuid"));
 		Map<String, String> orderDetails = inventoryMapper.getOrderDetails(map);
 		iSku.setGoodsPid(orderDetails.get("goods_pid"));
@@ -1073,7 +1074,8 @@ public class InventoryServiceImpl implements  InventoryService{
 		ilock.setIsDelete(0);
 		ilock.setIsUse(1);
 		ilock.setOdId(odId);
-		ilock.setLockRemaining(Integer.parseInt(StrUtils.object2NumStr(map.get("inventory_count"))));
+		int inventoryCount = Integer.parseInt(StrUtils.object2NumStr(map.get("inventory_count")));
+		ilock.setLockRemaining(inventoryCount);
 		inventoryMapper.insertLockInventory(ilock);
 		
 		//标记库位移动，告知仓库移位
@@ -1085,6 +1087,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		record.setOdId(odId);
 		record.setOrderBarcode(map.get("barcode"));
 		record.setState(0);
+		record.setChangeNum(inventoryCount);
 		inventoryMapper.insertInventoryBarcodeRecord(record );
 		
 	}
@@ -1205,7 +1208,8 @@ public class InventoryServiceImpl implements  InventoryService{
 			int lock_remaining = Integer.parseInt(StrUtils.object2NumStr(c.get("lock_remaining")));
 			int yourder =  Integer.parseInt(StrUtils.object2NumStr(c.get("yourorder")));
 			int seilUnit =  1;//Integer.parseInt(StrUtils.object2NumStr(c.get("seilUnit")));
-			inventory.put("inventory_count", String.valueOf(yourder * seilUnit - lock_remaining));
+			int inventoryCount = yourder * seilUnit - lock_remaining;
+			inventory.put("inventory_count", String.valueOf(inventoryCount));
 			inventory.put("tbskuid", StrUtils.object2Str(c.get("tbskuid")));
 			inventory.put("tbspecid", StrUtils.object2Str(c.get("tbspecid")));
 			inventory.put("shipno", StrUtils.object2Str(c.get("shipno")));
@@ -1240,6 +1244,7 @@ public class InventoryServiceImpl implements  InventoryService{
 					record.setRemark(StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"订单取消商品");
 					record.setOrderBarcode(StrUtils.object2Str(c.get("barcode")));
 					record.setOdId(odId);
+					record.setChangeNum(inventoryCount);
 					inventoryMapper.insertInventoryBarcodeRecord(record );
 				}
 			}

@@ -408,4 +408,11 @@ public interface InventoryMapper {
 	 */
 	List<LossInventoryWrap> inventoryLossList(Map<String,Object> map);
 	int inventoryLossListCount(Map<String,Object> map);
+	
+	
+	/**获取验货入库数据
+	 * @param odid
+	 * @return
+	 */
+	Map<String,Object> getInventoryDetailByOdid(int odid);
 }

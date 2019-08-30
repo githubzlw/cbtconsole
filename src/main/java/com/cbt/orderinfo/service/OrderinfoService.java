@@ -524,7 +524,7 @@ public class OrderinfoService implements IOrderinfoService {
 					authorizeRemark = "已授权";
 				}else if("1".equals(authorized_flag)){
 					check = "采购已对该品牌部分授权";
-					authorizeRemark = "未授权";
+					authorizeRemark = "部分授权";
 				}else if("-1".equals(authorized_flag)){
 					check = "该品牌侵权";
 					authorizeRemark = "侵权";

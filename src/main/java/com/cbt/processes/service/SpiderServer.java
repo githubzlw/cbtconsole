@@ -1,25 +1,28 @@
 package com.cbt.processes.service;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.cbt.bean.CollectionBean;
 import com.cbt.bean.SpiderBean;
 import com.cbt.parse.service.ParseGoodsUrl;
 import com.cbt.processes.dao.ISpiderDao;
 import com.cbt.processes.dao.SpiderDao;
 import com.cbt.processes.utils.Processes;
+import com.cbt.util.StrUtils;
 import com.cbt.util.Utility;
+import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.dao.SpiderMapper;
+import com.cbt.warehouse.service.InventoryService;
 
 import ceRong.tools.bean.SearchLog;
-
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class SpiderServer implements ISpiderServer {
@@ -28,7 +31,11 @@ public class SpiderServer implements ISpiderServer {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SpiderServer.class);
 	
 	@Autowired
+	private InventoryMapper inventoryMapper;
+	@Autowired
 	private SpiderMapper spiderMapper;
+	@Autowired
+	private InventoryService inventoryService;
 	
 	@Override
 	public int addGoogs_car(SpiderBean spider) {
@@ -105,6 +112,21 @@ public class SpiderServer implements ISpiderServer {
 		try {
 			ret = this.spiderMapper.updataCheckedById(id);
 			ret=this.spiderMapper.updataIqById(id);
+			//取消库存
+			Map<String, Object> det = inventoryMapper.getInventoryDetailByOdid(Integer.parseInt(id));
+			Map<String,String> map=new HashMap<String,String>();
+			map.put("orderid",StrUtils.object2Str(det.get("orderno")));
+			map.put("odid",StrUtils.object2Str(det.get("od_id")));
+			//取消验货数量
+			map.put("specid",StrUtils.object2Str(det.get("goods_specid")));
+			map.put("skuid",StrUtils.object2Str(det.get("good_skuid")));
+			map.put("tbskuid",StrUtils.object2Str(det.get("goods_p_skuid")));
+			map.put("tbspecid",StrUtils.object2Str(det.get("goods_p_specid")));
+			map.put("seiUnit","1");
+			String cance_inventory_count = StrUtils.object2NumStr(det.get("goods_number"));
+			map.put("cance_inventory_count",cance_inventory_count);
+			//如果该商品验货是有录入库存则做想应的减少
+			inventoryService.cancelInventory(map);
 			return ret;
 		}catch (Exception e){
 			e.printStackTrace();

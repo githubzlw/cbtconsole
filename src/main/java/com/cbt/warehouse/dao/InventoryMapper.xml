@@ -22,6 +22,7 @@
         <result column="seilUnit" property="odSeilUnit" jdbcType="INTEGER" />
         <result column="yourorder" property="odYourOrder" jdbcType="INTEGER" />
         <result column="li_id" property="liid" jdbcType="INTEGER" />
+        <result column="change_num" property="changeNum" jdbcType="INTEGER" />
         <result column="remaining" property="remaining" jdbcType="INTEGER" />
         <result column="can_remaining" property="canRemaining" jdbcType="INTEGER" />
         <result column="in_id" property="inid" jdbcType="INTEGER" />
@@ -679,8 +680,8 @@
     </update>
     
     <insert id="insertInventoryBarcodeRecord" parameterType="com.cbt.website.bean.InventoryBarcodeRecord">
-    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id,createtime,updatetime) 
-    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId},now(),now())
+    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id,createtime,updatetime,change_num) 
+    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId},now(),now(),#{changeNum})
     </insert>
     
     <update id="updateBarcodeRecord">
@@ -689,7 +690,7 @@
     
     <select id="getInventoryBarcode" resultMap="InventoryWrapMap">
     select li.in_id,li.lock_remaining,li.od_id,li.flag,li.is_delete,li.is_use,ib.updatetime as createtime,li.id as li_id,
-    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
+    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,ib.change_num,
     isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,
     isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,isk.remaining,isk.can_remaining,
     od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,od.yourorder,od.goodsid,
@@ -705,7 +706,7 @@
     </select>
     <select id="inventoryBarcodeList" resultMap="InventoryWrapMap">
     select ib.in_id,li.lock_remaining,ib.od_id,li.flag,li.is_delete,li.is_use,ib.updatetime as createtime,li.id as li_id,
-    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
+    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,ib.change_num,
     isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,
     od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,
     ods.specid as od_specid,ods.skuid as od_skuid
@@ -798,6 +799,12 @@
 	 <if test="startdate!=''">and change_time>#{startdate}</if>
 	 <if test="enddate!=''">and change_time&lt;#{enddate}</if>
     
+    </select>
+    <select id="getInventoryDetailByOdid" resultType="java.util.Map">
+    select  goods_pid,good_skuid,goods_specid,orderno,od_id,goods_number,
+    inventory_id,goods_p_skuid,goods_p_specid
+    
+    from inventory_details_sku where od_id=#{odid} and type=0 order by id desc limit 1 
     </select>
     
 </mapper>
