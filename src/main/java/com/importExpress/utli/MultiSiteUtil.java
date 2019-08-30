@@ -135,6 +135,18 @@ public class MultiSiteUtil {
         return webName;
     }
 
+    public static String getWebSiteUrl(Integer site) {
+        switch (site) {
+            case 1:
+                return "https://www.import-express.com";
+            case 2:
+                return "https://www.kidsproductwholesale.com";
+            case 3:
+                return "https://www.lovelypetsupply.com";
+        }
+        return "";
+    }
+
 
     public static void main(String[] args) {
         System.err.println(getSiteTypeNum("2190822P588"));
