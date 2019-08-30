@@ -186,6 +186,9 @@
         <result column="ali_weight" property="ali_weight"/>
         <result column="wholesale_price" property="wholesale_price"/>
         <result column="weight" property="weight_1688"/>
+        <result column="eninfo" property="enInfo"/>
+        <result column="remotpath" property="remotePath"/>
+        <result column="catid1" property="catid1"/>
     </resultMap>
 
 
@@ -932,9 +935,9 @@
         review_flag=#{map.update_flag},updatetime=now() where id = #{map.id}
     </update>
     <select id="queryCustomGoodsByLimit" resultMap="goodsParseResultMap">
-        select pid,ali_pid,ali_price,weight,wholesale_price,ali_weight
+        select pid,ali_pid,ali_price,weight,wholesale_price,ali_weight,enInfo,remotpath,catid1
         from custom_benchmark_ready
-        where id &gt;= #{minId} and id &lt;= #{maxId}
+        where id &gt; #{minId} and id &lt;= #{maxId}
     </select>
 
     <update id="updateCustomGoodsStatistic" parameterType="com.importExpress.pojo.GoodsParseBean">

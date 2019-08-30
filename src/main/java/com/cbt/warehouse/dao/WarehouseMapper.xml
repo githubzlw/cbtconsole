@@ -1053,6 +1053,14 @@
 		</foreach>
 	</insert>
 
+	<insert id="batchInsertSPLog" parameterType="java.util.List">
+		INSERT INTO shipping_package_online_log (shipmentno,orderid,remarks,createtime)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator="," >
+			(#{item.shipmentno},#{item.orderid},#{item.remarks},now())
+		</foreach>
+	</insert>
+
 	<insert id="addGoodsInventory" parameterType="java.util.List">
 		insert into goods_inventory (goods_url,inGoodNum,inGoodTime,remark)
 		select car_url,0-yourorder,now(),'出库'  from order_details where orderid in (${orders})
