@@ -9,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AdmUserDaoImpl implements AdmUserDao {
 
@@ -547,6 +549,57 @@ public class AdmUserDaoImpl implements AdmUserDao {
 	            DBHelper.getInstance().closeConnection(conn);
 	        }
 	        return admuser;
+	}
+
+	@Override
+	public List<Map<String, String>> getAllAnth() {
+		String sql = "select a.admName,a.authId,b.authName,b.url,b.reMark,c.id as admid, " + 
+				"c.roleType,c.buyAuto,c.automatic  " + 
+				"from  tbl_userauth_info a  " + 
+				"left join tbl_auth_info b on a.authId=b.authId " + 
+				"left join  admuser c on a.admName=c.admName " + 
+				"where b.del=0 and c.`status`=1";
+        Connection conn = DBHelper.getInstance().getConnection();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Map<String, String>> result = new ArrayList<>();
+        Map<String, String> map = null;
+        try {
+            stmt = conn.prepareStatement(sql.toString());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+            	map = new HashMap<String, String>();
+            	map.put("authId", rs.getString("authId"));
+            	map.put("admName", rs.getString("admName"));
+            	map.put("authname", rs.getString("authName"));
+            	map.put("url", rs.getString("url"));
+            	map.put("remark", rs.getString("reMark"));
+            	map.put("admid", rs.getString("admid"));
+            	map.put("roleType", rs.getString("roleType"));
+            	map.put("buyAuto", rs.getString("buyAuto"));
+            	map.put("automatic", rs.getString("automatic"));
+            	result.add(map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return result;
 	}
 
 }

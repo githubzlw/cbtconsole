@@ -511,7 +511,7 @@ function innerOuterNetUrl(btnUrl) {
 											data.message,
 											"error",
 											function() {
-												window.location.href = "/cbtconsole/website/main_login.jsp";
+												//window.location.href = "/cbtconsole/website/main_login.jsp";
 											});
 						}
 					},
@@ -522,7 +522,7 @@ function innerOuterNetUrl(btnUrl) {
 										"查询错误",
 										"error",
 										function() {
-											window.location.href = "/cbtconsole/website/main_login.jsp";
+											//window.location.href = "/cbtconsole/website/main_login.jsp";
 										});
 
 					}

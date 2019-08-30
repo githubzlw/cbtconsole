@@ -17,7 +17,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -54,11 +57,14 @@ public class UserLoginController {
 
     }
     @RequestMapping("/checkUserInfo.do")
-	public String login(@RequestParam("userName") String username, 
-			@RequestParam("passWord") String password){
+	public String login(HttpServletRequest request, HttpServletResponse response){
+    	String username = request.getParameter("userName");
+        String password = request.getParameter("passWord");
 		Subject currentUser = SecurityUtils.getSubject();
+		String sessionId = request.getSession().getId();
 		JsonResult json = new JsonResult();
 		json.setOk(true);
+		System.out.println("currentUser.isAuthenticated():"+currentUser.isAuthenticated());
 		if (!currentUser.isAuthenticated()) {
         	// 把用户名和密码封装为 UsernamePasswordToken 对象
             UsernamePasswordToken token = new UsernamePasswordToken(username, password);
@@ -69,6 +75,8 @@ public class UserLoginController {
             	// 执行登录. 
                 currentUser.login(token);
                 json.setOk(true);
+                Admuser admuser = (Admuser)currentUser.getPrincipal();
+                Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
             } 
             // ... catch more exceptions here (maybe custom ones specific to your application?
             // 所有认证时异常的父类. 
@@ -78,12 +86,74 @@ public class UserLoginController {
             	json.setOk(false);
                 json.setMessage("校检用户信息失败，原因：" + e.getMessage());
                 LOG.error("校检用户信息失败，原因：", e);
-            }
+            }catch (Exception e) {
+            	System.out.println("登录失败: " + e.getMessage());
+            	json.setOk(false);
+                json.setMessage("登录失败，原因：" + e.getMessage());
+                LOG.error("登录失败，原因：", e);
+			}
         }
 		
-		 return "redirect:/website/main_menu.jsp";
+		 return "redirect:/website/main_menu2.jsp";
 	}
 
+    /**
+           * 判断用户权限信息
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/authlist.do")
+    @ResponseBody
+    public JsonResult authlist(HttpServletRequest request, HttpServletResponse response) {
+    	
+    	LOG.info("step into the checkUserInfo()");
+    	String sessionId = request.getSession().getId();
+    	JsonResult json = new JsonResult();
+    	json.setOk(false);
+    	Subject currentUser = SecurityUtils.getSubject();
+    	if(currentUser.isAuthenticated()) {
+    		json.setOk(true);
+    	}
+    	Admuser admuser = (Admuser)currentUser.getPrincipal();
+    	try {
+    		
+    		List<AuthInfo> authlist;
+    		if (admuser != null) {
+    			authlist = userauthDao.getUserAuth(admuser.getAdmName());
+    			// 数据放入redis
+    	        Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
+    			Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
+    			LOG.info("authlist:{}", authlist);
+    			LOG.info("save sessionId:[]", sessionId);
+    			LOG.info("login is ok!");
+    			json.setData(authlist);
+    			json.setOk(true);
+    			//清除页面保存的用户名密码
+    			/*Cookie usName = new Cookie("usName", username);
+    			usName.setMaxAge(3600 * 24 * 6);
+    			usName.setPath("/");
+    			response.addCookie(usName);
+    			Cookie usPass = new Cookie("usPass", admuser.getPassword());
+    			usPass.setMaxAge(3600 * 24 * 6);
+    			usPass.setPath("/");
+    			response.addCookie(usPass);*/
+    		} else {
+    			json.setOk(false);
+    			LOG.info("login is NG!");
+    			json.setMessage("登录信息错误");
+    		}
+    		
+    		
+    	} catch (Exception e) {
+    		e.getStackTrace();
+    		json.setOk(false);
+    		json.setMessage("校检用户信息失败，原因：" + e.getMessage());
+    		LOG.error("校检用户信息失败，原因：", e);
+    	}
+    	return json;
+    }
     /**
      * 判断用户信息
      *

@@ -13,7 +13,7 @@ public class MyFormAuthenticationFilter extends FormAuthenticationFilter {
 	protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
 			ServletResponse response) throws Exception {
 		WebUtils.getAndClearSavedRequest(request);
-		WebUtils.redirectToSavedRequest(request, response, "/website/succ.jsp");
+		WebUtils.redirectToSavedRequest(request, response, "/website/main_menu.jsp");
 		return super.onLoginSuccess(token, subject, request, response);
 	}
 
