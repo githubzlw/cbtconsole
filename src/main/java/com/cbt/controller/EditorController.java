@@ -1879,6 +1879,7 @@ public class EditorController {
                 Document nwDoc = Jsoup.parseBodyFragment(eninfo);
                 Elements imgEls = nwDoc.getElementsByTag("img");
                 if (imgEls.size() > 0) {
+                    json.setOk(true);
                     Random random = new Random();
                     for (Element imel : imgEls) {
                         String imgUrl = imel.attr("src");
@@ -1947,6 +1948,9 @@ public class EditorController {
                                 }
                             }
                         }
+                    }
+                    if(!json.isOk()){
+                        return json;
                     }
                     json.setOk(true);
                     tempEninfo = nwDoc.toString();

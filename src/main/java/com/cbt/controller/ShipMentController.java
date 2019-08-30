@@ -99,6 +99,10 @@ public class ShipMentController {
 					list = ReadExcel.readDYExcel(path + mpf.getOriginalFilename(), uuid,company);
 				}else if("衡欣".equals(company)){
 					list = ReadExcel.readHXExcel(path + mpf.getOriginalFilename(), uuid,company);
+				}else if("DHL".equals(company)){
+					list = ExcelUtil.readDHLExcel(path + mpf.getOriginalFilename(), uuid,company);
+				}else if("FEDEX".equals(company) || "TNT".equals(company)){
+					list = ExcelUtil.readFEDEXExcel(path + mpf.getOriginalFilename(), uuid,company);
 				}
 				// 校验forwarder表中的运单信息
 				// 已经上传的运单信息不能重复上传

@@ -2014,6 +2014,310 @@ public class ExcelUtil {
 		return infoList;
 	}
 
+	public static List<Shipment> readDHLExcel(String filePath, String uuid, String company) throws EncryptedDocumentException, InvalidFormatException, IOException, NestedServletException, IllegalArgumentException{
+		List<Shipment> list = new ArrayList<Shipment>();
+		// 检查
+		fileCheck(filePath);
+		// 获取workbook对象
+		Workbook workbook = null;
+		workbook = getWorkbook(filePath);
+		try {
+			// 读文件 一个sheet一个sheet地读取
+			for (int numSheet = 0; numSheet < 1; numSheet++) {
+				Sheet sheet = workbook.getSheetAt(numSheet);
+				if (sheet == null) {
+					continue;
+				}
+				int firstRowIndex = sheet.getFirstRowNum();
+				int lastRowIndex = sheet.getLastRowNum();
+
+				Integer sentTimeIndex = null;
+				Integer recipientsIndex = null;
+				Integer fuelSurchargeIndex = null;
+				Integer deliveryFeeIndex = null;
+				Integer orderNoIndex = null;
+				Integer countryIndex = null;
+				Integer numbersIndex = null;
+				Integer weightIndex = null;
+				Integer freightIndex = null;
+				Integer totalPriceIndex = null;
+				Integer reMarkIndex = null;
+				for (int i = firstRowIndex; i <= lastRowIndex; i++) {
+					Row currentRow = sheet.getRow(i);
+					for (int j = 0; j < currentRow.getLastCellNum(); j++) {
+						String cellValue = getCellValue(currentRow.getCell(j), true);
+						if ("发件日期".equals(cellValue)) {
+							sentTimeIndex = j;
+						}else if ("运单号".equals(cellValue)) {
+							orderNoIndex = j;
+						}else if ("目的地国家".equals(cellValue)) {
+							countryIndex = j;
+						}else if ("收件人".equals(cellValue)) {
+							recipientsIndex = j;
+						}else if ("件数".equals(cellValue)) {
+							numbersIndex = j;
+						}else if ("重量".equals(cellValue)) {
+							weightIndex = j;
+						}else if ("运费".equals(cellValue)) {
+							freightIndex = j;
+						}else if ("燃油附加费".equals(cellValue)) {
+							fuelSurchargeIndex = j;
+						}else if ("偏远地区取件费/派送费".equals(cellValue)) {
+							deliveryFeeIndex = j;
+						}else if ("金额".equals(cellValue)) {
+							totalPriceIndex = j;
+						}else if ("备注".equals(cellValue)) {
+							reMarkIndex = j;
+						}
+					}
+					if (sentTimeIndex != null) {
+						break;
+					}
+				}
+				// 读取数据行
+				for (int rowIndex = 1; rowIndex <= lastRowIndex; rowIndex++) {
+					Row currentRow = sheet.getRow(rowIndex);
+					try {
+						Shipment shipMent = new Shipment();
+						String sentTime = getCellValue(currentRow.getCell(sentTimeIndex), true);
+						if (WebTool.isEmpty(sentTime)) {
+							continue;
+						}
+						// 发件日期
+						try {
+							Date javaDate = HSSFDateUtil.getJavaDate(currentRow.getCell(sentTimeIndex).getNumericCellValue());
+							shipMent.setSenttime(javaDate);
+						} catch (Exception e) {
+//							e.printStackTrace();
+							SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+							String date = getCellValue(currentRow.getCell(sentTimeIndex), true).trim();
+							Date sentDate = sdf.parse(date);
+							shipMent.setSenttime(sentDate);
+						}
+						// 运单号
+						shipMent.setOrderno(getCellValue(currentRow.getCell(orderNoIndex), true));
+						shipMent.setSwitchno(shipMent.getOrderno());
+						shipMent.setType("包裹");
+						// 目的地国家
+						if (!WebTool.isEmpty(getCellValue(currentRow.getCell(countryIndex), true))) {
+							shipMent.setCountry(getCellValue(currentRow.getCell(countryIndex), true));
+						}
+						// 收件人
+						if (recipientsIndex != null && !WebTool.isEmpty(getCellValue(currentRow.getCell(recipientsIndex), true))) {
+							shipMent.setAddressee(getCellValue(currentRow.getCell(recipientsIndex), true));
+						}
+						// 件数
+						if (numbersIndex != null) {
+							String numbers = getCellValue(currentRow.getCell(numbersIndex), true);
+							shipMent.setNumbers(WebTool.isEmpty(numbers) ? 1 : Integer.parseInt(numbers));
+						}
+						// 重量
+						if (weightIndex != null) {
+							String weight = getCellValue(currentRow.getCell(weightIndex), true).trim();
+							shipMent.setSettleweight(WebTool.isEmpty(weight) ? "0.00" :weight);
+							shipMent.setRealweight(WebTool.isEmpty(weight) ?"0.00" :weight);
+							shipMent.setBulkweight(WebTool.isEmpty(weight) ?"0.00" :weight);
+						}
+						// 运费
+						if (freightIndex != null && !WebTool.isEmpty(getCellValue(currentRow.getCell(freightIndex), true))) {
+							shipMent.setCharge(getCellValue(currentRow.getCell(freightIndex), true));
+						}
+						// 燃油附加费
+						if (fuelSurchargeIndex != null && !WebTool.isEmpty(getCellValue(currentRow.getCell(fuelSurchargeIndex), true))) {
+							shipMent.setFuelsurcharge(getCellValue(currentRow.getCell(fuelSurchargeIndex), true));
+						}
+						// 偏远地区取件费/派送费
+						if (deliveryFeeIndex != null && !WebTool.isEmpty(getCellValue(currentRow.getCell(deliveryFeeIndex), true))) {
+							shipMent.setSecuritycosts(getCellValue(currentRow.getCell(deliveryFeeIndex), true));
+						}
+
+						String other = "";
+						if (reMarkIndex != null) {
+							other = getCellValue(currentRow.getCell(reMarkIndex), true).trim();
+						}
+						if (!"".equals(other)) {
+							shipMent.setRemark(other);
+						}
+						shipMent.setTaxs("0.00");
+						if (totalPriceIndex != null) {
+							String price = getCellValue(currentRow.getCell(totalPriceIndex), true).trim();
+							shipMent.setTotalprice(WebTool.isEmpty(price) == true? "0.00" :price);
+						}
+						shipMent.setTransportcompany(company);
+						shipMent.setTransporttype(company);
+						shipMent.setCreatetime(new Date());
+						shipMent.setUuid(uuid);
+						list.add(shipMent);
+					} catch (Exception e) {
+						e.printStackTrace();
+						continue;
+					}
+				}
+				System.out.println("==========================excel解析完成============================");
+			}
+		} catch (Exception e) {
+			System.out.println("上传文件数据读取错误!");
+			e.printStackTrace();
+			return list;
+		} finally {
+			if (workbook != null) {
+				try {
+					workbook.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
+	}
+
+
+	public static List<Shipment> readFEDEXExcel(String filePath, String uuid, String company) throws EncryptedDocumentException, InvalidFormatException, IOException, NestedServletException, IllegalArgumentException{
+		List<Shipment> list = new ArrayList<Shipment>();
+		// 检查
+		fileCheck(filePath);
+		// 获取workbook对象
+		Workbook workbook = null;
+		workbook = getWorkbook(filePath);
+		try {
+			// 读文件 一个sheet一个sheet地读取
+			for (int numSheet = 0; numSheet < 1; numSheet++) {
+				Sheet sheet = workbook.getSheetAt(numSheet);
+				if (sheet == null) {
+					continue;
+				}
+				int firstRowIndex = sheet.getFirstRowNum();
+				int lastRowIndex = sheet.getLastRowNum();
+				Integer sentTimeIndex = null;
+				Integer recipientsIndex = null;
+				Integer orderNoIndex = null;
+				Integer countryIndex = null;
+				Integer numbersIndex = null;
+				Integer weightIndex = null;
+				Integer freightIndex = null;
+				Integer totalPriceIndex = null;
+				Integer reMarkIndex = null;
+				for (int i = firstRowIndex; i <= lastRowIndex; i++) {
+					Row currentRow = sheet.getRow(i);
+					for (int j = 0; j < currentRow.getLastCellNum(); j++) {
+						String cellValue = getCellValue(currentRow.getCell(j), true);
+						if ("发件日期".equals(cellValue)) {
+							sentTimeIndex = j;
+						}else if ("运单号".equals(cellValue)) {
+							orderNoIndex = j;
+						}else if ("目的地国家".equals(cellValue)) {
+							countryIndex = j;
+						}else if ("收件人".equals(cellValue)) {
+							recipientsIndex = j;
+						}else if ("件数".equals(cellValue)) {
+							numbersIndex = j;
+						}else if ("重量".equals(cellValue)) {
+							weightIndex = j;
+						}else if ("运费".equals(cellValue)) {
+							freightIndex = j;
+						}else if ("金额".equals(cellValue)) {
+							totalPriceIndex = j;
+						}else if ("备注".equals(cellValue)) {
+							reMarkIndex = j;
+						}
+					}
+					if (sentTimeIndex != null) {
+						break;
+					}
+				}
+				// 读取数据行
+				for (int rowIndex = 1; rowIndex <= lastRowIndex; rowIndex++) {
+					Row currentRow = sheet.getRow(rowIndex);
+					try {
+						Shipment shipMent = new Shipment();
+						String sentTime = getCellValue(currentRow.getCell(sentTimeIndex), true);
+						if (WebTool.isEmpty(sentTime)) {
+							continue;
+						}
+						// 发件日期
+						try {
+							Date javaDate = HSSFDateUtil.getJavaDate(currentRow.getCell(sentTimeIndex).getNumericCellValue());
+							shipMent.setSenttime(javaDate);
+						} catch (Exception e) {
+//							e.printStackTrace();
+							SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+							String date = getCellValue(currentRow.getCell(sentTimeIndex), true).trim();
+							Date sentDate = sdf.parse(date);
+							shipMent.setSenttime(sentDate);
+						}
+						// 运单号
+						shipMent.setOrderno(getCellValue(currentRow.getCell(orderNoIndex), true));
+						shipMent.setSwitchno(shipMent.getOrderno());
+						shipMent.setType("包裹");
+						// 目的地国家
+						if (!WebTool.isEmpty(getCellValue(currentRow.getCell(countryIndex), true))) {
+							shipMent.setCountry(getCellValue(currentRow.getCell(countryIndex), true));
+						}
+						// 收件人
+						if (recipientsIndex != null && !WebTool.isEmpty(getCellValue(currentRow.getCell(recipientsIndex), true))) {
+							shipMent.setAddressee(getCellValue(currentRow.getCell(recipientsIndex), true));
+						}
+						// 件数
+						if (numbersIndex != null) {
+							String numbers = getCellValue(currentRow.getCell(numbersIndex), true);
+							shipMent.setNumbers(WebTool.isEmpty(numbers) ? 1 : Integer.parseInt(numbers));
+						}
+						// 重量
+						if (weightIndex != null) {
+							String weight = getCellValue(currentRow.getCell(weightIndex), true).trim();
+							shipMent.setSettleweight(WebTool.isEmpty(weight) ? "0.00" :weight);
+							shipMent.setRealweight(WebTool.isEmpty(weight) ?"0.00" :weight);
+							shipMent.setBulkweight(WebTool.isEmpty(weight) ?"0.00" :weight);
+						}
+						// 运费
+						if (freightIndex != null && !WebTool.isEmpty(getCellValue(currentRow.getCell(freightIndex), true))) {
+							shipMent.setCharge(getCellValue(currentRow.getCell(freightIndex), true));
+						}
+
+						String other = "";
+						if (reMarkIndex != null) {
+							other = getCellValue(currentRow.getCell(reMarkIndex), true).trim();
+						}
+						if (!"".equals(other)) {
+							shipMent.setRemark(other);
+						}
+						shipMent.setTaxs("0.00");
+						if (totalPriceIndex != null) {
+							String price = getCellValue(currentRow.getCell(totalPriceIndex), true).trim();
+							shipMent.setTotalprice(WebTool.isEmpty(price) == true? "0.00" :price);
+						}
+						shipMent.setTransportcompany(company);
+						if(company.equals("FEDEX")){
+							shipMent.setTransporttype("联邦");
+						}else{
+							shipMent.setTransporttype(company);
+						}
+						shipMent.setCreatetime(new Date());
+						shipMent.setUuid(uuid);
+						list.add(shipMent);
+					} catch (Exception e) {
+						e.printStackTrace();
+						continue;
+					}
+				}
+				System.out.println("==========================excel解析完成============================");
+			}
+		} catch (Exception e) {
+			System.out.println("上传文件数据读取错误!");
+			e.printStackTrace();
+			return list;
+		} finally {
+			if (workbook != null) {
+				try {
+					workbook.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
+	}
+
 	public static String cutOneByte(String str) {
         if (str != null && !str.equals("")) {
             byte[] a = str.getBytes();// 转化为字节流处理,去掉最前面一个字节，以防止第一个字母乱码
