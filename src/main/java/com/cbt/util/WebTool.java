@@ -36,7 +36,7 @@ public class WebTool {
 	 * @return
 	 */
 	public static boolean isEmpty(String str) {
-		if (str == null || ("").equals(str.trim())) {
+		if (str == null || ("").equals(str.trim()) || "null".equals(str.trim())) {
 			return true;
 		}
 		return false;

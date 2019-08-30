@@ -143,6 +143,9 @@ function delShipment(str){
 				<option value="迅邮">迅邮</option>
 				<option value="大誉">大誉</option>
                 <option value="衡欣">衡欣</option>
+                <option value="DHL">DHL</option>
+                <option value="FEDEX">联邦</option>
+                <option value="TNT">TNT</option>
 			</select>
 		</div>
 	</div>
@@ -157,6 +160,9 @@ function delShipment(str){
     	<p>佳成表头字段:<span style="color: red;font-size: 20px">发件日期格式:yyyy-MM-dd</span><table><tr><td>DATE<br/>发件日期</td><td>CONS<br/>运单号</td><td>DEST<br/>收件地</td><td>PACKAGING</td><td>WT<br/>重量(kg)</td><td>PCS<br/>件数</td><td>NET CHARGE</td><td>PUEL SURCHARGE</td><td>安检费</td><td>OTHER<br/>其他</td><td>税金</td><td>Total<br/>小计</td></tr></table></p>
     	<p>邮政表头字段:<table><tr><td>运单号</td><td>转单号</td><td>快递类别</td><td>发件日期</td><td>目的地</td><td>收件人</td><td>件数</td><td>重量</td><td>费用</td><td>类型</td><td>备注</td></tr></table></p>
     	<p>泰蓝国际表头字段:<span style="color: red;font-size: 20px">日期格式:yyyy.MM.dd</span><table><tr><td>日期</td><td>运单号</td><td>渠道</td><td>目的地</td><td>件数</td><td>重量（KG）</td><td>单价</td><td>金额</td><td>备注</td></tr></table></p>
+        <p>DHL表头字段:<span style="color: red;font-size: 20px">日期格式:yyyy-MM-dd</span><table><tr><td>发件日期</td><td>运单号</td><td>目的地国家</td><td>收件人</td><td>件数</td><td>重量</td><td>运费</td><td>燃油附加费</td><td>偏远地区取件费/派送费</td><td>金额</td><td>备注</td></tr></table></p>
+        <p>FEDEX表头字段:<span style="color: red;font-size: 20px">日期格式:yyyy-MM-dd</span><table><tr><td>发件日期</td><td>运单号</td><td>目的地国家</td><td>收件人</td><td>件数</td><td>重量</td><td>运费</td><td>金额</td><td>备注</td></tr></table></p>
+        <p>TNT表头字段:<span style="color: red;font-size: 20px">日期格式:yyyy-MM-dd</span><table><tr><td>发件日期</td><td>运单号</td><td>目的地国家</td><td>收件人</td><td>件数</td><td>重量</td><td>运费</td><td>金额</td><td>备注</td></tr></table></p>
     </div>
 	<div id="res" style="display: none;">
 		<span id='info' style='color: red'>以下为校验未通过的运单信息:</span>
