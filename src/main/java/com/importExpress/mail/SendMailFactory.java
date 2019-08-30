@@ -64,7 +64,8 @@ public class SendMailFactory {
      * @Return: void
      */
     public void sendMail(String TO, String BCC, String SUBJECT, Map<String, Object> model, Enum<TemplateType> templateType) {
-        Integer siteType = (model.get("websiteType") != null && Integer.valueOf(model.get("websiteType").toString()) > 1)?2:1;
+        // websiteType 1-importx网站; 2-kids网站; 3-pets网站;
+        Integer siteType = (model.get("websiteType") != null && Integer.valueOf(model.get("websiteType").toString()) == 2)?2:1;
         sendMail(TO, BCC, SUBJECT, getHtmlContent(model, templateType), siteType);
     }
 
