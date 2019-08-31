@@ -1872,13 +1872,18 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		if((map.get("tb_1688_itemid") != null && String.valueOf(map.get("goods_pid")).equals(String.valueOf(map.get("tb_1688_itemid")))) || map.get("tb_1688_itemid") == null){
 			//有录入货源而且货源信息和推荐货源一致
 			if(map.get("authorizedFlag")!=null){
+				// 0-未授权  1-部分授权 2-自有品牌 3-无需授权 -1 -侵权
 				authorizedFlag=String.valueOf(map.get("authorizedFlag"));
-				if("1".equals(authorizedFlag)){
-					authorizedFlag="已授权";
-				}else if("2".equals(authorizedFlag)){
-					authorizedFlag="未授权但可买";
-				}else{
+				if("0".equals(authorizedFlag)){
 					authorizedFlag="未授权";
+				}else if("1".equals(authorizedFlag)){
+					authorizedFlag="部分授权";
+				}else if("2".equals(authorizedFlag)){
+					authorizedFlag="自有品牌";
+				}else if("3".equals(authorizedFlag)){
+					authorizedFlag="自有品牌";
+				}else if("-1".equals(authorizedFlag)){
+					authorizedFlag="侵权";
 				}
 			}
 			purchaseBean.setShopAddress(map.get("shopAddress"));
