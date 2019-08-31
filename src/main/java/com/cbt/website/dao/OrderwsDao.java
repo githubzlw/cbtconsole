@@ -5093,7 +5093,7 @@ public class OrderwsDao implements IOrderwsDao {
     @Override
     public List<Map<String, String>> getBuyerByOrderNo(String orderno) {
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        String sql = "SELECT DISTINCT g.odid,ad.admName FROM goods_distribution g LEFT JOIN order_details od ON g.orderid=od.orderid and g.goodsid=od.goodsid"
+        String sql = "SELECT DISTINCT g.odid,ad.admName FROM goods_distribution g LEFT JOIN order_details od ON g.orderid=od.orderid and g.odid=od.id"
                 + " LEFT JOIN admuser ad ON g.admuserid=ad.id WHERE od.id in (" + orderno + ")";
         Connection conn = DBHelper.getInstance().getConnection();
         PreparedStatement pst = null;
