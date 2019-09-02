@@ -119,6 +119,7 @@ public class HotManageController {
             param.setWebSite(webSite);
 
             List<HotCategory> res = hotManageService.queryForList(param);
+            SwitchDomainNameUtil.changeHotGoodsCatidList(res, webSite);
             int count = hotManageService.queryForListCount(param);
 
             json.setSuccess(true);
@@ -433,10 +434,14 @@ public class HotManageController {
 
         String categoryIdStr = request.getParameter("categoryId");
         String webType = request.getParameter("webType");
-        if(StringUtils.isBlank(webType)){
-            webType = "1";
+        if(StringUtils.isBlank(webType)) {
+            mv.addObject("isShow", 0);
+            mv.addObject("message", "获取网站类别失败");
+            return mv;
+        }else{
+            mv.addObject("webType", webType);
         }
-        mv.addObject("webType", webType);
+
 
         if (StringUtils.isBlank(categoryIdStr)) {
             mv.addObject("isShow", 0);
@@ -514,6 +519,8 @@ public class HotManageController {
                 }
                 goods.setGoodsUrl("https://www.import-express.com/goodsinfo/" + Utility.StringFilter(goods.getShowName()) + (goods.getIsNewCloud() > 0 ? "-3" : "-1") + goods.getGoodsPid() + ".html");
             }
+
+            SwitchDomainNameUtil.changeHotGoodsList(goodsList, Integer.valueOf(webType));
             mv.addObject("isOnTotal", isOnTotal);
             mv.addObject("allTotal", goodsList.size());
             mv.addObject("isShow", 1);
