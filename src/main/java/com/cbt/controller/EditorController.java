@@ -814,11 +814,11 @@ public class EditorController {
                 } else {
                     // 检查详情中是否含有非本地上传和我司网站的图片
                     // 产品详情
-                    String eninfo = contentStr.replaceAll(remotepath, "");
+                    // String eninfo = contentStr.replaceAll(remotepath, "");
                     //解析和上传阿里商品的图片
-                    json = uploadAliImgToLocal(pidStr, eninfo);
+                    json = uploadAliImgToLocal(pidStr, contentStr);
                     if (json.isOk()) {
-                        cgp.setEninfo(json.getData().toString());
+                        cgp.setEninfo(json.getData().toString().replace(remotepath, ""));
                     } else {
                         return json;
                     }
@@ -1886,7 +1886,14 @@ public class EditorController {
                         if (imgUrl == null || "".equals(imgUrl)) {
                             continue;
                         } else if (imgUrl.contains("http://") || imgUrl.contains("https://")) {
-                            if (imgUrl.contains("192.168.") || imgUrl.contains(".import-express.")) {
+                            if (imgUrl.contains("192.168.")) {
+                                continue;
+                            }else if(imgUrl.contains(".import-express.")){
+                                //
+                                if(!imgUrl.contains(pid)){
+                                    imel.remove();
+                                    json.setMessage("非当前PID图片删除");
+                                }
                                 continue;
                             }
                             // 检查配置文件信息是否正常读取

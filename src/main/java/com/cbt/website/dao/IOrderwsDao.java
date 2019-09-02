@@ -1174,4 +1174,6 @@ public interface IOrderwsDao {
 	 * @return
 	 */
 	List<UserBehaviorDetails> queryUserAddToOrderDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
+
+	int check_user_info_by_type(String beginDate,String endDate, int type, int site);
 }

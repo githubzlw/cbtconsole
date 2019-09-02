@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -904,6 +906,45 @@ public class UserBehaviorStatisticsController {
                 }
             }
         }
+    }
+
+
+    @RequestMapping("/exportByTime")
+    @ResponseBody
+    public JsonResult exportByTime(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        try {
+            String beginTimeStr = request.getParameter("beginTime");
+            String endTimeStr = request.getParameter("endTime");
+
+            if (StringUtils.isBlank(beginTimeStr) || StringUtils.isBlank(endTimeStr)) {
+                json.setOk(false);
+                json.setMessage("获取时间失败");
+                return json;
+            }else{
+                beginTimeStr += " 00:00:00";
+                endTimeStr += " 00:00:00";
+            }
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime beginTime = LocalDateTime.parse(beginTimeStr, dtf);
+            LocalDateTime endTime = LocalDateTime.parse(endTimeStr, dtf);
+            while (beginTime.isBefore(endTime)) {
+                dao.check_user_info_by_type(beginTime.format(dtf), beginTime.plusDays(1).format(dtf), 1, 1);
+                dao.check_user_info_by_type(beginTime.format(dtf), beginTime.plusDays(1).format(dtf), 2, 1);
+                dao.check_user_info_by_type(beginTime.format(dtf), beginTime.plusDays(1).format(dtf), 3, 1);
+                dao.check_user_info_by_type(beginTime.format(dtf), beginTime.plusDays(1).format(dtf), 1, 2);
+                dao.check_user_info_by_type(beginTime.format(dtf), beginTime.plusDays(1).format(dtf), 2, 2);
+                dao.check_user_info_by_type(beginTime.format(dtf), beginTime.plusDays(1).format(dtf), 3, 2);
+                beginTime = beginTime.plusDays(1);
+            }
+            // update check_user_info a,zone  b set a.country_name = b.chinapostbig where a.country = b.id;
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+        }
+        return json;
     }
 
     private HSSFWorkbook genTotalStatisticsExcel(List<UserBehaviorTotal> list, String title) {
