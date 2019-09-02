@@ -6934,16 +6934,27 @@ public class OrderwsDao implements IOrderwsDao {
         int count = 0;
         // 新客户下单
         String sql = "insert into check_user_info(user_id,create_time,email,country,site,type) " +
-                "select a.user_id,a.create_time,b.email,b.countryId," + site + " as site," + type + " as type " +
-                "from (select user_id,create_time from orderinfo where " +
+                "select a.user_id,a.orderpaytime,b.email,b.countryId," + site + " as site," + type + " as type " +
+                "from (select user_id,orderpaytime from orderinfo where " +
                 "orderpaytime >= '" + beginDate + "'  and " +
-                "orderpaytime < '" + endDate + "' and state in(1,2,3,4,5)" +
-                "and user_id not in (select user_id from orderinfo where " +
+                "orderpaytime < '" + endDate + "' and state in(1,2,3,4,5)" ;
+
+        if(site == 2){
+            sql += " and locate('K',order_no) = 8";
+        }else{
+            sql += " and locate('K',order_no) < 8 ";
+        }
+        sql += " and user_id not in (select user_id from orderinfo where " +
                 "orderpaytime < '"+beginDate+"' and state in(1,2,3,4,5))" +
                 "and user_id not in (select id from `user` where  is_test = 1)" +
                 "and user_id not in (select user_id from ip_record where user_id > 0 and is_china =1)" +
-                "group by user_id) a, user b where a.user_id = b.id and b.site = " + site + " order by a.create_time desc ";
-
+                "group by user_id) a, user b where a.user_id = b.id ";
+        if(site == 2){
+            sql += " and b.site in(2,3)";
+        }else{
+            sql += " and b.site in(0,1,3)";
+        }
+        sql += " order by a.orderpaytime desc ";
         if (type == 2) {
             // 新注册
             sql = "insert into check_user_info(user_id,create_time,email,country,site,type) " +
