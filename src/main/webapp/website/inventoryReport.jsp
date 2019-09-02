@@ -133,6 +133,7 @@ em,i{font-style: normal;}
 .datagrid-cell-c2-remarkContext{width:400px;}
 .li_more_s{display: none;}
 .report .btn_page_in{width:100px;}
+.btn-check-list{display: none;}
 </style>
 </head>
 <body>
@@ -484,7 +485,6 @@ em,i{font-style: normal;}
 		</div>
 	</div>
 </div>
-
 </body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/inventoryReport.js"></script>

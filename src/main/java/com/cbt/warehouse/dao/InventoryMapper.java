@@ -11,6 +11,7 @@ import com.cbt.pojo.Inventory;
 import com.cbt.website.bean.InventoryBarcodeRecord;
 import com.cbt.website.bean.InventoryCheck;
 import com.cbt.website.bean.InventoryCheckRecord;
+import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetails;
 import com.cbt.website.bean.InventoryLock;
@@ -420,4 +421,8 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int getUnDoneInventoryBarcode();
+	/**盘点列表所有
+	 * @return
+	 */
+	List<InventoryData> invetoryCheck();
 }

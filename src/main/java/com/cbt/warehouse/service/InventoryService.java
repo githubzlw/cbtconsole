@@ -185,6 +185,10 @@ public interface InventoryService {
 	 * @return
 	 */
 	List<InventoryCheckWrap> invetoryCheckList(Map<Object, Object> map);
+	/**盘点列表所有
+	 * @return
+	 */
+	List<InventoryCheckWrap> invetoryCheck();
 	
 	/**最近盘点
 	 * @return

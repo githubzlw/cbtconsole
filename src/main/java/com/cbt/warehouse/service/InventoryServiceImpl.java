@@ -144,6 +144,10 @@ public class InventoryServiceImpl implements  InventoryService{
 			if("0".equals(map.get("export"))){
 				opration = new StringBuilder();
 				//报损/调整
+				opration.append("<button class=\"btn btn-info mt5 btn-check-list\" onclick=\"updateCheck('0','"+i+"','"+t.getId()+"')\"> ")
+				.append("库存盘点").append("</button><br>");
+				
+				//报损/调整
 				opration.append("<button class=\"btn btn-info mt5\" onclick=\"updateInventory('0','"+i+"','"+t.getId()+"')\"> ")
 				.append("报损调整").append("</button>");
 				
@@ -1594,5 +1598,39 @@ public class InventoryServiceImpl implements  InventoryService{
 	public int getUnDoneInventoryBarcode() {
 		// TODO Auto-generated method stub
 		return inventoryMapper.getUnDoneInventoryBarcode();
+	}
+	@Override
+	public List<InventoryCheckWrap> invetoryCheck() {
+		//获取库存数据
+		List<InventoryData> iinOutInventory = inventoryMapper.invetoryCheck();
+		if(iinOutInventory == null || iinOutInventory.isEmpty()) {
+			return null;
+		}
+		List<InventoryCheckWrap> result = new ArrayList<>();
+		InventoryCheckWrap wrap = null;
+		for(InventoryData i : iinOutInventory) {
+			wrap = new InventoryCheckWrap();
+			
+			wrap.setBarcode(i.getBarcode());
+			wrap.setGoodsPid(i.getGoodsPid());
+			wrap.setGoodsImg("<img src=\""+i.getCarImg()+"\">");
+			wrap.setGoodsPrice(i.getGoodsPrice());
+			wrap.setGoodsSku(i.getSku());
+			wrap.setGoodsSkuid(i.getSkuid());
+			wrap.setGoodsSpecid(i.getSpecid());
+			wrap.setInventorySkuId(i.getId());
+			wrap.setRemaining(i.getRemaining());
+			wrap.setCategoryName(i.getCategoryName());
+			wrap.setCatid(i.getGoodsCatid());
+			wrap.setGoodsName(i.getGoodsName());
+			wrap.setOperation(i.getOperation());
+			wrap.setCanRemaining(i.getCanRemaining());
+			wrap.setInventoryCheckId(i.getInventoryCheckId());
+			wrap.setLastCheckRemaining(i.getCheckRemaining());
+			
+			result.add(wrap);
+		}
+		
+		return result;
 	}
 }

@@ -234,7 +234,7 @@
     
     <if test="isline == 1">and c.valid=1</if>
     <if test="isline == 2">and c.valid!=1</if>
-    order by createtime desc
+    order by isku.createtime desc
      limit #{page},20
     </select>
     <select id="getIinOutInventoryCount" resultType="INTEGER">
@@ -719,7 +719,7 @@
     where 1=1
     <if test="orderid!=null">and od.orderid=#{orderid}</if>
     <if test="state!=-1">and ib.state=#{state}</if>
-    <if test="inid!='0'">and ib.in_id=#{inid}</if>
+    <if test="inid!=0">and ib.in_id=#{inid}</if>
     order by ib.state asc,ib.updatetime desc
     limit #{page},20
     </select>
@@ -730,7 +730,7 @@
      where 1=1
      <if test="orderid!=null">and od.orderid=#{orderid}</if>
     <if test="state!=-1">and ib.state=#{state}</if>
-    <if test="inid!='0'">and ib.in_id=#{inid}</if>
+    <if test="inid!=0">and ib.in_id=#{inid}</if>
     </select>
     
     <select id="getAddInventory" resultType="java.util.Map">
@@ -810,6 +810,14 @@
     </select>
     <select id="getUnDoneInventoryBarcode" resultType="Integer">
     select count(*) from  inventory_barcode_record where state=0 or state=1
+    </select>
+    
+     <select id="invetoryCheck" resultMap="InventorySkuResultMap">
+      select  isku.*,
+      cat.en_name as categoryName 
+      from inventory_sku isku 
+      left join 1688_category cat on isku.goodscatid=cat.category_id
+    order by isku.createtime desc
     </select>
     
 </mapper>
