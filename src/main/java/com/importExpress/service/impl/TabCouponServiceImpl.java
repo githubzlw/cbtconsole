@@ -10,6 +10,7 @@ import com.importExpress.pojo.*;
 import com.importExpress.service.TabCouponService;
 import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.SwitchDomainNameUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
@@ -353,7 +354,8 @@ public class TabCouponServiceImpl implements TabCouponService {
                 modelM.put("qustion", "[" + id + "]" + qustion);
                 modelM.put("pname", pnameHtml);
                 modelM.put("websiteType", websiteType);
-                sendMailFactory.sendMail(email, null, "["+id+"]"+"Inquiry Reply From ImportExpress", modelM, TemplateType.GUESTBOOK_REPLY);
+                String title = "[" + id + "]" + SwitchDomainNameUtil.checkNullAndReplace("Inquiry Reply From ImportExpress", websiteType);
+                sendMailFactory.sendMail(email, null, title, modelM, TemplateType.GUESTBOOK_REPLY);
             }
         }.start();
         return 0;
