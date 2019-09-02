@@ -6537,8 +6537,8 @@ public class OrderwsDao implements IOrderwsDao {
         ResultSet rs = null;
         Statement stmt = null;
         String sql = "select a.user_id,a.create_time,b.email from (select user_id,create_time from orderinfo where " +
-                "  orderpaytime> '" + beginDate + "'  and " +
-                " orderpaytime< '" + endDate + "' and state in(1,2,3,4,5)" +
+                "  orderpaytime>= '" + beginDate + "'  and " +
+                " orderpaytime<= '" + endDate + "' and state in(1,2,3,4,5)" +
                 " and user_id not in (select user_id from orderinfo where " +
                 " orderpaytime < '" + beginDate + "' and state in(1,2,3,4,5))" +
                 " and user_id not in (select id from `user` where  is_test = 1)";
