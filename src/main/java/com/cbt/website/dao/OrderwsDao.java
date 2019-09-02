@@ -6932,52 +6932,64 @@ public class OrderwsDao implements IOrderwsDao {
         ResultSet rs = null;
         Statement stmt = null;
         int count = 0;
-        // 新客户下单
-        String sql = "insert into check_user_info(user_id,create_time,email,country,site,type) " +
-                "select a.user_id,a.orderpaytime,b.email,b.countryId," + site + " as site," + type + " as type " +
-                "from (select user_id,orderpaytime from orderinfo where " +
-                "orderpaytime >= '" + beginDate + "'  and " +
-                "orderpaytime < '" + endDate + "' and state in(1,2,3,4,5)" ;
 
-        if(site == 2){
-            sql += " and locate('K',order_no) = 8";
-        }else{
-            sql += " and locate('K',order_no) < 8 ";
+        // 新注册
+        String sql = "insert into check_user_info(user_id,create_time,email,country,site,type) " +
+                "select a.*," + site + " as site," + type + " as type  from (select id,createtime,email,countryId from user where 1=1 ";
+        if (site == 2) {
+            sql += " and site in(2,3) ";
+        } else {
+            sql += " and site in(0,1)";
         }
-        sql += " and user_id not in (select user_id from orderinfo where " +
-                "orderpaytime < '"+beginDate+"' and state in(1,2,3,4,5))" +
-                "and user_id not in (select id from `user` where  is_test = 1)" +
-                "and user_id not in (select user_id from ip_record where user_id > 0 and is_china =1)" +
-                "group by user_id) a, user b where a.user_id = b.id ";
-        if(site == 2){
-            sql += " and b.site in(2,3)";
-        }else{
-            sql += " and b.site in(0,1,3)";
-        }
-        sql += " order by a.orderpaytime desc ";
+        sql += " and createtime >= '" + beginDate + "'" +
+                " and createtime < '" + endDate + "'" +
+                " and id not in(select id from `user` where  is_test = 1)" +
+                " and id not in(select user_id from ip_record where user_id > 0 and is_china =1)" +
+                " ) a left join goods_carconfig b on a.id = b.userid and b.userid > 0 " +
+                " order by a.createtime desc";
         if (type == 2) {
-            // 新注册
-            sql = "insert into check_user_info(user_id,create_time,email,country,site,type) " +
-                    "select a.*," + site + " as site," + type + " as type  from (select id,createtime,email,countryId from user where 1=1 " +
-                    "and site = " + site + " and createtime >= '" + beginDate + "'" +
-                    "and createtime < '" + endDate + "'" +
-                    "and id not in(select id from `user` where  is_test = 1)" +
-                    "and id not in(select user_id from ip_record where user_id > 0 and is_china =1)" +
-                    ") a left join goods_carconfig b on a.id = b.userid and b.userid > 0 " +
-                    "order by a.createtime desc";
-        } else if (type == 3) {
             // 新客户加购物车
             sql = "insert into check_user_info(user_id,create_time,email,country,site,type) " +
-                    "select b.userid,b.datatime,c.email,c.countryId, " + site + " as site," + type + " as type " +
-                    "from (select userid,datatime from goods_car where userid > 0 " +
-                    "and datatime >=  '" + beginDate + "' " +
+                    " select b.userid,b.datatime,c.email,c.countryId, " + site + " as site," + type + " as type " +
+                    " from (select userid,datatime from goods_car where userid > 0 " +
+                    " and datatime >=  '" + beginDate + "' " +
                     "        and datatime < '" + endDate + "' group by userid) as b,user c " +
-                    "where b.userid not in(select id from `user` where  is_test = 1) and b.userid = c.id  and c.site = " + site +
-                    " and b.userid not in(select user_id from ip_record where user_id > 0 and is_china =1) " +
-                    "and b.userid not in(select user_id from orderinfo where create_time < '" + beginDate + "' and state in(1,2,3,4,5) " +
-                    "group by user_id having count(user_id) > 1)";
+                    " where b.userid not in(select id from `user` where  is_test = 1) and b.userid = c.id  ";
+            if (site == 2) {
+                sql += " and c.site in(2,3) ";
+            } else {
+                sql += " and c.site in(0,1)";
+            }
+            sql += " and b.userid not in(select user_id from ip_record where user_id > 0 and is_china =1) " +
+                    "and b.userid not in(select user_id from orderinfo where orderpaytime < '" + beginDate + "' and state in(1,2,3,4,5) ";
+            sql += " group by user_id having count(user_id) > 0)";
+            sql += " and b.userid not in (select userid from goods_car where datatime < '"+beginDate+"')";
+        } else if (type == 3) {
+            // 新客户下单
+            sql = "insert into check_user_info(user_id,create_time,email,country,site,type) " +
+                    "select a.user_id,a.orderpaytime,b.email,b.countryId," + site + " as site," + type + " as type " +
+                    "from (select user_id,orderpaytime from orderinfo where " +
+                    "orderpaytime >= '" + beginDate + "'  and " +
+                    "orderpaytime < '" + endDate + "' and state in(1,2,3,4,5)";
+
+            if (site == 2) {
+                sql += " and locate('K',order_no) = 8";
+            } else {
+                sql += " and locate('K',order_no) < 8 ";
+            }
+            sql += " and user_id not in (select user_id from orderinfo where " +
+                    "orderpaytime < '" + beginDate + "' and state in(1,2,3,4,5))" +
+                    "and user_id not in (select id from `user` where  is_test = 1)" +
+                    "and user_id not in (select user_id from ip_record where user_id > 0 and is_china =1)" +
+                    "group by user_id) a, user b where a.user_id = b.id ";
+            if (site == 2) {
+                sql += " and b.site in(2,3)";
+            } else {
+                sql += " and b.site in(0,1)";
+            }
+            sql += " order by a.orderpaytime desc ";
         }
-        System.err.println(sql);
+        System.err.println(sql + ";");
         try {
             stmt = conn.createStatement();
             count = stmt.executeUpdate(sql);
