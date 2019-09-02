@@ -2,6 +2,8 @@ package com.importExpress.utli;
 
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.OrderDetailsBean;
+import com.cbt.warehouse.pojo.HotCategory;
+import com.cbt.warehouse.pojo.HotSellingGoods;
 import com.cbt.website.bean.PurchasesBean;
 import com.importExpress.pojo.ShopCarMarketing;
 import com.importExpress.pojo.ShopRecommendGoods;
@@ -35,6 +37,60 @@ public class SwitchDomainNameUtil {
     private static final String RESTAURANT_DOMAIN_NAME_2 = "RestaurantKitchenEquipments";
     private static final String RESTAURANT_DOMAIN_NAME_3 = "Restaurant Kitchen Equipments";
 
+
+    /**
+     * 热卖区商品
+     *
+     * @param list
+     * @param webSite
+     */
+    public static void changeHotGoodsList(List<HotSellingGoods> list, int webSite) {
+        if (list != null && !list.isEmpty()) {
+            for (HotSellingGoods goods : list) {
+                changeSingleHotGoods(goods, webSite);
+            }
+        }
+    }
+
+
+    /**
+     * 热卖区商品
+     *
+     * @param sellingGoods
+     * @param webSite
+     */
+    public static void changeSingleHotGoods(HotSellingGoods sellingGoods, int webSite) {
+        if (sellingGoods != null) {
+            sellingGoods.setGoodsImg(checkNullAndReplace(sellingGoods.getGoodsImg(), webSite));
+            sellingGoods.setGoodsUrl(checkNullAndReplace(sellingGoods.getGoodsUrl(), webSite));
+        }
+    }
+
+    /**
+     * 热卖区类别
+     *
+     * @param list
+     * @param webSite
+     */
+    public static void changeHotGoodsCatidList(List<HotCategory> list, int webSite) {
+        if (list != null && !list.isEmpty()) {
+            for (HotCategory category : list) {
+                changeSingleHotGoodsCatid(category, webSite);
+            }
+        }
+    }
+
+    /**
+     * 热卖区类别
+     *
+     * @param hotCategory
+     * @param webSite
+     */
+    public static void changeSingleHotGoodsCatid(HotCategory hotCategory, int webSite) {
+        if (hotCategory != null) {
+            hotCategory.setShowImg(checkNullAndReplace(hotCategory.getShowImg(), webSite));
+        }
+    }
 
     /**
      * 购物车营销List的bean域名切换
