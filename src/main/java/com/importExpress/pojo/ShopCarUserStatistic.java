@@ -34,6 +34,18 @@ public class ShopCarUserStatistic {
     private String admname;// 客户浏览商品数
     private int usco;//问卷调查专用
     private int firstdiscount;//是否下单
+    /**
+     * 网站类型
+     */
+    private int site;
+
+    public int getSite() {
+        return site;
+    }
+
+    public void setSite(int site) {
+        this.site = site;
+    }
 
     public int getFirstdiscount() {
         return firstdiscount;
