@@ -51,5 +51,10 @@ public class InventoryBarcodeRecord {
 	 * 备注
 	 */
 	private String remark;
+	
+	/**
+	 * 移库数量
+	 */
+	private int changeNum;
 
 }

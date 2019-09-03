@@ -246,10 +246,26 @@ public interface InventoryMapper {
 	 */
 	int insertInventoryCheck(InventoryCheck check);
 	
+	/**复制库存表
+	 * @param date
+	 * @return
+	 */
+	int copyInventoryCheck(String table_name);
+	
+	/**复制表是否存在
+	 * @param table_name
+	 * @return
+	 */
+	String showCheckTable(String table_name);
+	
 	/**获取最近一次有效盘点 inventory_sku_check
 	 * @return
 	 */
 	InventoryCheck getLastInventoryCheck();
+	/**是否存在未完成的盘点操作
+	 * @return
+	 */
+	List<InventoryCheck> getUnDoneInventoryCheck();
 	
 	/**撤销盘点 inventory_sku_check
 	 * @param check
@@ -408,4 +424,20 @@ public interface InventoryMapper {
 	 */
 	List<LossInventoryWrap> inventoryLossList(Map<String,Object> map);
 	int inventoryLossListCount(Map<String,Object> map);
+	
+	
+	/**获取验货入库数据
+	 * @param odid
+	 * @return
+	 */
+	Map<String,Object> getInventoryDetailByOdid(int odid);
+	
+	/**未完成移库请求数量
+	 * @return
+	 */
+	int getUnDoneInventoryBarcode();
+	/**盘点列表所有
+	 * @return
+	 */
+	List<InventoryData> invetoryCheck();
 }

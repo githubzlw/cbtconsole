@@ -39,4 +39,17 @@ public class InventoryData extends InventorySku{
 	 */
 	private String remarkContext;
 	
+	/**
+	 *临时 盘点库存
+	 */
+	private int tempRemaining;
+	/**
+	 *临时 盘点记录表ID
+	 */
+	private int checkTempId;
+	/**
+	 * 临时盘点库位
+	 */
+	private String tempBarcode;
+	
 }

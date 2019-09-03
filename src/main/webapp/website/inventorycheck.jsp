@@ -83,7 +83,7 @@
 .tc1 .container{margin-top:50px;}
 .tc1 table td:last-child{text-align: center;}
 .tc1 table input[type="radio"]{width:20px;height:20px;}
-.tc1,.tc2,.tc3{position:absolute;z-index:10;display:none;top:100px;left:50%;margin-left:-600px;background-color:#fff;
+.tc1,.tc2,.tc3,.tc4{position:absolute;z-index:10;display:none;top:100px;left:50%;margin-left:-600px;background-color:#fff;
 padding: 20px;max-height: 800px;}
 .tc1_table,.tc2_table{max-height:500px;height:auto;overflow-y:auto;}
 /* 产品弹窗 tc2 */
@@ -128,6 +128,30 @@ em,i{font-style: normal;}
 .tc3 .other{position: absolute;top:15px;right:-222px;}
 .tc3 .wrap8{text-align: center;}
 .tc3 .wrap8 button{border:1px solid #999;padding:0 80px; line-height:28px;border-radius: 4px;}
+
+/* 产品弹窗 tc4 */
+*{margin:0;padding:0;box-sizing: border-box;}
+.tc4 em,.tc4 i{font-style: normal;display: inline-block;float:left;}
+.clearfix:before,.clearfix:after{content:"";display:table;}
+.clearfix:after{clear:both;}
+.clearfix{zoom:1;} 
+.tc4.wraps{border:2px solid #999;width:1049px;padding:20px;margin-left:-400px;}
+.tc4.wraps span{display:inline-block;width:103px;float:left;}
+.tc4.wraps input[type="text"]{border:1px solid #999;background-color: #fff;height:28px;border-radius: 4px;width:205px;float:left;}
+.tc4.wraps input[type="radio"]{width:18px;height:18px;position: relative;top:2px;}
+.tc4.wraps label{margin-right:10px;}
+.tc4 .wrap6{overflow:hidden;}
+.tc4 .wrap6 span,.wraps.tc3 .reasons{float:left;position: relative;}
+.tc4 .w235{width:235px;}
+.tc4.wraps .wrap{margin-bottom:40px;overflow:hidden;}
+.tc4 .wrap7 img{width:250px;height: 250px;}
+.tc4 .wrap2 em{width:645px;}
+.tc4 .wrap7 {float:right;position: relative;top:-30px;}
+.tc4 .left{float:left;}
+.tc4 p{text-align: center;}
+.tc4 .other{position: absolute;top:15px;right:-222px;}
+.tc4 .wrap8{text-align: center;}
+.tc4 .wrap8 button{border:1px solid #999;padding:0 80px; line-height:28px;border-radius: 4px;}
 
 
 .report .btn_page_in{width:100px;}
@@ -219,7 +243,7 @@ em,i{font-style: normal;}
 						<th>变更数量</th>
 						<th>库存数量</th>
 						<th>当前价格</th>
-						<th>盘点数量</th>
+						<!-- <th>盘点数量</th> -->
 						<th>库位</th>
 						<th>操作</th>
 					</tr>
@@ -243,14 +267,16 @@ em,i{font-style: normal;}
 						<td class="datagrid-cell-c2-remaining">${tory.remaining}
 						</td>
 						<td class="emprice">${tory.goodsPrice}</td>
-						<td class="datagrid-cell-c2-checkRemaining">
+						<%-- <td class="datagrid-cell-c2-checkRemaining">
 						<input class="datagrid-cell-c2-check-Remaining q_in_r c_remaining" value="${tory.remaining}" readonly="readonly" onchange="updateCheckRecord(${index.index})" id="iq_in_r${index.index}"></td>
-						<td class="datagrid-cell-c2-barcode">
+						 --%>
+						 <td class="datagrid-cell-c2-barcode">
+						 <em class="barcode_code">${tory.barcode}</em>
 						<em class="datagrid-cell-c2-canRemaining" style="display:none;">${tory.canRemaining}</em>
 						<input value="${tory.barcode}" class="q_in_barcode_h" type="hidden">
 						<input value="0" class="q_record_id" type="hidden">
 						<input value="${tory.inventorySkuId}" class="q_inventory_id" type="hidden">
-						<input value="${tory.barcode}" class="q_in_barcode" readonly="readonly" type="text" onchange="updateCheckRecord(${index.index})"></td>
+						<input value="${tory.barcode}" class="q_in_barcode" readonly="readonly" type="hidden" onchange="updateCheckRecord(${index.index})"></td>
 						<td>
 							${tory.operation}
 						</td>
@@ -504,11 +530,65 @@ em,i{font-style: normal;}
 			<button onclick="addLoss()" class="btn btn-success">保存</button>
 		</div>
 	</div>
+	<div class="wraps tc4">
+		<div class="wrap wrap1">
+			<span>产品 ID</span>
+			<input type="text" id="index_check_igoodsID" readonly="readonly">
+			<span style="margin-left: 40px;">SKUID</span>
+			<input type="text" id="index_check_iskuid" readonly="readonly">
+			<span style="margin-left: 40px;">SPECID</span>
+			<input type="text" name="ispecid" id="index_check_ispecid" readonly="readonly">
+		</div>
+		<div class="wrap wrap2">
+			<span>产品名称</span>
+			<em id="index_check_igoodsname">产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称</em>
+		</div>
+		<div class="wrap-overflow clearfix">
+			<div class="left">
+				<div class="wrap wrap3">
+					<span>产品规格</span>
+					<em class="w235" id="index_check_isku">产品规格产品规格产品规格产品规格产品规格</em>
+				</div>
+				<div class="wrap wrap4">
+					<span>库存数量</span>
+					<i id="index_check_iremaining">20</i>
+					<span style="margin-left:39px">可用库存数量</span>
+					<i id="index_check_icanremaining">20</i>
+				</div>
+				<div class="wrap wrap5">
+					<span>盘点数量</span>
+					<input type="text" id="index_check_ichangcount">
+				</div>
+				<div class="wrap wrap5">
+					<span>库位</span>
+					<input type="hidden" id="index_check_barcode_b">
+					<input type="text" id="index_check_barcode">
+				</div>
+			</div>
+			<div class="wrap7">
+				<p>产品图</p>
+				<img src="https://img1.import-express.com/importcsvimg/importimg/559138175864/8063cce6-2b0d-47c9-abe5-95e2b7ec1032_179.png" alt="" id="index_check_iimg">
+			</div>
+		</div>
+		
+		
+		<div class="wrap wrap8">
+		<input type="hidden" value="" id="index_check_index">
+		<input type="hidden" value="" id="index_check_goods_price">
+		<input type="hidden" value="" id="index_check_q_record_id">
+		<input type="hidden" value="" id="index_check_in_id">
+			<button onclick="addcheck()" class="btn btn-success">盘点</button>
+		</div>
+	</div>
 </div>
-
+<input type="hidden" value="${isBarcodeDone}" id="isBarcodeDone">
 </body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/inventoryReport.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
 </html>
 
 

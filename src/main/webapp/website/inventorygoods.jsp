@@ -162,6 +162,7 @@ em,i{font-style: normal;}
 						<th>产品信息</th>
 						<th>产品图片</th>
 						<th>产品Sku</th>
+						<th>数量</th>
 						<th>订单信息</th>
 						<th>库位</th>
 						<th>状态</th>
@@ -204,6 +205,7 @@ em,i{font-style: normal;}
 					Skuid:${b.iskSkuid }
 					
 					</td>
+					<td>${b.changeNum }</td>
 					<td>
 					订单号:${b.orderid} / ${b.odid }
 					
@@ -272,7 +274,6 @@ em,i{font-style: normal;}
 	</div>
 	
 </div>
-
 </body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript">

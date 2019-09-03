@@ -1,3 +1,141 @@
+(function() {
+    $.MsgBox = {
+        Alert: function(title, msg) {
+            GenerateHtml("alert", title, msg);
+            btnOk(); //alert只是弹出消息，因此没必要用到回调函数callback
+            btnNo();
+        },
+        Confirm: function(title, msg, callback) {
+            GenerateHtml("confirm", title, msg);
+            btnOk(callback);
+            btnNo();
+        }
+    }
+    //生成Html
+    var GenerateHtml = function(type, title, msg) {
+        var _html = "";
+        _html += '<div id="mb_box"></div><div id="mb_con"><span id="mb_tit">' + title + '</span>';
+        _html += '<a id="mb_ico">x</a><div id="mb_msg">' + msg + '</div><div id="mb_btnbox">';
+        if (type == "alert") {
+            _html += '<input id="mb_btn_ok" type="button" value="确定" />';
+        }
+        if (type == "confirm") {
+            _html += '<input id="mb_btn_ok" type="button" value="确定" />';
+            _html += '<input id="mb_btn_no" type="button" value="取消" />';
+        }
+        _html += '</div></div>';
+        //必须先将_html添加到body，再设置Css样式
+        $("body").append(_html);
+        //生成Css
+        GenerateCss();
+    }
+
+    //生成Css
+    var GenerateCss = function() {
+        $("#mb_box").css({
+            width: '100%',
+            height: '100%',
+            zIndex: '99999',
+            position: 'fixed',
+            filter: 'Alpha(opacity=60)',
+            backgroundColor: 'black',
+            top: '0',
+            left: '0',
+            opacity: '0.6'
+        });
+        $("#mb_con").css({
+            zIndex: '999999',
+            width: '400px',
+            position: 'fixed',
+            backgroundColor: 'White',
+            borderRadius: '15px'
+        });
+        $("#mb_tit").css({
+            display: 'block',
+            fontSize: '24px',
+            color: '#444',
+            padding: '10px 15px',
+            backgroundColor: '#DDD',
+            borderRadius: '15px 15px 0 0',
+            borderBottom: '3px solid #009BFE',
+            fontWeight: 'bold'
+        });
+        $("#mb_msg").css({
+            padding: '20px',
+            lineHeight: '36px',
+            borderBottom: '1px dashed #DDD',
+            fontSize: '24px'
+        });
+        $("#mb_ico").css({
+            display: 'block',
+            position: 'absolute',
+            right: '10px',
+            top: '11px',
+            border: '1px solid Gray',
+            width: '25px',
+            height: '25px',
+            textAlign: 'center',
+            lineHeight: '16px',
+            cursor: 'pointer',
+            borderRadius: '12px',
+            fontFamily: '微软雅黑',
+            fontSize:'20px'
+        });
+        $("#mb_btnbox").css({
+            margin: '15px 0 10px 0',
+            textAlign: 'center'
+        });
+        $("#mb_btn_ok,#mb_btn_no").css({
+            width: '85px',
+            height: '30px',
+            color: 'white',
+            border: 'none'
+        });
+        $("#mb_btn_ok").css({
+            backgroundColor: '#168bbb'
+        });
+        $("#mb_btn_no").css({
+            backgroundColor: 'gray',
+            marginLeft: '20px'
+        });
+        //右上角关闭按钮hover样式
+        $("#mb_ico").hover(function() {
+            $(this).css({
+                backgroundColor: 'Red',
+                color: 'White'
+            });
+        }, function() {
+            $(this).css({
+                backgroundColor: '#DDD',
+                color: 'black'
+            });
+        });
+        var _widht = document.documentElement.clientWidth; //屏幕宽
+        var _height = document.documentElement.clientHeight; //屏幕高
+        var boxWidth = $("#mb_con").width();
+        var boxHeight = $("#mb_con").height();
+        //让提示框居中
+        $("#mb_con").css({
+            top: (_height - boxHeight) / 2 + "px",
+            left: (_widht - boxWidth) / 2 + "px"
+        });
+    }
+    //确定按钮事件
+    var btnOk = function(callback) {
+        $("#mb_btn_ok").click(function() {
+            $("#mb_box,#mb_con").remove();
+            if (typeof(callback) == 'function') {
+                callback();
+            }
+        });
+    }
+    //取消按钮事件
+    var btnNo = function() {
+        $("#mb_btn_no,#mb_ico").click(function() {
+            $("#mb_box,#mb_con").remove();
+        });
+    }
+})();
 $(function(){
 	var query_goodscatid_q = $("#query_goodscatid_q").val();
 	//获取类别
@@ -38,14 +176,16 @@ $(function(){
 //		$(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
 			$("#query_button_check_start").attr("disabled", "disabled");
 //		$("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
+			$(".btn-check-list").removeAttr("disabled");
 			
-			$(".qbt_check").removeAttr("disabled", "disabled");
+			$(".qbt_check").removeAttr("disabled");
 //		$(".qbt_check").attr("style", "background-color: #fff;");
 		}else{
 			$(".qbt_check").attr("disabled", "disabled");
+			$(".btn-check-list").attr("disabled", "disabled");
 //		$(".qbt_check").attr("style", "background-color: #EEEEEE;");
 			
-			$("#query_button_check_start").removeAttr("disabled", "disabled");
+			$("#query_button_check_start").removeAttr("disabled");
 //		$("#query_button_check_start").attr("style", "background-color: #fff;");
 		}
 		
@@ -66,6 +206,13 @@ $(function(){
 	}
 	//开始盘点
 	$("#query_button_check_start").click(function(){
+		var isBarcodeDone = $("#isBarcodeDone").val();
+		if(isBarcodeDone !='0'){
+			 $.MsgBox.Confirm("温馨提示", "请先完成所有移库处理操作后再来盘点库存！点击'确定'跳转移库列表", function(){
+				 window.location.href = "/cbtconsole/inventory/barcode";
+			 });
+			return ;
+		}
 		var checkCategory = $("#query_catid_select").val();
 	    jQuery.ajax({
 		       url:"/cbtconsole/inventory/check/start",
@@ -77,14 +224,18 @@ $(function(){
 		    		  $("#query_button_check_start").attr("disabled", "disabled");
 //		    		  $("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
 		    			
-		    		  $(".qbt_check").removeAttr("disabled", "disabled");
+		    		  $(".qbt_check").removeAttr("disabled");
 //		    		 $(".qbt_check").attr("style", "background-color: #fff;");
 		    		 $(".p_q_r").attr("readonly","readonly");
 		    		 $("#query_catid_select").attr("readonly","readonly");
-		    			$(".p_qs_r").attr("disabled", "disabled");
-//		    	        $(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
-		    	        $(".q_in_barcode").removeAttr("readonly");
-		    		    $(".q_in_r").removeAttr("readonly");
+		    		 $(".p_qs_r").attr("disabled", "disabled");
+//		    	     $(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
+		    	     $(".q_in_barcode").removeAttr("readonly");
+		    		 $(".q_in_r").removeAttr("readonly");
+		    		 $(".btn-check-list").removeAttr("disabled");
+		    		 
+		    		 //列出所有打印
+		    		 window.location.href ="/cbtconsole/inventory/check/print";
 		    	  }else{
 		    		  $("#check_id").val(0);
 		    		  alert(data.reason);
@@ -108,6 +259,7 @@ $(function(){
 //		    	        $(".p_qs_r").attr("style", "background-color: #fff");
 		$(".q_in_r").attr("readonly","readonly");
 		$(".q_in_barcode").attr("readonly","readonly");
+		$(".btn-check-list").attr("disabled", "disabled");
 		var check_id = $("#check_id").val();
 		jQuery.ajax({
 		       url:"/cbtconsole/inventory/check/cancel",
@@ -115,6 +267,8 @@ $(function(){
 		       type:"post",
 		       success:function(data){
 		    	   $("#check_id").val(0);
+		    	   $("#current_page").val(1)
+		   		   doQuery(1,1);
 		    	  if(data.status == 200){
 		    	  }else{
 		    		  alert(data.reason);
@@ -124,8 +278,6 @@ $(function(){
 		   		alert("error盘点取消失败");
 		   	}
 		   });
-		$("#current_page").val(1)
-		doQuery(1,1);
 		
 	})
 	//完成盘点
@@ -140,7 +292,7 @@ $(function(){
 		$(".p_qs_r").removeAttr("disabled");
 		$(".q_in_r").attr("readonly","readonly");
 		$(".q_in_barcode").attr("readonly","readonly");
-		
+		$(".btn-check-list").attr("disabled", "disabled");
 		window.location.href ="/cbtconsole/inventory/check/done?check_id="+check_id;
 		/*$("#current_page").val(1)
 		doQuery(1,1);*/
@@ -186,6 +338,7 @@ $(function(){
 		$('.tc,.trnasparent,.tc1').hide();
 		$('.tc,.trnasparent,.tc2').hide();
 		$('.tc,.trnasparent,.tc3').hide();
+		$('.tc,.trnasparent,.tc4').hide();
 	});
 	
 $(".datagrid-cell-c2-remarkContext").each(function(){
@@ -461,6 +614,48 @@ function updateInventory(type,index,in_id){
 	}
 	$('.tc,.trnasparent,.tc3').show();
 }
+/* 
+*type： 0-单个产品库存进去  1- 头部按钮进去
+*index 产品库存序号
+*in-id 库存表id
+*/
+function updateCheck(type,index,in_id){
+	$("#index_check_igoodsID").val('');
+	$("#index_check_iskuid").val('');
+	$("#index_check_ispecid").val('');
+	$("#index_check_igoodsname").html('');
+	$("#index_check_isku").html('');
+	$("#index_check_iremaining").html('');
+	$("#index_check_icanremaining").html('');
+	$("#index_check_ichangcount").val('');
+	$("#index_check_iremark").val('');
+	$("#index_check_iimg").attr('src','');
+	$("#index_check_in_id").val('0');
+	$("#index_check_barcode").val('');
+	$("#index_check_barcode_b").val('');
+	$("#index_check_goods_price").val('');
+	$("#index_check_q_record_id").val('');
+	$("#index_check_index").val(index);
+	
+	if(index && index!=''){
+		var trd = $("#datagrid-row-r2-2-"+index);
+		$("#index_check_igoodsID").val(trd.find(".datagrid-cell-c2-goodsPid").text());
+		$("#index_check_iskuid").val(trd.find(".emskuid").text());
+		$("#index_check_ispecid").val(trd.find(".emspecid").text());
+		$("#index_check_igoodsname").html(trd.find(".datagrid-cell-c2-goodsName").text());
+		$("#index_check_isku").html(trd.find(".emsku").text());
+		$("#index_check_iremaining").html(trd.find(".datagrid-cell-c2-remaining").text());
+		$("#index_check_icanremaining").html(trd.find(".datagrid-cell-c2-canRemaining").text());
+		$("#index_check_barcode").val(trd.find(".barcode_code").text().trim());
+		$("#index_check_barcode_b").val(trd.find(".barcode_code").text().trim());
+		$("#index_check_goods_price").val(trd.find(".emprice").text().trim());
+		$("#index_check_q_record_id").val(trd.find(".q_record_id").val().trim());
+		$("#index_check_iimg").attr("src",trd.find(".datagrid-cell-c2-carImg img").attr("src"));
+		$("#index_check_ichangcount").val('0');
+		$("#index_check_in_id").val(in_id);
+	}
+	$('.tc,.trnasparent,.tc4').show();
+}
 /*
 * 库存报损
 */
@@ -470,13 +665,21 @@ function addLoss(){
  var ispecid= $("#index_ispecid").val();
  var changeNumber= $("#index_ichangcount").val();
  var remark=$("#index_iremark").val();
-	var  change_type = "0"; 
+ var  change_type = "0";
+ var index_icanremaining = $("#index_icanremaining").text().trim();
+ var index_iremaining = $("#index_iremaining").text().trim();
+ var in_id = $("#index_in_id").val();
+ if(index_iremaining != index_icanremaining){
+	 $.MsgBox.Confirm("温馨提示", "请先完成该产品的移库处理操作后再来！点击'确定'跳转移库列表", function(){
+		 window.location.href = "/cbtconsole/inventory/barcode?inid="+in_id;
+	 });
+	 return ;
+ }
  $(".radio_change").each(function(){
 	   if($(this).is(':checked')){
 		   change_type = $(this).val();
 	   }
  })
-  var in_id = $("#index_in_id").val();
   jQuery.ajax({
       url:"/cbtconsole/inventory/addLoss",
       data:{
@@ -503,7 +706,69 @@ function addLoss(){
       }
   });
 }
-
+/*
+* 库存报损
+*/
+function addcheck(){
+ var igoodsId=$("#index_check_igoodsID").val();
+ var iskuid= $("#index_check_iskuid").val();
+ var ispecid= $("#index_check_ispecid").val();
+ var check_remaining= $("#index_check_ichangcount").val();
+ var remark=$("#index_iremark").val();
+ var index_icanremaining = $("#index_check_icanremaining").text().trim();
+ var goods_sku = $("#index_check_isku").text().trim();
+ var index_iremaining = $("#index_check_iremaining").text().trim();
+ var in_id = $("#index_check_in_id").val();
+ var check_id = $("#check_id").val();
+ var before_barcode = $("#index_check_barcode_b").val();
+ var after_barcode = $("#index_check_barcode").val();
+ var goods_price = $("#index_check_goods_price").val();
+ var record_id = $("#index_check_record_id").val();
+ var index_c = $("#index_check_index").val();
+ var goods_name = $("#index_check_igoodsname").text().trim();
+ if(index_iremaining != index_icanremaining){
+	 $.MsgBox.Confirm("温馨提示", "请先完成该产品的移库处理操作后再来！点击'确定'跳转移库列表", function(){
+		 window.location.href = "/cbtconsole/inventory/barcode?inid="+in_id;
+	 });
+	 return ;
+ }
+ if(check_id=='' || check_id=='0'){
+	 alert("请先开始盘点");
+	 return ;
+ }
+  jQuery.ajax({
+      url:"/cbtconsole/inventory/check/update",
+      data:{
+    	  "goods_pid":igoodsId,
+          "goods_sku":goods_sku,
+          "goods_specid":ispecid,
+          "goods_skuid":iskuid,
+          "goods_price":goods_price,
+          "before_barcode":before_barcode,
+          "after_barcode":after_barcode,
+          "check_remaining":check_remaining,
+			"record_id":record_id,
+			"in_id":in_id,
+			"inventory_remaining":index_iremaining,
+			"check_id":check_id,
+			"goods_name":goods_name
+      },
+      type:"post",
+      success:function(data){
+          var status = data.status
+          if(status == 200){
+        	  $("#datagrid-row-r2-2-"+index_c).find(".q_record_id").val(data.recordId);
+        	  $('.tc,.trnasparent,.tc4').hide();
+              window.location.reload();
+          }else{
+        	  alert("修改库存失败:"+data.reason);
+          }
+      },
+      error:function(e){
+    	  alert("修改库存失败");
+      }
+  });
+}
 
 
 //导出报表
