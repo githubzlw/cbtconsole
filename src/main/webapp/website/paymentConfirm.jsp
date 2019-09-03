@@ -31,6 +31,30 @@ function confirmnamebtn(){
 	 /* $.post("/cbtconsole/WebsiteServlet",
 				{action:'infos',className:'OrderwsServlet',orderNo:'${param.orderNo}',userId:'${param.userid}'}); */
 }) 
+	
+	function setOnlineFreightByData(orderNo, amount) {
+		if(amount > 0){
+		    $.ajax({
+                url: "/cbtconsole/orderDetails/setOnlineFreightByData",
+                type: "post",
+                dataType: "json",
+                data: {"orderNo": orderNo, "amount": amount},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#info" + orderNo).show().text("执行成功");
+                    } else {
+                        $("#info" + orderNo).show().text("执行失败");
+                    }
+                    window.location.reload();
+                },
+                error: function (res) {
+                    $("#info" + orderNo).show().text("执行失败,请联系管理员");
+                }
+            });
+		}else{
+		    $("#info" + odid).text("不需要更新");
+		}
+    }
 </script>
 <style type="text/css">
 </style>
@@ -55,7 +79,11 @@ function confirmnamebtn(){
 	 		<c:if test="${checkOrder > 0}">
 	 			<br>
 	 			<hr>
-	 			<div><b style="color:red;font-size:20px;">订单金额校验结果:${checkMessage}</b></div>
+	 			<div><b style="color:red;font-size:20px;">订单金额校验结果:${checkMessage}</b>
+				
+				<button style="display: none;" onclick="setOnlineFreightByData('${order.orderNo}',${freightError})">设置运费</button>
+					<b id="info${order.orderNo}" style="display: none;color: red;"></b>
+				</div>
 				<br>
 				<div><b style="color:red;font-size:20px;">已付款金额(${nowAmount}USD)=总付款金额(${oldAmount}USD)-拆单金额(${splitAmount}USD)</b></div>
 	 		</c:if>

@@ -1385,7 +1385,12 @@ public class OrderinfoService implements IOrderinfoService {
         return null;
     }
 
-    @Override
+	@Override
+	public int updateOrderInfoFreight(String orderNo, String amount) {
+		return orderinfoMapper.updateOrderInfoFreight(orderNo, amount);
+	}
+
+	@Override
 	public OrderBean getOrders(String orderNo) {
 		OrderBean ob=orderinfoMapper.getOrder(orderNo);
 		if(ob != null){

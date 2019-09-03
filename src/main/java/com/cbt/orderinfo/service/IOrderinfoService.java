@@ -554,4 +554,6 @@ public interface IOrderinfoService {
 	int querySampleOrderInfoByOrderId(String orderNo);
 
     String checkCountryMsg(String orderid);
+
+    int updateOrderInfoFreight(String orderNo, String amount);
 }
