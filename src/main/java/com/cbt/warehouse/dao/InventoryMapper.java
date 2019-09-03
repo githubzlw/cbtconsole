@@ -262,7 +262,7 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	InventoryCheck getLastInventoryCheck();
-	/**获取最近一次有效盘点 inventory_sku_check
+	/**是否存在未完成的盘点操作
 	 * @return
 	 */
 	List<InventoryCheck> getUnDoneInventoryCheck();

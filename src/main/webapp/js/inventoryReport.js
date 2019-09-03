@@ -267,6 +267,8 @@ $(function(){
 		       type:"post",
 		       success:function(data){
 		    	   $("#check_id").val(0);
+		    	   $("#current_page").val(1)
+		   		   doQuery(1,1);
 		    	  if(data.status == 200){
 		    	  }else{
 		    		  alert(data.reason);
@@ -276,8 +278,6 @@ $(function(){
 		   		alert("error盘点取消失败");
 		   	}
 		   });
-		$("#current_page").val(1)
-		doQuery(1,1);
 		
 	})
 	//完成盘点
