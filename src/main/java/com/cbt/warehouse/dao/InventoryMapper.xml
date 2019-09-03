@@ -832,10 +832,10 @@
     order by isku.createtime desc
     </select>
     
-    <insert id="copyInventoryCheck">
+    <select id="copyInventoryCheck">
     DROP TABLE IF EXISTS #{table_name};
-    CREATE TABLE #{table_name} select *from inventory_sku
-    </insert>
+    CREATE TABLE #{table_name} (select *from inventory_sku);
+    </select >
     
     <select id="showCheckTable" resultType="String">
      show tables like #{table_name}; 
