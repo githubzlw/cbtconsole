@@ -1187,7 +1187,6 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 				row.createCell(6).setCellValue(bg.getInventoryRemaining());
 				row.createCell(7).setCellValue(bg.getCheckRemaining());
 				row.createCell(8).setCellValue(Math.abs(bg.getCheckRemaining() - bg.getInventoryRemaining() ));
-				
 				row.createCell(9).setCellValue(bg.getAfterBarcode());
 				row.createCell(10).setCellValue(bg.getCreateTime());
 			}
