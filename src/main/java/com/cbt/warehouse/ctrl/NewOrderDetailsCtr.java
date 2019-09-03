@@ -2271,7 +2271,9 @@ public class NewOrderDetailsCtr {
 		double calculatePrice = odbPrice -couponDiscount -extraDiscount-gradeDiscount-shareDiscount-discountAmount
 				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c
 				+ actual_lwh + processingfee-couponAmount + actual_allincost;
-
+		if(orderInfo.getIsDropshipOrder() > 0){
+		    calculatePrice += memberFee;
+        }
 		BigDecimal bd3   =   new   BigDecimal(Math.abs(calculatePrice - payPrice));
 		float ft3   =   bd3.setScale(3,   BigDecimal.ROUND_HALF_UP).floatValue();
 		if(ft3 > 0.01 ){
