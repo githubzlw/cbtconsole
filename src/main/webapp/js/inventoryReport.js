@@ -635,6 +635,7 @@ function updateCheck(type,index,in_id){
 	$("#index_check_barcode_b").val('');
 	$("#index_check_goods_price").val('');
 	$("#index_check_q_record_id").val('');
+	$("#index_check_index").val(index);
 	
 	if(index && index!=''){
 		var trd = $("#datagrid-row-r2-2-"+index);
@@ -708,7 +709,7 @@ function addLoss(){
 /*
 * 库存报损
 */
-function addCheck(){
+function addcheck(){
  var igoodsId=$("#index_check_igoodsID").val();
  var iskuid= $("#index_check_iskuid").val();
  var ispecid= $("#index_check_ispecid").val();
@@ -723,6 +724,8 @@ function addCheck(){
  var after_barcode = $("#index_check_barcode").val();
  var goods_price = $("#index_check_goods_price").val();
  var record_id = $("#index_check_record_id").val();
+ var index_c = $("#index_check_index").val();
+ var goods_name = $("#index_check_igoodsname").text().trim();
  if(index_iremaining != index_icanremaining){
 	 $.MsgBox.Confirm("温馨提示", "请先完成该产品的移库处理操作后再来！点击'确定'跳转移库列表", function(){
 		 window.location.href = "/cbtconsole/inventory/barcode?inid="+in_id;
@@ -747,12 +750,14 @@ function addCheck(){
 			"record_id":record_id,
 			"in_id":in_id,
 			"inventory_remaining":index_iremaining,
-			"check_id":check_id
+			"check_id":check_id,
+			"goods_name":goods_name
       },
       type:"post",
       success:function(data){
           var status = data.status
           if(status == 200){
+        	  $("#datagrid-row-r2-2-"+index_c).find(".q_record_id").val(data.recordId);
         	  $('.tc,.trnasparent,.tc4').hide();
               window.location.reload();
           }else{

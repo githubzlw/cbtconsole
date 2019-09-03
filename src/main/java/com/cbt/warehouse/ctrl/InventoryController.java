@@ -1201,11 +1201,19 @@ public class InventoryController {
 		mv.addObject("checkListCount", checkListCount);
 		int toryListPage = checkListCount % 20 == 0 ? checkListCount / 20 : checkListCount / 20 + 1;
 		mv.addObject("toryListPage", toryListPage);
+		
+		if(Integer.parseInt(StrUtils.object2NumStr(map.get("check_id"))) == 0) {
+			List<InventoryCheck> unDoneInventoryCheck = inventoryService.getUnDoneInventoryCheck();
+			map.put("check_id", 
+					unDoneInventoryCheck==null || unDoneInventoryCheck.isEmpty() ? 0 : unDoneInventoryCheck.get(0).getId());
+			
+		}
 		mv.addObject("queryParam",map);
 		
 		//是否有待操作的移库请求，只有处理完才可以盘点
 		int unDoneInventoryBarcode = inventoryService.getUnDoneInventoryBarcode();
 		mv.addObject("isBarcodeDone",unDoneInventoryBarcode);
+		
 		return mv;
 		
 	}
@@ -1287,6 +1295,7 @@ public class InventoryController {
 		String goodsPrice = request.getParameter("goods_price");
 		String beforeBarcode = request.getParameter("before_barcode");
 		String afterBarcode = request.getParameter("after_barcode");
+		String goodsName = request.getParameter("goods_name");
 		record.setAfterBarcode(afterBarcode);
 		record.setBeforeBarcode(beforeBarcode);
 		record.setCheckRemaining(Integer.parseInt(strCheckRemaining));
@@ -1298,7 +1307,7 @@ public class InventoryController {
 		record.setInventorySkuId(Integer.parseInt(strInventoryId));
 		record.setInventoryCheckId(Integer.parseInt(strCheckId));
 		record.setInventoryRemaining(Integer.parseInt(strInventoryRemaining));
-		
+		record.setGoodsName(goodsName);
 		if(recordId > 0) {
 			inventoryService.updateInventoryCheckRecord(record );
 		}else {

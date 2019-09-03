@@ -1,6 +1,8 @@
 package com.cbt.warehouse.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,7 @@ import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+import com.mysql.fabric.xmlrpc.base.Data;
 @Service
 public class InventoryServiceImpl implements  InventoryService{
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
@@ -1004,6 +1007,7 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public List<InventoryCheckWrap> invetoryCheckList(Map<Object, Object> map) {
+//		List<InventoryCheck> unDoneInventoryCheck = inventoryMapper.getUnDoneInventoryCheck();
 		//获取库存数据
 		List<InventoryData> iinOutInventory = getIinOutInventory(map);
 		if(iinOutInventory == null || iinOutInventory.isEmpty()) {
@@ -1032,7 +1036,12 @@ public class InventoryServiceImpl implements  InventoryService{
 			wrap.setInventoryCheckId(i.getInventoryCheckId());
 			wrap.setLastCheckTime(i.getCheckTime());
 			wrap.setLastCheckRemaining(i.getCheckRemaining());
-			
+			if(i.getCheckTempId() != 0) {
+				wrap.setRemaining(i.getTempRemaining());
+				wrap.setCanRemaining(i.getTempRemaining());
+				wrap.setBarcode(i.getTempBarcode());
+			}
+			wrap.setCheckId(i.getCheckTempId());
 			result.add(wrap);
 		}
 		
@@ -1043,8 +1052,17 @@ public class InventoryServiceImpl implements  InventoryService{
 		return inventoryMapper.getLastInventoryCheck();
 	}
 	@Override
+	public List<InventoryCheck> getUnDoneInventoryCheck() {
+		return inventoryMapper.getUnDoneInventoryCheck();
+	}
+	@Override
 	public int insertInventoryCheck(InventoryCheck check) {
 		inventoryMapper.insertInventoryCheck(check);
+		String table_name = LocalDate.now().toString().replace("-", "_");
+		table_name = "inventory_sku_"+table_name;
+		if(StringUtil.isBlank(inventoryMapper.showCheckTable(table_name))) {
+			inventoryMapper.copyInventoryCheck(table_name);
+		}
 		return check.getId();
 	}
 	@Override

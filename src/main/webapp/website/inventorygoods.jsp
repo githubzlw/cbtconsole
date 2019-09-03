@@ -205,11 +205,11 @@ em,i{font-style: normal;}
 					Skuid:${b.iskSkuid }
 					
 					</td>
+					<td>${b.changeNum }</td>
 					<td>
 					订单号:${b.orderid} / ${b.odid }
 					
 					</td>
-					<td>${b.changeNum }</td>
 					<td style="width: 400px;">
 					<c:if test="${b.ibState== 0}">
 					库存库位:<span class="in_barcode_${index.index}">${b.inBarcode }</span>

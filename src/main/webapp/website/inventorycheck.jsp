@@ -573,6 +573,7 @@ em,i{font-style: normal;}
 		
 		
 		<div class="wrap wrap8">
+		<input type="hidden" value="" id="index_check_index">
 		<input type="hidden" value="" id="index_check_goods_price">
 		<input type="hidden" value="" id="index_check_q_record_id">
 		<input type="hidden" value="" id="index_check_in_id">

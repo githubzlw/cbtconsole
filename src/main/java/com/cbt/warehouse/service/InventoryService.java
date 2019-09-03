@@ -194,6 +194,10 @@ public interface InventoryService {
 	 * @return
 	 */
 	InventoryCheck getLastInventoryCheck();
+	/**获取最近一次有效盘点 inventory_sku_check
+	 * @return
+	 */
+	List<InventoryCheck> getUnDoneInventoryCheck();
 	
 	/**开始盘点
 	 * @param check

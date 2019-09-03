@@ -11,7 +11,6 @@ import com.cbt.pojo.Inventory;
 import com.cbt.website.bean.InventoryBarcodeRecord;
 import com.cbt.website.bean.InventoryCheck;
 import com.cbt.website.bean.InventoryCheckRecord;
-import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetails;
 import com.cbt.website.bean.InventoryLock;
@@ -247,10 +246,26 @@ public interface InventoryMapper {
 	 */
 	int insertInventoryCheck(InventoryCheck check);
 	
+	/**复制库存表
+	 * @param date
+	 * @return
+	 */
+	int copyInventoryCheck(String table_name);
+	
+	/**复制表是否存在
+	 * @param table_name
+	 * @return
+	 */
+	String showCheckTable(String table_name);
+	
 	/**获取最近一次有效盘点 inventory_sku_check
 	 * @return
 	 */
 	InventoryCheck getLastInventoryCheck();
+	/**获取最近一次有效盘点 inventory_sku_check
+	 * @return
+	 */
+	List<InventoryCheck> getUnDoneInventoryCheck();
 	
 	/**撤销盘点 inventory_sku_check
 	 * @param check

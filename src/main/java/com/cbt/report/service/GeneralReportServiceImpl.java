@@ -85,7 +85,7 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	String[] excelTota21 = { "序号","商品名称","网站链接","商品库位","商品规格","采购价","首次库存数量","首次库存金额","盘点后库存数量","盘点后库存金额","可用库存数量","首次录入时间","最后更新库存时间","删除人","删除时间","删除备注"};
 	String[] excelTota22 = { "序号","盘点前库存","盘点后库存","盘点前库位","盘点后库位","商品规格","损耗单价","损耗库存金额","损耗时间","损耗人","损耗原因"};
 	String[] excelTota23 = { "序号","支付月份","用户ID","用户邮箱","VIP等级","订单数量","实际重量（kg）","预估重量(kg)","实际支付金额(RMB)","实际采购金额(RMB)","实际运费(RMB)","客户付的运费(RMB)","用户利润(RMB)","用户利润率(%)","预计运费(RMB)","用户利润预估(RMB)","用户预估利润率(%)"};
-	String[] excelTota24 = { "序号","盘点前库存","盘点后库存","盘点前库位","盘点后库位","商品ID","商品规格","specid","skuid","时间","盘点记录id","库存id"};
+	String[] excelTota24 = { "序号","商品ID","产品名","skuid","specid","sku","盘点前库存","盘点后库存","差异值","库位","时间"};
 	String[] excelTota25 = { "序号","类别","商品ID","商品名称","商品sku","商品图片","上次盘点数量","库存数量","库位","盘点数量"};
 
 	@Override
@@ -1174,22 +1174,22 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 		}
 		try{
 			//写入报表汇总
-			//{ "序号","盘点前库存","盘点后库存","盘点前库位","盘点后库位","商品ID","商品规格","specid","skuid","时间","盘点记录id","库存id"};
+			//{"序号","商品ID","产品名","skuid","specid","sku","盘点前库存","盘点后库存","差异值","库位","时间"};
 			for (int i = 0; i < list.size(); i++) {
 				row = sheet.createRow(rows++);
 				InventoryCheckRecord bg = list.get(i);
 				row.createCell(0).setCellValue((i+1));
-				row.createCell(1).setCellValue(bg.getInventoryRemaining());
-				row.createCell(2).setCellValue(bg.getCheckRemaining());
-				row.createCell(3).setCellValue(bg.getBeforeBarcode());
-				row.createCell(4).setCellValue(bg.getAfterBarcode());
-				row.createCell(5).setCellValue(bg.getGoodsPid());
-				row.createCell(6).setCellValue(bg.getGoodsSku());
-				row.createCell(7).setCellValue(bg.getGoodsSpecid());
-				row.createCell(8).setCellValue(bg.getGoodsSpecid());
-				row.createCell(9).setCellValue(bg.getCreateTime());
-				row.createCell(10).setCellValue(bg.getInventoryCheckId());
-				row.createCell(11).setCellValue(bg.getInventorySkuId());
+				row.createCell(1).setCellValue(bg.getGoodsPid());
+				row.createCell(2).setCellValue(bg.getGoodsName());
+				row.createCell(3).setCellValue(bg.getGoodsSkuid());
+				row.createCell(4).setCellValue(bg.getGoodsSpecid());
+				row.createCell(5).setCellValue(bg.getGoodsSku());
+				row.createCell(6).setCellValue(bg.getInventoryRemaining());
+				row.createCell(7).setCellValue(bg.getCheckRemaining());
+				row.createCell(8).setCellValue(Math.abs(bg.getCheckRemaining() - bg.getInventoryRemaining() ));
+				
+				row.createCell(9).setCellValue(bg.getAfterBarcode());
+				row.createCell(10).setCellValue(bg.getCreateTime());
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -1208,9 +1208,9 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 		HSSFCell hcell = row.createCell(0); //添加标题
 		hcell.setCellValue("库存列表");
 		row = sheet.createRow(rows++);  //到下一行添加数据
-		for (int i = 0; i < excelTota24.length; i++) {
+		for (int i = 0; i < excelTota25.length; i++) {
 			HSSFCell cell = row.createCell(i);
-			cell.setCellValue(excelTota24[i]);
+			cell.setCellValue(excelTota25[i]);
 			cell.setCellStyle(style);
 		}
 		try{
