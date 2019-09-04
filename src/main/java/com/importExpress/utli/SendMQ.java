@@ -36,6 +36,7 @@ public class SendMQ {
 
     private final static String QUEUE_REDIS_NAME = "redis";
     private final static String QUEUE_REDIS_NAME_KIDS = "redis_kids";
+    private final static String QUEUE_REDIS_NAME_PETS = "redis_pets";
     private static long totalConnect = 0;
     private static long totalDisConnect = 0;
 
@@ -174,12 +175,15 @@ public class SendMQ {
     }
 
     private void sendMessageStr(String json, int website) throws Exception{
-        if (website > 0) {
-            channel.queueDeclare(QUEUE_REDIS_NAME_KIDS, false, false, false, null);
-            channel.basicPublish("", QUEUE_REDIS_NAME_KIDS, null, json.getBytes("UTF-8"));
-        } else {
+        if (website == 0) {
             channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
             channel.basicPublish("", QUEUE_REDIS_NAME, null, json.getBytes("UTF-8"));
+        }else if (website == 1) {
+            channel.queueDeclare(QUEUE_REDIS_NAME_KIDS, false, false, false, null);
+            channel.basicPublish("", QUEUE_REDIS_NAME_KIDS, null, json.getBytes("UTF-8"));
+        }else if (website == 2) {
+            channel.queueDeclare(QUEUE_REDIS_NAME_PETS, false, false, false, null);
+            channel.basicPublish("", QUEUE_REDIS_NAME_PETS, null, json.getBytes("UTF-8"));
         }
         System.err.println(" [x] Sent '" + json + "'");
     }
