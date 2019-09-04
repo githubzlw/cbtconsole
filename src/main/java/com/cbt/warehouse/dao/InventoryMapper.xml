@@ -592,7 +592,7 @@
     <select id="getInventoryCheckRecord" resultMap="InventoryCheckRecordMap">
     select id,inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
     goods_specid,goods_skuid,goods_price,inventory_remaining,
-    check_remaining,create_time,before_barcode,after_barcode,good_name
+    check_remaining,create_time,before_barcode,after_barcode,goods_name
     from inventory_sku_check_record_temp 
     where inventory_check_id=#{checkId}
     </select>
