@@ -1747,7 +1747,7 @@ public class OrderwsDao implements IOrderwsDao {
                 + "pay_price_tow ,pay_price_three ,remaining_price ,currency,actual_ffreight,"
                 +"(SELECT  ifnull(sum(amount),0)  FROM tab_coupon_use_record WHERE  order_no=o.order_no AND state=1) as couponAmount,"
                 + "coupon_discount,extra_discount,grade_discount,share_discount,discount_amount,cashback, "
-                + "service_fee,extra_freight,firstdiscount,vatbalance,actual_freight_c,processingfee,actual_lwh,memberFee" +
+                + "service_fee,extra_freight,firstdiscount,vatbalance,actual_freight_c,processingfee,actual_lwh,memberFee,isDropshipOrder" +
                 " FROM orderinfo o where LEFT(order_no,17) = LEFT(?,17) ";
         List<OrderBean> list = new ArrayList<OrderBean>();
         Connection conn = DBHelper.getInstance().getConnection();
@@ -1787,6 +1787,7 @@ public class OrderwsDao implements IOrderwsDao {
                 ob.setActual_lwh(rs.getString("actual_lwh"));
                 ob.setProcessingfee(rs.getDouble("processingfee"));
                 ob.setMemberFee(rs.getDouble("memberFee"));
+                ob.setIsDropshipOrder(rs.getInt("isDropshipOrder"));
 
                 /*
                  * SimpleDateFormat dateFormat = new
