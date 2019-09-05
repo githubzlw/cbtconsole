@@ -1679,7 +1679,7 @@
         (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
         inner join shop_car_distribution sb on sa.userid = sb.user_id
         <if test="distributionAdminId > 0">
-            and sb.admin_id = #{followAdminId}
+            and sb.admin_id = #{distributionAdminId}
         </if>
         where userid > 0 group by userid
         )scm on gcf.userid = scm.userid
@@ -1731,7 +1731,7 @@
         (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
         inner join shop_car_distribution sb on sa.userid = sb.user_id
         <if test="distributionAdminId > 0">
-            and sb.admin_id = #{followAdminId}
+            and sb.admin_id = #{distributionAdminId}
         </if>
         where userid > 0 group by userid
         )scm on gcf.userid = scm.userid
