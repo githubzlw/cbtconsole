@@ -18,6 +18,7 @@ public class ShopCarUserStatistic {
     private String currency;//用户货币
     private int totalCatid;//类别总数
     private int followAdminId;//跟进人ID
+    private int distributionAdminId;//跟进人ID
     private String followAdminName;//跟进人
     private String followTime;//跟进时间
     private int isOrder = -1;//是否下单 0未下单 1下单
@@ -45,6 +46,14 @@ public class ShopCarUserStatistic {
 
     public void setSite(int site) {
         this.site = site;
+    }
+
+    public int getDistributionAdminId() {
+        return distributionAdminId;
+    }
+
+    public void setDistributionAdminId(int distributionAdminId) {
+        this.distributionAdminId = distributionAdminId;
     }
 
     public int getFirstdiscount() {

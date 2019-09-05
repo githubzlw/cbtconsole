@@ -882,7 +882,7 @@ public class ShopCarMarketingController {
             return json;
         } else {
             if (!"0".equals(admuser.getRoletype())) {
-                statistic.setFollowAdminId(admuser.getId());
+                statistic.setDistributionAdminId(admuser.getId());
             }
         }
 
@@ -898,12 +898,11 @@ public class ShopCarMarketingController {
             startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
         }
 
-
-        /*String followIdStr = request.getParameter("followId");
+        String followIdStr = request.getParameter("followId");
         int followId = 0;
         if (StringUtils.isNotBlank(followIdStr)) {
             followId = Integer.parseInt(followIdStr);
-        }*/
+        }
 
         String adminIdStr = request.getParameter("adminId");
         int adminId = 0;
@@ -948,7 +947,9 @@ public class ShopCarMarketingController {
 
         try {
 
-            // statistic.setFollowAdminId(followId);
+            if("0".equals(admuser.getRoletype())){
+                statistic.setFollowAdminId(followId);
+            }
             statistic.setSaleId(adminId);
             statistic.setIsOrder(isOrder);
             statistic.setUserId(userId);

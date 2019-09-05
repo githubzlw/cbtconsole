@@ -1677,7 +1677,10 @@
         from goods_carconfig gcf
         inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
         (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
-        inner join shop_car_distribution sb on sa.userid = sb.user_id and sb.admin_id = #{followAdminId}
+        inner join shop_car_distribution sb on sa.userid = sb.user_id
+        <if test="distributionAdminId > 0">
+            and sb.admin_id = #{followAdminId}
+        </if>
         where userid > 0 group by userid
         )scm on gcf.userid = scm.userid
         left join user us on gcf.userid = us.id
@@ -1726,7 +1729,10 @@
         from goods_carconfig gcf
         inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
         (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
-        inner join shop_car_distribution sb on sa.userid = sb.user_id and sb.admin_id = #{followAdminId}
+        inner join shop_car_distribution sb on sa.userid = sb.user_id
+        <if test="distributionAdminId > 0">
+            and sb.admin_id = #{followAdminId}
+        </if>
         where userid > 0 group by userid
         )scm on gcf.userid = scm.userid
         left join user us on gcf.userid = us.id
