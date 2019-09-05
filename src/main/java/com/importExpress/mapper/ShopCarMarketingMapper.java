@@ -122,4 +122,12 @@ public interface ShopCarMarketingMapper {
      * @return
      */
     int insertIntoPriceLog(ShopCarMarketing shopCarMarketing);
+
+    /**
+     * 查询是否分配
+     * @param userId
+     * @param adminId
+     * @return
+     */
+    int checkIsDistribution(@Param("userId") int userId, @Param("adminId") int adminId);
 }

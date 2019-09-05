@@ -1676,8 +1676,9 @@
         DATE_FORMAT(gcf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time
         from goods_carconfig gcf
         inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
-        (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing where userid > 0
-        group by userid
+        (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
+        inner join shop_car_distribution sb on sa.userid = sb.user_id and sb.admin_id = #{followAdminId}
+        where userid > 0 group by userid
         )scm on gcf.userid = scm.userid
         left join user us on gcf.userid = us.id
         left join (select admin_r_user.userid,admin_r_user.adminid,admuser.admName from admin_r_user,admuser
@@ -1724,8 +1725,9 @@
         select count(1)
         from goods_carconfig gcf
         inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
-        (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing where userid > 0
-        group by userid
+        (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
+        inner join shop_car_distribution sb on sa.userid = sb.user_id and sb.admin_id = #{followAdminId}
+        where userid > 0 group by userid
         )scm on gcf.userid = scm.userid
         left join user us on gcf.userid = us.id
         left join (select admin_r_user.userid,admin_r_user.adminid,admuser.admName from admin_r_user,admuser
@@ -1884,4 +1886,9 @@
         insert into shop_car_marketing_price_log(shop_mark_id,user_id,pid,goods_price,goods_price_new,admin_id)
         values(#{id}, #{userid} , #{itemid} , #{googsPrice} , #{priceNew} , #{adminId} )
     </insert>
+
+    <select id="checkIsDistribution" resultType="integer">
+        select count(0) from shop_car_distribution
+        where user_id =#{userId} and admin_id = #{adminId}
+    </select>
 </mapper>
