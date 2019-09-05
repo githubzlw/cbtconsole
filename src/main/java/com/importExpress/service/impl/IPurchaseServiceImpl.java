@@ -1652,9 +1652,9 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		if(inventory != null) {
 			purchaseBean.setSkuid((String)inventory.get("skuid"));
 			purchaseBean.setSpecid((String)inventory.get("specid"));
-			String can_remaining = com.cbt.util.StrUtils.object2NumStr(inventory.get("remaining"));
-			purchaseBean.setInventory(can_remaining);
 			if(unUseInventory) {
+				String can_remaining = com.cbt.util.StrUtils.object2NumStr(inventory.get("can_remaining"));
+				purchaseBean.setInventory(can_remaining);
 				purchaseBean.setInventorySkuId(com.cbt.util.StrUtils.object2NumStr(inventory.get("inventory_id")));
 				purchaseBean.setRemaining(can_remaining);
 				purchaseBean.setNew_remaining(can_remaining);

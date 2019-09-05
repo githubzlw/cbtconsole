@@ -64,4 +64,8 @@ public class InventoryCheckRecord {
 	 */
 	private String goodsImg;
 
+	/**
+	 * 名称
+	 */
+	private String goodsName;
 }

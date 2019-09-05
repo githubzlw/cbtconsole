@@ -23,6 +23,7 @@ import com.cbt.warehouse.pojo.JcexPrintInfo;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
 import com.cbt.website.bean.InventoryCheckRecord;
+import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 
 public interface GeneralReportService {
@@ -131,5 +132,11 @@ public interface GeneralReportService {
      * @return
      */
     public HSSFWorkbook exportInventoryCheckExcel(List<InventoryCheckRecord> list);
+    /**
+     * 库存盘点记录导出
+     * @param list
+     * @return
+     */
+    public HSSFWorkbook exportInventoryExcel(List<InventoryCheckWrap> list);
 
 }

@@ -22,6 +22,7 @@
         <result column="seilUnit" property="odSeilUnit" jdbcType="INTEGER" />
         <result column="yourorder" property="odYourOrder" jdbcType="INTEGER" />
         <result column="li_id" property="liid" jdbcType="INTEGER" />
+        <result column="change_num" property="changeNum" jdbcType="INTEGER" />
         <result column="remaining" property="remaining" jdbcType="INTEGER" />
         <result column="can_remaining" property="canRemaining" jdbcType="INTEGER" />
         <result column="in_id" property="inid" jdbcType="INTEGER" />
@@ -65,6 +66,7 @@
         <result column="before_barcode" property="beforeBarcode" jdbcType="VARCHAR" />
         <result column="after_barcode" property="afterBarcode" jdbcType="VARCHAR" />
         <result column="goods_img" property="goodsImg" jdbcType="VARCHAR" />
+        <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
     </resultMap>
     <resultMap id="InventoryCheckMap" type="com.cbt.website.bean.InventoryCheck" >
         <result column="id" property="id" jdbcType="INTEGER" />
@@ -152,6 +154,9 @@
         <result column="check_remaining" property="checkRemaining" jdbcType="INTEGER"/>
         <result column="inventory_check_id" property="inventoryCheckId" jdbcType="INTEGER"/>
         <result column="check_time" property="checkTime" jdbcType="VARCHAR"/>
+        <result column="temp_remaining" property="tempRemaining" jdbcType="INTEGER"/>
+        <result column="check_temp_id" property="checkTempId" jdbcType="INTEGER"/>
+        <result column="after_barcode" property="tempBarcode" jdbcType="VARCHAR"/>
     </resultMap>
     <resultMap id="InventoryResultMap" type="com.cbt.pojo.Inventory" >
         <result column="id" property="id" jdbcType="INTEGER" />
@@ -214,11 +219,13 @@
     </update>
     <select id="getIinOutInventory" resultMap="InventorySkuResultMap">
       select  isku.*,ifnull(c.valid,2) AS online_flag,c.unsellableReason as unsellableReason,
-      cat.en_name as categoryName ,isc.check_time
+      cat.en_name as categoryName ,isc.check_time,
+      it.check_remaining as temp_remaining,it.after_barcode,it.id as check_temp_id
       from inventory_sku isku 
       left join inventory_sku_check isc on isku.inventory_check_id=isc.id
       left join custom_benchmark_ready c on isku.goods_pid=c.pid
       left join 1688_category cat on isku.goodscatid=cat.category_id
+      left join inventory_sku_check_record_temp it on it.inventory_sku_id=isku.id
     where 1=1
     <if test="inid>0">and isku.id=#{inid}</if>
     <if test="goods_pid != null"> and isku.goods_pid=#{goods_pid}</if>
@@ -233,7 +240,7 @@
     
     <if test="isline == 1">and c.valid=1</if>
     <if test="isline == 2">and c.valid!=1</if>
-    order by createtime desc
+    order by isku.createtime desc
      limit #{page},20
     </select>
     <select id="getIinOutInventoryCount" resultType="INTEGER">
@@ -524,6 +531,10 @@
     <select id="getLastInventoryCheck" resultMap="InventoryCheckMap">
     select  id,check_cat,check_adm,check_time from inventory_sku_check where cancle_flag=0 and check_done=1 order by id desc limit 1
     </select>
+     <!-- 是否存在未完成的盘点操作 -->
+    <select id="getUnDoneInventoryCheck" resultMap="InventoryCheckMap">
+    select  id,check_cat,check_adm,check_time from inventory_sku_check where cancle_flag=0 and check_done=0
+    </select>
     <!-- 批量插入盘点记录 -->
     <insert id="iBatchInventoryCheckRecord">
     insert into inventory_sku_check_record(inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
@@ -558,9 +569,9 @@
     <!-- 完结盘点 -->
     <insert id="doneInventoryCheckRecord">
     insert into inventory_sku_check_record(inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
-    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode) 
+    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode,goods_name) 
     (select inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
-    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode 
+    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode,goods_name 
     from inventory_sku_check_record_temp where inventory_check_id=#{checkId})
     </insert>
     <!-- 更新阿盘点数据 -->
@@ -572,21 +583,23 @@
     <!-- 插入本次盘点数据 -->
     <insert id="insertInventoryCheckRecord" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventoryCheckRecord">
     insert into inventory_sku_check_record_temp(inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
-    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode) 
+    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode,goods_name) 
     values(#{inventoryCheckId},#{inventorySkuId},#{goodsPid},#{goodsSku},
     #{goodsSpecid},#{goodsSkuid},#{goodsPrice},#{inventoryRemaining},
-    #{checkRemaining},now(),#{beforeBarcode},#{afterBarcode})
+    #{checkRemaining},now(),#{beforeBarcode},#{afterBarcode},#{goodsName})
     </insert>
     <!-- 获取本次盘点数据 -->
     <select id="getInventoryCheckRecord" resultMap="InventoryCheckRecordMap">
     select id,inventory_check_id,inventory_sku_id,goods_pid,goods_sku,
-    goods_specid,goods_skuid,goods_price,inventory_remaining,check_remaining,create_time,before_barcode,after_barcode
-    from inventory_sku_check_record_temp where inventory_check_id=#{checkId}
+    goods_specid,goods_skuid,goods_price,inventory_remaining,
+    check_remaining,create_time,before_barcode,after_barcode,goods_name
+    from inventory_sku_check_record_temp 
+    where inventory_check_id=#{checkId}
     </select>
     <!-- 获取盘点历史数据 -->
     <select id="getICRHistory" resultMap="InventoryCheckRecordMap">
     select iscr.id,iscr.inventory_check_id,iscr.inventory_sku_id,iscr.goods_pid,iscr.goods_sku,
-    iscr.goods_specid,iscr.goods_skuid,iscr.goods_price,iscr.inventory_remaining,
+    iscr.goods_specid,iscr.goods_skuid,iscr.goods_price,iscr.inventory_remaining,iscr.goods_name
     iscr.check_remaining,iscr.create_time,iscr.before_barcode,iscr.after_barcode,isk.car_img as goods_img
     
     from inventory_sku_check_record iscr
@@ -679,8 +692,8 @@
     </update>
     
     <insert id="insertInventoryBarcodeRecord" parameterType="com.cbt.website.bean.InventoryBarcodeRecord">
-    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id,createtime,updatetime) 
-    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId},now(),now())
+    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id,createtime,updatetime,change_num) 
+    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId},now(),now(),#{changeNum})
     </insert>
     
     <update id="updateBarcodeRecord">
@@ -689,7 +702,7 @@
     
     <select id="getInventoryBarcode" resultMap="InventoryWrapMap">
     select li.in_id,li.lock_remaining,li.od_id,li.flag,li.is_delete,li.is_use,ib.updatetime as createtime,li.id as li_id,
-    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
+    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,ib.change_num,
     isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,
     isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,isk.remaining,isk.can_remaining,
     od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,od.yourorder,od.goodsid,
@@ -705,7 +718,7 @@
     </select>
     <select id="inventoryBarcodeList" resultMap="InventoryWrapMap">
     select ib.in_id,li.lock_remaining,ib.od_id,li.flag,li.is_delete,li.is_use,ib.updatetime as createtime,li.id as li_id,
-    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,
+    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,ib.change_num,
     isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,
     od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,
     ods.specid as od_specid,ods.skuid as od_skuid
@@ -718,6 +731,7 @@
     where 1=1
     <if test="orderid!=null">and od.orderid=#{orderid}</if>
     <if test="state!=-1">and ib.state=#{state}</if>
+    <if test="inid!=0">and ib.in_id=#{inid}</if>
     order by ib.state asc,ib.updatetime desc
     limit #{page},20
     </select>
@@ -728,6 +742,7 @@
      where 1=1
      <if test="orderid!=null">and od.orderid=#{orderid}</if>
     <if test="state!=-1">and ib.state=#{state}</if>
+    <if test="inid!=0">and ib.in_id=#{inid}</if>
     </select>
     
     <select id="getAddInventory" resultType="java.util.Map">
@@ -798,6 +813,32 @@
 	 <if test="startdate!=''">and change_time>#{startdate}</if>
 	 <if test="enddate!=''">and change_time&lt;#{enddate}</if>
     
+    </select>
+    <select id="getInventoryDetailByOdid" resultType="java.util.Map">
+    select  goods_pid,good_skuid,goods_specid,orderno,od_id,goods_number,
+    inventory_id,goods_p_skuid,goods_p_specid
+    
+    from inventory_details_sku where od_id=#{odid} and type=0 order by id desc limit 1 
+    </select>
+    <select id="getUnDoneInventoryBarcode" resultType="Integer">
+    select count(*) from  inventory_barcode_record where state=0 or state=1
+    </select>
+    
+     <select id="invetoryCheck" resultMap="InventorySkuResultMap">
+      select  isku.*,
+      cat.en_name as categoryName 
+      from inventory_sku isku 
+      left join 1688_category cat on isku.goodscatid=cat.category_id
+    order by isku.createtime desc
+    </select>
+    
+    <select id="copyInventoryCheck">
+    DROP TABLE IF EXISTS #{table_name};
+    CREATE TABLE #{table_name} (select *from inventory_sku);
+    </select >
+    
+    <select id="showCheckTable" resultType="String">
+     show tables like #{table_name}; 
     </select>
     
 </mapper>

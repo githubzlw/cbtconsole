@@ -167,4 +167,9 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
         return shopCarMarketingMapper.insertIntoPriceLog(shopCarMarketing);
     }
 
+    @Override
+    public boolean checkIsDistribution(int userId, int adminId) {
+        return shopCarMarketingMapper.checkIsDistribution(userId, adminId) > 0;
+    }
+
 }

@@ -88,12 +88,15 @@ public class InventoryController {
 		state = StrUtils.isNum(state) ? state : "-1";
 		String orderid = request.getParameter("orderid");
 		orderid = StringUtil.isBlank(orderid) ? null : orderid;
+		String inid = request.getParameter("inid");
+		inid = StrUtils.isNum(inid) ? inid : "0";
 		String page = request.getParameter("page");
 		page = StrUtils.isNum(page) ? page : "1";
 		map.put("currentPage", Integer.parseInt(page));
 		map.put("page", (Integer.parseInt(page) - 1)*20);
 		map.put("state", state);
 		map.put("orderid", orderid);
+		map.put("inid", inid);
 		
 		int count = inventoryService.inventoryBarcodeListCount(map);
 		if(count > 0) {
@@ -448,6 +451,9 @@ public class InventoryController {
 		mv.addObject("toryListPage", toryListPage);
 		mv.addObject("page", map.get("current_page"));
 		mv.addObject("queryParam",map);
+//		//是否有待操作的移库请求，只有处理完才可以盘点
+//		int unDoneInventoryBarcode = inventoryService.getUnDoneInventoryBarcode();
+//		mv.addObject("isBarcodeDone",unDoneInventoryBarcode);
 		return mv;
 	}
 	
@@ -1195,7 +1201,18 @@ public class InventoryController {
 		mv.addObject("checkListCount", checkListCount);
 		int toryListPage = checkListCount % 20 == 0 ? checkListCount / 20 : checkListCount / 20 + 1;
 		mv.addObject("toryListPage", toryListPage);
+		
+		if(Integer.parseInt(StrUtils.object2NumStr(map.get("check_id"))) == 0) {
+			List<InventoryCheck> unDoneInventoryCheck = inventoryService.getUnDoneInventoryCheck();
+			map.put("check_id", 
+					unDoneInventoryCheck==null || unDoneInventoryCheck.isEmpty() ? 0 : unDoneInventoryCheck.get(0).getId());
+			
+		}
 		mv.addObject("queryParam",map);
+		
+		//是否有待操作的移库请求，只有处理完才可以盘点
+		int unDoneInventoryBarcode = inventoryService.getUnDoneInventoryBarcode();
+		mv.addObject("isBarcodeDone",unDoneInventoryBarcode);
 		
 		return mv;
 		
@@ -1278,6 +1295,7 @@ public class InventoryController {
 		String goodsPrice = request.getParameter("goods_price");
 		String beforeBarcode = request.getParameter("before_barcode");
 		String afterBarcode = request.getParameter("after_barcode");
+		String goodsName = request.getParameter("goods_name");
 		record.setAfterBarcode(afterBarcode);
 		record.setBeforeBarcode(beforeBarcode);
 		record.setCheckRemaining(Integer.parseInt(strCheckRemaining));
@@ -1289,7 +1307,7 @@ public class InventoryController {
 		record.setInventorySkuId(Integer.parseInt(strInventoryId));
 		record.setInventoryCheckId(Integer.parseInt(strCheckId));
 		record.setInventoryRemaining(Integer.parseInt(strInventoryRemaining));
-		
+		record.setGoodsName(goodsName);
 		if(recordId > 0) {
 			inventoryService.updateInventoryCheckRecord(record );
 		}else {
@@ -1359,6 +1377,33 @@ public class InventoryController {
 		try {
 			List<InventoryCheckRecord> dicRecord = inventoryService.doneInventoryCheckRecord(checkId,adm.getId());
 			HSSFWorkbook wb = generalReportService.exportInventoryCheckExcel(dicRecord);
+			response.setContentType("application/vnd.ms-excel");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String filename = "库存盘点数据导出" + sdf.format(new Date());
+			filename = StringUtils.getFileName(filename);
+			response.setHeader("Content-disposition", "attachment;filename=" + filename);
+			OutputStream ouputStream = response.getOutputStream();
+			wb.write(ouputStream);
+			ouputStream.flush();
+			ouputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	/**完成盘点
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/check/print")
+	public void checkPrint(HttpServletRequest request, HttpServletResponse response) {
+		Map<Object, Object> map = getObjectByInventory(request,true);
+		try {
+			
+			List<InventoryCheckWrap> checkList = inventoryService.invetoryCheckList(map);
+			
+			HSSFWorkbook wb = generalReportService.exportInventoryExcel(checkList);
 			response.setContentType("application/vnd.ms-excel");
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String filename = "库存盘点数据导出" + sdf.format(new Date());

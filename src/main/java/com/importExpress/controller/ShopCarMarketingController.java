@@ -366,7 +366,7 @@ public class ShopCarMarketingController {
                         json.setMessage("客户购物车信息为空");
                         return json;
                     }
-                } else if ("2".equals(websiteType)) {
+                } else if ("2".equals(websiteType) || "3".equals(websiteType) || "4".equals(websiteType)) {
                     if (StringUtils.isBlank(carconfigWithBLOBs.getKidscarconfig()) || carconfigWithBLOBs.getKidscarconfig().length() < 10) {
                         json.setOk(false);
                         json.setMessage("客户购物车信息为空");
@@ -380,7 +380,7 @@ public class ShopCarMarketingController {
 
                 List<GoodsCarActiveSimplBean> listActive = new ArrayList<>();
 
-                if ("2".equals(websiteType)) {
+                if ("2".equals(websiteType) || "3".equals(websiteType) || "4".equals(websiteType)) {
                     listActive =(List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getKidscarconfig()), GoodsCarActiveSimplBean.class);
                 }else if ("1".equals(websiteType)){
                     listActive =(List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
@@ -487,7 +487,6 @@ public class ShopCarMarketingController {
     private boolean genHtmlEamil(int userId,Map<String,String> paramMap) {
         boolean isSuccess = false;
         int websiteType = Integer.valueOf(paramMap.get("websiteType"));
-        boolean isKidFlag =  websiteType == 2;
         try {
             Map<String, Object> modelM = new HashMap<String, Object>();
 
@@ -502,7 +501,7 @@ public class ShopCarMarketingController {
                 return isSuccess;
             }
 
-            if (isKidFlag) {
+            if (websiteType > 1) {
                 modelM.put("emailFollowUrl", SwitchDomainNameUtil.checkNullAndReplace(EMAIL_FOLLOW_URL + followCode, websiteType));
                 modelM.put("carUrl", SwitchDomainNameUtil.checkNullAndReplace(AUTO_LOGIN_URL + "?userId=" + userId + "&uuid=" + followCode, websiteType));
             } else {
@@ -585,7 +584,7 @@ public class ShopCarMarketingController {
                 }
                 modelM.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
                 // 域名转换
-                if(isKidFlag){
+                if(websiteType > 0){
                     SwitchDomainNameUtil.changeShopCarMarketingList(resultList, websiteType);
                     SwitchDomainNameUtil.changeShopCarMarketingList(sourceList, websiteType);
                 }
@@ -681,7 +680,7 @@ public class ShopCarMarketingController {
                 jsonObject.put("uuid", followCode);
                 // 失效时间3周
                 jsonObject.put("timeout", 3 * 7 * 24 * 60 * 60);
-                sendMQ.sendMsg(jsonObject, isKidFlag ? 1 : 0);
+                sendMQ.sendMsg(jsonObject, websiteType -1);
                 sendMQ.closeConn();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -883,7 +882,7 @@ public class ShopCarMarketingController {
             return json;
         } else {
             if (!"0".equals(admuser.getRoletype())) {
-                statistic.setFollowAdminId(admuser.getId());
+                statistic.setDistributionAdminId(admuser.getId());
             }
         }
 
@@ -898,7 +897,6 @@ public class ShopCarMarketingController {
         if (StringUtils.isNotBlank(pageStr)) {
             startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
         }
-
 
         String followIdStr = request.getParameter("followId");
         int followId = 0;
@@ -949,7 +947,9 @@ public class ShopCarMarketingController {
 
         try {
 
-            statistic.setFollowAdminId(followId);
+            if("0".equals(admuser.getRoletype())){
+                statistic.setFollowAdminId(followId);
+            }
             statistic.setSaleId(adminId);
             statistic.setIsOrder(isOrder);
             statistic.setUserId(userId);
@@ -991,13 +991,20 @@ public class ShopCarMarketingController {
         } else {
             mv.addObject("userId", userIdStr);
         }
+        int userId = Integer.valueOf(userIdStr);
+        if(!"0".equals(user.getRoletype()) && !shopCarMarketingService.checkIsDistribution(userId,user.getId())){
+            mv.addObject("message", "非当前分配销售");
+            mv.addObject("success", 0);
+            return mv;
+        }
+
         String websiteStr = request.getParameter("website");
         int checkWebsite = 0;
         if(StringUtils.isNotBlank(websiteStr)){
             checkWebsite = Integer.valueOf(websiteStr);
         }
         try {
-            int userId = Integer.valueOf(userIdStr);
+
             ShopCarUserStatistic carUserStatistic = shopCarMarketingService.queryUserInfo(userId);
             if ("ePacket".equals(carUserStatistic.getShippingName())) {
                 carUserStatistic.setShippingName("EPACKET (USPS)");

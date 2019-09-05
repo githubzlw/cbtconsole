@@ -1457,4 +1457,8 @@
 	update order_details set state=0,checked=0 where id=#{odid};
 	update id_relationtable set goodstatus=5 where odid=#{odid};
 	</update>
+
+    <update id="updateOrderInfoFreight">
+        update orderinfo set extra_freight = #{amount}  where order_no = #{orderNo}
+    </update>
 </mapper>

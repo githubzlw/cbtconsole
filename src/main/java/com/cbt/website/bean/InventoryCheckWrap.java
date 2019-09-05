@@ -87,5 +87,10 @@ public class InventoryCheckWrap {
 	 */
 	private String  operation;
 	
+	/**
+	 * 正在盘点id
+	 */
+	private int checkId;
+	
 
 }

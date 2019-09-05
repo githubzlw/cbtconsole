@@ -37,9 +37,8 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
-import com.importExpress.pojo.PurchaseInfoBean;
 import com.importExpress.pojo.OrderSplitChild;
-import com.importExpress.pojo.SampleOrderBean;
+import com.importExpress.pojo.PurchaseInfoBean;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.OrderSplitRecordService;
@@ -2272,16 +2271,43 @@ public class NewOrderDetailsCtr {
 		double calculatePrice = odbPrice -couponDiscount -extraDiscount-gradeDiscount-shareDiscount-discountAmount
 				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c
 				+ actual_lwh + processingfee-couponAmount + actual_allincost;
-
+		if(orderInfo.getIsDropshipOrder() > 0){
+		    calculatePrice += memberFee;
+        }
 		BigDecimal bd3   =   new   BigDecimal(Math.abs(calculatePrice - payPrice));
 		float ft3   =   bd3.setScale(3,   BigDecimal.ROUND_HALF_UP).floatValue();
 		if(ft3 > 0.01 ){
 
+			request.setAttribute("freightError", ft3);
 			request.setAttribute("checkOrder", 1);
+			// + "->"+ ft3
 			request.setAttribute("checkMessage", "实际支付金额("+ payPrice +")不等于商品总金额减去优惠("+ BigDecimalUtil.truncateDouble(calculatePrice,2) +")");
 			return false;
 		}
 		return true;
+	}
+
+	@RequestMapping("/setOnlineFreightByData")
+	@ResponseBody
+	public JsonResult setOnlineFreightByData(HttpServletRequest request, HttpServletResponse response) {
+		JsonResult json = new JsonResult();
+		String orderNo = request.getParameter("orderNo");
+		String amount = request.getParameter("amount");
+		if (StringUtils.isBlank(orderNo) || StringUtils.isBlank(amount)) {
+			json.setOk(false);
+			json.setMessage("获取参数失败");
+			return json;
+		}
+		try {
+			String sql = "update orderinfo set extra_freight =" + amount + " where order_no = '" + orderNo + "'";
+			NotifyToCustomerUtil.sendSqlByMq(sql);
+			iOrderinfoService.updateOrderInfoFreight(orderNo, amount);
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.setOk(false);
+			json.setMessage("执行失败");
+		}
+		return json;
 	}
 
 	// 保存咨询问题 发送通知和 确认购买

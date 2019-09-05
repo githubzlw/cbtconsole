@@ -712,5 +712,7 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	int  cancelOrderState(int odid);
+
+	int updateOrderInfoFreight(@Param("orderNo") String orderNo, @Param("amount") String amount);
 	
 }

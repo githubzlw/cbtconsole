@@ -124,6 +124,7 @@
         <result column ="follow_time" property="followTime"/>
         <result column ="adminid" property="saleId"/>
         <result column ="admName" property="saleName"/>
+        <result column ="site" property="site"/>
     </resultMap>
 
 
@@ -1650,8 +1651,8 @@
         select a.userid,a.shippingname,date_format(b.createtime,'%Y-%m-%d %H:%i:%s') as createtime,
         <!-- date_format(b.createtime,'%Y-%m-%d %H:%i:%s') as last_login_time,  -->
         '' as last_login_time,
-        b.countryId,b.country,b.grade,b.email
-        from goods_carconfig a LEFT JOIN (select user.id,user.email,user.createtime,user.countryId,user.grade,zone.country
+        b.countryId,b.country,b.grade,b.email,b.site
+        from goods_carconfig a LEFT JOIN (select user.id,user.email,user.createtime,user.countryId,user.grade,user.site,zone.country
         from user LEFT JOIN zone on user.countryId = zone.id) b on a.userid = b.id
         where a.userid = #{userId}
     </select>
@@ -1670,13 +1671,17 @@
             resultMap="shopCarUserStatisticResultMap">
         select gcf.userid,us.email,scm.total_catid,DATE_FORMAT(gcf.updateTime,'%Y-%m-%d %H:%i:%s') as last_add_cart_time,
         convert(scm.total_price,decimal(10,2)) as total_price,convert(scm.average_price,decimal(10,2)) as average_price,
-        us.countryId,zone.country,us.currency,au.adminid,au.admName,
+        us.countryId,zone.country,us.currency,au.adminid,au.admName,us.site,
         '' as last_login_time,ifnull(adm.id,0) as follow_admin_id,ifnull(adm.admName,'') as follow_admin_name,
         DATE_FORMAT(gcf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time
         from goods_carconfig gcf
         inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
-        (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing where userid > 0
-        group by userid
+        (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
+        inner join shop_car_distribution sb on sa.userid = sb.user_id
+        <if test="distributionAdminId > 0">
+            and sb.admin_id = #{distributionAdminId}
+        </if>
+        where userid > 0 group by userid
         )scm on gcf.userid = scm.userid
         left join user us on gcf.userid = us.id
         left join (select admin_r_user.userid,admin_r_user.adminid,admuser.admName from admin_r_user,admuser
@@ -1723,8 +1728,12 @@
         select count(1)
         from goods_carconfig gcf
         inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
-        (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing where userid > 0
-        group by userid
+        (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
+        inner join shop_car_distribution sb on sa.userid = sb.user_id
+        <if test="distributionAdminId > 0">
+            and sb.admin_id = #{distributionAdminId}
+        </if>
+        where userid > 0 group by userid
         )scm on gcf.userid = scm.userid
         left join user us on gcf.userid = us.id
         left join (select admin_r_user.userid,admin_r_user.adminid,admuser.admName from admin_r_user,admuser
@@ -1883,4 +1892,9 @@
         insert into shop_car_marketing_price_log(shop_mark_id,user_id,pid,goods_price,goods_price_new,admin_id)
         values(#{id}, #{userid} , #{itemid} , #{googsPrice} , #{priceNew} , #{adminId} )
     </insert>
+
+    <select id="checkIsDistribution" resultType="integer">
+        select count(0) from shop_car_distribution
+        where user_id =#{userId} and admin_id = #{adminId}
+    </select>
 </mapper>

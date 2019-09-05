@@ -185,11 +185,19 @@ public interface InventoryService {
 	 * @return
 	 */
 	List<InventoryCheckWrap> invetoryCheckList(Map<Object, Object> map);
+	/**盘点列表所有
+	 * @return
+	 */
+	List<InventoryCheckWrap> invetoryCheck();
 	
 	/**最近盘点
 	 * @return
 	 */
 	InventoryCheck getLastInventoryCheck();
+	/**获取最近一次有效盘点 inventory_sku_check
+	 * @return
+	 */
+	List<InventoryCheck> getUnDoneInventoryCheck();
 	
 	/**开始盘点
 	 * @param check
@@ -271,5 +279,9 @@ public interface InventoryService {
 	 */
 	List<LossInventoryWrap> inventoryLossList(Map<String,Object> map);
 	int inventoryLossListCount(Map<String,Object> map);
+	/**未完成移库请求数量
+	 * @return
+	 */
+	int getUnDoneInventoryBarcode();
 	
 }

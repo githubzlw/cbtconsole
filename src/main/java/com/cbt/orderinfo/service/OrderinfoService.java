@@ -524,7 +524,7 @@ public class OrderinfoService implements IOrderinfoService {
 					authorizeRemark = "已授权";
 				}else if("1".equals(authorized_flag)){
 					check = "采购已对该品牌部分授权";
-					authorizeRemark = "未授权";
+					authorizeRemark = "部分授权";
 				}else if("-1".equals(authorized_flag)){
 					check = "该品牌侵权";
 					authorizeRemark = "侵权";
@@ -1385,7 +1385,12 @@ public class OrderinfoService implements IOrderinfoService {
         return null;
     }
 
-    @Override
+	@Override
+	public int updateOrderInfoFreight(String orderNo, String amount) {
+		return orderinfoMapper.updateOrderInfoFreight(orderNo, amount);
+	}
+
+	@Override
 	public OrderBean getOrders(String orderNo) {
 		OrderBean ob=orderinfoMapper.getOrder(orderNo);
 		if(ob != null){

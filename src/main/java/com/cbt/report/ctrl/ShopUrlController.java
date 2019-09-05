@@ -371,7 +371,7 @@ public class ShopUrlController {
         }
         if (StringUtils.isBlank(shopId) && urlType.equals("0")) {
             shopId = shopUrl.substring(preCount, shopUrl.indexOf(".1688.com"));
-            shopUrl = shopUrl.substring(0, shopUrl.indexOf(".1688.com") + 11);
+            shopUrl = shopUrl.substring(0, shopUrl.indexOf(".1688.com") + ".1688.com".length());
         } else if (StringUtils.isBlank(shopId) && urlType.equals("1")) {
             shopId = typeShopUrls[0].substring(preCount, typeShopUrls[0].indexOf(".1688.com"));
         }
