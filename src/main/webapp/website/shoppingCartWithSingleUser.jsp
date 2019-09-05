@@ -300,10 +300,14 @@
             });
         }
 
-        function changeWebsite(userId, obj) {
-            var website = $(obj).val();
-            window.location.href = '/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId='
-                + userId + '&website=' + website;
+        function changeWebsite(site, userId, obj) {
+            if (site == 3) {
+                var website = $(obj).val();
+                window.location.href = '/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId='
+                    + userId + '&website=' + website;
+            } else {
+                return false;
+            }
         }
     </script>
 </head>
@@ -384,7 +388,7 @@
                         <%--<input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>--%>
-                        <span>网站:<select id="select_web_site"  style="height: 28px;width: 180px;" onchange="changeWebsite(${userId},this)">
+                        <span>网站:<select id="select_web_site"  style="height: 28px;width: 180px;" disabled="disabled">
                             <option value="0">import-express</option>
                             <option value="1">kidsproductwholesale</option>
                         </select></span>
