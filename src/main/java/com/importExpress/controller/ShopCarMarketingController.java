@@ -899,11 +899,11 @@ public class ShopCarMarketingController {
         }
 
 
-        String followIdStr = request.getParameter("followId");
+        /*String followIdStr = request.getParameter("followId");
         int followId = 0;
         if (StringUtils.isNotBlank(followIdStr)) {
             followId = Integer.parseInt(followIdStr);
-        }
+        }*/
 
         String adminIdStr = request.getParameter("adminId");
         int adminId = 0;
@@ -948,7 +948,7 @@ public class ShopCarMarketingController {
 
         try {
 
-            statistic.setFollowAdminId(followId);
+            // statistic.setFollowAdminId(followId);
             statistic.setSaleId(adminId);
             statistic.setIsOrder(isOrder);
             statistic.setUserId(userId);
@@ -990,13 +990,20 @@ public class ShopCarMarketingController {
         } else {
             mv.addObject("userId", userIdStr);
         }
+        int userId = Integer.valueOf(userIdStr);
+        if(!"0".equals(user.getRoletype()) && !shopCarMarketingService.checkIsDistribution(userId,user.getId())){
+            mv.addObject("message", "非当前分配销售");
+            mv.addObject("success", 0);
+            return mv;
+        }
+
         String websiteStr = request.getParameter("website");
         int checkWebsite = 0;
         if(StringUtils.isNotBlank(websiteStr)){
             checkWebsite = Integer.valueOf(websiteStr);
         }
         try {
-            int userId = Integer.valueOf(userIdStr);
+
             ShopCarUserStatistic carUserStatistic = shopCarMarketingService.queryUserInfo(userId);
             if ("ePacket".equals(carUserStatistic.getShippingName())) {
                 carUserStatistic.setShippingName("EPACKET (USPS)");
