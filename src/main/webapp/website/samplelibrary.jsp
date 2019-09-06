@@ -158,6 +158,7 @@
            window.location.href="/cbtconsole/orderSplit/deliverOrder?orderno=${orderno}&&pid="+pid;
         }
         function deliver(od) {
+            alert(od)
             // var Tborder=$("#Tborderus").val()
             // var returnNO=$("#openRt").val()
             alert(od)
@@ -199,7 +200,7 @@
     <td>
         <input type="button"
                style="position: fixed; bottom: 528px; right: 50px; width: 150px; height: 30px;" id="open"
-               onclick="deliver(${orderno})" value="送样">
+               onclick="deliver('${orderno}')" value="送样">
     </td>
 </tr>
 <div style="width:1233px;">
