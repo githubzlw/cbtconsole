@@ -151,6 +151,10 @@
     <script type="text/javascript">
         function serach(){
             var pid = $("#pid").val();
+            var pids=pid.split(",")
+            if (pids.length>3){
+                alert("最多输入3pid")
+            }
            window.location.href="/cbtconsole/orderSplit/deliverOrder?orderno=${orderno}&&pid="+pid;
         }
         function deliver(od) {
@@ -189,7 +193,7 @@
 </head>
 <body>
 <h2>送样管理</h2>
-商品pid：<input id="pid" type="text" value="">&nbsp;&nbsp;&nbsp;&nbsp; <button onclick="serach('${orderno}')">查询</button><br/><br/><br/>
+商品pid：<input id="pid" type="text" value="">&nbsp;&nbsp;&nbsp;&nbsp; <button onclick="serach('${orderno}')">查询</button>多个商品用逗号隔开<br/><br/><br/>
 
 <tr>
     <td>
@@ -214,8 +218,8 @@
 <c:forEach items="${orderDetail}" var="orderd" varStatus="sd">
     <tr>
 <td>${orderd.goods_pid}</td>
-<td><img  src="${orderd.car_img}" height="200" width="200" alt=""><br/><a target="_blank" href="${orderd.goods_p_url}">商品货源链接</a></td>
-        <td style="font-size: 18px"><a target="_blank" target="_blank" href="${orderd.goods_url}" >${orderd.good_name}</a></td>
+<td><img  src="${orderd.car_img}" height="200" width="200" alt=""><br/><a target="_blank" href="https://detail.1688.com/offer/${orderd.goods_pid}.html">商品货源链接</a></td>
+        <td style="font-size: 18px"><a target="_blank" target="_blank" href="https://www.import-express.com/goodsinfo/cbtconsole-1${orderd.goods_pid}.html" >${orderd.good_name}</a></td>
 <td>${orderd.can_remaining}</td>
 <td>${orderd.goodsprice}</td>
 <td><c:forEach items="${orderd.skuList}" var="sku" varStatus="sk">
