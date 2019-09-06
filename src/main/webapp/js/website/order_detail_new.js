@@ -439,7 +439,8 @@ function deliver(orderno, usid, paytime,paymoney) {
     }
     url="/cbtconsole/orderSplit/deliverOrder?orderno="+orderno+"&&userid="+usid;
     var param = "height=860,width=1500,top=80,left=200,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
-    window.open(url, "windows", param);
+     window.open(url, "windows", param);
+    // window.location.href="/cbtconsole/orderSplit/deliverOrder?orderno="+orderno+"&&userid="+usid;
 }
 function fnRodio(state) {
 	if (state == 0) {
