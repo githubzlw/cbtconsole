@@ -1992,6 +1992,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
+    public int bgUpdateLog(List<Map<String, String>> list) {
+        return warehouseMapper.bgUpdateLog(list);
+    }
+
+    @Override
     public List<SbxxPojo> getSbxxList(Map<String, String> map) {
         return warehouseMapper.getSbxxList(map);
     }

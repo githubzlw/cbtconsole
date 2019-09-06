@@ -348,6 +348,8 @@ public interface WarehouseMapper {
 	//出库的时候修改包裹信息
 	int bgUpdate(List<Map<String, String>> list);
 
+	int bgUpdateLog(List<Map<String, String>> list);
+
 	int xlsbatch(List<Map<String, String>> list);
 
 	//根据订单查询地址

@@ -201,6 +201,8 @@ public interface IWarehouseService {
 	//出库的时候修改包裹信息
 	int bgUpdate(List<Map<String, String>> list);
 
+	int bgUpdateLog(List<Map<String, String>> list);
+
 	int xlsbatch(List<Map<String, String>> list);
 	//包裹列表
 	List<ShippingPackage> getPackageInfoList(Map<String, String> map);
