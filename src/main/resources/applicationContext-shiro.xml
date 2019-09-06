@@ -3,12 +3,27 @@
 xmlns:util="http://www.springframework.org/schema/util" 
 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd" default-lazy-init="true">
 	<description>Shiro安全配置</description>
+	<!--
+        1.配置lifecycleBeanPostProcessor，可以在Spring IOC容器中调用shiro的生命周期方法.
+    -->
+    <bean class="org.apache.shiro.spring.LifecycleBeanPostProcessor" id="lifecycleBeanPostProcessor" />
 
+    <!--
+        2.启用Spring IOC容器Shiro注解，但必须配置了lifecycleBeanPostProcessor后才可以使用
+    -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor" />
+	
+	<!-- 3.开启Spring AOC Shiro注解支持 -->
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+	
+	
 	<!-- Shiro's main business-tier object for web-enabled applications -->
 	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
-		<property name="realm" ref="jdbcRealm" />
+		<property name="realms" ref="shiroRealm" />
 		<property name="cacheManager" ref="cacheManager"/>
-		 <property name="authenticator" ref="authenticator"></property>
+		 <!-- <property name="authenticator" ref="authenticator"></property> -->
 		  <property name="rememberMeManager.cookie.maxAge" value="86400"></property>
 	</bean>
 	<!-- 配置 CacheManager： 需要加入 ehcache 的 jar 包及配置文件. -->
@@ -21,41 +36,42 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.sprin
     	3. 配置 Realm 
     	3.1 直接配置实现了 org.apache.shiro.realm.Realm 接口的 bean
     -->     
-    <bean id="jdbcRealm" class="com.cbt.shiro.ShiroRealm">
+    <bean id="shiroRealm" class="com.cbt.shiro.ShiroRealm">
 	   <!-- 配置加密算法 -->
-	    <property name="credentialsMatcher">
+	   <property name="credentialsMatcher" >
 	    <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
-	    <!-- 指定加密算法类型 -->
-	    <property name="hashAlgorithmName" value="MD5"></property>
-	    <!-- 指定加密次数 -->
-	    <property name="hashIterations" value="1"></property>
-	    </bean>
+		    <!-- 指定加密算法类型 -->
+		    <property name="hashAlgorithmName" value="MD5"></property>
+		   <!--  指定加密次数 -->
+		   <property name="hashIterations" value="1"></property>
+	    </bean> 
 	    </property>
     </bean>
-	
-	<!-- 配置 LifecycleBeanPostProcessor. 可以自定的来调用配置在 Spring IOC 容器中 shiro bean 的生命周期方法. -->
-	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"></bean>
-	
-	<!-- 启用 IOC 容器中使用 shiro 的注解. 但必须在配置了 LifecycleBeanPostProcessor 之后才可以使用. -->
-	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"></bean>
-	
+    <bean id="shiroDbRealm" class="com.cbt.shiro.ShiroDbRealm">
+		<property name="iUserServer" ref="iUserServer"/>
+	</bean>
+    
+    
 	<!-- 配置 ShiroFilter. 
  必须和 web.xml 文件中配置的 DelegatingFilterProxy 的 <filter-name> 一致.
   若不一致, 则会抛出: NoSuchBeanDefinitionException. 因为 Shiro 会来 IOC 容器中查找和 <filter-name> 名字对应的 filter bean. -->
-  
 	  <!-- 配置一个 bean, 该 bean 实际上是一个 Map. 通过实例工厂方法的方式 -->
-    <bean id="filterChainDefinitionMap"  factory-bean="filterChainDefinitionMapBuilder" factory-method="buildFilterChainDefinitionMap"></bean>
-    
     <bean id="filterChainDefinitionMapBuilder" class="com.cbt.filter.FilterChainDefinitionMapBuilder"></bean>
+
+  
+    <bean id="filterChainDefinitionMap"  
+    factory-bean="filterChainDefinitionMapBuilder" 
+    factory-method="buildFilterChainDefinitionMap"></bean>
+    
     	
 	<!-- Shiro Filter -->
 	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
 		<property name="securityManager" ref="securityManager" />
 		<property name="loginUrl" value="/website/main_login.jsp" />
-		<property name="successUrl" value="/website/main_menu2.jsp" />
-		<property name="unauthorizedUrl" value="/website/main_login.jsp"/>
-	<!-- 	<property name="filterChainDefinitionMap" ref="filterChainDefinitionMap"></property> -->
-		<property name="filterChainDefinitions">
+		<property name="successUrl" value="/website/main_menu.jsp" />
+		<property name="unauthorizedUrl" value="/apa/unauth.html"/>
+	<property name="filterChainDefinitionMap" ref="filterChainDefinitionMap"></property>
+		<!-- <property name="filterChainDefinitions"> -->
 		 <!--  
         	配置哪些页面需要受保护. 
         	以及访问这些页面需要的权限. 
@@ -64,7 +80,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.sprin
         	3). logout 登出.
         	4). roles 角色过滤器 
         -->
-			<value>
+			<!-- <value> -->
 			<!--
 				/login = authc
 				/logout = logout
@@ -76,7 +92,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.sprin
 				
 				/website/main_menu.jsp = anon
 		 -->
-				/css/** = anon
+				<!-- /css/** = anon
 				/img/** = anon
 				/js/** = anon
 				/source/** = anon
@@ -85,7 +101,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.sprin
 				/userLogin/loginOut.do = logout
 				/** = authc
 			</value>
-		</property>
+		</property> -->
 		<!-- 自定义shiro 的 Filter -->
 		<property name="filters">
 		<util:map>
@@ -110,7 +126,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.sprin
     
     
     <!-- 配置认证器 -->
-  	<bean id="authenticator" 
+  	<!-- <bean id="authenticator" 
     	class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
     	<property name="realms">
 	    	<list>
@@ -118,9 +134,9 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.sprin
 	    	</list>
     	</property>
     	<property name="authenticationStrategy">
-    	<bean class="org.apache.shiro.authc.pam.AllSuccessfulStrategy"></bean>
+    	<bean class="org.apache.shiro.authc.pam.FirstSuccessfulStrategy"></bean>
     	</property>
-    </bean>
+    </bean> -->
     
     
  <!--     <bean id="secondRealm" class="com.atguigu.shiro.realms.SecondRealm">

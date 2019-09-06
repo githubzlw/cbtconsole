@@ -67,7 +67,7 @@ public class UserLoginController {
 		System.out.println("currentUser.isAuthenticated():"+currentUser.isAuthenticated());
 		if (!currentUser.isAuthenticated()) {
         	// 把用户名和密码封装为 UsernamePasswordToken 对象
-            UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+            UsernamePasswordToken token = new UsernamePasswordToken(username.toLowerCase(),password);
             // rememberme
             token.setRememberMe(true);
             try {
@@ -81,6 +81,7 @@ public class UserLoginController {
             // ... catch more exceptions here (maybe custom ones specific to your application?
             // 所有认证时异常的父类. 
             catch (AuthenticationException e) {
+            	e.printStackTrace();
                 //unexpected condition?  error?
             	System.out.println("登录失败: " + e.getMessage());
             	json.setOk(false);
@@ -94,7 +95,7 @@ public class UserLoginController {
 			}
         }
 		
-		 return "redirect:/website/main_menu2.jsp";
+		 return "redirect:/website/main_menu.jsp";
 	}
 
     /**
@@ -216,7 +217,14 @@ public class UserLoginController {
     }
 
     private Admuser checkUserPassword(String userName, String password) {
-        Admuser adm = null;
+        
+        Admuser adm = admuserDao.queryForListByName(userName);
+        if(adm != null) {
+        	if (adm.getPassword().equals(password) || adm.getPassword().equals(Md5Util.md5Operation(password))) {
+                return adm;
+            }
+        }
+        /*Admuser adm = null;
         if (admuserList == null || admuserList.size() == 0) {
             try {
                 admuserList = admuserDao.queryForList();
@@ -231,8 +239,8 @@ public class UserLoginController {
                 }
                 break;
             }
-        }
-        return adm;
+        }*/
+        return null;
     }
 
     /**
@@ -249,6 +257,11 @@ public class UserLoginController {
             request.getSession().removeAttribute("admuser");
             request.getSession().removeAttribute("userauth");
             Redis.hdel(request.getSession().getId());
+            Subject currentUser = SecurityUtils.getSubject();
+            Admuser admuser = (Admuser)currentUser.getPrincipal();
+            if(admuser != null) {
+            	Redis.hdel("authPremession"+admuser.getId());
+            }
             //清除页面保存的用户名密码
             Cookie usName = new Cookie("usName", null);
             usName.setMaxAge(0);
@@ -258,6 +271,7 @@ public class UserLoginController {
             usPass.setMaxAge(0);
             usPass.setPath("/");
             response.addCookie(usPass);
+            currentUser.logout();
         } catch (Exception e) {
             e.getStackTrace();
             LOG.error("退出失败，原因：" + e.getMessage());

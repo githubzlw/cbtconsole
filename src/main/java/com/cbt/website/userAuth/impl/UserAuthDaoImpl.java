@@ -59,7 +59,55 @@ public class UserAuthDaoImpl implements UserAuthDao {
 		}
 		return list;
 	}
-
+	@Override
+	public List<AuthInfo> getUserAuthPremession(String admName) throws Exception {
+	/*	StringBuffer sql=new StringBuffer("SELECT DISTINCT a.* from tbl_auth_info a,tbl_userauth_info u where del=0 ");
+		sql.append("AND a.authID in (select authId from tbl_userauth_info where admName = '");
+		if (admName != null && !"".equals(admName)) {
+			sql.append(admName + "')");
+		}
+		sql.append(" order by module_type,orderNo");*/
+		String sql = "SELECT a.* from tbl_auth_info a left join tbl_userauth_info b on a.authID=b.authId "
+				+ "where a.del=0 and b.admName=? group by a.authID  order by a.module_type,a.orderNo";
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		ResultSet rs=null;
+		List<AuthInfo> list = new ArrayList<AuthInfo>();
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, admName);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				AuthInfo authinfo = new AuthInfo();
+				authinfo.setAuthId(rs.getInt("authId"));
+				authinfo.setAuthName(rs.getString("authName"));
+				authinfo.setUrl(rs.getString("url"));
+				authinfo.setReMark(rs.getString("reMark"));
+				authinfo.setModuleType(rs.getInt("module_type"));
+				authinfo.setOrderNo(rs.getInt("orderNo"));
+				list.add(authinfo);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DBHelper.getInstance().closeConnection(conn);
+		}
+		return list;
+	}
 	@Override
 	public int getUserAuthCount(String admName, String url) throws Exception {
 		StringBuffer sql=new StringBuffer("select count(distinct admName) from tbl_userauth_info where 1=1 "

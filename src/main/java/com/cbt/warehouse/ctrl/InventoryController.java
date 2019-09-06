@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -424,13 +426,9 @@ public class InventoryController {
 	 * @throws ParseException
 	 */
 	@RequestMapping(value = "/list")
+	@RequiresPermissions(value = {"admin","user:1026" },logical= Logical.OR)
 	protected ModelAndView inventoryInfo(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-		if(adm == null) {
-			return null;
-		}
 		ModelAndView mv = new ModelAndView("inventoryReport");
 		Map<Object, Object> map = getObjectByInventory(request,false);
 		int toryListCount = inventoryService.getIinOutInventoryCount(map);

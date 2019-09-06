@@ -922,6 +922,17 @@
     <filter-name>CharacterEncodingFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  <!-- <filter>
+	    <filter-name>LoginFilter</filter-name>
+	    <filter-class>com.cbt.filter.LoginFilter</filter-class>
+	</filter>
+	<filter-mapping>
+	    <filter-name>LoginFilter</filter-name>
+	    <url-pattern>/*</url-pattern>
+	    <dispatcher>REQUEST</dispatcher>
+	    <dispatcher>FORWARD</dispatcher>
+	</filter-mapping> -->
+	
   <servlet>
     <description></description>
     <display-name>EmailReceiveServlet</display-name>
