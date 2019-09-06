@@ -612,8 +612,8 @@
                             },
                             success: function (data) {
                                 if (data.ok) {
-                                    $.messager.confirm('提示', '此商品为热销有库存商品，确定要下架此商品吗？', function (rs) {
-                                        if (rs) {
+                                    $.messager.confirm('提示', '此商品为热销有库存商品，确定要下架此商品吗？', function (yes) {
+                                        if (yes) {
                                             doGoodsUnValid(pid, 1, rs);
                                         }
                                     });

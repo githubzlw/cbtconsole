@@ -120,6 +120,8 @@ public class EditorController {
             } else {
                 goods.setUnsellAbleReasonDesc("未知下架原因");
             }
+        }else if (goods.getGoodsState() == 1) {
+            goods.setOffReason(null);
         }
 
         if (goods == null) {
@@ -1255,6 +1257,7 @@ public class EditorController {
             if (count > 0) {
                 // 判断是否是kids商品，如果是，则删除图片服务器图片
                 boolean isSu = deleteImgByUrl(pidStr);
+                // boolean isSu = true;
                 if (isSu) {
                     json.setOk(true);
                     json.setMessage("执行成功");
