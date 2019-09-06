@@ -108,10 +108,26 @@
                     if (data.ok) {
                         $("#file_form").hide();
                         var rsData = data.data;
-                        $("#certificate_file").val(rsData[2]);
+                        var fileNames = '';
+                        var remotePaths = '';
+                        var localPaths = '';
+                        for(var i=0;i<rsData.length;i++){
+                            if(i < rsData.length - 1){
+                                fileNames += rsData[i][2] + ';';
+                                remotePaths += rsData[i][1] + ';';
+                                localPaths += rsData[i][2] + "@"+rsData[i][0] + ';';
+                            }else{
+                                fileNames += rsData[i][2];
+                                remotePaths += rsData[i][1];
+                                localPaths += rsData[i][2] + "@"+rsData[i][0];
+                            }
+                        }
+
+
+                        $("#certificate_file").val(fileNames);
                         $("#certificate_file").show();
-                        $("#remote_path").val(rsData[1]);
-                        $("#local_path").val(rsData[0]);
+                        $("#remote_path").val(remotePaths);
+                        $("#local_path").val(localPaths);
                     } else {
                         $.messager.alert("提醒", data.message, "error");
                     }
@@ -243,9 +259,9 @@
                     <div id="file_div">
                         <form id="file_form" method="post" enctype="multipart/form-data">
                             <input type="button" onclick="uploadFile()" value="上传"/>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="file" type="file" name="file"
-                                                                       multiple="false">
-                            <span style="color: red;">*请在保存之前上传文件(选择文件->上传)</span>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input id="file" type="file" name="file" multiple="true">
+                            <span style="color: red;">*请在保存之前上传文件(选择文件,可多选->上传)</span>
                         </form>
                     </div>
 
@@ -316,13 +332,13 @@
                         ${brandInfo.termOfValidity}
                 </td>
                 <td>
-                        ${brandInfo.certificateFile}
                     <c:if test="${brandInfo.authorizeState == 1 && brandInfo.certificateFile !=null}">
-                        <br>
-                        <a target="_blank" href="${brandInfo.localPath}">查看</a>
+                        <c:set value="${ fn:split(brandInfo.localPath, ';') }" var="fileList" />
+                        <c:forEach items="${ fileList }" var="flName">
+                            <c:set value="${ fn:split(flName, '@') }" var="spData" />
+                            <a target="_blank" href="${spData[1]}">${spData[0]}</a><strong>&nbsp;||&nbsp;</strong>
+                        </c:forEach>
                     </c:if>
-
-
                 </td>
                 <td>
                         ${brandInfo.createTime}

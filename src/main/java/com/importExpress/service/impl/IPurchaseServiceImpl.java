@@ -1918,7 +1918,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		}
 		purchaseBean.setPidInventory(pidInventory);
 		purchaseBean.setOldValue(map.get("oldValue"));
-		purchaseBean.setGoods_title(map.get("goods_title").replace("'", ""));
+		if(org.apache.commons.lang3.StringUtils.isNotBlank(map.get("goods_title"))){
+			purchaseBean.setGoods_title(map.get("goods_title").replace("'", ""));
+		} else{
+			purchaseBean.setGoods_title("");
+		}
 		if (map.get("paytime") == null || String.valueOf(map.get("paytime")).trim().length() < 1) {
 			purchaseBean.setPaytime(map.get("paytime"));
 		}else {

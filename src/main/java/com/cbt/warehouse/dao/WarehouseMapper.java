@@ -348,6 +348,8 @@ public interface WarehouseMapper {
 	//出库的时候修改包裹信息
 	int bgUpdate(List<Map<String, String>> list);
 
+	int bgUpdateLog(List<Map<String, String>> list);
+
 	int xlsbatch(List<Map<String, String>> list);
 
 	//根据订单查询地址
@@ -1469,8 +1471,11 @@ public interface WarehouseMapper {
 	String getRepathByPid(@Param("pid") String pid);
 
     List<Integer> queryUserCheckByUserid(@Param("list") List<UserInfo> list);
-    @Select("<script>SELECT b.final_weight,b.entype,b.is_sold_flag,b.volume_weight,b.weight,b.max_price as goodsprice,a.* FROM Inventory a ,custom_benchmark_ready b WHERE <when test='pid!=null'>a.goods_pid=#{pid} AND </when> a.goods_pid=b.pid AND a.can_remaining >0 ORDER BY a.can_remaining DESC LIMIT 0,200</script>")
+    @Select("<script>SELECT b.final_weight,concat(b.remotpath,b.custom_main_image) as  car_img,b.entype,b.is_sold_flag,b.volume_weight,b.weight,b.max_price as goodsprice,a.* FROM Inventory a ,custom_benchmark_ready b WHERE <when test='pid!=null'>a.goods_pid=#{pid} AND </when> a.goods_pid=b.pid AND a.can_remaining >0 ORDER BY a.can_remaining DESC LIMIT 0,200</script>")
 	List<Inventory> FindAllGoods(@Param("pagenumber") int pagenumber, @Param("pagesize") int pagesize,@Param("pid") String pid);
     @Update("UPDATE inventory SET can_remaining=can_remaining-#{sampleOrderBean.goodsNum} WHERE goods_pid=#{sampleOrderBean.pid} and sku=#{sampleOrderBean.skuId}")
 	void setInventoryCountBySkuAndPid(@Param("sampleOrderBean") SampleOrderBean sampleOrderBean);
+    @Select("SELECT c.*,IFNULL(d.can_remaining,0) can_remaining FROM (SELECT a.final_weight,a.type_name as sku,a.is_sold_flag,a.pid as goods_pid,b.name as good_name,b.volume_weight,b.entype,b.weight,b.max_price as goodsprice,concat(b.remotpath,b.custom_main_image) as  car_img " +
+			"FROM custom_benchmark_sku a,custom_benchmark_ready b WHERE a.pid=b.pid AND a.pid = #{pid})c LEFT JOIN inventory d ON c.goods_pid=d.goods_pid")
+	List<Inventory> FindGoodsByPid(@Param("pid") String pid);
 }
