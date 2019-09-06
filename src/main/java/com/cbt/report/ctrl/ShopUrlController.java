@@ -3777,7 +3777,7 @@ public class ShopUrlController {
 
     @RequestMapping(value = "/uploadBrandFile", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
-    public JsonResult uploadBrandFile(@RequestParam(value = "file", required = true) CommonsMultipartFile mf,
+    public JsonResult uploadBrandFile(@RequestParam(value = "file", required = true) CommonsMultipartFile[] files,
                                       HttpServletRequest request) {
         JsonResult json = new JsonResult();
 
@@ -3789,8 +3789,13 @@ public class ShopUrlController {
             FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
             GetConfigureInfo.checkFtpConfig(ftpConfig, json);
             String localDiskPath = ftpConfig.getLocalDiskPath();
+            List<String[]> list = new ArrayList<>();
+            int count = 0;
             if (json.isOk()) {
-                /*// 得到文件保存的名称mf.getOriginalFilename()
+                for (CommonsMultipartFile mf : files) {
+                    if (!mf.isEmpty()) {
+                        count ++;
+                        /*// 得到文件保存的名称mf.getOriginalFilename()
                 String originalName = mf.getOriginalFilename();
                 // 文件的后缀取出来
                 String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
@@ -3802,8 +3807,18 @@ public class ShopUrlController {
                 // 检查图片分辨率
                 imgUrl = ftpConfig.getLocalShowPath() + localFilePath;*/
 
-                String[] imgInfo = SearchFileUtils.comFileUpload(mf, "AuthorizedFile", null, null, null, 0);
-                json.setData(imgInfo);
+                        String[] imgInfo = SearchFileUtils.comFileUpload(mf, "AuthorizedFile", null, null, null, 0);
+                        if(imgInfo != null){
+                            list.add(imgInfo);
+                        }
+                    }
+                }
+                json.setData(list);
+                if(count == list.size()){
+                    json.setMessage("全部成功");
+                }else{
+                    json.setMessage("部分成功");
+                }
             }
         } catch (Exception e) {
             json.setOk(false);
