@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.cbt.FreightFee.service.FreightFeeSerive;
 import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
+import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.TypeBean;
 import com.cbt.bean.ZoneBean;
-import com.cbt.bean.*;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -44,8 +44,8 @@ import com.cbt.warehouse.service.MabangshipmentService;
 import com.cbt.warehouse.service.SkuinfoService;
 import com.cbt.warehouse.service.ZoneShippingService;
 import com.cbt.warehouse.thread.warehouseThread;
-import com.cbt.warehouse.util.Utility;
 import com.cbt.warehouse.util.*;
+import com.cbt.warehouse.util.Utility;
 import com.cbt.website.bean.*;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
 import com.cbt.website.dao.IExpressTrackDao;
@@ -57,8 +57,8 @@ import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.servlet.Purchase;
 import com.cbt.website.thread.AddInventoryThread;
 import com.cbt.website.util.ContentConfig;
-import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.*;
+import com.cbt.website.util.EasyUiJsonResult;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -6697,7 +6697,7 @@ public class WarehouseCtrl {
 				//插入出库记录 王宏杰 2018-06-20
 				iWarehouseService.insertGoodsInventory(orderid);
 			}catch (Exception e){
-				LOG.info("插入出库明细失败【"+orderid+"】");
+				LOG.error("插入出库明细失败【"+orderid+"】", e);
 			}
 		}
 	}
@@ -7948,10 +7948,31 @@ public class WarehouseCtrl {
 		@Override
 		public synchronized void run() {
 			try {
-				DataSourceSelector.set("dataSource127hop");
+
+				/*DataSourceSelector.set("dataSource127hop");
 				int ret = iWarehouseService.bgUpdate(bgList);
 				LOG.info("更新线上shipping_package包裹状态:" + ret);
-				DataSourceSelector.restore();
+				DataSourceSelector.restore();*/
+
+				// 加入日志
+				iWarehouseService.bgUpdateLog(bgList);
+
+				StringBuffer upSql = new StringBuffer();
+				if (bgList != null && bgList.size() > 0) {
+					for (Map<String, String> param : bgList) {
+						upSql.append("update shipping_package set ")
+								.append("transportcompany = '" + param.get("transportcompany") + "',")
+								.append("shippingtype = '" + param.get("fpxProductCode") + "',")
+								.append("transportcountry = '" + param.get("fpxCountryCode") + "',")
+								.append("expressno = '" + param.get("expressno") + "',")
+								.append("freight = '" + param.get("freight") + "',")
+								.append("estimatefreight = '" + param.get("estimatefreight") + "',")
+								.append("pdfUrl = '" + param.get("pdfUrl") + "',")
+								.append("sflag='3',createtime=now() ")
+								.append(" where shipmentno ='" + param.get("shipmentno") + "';");
+					}
+					NotifyToCustomerUtil.sendSqlByMq(upSql.toString());
+				}
 			} catch (Exception e) {
 				LOG.error("更新线上出库信息", e);
 			}

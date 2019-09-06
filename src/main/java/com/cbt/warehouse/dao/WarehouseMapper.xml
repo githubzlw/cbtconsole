@@ -1252,6 +1252,54 @@
 		</foreach>
 	</update>
 
+	<update id="bgUpdateLog" parameterType="list">
+		update shipping_package
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="transportcompany =case" suffix="end,"><!-- 运输公司-->
+				<foreach collection="list" item="i" index="index">
+					when shipmentno='${i.shipmentno}' then '${i.transportcompany}'
+				</foreach>
+			</trim>
+			<trim prefix="shippingtype =case" suffix="end,">     <!-- 运输方式-->
+				<foreach collection="list" item="i" index="index">
+					when shipmentno='${i.shipmentno}' then '${i.fpxProductCode}'
+				</foreach>
+			</trim>
+			<trim prefix=" transportcountry =case" suffix="end,"> <!-- 运输国家 -->
+				<foreach collection="list" item="i" index="index">
+					when shipmentno='${i.shipmentno}' then '${i.fpxCountryCode}'
+				</foreach>
+			</trim>
+			<trim prefix=" expressno =case" suffix="end,"> <!-- 包裹号 -->
+				<foreach collection="list" item="i" index="index">
+					when shipmentno='${i.shipmentno}' then '${i.expressno}'
+				</foreach>
+			</trim>
+			<trim prefix=" freight =case" suffix="end,"> <!-- 实际运费-->
+				<foreach collection="list" item="i" index="index">
+					when shipmentno='${i.shipmentno}' then '${i.freight}'
+				</foreach>
+			</trim>
+			<trim prefix=" estimatefreight =case" suffix="end,"> <!-- 估算运费 -->
+				<foreach collection="list" item="i" index="index">
+					when shipmentno='${i.shipmentno}' then '${i.estimatefreight}'
+				</foreach>
+			</trim>
+			<trim prefix=" pdfUrl =case" suffix="end,"> <!-- 中通下单标签地址 -->
+				<foreach collection="list" item="i" index="index">
+					when shipmentno='${i.shipmentno}' then '${i.pdfUrl}'
+				</foreach>
+			</trim>
+			sflag='3',
+			createtime=now(),
+		</trim>
+
+		where
+		<foreach collection="list" separator="or" item="i" index="index">
+			shipmentno='${i.shipmentno}'
+		</foreach>
+	</update>
+
 	<select id="getSbxxList" resultType="com.cbt.warehouse.pojo.SbxxPojo">
 
 		select * from sbxx order by px
