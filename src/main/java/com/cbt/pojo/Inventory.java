@@ -107,7 +107,80 @@ public class Inventory {
 	private int is_sold_flag;//商品详情集合
 	private String volume_weight;//商品详情集合
 	private String weight;//商品详情集合
-	public int getType() {
+
+    public String getCheck_time() {
+        return check_time;
+    }
+
+    public void setCheck_time(String check_time) {
+        this.check_time = check_time;
+    }
+
+    public String getSkuid() {
+        return skuid;
+    }
+
+    public void setSkuid(String skuid) {
+        this.skuid = skuid;
+    }
+
+    public String getSpecid() {
+        return specid;
+    }
+
+    public void setSpecid(String specid) {
+        this.specid = specid;
+    }
+
+    public String getFinal_weight() {
+        return final_weight;
+    }
+
+    public void setFinal_weight(String final_weight) {
+        this.final_weight = final_weight;
+    }
+
+    public List<String> getSkuList() {
+        return skuList;
+    }
+
+    public void setSkuList(List<String> skuList) {
+        this.skuList = skuList;
+    }
+
+    public String getEntype() {
+        return entype;
+    }
+
+    public void setEntype(String entype) {
+        this.entype = entype;
+    }
+
+    public int getIs_sold_flag() {
+        return is_sold_flag;
+    }
+
+    public void setIs_sold_flag(int is_sold_flag) {
+        this.is_sold_flag = is_sold_flag;
+    }
+
+    public String getVolume_weight() {
+        return volume_weight;
+    }
+
+    public void setVolume_weight(String volume_weight) {
+        this.volume_weight = volume_weight;
+    }
+
+    public String getWeight() {
+        return weight;
+    }
+
+    public void setWeight(String weight) {
+        this.weight = weight;
+    }
+
+    public int getType() {
 		return type;
 	}
 

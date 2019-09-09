@@ -2974,12 +2974,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
                    list.addAll(inventories);
                 }
                 for (int i=0;i<list.size();i++){
-                    list.get(i).setSkuList(this.getSkulistSd(list.get(i).getSku(),list.get(i).getFinal_weight(),list.get(i).getGoods_p_price()));
+                    list.get(i).setSkuList(this.getSkulistSd(list.get(i).getSku(),list.get(i).getFinal_weight()));
                 }
             }else {
                list = this.warehouseMapper.FindAllGoods(page * pagesize, pagesize, pid);
                 for (int i=0;i<list.size();i++){
-                    list.get(i).setSkuList(this.getSkulist(list.get(i).getSku(),list.get(i).getFinal_weight(),list.get(i).getGoods_p_price()));
+                    list.get(i).setSkuList(this.getSkulist(list.get(i).getSku(),list.get(i).getFinal_weight()));
                 }
             }
             return list;
@@ -3003,19 +3003,17 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     }
 
-    public List<String> getSkulist(String sku,String weight,String price) {
+    public List<String> getSkulist(String sku,String weight) {
          String [] arr=sku.split(",");
          List<String> list = Arrays.asList(arr);
          List lists=new ArrayList(list);
          lists.add("重量:"+weight);
-         lists.add("1688采购价:"+price);
        return lists;
     }
-    public List<String> getSkulistSd(String sku,String weight,String price) {
+    public List<String> getSkulistSd(String sku,String weight) {
         List lists=new ArrayList();
         lists.add("规格:"+sku);
         lists.add("重量:"+weight);
-        lists.add("1688采购价:"+price);
         return lists;
     }
 
