@@ -426,7 +426,7 @@ public class InventoryController {
 	 * @throws ParseException
 	 */
 	@RequestMapping(value = "/list")
-	@RequiresPermissions(value = {"admin","user:1026" },logical= Logical.OR)
+	@RequiresPermissions(value = {"admin","user:1026"},logical= Logical.OR)
 	protected ModelAndView inventoryInfo(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
 		ModelAndView mv = new ModelAndView("inventoryReport");

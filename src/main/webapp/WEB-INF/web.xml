@@ -480,6 +480,10 @@
     <error-code>404</error-code>
     <location>/WEB-INF/views/error/404.jsp</location>
   </error-page>
+  <error-page>
+	<exception-type>org.apache.shiro.authz.UnauthorizedException</exception-type>
+	<location>/apa/unauth.html</location>
+  </error-page>
   <servlet>
     <description></description>
     <display-name>CheckGoodsServlet</display-name>

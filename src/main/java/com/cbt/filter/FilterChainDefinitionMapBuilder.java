@@ -25,8 +25,9 @@ public class FilterChainDefinitionMapBuilder {
 		List<Map<String,String>> allAnth = admuserDao.getAllAnth();
 		for(Map<String,String> m : allAnth) {
 			String url = m.get("url");
-			url = url.startsWith("") ? url : "/cbtconsole"+url+"**";
-			map.put(url, "perms[admin,user:"+m.get("authId")+"]");
+			url = url.replace("?colorFlag=ccff9a", "");
+			url = url.startsWith("http") ? url : "/cbtconsole"+url;
+			map.put(url, "perms[admin|req:"+m.get("authId")+"]");
 		}
 		map.put("/**", "authc");
 		return map;

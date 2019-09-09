@@ -107,6 +107,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.sprin
 		<util:map>
 		<entry key="authc" value-ref="myFormAuthenticationFilter"></entry>
 		<entry key="roles" value-ref="myRolesFilter"></entry> 
+		<entry key="perms" value-ref="orFilter"></entry> 
 
 		</util:map>
 		</property>
@@ -123,7 +124,8 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.sprin
     <bean id="iUserServer" class="com.cbt.processes.service.UserServer"></bean>
     <bean id="myFormAuthenticationFilter" class="com.cbt.filter.MyFormAuthenticationFilter"></bean>
     <bean id="myRolesFilter" class="com.cbt.filter.MyRolesFilter"></bean>
-    
+    <!-- 自定义的过滤器 -->
+	<bean id="orFilter" class="com.cbt.filter.CustomAuthorizationFilter" />
     
     <!-- 配置认证器 -->
   	<!-- <bean id="authenticator" 
