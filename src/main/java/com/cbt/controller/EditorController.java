@@ -3835,24 +3835,24 @@ public class EditorController {
 
 
     private boolean deleteImgByUrl(String pid) {
-        boolean isSu = false;
+        /*boolean isSu = false;
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
         if (checkIsKidsCatid(goods.getCatid1()) && goods.getValid() == 0) {
             // 接口调用
             isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
-                    /*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
+                    *//*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
                     boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
                     if (!isSu) {
                         isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
                     }
                     if (!isSu) {
                         LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
-                    }*/
+                    }*//*
 
         } else {
             isSu = true;
-        }
-        return isSu;
+        }*/
+        return OKHttpUtils.optionGoodsInterface(pid, 0, 6, 2);
     }
 
     private boolean checkListContains(List<String> list, String str) {
