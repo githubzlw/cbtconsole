@@ -1475,7 +1475,7 @@ public interface WarehouseMapper {
 	List<Inventory> FindAllGoods(@Param("pagenumber") int pagenumber, @Param("pagesize") int pagesize,@Param("pid") String pid);
     @Update("UPDATE inventory SET can_remaining=can_remaining-#{sampleOrderBean.goodsNum} WHERE goods_pid=#{sampleOrderBean.pid} and sku=#{sampleOrderBean.skuId}")
 	void setInventoryCountBySkuAndPid(@Param("sampleOrderBean") SampleOrderBean sampleOrderBean);
-    @Select("SELECT c.*,IFNULL(d.can_remaining,0) can_remaining FROM (SELECT a.final_weight,a.type_name as sku,a.is_sold_flag,a.pid as goods_pid,b.name as good_name,b.volume_weight,b.entype,b.weight,b.max_price as goodsprice,concat(b.remotpath,b.custom_main_image) as  car_img " +
-			"FROM custom_benchmark_sku a,custom_benchmark_ready b WHERE a.pid=b.pid AND a.pid = #{pid})c LEFT JOIN inventory d ON c.goods_pid=d.goods_pid")
+    @Select("SELECT c.*,IFNULL(d.can_remaining,0) can_remaining FROM (SELECT a.final_weight,a.type_name as sku,a.is_sold_flag,a.pid as goods_pid,b.name as good_name,b.volume_weight,b.ali_price as goods_p_price,b.entype,b.weight,b.max_price as goodsprice,concat(b.remotpath,b.custom_main_image) as  car_img " +
+			"FROM (SELECT cb.final_weight,cb.is_sold_flag,cb.pid,st.type_name FROM custom_benchmark_sku cb,custom_benchmark_sku_type_name st WHERE cb.spec_id=st.spec_id AND cb.pid = #{pid})a, custom_benchmark_ready b WHERE a.pid=b.pid)c LEFT JOIN inventory d ON c.goods_pid=d.goods_pid" )
 	List<Inventory> FindGoodsByPid(@Param("pid") String pid);
 }
