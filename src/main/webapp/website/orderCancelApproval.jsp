@@ -342,7 +342,7 @@
             //拒绝退款
             var str = prompt('是否驳回？请输入备注:', '');
             if (str) {
-                rejectApproval(approvalId, 4, userId, orderNo, operatorId,str);
+                rejectApproval(approvalId, 4, userId, orderNo, operatorId,str, refundMethod);
             }
         } else if (dealState < 2) {
             if (dealState == 0) {
@@ -467,7 +467,7 @@
      * @param operatorId
      * @param remark
      */
-    function rejectApproval(approvalId, dealState, userId, orderNo, operatorId, remark) {
+    function rejectApproval(approvalId, dealState, userId, orderNo, operatorId, remark, refundMethod) {
         $.messager.progress({
             title: '正在执行',
             msg: '请等待...'
@@ -483,7 +483,8 @@
                 "orderNo": orderNo,
                 "operatorId": operatorId,
                 "refundAmount": 0,
-                "remark": remark
+                "remark": remark,
+                "refundMethod": refundMethod
             },
             success: function (data) {
                 $.messager.progress('close');
