@@ -1015,8 +1015,14 @@ public class OrderinfoService implements IOrderinfoService {
 		List<Map<String, String>> list=orderinfoMapper.getOrderManagementQuery(paramMap);
 		long start2=System.currentTimeMillis();
 		for(Map<String, String> map:list){
+			String orderRemark = map.get("orderRemark");
 			String paytype=map.get("paytypes");
 			String tp="支付类型错误";
+			if(org.apache.commons.lang3.StringUtils.isNoneBlank(orderRemark)){
+				if(orderRemark.indexOf("@@@@@justSave") > -1){
+					tp = "USA订单等待处理!";
+				}
+			}
 			int count=this.pruchaseMapper.FindCountByEmial(map.get("email"));
 			map.put("emailcount",String.valueOf(count));
 			if(StringUtil.isNotBlank(paytype) && paytype.indexOf(",")>-1){
