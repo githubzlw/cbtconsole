@@ -5,15 +5,12 @@ import com.importExpress.pojo.ShopUrlAuthorizedInfoPO;
 import com.importExpress.pojo.TabSeachPageBean;
 import com.importExpress.pojo.TabSeachPagesDetailBean;
 import com.importExpress.service.TabSeachPageService;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 public class TabSeachPageServiceImpl implements TabSeachPageService {
@@ -77,7 +74,7 @@ public class TabSeachPageServiceImpl implements TabSeachPageService {
             return false;
         }
         TabSeachPageBean tabSeachPageBean = get(sid);
-        String title = "Promotion " + tabSeachPageBean.getKeyword() + " Shopping Festival-China Wholesale Online, Buying Chinese Products|Import-Express.com";
+        String title = "Promotion " + tabSeachPageBean.getKeyword() + " Shopping Festival-China Wholesale Online, Buying Chinese Products | our website";
         StringBuffer keywords = new StringBuffer();
         StringBuffer description = new StringBuffer();
         for (TabSeachPagesDetailBean bean : detailList) {
