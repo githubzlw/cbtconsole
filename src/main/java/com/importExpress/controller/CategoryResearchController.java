@@ -110,8 +110,7 @@ public class CategoryResearchController {
 	}
 	//关键词列表
 	@RequestMapping("/list")
-	@ResponseBody
-	public String list(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void list(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	/*	response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		DataSourceSelector.set("dataSource127hop");
@@ -133,8 +132,12 @@ public class CategoryResearchController {
 		String jsontree = JsonTreeUtils.jsonTree(li);
 		//this.tree(tm, li, s, true);
 		DataSourceSelector.restore();
-		return jsontree;
-
+        if (StringUtils.isNotBlank(jsontree)) {  // 解决乱码
+            response.setCharacterEncoding("utf-8");
+            response.setContentType("application/json; charset=utf-8");
+            PrintWriter writer = response.getWriter();
+            writer.write(jsontree);
+        }
 	}
 
 

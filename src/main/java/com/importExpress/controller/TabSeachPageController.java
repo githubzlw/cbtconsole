@@ -11,10 +11,7 @@ import com.importExpress.pojo.ShopUrlAuthorizedInfoPO;
 import com.importExpress.pojo.TabSeachPageBean;
 import com.importExpress.pojo.TabSeachPagesDetailBean;
 import com.importExpress.service.TabSeachPageService;
-import com.importExpress.utli.JsonTreeUtils;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SearchFileUtils;
-import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.httpclient.HttpStatus;
@@ -168,8 +165,7 @@ public class TabSeachPageController {
 	 * @throws IOException
 	 */
 	@RequestMapping("/list")
-	public @ResponseBody
-    String list(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void list(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String pid = request.getParameter("id");
 		if (org.apache.commons.lang.StringUtils.isBlank(pid)) {
 			pid = "0";
@@ -179,12 +175,17 @@ public class TabSeachPageController {
 			DataSourceSelector.set("dataSource127hop");
 			List<TabSeachPageBean> li = this.tabSeachPageService.list(Integer.parseInt(pid));
 			jsontree = JsonTreeUtils.jsonTree(li);
+			if (StringUtils.isNotBlank(jsontree)) {  // 解决乱码
+                response.setCharacterEncoding("utf-8");
+                response.setContentType("application/json; charset=utf-8");
+                PrintWriter writer = response.getWriter();
+                writer.write(jsontree);
+            }
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {
 			DataSourceSelector.restore();
 		}
-		return jsontree;
 	}
 
 	/**
@@ -1016,9 +1017,6 @@ public class TabSeachPageController {
 				params.add(new BasicNameValuePair("sid", sid));
 				params.add(new BasicNameValuePair("keyword", keyword));
 				result = getContentClientPost(cbtstaticizePath + "/tabseachpage/staticize.do", params);
-
-				// List <NameValuePair> params1 = new ArrayList<NameValuePair>();
-				// getContentClientPost(importexpressPath+"/app/rlevel",params1);
 			} else {
 				result = "{\"status\":false,\"message\":\"主关键词没有对应的类别！请添加下面的类别\"}";
 			}
@@ -1051,10 +1049,14 @@ public class TabSeachPageController {
 		// 查询需要生成的静态页
 		List<TabSeachPageBean> list=new ArrayList<TabSeachPageBean>();
 		try{
-            //清除缓存数据
-            HttpUtil.doGet("https://www.import-express.com/seachpage/clear.do", "success", 3);
-            //已启用的关键词的静态页重新生成(缓存数据)
-            HttpUtil.doGet("https://www.import-express.com/app/rlevel.do", "status\":\"1", 3);
+            String refRes;
+            for (String webSite : MultiSiteUtil.webSiteMap.keySet()) {
+                refRes = HttpUtil.doGet(MultiSiteUtil.webSiteMap.get(webSite) + "/seachpage/clear.do", "success", 3);
+                System.out.println(webSite + " message1" + "已启用的关键词的静态页重新生成(缓存数据清除):" + refRes);
+                refRes = HttpUtil.doGet(MultiSiteUtil.webSiteMap.get(webSite) + "/app/rlevel.do", "status\":\"1", 3);
+                System.out.println(webSite + " message2" + "已启用的关键词的静态页重新生成(缓存数据):" + refRes);
+            }
+
 			DataSourceSelector.set("dataSource127hop");
 			list = tabSeachPageService.queryStaticizeAll();
 			if (list == null || list.size() == 0) {
@@ -1136,7 +1138,11 @@ public class TabSeachPageController {
 			if (StringUtil.isNotBlank(bean.getFilename())) {
 				int res = tabSeachPageService.updateIsshow(Integer.parseInt(isshow), Integer.parseInt(id));
 				if (res > 0) {
-                    HttpUtil.doGet("https://www.import-express.com/app/rlevel.do", "status\":\"1", 3);
+                    String refRes;
+                    for (String webSite : MultiSiteUtil.webSiteMap.keySet()) {
+                        refRes = HttpUtil.doGet(MultiSiteUtil.webSiteMap.get(webSite) + "/app/rlevel.do", "status\":\"1", 3);
+                        System.out.println(webSite + " message2" + "已启用的关键词的静态页重新生成(缓存数据):" + refRes);
+                    }
                     if ("1".equals(isshow)) {
 						result = "{\"status\":true,\"message\":\"启用成功\"}";
 					} else {
