@@ -3,6 +3,9 @@ package com.importExpress.utli;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 public class MultiSiteUtil {
 
@@ -146,6 +149,12 @@ public class MultiSiteUtil {
         }
         return "";
     }
+
+    public static Map<String, String> webSiteMap = new HashMap<String, String>(){{
+        put("ImportExpress", "https://www.import-express.com");
+        put("KidsProductWholesale", "https://www.kidsproductwholesale.com");
+        put("LovelyPetSupply", "https://www.lovelypetsupply.com");
+    }};
 
 
     public static void main(String[] args) {

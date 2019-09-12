@@ -119,7 +119,14 @@ public class NewOrderDetailsCtr {
 //			String allFreight = String.valueOf(iOrderinfoService.getAllFreightByOrderid(orderNo));
 			// 订单信息
 			OrderBean orderInfo =iOrderinfoService.getOrders(orderNo);
-			//获取实际运费
+		String orderRemark = orderInfo.getOrderRemark();
+		if(org.apache.commons.lang3.StringUtils.isNoneBlank(orderRemark)){
+			if(orderRemark.indexOf("@@@@@justSave") > -1){
+				orderRemark = orderRemark.replaceAll("@@@@@justSave", "");
+				orderInfo.setOrderRemark(orderRemark);
+			}
+		}
+		//获取实际运费
 			Long start = System.currentTimeMillis();
 			double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
 			System.out.println("花费时间： = " + (System.currentTimeMillis() - start));
