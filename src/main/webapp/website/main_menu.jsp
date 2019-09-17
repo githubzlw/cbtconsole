@@ -1,21 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="com.cbt.website.userAuth.bean.*"%>
-<%@page import="java.util.List"%>
-<%@page import="com.cbt.util.*"%>
-<%@page import="com.cbt.util.Redis"%>
-<%@page import="com.cbt.website.userAuth.bean.Admuser"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%
-	String sessionId = request.getSession().getId();
-	String authJson = Redis.hget(sessionId, "userauth");
-
-	String userJson = Redis.hget(sessionId, "admuser");
-	Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
-	int uid = user.getId();
-    String admName = user.getAdmName();
-%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -148,329 +133,355 @@ function innerOuterNetUrl(btnUrl) {
 }
 	$(function() {
 		hideTable();
-		var json =
-<%=authJson%>
-	;
+		$.ajax({
+			type : 'POST',
+			url : '/cbtconsole/userLogin/authlist.do',
+			data : {},
+			success : function(data) {
+				if (data.ok) {
+					var json = data.data;
 
-		if (json.length > 0) {
-			var temporarily_unuse = {
-				"count" : 0,
-				"content" : "<tr>"
-			};
-			var other_utils = {
-				"count" : 0,
-				"content" : "<tr>"
-			};
-			var order_manager = {
-				"count" : 0,
-				"content" : "<tr>"
-			};
-			var customer_info_mng = {
-				"count" : 0,
-				"content" : "<tr>"
-			};
-			var procure_supplier_mng = {
-					"count" : 0,
-					"content" : "<tr>"
-				};
-			var warehouse_mng = {
-				"count" : 0,
-				"content" : "<tr>"
-			};
-			var financial_mng = {
-				"count" : 0,
-				"content" : "<tr>"
-			};
-			var marketing_mng = {
-				"count" : 0,
-				"content" : "<tr>"
-			};
-			var configuration_module = {
-					"count" : 0,
-					"content" : "<tr>"
-				};
-			var product_manager = {
-				"count" : 0,
-				"content" : "<tr>"
-			};
-			
-			var regMark = /^\d{4}-\d{1,2}-\d{1,2}$/;
-			var regExpMark = new RegExp(regMark);
-			for (var i = 0; i < json.length; i++) {
-				//时间判断 最近2天的显示红色
-				var reMark = json[i].reMark;
-				var reMarkStr='';
-				if(reMark != '' && reMark != undefined && reMark != null){
-					var reMarkArr = reMark.split("/");
-					if(reMarkArr != null && reMarkArr.length == 2){
-						if(regExpMark.test(reMarkArr[1])){
-							//是日期格式
-							if(parseInt(new Date() - new Date(reMarkArr[1] + ' 00:00')) / 1000 / 3600 / 24 <= 3){
-								//3天内的日期 红色显示
-								reMarkStr = "<br /><span style=\"color: #CC0033;font-weight: normal;\">" + reMark + "</span>";
+					if (json.length > 0) {
+						var temporarily_unuse = {
+							"count" : 0,
+							"content" : "<tr>"
+						};
+						var other_utils = {
+							"count" : 0,
+							"content" : "<tr>"
+						};
+						var order_manager = {
+							"count" : 0,
+							"content" : "<tr>"
+						};
+						var customer_info_mng = {
+							"count" : 0,
+							"content" : "<tr>"
+						};
+						var procure_supplier_mng = {
+								"count" : 0,
+								"content" : "<tr>"
+							};
+						var warehouse_mng = {
+							"count" : 0,
+							"content" : "<tr>"
+						};
+						var financial_mng = {
+							"count" : 0,
+							"content" : "<tr>"
+						};
+						var marketing_mng = {
+							"count" : 0,
+							"content" : "<tr>"
+						};
+						var configuration_module = {
+								"count" : 0,
+								"content" : "<tr>"
+							};
+						var product_manager = {
+							"count" : 0,
+							"content" : "<tr>"
+						};
+						
+						var regMark = /^\d{4}-\d{1,2}-\d{1,2}$/;
+						var regExpMark = new RegExp(regMark);
+						for (var i = 0; i < json.length; i++) {
+							//时间判断 最近2天的显示红色
+							var reMark = json[i].reMark;
+							var reMarkStr='';
+							if(reMark != '' && reMark != undefined && reMark != null){
+								var reMarkArr = reMark.split("/");
+								if(reMarkArr != null && reMarkArr.length == 2){
+									if(regExpMark.test(reMarkArr[1])){
+										//是日期格式
+										if(parseInt(new Date() - new Date(reMarkArr[1] + ' 00:00')) / 1000 / 3600 / 24 <= 3){
+											//3天内的日期 红色显示
+											reMarkStr = "<br /><span style=\"color: #CC0033;font-weight: normal;\">" + reMark + "</span>";
+										}
+									}
+								}
+								if(reMarkStr == ''){
+									//存储格式问题不显示红色
+									reMarkStr = "<br /><span style=\"color: #8B8378;font-weight: normal;\">" + reMark + "</span>";
+								}
+							}
+							//以按钮或者按标签方式显示 urlFlag=a
+							var btnUrl = json[i].url;
+							var btnAFlag = false;
+							if (btnUrl.indexOf("urlFlag=a") != -1) {
+								btnUrl = btnUrl.replace("&urlFlag=a","").replace("urlFlag=a","");
+								if (btnUrl.indexOf("?") + 1 == btnUrl.length) {
+									btnUrl = btnUrl.replace("?","");
+								}
+								btnAFlag = true;
+							}
+							//背景颜色 colorFlag=ccff9a
+							var btnColor = '';
+							if (btnUrl.indexOf("colorFlag=") != -1) {
+								btnColor = getUrlParam(btnUrl,"colorFlag");
+								btnUrl = btnUrl.replace("&colorFlag=" + btnColor,"").replace("colorFlag=" + btnColor,"");
+								if (btnUrl.indexOf("?") + 1 == btnUrl.length) {
+									btnUrl = btnUrl.replace("?","");
+								}
+								btnColor = "style=\"background-color: #" + btnColor + ";\""
+							}
+							//内网地址 外网地址
+			                btnUrl = innerOuterNetUrl(btnUrl);
+							var content = '';
+							if (btnUrl.substring(0, 4) == "http" || btnUrl.substring(0, 3) == "ftp") {
+								content += '<td><a ' + btnColor + ' href="'+btnUrl+'" target="_blank" >';
+								if (!btnAFlag) {
+									content += '<button class="menu_btn" type="button">' + json[i].authName + reMarkStr + '</button>';
+								} else {
+									content += json[i].authName + reMarkStr
+								}
+								content += '</a></td>';
+							} else {
+								content += 'id="menu' + i + '" onclick="btnClick(\'' + btnUrl + '\')">' + json[i].authName + reMarkStr;
+								if (!btnAFlag) {
+									content = '<td><button ' + btnColor + ' class="menu_btn" type="button" ' + content + '</button></td>';
+								} else {
+									content += '<td><a ' + btnColor + ' href="#" ' + content + '</a></td>';
+								}
+							}
+
+							if (json[i].moduleType == -1) {
+
+								if (temporarily_unuse["count"] != 0
+										&& temporarily_unuse["count"] % 5 == 0) {
+									temporarily_unuse["content"] += '</tr><br><tr>'
+											+ content;
+								} else {
+									temporarily_unuse["content"] += content;
+								}
+								temporarily_unuse["count"] += 1;
+							} else if (json[i].moduleType == 0) {
+
+								if (other_utils["count"] != 0
+										&& other_utils["count"] % 5 == 0) {
+									other_utils["content"] += '</tr><br><tr>' + content;
+								} else {
+									other_utils["content"] += content;
+								}
+								other_utils["count"] += 1;
+							} else if (json[i].moduleType == 1) {
+
+								if (order_manager["count"] != 0
+										&& order_manager["count"] % 5 == 0) {
+									order_manager["content"] += '</tr><br><tr>' + content;
+								} else {
+									order_manager["content"] += content;
+								}
+								order_manager["count"] += 1;
+							} else if (json[i].moduleType == 2) {
+
+								if (customer_info_mng["count"] != 0
+										&& customer_info_mng["count"] % 5 == 0) {
+									customer_info_mng["content"] += '</tr><br><tr>'
+											+ content;
+								} else {
+									customer_info_mng["content"] += content;
+								}
+								customer_info_mng["count"] += 1;
+							} else if (json[i].moduleType == 3) {
+
+								if (procure_supplier_mng["count"] != 0
+										&& procure_supplier_mng["count"] % 5 == 0) {
+									procure_supplier_mng["content"] += '</tr><br><tr>' + content;
+								} else {
+									procure_supplier_mng["content"] += content;
+								}
+								procure_supplier_mng["count"] += 1;
+							} else if (json[i].moduleType == 4) {
+								//每行只放指定部分 这里根据orderNo进行分布
+								/* if (warehouse_mng["count"] != 0
+										&& warehouse_mng["count"] % 5 == 0) {
+									warehouse_mng["content"] += '</tr><br><tr>' + content;
+								} else {
+									warehouse_mng["content"] += content;
+								}
+								warehouse_mng["count"] += 1; */
+								if (json[i].orderNo % 5 == 1) {
+									warehouse_mng["content"] += '</tr><br><tr>' + content;
+								} else {
+									warehouse_mng["content"] += content;
+								}
+								warehouse_mng["count"] += 1;
+							} else if (json[i].moduleType == 5) {
+
+								if (financial_mng["count"] != 0
+										&& financial_mng["count"] % 5 == 0) {
+									financial_mng["content"] += '</tr><br><tr>' + content;
+								} else {
+									financial_mng["content"] += content;
+								}
+								financial_mng["count"] += 1;
+							} else if (json[i].moduleType == 6) {
+
+								if (marketing_mng["count"] != 0
+										&& marketing_mng["count"] % 5 == 0) {
+									marketing_mng["content"] += '</tr><br><tr>' + content;
+								} else {
+									marketing_mng["content"] += content;
+								}
+								marketing_mng["count"] += 1;
+							} else if (json[i].moduleType == 7) {
+
+								if (product_manager["count"] != 0
+										&& product_manager["count"] % 5 == 0) {
+									product_manager["content"] += '</tr><br><tr>'
+											+ content;
+								} else {
+									product_manager["content"] += content;
+								}
+								product_manager["count"] += 1;
+							} else if (json[i].moduleType == 8) {
+
+								if (configuration_module["count"] != 0
+										&& configuration_module["count"] % 5 == 0) {
+									configuration_module["content"] += '</tr><br><tr>'
+											+ content;
+								} else {
+									configuration_module["content"] += content;
+								}
+								configuration_module["count"] += 1;
 							}
 						}
+
+						if (temporarily_unuse["count"] > 0) {
+							var temRemain = 5 - temporarily_unuse["count"] % 5;
+							if (temRemain != 0 && temRemain != 5) {
+								for (var k = 0; k < temRemain; k++) {
+									temporarily_unuse["content"] += "<td></td>"
+								}
+							}
+							$("#temporarily_unuse tbody").append(
+									temporarily_unuse["content"] + '</tr>');
+							$("#temporarily_unuse").show();
+						}
+						if (other_utils["count"] > 0) {
+							var claRemain = 5 - other_utils["count"] % 5;
+							if (claRemain != 0 && claRemain != 5) {
+								for (var k = 0; k < claRemain; k++) {
+									other_utils["content"] += "<td></td>"
+								}
+							}
+							$("#other_utils tbody")
+									.append(other_utils["content"] + '</tr>');
+							$("#other_utils").show();
+						}
+						if (order_manager["count"] > 0) {
+							var comRemain = 5 - order_manager["count"] % 5;
+							if (comRemain != 0 && comRemain != 5) {
+								for (var k = 0; k < comRemain; k++) {
+									order_manager["content"] += "<td></td>"
+								}
+							}
+							$("#order_manager tbody").append(
+									order_manager["content"] + '</tr>');
+							$("#order_manager").show();
+						}
+						if (customer_info_mng["count"] > 0) {
+							var cusRemain = 5 - customer_info_mng["count"] % 5;
+							if (cusRemain != 0 && cusRemain != 5) {
+								for (var k = 0; k < cusRemain; k++) {
+									customer_info_mng["content"] += "<td></td>"
+								}
+							}
+							$("#customer_info_mng tbody").append(
+									customer_info_mng["content"] + '</tr>');
+							$("#customer_info_mng").show();
+						}
+						if (warehouse_mng["count"] > 0) {
+							var warRemain = 5 - warehouse_mng["count"] % 5;
+							if (warRemain != 0 && warRemain != 5) {
+								for (var k = 0; k < warRemain; k++) {
+									warehouse_mng["content"] += "<td></td>"
+								}
+							}
+							$("#warehouse_mng tbody").append(
+									warehouse_mng["content"] + '</tr>');
+							$("#warehouse_mng").show();
+						}
+
+						if (financial_mng["count"] > 0) {
+							var finRemain = 5 - financial_mng["count"] % 5;
+							if (finRemain != 0 && finRemain != 5) {
+								for (var k = 0; k < finRemain; k++) {
+									financial_mng["content"] += "<td></td>"
+								}
+							}
+							$("#financial_mng tbody").append(
+									financial_mng["content"] + '</tr>');
+							$("#financial_mng").show();
+						}
+						if (marketing_mng["count"] > 0) {
+							var staRemain = 5 - marketing_mng["count"] % 5;
+							if (staRemain != 0 && staRemain != 5) {
+								for (var k = 0; k < staRemain; k++) {
+									marketing_mng["content"] += "<td></td>"
+								}
+							}
+							$("#marketing_mng tbody").append(
+									marketing_mng["content"] + '</tr>');
+							$("#marketing_mng").show();
+						}
+						if (configuration_module["count"] > 0) {
+							var conRemain = 5 - configuration_module["count"] % 5;
+							if (conRemain != 0 && conRemain != 5) {
+								for (var k = 0; k < conRemain; k++) {
+									configuration_module["content"] += "<td></td>"
+								}
+							}
+							$("#configuration_module tbody").append(
+									configuration_module["content"] + '</tr>');
+							$("#configuration_module").show();
+						}
+						if (procure_supplier_mng["count"] > 0) {
+							var proSupNum = 5 - procure_supplier_mng["count"] % 5;
+							if (proSupNum != 0 && proSupNum != 5) {
+								for (var k = 0; k < proSupNum; k++) {
+									procure_supplier_mng["content"] += "<td></td>"
+								}
+							}
+							$("#procure_supplier_mng tbody").append(
+									procure_supplier_mng["content"] + '</tr>');
+							$("#procure_supplier_mng").show();
+						}
+						if (product_manager["count"] > 0) {
+							var proMngNum = 5 - product_manager["count"] % 5;
+							if (proMngNum != 0 && proMngNum != 5) {
+								for (var k = 0; k < proMngNum; k++) {
+									product_manager["content"] += "<td></td>"
+								}
+							}
+							$("#product_manager tbody").append(
+									product_manager["content"] + '</tr>');
+							$("#product_manager").show();
+						}
 					}
-					if(reMarkStr == ''){
-						//存储格式问题不显示红色
-						reMarkStr = "<br /><span style=\"color: #8B8378;font-weight: normal;\">" + reMark + "</span>";
-					}
-				}
-				//以按钮或者按标签方式显示 urlFlag=a
-				var btnUrl = json[i].url;
-				var btnAFlag = false;
-				if (btnUrl.indexOf("urlFlag=a") != -1) {
-					btnUrl = btnUrl.replace("&urlFlag=a","").replace("urlFlag=a","");
-					if (btnUrl.indexOf("?") + 1 == btnUrl.length) {
-						btnUrl = btnUrl.replace("?","");
-					}
-					btnAFlag = true;
-				}
-				//背景颜色 colorFlag=ccff9a
-				var btnColor = '';
-				if (btnUrl.indexOf("colorFlag=") != -1) {
-					btnColor = getUrlParam(btnUrl,"colorFlag");
-					btnUrl = btnUrl.replace("&colorFlag=" + btnColor,"").replace("colorFlag=" + btnColor,"");
-					if (btnUrl.indexOf("?") + 1 == btnUrl.length) {
-						btnUrl = btnUrl.replace("?","");
-					}
-					btnColor = "style=\"background-color: #" + btnColor + ";\""
-				}
-				//内网地址 外网地址
-                btnUrl = innerOuterNetUrl(btnUrl);
-				var content = '';
-				if (btnUrl.substring(0, 4) == "http" || btnUrl.substring(0, 3) == "ftp") {
-					content += '<td><a ' + btnColor + ' href="'+btnUrl+'" target="_blank" >';
-					if (!btnAFlag) {
-						content += '<button class="menu_btn" type="button">' + json[i].authName + reMarkStr + '</button>';
-					} else {
-						content += json[i].authName + reMarkStr
-					}
-					content += '</a></td>';
 				} else {
-					content += 'id="menu' + i + '" onclick="btnClick(\'' + btnUrl + '\')">' + json[i].authName + reMarkStr;
-					if (!btnAFlag) {
-						content = '<td><button ' + btnColor + ' class="menu_btn" type="button" ' + content + '</button></td>';
-					} else {
-						content += '<td><a ' + btnColor + ' href="#" ' + content + '</a></td>';
-					}
+					$.messager.alert(
+									"提醒",
+									data.message,
+									"error",
+									function() {
+										window.location.href = "/cbtconsole/website/main_login.jsp";
+									});
 				}
+			},
+			error : function(res) {
+				$.messager.alert(
+								"提醒",
+								"查询错误",
+								"error",
+								function() {
+									window.location.href = "/cbtconsole/website/main_login.jsp";
+								});
 
-				if (json[i].moduleType == -1) {
-
-					if (temporarily_unuse["count"] != 0
-							&& temporarily_unuse["count"] % 5 == 0) {
-						temporarily_unuse["content"] += '</tr><br><tr>'
-								+ content;
-					} else {
-						temporarily_unuse["content"] += content;
-					}
-					temporarily_unuse["count"] += 1;
-				} else if (json[i].moduleType == 0) {
-
-					if (other_utils["count"] != 0
-							&& other_utils["count"] % 5 == 0) {
-						other_utils["content"] += '</tr><br><tr>' + content;
-					} else {
-						other_utils["content"] += content;
-					}
-					other_utils["count"] += 1;
-				} else if (json[i].moduleType == 1) {
-
-					if (order_manager["count"] != 0
-							&& order_manager["count"] % 5 == 0) {
-						order_manager["content"] += '</tr><br><tr>' + content;
-					} else {
-						order_manager["content"] += content;
-					}
-					order_manager["count"] += 1;
-				} else if (json[i].moduleType == 2) {
-
-					if (customer_info_mng["count"] != 0
-							&& customer_info_mng["count"] % 5 == 0) {
-						customer_info_mng["content"] += '</tr><br><tr>'
-								+ content;
-					} else {
-						customer_info_mng["content"] += content;
-					}
-					customer_info_mng["count"] += 1;
-				} else if (json[i].moduleType == 3) {
-
-					if (procure_supplier_mng["count"] != 0
-							&& procure_supplier_mng["count"] % 5 == 0) {
-						procure_supplier_mng["content"] += '</tr><br><tr>' + content;
-					} else {
-						procure_supplier_mng["content"] += content;
-					}
-					procure_supplier_mng["count"] += 1;
-				} else if (json[i].moduleType == 4) {
-					//每行只放指定部分 这里根据orderNo进行分布
-					/* if (warehouse_mng["count"] != 0
-							&& warehouse_mng["count"] % 5 == 0) {
-						warehouse_mng["content"] += '</tr><br><tr>' + content;
-					} else {
-						warehouse_mng["content"] += content;
-					}
-					warehouse_mng["count"] += 1; */
-					if (json[i].orderNo % 5 == 1) {
-						warehouse_mng["content"] += '</tr><br><tr>' + content;
-					} else {
-						warehouse_mng["content"] += content;
-					}
-					warehouse_mng["count"] += 1;
-				} else if (json[i].moduleType == 5) {
-
-					if (financial_mng["count"] != 0
-							&& financial_mng["count"] % 5 == 0) {
-						financial_mng["content"] += '</tr><br><tr>' + content;
-					} else {
-						financial_mng["content"] += content;
-					}
-					financial_mng["count"] += 1;
-				} else if (json[i].moduleType == 6) {
-
-					if (marketing_mng["count"] != 0
-							&& marketing_mng["count"] % 5 == 0) {
-						marketing_mng["content"] += '</tr><br><tr>' + content;
-					} else {
-						marketing_mng["content"] += content;
-					}
-					marketing_mng["count"] += 1;
-				} else if (json[i].moduleType == 7) {
-
-					if (product_manager["count"] != 0
-							&& product_manager["count"] % 5 == 0) {
-						product_manager["content"] += '</tr><br><tr>'
-								+ content;
-					} else {
-						product_manager["content"] += content;
-					}
-					product_manager["count"] += 1;
-				} else if (json[i].moduleType == 8) {
-
-					if (configuration_module["count"] != 0
-							&& configuration_module["count"] % 5 == 0) {
-						configuration_module["content"] += '</tr><br><tr>'
-								+ content;
-					} else {
-						configuration_module["content"] += content;
-					}
-					configuration_module["count"] += 1;
-				}
 			}
-
-			if (temporarily_unuse["count"] > 0) {
-				var temRemain = 5 - temporarily_unuse["count"] % 5;
-				if (temRemain != 0 && temRemain != 5) {
-					for (var k = 0; k < temRemain; k++) {
-						temporarily_unuse["content"] += "<td></td>"
-					}
-				}
-				$("#temporarily_unuse tbody").append(
-						temporarily_unuse["content"] + '</tr>');
-				$("#temporarily_unuse").show();
-			}
-			if (other_utils["count"] > 0) {
-				var claRemain = 5 - other_utils["count"] % 5;
-				if (claRemain != 0 && claRemain != 5) {
-					for (var k = 0; k < claRemain; k++) {
-						other_utils["content"] += "<td></td>"
-					}
-				}
-				$("#other_utils tbody")
-						.append(other_utils["content"] + '</tr>');
-				$("#other_utils").show();
-			}
-			if (order_manager["count"] > 0) {
-				var comRemain = 5 - order_manager["count"] % 5;
-				if (comRemain != 0 && comRemain != 5) {
-					for (var k = 0; k < comRemain; k++) {
-						order_manager["content"] += "<td></td>"
-					}
-				}
-				$("#order_manager tbody").append(
-						order_manager["content"] + '</tr>');
-				$("#order_manager").show();
-			}
-			if (customer_info_mng["count"] > 0) {
-				var cusRemain = 5 - customer_info_mng["count"] % 5;
-				if (cusRemain != 0 && cusRemain != 5) {
-					for (var k = 0; k < cusRemain; k++) {
-						customer_info_mng["content"] += "<td></td>"
-					}
-				}
-				$("#customer_info_mng tbody").append(
-						customer_info_mng["content"] + '</tr>');
-				$("#customer_info_mng").show();
-			}
-			if (warehouse_mng["count"] > 0) {
-				var warRemain = 5 - warehouse_mng["count"] % 5;
-				if (warRemain != 0 && warRemain != 5) {
-					for (var k = 0; k < warRemain; k++) {
-						warehouse_mng["content"] += "<td></td>"
-					}
-				}
-				$("#warehouse_mng tbody").append(
-						warehouse_mng["content"] + '</tr>');
-				$("#warehouse_mng").show();
-			}
-
-			if (financial_mng["count"] > 0) {
-				var finRemain = 5 - financial_mng["count"] % 5;
-				if (finRemain != 0 && finRemain != 5) {
-					for (var k = 0; k < finRemain; k++) {
-						financial_mng["content"] += "<td></td>"
-					}
-				}
-				$("#financial_mng tbody").append(
-						financial_mng["content"] + '</tr>');
-				$("#financial_mng").show();
-			}
-			if (marketing_mng["count"] > 0) {
-				var staRemain = 5 - marketing_mng["count"] % 5;
-				if (staRemain != 0 && staRemain != 5) {
-					for (var k = 0; k < staRemain; k++) {
-						marketing_mng["content"] += "<td></td>"
-					}
-				}
-				$("#marketing_mng tbody").append(
-						marketing_mng["content"] + '</tr>');
-				$("#marketing_mng").show();
-			}
-			if (configuration_module["count"] > 0) {
-				var conRemain = 5 - configuration_module["count"] % 5;
-				if (conRemain != 0 && conRemain != 5) {
-					for (var k = 0; k < conRemain; k++) {
-						configuration_module["content"] += "<td></td>"
-					}
-				}
-				$("#configuration_module tbody").append(
-						configuration_module["content"] + '</tr>');
-				$("#configuration_module").show();
-			}
-			if (procure_supplier_mng["count"] > 0) {
-				var proSupNum = 5 - procure_supplier_mng["count"] % 5;
-				if (proSupNum != 0 && proSupNum != 5) {
-					for (var k = 0; k < proSupNum; k++) {
-						procure_supplier_mng["content"] += "<td></td>"
-					}
-				}
-				$("#procure_supplier_mng tbody").append(
-						procure_supplier_mng["content"] + '</tr>');
-				$("#procure_supplier_mng").show();
-			}
-			if (product_manager["count"] > 0) {
-				var proMngNum = 5 - product_manager["count"] % 5;
-				if (proMngNum != 0 && proMngNum != 5) {
-					for (var k = 0; k < proMngNum; k++) {
-						product_manager["content"] += "<td></td>"
-					}
-				}
-				$("#product_manager tbody").append(
-						product_manager["content"] + '</tr>');
-				$("#product_manager").show();
-			}
-		}
+		});
+		
 	});
 
 	function hideTable() {
@@ -511,7 +522,7 @@ function innerOuterNetUrl(btnUrl) {
 											data.message,
 											"error",
 											function() {
-												window.location.href = "/cbtconsole/website/main_login.jsp";
+												//window.location.href = "/cbtconsole/website/main_login.jsp";
 											});
 						}
 					},
@@ -522,7 +533,7 @@ function innerOuterNetUrl(btnUrl) {
 										"查询错误",
 										"error",
 										function() {
-											window.location.href = "/cbtconsole/website/main_login.jsp";
+											//window.location.href = "/cbtconsole/website/main_login.jsp";
 										});
 
 					}
@@ -601,8 +612,8 @@ function innerOuterNetUrl(btnUrl) {
 
     <div class="usetablediv" style="border: none;">
         <button class="but_color" onclick="loginOut()" style="margin-right: 100px">退出</button>
-        <button class="but_color" onclick="resetPwd('<%=admName%>')">密码修改</button>
-        <span style="float: right;margin: 36px 10px 0 0;">当前登录用户:&nbsp;<%=admName%></span>
+        <button class="but_color" onclick="resetPwd()">密码修改</button>
+        <span style="float: right;margin: 36px 10px 0 0;">当前登录用户:&nbsp;<span id="current_name"></span></span>
     </div>
 
 	<%-- <%  if(!(user.getId() ==1 || user.getAdmName().equalsIgnoreCase("Ling"))){%>
