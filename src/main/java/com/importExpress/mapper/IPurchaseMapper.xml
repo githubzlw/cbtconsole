@@ -518,106 +518,107 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
         left join order_buy_info obi on obi.orderid=o.order_no and obi.admuser=#{admuserid}
         left join order_address oa on g.orderid=oa.orderNo
         left join zone z on replace(oa.country,' ','')=replace(z.country,' ','') or oa.country=z.id
-        inner join order_details od on g.orderid=od.orderid AND g.odid=od.id
-        <if test="state == 2 or state == 4">
-            left join id_relationtable id on od.orderid=id.orderid and od.id=id.odid and id.is_replenishment=1 and id.is_delete=0
-        </if>
-        <if test="state == 3">
-            left join id_relationtable id on od.orderid=id.orderid and od.id=id.odid and id.is_replenishment=1 and id.goodstatus<![CDATA[<>]]>1 and id.is_delete=0
-        </if>
-        <if test="state == 0 or state == 1 or state == 2">
-            left join order_product_source ops on ops.orderid=od.orderid AND ops.od_id=od.id  AND ops.purchase_state IN(3,4,6,8)
-        </if>
-        <if test="state == 10">
-            inner join order_product_source ops on ops.orderid=od.orderid AND ops.od_id=od.id  AND ops.purchase_state IN(3,4,6,8)
-        </if>
-        <if test="state == 11">
-            inner join ChangeGoodsLog cgd on o.order_no=cgd.orderid
-        </if>
-        WHERE 1=1
-        <if test="state == 1 or state == 2">
-            AND od.state<![CDATA[<>]]>2 AND o.state=1
-        </if>
-        <if test="state == 0">
-            AND od.state<![CDATA[<>]]>2 AND o.state in (1,5)
-        </if>
-        <if test="state == 3 or state == 5">
-            AND o.state=2
-        </if>
-        <if test="state == 4">
-            AND o.state>0 and o.state<![CDATA[<]]>6
-        </if>
-        <if test="state == 6">
-            AND o.state=3
-        </if>
-        <if test="state == 7">
-            AND o.state=4
-        </if>
-        <if test="state == 8">
-            AND o.state in (-1,6)
-        </if>
-        <if test="state == 9">
-            AND o.isDropshipOrder=3
-        </if>
-        <if test="state != 9">
-            AND o.isDropshipOrder<![CDATA[<>]]>3
-        </if>
-        <if test="orderid != null">
-            and g.orderid in (${orderid})
-        </if>
-        <if test="userid != null">
-            and o.user_id=#{userid}
-        </if>
-        <if test="goodsid != null">
-            and (od.goodsid=#{goodsid} or od.id=#{goodsid})
-        </if>
-        <if test="goods_pid != null">
-            and (od.goods_pid=#{goods_pid} or od.id in (select od_id from order_product_source where tb_1688_itemid=#{goods_pid}))
-        </if>
-        <if test="days != null and days != '999'">
-            and g.createtime>DATE_ADD(NOW(),INTERVAL -${days} DAY)
-        </if>
-        <if test="goods_name != null">
-            and od.goodsname like '%${goods_name}%'
-        </if>
-        <if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
-            and g.admuserid=#{admuserid}
-        </if>
-        group by o.order_no
-        <if test="state == 0">
-            HAVING COUNT(ops.id)<![CDATA[<=]]>0
-        </if>
-        <if test="state == 1">
-            HAVING COUNT(distinct ops.id)>0 and COUNT(distinct ops.id)<![CDATA[<]]>COUNT(distinct g.id)
-        </if>
-        <if test="state == 2">
-            HAVING COUNT(distinct ops.id)=COUNT(distinct g.id) and count(distinct id.id)<![CDATA[<]]>COUNT(distinct ops.id)
-        </if>
-        <if test="state == 3">
-            HAVING IFNULL(COUNT(id.id),0)!=0
-        </if>
-        <if test="state == 4">
-            having sum(IFNULL(od.checked,0))=0 and COUNT(distinct g.id)=count(distinct id.id)
-        </if>
-        <if test="state == 5">
-            having sum(IFNULL(od.checked,0))=COUNT(distinct g.id)
-        </if>
-        <if test="state == 10">
-            having SUM(ops.buycount)>SUM(od.yourorder*(CASE WHEN GetNum(od.seilUnit) ='' THEN 1 ELSE GetNum(od.seilUnit) END))
-        </if>
-        ORDER BY o.orderpaytime DESC limit ${page},40;
-    </select>
-    <select id="queryBuyCount" resultType="java.lang.String">
-        select account from tb_1688_accounts where adminid=${admuserid} and del=1
-    </select>
-    <select id="getGoodsInfo" resultType="INTEGER">
-        SELECT COUNT(DISTINCT gc.id) FROM goods_distribution g INNER JOIN goods_communication_info gc ON g.orderid=gc.orderid AND g.odid=gc.odid and gc.is_read=0
-        WHERE g.orderid =#{orderid}
-        <if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
-            AND g.admuserid=#{admuserid}
-        </if>
-    </select>
-    <!-- 当月已经采购的数量 -->
+    <!-- inner join order_details od on g.orderid=od.orderid AND g.odid=od.id -->
+        inner join order_details od on g.orderid=od.orderid AND g.goodsid=od.goodsid
+    <if test="state == 2 or state == 4">
+        left join id_relationtable id on od.orderid=id.orderid and od.id=id.odid and id.is_replenishment=1 and id.is_delete=0
+    </if>
+    <if test="state == 3">
+        left join id_relationtable id on od.orderid=id.orderid and od.id=id.odid and id.is_replenishment=1 and id.goodstatus<![CDATA[<>]]>1 and id.is_delete=0
+    </if>
+    <if test="state == 0 or state == 1 or state == 2">
+        left join order_product_source ops on ops.orderid=od.orderid AND ops.od_id=od.id  AND ops.purchase_state IN(3,4,6,8)
+    </if>
+    <if test="state == 10">
+        inner join order_product_source ops on ops.orderid=od.orderid AND ops.od_id=od.id  AND ops.purchase_state IN(3,4,6,8)
+    </if>
+    <if test="state == 11">
+        inner join ChangeGoodsLog cgd on o.order_no=cgd.orderid
+    </if>
+    WHERE 1=1
+    <if test="state == 1 or state == 2">
+        AND od.state<![CDATA[<>]]>2 AND o.state=1
+    </if>
+    <if test="state == 0">
+        AND od.state<![CDATA[<>]]>2 AND o.state in (1,5)
+    </if>
+    <if test="state == 3 or state == 5">
+        AND o.state=2
+    </if>
+    <if test="state == 4">
+        AND o.state>0 and o.state<![CDATA[<]]>6
+    </if>
+    <if test="state == 6">
+        AND o.state=3
+    </if>
+    <if test="state == 7">
+        AND o.state=4
+    </if>
+    <if test="state == 8">
+        AND o.state in (-1,6)
+    </if>
+    <if test="state == 9">
+        AND o.isDropshipOrder=3
+    </if>
+    <if test="state != 9">
+        AND o.isDropshipOrder<![CDATA[<>]]>3
+    </if>
+    <if test="orderid != null">
+        and g.orderid in (${orderid})
+    </if>
+    <if test="userid != null">
+        and o.user_id=#{userid}
+    </if>
+    <if test="goodsid != null">
+        and (od.goodsid=#{goodsid} or od.id=#{goodsid})
+    </if>
+    <if test="goods_pid != null">
+        and (od.goods_pid=#{goods_pid} or od.id in (select od_id from order_product_source where tb_1688_itemid=#{goods_pid}))
+    </if>
+    <if test="days != null and days != '999'">
+        and g.createtime>DATE_ADD(NOW(),INTERVAL -${days} DAY)
+    </if>
+    <if test="goods_name != null">
+        and od.goodsname like '%${goods_name}%'
+    </if>
+    <if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
+        and g.admuserid=#{admuserid}
+    </if>
+    group by o.order_no
+    <if test="state == 0">
+        HAVING COUNT(ops.id)<![CDATA[<=]]>0
+    </if>
+    <if test="state == 1">
+        HAVING COUNT(distinct ops.id)>0 and COUNT(distinct ops.id)<![CDATA[<]]>COUNT(distinct g.id)
+    </if>
+    <if test="state == 2">
+        HAVING COUNT(distinct ops.id)=COUNT(distinct g.id) and count(distinct id.id)<![CDATA[<]]>COUNT(distinct ops.id)
+    </if>
+    <if test="state == 3">
+        HAVING IFNULL(COUNT(id.id),0)!=0
+    </if>
+    <if test="state == 4">
+        having sum(IFNULL(od.checked,0))=0 and COUNT(distinct g.id)=count(distinct id.id)
+    </if>
+    <if test="state == 5">
+        having sum(IFNULL(od.checked,0))=COUNT(distinct g.id)
+    </if>
+    <if test="state == 10">
+        having SUM(ops.buycount)>SUM(od.yourorder*(CASE WHEN GetNum(od.seilUnit) ='' THEN 1 ELSE GetNum(od.seilUnit) END))
+    </if>
+    ORDER BY o.orderpaytime DESC limit ${page},40;
+</select>
+<select id="queryBuyCount" resultType="java.lang.String">
+    select account from tb_1688_accounts where adminid=${admuserid} and del=1
+</select>
+<select id="getGoodsInfo" resultType="INTEGER">
+    SELECT COUNT(DISTINCT gc.id) FROM goods_distribution g INNER JOIN goods_communication_info gc ON g.orderid=gc.orderid AND g.odid=gc.odid and gc.is_read=0
+    WHERE g.orderid =#{orderid}
+    <if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
+        AND g.admuserid=#{admuserid}
+    </if>
+</select>
+<!-- 当月已经采购的数量 -->
     <select id="getMCgCount" resultType="String">
         select count(distinct od.goods_pid) from order_product_source ops
         inner join order_details od on ops.orderid=od.orderid AND ops.goodsid=od.goodsid
