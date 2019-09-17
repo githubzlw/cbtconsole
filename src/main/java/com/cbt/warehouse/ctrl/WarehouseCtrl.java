@@ -3853,9 +3853,7 @@ public class WarehouseCtrl {
 						}
 					}
 					DataSourceSelector.restore();*/
-					if (iWarehouseService.selectShippingPackage(m) > 0) {
-						NotifyToCustomerUtil.sendSqlByMq("delete from shipping_package where orderid ='"+orderid+"'");
-					}
+					NotifyToCustomerUtil.sendSqlByMq("delete from shipping_package where orderid ='"+orderid+"'");
 				} catch (Exception e) {
 					LOG.error("删除线上打印标签纸记录异常【订单号:" + m.get("orderid") + "】", e);
 				}
