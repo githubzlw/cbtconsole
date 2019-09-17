@@ -1253,7 +1253,7 @@
 	</update>
 
 	<update id="bgUpdateLog" parameterType="list">
-		update shipping_package
+		update shipping_package_online_log
 		<trim prefix="set" suffixOverrides=",">
 			<trim prefix="transportcompany =case" suffix="end,"><!-- 运输公司-->
 				<foreach collection="list" item="i" index="index">
