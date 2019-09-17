@@ -519,7 +519,7 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
         left join order_address oa on g.orderid=oa.orderNo
         left join zone z on replace(oa.country,' ','')=replace(z.country,' ','') or oa.country=z.id
     <!-- inner join order_details od on g.orderid=od.orderid AND g.odid=od.id -->
-        inner join order_details od on g.orderid=od.orderid AND g.goodsid=od.goodsid
+        inner join order_details od on g.orderid=od.orderid AND (g.odid=od.id or g.goodsid=od.goodsid)
     <if test="state == 2 or state == 4">
         left join id_relationtable id on od.orderid=id.orderid and od.id=id.odid and id.is_replenishment=1 and id.is_delete=0
     </if>
