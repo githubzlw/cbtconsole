@@ -206,7 +206,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.9</version>
+            <version>4.12</version>
         </dependency>
         <!-- spring核心包 -->
         <dependency>
@@ -586,9 +586,6 @@
             <properties>
                 <package.environment>dev</package.environment>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <!-- 生产环境 -->
@@ -596,9 +593,9 @@
             <properties>
                 <package.environment>prod</package.environment>
             </properties>
-<!--            <activation>
+            <activation>
                 <activeByDefault>true</activeByDefault>
-            </activation>-->
+            </activation>
         </profile>
     </profiles>
     <build>
