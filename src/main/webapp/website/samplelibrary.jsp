@@ -155,13 +155,13 @@
             if (pids.length>3){
                 alert("最多输入3pid")
             }
-           window.location.href="/cbtconsole/orderSplit/deliverOrder?orderno=${orderno}&&pid="+pid;
+           window.location.href="/cbtconsole/orderSplit/deliverOrder?orderno=${orderno}&&pid="+pid+"&&userid=${userid}";
         }
         function deliver(od) {
-            alert(od)
+
             // var Tborder=$("#Tborderus").val()
             // var returnNO=$("#openRt").val()
-            alert(od)
+
             var cusorder=${odls}
             var OrderMap = new Array();
             var userid=${userid}

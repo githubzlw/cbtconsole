@@ -6,6 +6,7 @@ import com.cbt.pojo.Admuser;
 import com.cbt.pojo.GoodsDistribution;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
+import com.cbt.warehouse.pojo.SampleOrderBean;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.SearchResultInfo;
@@ -556,4 +557,6 @@ public interface IOrderinfoService {
     String checkCountryMsg(String orderid);
 
     int updateOrderInfoFreight(String orderNo, String amount);
+
+    boolean setSampleGoodsIsOrder(String orderNo, Integer userId, List<SampleOrderBean> list);
 }

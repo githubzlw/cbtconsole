@@ -176,12 +176,13 @@ public class NewOrderSplitCtr {
     public int SaveNewOrder(HttpServletRequest request, HttpServletResponse response,@RequestBody List<SampleOrderBean> list ) {
         if (list.size()>0) {
             try {
-                send.deliverMqSend(list);
-                boolean bo=this.iWarehouseService.setInventoryCountBySkuAndPid(list);
-                if (bo){
-                    return 1;
+                boolean bo=this.iOrderinfoService.setSampleGoodsIsOrder(list.get(0).getOrderNo(), list.get(0).getUserId(), list);
+//                send.deliverMqSend(list);
+                if (!bo){
+                    return 0;
                 }
-                return 0;
+                 bo=this.iWarehouseService.setInventoryCountBySkuAndPid(list);
+                return 1;
             }catch (Exception e){
                 return 0;
             }
