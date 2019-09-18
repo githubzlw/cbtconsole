@@ -12,7 +12,7 @@
 
 <div style="margin-left: 700px; margin-top: 240px;">
 
-
+<form action="/cbtconsole/userLogin/checkUserInfo.do" method="post">
     <div style="width: 500px; font-size: 28px; background: rgb(140, 228, 111);">
         <h3 style="text-align: center">电商后台管理系统登录</h3>
         <div style="padding: 10px 60px 20px 60px;">
@@ -21,26 +21,29 @@
                     <td>用户名:</td>
                     <td><input
                             style="width: 182px; height: 30px; font-size: 24px;" type="text" id="username"
-                            name="username"/></td>
+                            name="userName"/></td>
                 </tr>
                 <tr>
                     <td>密&nbsp;&nbsp;&nbsp;码:</td>
                     <td><input
-                            style="width: 182px; height: 30px; font-size: 24px;" type="password" id="pwd" name="pwd"
-                            onkeypress="if (event.keyCode == 13){submitForm()}"/></td>
+                            style="width: 182px; height: 30px; font-size: 24px;" type="password" id="pwd" name="passWord"
+                            /></td>
+                            <!-- onkeypress="if (event.keyCode == 13){submitForm()}" -->
                 </tr>
                 <tr>
                     <td></td>
                     <td><br>
                         <input style="width: 166px;height: 40px;font-size: 26px;background-color: #e0d7ef;"
-                               type="button" onclick="submitForm()"
+                               type="submit" 
                                value="登录"/>
+                               <!--onclick="submitForm()"  -->
                         <div class="login_info" style="color: red;"></div>
                     </td>
                 </tr>
             </table>
         </div>
     </div>
+    </form>
 </div>
 <script>
     fnAutoLoginByCookie();

@@ -9,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AdmUserDaoImpl implements AdmUserDao {
 
@@ -504,5 +506,138 @@ public class AdmUserDaoImpl implements AdmUserDao {
         }
         return admuser;
     }
+
+	@Override
+	public Admuser queryForListByName(String name) {
+		 	String sql = "select * from admuser where status=1 and admName=? limit 1";
+	        Connection conn = DBHelper.getInstance().getConnection();
+	        PreparedStatement stmt = null;
+	        ResultSet rs = null;
+	        Admuser admuser = null;
+	        try {
+	            stmt = conn.prepareStatement(sql.toString());
+	            stmt.setString(1, name);
+	            rs = stmt.executeQuery();
+	            if (rs.next()) {
+	            	admuser = new Admuser();
+	                admuser.setId(rs.getInt("id"));
+	                admuser.setAdmName(rs.getString("admName"));
+	                admuser.setEmail(rs.getString("email"));
+	                admuser.setPassword(rs.getString("password"));
+	                admuser.setTitle(rs.getString("title"));
+	                admuser.setRoletype(rs.getString("roleType"));
+	                admuser.setStatus(rs.getString("status"));
+	                admuser.setEmialpass(rs.getString("emailpass"));
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (rs != null) {
+	                try {
+	                    rs.close();
+	                } catch (SQLException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	            if (stmt != null) {
+	                try {
+	                    stmt.close();
+	                } catch (SQLException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	            DBHelper.getInstance().closeConnection(conn);
+	        }
+	        return admuser;
+	}
+
+	public List<Map<String, String>> getAllAnthn() {
+		String sql = "select a.admName,a.authId,b.authName,b.url,b.reMark,c.id as admid, " + 
+				"c.roleType,c.buyAuto,c.automatic  " + 
+				"from  tbl_userauth_info a  " + 
+				"left join tbl_auth_info b on a.authId=b.authId " + 
+				"left join  admuser c on a.admName=c.admName " + 
+				"where b.del=0 and c.`status`=1";
+        Connection conn = DBHelper.getInstance().getConnection();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Map<String, String>> result = new ArrayList<>();
+        Map<String, String> map = null;
+        try {
+            stmt = conn.prepareStatement(sql.toString());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+            	map = new HashMap<String, String>();
+            	map.put("url", rs.getString("url"));
+            	map.put("role", rs.getString("roleType"));
+            	map.put("url", rs.getString("url"));
+            	map.put("role", rs.getString("roleType"));
+            	result.add(map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return result;
+	}
+	@Override
+	public List<Map<String, String>> getAllAnth() {
+//		String sql = "select a.admName,a.authId,b.authName,b.url,b.reMark,c.id as admid, " + 
+//				"c.roleType,c.buyAuto,c.automatic  " + 
+//				"from  tbl_userauth_info a  " + 
+//				"left join tbl_auth_info b on a.authId=b.authId " + 
+//				"left join  admuser c on a.admName=c.admName " + 
+//				"where b.del=0 and c.`status`=1";
+		String sql = "select authId,url from tbl_auth_info";
+        Connection conn = DBHelper.getInstance().getConnection();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Map<String, String>> result = new ArrayList<>();
+        Map<String, String> map = null;
+        try {
+            stmt = conn.prepareStatement(sql.toString());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+            	map = new HashMap<String, String>();
+            	map.put("url", rs.getString("url"));
+            	map.put("authId", rs.getString("authId"));
+            	result.add(map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return result;
+	}
 
 }
