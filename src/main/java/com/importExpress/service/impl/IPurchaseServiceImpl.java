@@ -335,7 +335,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				map.put("gcar_urlMD5", gMap.get("car_urlMD5"));
 				map.put("gshop_id", gMap.get("shop_id"));
 				map.put("gaddress",StringUtil.isBlank(map.get("straight_address"))?"":gMap.get("address"));
-				pruchaseMapper.updateGoodsSource(map);
+				//使用货源 不要删除历史货源20190918
+//				pruchaseMapper.updateGoodsSource(map);
 			}else{
 				OrderDetailsBean odb=pruchaseMapper.queryOrderDetails(map);
 				if(odb != null){
