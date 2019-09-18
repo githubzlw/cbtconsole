@@ -1461,4 +1461,57 @@
     <update id="updateOrderInfoFreight">
         update orderinfo set extra_freight = #{amount}  where order_no = #{orderNo}
     </update>
+
+    <update id="updateSampleOrderGoods" parameterType="java.util.ArrayList">
+        <foreach collection="list" item="spGoods" separator=";">
+            update sample_order_info set order_no = #{spGoods.orderNo}
+            <if test="spGoods.isChoose > 0">
+                ,is_choose = #{spGoods.isChoose}
+            </if>
+            where user_id = #{spGoods.userId} and pid = #{spGoods.pid}
+        </foreach>
+    </update>
+
+    <insert id="insertSampleOrderInfo">
+        insert orderinfo(order_no,user_id,product_cost,state,delivery_time,service_fee,ip,mode_transport,create_time,details_number,
+        pay_price_three,actual_allincost,foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,share_discount,
+        order_ac,actual_lwh,actual_weight,actual_weight_estimate,extra_freight,orderRemark,cashback,firstdiscount,
+        isDropshipOrder,address_id,packag_number,coupon_discount,exchange_rate,grade_discount,vatbalance,ordertype,actual_freight_c,
+        memberFee,processingfee)
+        select #{nwOrderNo} as order_no,user_id,0 as product_cost,state,delivery_time,0 as service_fee,ip,mode_transport,create_time,
+        2 as details_number, 0 as pay_price_three,actual_allincost,0 as foreign_freight,0 as pay_price,0 as pay_price_tow,currency,
+        0 as actual_ffreight,0 as discount_amount,0 as share_discount,
+        0 as order_ac,0 as actual_lwh,actual_weight,actual_weight_estimate,0 as extra_freight,'sampleOrder' as orderRemark,
+        0 as cashback,0 as firstdiscount,isDropshipOrder,address_id,packag_number,0 as coupon_discount,
+        exchange_rate,grade_discount,vatbalance,ordertype,actual_freight_c,0 as memberFee,processingfee
+        FROM orderinfo WHERE order_no =#{orderNo} and NOT EXISTS (SELECT order_no FROM orderinfo WHERE order_no=#{nwOrderNo})
+    </insert>
+
+    <insert id="insertSampleOrderAddress">
+        insert into order_address(AddressID,orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,street,recipients)
+        select AddressID,#{nwOrderNo} as orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,street,recipients
+        FROM order_address WHERE  orderNo=#{orderNo}  and NOT EXISTS (SELECT orderNo FROM order_address WHERE orderNo=#{nwOrderNo})
+    </insert>
+
+    <insert id="batchAddOrderDetail">
+        insert order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder,
+        userid,goodsname,goodsprice,goodsfreight,goodsdata_id,remark,goods_class,extra_freight,car_url,car_urlMD5,goods_pid,
+        car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,isFeight,seilUnit,
+        startPrice,bizPriceDiscount,group_buy_id,actual_volume,actual_weight,isFreeShipProduct,shopCount)
+        values
+        <foreach collection="detailsList" item="item" index="index" separator="," >
+            (#{item.goodsid},#{item.orderid},#{item.dropshipid},#{item.delivery_time},#{item.checkprice_fee},#{item.checkproduct_fee},#{item.state},#{item.fileupload},#{item.yourorder},
+            #{item.userid},#{item.goodsname},#{item.goodsprice},#{item.goodsfreight},#{item.goodsdata_id},#{item.remark},#{item.goods_class},#{item.extra_freight},#{item.goods_url},#{item.car_urlMD5},#{item.goods_pid},
+            #{item.goods_img},#{item.goods_type},#{item.freight_free},#{item.bulk_volume},#{item.total_weight},#{item.discount_ratio},#{item.goodscatid},#{item.isFeight},#{item.serUnit},
+            #{item.startPrice},#{item.bizPriceDiscount},#{item.groupBuyId},#{item.actual_volume},#{item.actual_weight},#{item.isFreeShipProduct},#{item.shopCount})
+        </foreach>
+    </insert>
+
+    <insert id="batchInsertIntoSampleOrderGoods" parameterType="java.util.ArrayList">
+        insert into sample_order_info(user_id,order_no,pid,img_url,sku_id,en_type,is_choose)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.userId}, #{item.orderNo}, #{item.pid}, #{item.imgUrl}, #{item.skuId}, #{item.enType}, #{item.isChoose})
+        </foreach>
+    </insert>
 </mapper>
