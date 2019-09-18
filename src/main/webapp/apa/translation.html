@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>待翻译图片</title>
+    <script type="text/javascript" src="/cbtconsole/js/vue.min.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/axios.min.js"></script>
+</head>
+<script type="text/css">
+</script>
+<body>
+<div id="app">
+    <div>
+    <input type="button" style="width: 80px;height: 30px" v-on:click="GetImg()" value="查询"><input type="button" style="width: 80px;height: 30px" v-on:click="delImg()" value="删除选择项">
+        <input type="button" style="width: 80px;height: 30px" v-on:click="translationImg()" value="翻译选择项">
+        <input type="button" id="quan" style="width: 80px;height: 30px" v-on:click="checkAll()" value="全选">
+    </div>
+    <ul >
+        <div v-for="imgs,index in imglist">
+            <nobr  v-for="img,index in imgs">
+                <img style="width: 480px;height: 350px" v-bind:src="img">
+                <input class="checkImg" style="height: 30px;width: 30px" type="checkbox"  v-bind:value="img" v-model="sizeChartList">
+            </nobr>
+        </div>
+        <div style="text-align: right"><input type="button" style="width: 100px;height: 40px" value="上一页" v-on:click="getPageRe()"><input style="width: 100px;height: 40px" type="text" v-model="page">
+            <i v-mold="totalpage" value>{{totalpage}}</i>
+            <input type="button" style="width: 100px;height: 40px" value="下一页" v-on:click="getPageAdd()"></div>
+    </ul>
+    <div><input type="button" value="确认标记" v-on:click="putSizeChart()"></div>
+</div>
+<script type="text/javascript">
+    var app=new Vue({
+        el:"#app",
+        data:{
+            categoryId:1037004,
+            page:0,
+            totalpage:5,
+            imglist:[],
+            categoryIdlist:[],
+            sizeChartList:[]
+        },
+        methods: {
+            GetImg: function () {
+                var _this=this;
+                axios.get('/cbtconsole/get/gettranslationImg', {
+                    params: {
+                        categoryId: this.categoryId,
+                        page: this.page
+                    }
+                }).then(function (resp) {
+                    _this.imglist =resp.data.results;
+                    _this.totalpage=resp.data.totalpage
+                }).catch((error) => {
+                })
+            },
+            delImg:function () {
+                var _this=this;
+                axios.post('/cbtconsole/get/delImgurl', {
+                    sizeChartList: this.sizeChartList,
+                }).then(function (resp) {
+                _this.GetImg()
+                }).catch((error) => {
+                })
+            },
+            translationImg:function () {
+
+                window.open('/cbtconsole/apa/translationRe.html?sizeChartList='+this.sizeChartList,'_blank');
+                // var _this=this;
+                // axios.post('/cbtconsole/get/getchangeChineseImgToEnglishImg', {
+                //     sizeChartList: this.sizeChartList,
+                // }).then(function (resp) {
+                //   _this.imglist =resp.data.results;
+                // }).catch((error) => {
+                // })
+            },
+            checkAll:function(){ // 点击全选事件函数
+                   if (this.sizeChartList.length>0){
+                       this.sizeChartList=[];
+                   }else {
+                       this.imglist.forEach((el, i) => {
+                           // 数组里没有这一个value才push，防止重复push
+                           if (this.sizeChartList.indexOf(el.value) == '-1') {
+                               el.forEach((e, j) => {
+                                   if (this.sizeChartList.indexOf(e) == '-1') {
+                                       this.sizeChartList.push(e);
+                                   }
+                               });
+                           }
+                       });
+                   }
+            },
+            // putSizeChart:function () {
+            //     var _this=this;
+            //     axios.post('/get/SizeChart', {
+            //         sizeChartList: this.sizeChartList,
+            //
+            //     }).then(function (resp) {
+            //         if (resp.data.message==500){
+            //             alert("服务器错误")
+            //         }
+            //         // _this.page++
+            //         _this.GetImg()
+            //     }).catch((error) => {
+            //     })
+            // },
+            getPageAdd:function () {
+                if (this.page<this.totalpage){
+                    this.page++;
+                }
+            },
+            getPageRe:function () {
+                if (this.page>0){
+                    this.page--;
+                }
+            },
+        } ,
+        created(){
+            this.GetImg();
+        },
+        watch: {
+            page(newVal,oldVal){
+                console.log(newVal,oldVal)
+                if(newVal != ""){
+                    this.GetImg()
+                }
+            },
+            handler(){
+                if(this.checkData.length == this.imglist.length){
+                    document.querySelector('#quan').checked = true;
+                }else {
+                    document.querySelector('#quan').checked = false;
+                }
+            },
+            deep: true
+        },
+    })
+</script>
+</body>
+</html>
