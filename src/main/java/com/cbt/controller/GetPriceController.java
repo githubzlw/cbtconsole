@@ -32,7 +32,7 @@ import java.util.UUID;
 @ResponseBody
 @RequestMapping("/get")
 public class GetPriceController {
-    @Autowired
+    /*@Autowired
     private GetPriceService getPriceService;
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
     private static final String OCR_URL = "http://192.168.1.251:5000/photo";
@@ -126,6 +126,6 @@ public class GetPriceController {
         imgUrls.add(imglist);
        json.setResults(imgUrls);
        return json;
-    }
+    }*/
     
 }

@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 @Service
 public class GetPriceService {
+    /*
     @Autowired
     private GetPriceMapper getPriceMapper;
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
@@ -139,6 +140,7 @@ public class GetPriceService {
         // 为防止文件覆盖的现象发生，要为上传文件产生一个唯一的文件名
         return UUID.randomUUID().toString() + "_" + filename;
     }
+
     public String changeChineseImgToEnglishImg(String imgUrl) {
        String img="";
         try {
@@ -164,14 +166,14 @@ public class GetPriceService {
                 MultipartBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("file", imgFile.getName(), fileBody)
-                        .build();
-                Request okHttpRequest = new Request.Builder().addHeader("Accept", "*/*").addHeader("Connection", "close")
-                        .addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
-                        .post(body)
-                        .url(OCR_URL)
-                        .build();
+                        .build();*/
+//                Request okHttpRequest = new Request.Builder().addHeader("Accept", "*/*").addHeader("Connection", "close")
+//                        .addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+//                        .post(body)
+//                        .url(OCR_URL)
+//                        .build();
 
-                Response okHttpResponse = client.newCall(okHttpRequest).execute();
+                /* Response okHttpResponse = client.newCall(okHttpRequest).execute();
                 if (okHttpResponse.isSuccessful()) {
                     // 本地生成新的文件
                     Random random = new Random();
@@ -205,7 +207,7 @@ public class GetPriceService {
             img="changeChineseImgToEnglishImg error:" + e.getMessage();
         }
         return img;
-    }
+    }*/
 }
 
 
