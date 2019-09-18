@@ -7,6 +7,7 @@ import com.cbt.pojo.GoodsDistribution;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
+import com.cbt.warehouse.pojo.OrderDetailsBeans;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
@@ -714,5 +715,16 @@ public interface OrderinfoMapper {
 	int  cancelOrderState(int odid);
 
 	int updateOrderInfoFreight(@Param("orderNo") String orderNo, @Param("amount") String amount);
-	
+
+
+
+	int insertSampleOrderInfo(@Param("orderNo") String orderNo, @Param("nwOrderNo") String nwOrderNo);
+
+	int insertSampleOrderAddress(@Param("orderNo") String orderNo, @Param("nwOrderNo") String nwOrderNo);
+
+	void batchAddOrderDetail(@Param("detailsList")List<OrderDetailsBeans> odbList);
+
+	void updateSampleOrderGoods(List<com.cbt.warehouse.pojo.SampleOrderBean> sampleOrderBeanList);
+
+	void batchInsertIntoSampleOrderGoods(List<com.cbt.warehouse.pojo.SampleOrderBean> sampleOrderBeanList);
 }

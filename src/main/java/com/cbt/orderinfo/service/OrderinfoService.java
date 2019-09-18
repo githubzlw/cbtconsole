@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import com.cbt.warehouse.pojo.OrderDetailsBeans;
+import com.cbt.warehouse.pojo.SampleOrderBean;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1396,7 +1398,84 @@ public class OrderinfoService implements IOrderinfoService {
 		return orderinfoMapper.updateOrderInfoFreight(orderNo, amount);
 	}
 
-	@Override
+    @Override
+    public boolean setSampleGoodsIsOrder(String orderNo, Integer userId, List<SampleOrderBean> sampleOrderBeanList) {
+		try {
+			if (sampleOrderBeanList != null && sampleOrderBeanList.size() > 0) {
+				for(SampleOrderBean sm : sampleOrderBeanList){
+					sm.setOrderNo(orderNo);
+					sm.setUserId(userId);
+				}
+				// 保存客户选择的样品信息到数据库
+				this.orderinfoMapper.batchInsertIntoSampleOrderGoods(sampleOrderBeanList);
+				// 更新客户选择的样品信息
+				// sampleOrderService.updateSampleOrderGoods(sampleOrderBeanList);
+				// 生成样品订单数据
+				boolean bo=this.genSampleOrderByInfoList(orderNo, userId, sampleOrderBeanList);
+				sampleOrderBeanList.clear();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("userId:" + userId + "orderNo:" + orderNo + ",setSampleGoodsIsOrder error: ", e);
+			return false;
+		}
+
+    	return true;
+    }
+	public boolean genSampleOrderByInfoList(String orderNo, int userId, List<SampleOrderBean> sampleOrderBeanList) {
+		// 插入订单详情
+		String spOrderNo = orderNo + "_SP";
+		//生成order-details
+		List<OrderDetailsBeans> odbList = new ArrayList<>();
+		for (SampleOrderBean sampleOrderBean : sampleOrderBeanList) {
+			sampleOrderBean.setOrderNo(spOrderNo);
+			sampleOrderBean.setUserId(userId);
+
+			OrderDetailsBeans temp = new OrderDetailsBeans();
+			temp.setGoodsid((int) ((Math.random() * 9 + 1) * 500000));
+			temp.setIsStockFlag(0);
+			temp.setShopCount(0);
+			temp.setDelivery_time("");
+			temp.setIsFreeShipProduct(3);
+			temp.setGoods_pid(sampleOrderBean.getPid());
+			temp.setIsFeight(3);
+			temp.setStartPrice("0");
+			temp.setBizPriceDiscount("0");
+			temp.setCheckprice_fee(0);
+			temp.setCheckproduct_fee(0);
+			temp.setState(0);
+			temp.setFileupload("/temp/pic");
+			temp.setActual_weight("0");
+			temp.setFreight_free(0);
+			temp.setYourorder(sampleOrderBean.getGoodsNum());
+			temp.setUserid(userId);
+			temp.setGoodsname(sampleOrderBean.getEnName());
+			temp.setGoodsprice("0");
+			temp.setFreight("0");
+			temp.setRemark("sample goods");
+			temp.setGoods_url(sampleOrderBean.getOnlineUrl());
+			temp.setGoodsUrlMD5(sampleOrderBean.getUrlMd5());
+			temp.setGoods_img(sampleOrderBean.getImgUrl());
+			temp.setGoods_type(sampleOrderBean.getEnType());
+			temp.setTotal_weight(sampleOrderBean.getWeight());
+			temp.setGoodscatid(sampleOrderBean.getCatid());
+			temp.setSerUnit(sampleOrderBean.getSellUnit());
+			temp.setActual_volume(sampleOrderBean.getSkuId());
+			temp.setOrderid(spOrderNo);
+			temp.setExtra_freight(0);
+			odbList.add(temp);
+		}
+		//添加订单详细信息
+		this.orderinfoMapper.batchAddOrderDetail(odbList);
+		// 插入地址信息
+		this.orderinfoMapper.insertSampleOrderAddress(orderNo, spOrderNo);
+		// 插入订单信息
+		this.orderinfoMapper.insertSampleOrderInfo(orderNo, spOrderNo);
+		// 设置样品商品订单号
+		this.orderinfoMapper.updateSampleOrderGoods(sampleOrderBeanList);
+		return true;
+	}
+    @Override
 	public OrderBean getOrders(String orderNo) {
 		OrderBean ob=orderinfoMapper.getOrder(orderNo);
 		if(ob != null){
