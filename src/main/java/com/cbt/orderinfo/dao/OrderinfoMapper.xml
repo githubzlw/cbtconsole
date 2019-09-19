@@ -1478,7 +1478,7 @@
         order_ac,actual_lwh,actual_weight,actual_weight_estimate,extra_freight,orderRemark,cashback,firstdiscount,
         isDropshipOrder,address_id,packag_number,coupon_discount,exchange_rate,grade_discount,vatbalance,ordertype,actual_freight_c,
         memberFee,processingfee)
-        select #{nwOrderNo} as order_no,user_id,0 as product_cost,state,delivery_time,0 as service_fee,ip,mode_transport,create_time,
+        select #{nwOrderNo} as order_no,user_id,0 as product_cost,5 as state,delivery_time,0 as service_fee,ip,mode_transport,create_time,
         2 as details_number, 0 as pay_price_three,actual_allincost,0 as foreign_freight,0 as pay_price,0 as pay_price_tow,currency,
         0 as actual_ffreight,0 as discount_amount,0 as share_discount,
         0 as order_ac,0 as actual_lwh,actual_weight,actual_weight_estimate,0 as extra_freight,'sampleOrder' as orderRemark,
@@ -1500,7 +1500,7 @@
         startPrice,bizPriceDiscount,group_buy_id,actual_volume,actual_weight,isFreeShipProduct,shopCount)
         values
         <foreach collection="detailsList" item="item" index="index" separator="," >
-            (#{item.goodsid},#{item.orderid},#{item.dropshipid},#{item.delivery_time},#{item.checkprice_fee},#{item.checkproduct_fee},#{item.state},#{item.fileupload},#{item.yourorder},
+            (#{item.goodsid},#{item.orderid},#{item.dropshipid},#{item.delivery_time},#{item.checkprice_fee},#{item.checkproduct_fee},5,#{item.fileupload},#{item.yourorder},
             #{item.userid},#{item.goodsname},#{item.goodsprice},#{item.goodsfreight},#{item.goodsdata_id},#{item.remark},#{item.goods_class},#{item.extra_freight},#{item.goods_url},#{item.car_urlMD5},#{item.goods_pid},
             #{item.goods_img},#{item.goods_type},#{item.freight_free},#{item.bulk_volume},#{item.total_weight},#{item.discount_ratio},#{item.goodscatid},#{item.isFeight},#{item.serUnit},
             #{item.startPrice},#{item.bizPriceDiscount},#{item.groupBuyId},#{item.actual_volume},#{item.actual_weight},#{item.isFreeShipProduct},#{item.shopCount})
