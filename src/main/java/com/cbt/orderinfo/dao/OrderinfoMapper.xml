@@ -1514,4 +1514,22 @@
             (#{item.userId}, #{item.orderNo}, #{item.pid}, #{item.imgUrl}, #{item.skuId}, #{item.enType}, #{item.isChoose})
         </foreach>
     </insert>
+
+    <update id="updateOrderSplitNumPurchaseData">
+        update order_product_source ops,order_details od
+        set ops.od_id = od.id
+        where ops.orderid = od.orderid and ops.orderid =#{orderNo}  and ops.goodsid = od.goodsid and (ops.od_id  = 0 or ops.od_id is null)
+    </update>
+
+    <update id="updateOrderSplitNumIdRelationtableData">
+        update id_relationtable ir,order_details od
+        set ir.odid = od.id
+        where ir.orderid = od.orderid and ir.orderid =#{orderNo}  and ir.goodid = od.goodsid and (ir.odid  = 0 or ir.odid is null)
+    </update>
+
+    <update id="updateOrderSplitNumGoodsCommunicationInfoData">
+        update goods_communication_info gci,order_details od
+        set gci.odid = od.id
+        where gci.orderid = od.orderid and gci.orderid =#{orderNo} and gci.goodsid = od.goodsid and (gci.odid  = 0 or gci.odid is null)
+    </update>
 </mapper>

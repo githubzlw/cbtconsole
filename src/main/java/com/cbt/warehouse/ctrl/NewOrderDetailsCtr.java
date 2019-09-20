@@ -126,6 +126,16 @@ public class NewOrderDetailsCtr {
 				orderInfo.setOrderRemark(orderRemark);
 			}
 		}
+
+		if(orderNo.contains("_SN") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)){
+			// 数量拆单采购数据处理
+			iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
+			// 数量拆单入库数据处理
+			iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
+			// 数量拆单商品备注沟通数据处理
+			iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+		}
+
 		//获取实际运费
 			Long start = System.currentTimeMillis();
 			double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
