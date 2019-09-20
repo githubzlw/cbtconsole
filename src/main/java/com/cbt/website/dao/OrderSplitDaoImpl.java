@@ -3037,11 +3037,11 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		// 本地执行SQL队列
 		List<String> localSqlList = new ArrayList<String>();
 
-		String localSql ="update id_relationtable set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
+		String idRelationSql ="update id_relationtable set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
 				+ orderNoOld + "' and goodid in(" ;
-		String localSql1 ="update goods_distribution set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
+		String goodsDistributionSql ="update goods_distribution set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
 				+ orderNoOld + "' and goodsid in(" ;
-		String localSql2 ="update goods_communication_info set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
+		String goodsCommunicationSql ="update goods_communication_info set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
 				+ orderNoOld + "' and goodsid in(" ;
 		//将拆单后的订单号和商品号数据保存到split_details表中，用定时任务去执行采购商品退回操作  王宏杰2018-05-14
 		String insert_split_details="insert into split_details(new_orderid,goodsid) values";
@@ -3100,6 +3100,12 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 			if(isSplitNum > 0) {
 				// 数量拆单的单独处理
+				// 商品沟通备注数据
+				String insertGoodsCommunicationInfoSql = "insert into goods_communication_info(context,is_read,send_id,accept_id," +
+						"create_time,orderid,goodsid,odid) " +
+						" select context,is_read,send_id,accept_id,create_time,'"+odbeanNew.getOrderNo() +"' as orderid,goodsid, 0 as odid " +
+						" from goods_communication_info where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+				localSqlList.add(insertGoodsCommunicationInfoSql);
 				// 新增货源数据
 				String insertOrderProductSql = "insert into order_product_source(od_id,adminid,userid,addtime,orderid,confirm_userid,confirm_time,goodsid,goodsdataid,goods_url," +
 						"goods_p_url,last_goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,usecount,buycount,currency," +
@@ -3113,13 +3119,25 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 						" where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
 				localSqlList.add(insertOrderProductSql);
 
-				String idRelationSql = "insert into id_relationtable(orderid,goodid,goodstatus,goodurl,barcode,picturepath,createtime," +
+				String updateOrderProductSql1 = "update order_product_source set usecount = usecount -" + oddsb.getYourorder()
+						+ " where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid() + " and usecount > 0";
+				String updateOrderProductSql2 = "update order_product_source set buycount = buycount -" + oddsb.getYourorder()
+						+ " where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid() + " and buycount > 0";
+				localSqlList.add(updateOrderProductSql1);
+				localSqlList.add(updateOrderProductSql2);
+
+				// 入库
+				String insertIdRelationSql = "insert into id_relationtable(orderid,goodid,goodstatus,goodurl,barcode,picturepath,createtime," +
 						"POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,itemqty,itemid,odid)" +
 						" select '"+odbeanNew.getOrderNo()+"',goodid,goodstatus,goodurl,barcode," +
 						"CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'/','"+odbeanNew.getOrderNo()+"','_',goodid,'.jpg'),createtime," +
-						"POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,itemqty,itemid,0 as odid " +
+						"POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,"
+						+oddsb.getYourorder()+" as itemqty,itemid,0 as odid " +
 						"from id_relationtable " + " where orderid = '" + orderNoOld + "' and goodid=" + oddsb.getGoodsid();
-				localSqlList.add(idRelationSql);
+				localSqlList.add(insertIdRelationSql);
+				String updateRelationSql = "update id_relationtable set itemqty = itemqty - " + oddsb.getYourorder()
+						+ " where orderid='"+orderNoOld+"' and goodid=" + oddsb.getGoodsid() + " and itemqty > 0";
+				localSqlList.add(updateRelationSql);
 			}else {
 				//更新order_product_source表数据
 				String order_product_source_sql = "update order_product_source set orderid='" + odbeanNew.getOrderNo() + "' where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
@@ -3139,14 +3157,16 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 			localSqlList.add(inspection_pictureSql);
 		}
 		insert_split_details=insert_split_details.substring(0,insert_split_details.length()-1)+";";
-		localSql += tempSql.substring(1) + ")";
-		localSqlList.add(localSql);
+
 		if(isSplitNum == 0){
-			localSql1 += tempSql.substring(1) + ")";
-			localSqlList.add(localSql1);
+			idRelationSql += tempSql.substring(1) + ")";
+			localSqlList.add(idRelationSql);
+			goodsDistributionSql += tempSql.substring(1) + ")";
+			localSqlList.add(goodsDistributionSql);
+			goodsCommunicationSql += tempSql.substring(1) + ")";
+			localSqlList.add(goodsCommunicationSql);
 		}
-		localSql2 += tempSql.substring(1) + ")";
-		localSqlList.add(localSql2);
+
 		//localSqlList.add(insert_split_details);
 
         if(isSplitNum > 0){

@@ -132,6 +132,8 @@ public class NewOrderDetailsCtr {
 			iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
 			// 数量拆单入库数据处理
 			iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
+			// 数量拆单商品备注沟通数据处理
+			iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
 		}
 
 		//获取实际运费

@@ -572,4 +572,11 @@ public interface IOrderinfoService {
 	 * @return
 	 */
 	int updateOrderSplitNumIdRelationtableData(String orderNo);
+
+	/**
+	 * 更新商品备注沟通数据
+	 * @param orderNo
+	 * @return
+	 */
+	int updateOrderSplitNumGoodsCommunicationInfoData(String orderNo);
 }

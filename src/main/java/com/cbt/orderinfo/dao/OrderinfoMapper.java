@@ -741,5 +741,10 @@ public interface OrderinfoMapper {
 	 */
 	int updateOrderSplitNumIdRelationtableData(@Param("orderNo") String orderNo);
 
-
+	/**
+	 * 更新商品备注沟通数据
+	 * @param orderNo
+	 * @return
+	 */
+	int updateOrderSplitNumGoodsCommunicationInfoData(@Param("orderNo") String orderNo);
 }

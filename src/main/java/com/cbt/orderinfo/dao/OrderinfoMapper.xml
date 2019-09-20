@@ -1524,6 +1524,12 @@
     <update id="updateOrderSplitNumIdRelationtableData">
         update id_relationtable ir,order_details od
         set ir.odid = od.id
-        where ir.orderid = od.orderid and ir.orderid =#{orderNo}  and ir.goodid = od.goodsid and (ir.odid  = 0 or ir.odid is null);
+        where ir.orderid = od.orderid and ir.orderid =#{orderNo}  and ir.goodid = od.goodsid and (ir.odid  = 0 or ir.odid is null)
+    </update>
+
+    <update id="updateOrderSplitNumGoodsCommunicationInfoData">
+        update goods_communication_info gci,order_details od
+        set gci.odid = od.id
+        where gci.orderid = od.orderid and gci.orderid =#{orderNo} and gci.goodsid = od.goodsid and (gci.odid  = 0 or gci.odid is null)
     </update>
 </mapper>

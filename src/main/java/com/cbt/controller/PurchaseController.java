@@ -1166,6 +1166,8 @@ public class PurchaseController {
 				iOrderinfoService.updateOrderSplitNumPurchaseData(orderno);
 				// 数量拆单入库数据处理
 				iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderno);
+				// 数量拆单商品备注沟通数据处理
+			    iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderno);
 			}
 			int unpay = 0;
 			unpay = StringUtils.isStrNull(unpaid) ? 0 : Integer.parseInt(unpaid);
