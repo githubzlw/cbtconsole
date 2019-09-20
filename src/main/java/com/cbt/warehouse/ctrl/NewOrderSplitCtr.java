@@ -612,10 +612,11 @@ public class NewOrderSplitCtr {
                         newTotalGoodsCost += goodsNumBean.getGoodsPrice() * goodsNumBean.getNum();
                         // 执行修改产品数量操作
                         orderDetail.setYourorder(goodsNumBean.getOldNum() - goodsNumBean.getNum());
-                        oldOrderDeatisMap.put(orderDetail.getId(), orderDetail);
+                        oldOrderDeatisMap.put(orderDetail.getGoodsid(), orderDetail);
                         //
                         OrderDetailsBean orderDetailTemp = (OrderDetailsBean) orderDetail.clone();
                         orderDetailTemp.setYourorder(goodsNumBean.getNum());
+                        orderDetailTemp.setOldGoodsNum(goodsNumBean.getOldNum() - goodsNumBean.getNum());
                         nwOrderDetails.add(orderDetailTemp);
                         break;
                     }
@@ -645,7 +646,8 @@ public class NewOrderSplitCtr {
             orderBeans.add(orderBeanTemp);
             splitDao.saveOrderInfoLogByList(orderBeans, admuser);
             // 3.开始执行拆单
-            boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails, OrderInfoConstantUtil.REVIEW, 1);
+            boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails,
+                    OrderInfoConstantUtil.REVIEW,  1);
             if (isOk) {
                 json.setOk(true);
             } else {
