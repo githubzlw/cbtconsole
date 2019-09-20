@@ -20,7 +20,10 @@ public interface CustomerDisputeService {
 	Map<String,Object> list(String disputeID,int startNum,int limitNum,
 			String startTime,String endTime,String status,int admID,String roleType);
 	
-	
+	/**未读申诉消息
+	 * @return
+	 */
+	int countUnReadDispute();
 	
 	/**申诉详情
 	 * @param disputeID

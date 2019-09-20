@@ -183,15 +183,22 @@
     		return actionHtml;
     	}
         function formatAction(val, row, index) {
+        	var ac = "";
         	if(row.apiType.indexOf('Paypal')>-1){
-        		return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
-				+ row.disputeID+'&merchant='+ row.merchantID+'&isread='+row.read+ '">查看</a>';
+        		ac = '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
+				+ row.disputeID+'&merchant='+ row.merchantID+'&isread='+row.read;
+        	}else if(row.apiType.indexOf('Stripe')>-1){
+        		ac = '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
+				+ row.disputeID+'&isread='+row.read
+        	}else{
+        		
         	}
-        	if(row.apiType.indexOf('Stripe')>-1){
-        		return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
-				+ row.disputeID+'&isread='+row.read+ '">查看</a>';
+        	if(row.read){
+        		ac = ac + '">查看</a>';
+        	}else{
+        		ac = ac + '"><img src="/cbtconsole/img/new_message.jpg" width="60px;" height="30px;"></a>';
         	}
-        	return '';
+        	return ac;
 
     	}
 
