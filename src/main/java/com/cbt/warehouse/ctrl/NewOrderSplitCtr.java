@@ -581,7 +581,7 @@ public class NewOrderSplitCtr {
                 return json;
             }
             OrderBean orderInfo = iOrderinfoService.getOrders(orderNo);
-            if (orderInfo.getState() != 5 || orderInfo.getState() != 1 || orderInfo.getState() != 2) {
+            if (orderInfo.getState() != 5 && orderInfo.getState() != 1 && orderInfo.getState() != 2) {
                 json.setOk(false);
                 json.setMessage("订单状态非审核、采购或者入库状态，不能拆单");
                 return json;

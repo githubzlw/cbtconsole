@@ -559,4 +559,17 @@ public interface IOrderinfoService {
     int updateOrderInfoFreight(String orderNo, String amount);
 
     boolean setSampleGoodsIsOrder(String orderNo, Integer userId, List<SampleOrderBean> list);
+
+	/**
+	 * 更新数量拆单的采购数据
+	 * @return
+	 */
+	int updateOrderSplitNumPurchaseData(String orderNo);
+
+	/**
+	 * 更新数量拆单的入库数据
+	 * @param orderNo
+	 * @return
+	 */
+	int updateOrderSplitNumIdRelationtableData(String orderNo);
 }

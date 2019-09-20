@@ -3047,8 +3047,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		String insert_split_details="insert into split_details(new_orderid,goodsid) values";
 		String tempSql ="";
 
-		String goodsDistributionSqlBegin = "insert into goods_distribution(orderid,odid,goodsid,admuserid,goodscatid,goods_pid,createtime) " +
-                "select '"+odbeanNew.getOrderNo()+"' as orderid,odid,goodsid,admuserid,goodscatid,goods_pid,now() " +
+		String goodsDistributionSqlBegin = "insert into goods_distribution(orderid,odid,goodsid,admuserid,goodscatid,goods_pid,goods_url,createtime) " +
+                "select '"+odbeanNew.getOrderNo()+"' as orderid,odid,goodsid,admuserid,goodscatid,goods_pid,goods_url,now() " +
                 "from goods_distribution where orderid = '"+orderNoOld +"' and odid in(";
         String goodsDistributionSqlEnd="";
 		for (OrderDetailsBean oddsb : nwOrderDetails) {
@@ -3097,10 +3097,34 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 					+ orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
 			//localSqlList.add(orderReplenishment);
 
-			//更新order_product_source表数据
-			String order_product_source_sql = "update order_product_source set orderid='" + odbeanNew.getOrderNo() + "' where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
-			localSqlList.add(order_product_source_sql);
 
+			if(isSplitNum > 0) {
+				// 数量拆单的单独处理
+				// 新增货源数据
+				String insertOrderProductSql = "insert into order_product_source(od_id,adminid,userid,addtime,orderid,confirm_userid,confirm_time,goodsid,goodsdataid,goods_url," +
+						"goods_p_url,last_goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,usecount,buycount,currency," +
+						"goods_p_name,bargainRemark,deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks,questionsRemarks," +
+						"unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime,old_shopid,tborderid) " +
+						" select 0 as od_id,adminid,userid,addtime,'" + odbeanNew.getOrderNo() + "' as orderid,confirm_userid,confirm_time," +
+						"goodsid,goodsdataid,goods_url,goods_p_url,last_goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,"
+						+ oddsb.getYourorder() + " as usecount," + oddsb.getYourorder() + " as buycount,currency," +
+						"goods_p_name,bargainRemark,deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks,questionsRemarks," +
+						"unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime,old_shopid,tborderid from order_product_source " +
+						" where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+				localSqlList.add(insertOrderProductSql);
+
+				String idRelationSql = "insert into id_relationtable(orderid,goodid,goodstatus,goodurl,barcode,picturepath,createtime," +
+						"POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,itemqty,itemid,odid)" +
+						" select '"+odbeanNew.getOrderNo()+"',goodid,goodstatus,goodurl,barcode," +
+						"CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'/','"+odbeanNew.getOrderNo()+"','_',goodid,'.jpg'),createtime," +
+						"POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,itemqty,itemid,0 as odid " +
+						"from id_relationtable " + " where orderid = '" + orderNoOld + "' and goodid=" + oddsb.getGoodsid();
+				localSqlList.add(idRelationSql);
+			}else {
+				//更新order_product_source表数据
+				String order_product_source_sql = "update order_product_source set orderid='" + odbeanNew.getOrderNo() + "' where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+				localSqlList.add(order_product_source_sql);
+			}
 
 			// 替换拆单的入库商品单号
 			tempSql += "," + oddsb.getGoodsid();
