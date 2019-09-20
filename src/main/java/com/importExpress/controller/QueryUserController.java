@@ -679,7 +679,7 @@ public class QueryUserController {
     public Map<String, String> updateNeedoffshelfByPid(String pid, String noShelfInfo) {
         Map<String, String> result = new HashMap<String, String>();
         try {
-            queryUserService.updateNeedoffshelfByPid(pid, noShelfInfo);
+            queryUserService.upNeedoffshelfByPid(pid, noShelfInfo);
             result.put("message", "已修改!");
         } catch (Exception e) {
             result.put("message", "内部异常, 修改失败!");
