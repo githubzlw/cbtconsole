@@ -730,7 +730,7 @@ public class QueryUserServiceImpl implements QueryUserService {
     }
 
     @Override
-    public void updateNeedoffshelfByPid(String pid, String noShelfInfo) {
+    public void upNeedoffshelfByPid(String pid, String noShelfInfo) {
         DataSourceSelector.set("dataSource28hop");
         queryUserMapper.updateNeedoffshelfByPid(pid, noShelfInfo);
         DataSourceSelector.restore();
