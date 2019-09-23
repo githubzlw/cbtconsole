@@ -730,7 +730,7 @@ public interface OrderinfoMapper {
 	void batchInsertIntoSampleOrderGoods(List<com.cbt.warehouse.pojo.SampleOrderBean> sampleOrderBeanList);
     @Select("SELECT orderid as orderNo,admuserid as userId from goods_distribution WHERE orderid=#{orderNo} LIMIT 1")
 	com.cbt.warehouse.pojo.SampleOrderBean addprocurement(@Param("orderNo") String orderNo);
-     @Select("INSERT INTO goods_distribution (orderid,  admuserid, createtime, goods_pid) VALUES (#{ben.orderNo}, #{ben.userId}, NOW(),#{ben.pid});")
+     @Select("INSERT INTO goods_distribution (orderid,odid,goodsid,admuserid,createtime,goods_pid) VALUES (#{ben.orderNo},'0','0', #{ben.userId}, NOW(),#{ben.pid});")
 	void addOrder(@Param("ben") com.cbt.warehouse.pojo.SampleOrderBean ben);
 
 	/**
