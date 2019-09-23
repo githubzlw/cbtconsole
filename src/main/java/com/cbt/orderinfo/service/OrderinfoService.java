@@ -1422,6 +1422,22 @@ public class OrderinfoService implements IOrderinfoService {
 
     	return true;
     }
+
+	@Override
+	public int updateOrderSplitNumPurchaseData(String orderNo) {
+		return orderinfoMapper.updateOrderSplitNumPurchaseData(orderNo);
+	}
+
+	@Override
+	public int updateOrderSplitNumIdRelationtableData(String orderNo) {
+		return orderinfoMapper.updateOrderSplitNumIdRelationtableData(orderNo);
+	}
+
+	@Override
+	public int updateOrderSplitNumGoodsCommunicationInfoData(String orderNo) {
+		return orderinfoMapper.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+	}
+
 	public boolean genSampleOrderByInfoList(String orderNo, int userId, List<SampleOrderBean> sampleOrderBeanList) {
 		// 插入订单详情
 		String spOrderNo = orderNo + "_SP";

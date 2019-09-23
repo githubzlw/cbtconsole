@@ -418,10 +418,10 @@
 			success : function(data) {
 				$(".refresh_color").attr("disabled",false);
 				$(".refresh_color").css("background","#44a823");
-				if(data==1){
+				if(data.code==200){
 					$("#gen_show_notice").text("刷新成功！");
 				}else{
-					$("#gen_show_notice").text("刷新失败，请重试，如果还不行，请联系IT！");
+					$("#gen_show_notice").text("刷新失败，"+ data.message);
 				}
 			}
 		});
@@ -446,10 +446,10 @@
     			success : function(data) {
     				$(".refresh_color").attr("disabled",false);
     				$(".refresh_color").css("background","#44a823");
-    				if(data==1){
+    				if(data.code==200){
     					$("#gen_show_notice").text("刷新成功！");
     				}else{
-    					$("#gen_show_notice").text("刷新失败，请重试，如果还不行，请联系IT！");
+    					$("#gen_show_notice").text("刷新失败，"+ data.message);
     				}
     			}
     		});

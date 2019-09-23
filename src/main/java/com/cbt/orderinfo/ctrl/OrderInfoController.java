@@ -269,6 +269,13 @@ public class OrderInfoController{
 		}catch (Exception e){
 			e.printStackTrace();
 		}
+		for (SearchResultInfo searchResultInfo : list) {
+			if (searchResultInfo.getOrderid().contains("_SN")) {
+				// 数量拆单入库数据处理
+				iOrderinfoService.updateOrderSplitNumIdRelationtableData(searchResultInfo.getOrderid());
+				iOrderinfoService.updateOrderSplitNumIdRelationtableData(searchResultInfo.getOrderid());
+			}
+		}
 		out.print(net.minidev.json.JSONArray.toJSONString(list));
 		out.flush();
 		out.close();

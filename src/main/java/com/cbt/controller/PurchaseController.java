@@ -1160,6 +1160,15 @@ public class PurchaseController {
 			date = StringUtils.isStrNull(date) ? "" : date;
 			days = StringUtils.isStrNull(days) ? "" : days;
 			state = StringUtils.isStrNull(state) ? "" : state;
+
+			if(orderno.contains("_SN")){
+				// 数量拆单采购数据处理
+				iOrderinfoService.updateOrderSplitNumPurchaseData(orderno);
+				// 数量拆单入库数据处理
+				iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderno);
+				// 数量拆单商品备注沟通数据处理
+			    iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderno);
+			}
 			int unpay = 0;
 			unpay = StringUtils.isStrNull(unpaid) ? 0 : Integer.parseInt(unpaid);
 			System.out.println("========开始执行,purchaseServer.findPageByCondition:" + sdf1.format(new Date()) + "========");
