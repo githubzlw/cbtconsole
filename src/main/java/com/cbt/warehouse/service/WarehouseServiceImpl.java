@@ -3003,6 +3003,26 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     }
 
+    @Override
+    public boolean addprocurement(List<SampleOrderBean> orderNos) {
+        try {
+        SampleOrderBean ben=this.orderinfoMapper.addprocurement(orderNos.get(0).getOrderNo());
+        boolean bo=false;
+        for (SampleOrderBean sob:orderNos) {
+            if (ben != null) {
+                ben.setPid(sob.getPid());
+                  this.orderinfoMapper.addOrder(ben);
+            }else {
+                return false;
+            }
+        }
+        return true;
+        }  catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public List<String> getSkulist(String sku,String weight) {
          String [] arr=sku.split(",");
          List<String> list = Arrays.asList(arr);
