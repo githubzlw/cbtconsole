@@ -1532,7 +1532,7 @@ public class OrderinfoService implements IOrderinfoService {
 					"        0 as order_ac,0 as actual_lwh,actual_weight,actual_weight_estimate,0 as extra_freight,'sampleOrder' as orderRemark," +
 					"        0 as cashback,0 as firstdiscount,isDropshipOrder,address_id,packag_number,0 as coupon_discount," +
 					"        exchange_rate,grade_discount,vatbalance,ordertype,actual_freight_c,0 as memberFee,processingfee" +
-					"        FROM orderinfo WHERE order_no ="+orderNo+" and NOT EXISTS (SELECT order_no FROM orderinfo WHERE order_no='"+spOrderNo+"')"));
+					"        FROM orderinfo WHERE order_no ='"+orderNo+"' and NOT EXISTS (SELECT order_no FROM orderinfo WHERE order_no='"+spOrderNo+"')"));
 
 			for (SampleOrderBean sb:sampleOrderBeanList){
 				String sql="";
