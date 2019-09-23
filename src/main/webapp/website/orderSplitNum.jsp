@@ -179,10 +179,10 @@
     function chooseCheckBox(obj, num) {
         var inputVal = $(obj).val();
         if (inputVal > 0) {
-            if (num > inputVal) {
+            if (num >= inputVal) {
                 $(obj).parent().find("input:checkbox").prop("checked", true);
             } else {
-                $.messager.alert("提醒", "拆单数量必须小于客户购买数量!", "info");
+                $.messager.alert("提醒", "拆单数量必须小于等于客户购买数量!", "info");
                 return;
             }
         }else{

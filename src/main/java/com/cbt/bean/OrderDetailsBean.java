@@ -148,6 +148,19 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private String locationNum;
 	private int downSample;//拆样数量
 
+	/**
+	 * 原始拆单前商品数量
+	 */
+	private int oldGoodsNum = -1;
+
+	public int getOldGoodsNum() {
+		return oldGoodsNum;
+	}
+
+	public void setOldGoodsNum(int oldGoodsNum) {
+		this.oldGoodsNum = oldGoodsNum;
+	}
+
 	public int getDownSample() {
 		return downSample;
 	}
