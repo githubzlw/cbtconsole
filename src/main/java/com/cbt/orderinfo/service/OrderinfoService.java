@@ -1,9 +1,6 @@
 package com.cbt.orderinfo.service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -1400,19 +1397,30 @@ public class OrderinfoService implements IOrderinfoService {
 
     @Override
     public boolean setSampleGoodsIsOrder(String orderNo, Integer userId, List<SampleOrderBean> sampleOrderBeanList) {
-		try {
+		SendMQ sendMQ = null;
+    	try {
 			if (sampleOrderBeanList != null && sampleOrderBeanList.size() > 0) {
 				for(SampleOrderBean sm : sampleOrderBeanList){
 					sm.setOrderNo(orderNo);
 					sm.setUserId(userId);
 				}
 				// 保存客户选择的样品信息到数据库
-				this.orderinfoMapper.batchInsertIntoSampleOrderGoods(sampleOrderBeanList);
+//				this.orderinfoMapper.batchInsertIntoSampleOrderGoods(sampleOrderBeanList);
+				sendMQ = new SendMQ();
+				for (SampleOrderBean sob:sampleOrderBeanList){
+					String sql=" insert into sample_order_info(user_id,order_no,pid,img_url,sku_id,en_type,is_choose)" +
+							"        values " +
+							"            ('"+sob.getUserId()+"','"+sob.getOrderNo()+"','"+sob.getPid()+"','"+sob.getImgUrl()+"','"+sob.getSkuId()+"','"+sob.getEnType()+"','"+sob.getIsChoose()+"')";
+					sendMQ.sendMsg(new RunSqlModel(sql));
+					System.out.println(sql);
+				}
+
+			    sendMQ.closeConn();
 				// 更新客户选择的样品信息
 				// sampleOrderService.updateSampleOrderGoods(sampleOrderBeanList);
 				// 生成样品订单数据
 				boolean bo=this.genSampleOrderByInfoList(orderNo, userId, sampleOrderBeanList);
-				sampleOrderBeanList.clear();
+//				sampleOrderBeanList.clear();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1481,14 +1489,68 @@ public class OrderinfoService implements IOrderinfoService {
 			temp.setExtra_freight(0);
 			odbList.add(temp);
 		}
-		//添加订单详细信息
-		this.orderinfoMapper.batchAddOrderDetail(odbList);
-		// 插入地址信息
-		this.orderinfoMapper.insertSampleOrderAddress(orderNo, spOrderNo);
-		// 插入订单信息
-		this.orderinfoMapper.insertSampleOrderInfo(orderNo, spOrderNo);
-		// 设置样品商品订单号
-		this.orderinfoMapper.updateSampleOrderGoods(sampleOrderBeanList);
+
+		SendMQ sendMQ = null;
+		try {
+//			//添加订单详细信息
+//			this.orderinfoMapper.batchAddOrderDetail(odbList);
+//			// 插入地址信息
+//			this.orderinfoMapper.insertSampleOrderAddress(orderNo, spOrderNo);
+//			// 插入订单信息
+//			this.orderinfoMapper.insertSampleOrderInfo(orderNo, spOrderNo);
+//			// 设置样品商品订单号
+//			this.orderinfoMapper.updateSampleOrderGoods(sampleOrderBeanList);
+			sendMQ = new SendMQ();
+
+			for (OrderDetailsBeans od:odbList){
+				String sql="insert order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder," +
+						"        userid,goodsname,goodsprice,goodsfreight,goodsdata_id,remark,goods_class,extra_freight,car_url,car_urlMD5,goods_pid," +
+						"        car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,isFeight,seilUnit," +
+						"        startPrice,bizPriceDiscount,group_buy_id,actual_volume,actual_weight,isFreeShipProduct,shopCount) values";
+               String value="('"+od.getGoodsid()+"','"+od.getOrderid()+"','"+od.getDropshipid()+"','"+od.getDelivery_time()+"','"+od.getCheckprice_fee()+"','"+od.getCheckproduct_fee()+"','5','"+od.getFileupload()+"','"+od.getYourorder()+"','" +
+					   "            "+od.getUserid()+"','"+od.getGoodsname()+"','"+od.getGoodsprice()+"','"+od.getGoodsfreight()+"','"+od.getGoodsdata_id()+"','"+od.getRemark()+"','"+od.getGoods_class()+"','"+od.getExtra_freight()+"','"+od.getGoods_url()+"','"+od.getGoodsUrlMD5()+"','"+od.getGoods_pid()+"','" +
+					   "            "+od.getGoods_img()+"','"+od.getGoods_type()+"','"+od.getFreight_free()+"','"+od.getBulk_volume()+"','"+od.getTotal_weight()+"','"+od.getDiscount_ratio()+"','"+od.getGoodscatid()+"','"+od.getIsFeight()+"','"+od.getSerUnit()+"','" +
+					   "            "+od.getStartPrice()+"','"+od.getBizPriceDiscount()+"','"+od.getGroupBuyId()+"','"+od.getActual_volume()+"','"+od.getActual_weight()+"','"+od.getIsFreeShipProduct()+"','"+od.getShopCount()+"')";
+			sql+=value;
+				//添加订单详细信息
+				sendMQ.sendMsg(new RunSqlModel(sql));
+				System.out.println(sql);
+			}
+			// 插入地址信息
+			sendMQ.sendMsg(new RunSqlModel("insert into order_address(AddressID,orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,street,recipients)" +
+					"select AddressID,"+spOrderNo+" as orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,street,recipients " +
+					"FROM order_address WHERE  orderNo='"+orderNo+"' and NOT EXISTS (SELECT orderNo FROM order_address WHERE orderNo='"+spOrderNo+"')"));
+			// 插入订单信息
+			sendMQ.sendMsg(new RunSqlModel(" insert orderinfo(order_no,user_id,product_cost,state,delivery_time,service_fee,ip,mode_transport,create_time,details_number," +
+					"        pay_price_three,actual_allincost,foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,share_discount," +
+					"        order_ac,actual_lwh,actual_weight,actual_weight_estimate,extra_freight,orderRemark,cashback,firstdiscount," +
+					"        isDropshipOrder,address_id,packag_number,coupon_discount,exchange_rate,grade_discount,vatbalance,ordertype,actual_freight_c," +
+					"        memberFee,processingfee) " +
+					"        select '"+spOrderNo+"' as order_no,user_id,0 as product_cost,5 as state,delivery_time,0 as service_fee,ip,mode_transport,create_time," +
+					"        2 as details_number, 0 as pay_price_three,actual_allincost,0 as foreign_freight,0 as pay_price,0 as pay_price_tow,currency," +
+					"        0 as actual_ffreight,0 as discount_amount,0 as share_discount," +
+					"        0 as order_ac,0 as actual_lwh,actual_weight,actual_weight_estimate,0 as extra_freight,'sampleOrder' as orderRemark," +
+					"        0 as cashback,0 as firstdiscount,isDropshipOrder,address_id,packag_number,0 as coupon_discount," +
+					"        exchange_rate,grade_discount,vatbalance,ordertype,actual_freight_c,0 as memberFee,processingfee" +
+					"        FROM orderinfo WHERE order_no ="+orderNo+" and NOT EXISTS (SELECT order_no FROM orderinfo WHERE order_no='"+spOrderNo+"')"));
+
+			for (SampleOrderBean sb:sampleOrderBeanList){
+				String sql="";
+				if (sb.getIsChoose()>0){
+					sql = " update sample_order_info set order_no = '"+sb.getOrderNo()+"',is_choose = '"+sb.getIsChoose()+"' where user_id = '"+sb.getUserId()+"' and pid = '"+sb.getPid()+"'";
+				}else {
+					sql = " update sample_order_info set order_no = '"+sb.getOrderNo()+"' where user_id = '"+sb.getUserId()+"' and pid = '"+sb.getPid()+"'";
+				}
+				// 设置样品商品订单号
+				sendMQ.sendMsg(new RunSqlModel(sql));
+			}
+
+
+			sendMQ.closeConn();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return true;
 	}
     @Override
