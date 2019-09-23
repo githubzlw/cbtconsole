@@ -1515,6 +1515,17 @@
         </foreach>
     </insert>
 
+    <update id="updateOrderSplitNumOrderDetailsData">
+        update order_details od,(select ${newOrderNo} as orderid,goodsid,shipno from order_details where orderid = #{oldOrderNo}) tod set
+        od.shipno = tod.shipno where od.orderid = tod.orderid and od.goodsid = tod.goodsid and (od.shipno is null or od.shipno = '' or od.shipno = '0');
+        update order_details od,(select ${newOrderNo} as orderid,goodsid,re_shipnos from order_details where orderid = #{oldOrderNo}) tod set
+        od.re_shipnos = tod.re_shipnos where od.orderid = tod.orderid and od.goodsid = tod.goodsid
+        and (od.re_shipnos is null or od.re_shipnos =''  or od.re_shipnos = '0');
+        update order_details od,(select ${newOrderNo} as orderid,goodsid,inventory_remark from order_details where orderid = #{oldOrderNo}) tod set
+        od.inventory_remark = tod.inventory_remark where od.orderid = tod.orderid and od.goodsid = tod.goodsid
+        and (od.inventory_remark is null or od.inventory_remark = '');
+    </update>
+
     <update id="updateOrderSplitNumPurchaseData">
         update order_product_source ops,order_details od
         set ops.od_id = od.id

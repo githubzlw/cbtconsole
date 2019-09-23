@@ -729,6 +729,14 @@ public interface OrderinfoMapper {
 	void batchInsertIntoSampleOrderGoods(List<com.cbt.warehouse.pojo.SampleOrderBean> sampleOrderBeanList);
 
 	/**
+	 * 订单详情线下采购
+	 * @param oldOrderNo
+	 * @param newOrderNo
+	 * @return
+	 */
+	int updateOrderSplitNumOrderDetailsData(@Param("oldOrderNo") String oldOrderNo, @Param("newOrderNo") String newOrderNo);
+
+	/**
 	 * 更新数量拆单的采购数据
 	 * @return
 	 */

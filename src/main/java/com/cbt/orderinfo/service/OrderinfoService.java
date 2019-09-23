@@ -1424,6 +1424,11 @@ public class OrderinfoService implements IOrderinfoService {
     }
 
 	@Override
+	public int updateOrderSplitNumOrderDetailsData(String oldOrderNo, String newOrderNo) {
+		return orderinfoMapper.updateOrderSplitNumOrderDetailsData(oldOrderNo, "'" + newOrderNo + "'");
+	}
+
+	@Override
 	public int updateOrderSplitNumPurchaseData(String orderNo) {
 		return orderinfoMapper.updateOrderSplitNumPurchaseData(orderNo);
 	}

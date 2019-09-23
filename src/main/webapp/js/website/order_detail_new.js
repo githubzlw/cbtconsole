@@ -956,15 +956,16 @@ function showcomm(id,car_type,adminname,orderNo,goods_pid,countryid,admindid){
     $("#cm_carType").val(car_type);
     $("#comment_content_").val($(controls[0]).attr("title"));
     var rfddd1 = document.getElementById("commentDiv1");
-    rfddd1.style.display = "block";;
+    rfddd1.style.display = "block";
 
 }
 
 //备注回复
-function doReplay1(orderid,odid){
+function doReplay1(orderid,odid,goodsid){
     $("#remark_content_").val("");
     $("#rk_orderNo").val(orderid);
     $("#rk_odid").val(odid);
+    $("#rk_goodsid").val(goodsid);
     var rfddd = document.getElementById("repalyDiv1");
     rfddd.style.display = "block";
 }
@@ -1215,22 +1216,6 @@ function saveCommentContent(){
         }
     });
 }
-//弹出评论框yyl
-function showcomm(id,car_type,adminname,orderNo,goods_pid,countryid,admindid){
-    var controls=document.getElementsByName("but"+goods_pid);
-    $("#cm_id").val($(controls[0]).attr("cmid"));
-    $("#cm_adminname").val(adminname);
-    $("#cm_orderNo").val(orderNo);
-    $("#cm_goodsPid").val(goods_pid);
-    $("#cm_country").val(countryid);
-    $("#cm_adminId").val(admindid);
-    $("#cm_oid").val(id);
-    $("#cm_carType").val(car_type);
-    $("#comment_content_").val($(controls[0]).attr("title"));
-    var rfddd1 = document.getElementById("commentDiv1");
-    rfddd1.style.display = "block";;
-
-}
 
 //手动调整采购人员
 function changeBuyer(odid,buyid){
@@ -1271,15 +1256,6 @@ function changeAllBuyer(orderNo,buyid){
             $("#orderbuyer").text("执行失败,请联系管理员");
         }
     });
-}
-
-//备注回复
-function doReplay1(orderid,odid){
-    $("#remark_content_").val("");
-    $("#rk_orderNo").val(orderid);
-    $("#rk_odid").val(odid);
-    var rfddd = document.getElementById("repalyDiv1");
-    rfddd.style.display = "block";
 }
 
 // 确认弹出框关闭方法
@@ -2302,19 +2278,11 @@ function afterReplenishment(){
 }
 
 
-//备注回复
-function doReplay1(orderid,odid){
-    $("#remark_content_").val("");
-    $("#rk_orderNo").val(orderid);
-    $("#rk_odid").val(odid);
-    var rfddd = document.getElementById("repalyDiv1");
-    rfddd.style.display = "block";
-}
-
 //增加商品沟通信息
 function saveRepalyContent(){
     var orderid=$("#rk_orderNo").val();
     var odid=$("#rk_odid").val();
+    var goodsid=$("#rk_goodsid").val();
     var text=$("#remark_content_").val();
     $.ajax({
         type : 'POST',
@@ -2323,6 +2291,7 @@ function saveRepalyContent(){
         data : {
             'orderid' : orderid,
             'odid' : odid,
+			'goodsid' : goodsid,
             "type":'2',
             'text' : text
         },
@@ -2334,27 +2303,6 @@ function saveRepalyContent(){
             }
         }
     });
-}
-
-
-
-//弹出评论框yyl
-function showcomm(id,car_type,adminname,orderNo,goods_pid,countryid,admindid){
-    //var timer1 = setTimeout(function(){
-    var controls=document.getElementsByName("but"+goods_pid);
-    $("#cm_id").val($(controls[0]).attr("cmid"))//获取主键
-    $("#cm_adminname").val(adminname);
-    $("#cm_orderNo").val(orderNo);
-    $("#cm_goodsPid").val(goods_pid);
-    $("#cm_country").val(countryid);
-    $("#cm_adminId").val(admindid);
-    $("#cm_oid").val(id);
-    $("#cm_carType").val(car_type);
-    $("#comment_content_").val($(controls[0]).attr("title"))
-    var rfddd1 = document.getElementById("commentDiv1");
-    rfddd1.style.display = "block";;
-    //},2000)
-
 }
 
 

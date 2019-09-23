@@ -173,6 +173,7 @@ public class Purchase extends HttpServlet {
 		String time=sdf.format(date);
 		String orderid=request.getParameter("orderid");
 		String odid=request.getParameter("odid");
+		String goodsid=request.getParameter("goodsid");
 		String text=request.getParameter("text");
 		String type=request.getParameter("type");
 		if(!StringUtils.isEmpty(text)){
@@ -182,6 +183,7 @@ public class Purchase extends HttpServlet {
 		}
 		map.put("orderid", orderid);
 		map.put("odid", odid);
+		map.put("goodsid", goodsid);
 		map.put("text", text);
 		map.put("type", type);
 		String context = purchaseServer.saveRepalyContent(map);
