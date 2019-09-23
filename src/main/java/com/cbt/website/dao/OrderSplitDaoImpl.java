@@ -3147,12 +3147,12 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
                     String insertOrderProductSql = "insert into order_product_source(od_id,adminid,userid,addtime,orderid,confirm_userid,confirm_time,goodsid,goodsdataid,goods_url," +
                             "goods_p_url,last_goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,usecount,buycount,currency," +
                             "goods_p_name,bargainRemark,deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks,questionsRemarks," +
-                            "unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime,old_shopid,tborderid) " +
+                            "unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime,old_shopid,tborderid,offline_purchase,tb_id) " +
                             " select 0 as od_id,adminid,userid,addtime,'" + odbeanNew.getOrderNo() + "' as orderid,confirm_userid,confirm_time," +
                             "goodsid,goodsdataid,goods_url,goods_p_url,last_goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,"
                             + oddsb.getYourorder() + " as usecount," + oddsb.getYourorder() + " as buycount,currency," +
                             "goods_p_name,bargainRemark,deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks,questionsRemarks," +
-                            "unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime,old_shopid,tborderid from order_product_source " +
+                            "unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime,old_shopid,tborderid,offline_purchase,tb_id from order_product_source " +
                             " where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
                     localSqlList.add(insertOrderProductSql);
 

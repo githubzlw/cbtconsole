@@ -734,6 +734,14 @@ public interface OrderinfoMapper {
 	void addOrder(@Param("ben") com.cbt.warehouse.pojo.SampleOrderBean ben);
 
 	/**
+	 * 订单详情线下采购
+	 * @param oldOrderNo
+	 * @param newOrderNo
+	 * @return
+	 */
+	int updateOrderSplitNumOrderDetailsData(@Param("oldOrderNo") String oldOrderNo, @Param("newOrderNo") String newOrderNo);
+
+	/**
 	 * 更新数量拆单的采购数据
 	 * @return
 	 */

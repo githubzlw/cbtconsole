@@ -839,4 +839,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryChTypeBySkuId(skuId);
     }
 
+    @Override
+    public List<String> queryAllShopBlackList() {
+        return customGoodsMapper.queryAllShopBlackList();
+    }
+
+
 }
