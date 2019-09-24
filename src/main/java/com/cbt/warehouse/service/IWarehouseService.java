@@ -1166,5 +1166,14 @@ public interface IWarehouseService {
     List<Inventory> FindAllGoods(int page,int pagesize,String pid);
 
 	boolean setInventoryCountBySkuAndPid(List<SampleOrderBean> list);
+
+	/**
+	 * 插入MO Sql日志
+	 * @param sqlStr
+	 * @param shopNo
+	 * @param orderNo
+	 * @return
+	 */
+	int insertMqLog(String sqlStr, String shopNo, String orderNo,  String paramStr);
 }
  
