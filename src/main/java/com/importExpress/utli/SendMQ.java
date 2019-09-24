@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class SendMQ {
 
-    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(SendMQ.class);
+    private final static org.slf4j.Logger log = LoggerFactory.getLogger(SendMQ.class);
 
     /** 直接执行的sql 及 下架*/
     private final static String QUEUE_NAME = "updateTbl";
@@ -46,10 +46,8 @@ public class SendMQ {
     private Channel channel;
 
     static{
-        System.err.println("host:" + SysParamUtil.getParam("rabbitmq.host"));
-        System.err.println("port:" + SysParamUtil.getParam("rabbitmq.port"));
-        System.err.println("username:" + SysParamUtil.getParam("rabbitmq.username"));
-        System.err.println("password:" + SysParamUtil.getParam("rabbitmq.password"));
+        log.info("host:" + SysParamUtil.getParam("rabbitmq.host"));
+        log.info("port:" + SysParamUtil.getParam("rabbitmq.port"));
         config.put("host",SysParamUtil.getParam("rabbitmq.host"));
         config.put("port",SysParamUtil.getParam("rabbitmq.port"));
         config.put("username",SysParamUtil.getParam("rabbitmq.username"));
@@ -66,7 +64,7 @@ public class SendMQ {
         channel = connection.createChannel();
         ++totalConnect;
 
-        logger.info("取得MQ 返回总数/获取总数：" + totalDisConnect + "/" + totalConnect);
+        log.info("取得MQ 返回总数/获取总数：" + totalDisConnect + "/" + totalConnect);
     }
 
     public void closeConn() {
@@ -74,9 +72,9 @@ public class SendMQ {
             try {
                 channel.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("closeConn",e);
             } catch (TimeoutException e) {
-                e.printStackTrace();
+                log.error("closeConn",e);
             }
         }
         if(connection!=null){
@@ -84,7 +82,7 @@ public class SendMQ {
                 connection.close();
                 --totalDisConnect;
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("closeConn",e);
             }
         }
     }
@@ -98,7 +96,7 @@ public class SendMQ {
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
         JSONObject jsonObject = JSONObject.fromObject(model);
         channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
-        System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
+        log.info(" [x] Sent '" + jsonObject.toString() + "'");
     }
 
     /**
@@ -110,7 +108,7 @@ public class SendMQ {
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
         JSONObject jsonObject = JSONObject.fromObject(model);
         channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
-        System.err.println(" [x] Sent '" + jsonObject.toString() + "'");
+        log.info(" [x] Sent '" + jsonObject.toString() + "'");
     }
     
     /**
@@ -132,7 +130,7 @@ public class SendMQ {
             sendCouponMsg(couponJson, 2);
             sendCouponMsg(couponJson, 3);
         }
-    	System.err.println("Site=" + website + " [x] Sent '" + couponJson + "'");
+        log.info("Site=" + website + " [x] Sent '" + couponJson + "'");
     }
 
     /**
@@ -145,7 +143,7 @@ public class SendMQ {
         channel.basicPublish(RECOMMEND_NAME,"",null,recommendJson.getBytes("UTF-8"));
 //        channel.queueDeclare(RECOMMEND_NAME, false, false, false, null);
 //        channel.basicPublish("", RECOMMEND_NAME, null, recommendJson.getBytes("UTF-8"));
-        System.err.println(" [x] Sent '" + recommendJson + "'");
+        log.info(" [x] Sent '" + recommendJson + "'");
     }
 
     public static String repCha(String str){
@@ -185,7 +183,7 @@ public class SendMQ {
             channel.queueDeclare(QUEUE_REDIS_NAME_PETS, false, false, false, null);
             channel.basicPublish("", QUEUE_REDIS_NAME_PETS, null, json.getBytes("UTF-8"));
         }
-        System.err.println(" [x] Sent '" + json + "'");
+        log.info(" [x] Sent '" + json + "'");
     }
 
 

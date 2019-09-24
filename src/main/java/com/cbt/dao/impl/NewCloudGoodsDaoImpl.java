@@ -1705,53 +1705,7 @@ public class NewCloudGoodsDaoImpl implements NewCloudGoodsDao {
 	@Override
 	public boolean batchDeletePids(String[] pidLst) {
 
-		Connection conn = DBHelper.getInstance().getConnection();
-		Connection remoteConn = DBHelper.getInstance().getConnection2();
-		String deSql = "delete from custom_benchmark_ready_cloud where pid = ?";
-		PreparedStatement stmt = null;
-		PreparedStatement remoteStmt = null;
-		String deRemoteSql = "delete from custom_benchmark_ready_cloud where pid = ?";
-		boolean rs = false;
-		try {
-			stmt = conn.prepareStatement(deSql);
-			remoteStmt = remoteConn.prepareStatement(deRemoteSql);
-			for (int i = 0; i < pidLst.length; i++) {
-				stmt.setString(1, pidLst[i]);
-				stmt.addBatch();
-				remoteStmt.setString(1, pidLst[i]);
-				remoteStmt.addBatch();
-			}
-
-			int[] countArr = stmt.executeBatch();
-			if (countArr.length > 0) {
-				return remoteStmt.executeBatch().length > 0;
-			} else {
-				return rs;
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("batchDeletePids error :" + e.getMessage());
-			LOG.error("batchDeletePids error :" + e.getMessage());
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (remoteStmt != null) {
-				try {
-					remoteStmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(remoteConn);
-		}
-		return rs;
+		throw new RuntimeException("already cancel method called");
 	}
 
 	@Override

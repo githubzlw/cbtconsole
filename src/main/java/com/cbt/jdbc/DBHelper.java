@@ -25,7 +25,6 @@ public class DBHelper {
     private static DruidDataSource dataSource = null;
     private static ComboPooledDataSource dataSource2 = null;
     private static ComboPooledDataSource dataSource3 = null;
-    private static ComboPooledDataSource dataSource4 = null;
     /***
      *dataSource28alidata
      */
@@ -46,7 +45,6 @@ public class DBHelper {
     private static AtomicInteger totalConnect1  = new AtomicInteger();
     private static AtomicInteger totalConnect2  = new AtomicInteger();
     private static AtomicInteger totalConnect3  = new AtomicInteger();
-    private static AtomicInteger totalConnect4 = new AtomicInteger();
     private static AtomicInteger totalConnect5 = new AtomicInteger();
     private static AtomicInteger totalConnect6 = new AtomicInteger();
     private static AtomicInteger totalConnect7 = new AtomicInteger();

@@ -27,6 +27,7 @@ import com.importExpress.service.impl.SendMQServiceImpl;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+import com.mysql.jdbc.JDBC4PreparedStatement;
 import net.sf.json.JSONArray;
 import org.slf4j.LoggerFactory;
 
@@ -5466,7 +5467,11 @@ public class OrderwsDao implements IOrderwsDao {
                 stmt.setString(26, rs.getString("car_urlMD5"));
                 stmt.setString(27, rs.getString("goods_pid"));
                 stmt.setString(28, rs.getString("actual_weight"));
-                row = stmt.executeUpdate();
+                String runSql = ((JDBC4PreparedStatement) stmt).asSql();
+                SendMQ sendMQ = new SendMQ();
+                sendMQ.sendMsg(new RunSqlModel(runSql));
+                sendMQ.closeConn();
+//                row = stmt.executeUpdate();
                 sql = "select id,goodsdata_id,goodscatid,car_url from order_details where orderid='" + newOrderid
                         + "' and goodsid='" + goodsid + "'";
                 stmt = conn.prepareStatement(sql);
@@ -5491,7 +5496,7 @@ public class OrderwsDao implements IOrderwsDao {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("addOrderDetails",e);
         } finally {
             DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeResultSet(rs);
