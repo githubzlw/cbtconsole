@@ -6,6 +6,8 @@ import com.cbt.bean.Preferential;
 import com.cbt.bean.PreferentialWeb;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.Utility;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -824,20 +826,23 @@ public static void main(String[] args) {
 //		String sql = "update preferential_application set discountedunitprice=?,state=1 where id=?";
 		String sql = "update preferential_application set pay_price=?  where itemId=?";
 		Connection con = DBHelper.getInstance().getConnection();
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement ps1=null,ps2=null;
+		PreparedStatement ps1=null;
 		int i =0;
 		try {
 			ps1 = con.prepareStatement(sql);
 			ps1.setDouble(1, payPrice);
 			ps1.setString(2, itemId);
-			
-			ps2 = conn.prepareStatement(sql);
-			ps2.setDouble(1, payPrice);
-			ps2.setString(2, itemId);
-			
+
+			List<String> lstValues = new ArrayList<>(2);
+			lstValues.add( String.valueOf(payPrice));
+			lstValues.add( itemId);
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			SendMQ sendMQ = new SendMQ();
+			sendMQ.sendMsg(new RunSqlModel(runSql));
+			sendMQ.closeConn();
+
 			i = ps1.executeUpdate();
-			i+= ps2.executeUpdate();
+			++i;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -848,15 +853,7 @@ public static void main(String[] args) {
 					e.printStackTrace();
 				}
 			}
-			if(ps2!=null){
-				try {
-					ps2.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
 		}
-		DBHelper.getInstance().closeConnection(conn);
 		DBHelper.getInstance().closeConnection(con);
 		return i;
 	}

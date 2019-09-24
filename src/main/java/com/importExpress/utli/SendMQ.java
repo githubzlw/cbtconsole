@@ -54,15 +54,19 @@ public class SendMQ {
         config.put("password",SysParamUtil.getParam("rabbitmq.password"));
     }
 
-    public SendMQ() throws IOException, TimeoutException {
+    public SendMQ()  {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(config.get("host"));
         factory.setPort(Integer.parseInt(config.get("port")));
         factory.setUsername(config.get("username"));
         factory.setPassword(config.get("password"));
-        connection= factory.newConnection();
-        channel = connection.createChannel();
-        ++totalConnect;
+        try {
+            connection= factory.newConnection();
+            channel = connection.createChannel();
+            ++totalConnect;
+        } catch (Exception e) {
+           log.error("SendMQ",e);
+        }
 
         log.info("取得MQ 返回总数/获取总数：" + totalDisConnect + "/" + totalConnect);
     }
@@ -104,11 +108,15 @@ public class SendMQ {
      * @param model 其中type为2 直接执行对应sql
      * @throws Exception
      */
-    public void sendMsg(RunSqlModel model) throws Exception {
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        JSONObject jsonObject = JSONObject.fromObject(model);
-        channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
-        log.info(" [x] Sent '" + jsonObject.toString() + "'");
+    public void sendMsg(RunSqlModel model)  {
+        try {
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+            JSONObject jsonObject = JSONObject.fromObject(model);
+            channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
+            log.info(" [x] Sent '" + jsonObject.toString() + "'");
+        } catch (IOException e) {
+            log.error("sendMsg",e);
+        }
     }
     
     /**
