@@ -210,7 +210,13 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 		}
 		BasicDBObject update = new BasicDBObject("$set",new BasicDBObject("isRead",true));
 		long result = instance.update("data", filter, update ); 
-		
+		if(result == 0 && StringUtils.startsWith(disputeId, "PP")) {
+			filter = new BasicDBObject();
+			filter.put("case_type", "dispute");
+			filter.put("case_id", disputeId);
+			update = new BasicDBObject("$set",new BasicDBObject("isRead",true));
+			result = instance.update("data", filter, update ); 
+		}
 		return result;
 	}
 	
@@ -357,6 +363,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			bean.setReason(reason_code);
 	    			String merchant_id = document.getString("receiver_id");
 	    			bean.setMerchantID(merchant_id);
+	    			bean.setRead(document.getBooleanValue("isRead"));
 					list.add(bean);
 				}
 			}
@@ -407,6 +414,26 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 			return filter.collect(Collectors.toList());
 		}
 		return null;
+	}
+	@Override
+	public int countUnReadDispute() {
+		List<CustomerDisputeVO> list = getDisputesFromMongo();
+		List<String> filter = new ArrayList<String>();
+		List<String> isUnRead = new ArrayList<String>();
+		list = list.stream().filter(b->{
+    		if(filter.contains(b.getDisputeID())) {
+    			return false;
+    		}
+    		filter.add(b.getDisputeID());
+    		if(!b.isRead()) {
+    			isUnRead.add(b.getDisputeID());
+    		}
+    		boolean fl = true;
+    		
+    		return fl;
+    	}).collect(Collectors.toList());
+    	
+		return isUnRead.size();
 	}
 }
 

@@ -3004,6 +3004,27 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
+    public boolean addprocurement(List<SampleOrderBean> orderNos) {
+        try {
+        SampleOrderBean ben=this.orderinfoMapper.addprocurement(orderNos.get(0).getOrderNo().replace("_SP",""));
+        boolean bo=false;
+        for (SampleOrderBean sob:orderNos) {
+            if (ben != null) {
+                ben.setPid(sob.getPid());
+                ben.setOrderNo(sob.getOrderNo());
+                  this.orderinfoMapper.addOrder(ben);
+            }else {
+                return false;
+            }
+        }
+        return true;
+        }  catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
     public int insertMqLog(String sqlStr, String shopNo, String orderNo, String paramStr) {
         return warehouseMapper.insertMqLog(sqlStr, shopNo, orderNo, paramStr);
     }

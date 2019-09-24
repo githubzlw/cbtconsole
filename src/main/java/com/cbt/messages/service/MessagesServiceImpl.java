@@ -1,5 +1,15 @@
 package com.cbt.messages.service;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.BusiessBean;
 import com.cbt.dao.BusiessDao;
@@ -9,17 +19,9 @@ import com.cbt.messages.vo.MessagesCountVo;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.Messages;
 import com.cbt.pojo.page.Page;
+import com.importExpress.service.CustomerDisputeService;
 import com.importExpress.utli.MongoDBHelp;
 import com.mongodb.BasicDBObject;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 
 @Service("MessagesService")
@@ -27,6 +29,8 @@ public class MessagesServiceImpl implements MessagesService{
 	private SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");//注意格式化的表达式
 	@Autowired
 	private MessagesMapper messagesDao;
+	@Autowired
+	private CustomerDisputeService customerDisputeService;
 	
     @Autowired
     private BusiessDao busiessDao;
@@ -202,29 +206,8 @@ public class MessagesServiceImpl implements MessagesService{
 		Integer count1073 = questionnum.getNoDeleteCount();
 		
 		//申诉未读消息 1114
-		MongoDBHelp instance = MongoDBHelp.INSTANCE;
-		BasicDBObject q = new BasicDBObject();
-		q.put("resource_type", "dispute");
-		BasicDBObject s = new BasicDBObject("_id",-1);
-		List<String> documents = 
-				instance.findAny("data",q,s);
-		List<String> disputeList = new ArrayList<String>();
-		int count1114  = 0;
-		for(String content : documents) {
-    		if(StringUtils.indexOf(content,"dispute_id") > -1) {
-    			JSONObject document = JSONObject.parseObject(content);
-    			JSONObject  resource = (JSONObject)document.get("resource");
-    			String dispute_id = resource.getString("dispute_id");
-    			if(disputeList.contains(dispute_id)) {
-    				continue;
-    			}
-    			disputeList.add(dispute_id);
-    			if(!document.getBooleanValue("isRead")) {
-    				count1114 ++;
-    			}
-    		}
-    	}
 		
+		int count1114 = customerDisputeService.countUnReadDispute();
 		
 		//查询需要加待处理消息数量入口的名称，用于入口页面中搜索入口按钮及拼接对应数量
 		List<HashMap<String, String>> result = messagesDao.queryAuthNameByIds(Arrays.asList(new String[]{"19","29","1073","1027","1114"}));

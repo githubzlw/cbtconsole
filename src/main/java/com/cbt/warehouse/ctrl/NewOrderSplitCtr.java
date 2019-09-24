@@ -182,6 +182,7 @@ public class NewOrderSplitCtr {
                     return 0;
                 }
                  bo=this.iWarehouseService.setInventoryCountBySkuAndPid(list);
+                 bo=this.iWarehouseService.addprocurement(list);
                 return 1;
             }catch (Exception e){
                 return 0;
