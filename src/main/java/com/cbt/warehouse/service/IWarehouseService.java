@@ -1168,5 +1168,14 @@ public interface IWarehouseService {
 	boolean setInventoryCountBySkuAndPid(List<SampleOrderBean> list);
 
     boolean addprocurement(List<SampleOrderBean> orderNos);
+
+	/**
+	 * 插入MO Sql日志
+	 * @param sqlStr
+	 * @param shopNo
+	 * @param orderNo
+	 * @return
+	 */
+	int insertMqLog(String sqlStr, String shopNo, String orderNo,  String paramStr);
 }
  
