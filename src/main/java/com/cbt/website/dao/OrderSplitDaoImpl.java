@@ -2948,11 +2948,10 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	                                List<OrderDetailsBean> nwOrderDetails,String state, int isSplitNum) {
 
 		String orderNoOld = orderBeanTemp.getOrderNo();
-		Connection remoteConn = DBHelper.getInstance().getConnection2();
 		Connection localConn = DBHelper.getInstance().getConnection();
-		Statement ppStamt = null;
 		Statement wStamt = null;
 		Statement localStamt = null;
+		//Statement ppStamt = null;
 		boolean isSuccess = false;
 		// 远程执行SQL队列
 		List<String> remoteSqlList = new ArrayList<String>();
@@ -3166,16 +3165,15 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
         }
 
 		try {
-			remoteConn.setAutoCommit(false);
 			localConn.setAutoCommit(false);
-			ppStamt = remoteConn.createStatement();
 			System.err.println("exSql begin");
+			int count=0;
 			for (String exSql : remoteSqlList) {
 				System.err.println(exSql + ";");
-				ppStamt.addBatch(exSql);
+				count+=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(exSql)));
 			}
 
-			isSuccess = ppStamt.executeBatch().length > 0;
+			isSuccess = count > 0;
 			if(isSuccess){
 				wStamt = localConn.createStatement();
 				for(String loSql : localSqlList){
@@ -3184,10 +3182,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				//ppStamt.executeUpdate(localSql);
 				isSuccess = wStamt.executeBatch().length > 0;
 				if(isSuccess){
-				    remoteConn.commit();
 				    localConn.commit();
                 }else{
-				    remoteConn.rollback();
 				    localConn.rollback();
                 }
 				//拆单取消时记录拆单的商品
@@ -3196,30 +3192,18 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 					wStamt = localConn.createStatement();
 					wStamt.executeUpdate(insert_split_details);
 				}
-			}else{
-				remoteConn.rollback();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			isSuccess = false;
-			try {
-				remoteConn.rollback();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
+
 			try {
 				localConn.rollback();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
 		} finally {
-			if (ppStamt != null) {
-				try {
-					ppStamt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+
 			if (wStamt != null) {
 				try {
 					wStamt.close();
@@ -3235,7 +3219,6 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(localConn);
-			DBHelper.getInstance().closeConnection(remoteConn);
 		}
 		return isSuccess;
 	}

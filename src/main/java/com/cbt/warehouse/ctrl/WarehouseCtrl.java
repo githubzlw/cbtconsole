@@ -9010,8 +9010,7 @@ public class WarehouseCtrl {
 					lstValues.add(i_id);
 					runSql = DBHelper.covertToSQL(sql,lstValues);
 					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
-				} catch (SQLException e) {
-					e.printStackTrace();
+
 				} finally {
 					try {
 						if (stmt != null) {
