@@ -1169,6 +1169,8 @@ public interface IWarehouseService {
 
     boolean addprocurement(List<SampleOrderBean> orderNos);
 
+    int orderdtailDetail();
+
 	/**
 	 * 插入MO Sql日志
 	 * @param sqlStr

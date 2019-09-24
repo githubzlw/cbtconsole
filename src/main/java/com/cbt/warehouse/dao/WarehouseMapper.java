@@ -1488,4 +1488,6 @@ public interface WarehouseMapper {
 	 */
     int insertMqLog(@Param("sqlStr") String sqlStr, @Param("shopNo") String shopNo,
 					@Param("orderNo") String orderNo, @Param("paramStr") String paramStr);
+    @Select("UPDATE goods_distribution a,order_details b SET a.odid=b.id,a.goodsid=b.goodsid WHERE a.goods_pid=b.goods_pid AND a.odid=0 AND a.goodsid=0")
+    void orderdtailDetail();
 }

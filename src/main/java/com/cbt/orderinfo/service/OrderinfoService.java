@@ -1509,15 +1509,16 @@ public class OrderinfoService implements IOrderinfoService {
 
 			for (OrderDetailsBeans od:odbList){
 				String sql="insert order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder," +
-						"        userid,goodsname,goodsprice,goodsfreight,goodsdata_id,remark,goods_class,extra_freight,car_url,car_urlMD5,goods_pid," +
-						"        car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,isFeight,seilUnit," +
-						"        startPrice,bizPriceDiscount,group_buy_id,actual_volume,actual_weight,isFreeShipProduct,shopCount) values";
+						"userid,goodsname,goodsprice,goodsfreight,goodsdata_id,remark,goods_class,extra_freight,car_url,car_urlMD5,goods_pid," +
+						"car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,isFeight,seilUnit," +
+						"startPrice,bizPriceDiscount,group_buy_id,actual_volume,actual_weight,isFreeShipProduct,shopCount) values";
                String value="('"+od.getGoodsid()+"','"+od.getOrderid()+"','"+od.getDropshipid()+"','"+od.getDelivery_time()+"','"+od.getCheckprice_fee()+"','"+od.getCheckproduct_fee()+"','5','"+od.getFileupload()+"','"+od.getYourorder()+"','" +
-					   "            "+od.getUserid()+"','"+od.getGoodsname()+"','"+od.getGoodsprice()+"','"+od.getGoodsfreight()+"','"+od.getGoodsdata_id()+"','"+od.getRemark()+"','"+od.getGoods_class()+"','"+od.getExtra_freight()+"','"+od.getGoods_url()+"','"+od.getGoodsUrlMD5()+"','"+od.getGoods_pid()+"','" +
-					   "            "+od.getGoods_img()+"','"+od.getGoods_type()+"','"+od.getFreight_free()+"','"+od.getBulk_volume()+"','"+od.getTotal_weight()+"','"+od.getDiscount_ratio()+"','"+od.getGoodscatid()+"','"+od.getIsFeight()+"','"+od.getSerUnit()+"','" +
-					   "            "+od.getStartPrice()+"','"+od.getBizPriceDiscount()+"','"+od.getGroupBuyId()+"','"+od.getActual_volume()+"','"+od.getActual_weight()+"','"+od.getIsFreeShipProduct()+"','"+od.getShopCount()+"')";
+					   od.getUserid()+"','"+SendMQ.repCha(od.getGoodsname())+"','"+od.getGoodsprice()+"','"+od.getGoodsfreight()+"','"+od.getGoodsdata_id()+"','"+od.getRemark()+"','"+od.getGoods_class()+"','"+od.getExtra_freight()+"','"+od.getGoods_url()+"','"+od.getGoodsUrlMD5()+"','"+od.getGoods_pid()+"','" +
+					   od.getGoods_img()+"','"+SendMQ.repCha(od.getGoods_type())+"','"+od.getFreight_free()+"','"+od.getBulk_volume()+"','"+od.getTotal_weight()+"','"+od.getDiscount_ratio()+"','"+od.getGoodscatid()+"','"+od.getIsFeight()+"','"+od.getSerUnit()+"','" +
+					   od.getStartPrice()+"','"+od.getBizPriceDiscount()+"','"+od.getGroupBuyId()+"','"+od.getActual_volume()+"','"+od.getActual_weight()+"','"+od.getIsFreeShipProduct()+"','"+od.getShopCount()+"')";
 			sql+=value;
 				//添加订单详细信息
+
 				sendMQ.sendMsg(new RunSqlModel(sql));
 				System.out.println(sql);
 			}

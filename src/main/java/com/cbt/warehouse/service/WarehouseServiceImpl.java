@@ -3025,6 +3025,17 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
+    public int orderdtailDetail() {
+        try {
+         this.warehouseMapper.orderdtailDetail();
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    @Override
     public int insertMqLog(String sqlStr, String shopNo, String orderNo, String paramStr) {
         return warehouseMapper.insertMqLog(sqlStr, shopNo, orderNo, paramStr);
     }

@@ -1023,6 +1023,20 @@ public class NewOrderSplitCtr {
         LOG.info("getOrderSplit sendEmailInfo end");
         return message;
     }
-
+   @RequestMapping("/orderdtail")
+   public void getorderdtail(HttpServletResponse response,HttpServletRequest request ) throws IOException {
+       try {
+           int i=this.iWarehouseService.orderdtailDetail();
+           if (i==0){
+               i=1/0;
+           }
+       } catch (Exception e) {
+           response.getWriter().write("{\"code\":500,\"message\":\"fail newPreOrderAutoDistribution " + e.getMessage() + "\",\"data\":null}");
+           LOG.error("fail newPreOrderAutoDistribution error ", e);
+           return;
+       }
+       response.setContentType("text/html;charset=UTF-8");
+       response.getWriter().write("{\"code\":200,\"message\":\"success\",\"data\":null}");
+   }
 
 }
