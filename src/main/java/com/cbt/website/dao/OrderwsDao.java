@@ -5438,36 +5438,37 @@ public class OrderwsDao implements IOrderwsDao {
                 sql = " insert into order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder,userid,goodsname,goodsprice,goodsfreight,"
                         + "goodsdata_id,remark,goods_class,extra_freight,car_url,car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,car_urlMD5,goods_pid,actual_weight) "
                         + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                stmt = conn.prepareStatement(sql);
-                stmt.setString(1, goodsid);
-                stmt.setString(2, newOrderid);
-                stmt.setString(3, rs.getString("dropshipid"));
-                stmt.setString(4, rs.getString("delivery_time"));
-                stmt.setString(5, rs.getString("checkprice_fee"));
-                stmt.setString(6, rs.getString("checkproduct_fee"));
-                stmt.setString(7, "0");
-                stmt.setString(8, rs.getString("fileupload"));
-                stmt.setString(9, count);
-                stmt.setString(10, rs.getString("userid"));
-                stmt.setString(11, rs.getString("goodsname"));
-                stmt.setString(12, rs.getString("goodsprice"));
-                stmt.setString(13, rs.getString("goodsfreight"));
-                stmt.setString(14, rs.getString("goodsdata_id"));
-                stmt.setString(15, rs.getString("remark"));
-                stmt.setString(16, rs.getString("goods_class"));
-                stmt.setString(17, rs.getString("extra_freight"));
-                stmt.setString(18, rs.getString("car_url"));
-                stmt.setString(19, rs.getString("car_img"));
-                stmt.setString(20, rs.getString("car_type"));
-                stmt.setString(21, rs.getString("freight_free"));
-                stmt.setString(22, rs.getString("od_bulk_volume"));
-                stmt.setString(23, rs.getString("od_total_weight"));
-                stmt.setString(24, rs.getString("discount_ratio"));
-                stmt.setString(25, rs.getString("goodscatid"));
-                stmt.setString(26, rs.getString("car_urlMD5"));
-                stmt.setString(27, rs.getString("goods_pid"));
-                stmt.setString(28, rs.getString("actual_weight"));
-                String runSql = ((JDBC4PreparedStatement) stmt).asSql();
+                List<String> lstValues = new ArrayList<>(30);
+                lstValues.add( goodsid);
+                lstValues.add( newOrderid);
+                lstValues.add( rs.getString("dropshipid"));
+                lstValues.add( rs.getString("delivery_time"));
+                lstValues.add( rs.getString("checkprice_fee"));
+                lstValues.add( rs.getString("checkproduct_fee"));
+                lstValues.add( "0");
+                lstValues.add( rs.getString("fileupload"));
+                lstValues.add( count);
+                lstValues.add( rs.getString("userid"));
+                lstValues.add( rs.getString("goodsname"));
+                lstValues.add( rs.getString("goodsprice"));
+                lstValues.add( rs.getString("goodsfreight"));
+                lstValues.add( rs.getString("goodsdata_id"));
+                lstValues.add( rs.getString("remark"));
+                lstValues.add( rs.getString("goods_class"));
+                lstValues.add( rs.getString("extra_freight"));
+                lstValues.add( rs.getString("car_url"));
+                lstValues.add( rs.getString("car_img"));
+                lstValues.add( rs.getString("car_type"));
+                lstValues.add( rs.getString("freight_free"));
+                lstValues.add( rs.getString("od_bulk_volume"));
+                lstValues.add( rs.getString("od_total_weight"));
+                lstValues.add( rs.getString("discount_ratio"));
+                lstValues.add( rs.getString("goodscatid"));
+                lstValues.add( rs.getString("car_urlMD5"));
+                lstValues.add( rs.getString("goods_pid"));
+                lstValues.add( rs.getString("actual_weight"));
+
+                String runSql = DBHelper.covertToSQL(sql,lstValues);
                 SendMQ sendMQ = new SendMQ();
                 sendMQ.sendMsg(new RunSqlModel(runSql));
                 sendMQ.closeConn();
@@ -5496,6 +5497,7 @@ public class OrderwsDao implements IOrderwsDao {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             LOG.error("addOrderDetails",e);
         } finally {
             DBHelper.getInstance().closeStatement(stmt);

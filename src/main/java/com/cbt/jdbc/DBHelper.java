@@ -8,12 +8,16 @@ package com.cbt.jdbc;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -409,6 +413,30 @@ public class DBHelper {
         } catch (SQLException e) {
             logger.error("closeStatement",e);
         }
+    }
+
+    public static String covertToSQL(String prepareSQL, List<String> lstValues){
+        if(StringUtils.isNotBlank(prepareSQL) && lstValues != null){
+            String replaceSQL = prepareSQL.replace("?", "'%s'");
+            return String.format(replaceSQL, lstValues.toArray());
+        }else{
+            throw new IllegalArgumentException("input parameters is invalid");
+        }
+    }
+
+    public static void  main(String[] args){
+        System.out.println(String.format("Hi,%s", "王力"));
+        String replaceSQL = "abc %s,%s";
+        List<String> lstValues = new ArrayList<>();
+        lstValues.add("1");
+        lstValues.add("2");
+        String[] lst = new String[2];
+        lst[0] = "11";
+        lst[1] = "22";
+        String result = String.format(replaceSQL, lst);
+        System.out.println(result);
+        Object[] x = lstValues.toArray();
+        System.out.println(x);
     }
 
 }
