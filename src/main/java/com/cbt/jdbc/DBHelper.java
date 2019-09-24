@@ -83,8 +83,6 @@ public class DBHelper {
 
                 initDataSource3(p);
 
-                initDataSource4(p);
-
                 initDataSource5(p);
 
                 initDataSource6(p);
@@ -159,26 +157,6 @@ public class DBHelper {
         logger.info("初始化数据库3完成");
     }
 
-    /**
-     * connection_28_alidata
-     * @param p
-     * @throws PropertyVetoException
-     */
-    private void initDataSource4(Properties p) throws PropertyVetoException {
-        dataSource4 = new ComboPooledDataSource();
-        dataSource4.setUser(p.getProperty("jdbc.userName28hop"));
-        dataSource4.setPassword(p.getProperty("jdbc.userPass28hop"));
-        dataSource4.setJdbcUrl(p.getProperty("jdbc.url28hop")
-                + "?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useCompression=true&allowMultiQueries=true");
-        dataSource4.setDriverClass(p.getProperty("driver"));
-        dataSource4.setInitialPoolSize(20);
-        dataSource4.setMinPoolSize(10);
-        dataSource4.setMaxPoolSize(100);
-        dataSource4.setMaxStatements(50);
-        dataSource4.setMaxIdleTime(60);
-
-        logger.info("初始化数据库4完成");
-    }
 
     private void initDataSource5(Properties p) throws PropertyVetoException {
         dataSource5 = new ComboPooledDataSource();
@@ -317,21 +295,6 @@ public class DBHelper {
         return conn;
     }
 
-    /**
-     * connection 28_alidata
-     * @return
-     */
-    public synchronized final Connection getConnection4() {
-        Connection conn;
-        try {
-            conn = dataSource4.getConnection();
-            logger.info("取得数据库连接+1 (#4),连接数：" + totalConnect4.incrementAndGet() + ",返回总数/获取总数：" + totalDisConnectNum + "/" + totalConnectNum.incrementAndGet());
-        } catch (SQLException e) {
-            logger.error("getConnection4",e);
-            throw new RuntimeException("getConnection4 ERROR");
-        }
-        return conn;
-    }
 
     /**
      * connection 28_alidata
