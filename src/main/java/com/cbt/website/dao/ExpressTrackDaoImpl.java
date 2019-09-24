@@ -373,6 +373,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 		String sql = "";
 		Set set=new HashSet();
 		Connection conn = DBHelper.getInstance().getConnection();
+		Connection conn5 = DBHelper.getInstance().getConnection5();
 		// 本地化链接
 		List<SearchResultInfo> info = new ArrayList<SearchResultInfo>();
 		List<SearchTaobaoInfo> taobaoinfoList = new ArrayList<SearchTaobaoInfo>();
@@ -413,8 +414,8 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 				searchresultinfo.setGoods_pid(rs1.getString("goods_pid"));
 				if(rs1.getInt("isDropshipOrder")==3){
 					sql = "select goods_pid,shop_id from ali_info_data where 1688_pid='"+rs1.getString("goods_pid")+"' limit 1";
-					Connection conn4 = DBHelper.getInstance().getConnection4();
-					stmt = conn4.prepareStatement(sql);
+
+					stmt = conn5.prepareStatement(sql);
 					rs2 = stmt.executeQuery();
 					if (rs2.next()) {
 						searchresultinfo.setShop_id(rs2.getString("shop_id"));
@@ -554,6 +555,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 			DBHelper.getInstance().closeResultSet(rs2);
 			DBHelper.getInstance().closePreparedStatement(stmt);
 			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeConnection(conn5);
 		}
 		return info;
 	}
@@ -636,15 +638,15 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 					searchresultinfo.setGoods_pid(rs1.getString("goods_pid"));
 					if(rs1.getInt("isDropshipOrder")==3 && "1".equals(checked)){
 						sql = "select goods_pid,shop_id from ali_info_data where 1688_pid='"+rs1.getString("goods_pid")+"' limit 1";
-						Connection conn4 = DBHelper.getInstance().getConnection4();
-						stmt = conn4.prepareStatement(sql);
+						Connection conn5 = DBHelper.getInstance().getConnection5();
+						stmt = conn5.prepareStatement(sql);
 						rs2 = stmt.executeQuery();
 						if (rs2.next()) {
 							searchresultinfo.setShop_id(rs2.getString("shop_id"));
 						}
 						DBHelper.getInstance().closeResultSet(rs2);
 						DBHelper.getInstance().closePreparedStatement(stmt);
-						DBHelper.getInstance().closeConnection(conn4);
+						DBHelper.getInstance().closeConnection(conn5);
 					}else{
 						List<String> shop_id_b=new ArrayList<String>();
 						String shop_id="";

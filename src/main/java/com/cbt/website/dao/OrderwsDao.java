@@ -49,7 +49,7 @@ public class OrderwsDao implements IOrderwsDao {
     public String getAliPid(String goods_pid) {
         StringBuilder sb = new StringBuilder();
         final String sql = "select goods_pid,shop_id from ali_info_data where 1688_pid='" + goods_pid + "' limit 1";
-        Connection conn = DBHelper.getInstance().getConnection4();
+        Connection conn = DBHelper.getInstance().getConnection5();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         try {

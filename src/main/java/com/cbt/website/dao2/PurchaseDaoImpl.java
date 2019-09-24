@@ -102,11 +102,11 @@ public class PurchaseDaoImpl implements PurchaseDao {
 	public String getAliPid(String goods_pid) {
 		StringBuilder sb=new StringBuilder();
 		String sql = "select goods_pid,shop_id from ali_info_data where 1688_pid='"+goods_pid+"' limit 1";
-		Connection conn = DBHelper.getInstance().getConnection4();
+		Connection connection5 = DBHelper.getInstance().getConnection5();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
+			stmt = connection5.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			while (rs.next()) {
 				sb.append(rs.getString("goods_pid")).append("&").append(rs.getString("shop_id"));
@@ -124,7 +124,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 			}catch(Exception e){
 				e.printStackTrace();
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeConnection(connection5);
 		}
 		return sb.toString();
 	}
