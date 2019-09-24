@@ -3035,6 +3035,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
         }
     }
 
+    @Override
+    public int insertMqLog(String sqlStr, String shopNo, String orderNo, String paramStr) {
+        return warehouseMapper.insertMqLog(sqlStr, shopNo, orderNo, paramStr);
+    }
+
     public List<String> getSkulist(String sku,String weight) {
          String [] arr=sku.split(",");
          List<String> list = Arrays.asList(arr);

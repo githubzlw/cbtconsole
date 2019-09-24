@@ -379,6 +379,9 @@
                 <c:if test="${noSave > 0}">
                     <b style="color: red;font-size: 18px;">(未保存类别平均重量数据)</b>
                 </c:if>
+                <c:if test="${isBlack > 0}">
+                    <b style="color: red;font-size: 22px;">(黑名单店铺)</b>
+                </c:if>
             </p>
             <table id="shop_category_id" border="1" cellpadding="1"
                    cellspacing="0" align="center">
