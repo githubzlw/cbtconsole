@@ -3024,6 +3024,17 @@ public class WarehouseServiceImpl implements IWarehouseService {
         }
     }
 
+    @Override
+    public int orderdtailDetail() {
+        try {
+         this.warehouseMapper.orderdtailDetail();
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     public List<String> getSkulist(String sku,String weight) {
          String [] arr=sku.split(",");
          List<String> list = Arrays.asList(arr);

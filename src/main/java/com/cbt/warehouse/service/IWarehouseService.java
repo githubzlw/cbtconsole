@@ -1168,5 +1168,7 @@ public interface IWarehouseService {
 	boolean setInventoryCountBySkuAndPid(List<SampleOrderBean> list);
 
     boolean addprocurement(List<SampleOrderBean> orderNos);
+
+    int orderdtailDetail();
 }
  
