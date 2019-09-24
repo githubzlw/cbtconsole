@@ -418,7 +418,7 @@ public class DBHelper {
     public static String covertToSQL(String prepareSQL, List<String> lstValues){
         if(StringUtils.isNotBlank(prepareSQL) && lstValues != null){
             String replaceSQL = prepareSQL.replace("?", "'%s'");
-            return String.format(replaceSQL, lstValues.toArray());
+            return String.format(replaceSQL, lstValues.toArray(new String[lstValues.size()]));
         }else{
             throw new IllegalArgumentException("input parameters is invalid");
         }
