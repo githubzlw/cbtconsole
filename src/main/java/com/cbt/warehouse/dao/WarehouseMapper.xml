@@ -3767,5 +3767,9 @@
         </foreach>
     </select>
 
+	<insert id="insertMqLog">
+		insert into shipping_package_mq(sql_str,shop_no,order_no,param_str)
+		values(#{sqlStr}, #{shopNo}, #{orderNo}, #{paramStr} )
+	</insert>
 	
 </mapper>

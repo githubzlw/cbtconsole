@@ -37,6 +37,19 @@ public class ShopUrl {
 	private String onlineStatusView;
 	private int isAuto;
 
+	/**
+	 * 是否黑名单
+	 */
+	private int isBlack;
+
+	public int getIsBlack() {
+		return isBlack;
+	}
+
+	public void setIsBlack(int isBlack) {
+		this.isBlack = isBlack;
+	}
+
 	private int urlType;
 
 	private String brandNames;

@@ -1434,4 +1434,7 @@
         where spec_id= #{skuId}
     </select>
 
+    <select id="queryAllShopBlackList" resultType="string">
+        select shop_id from shop_blacklist_list
+    </select>
 </mapper>

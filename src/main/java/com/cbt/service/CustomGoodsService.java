@@ -844,4 +844,10 @@ public interface CustomGoodsService {
      * @return
      */
     String queryChTypeBySkuId(String skuId);
+
+    /**
+     * 查询所有黑名单店铺
+     * @return
+     */
+    List<String> queryAllShopBlackList();
 }

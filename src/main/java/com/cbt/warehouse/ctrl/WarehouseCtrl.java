@@ -7976,9 +7976,10 @@ public class WarehouseCtrl {
 				// 加入日志
 				iWarehouseService.bgUpdateLog(bgList);
 
-				StringBuffer upSql = new StringBuffer();
+				StringBuffer upAllSql = new StringBuffer();
 				if (bgList != null && bgList.size() > 0) {
 					for (Map<String, String> param : bgList) {
+						StringBuffer upSql = new StringBuffer();
 						upSql.append("update shipping_package set ")
 								.append("transportcompany = '" + param.get("transportcompany") + "',")
 								.append("shippingtype = '" + param.get("fpxProductCode") + "',")
@@ -7989,8 +7990,11 @@ public class WarehouseCtrl {
 								.append("pdfUrl = '" + param.get("pdfUrl") + "',")
 								.append("sflag='3',createtime=now() ")
 								.append(" where shipmentno ='" + param.get("shipmentno") + "';");
+						iWarehouseService.insertMqLog(upSql.toString(), param.get("shipmentno"), "出库更新线上",param.toString());
+						upAllSql.append(upSql.toString());
 					}
-					NotifyToCustomerUtil.sendSqlByMq(upSql.toString());
+
+					NotifyToCustomerUtil.sendSqlByMq(upAllSql.toString());
 				}
 			} catch (Exception e) {
 				LOG.error("更新线上出库信息", e);
@@ -8064,6 +8068,7 @@ public class WarehouseCtrl {
 						+ map.get("logistics_name") + "',sweight='" + map.get("sweight") + "'," + "svolume='" + map.get("svolume")
 						+ "',volumeweight='" + map.get("volumeweight") + "',freight = '" + map.get("freight") + "' where shipmentno='"
 						+ map.get("shipmentno") + "'";
+				iWarehouseService.insertMqLog(sql, String.valueOf(map.get("shipmentno")), String.valueOf(map.get("express_no")),map.toString());
 				NotifyToCustomerUtil.sendSqlByMq(sql);
 			} catch (Exception e) {
 				LOG.error("更新线上运单信息", e);
@@ -8165,6 +8170,7 @@ public class WarehouseCtrl {
 					}
 					if(map.get("shipmentno")!=null){
 						sqls.append(" where shipmentno='"+map.get("shipmentno")+"'");
+						iWarehouseService.insertMqLog(sqls.toString(), map.get("shipmentno"), "自动测量",map.toString());
 						NotifyToCustomerUtil.sendSqlByMq(sqls.toString());
 					}
 				}
