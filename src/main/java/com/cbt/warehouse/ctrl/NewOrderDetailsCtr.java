@@ -2501,6 +2501,7 @@ public class NewOrderDetailsCtr {
 			List<PurchaseInfoBean> purchaseInfoList = iPurchaseService.queryOrderProductSourceByOrderNo(orderNo);
 
 			List<OrderDetailsBean> nwOdbList;
+			/*过滤条件去除
 			if (purchaseInfoList != null && purchaseInfoList.size() > 0) {
 				Set<Integer> hasPurchaseSet = purchaseInfoList.stream()
 						.filter(e -> e.getConfirmUserId() != null && e.getConfirmUserId() > 0)
@@ -2512,7 +2513,8 @@ public class NewOrderDetailsCtr {
 				odbList.clear();
 			} else {
 				request.setAttribute("odList", odbList);
-			}
+			}*/
+			request.setAttribute("odList", odbList);
 			request.setAttribute("orderInfo", orderInfo);
 			request.setAttribute("isShow", 1);
 		} catch (Exception e) {
