@@ -1,10 +1,12 @@
 package com.importExpress.utli;
 
+import com.cbt.mq.RPCClient;
 import com.cbt.util.SysParamUtil;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
@@ -18,12 +20,16 @@ import java.util.concurrent.TimeoutException;
  * @author luohao
  * @date 2018/6/25
  */
+@Slf4j
 public class SendMQ {
-
-    private final static org.slf4j.Logger log = LoggerFactory.getLogger(SendMQ.class);
 
     /** 直接执行的sql 及 下架*/
     private final static String QUEUE_NAME = "updateTbl";
+
+    /** 直接执行的sql带返回值*/
+    public final static String QUEUE_NAME_RPC = "updateTbl_rpc";
+
+
 
     /** 优惠卷json数据*/
     private final static String COUPON_NAME = "coupon"; //发送优惠卷到线上 （mq 连接27更新线上，连接98更新153）
@@ -40,7 +46,7 @@ public class SendMQ {
     private static long totalConnect = 0;
     private static long totalDisConnect = 0;
 
-    private final static HashMap<String,String> config = new HashMap(10);
+    public final static HashMap<String,String> config = new HashMap(10);
 
     private Connection connection;
     private Channel channel;
@@ -194,6 +200,25 @@ public class SendMQ {
         log.info(" [x] Sent '" + json + "'");
     }
 
+    /**
+     * RPC方式调用MQ（有返回值）
+     * 不需要关闭mq连接（mq执行完成后自动释放资源）
+     * @param model
+     * @return
+     */
+    public static String sendMsgByRPC(RunSqlModel model)  {
+        try (RPCClient fibonacciRpc = new RPCClient()) {
+
+            JSONObject jsonObject = JSONObject.fromObject(model);
+            log.info(" [x] Sent [{}]" , jsonObject);
+            String response = fibonacciRpc.call(jsonObject.toString());
+            log.info(" [x] response [{}]" , response );
+            return response;
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            log.error("sendMsgByRPC",e);
+            return  null;
+        }
+    }
 
     public static void main(String[] argv) throws Exception {
         SendMQ sendMQ = new SendMQ();
