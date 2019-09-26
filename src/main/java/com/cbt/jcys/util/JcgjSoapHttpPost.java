@@ -314,7 +314,7 @@ public class JcgjSoapHttpPost {
 		InputStream in = null;
 		BufferedReader breader = null;
 		try {
-			url = new URL("http://api.cnexps.com/cgi-bin/EmsData.dll?DoApi");
+			url = new URL("http://api.cne.com/cgi-bin/EmsData.dll?DoApi");
 			// 以post方式请求
 			httpurlconnection = (HttpURLConnection) url.openConnection();
 			httpurlconnection.setDoOutput(true);
