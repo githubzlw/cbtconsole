@@ -7,7 +7,6 @@ import static com.importExpress.utli.SendMQ.QUEUE_NAME_RPC;
 
 public class RPCServer {
 
-    private static final String RPC_QUEUE_NAME = QUEUE_NAME_RPC;
 
     private static int fib(int n) {
         if (n == 0) return 0;
@@ -24,8 +23,8 @@ public class RPCServer {
 
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
-            channel.queueDeclare(RPC_QUEUE_NAME, false, false, false, null);
-            channel.queuePurge(RPC_QUEUE_NAME);
+            channel.queueDeclare(QUEUE_NAME_RPC, false, false, false, null);
+            channel.queuePurge(QUEUE_NAME_RPC);
 
             channel.basicQos(1);
 
@@ -58,7 +57,7 @@ public class RPCServer {
                 }
             };
 
-            channel.basicConsume(RPC_QUEUE_NAME, false, deliverCallback, (consumerTag -> { }));
+            channel.basicConsume(QUEUE_NAME_RPC, false, deliverCallback, (consumerTag -> { }));
             // Wait and be prepared to consume the message from RPC client.
             while (true) {
                 synchronized (monitor) {

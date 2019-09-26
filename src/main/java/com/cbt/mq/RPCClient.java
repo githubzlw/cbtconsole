@@ -15,13 +15,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static com.importExpress.utli.SendMQ.QUEUE_NAME_RPC;
+import static com.importExpress.utli.SendMQ.QUEUE_NAME;
 
 @Slf4j
 public class RPCClient implements AutoCloseable {
 
     private Connection connection;
     private Channel channel;
-    private String requestQueueName = QUEUE_NAME_RPC;
+
 
     public RPCClient() throws IOException, TimeoutException {
 
@@ -46,7 +47,7 @@ public class RPCClient implements AutoCloseable {
                 .replyTo(replyQueueName)
                 .build();
 
-        channel.basicPublish("", requestQueueName, props, message.getBytes("UTF-8"));
+        channel.basicPublish("", QUEUE_NAME_RPC, props, message.getBytes("UTF-8"));
 
         final BlockingQueue<String> response = new ArrayBlockingQueue<>(1);
 
@@ -65,8 +66,8 @@ public class RPCClient implements AutoCloseable {
 
     public void callNoReturn(String message) throws IOException, InterruptedException {
 
-        channel.queueDeclare(requestQueueName, false, false, false, null);
-        channel.basicPublish("", requestQueueName, null, message.getBytes("UTF-8"));
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        channel.basicPublish("", QUEUE_NAME, null, message.getBytes("UTF-8"));
     }
 
     @Override

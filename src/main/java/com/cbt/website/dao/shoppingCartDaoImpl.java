@@ -15,6 +15,8 @@ import com.cbt.website.bean.TblPreshoppingcarInfo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.Utility;
 import com.ibm.icu.math.BigDecimal;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.LoggerFactory;
@@ -968,10 +970,10 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 	}
 	}
 	
+	@Override
 	public int updateWeight(int carid, double weight, int number){
 		String sql = "update goods_car set total_weight=?,per_weight=? where id=?";
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		PreparedStatement pst = null,pst2 = null;
 		int i  = 0;
 		try {
@@ -979,12 +981,14 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 			pst.setDouble(1, weight);
 			pst.setDouble(2, weight/number);
 			pst.setInt(3, carid);
-			pst2 = conn2.prepareStatement(sql);
-			pst2.setDouble(1, weight);
-			pst2.setDouble(2, weight/number);
-			pst2.setInt(3, carid);
-			i = pst.executeUpdate();
-			i += pst2.executeUpdate();
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(String.valueOf(weight));
+			lstValues.add(String.valueOf(weight/number));
+			lstValues.add(String.valueOf(carid));
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			i += Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+			i += pst.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -995,15 +999,7 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 					e.printStackTrace();
 				}
 			}
-			if(pst2!=null){
-				try {
-					pst2.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 		return i;
 	}

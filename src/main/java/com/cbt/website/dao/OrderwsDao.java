@@ -5735,28 +5735,22 @@ public class OrderwsDao implements IOrderwsDao {
     @Override
     public int closeDropshipOrderByMainOrderNo(String mainOrderNo) throws Exception {
 
-        PreparedStatement stmt = null;
-        int rs = 0;
-        Connection conn = DBHelper.getInstance().getConnection2();
         String upSql = "update dropshiporder set state = ? where parent_order_no = ?";
-        try {
-            if (GetConfigureInfo.openSync()) {
-                String syncSql = "update dropshiporder set state = '" + OrderInfoConstantUtil.OFFLINECANCEL
-                        + "' where parent_order_no='" + mainOrderNo + "'";
-                SaveSyncTable.InsertOnlineDataInfo(0, mainOrderNo, "更新dropship主订单状态", "dropshiporder", syncSql);
-                rs = 1;
-            } else {
-                stmt = conn.prepareStatement(upSql);
-                stmt.setString(1, OrderInfoConstantUtil.OFFLINECANCEL);
-                stmt.setString(2, mainOrderNo);
-                rs = stmt.executeUpdate();
-            }
 
-        } finally {
-            DBHelper.getInstance().closeStatement(stmt);
-            DBHelper.getInstance().closeConnection(conn);
+        if (GetConfigureInfo.openSync()) {
+            String syncSql = "update dropshiporder set state = '" + OrderInfoConstantUtil.OFFLINECANCEL
+                    + "' where parent_order_no='" + mainOrderNo + "'";
+            SaveSyncTable.InsertOnlineDataInfo(0, mainOrderNo, "更新dropship主订单状态", "dropshiporder", syncSql);
+            return 1;
+        } else {
+            List<String> lstValues = new ArrayList<>();
+            lstValues.add(OrderInfoConstantUtil.OFFLINECANCEL);
+            lstValues.add(mainOrderNo);
+            String runSql = DBHelper.covertToSQL(upSql,lstValues);
+            return Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
         }
-        return rs;
+
+
     }
 
     @Override

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeoutException;
 public class SendMQ {
 
     /** 直接执行的sql 及 下架*/
-    private final static String QUEUE_NAME = "updateTbl";
+    public final static String QUEUE_NAME = "updateTbl";
 
     /** 直接执行的sql带返回值*/
     public final static String QUEUE_NAME_RPC = "updateTbl_rpc";
