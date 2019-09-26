@@ -317,9 +317,9 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                     //End：
 
                     try {
-                        SendMQ sendMQ = new SendMQ();
-                        sendMQ.sendMsg(new RunSqlModel(sql));
-                        sendMQ.closeConn();
+
+                        SendMQ.sendMsg(new RunSqlModel(sql));
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -504,10 +504,10 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                     sql += ",";
                 }
             }
-            SendMQ sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel(sql));
+
+            SendMQ.sendMsg(new RunSqlModel(sql));
             res = 1;
-            sendMQ.closeConn();
+
         } catch (Exception e) {
             logger.error("GoodsAddThread:批量插入goods_car表出错!", e);
             logger.error("------商品信息： " + spider.toString());
@@ -836,9 +836,9 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                         //End：
 
                         try {
-                            SendMQ sendMQ = new SendMQ();
-                            //sendMQ.sendMsg(new RunSqlModel(sql));
-                            sendMQ.closeConn();
+
+                            //SendMQ.sendMsg(new RunSqlModel(sql));
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

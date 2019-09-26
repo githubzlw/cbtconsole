@@ -2136,9 +2136,9 @@ public class OrderwsDao implements IOrderwsDao {
             sql="update orderinfo set server_update=1 where order_no='"+orderNo+"'";
             stmt3 = conn.prepareStatement(sql);
             stmt3.executeUpdate();
-            SendMQ sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel(sql));
-            sendMQ.closeConn();
+
+            SendMQ.sendMsg(new RunSqlModel(sql));
+
         } catch (Exception e) {
             e.printStackTrace();
             result =0;
@@ -5461,9 +5461,9 @@ public class OrderwsDao implements IOrderwsDao {
                 lstValues.add( rs.getString("actual_weight"));
 
                 String runSql = DBHelper.covertToSQL(sql,lstValues);
-                SendMQ sendMQ = new SendMQ();
-                sendMQ.sendMsg(new RunSqlModel(runSql));
-                sendMQ.closeConn();
+
+                SendMQ.sendMsg(new RunSqlModel(runSql));
+
 //                row = stmt.executeUpdate();
                 sql = "select id,goodsdata_id,goodscatid,car_url from order_details where orderid='" + newOrderid
                         + "' and goodsid='" + goodsid + "'";

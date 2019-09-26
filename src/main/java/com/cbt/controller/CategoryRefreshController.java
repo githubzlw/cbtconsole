@@ -72,7 +72,7 @@ public class CategoryRefreshController {
 	@ResponseBody
 	public int dealDiscount(HttpServletRequest req, HttpServletResponse resp){
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			String strid = req.getParameter("id");
 			String ename = req.getParameter("ename");
 			int id = StrUtils.isNum(strid) ? Integer.valueOf(strid) : 0;
@@ -80,8 +80,8 @@ public class CategoryRefreshController {
 				return -1;
 			}
 			ename = ename.trim();
-			sendMQ.sendMsg(new RunSqlModel("update 1688_category set en_name='"+ename+"' where id='"+id+"'"));
-			sendMQ.closeConn();
+			SendMQ.sendMsg(new RunSqlModel("update 1688_category set en_name='"+ename+"' where id='"+id+"'"));
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}

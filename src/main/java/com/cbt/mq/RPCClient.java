@@ -63,6 +63,12 @@ public class RPCClient implements AutoCloseable {
         return result;
     }
 
+    public void callNoReturn(String message) throws IOException, InterruptedException {
+
+        channel.queueDeclare(requestQueueName, false, false, false, null);
+        channel.basicPublish("", requestQueueName, null, message.getBytes("UTF-8"));
+    }
+
     @Override
     public void close() throws IOException {
         connection.close();

@@ -203,9 +203,9 @@ public class TabSeachPageController {
 		String result = null;
 		int res = 1;
 		try {
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("update tab_seach_pages set sate=1 where id=" + id + ""));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel("update tab_seach_pages set sate=1 where id=" + id + ""));
+
 			if (res > 0) {
 				result = "{\"status\":true,\"message\":\"删除成功！\"}";
 			} else {
@@ -229,12 +229,12 @@ public class TabSeachPageController {
 	public void deleteCate(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String result = "";
 		try {
-			SendMQ sendMQ = new SendMQ();
+
 			String id = request.getParameter("id");
-			sendMQ.sendMsg(new RunSqlModel("update tab_seach_pages set pid = -1 where pid='" + id + "'"));
-			sendMQ.sendMsg(new RunSqlModel("update tab_seach_pages set sate=1 where id='" + id + "'"));
+			SendMQ.sendMsg(new RunSqlModel("update tab_seach_pages set pid = -1 where pid='" + id + "'"));
+			SendMQ.sendMsg(new RunSqlModel("update tab_seach_pages set sate=1 where id='" + id + "'"));
 			result = "{\"status\":true,\"message\":\"删除成功！\"}";
-			sendMQ.closeConn();
+
 		} catch (Exception e) {
 			result = "{\"status\":false,\"message\":\"删除失败！\"}";
 			e.printStackTrace();
@@ -614,14 +614,14 @@ public class TabSeachPageController {
 		String result = null;
 		int res = 1;
 		try {
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("update tab_seach_pages_details set sate=1 where id='" + id + "'"));
+
+			SendMQ.sendMsg(new RunSqlModel("update tab_seach_pages_details set sate=1 where id='" + id + "'"));
 			if (res > 0) {
 				result = "{\"status\":true,\"message\":\"删除成功！\"}";
 			} else {
 				result = "{\"status\":false,\"message\":\"删除失败！\"}";
 			}
-			sendMQ.closeConn();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -645,14 +645,14 @@ public class TabSeachPageController {
 		String result = null;
 		int res = 1;
 		try {
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("update tab_seach_pages_details set banner_img_name = null, banner_img_url = null, banner_name = null, banner_describe = null where id='" + id + "'"));
+
+			SendMQ.sendMsg(new RunSqlModel("update tab_seach_pages_details set banner_img_name = null, banner_img_url = null, banner_name = null, banner_describe = null where id='" + id + "'"));
 			if (res > 0) {
 				result = "{\"status\":true,\"message\":\"删除成功！\"}";
 			} else {
 				result = "{\"status\":false,\"message\":\"删除失败！\"}";
 			}
-			sendMQ.closeConn();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -746,7 +746,7 @@ public class TabSeachPageController {
 			} else {
 				List<Map<String, Object>> goodslist = null;
 				try {
-					SendMQ sendMQ = new SendMQ();
+
 					// goodslist = getGoodslist(seach_url,anti_words);
 					// if(goodslist != null && goodslist.size() >= 4) {
 					TabSeachPagesDetailBean bean = new TabSeachPagesDetailBean();
@@ -793,14 +793,14 @@ public class TabSeachPageController {
 						}
 						sql += "',banner_name='" + SendMQ.repCha(bean.getBannerName()) + "',banner_describe='"
 								+ SendMQ.repCha(bean.getBannerDescribe()) + "' where id='" + bean.getId() + "'";
-						sendMQ.sendMsg(new RunSqlModel(sql));
+						SendMQ.sendMsg(new RunSqlModel(sql));
 						int res = 1;// tabSeachPageService.updateDetail(bean);
 						if (res > 0) {
 							result = "{\"status\":true,\"message\":\"修改成功！\",\"id\":\"" + id + "\"}";
 						} else {
 							result = "{\"status\":false,\"message\":\"修改失败！\"}";
 						}
-						sendMQ.closeConn();
+
 					}
 				} catch (Exception e) {
 					result = "{\"status\":false,\"message\":\"修改失败！\"}";

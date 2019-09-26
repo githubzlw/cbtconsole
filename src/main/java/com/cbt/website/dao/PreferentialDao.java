@@ -837,9 +837,9 @@ public static void main(String[] args) {
 			lstValues.add( String.valueOf(payPrice));
 			lstValues.add( itemId);
 			String runSql = DBHelper.covertToSQL(sql,lstValues);
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel(runSql));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel(runSql));
+
 
 			i = ps1.executeUpdate();
 			++i;

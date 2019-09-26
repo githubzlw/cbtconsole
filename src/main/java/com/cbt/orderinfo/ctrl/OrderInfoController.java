@@ -688,8 +688,8 @@ public class OrderInfoController{
 //			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
 			SendMQ sendMQ=new SendMQ();
 			iOrderinfoService.updateOrderinfoUpdateState(orderNo);
-			sendMQ.sendMsg(new RunSqlModel("update orderinfo set server_update=1 where order_no='"+orderNo+"'"));
-			sendMQ.closeConn();
+			SendMQ.sendMsg(new RunSqlModel("update orderinfo set server_update=1 where order_no='"+orderNo+"'"));
+
 			row=1;
 		}
 		out.print(row);

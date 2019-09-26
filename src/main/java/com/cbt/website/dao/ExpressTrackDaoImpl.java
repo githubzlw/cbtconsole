@@ -903,7 +903,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 				stmt = conn.prepareStatement(sql);
 				row = stmt.executeUpdate();
 				sql = "update orderinfo set state=1 where order_no='" + map.get("orderid")+ "'";
-				sendMQ.sendMsg(new RunSqlModel(sql));
+				SendMQ.sendMsg(new RunSqlModel(sql));
 				sql = "update orderinfo set state=1 where order_no='" + map.get("orderid")+ "'";
 				stmt = conn.prepareStatement(sql);
 				row = stmt.executeUpdate();
@@ -933,7 +933,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 						DBHelper.getInstance().closeConnection(conn28);
 						//线上表
 //                        sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-//                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        SendMQ.sendMsg(new RunSqlModel(sql));
 						GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
 					}else{
 						//如果库存锁定后可用库存为0则更新线上产品表。预上线表。后台产品表库存标识为无库存
@@ -949,7 +949,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 						DBHelper.getInstance().closeConnection(conn28);
 						//线上表
 //                        sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
-//                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        SendMQ.sendMsg(new RunSqlModel(sql));
 						GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"0");
 					}
 				}
@@ -972,7 +972,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			sendMQ.closeConn();
+
 		}
 		return row;
 	}
@@ -1096,7 +1096,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 					DBHelper.getInstance().closeConnection(conn28);
 					//线上表
 //                    sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
-//                    sendMQ.sendMsg(new RunSqlModel(sql));
+//                    SendMQ.sendMsg(new RunSqlModel(sql));
 					GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"0");
 				} else {
 					// 根据锁定库存数量时间来重新分配可使用库存量
@@ -1186,7 +1186,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 						DBHelper.getInstance().closeConnection(conn28);
 						//线上表
 //                        sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-//                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        SendMQ.sendMsg(new RunSqlModel(sql));
 						GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
 					}else{
 						//释放锁定库存后更新线上产品表。预上线表。后台产品表库存标识为无库存
@@ -1202,12 +1202,12 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 						DBHelper.getInstance().closeConnection(conn28);
 						//线上表
 //                        sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+rs1.getString("goods_pid")+"'";
-//                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        SendMQ.sendMsg(new RunSqlModel(sql));
 						GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"0");
 					}
 				}
 			}
-			sendMQ.closeConn();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			// updateLockInventory(map);
@@ -1241,7 +1241,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			sendMQ.closeConn();
+
 		}
 		return row;
 	}
@@ -1320,7 +1320,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 								+ map.get("orderid")
 								+ "' and goodsid='"
 								+ map.get("goodsid") + "'";
-						sendMQ.sendMsg(new RunSqlModel(sql2));
+						SendMQ.sendMsg(new RunSqlModel(sql2));
 						sql2 = "SELECT DISTINCT COUNT(b.id)-SUM(b.state) as counts FROM order_details o INNER JOIN order_details b ON o.dropshipid=b.dropshipid WHERE o.orderid='"
 								+ map.get("orderid")
 								+ "' AND o.goodsid='"
@@ -1332,13 +1332,13 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 									+ map.get("orderid")
 									+ "' and goodsid='"
 									+ map.get("goodsid") + "')";
-							sendMQ.sendMsg(new RunSqlModel(sql2));
+							SendMQ.sendMsg(new RunSqlModel(sql2));
 						}else{
 							sql2 = "update dropshiporder set state=1 where child_order_no=(select dropshipid from order_details where orderid='"
 									+ map.get("orderid")
 									+ "' and goodsid='"
 									+ map.get("goodsid") + "')";
-							sendMQ.sendMsg(new RunSqlModel(sql2));
+							SendMQ.sendMsg(new RunSqlModel(sql2));
 						}
 						// 判断主单下所有的子单是否到库
 						sql2 = "SELECT  COUNT(orderid)*2-SUM(state) as countss FROM dropshiporder WHERE parent_order_no='"
@@ -1348,11 +1348,11 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 						if (rs.next() && rs.getInt("countss") == 0) {
 							sql2 = "update orderinfo set state=2 where order_no='"
 									+ map.get("orderid") + "'";
-							sendMQ.sendMsg(new RunSqlModel(sql2));
+							SendMQ.sendMsg(new RunSqlModel(sql2));
 						}else{
 							sql2 = "update orderinfo set state=1 where order_no='"
 									+ map.get("orderid") + "'";
-							sendMQ.sendMsg(new RunSqlModel(sql2));
+							SendMQ.sendMsg(new RunSqlModel(sql2));
 						}
 						sql2 = "update order_details set checked=1,inventory_remark='库存充足' where orderid='"
 								+ map.get("orderid")
@@ -1366,7 +1366,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 								+ map.get("orderid")
 								+ "' and goodsid='"
 								+ map.get("goodsid") + "'";
-						sendMQ.sendMsg(new RunSqlModel(sql2));
+						SendMQ.sendMsg(new RunSqlModel(sql2));
 						sql2 = "SELECT (COUNT(id) - SUM(state)) as orderdetails_count FROM order_details WHERE state<2 AND orderid='"
 								+ map.get("orderid") + "'";
 						stmt = conn1.prepareStatement(sql2);
@@ -1374,11 +1374,11 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 						if (rs.next() && rs.getInt("orderdetails_count") == 0) {
 							sql2 = "UPDATE orderinfo SET state=2 WHERE order_no='"
 									+ map.get("orderid") + "'";
-							sendMQ.sendMsg(new RunSqlModel(sql2));
+							SendMQ.sendMsg(new RunSqlModel(sql2));
 						}else{
 							sql2 = "UPDATE orderinfo SET state=1 WHERE order_no='"
 									+ map.get("orderid") + "'";
-							sendMQ.sendMsg(new RunSqlModel(sql2));
+							SendMQ.sendMsg(new RunSqlModel(sql2));
 						}
 						sql2 = "update order_details set checked=1,inventory_remark='库存充足' where orderid='"
 								+ map.get("orderid")
@@ -1407,7 +1407,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 						DBHelper.getInstance().closeConnection(conn28);
 						//线上表
 //                        sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-//                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        SendMQ.sendMsg(new RunSqlModel(sql));
 						GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
 					}else{
 						//如果库存锁定后可用库存为0则更新线上产品表。预上线表。后台产品表库存标识为无库存
@@ -1423,12 +1423,12 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 						DBHelper.getInstance().closeConnection(conn28);
 						//线上表
 //                        sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
-//                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        SendMQ.sendMsg(new RunSqlModel(sql));
 						GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"0");
 					}
 				}
 			}
-//            sendMQ.closeConn();
+//
 		} catch (Exception e) {
 			if (rs != null) {
 				try {
@@ -1818,9 +1818,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 			stmt.setString(3,map.get("picPath"));
 			row=stmt.executeUpdate();
 			if(row>0){
-				sendMQ.sendMsg(new RunSqlModel("update inspection_picture set isdelete=1 where orderid='"+map.get("orderid")+"' and goods_id='"+map.get("goodsid")+"' and pic_path='"+map.get("picPath")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update inspection_picture set isdelete=1 where orderid='"+map.get("orderid")+"' and goods_id='"+map.get("goodsid")+"' and pic_path='"+map.get("picPath")+"'"));
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {
@@ -1922,9 +1922,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 				stmt.setString(2, localImgPath);
 				stmt.setString(3, orderid);
 				row = stmt.executeUpdate();
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set ftpPicPath='"+ftpPicPath+"',localImgPath='"+localImgPath+"' where order_no='"+orderid+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set ftpPicPath='"+ftpPicPath+"',localImgPath='"+localImgPath+"' where order_no='"+orderid+"'"));
 			}
-			sendMQ.closeConn();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -1988,9 +1988,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 				stmt.setString(2, localImgPaths);
 				stmt.setString(3, orderid);
 				row = stmt.executeUpdate();
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set ftpPicPath='"+ftpPicPaths+"',localImgPath='"+localImgPaths+"' where order_no='"+orderid+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set ftpPicPath='"+ftpPicPaths+"',localImgPath='"+localImgPaths+"' where order_no='"+orderid+"'"));
 			}
-			sendMQ.closeConn();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -2022,8 +2022,8 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 		PreparedStatement stmt = null;
 		String sql = "UPDATE order_details t SET t.picturepath = ? WHERE t.orderid = ? AND t.id = ?";
 		try {
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("UPDATE order_details t SET t.picturepath = '"+(success?ftpPath:path)+"' WHERE t.orderid = '"+orderid+"' AND t.id = '"+odid+"'"));
+
+			SendMQ.sendMsg(new RunSqlModel("UPDATE order_details t SET t.picturepath = '"+(success?ftpPath:path)+"' WHERE t.orderid = '"+orderid+"' AND t.id = '"+odid+"'"));
 			stmt = conn1.prepareStatement(sql);
 			stmt.setString(1, success?ftpPath:path);
 			stmt.setString(2, orderid);
@@ -2040,9 +2040,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 			stmt.setString(1, orderid);
 			stmt.setString(2, odid);
 			row = stmt.executeUpdate();
-			sendMQ.sendMsg(new RunSqlModel("insert into inspection_picture(pid,orderid,odid,pic_path,createtime) " +
+			SendMQ.sendMsg(new RunSqlModel("insert into inspection_picture(pid,orderid,odid,pic_path,createtime) " +
 					"select goods_pid,orderid,id,'"+ftpPath+"',now() from order_details where orderid='"+orderid+"' and id='"+odid+"'"));
-			sendMQ.closeConn();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -2091,7 +2091,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 		String queryLocation = "SELECT count(id) as counts FROM id_relationtable WHERE orderid =? AND is_delete = 0";
 		String canceLocation = "update storage_location set acount=0 where barcode=(select barcode from id_relationtable where orderid=? limit 1)";
 		try {
-			SendMQ sendMQ = new SendMQ();
+
 			cstmtsqlIdRelationtable1 = conn1
 					.prepareStatement(sqlIdRelationtable);
 			cstmtsqlIdRelationtable1.setString(1, orderid);
@@ -2128,9 +2128,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 			// 更新线上状态
 			sqlOrderDetails = "UPDATE order_details t SET t.state = 0 WHERE t.orderid = ? AND t.goodsid = ?;";
 			rs1 +=1;
-			sendMQ.sendMsg(new RunSqlModel("UPDATE order_details t SET t.state = 0 WHERE t.orderid = '"+orderid+"' AND t.goodsid = '"+goodid+"'"));
-			sendMQ.sendMsg(new RunSqlModel("UPDATE orderinfo t SET t.state = 1 WHERE t.order_no = '"+orderid+"'"));
-			sendMQ.closeConn();
+			SendMQ.sendMsg(new RunSqlModel("UPDATE order_details t SET t.state = 0 WHERE t.orderid = '"+orderid+"' AND t.goodsid = '"+goodid+"'"));
+			SendMQ.sendMsg(new RunSqlModel("UPDATE orderinfo t SET t.state = 1 WHERE t.order_no = '"+orderid+"'"));
+
 			rs1 +=1;
 
 			String sql1 = "select goods_p_price from order_product_source where goodsid=? and orderid=?";
@@ -2499,7 +2499,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 			}
 			PreparedStatement stmt2 = null;
 			try {
-				SendMQ sendMQ = new SendMQ();
+
 				sql="update storage_problem_order set flag=1 where shipno='"+shipno+"'";
 				stmt2 = conn.prepareStatement(sql);
 				stmt2.executeUpdate();
@@ -2514,7 +2514,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 								+ orderid + "' and goodsid='" + goodid + "'";
 						stmt2 = conn.prepareStatement(sql2);
 						stmt2.executeUpdate();
-						sendMQ.sendMsg(new RunSqlModel(sql2));
+						SendMQ.sendMsg(new RunSqlModel(sql2));
 						sql2 = "SELECT DISTINCT COUNT(b.id)-SUM(b.state) as counts FROM order_details o INNER JOIN order_details b ON o.dropshipid=b.dropshipid WHERE o.orderid='"
 								+ orderid
 								+ "' AND o.goodsid='"
@@ -2530,7 +2530,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 									+ "')";
 							stmt2 = conn.prepareStatement(sql2);
 							stmt2.executeUpdate();
-							sendMQ.sendMsg(new RunSqlModel(sql2));
+							SendMQ.sendMsg(new RunSqlModel(sql2));
 						}
 						// 判断主单下所有的子单是否到库
 						sql2 = "SELECT  COUNT(orderid)*2-SUM(state) as countss FROM dropshiporder WHERE parent_order_no='"
@@ -2542,7 +2542,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 									+ orderid + "'";
 							stmt2 = conn.prepareStatement(sql2);
 							stmt2.executeUpdate();
-							sendMQ.sendMsg(new RunSqlModel(sql2));
+							SendMQ.sendMsg(new RunSqlModel(sql2));
 						}
 					} else {
 						// 非dropshi订单
@@ -2550,7 +2550,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 								+ orderid + "' and goodsid='" + goodid + "'";
 						stmt2 = conn.prepareStatement(sql2);
 						stmt2.executeUpdate();
-						sendMQ.sendMsg(new RunSqlModel(sql2));
+						SendMQ.sendMsg(new RunSqlModel(sql2));
 						sql2 = "SELECT (COUNT(id) - SUM(state)) as orderdetails_count FROM order_details WHERE state<2 AND orderid='"
 								+ orderid + "'";
 						stmt2 = conn.prepareStatement(sql2);
@@ -2560,11 +2560,11 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 									+ orderid + "'";
 							stmt2 = conn.prepareStatement(sql2);
 							stmt2.executeUpdate();
-							sendMQ.sendMsg(new RunSqlModel(sql2));
+							SendMQ.sendMsg(new RunSqlModel(sql2));
 						}
 					}
 				}
-				sendMQ.closeConn();
+
 			} catch (Exception e) {
 				e.printStackTrace();
 				LOG.info("====================================================更新【"
@@ -2831,9 +2831,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 //                    stmt.executeUpdate();
 //                    //线上表
 //                    sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-//                    SendMQ sendMQ = new SendMQ();
-//                    sendMQ.sendMsg(new RunSqlModel(sql));
-//                    sendMQ.closeConn();
+//
+//                    SendMQ.sendMsg(new RunSqlModel(sql));
+//
 					GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
 				}
 				//记录库存存入记录，用来统计当月库存金额

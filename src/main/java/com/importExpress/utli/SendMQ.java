@@ -102,11 +102,9 @@ public class SendMQ {
      * @param model 其中type为1 2值的更新低库存标志，4值的更新上下线状态信息
      * @throws Exception
      */
-    public void sendMsg(UpdateTblModel model) throws Exception {
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        JSONObject jsonObject = JSONObject.fromObject(model);
-        channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
-        log.info(" [x] Sent '" + jsonObject.toString() + "'");
+    public static void sendMsg(UpdateTblModel model) {
+
+        sendMsg(JSONObject.fromObject(model).toString());
     }
 
     /**
@@ -114,15 +112,20 @@ public class SendMQ {
      * @param model 其中type为2 直接执行对应sql
      * @throws Exception
      */
-    public void sendMsg(RunSqlModel model)  {
-        try {
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-            JSONObject jsonObject = JSONObject.fromObject(model);
-            channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
-            log.info(" [x] Sent '" + jsonObject.toString() + "'");
-        } catch (IOException e) {
-            log.error("sendMsg",e);
+    public static void sendMsg(RunSqlModel model)  {
+        sendMsg(JSONObject.fromObject(model).toString());
+    }
+
+    public static void sendMsg(String data) {
+
+        try (RPCClient rpcClient = new RPCClient()) {
+            log.info(" [x] Sent [{}]" , data);
+            rpcClient.callNoReturn(data);
+            log.info(" [x] Sent [{}] is OK" , data);
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            log.error("MQ sendMsg",e);
         }
+
     }
     
     /**
@@ -147,18 +150,18 @@ public class SendMQ {
         log.info("Site=" + website + " [x] Sent '" + couponJson + "'");
     }
 
-    /**
-     * 通过消息将新购物车推荐商品数据传到线上
-     * @param recommendJson
-     * @throws Exception
-     */
-    public void sendRecommend(String recommendJson) throws Exception {
-        channel.exchangeDeclare(RECOMMEND_NAME, BuiltinExchangeType.FANOUT);
-        channel.basicPublish(RECOMMEND_NAME,"",null,recommendJson.getBytes("UTF-8"));
-//        channel.queueDeclare(RECOMMEND_NAME, false, false, false, null);
-//        channel.basicPublish("", RECOMMEND_NAME, null, recommendJson.getBytes("UTF-8"));
-        log.info(" [x] Sent '" + recommendJson + "'");
-    }
+//    /**
+//     * 通过消息将新购物车推荐商品数据传到线上
+//     * @param recommendJson
+//     * @throws Exception
+//     */
+//    public void sendRecommend(String recommendJson) throws Exception {
+//        channel.exchangeDeclare(RECOMMEND_NAME, BuiltinExchangeType.FANOUT);
+//        channel.basicPublish(RECOMMEND_NAME,"",null,recommendJson.getBytes("UTF-8"));
+////        channel.queueDeclare(RECOMMEND_NAME, false, false, false, null);
+////        channel.basicPublish("", RECOMMEND_NAME, null, recommendJson.getBytes("UTF-8"));
+//        log.info(" [x] Sent '" + recommendJson + "'");
+//    }
 
     public static String repCha(String str){
     	if (StringUtils.isBlank(str)) {
@@ -207,11 +210,11 @@ public class SendMQ {
      * @return
      */
     public static String sendMsgByRPC(RunSqlModel model)  {
-        try (RPCClient fibonacciRpc = new RPCClient()) {
+        try (RPCClient rpcClient = new RPCClient()) {
 
             JSONObject jsonObject = JSONObject.fromObject(model);
             log.info(" [x] Sent [{}]" , jsonObject);
-            String response = fibonacciRpc.call(jsonObject.toString());
+            String response = rpcClient.call(jsonObject.toString());
             log.info(" [x] response [{}]" , response );
             return response;
         } catch (IOException | TimeoutException | InterruptedException e) {
@@ -220,29 +223,4 @@ public class SendMQ {
         }
     }
 
-    public static void main(String[] argv) throws Exception {
-        SendMQ sendMQ = new SendMQ();
-        /*// 直接执行sql示例
-        String sql = "INSERT INTO shipping_package (shipmentno,orderid,remarks,createtime) VALUES('0001','O4051803889279563','O4051803889279563',now())" +
-                "on duplicate key update shipmentno ='0001',createtime =now(),remarks ='O4051803889279563'";
-
-        sendMQ.sendMsg(new RunSqlModel(sql));*/
-        // sendMQ.sendMsg(new RunSqlModel(sql1));
-        //执行sql并保存记录，对应可以注入
-//    	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
-//    	sendMQ.runSqlOnline("543232153010", sql);
-
-
-        //redis示例
-//        sendMQ.sendMsg(new RedisModel(new String[]{"15937"}), 1);
-
-
-        String[] userIds = {"13895"};
-        RedisModel redisModel = new RedisModel(userIds);
-        redisModel.setType("3");
-        sendMQ.sendMsg(redisModel, 1);
-        sendMQ.closeConn();
-    	
-    }
-    
 }

@@ -136,9 +136,9 @@ public class QueAnsController {
 			String pid=request.getParameter("pid");
 			String type=request.getParameter("type");
 			row=questionAndAnswerService.changeIsShow(pid,type);
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("update question_answer set isShow='"+type+"' where questionid='"+pid+"'"));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel("update question_answer set isShow='"+type+"' where questionid='"+pid+"'"));
+
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -154,7 +154,7 @@ public class QueAnsController {
 	@RequestMapping("/influenceShop")
 	@ResponseBody
     public int influenceShop(HttpServletRequest request, HttpServletResponse response) throws Exception{
-		SendMQ sendMQ = new SendMQ();
+
 		String strqid = request.getParameter("qid");
 		String shop_id = request.getParameter("shop_id");
 		String reply_content = request.getParameter("reply_content");
@@ -165,15 +165,15 @@ public class QueAnsController {
 		}
 		int updateReplyContent = questionAndAnswerService.influenceShop(qid,shop_id,state);
 		if("1".equals(state)){
-			sendMQ.sendMsg(new RunSqlModel("update question_answer set reply_status=2 where questionid='"+qid+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update question_answer set reply_status=2 where questionid='"+qid+"'"));
 		}else if("2".equals(state)){
-			sendMQ.sendMsg(new RunSqlModel("update question_answer set reply_status=1 where questionid='"+qid+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update question_answer set reply_status=1 where questionid='"+qid+"'"));
 		}else if("3".equals(state)){
-			sendMQ.sendMsg(new RunSqlModel("update question_answer set isShow=2,shop_id='"+shop_id+"' where questionid='"+qid+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update question_answer set isShow=2,shop_id='"+shop_id+"' where questionid='"+qid+"'"));
 		}else if("4".equals(state)){
-			sendMQ.sendMsg(new RunSqlModel("update question_answer set isShow=1 where questionid='"+qid+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update question_answer set isShow=1 where questionid='"+qid+"'"));
 		}
-		sendMQ.closeConn();
+
 		return updateReplyContent;
 	}
 
@@ -187,7 +187,7 @@ public class QueAnsController {
 	@RequestMapping("/deleteQuestion")
 	@ResponseBody
 	public int deleteQuestion(HttpServletRequest request, HttpServletResponse response) throws Exception{
-		SendMQ sendMQ = new SendMQ();
+
 		String strqid = request.getParameter("qid");
 		int qid = StrUtils.isNum(strqid) ? Integer.valueOf(strqid) : 0;
 		if(qid == 0){
@@ -195,9 +195,9 @@ public class QueAnsController {
 		}
 		int updateReplyContent = questionAndAnswerService.deleteQuestion(qid);
 		if(updateReplyContent>0){
-			sendMQ.sendMsg(new RunSqlModel("update question_answer set is_delete=1 where questionid='"+qid+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update question_answer set is_delete=1 where questionid='"+qid+"'"));
 		}
-		sendMQ.closeConn();
+
 		return updateReplyContent;
 	}
 
@@ -274,15 +274,15 @@ public class QueAnsController {
 		Date now = new Date();
 		dateFormat.setLenient(false);
 		String date = dateFormat.format(now);
-		SendMQ sendMQ = new SendMQ();
+
 		int updateReplyContent =questionAndAnswerService.updateReplyContent(qid, adminid, replyContent,isShow,shop_id);
 		if(updateReplyContent > 0){
-			sendMQ.sendMsg(new RunSqlModel("update question_answer set reply_content='"+replyContent+"',reply_status=2,reply_name='"+adminid+"',reply_time=now(),shop_id='"+shop_id+"' where questionid='"+qid+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update question_answer set reply_content='"+replyContent+"',reply_status=2,reply_name='"+adminid+"',reply_time=now(),shop_id='"+shop_id+"' where questionid='"+qid+"'"));
 			//影响同店铺
 			if("2".equals(shop_flag)){
 				int row=questionAndAnswerService.influenceShop(qid,shop_id,"3");
 				if(row>0){
-					sendMQ.sendMsg(new RunSqlModel(" update question_answer set isShow=2 where questionid='"+qid+"'"));
+					SendMQ.sendMsg(new RunSqlModel(" update question_answer set isShow=2 where questionid='"+qid+"'"));
 				}
 			}
 		}
@@ -292,7 +292,7 @@ public class QueAnsController {
 		if (isValid){
 			Website="1";
 		}
-		sendMQ.closeConn();
+
 		//给客户发送邮件
 		QueAns q=questionAndAnswerService.getQueAnsinfo(qid);
 		questionAndAnswerService.replyReportQes(q.getQuestionid(),replyContent, date, q.getEmail(), q.getQuestion_content(), q.getEmail(), Integer.valueOf(q.getUserid()), q.getSale_email(),url,Website);
@@ -319,9 +319,9 @@ public class QueAnsController {
 		}
 		remark = remark.trim();
 		int isReview = remarkFlag == 0 ? 1 : 2;
-		SendMQ sendMQ = new SendMQ();
-		sendMQ.sendMsg(new RunSqlModel(" update question_answer set is_review='"+isReview+"',review_remark='"+remark+"',update_time=now() where id='"+qid+"'"));
-		sendMQ.closeConn();
+
+		SendMQ.sendMsg(new RunSqlModel(" update question_answer set is_review='"+isReview+"',review_remark='"+remark+"',update_time=now() where id='"+qid+"'"));
+
 		int updateRemark=questionAndAnswerService.updateRemark(qid, adminid, isReview, remark);
 		return updateRemark;
 	}

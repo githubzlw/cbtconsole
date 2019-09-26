@@ -285,7 +285,7 @@ public class OrderinfoService implements IOrderinfoService {
 		int old_itemqty=0;
 		String sql="";
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			//查询入库备注
 			Map<String,String> reMap=orderinfoMapper.getRemarkInspetion(map);
 			if(reMap !=null){
@@ -362,18 +362,18 @@ public class OrderinfoService implements IOrderinfoService {
 			Map<String,Object> orderinfoMap = pruchaseMapper.queryUserIdAndStateByOrderNo(map.get("orderid"));
 			if (isDropshipOrder == 1) {
 				orderinfoMapper.updateOrderDetails(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 				int counts=orderinfoMapper.getDtailsState(map);
 				if(counts == 0){
 					orderinfoMapper.updateDropshiporder(map);
-					sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+map.get("orderid")+"' " +
+					SendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+map.get("orderid")+"' " +
 							"and id='"+map.get("odid")+"')"));
 				}
 				//判断主单下所有的子单是否到库
 				counts=orderinfoMapper.getAllChildOrderState(map);
 				if(counts == 0){
 					orderinfoMapper.updateOrderInfoState(map);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 					//判断订单状态是否一致
 					if(!orderinfoMap.get("old_state").toString().equals("2")){
 						//发送消息给客户
@@ -384,12 +384,12 @@ public class OrderinfoService implements IOrderinfoService {
 			}else{
 				// 非dropshi订单
 				orderinfoMapper.updateOrderDetails(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 				//判断订单是否全部到库
 				int counts=orderinfoMapper.getDetailsState(map);
 				if(counts == 0){
 					orderinfoMapper.updateOrderInfoState(map);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 					//判断订单状态是否一致
 					if(!orderinfoMap.get("old_state").toString().equals("2")){
 						//发送消息给客户
@@ -407,7 +407,7 @@ public class OrderinfoService implements IOrderinfoService {
 				orderinfoMapper.insertGoodsInventory(map);
 			}
 			LOG.info("--------------------结束记录商品入库--------------------");
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -710,7 +710,7 @@ public class OrderinfoService implements IOrderinfoService {
 	public int updatecanceltatus(Map<String, String> map) {
 		int row=0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			// 直接删除 标识记为已经删除
 			row=orderinfoMapper.updateIdrelationtableFlag(map);
 			int counts=orderinfoMapper.getInCount(map);
@@ -725,9 +725,9 @@ public class OrderinfoService implements IOrderinfoService {
 				row=orderinfoMapper.updateOrderSource(map);
 			}
 			// 更新线上状态
-			sendMQ.sendMsg(new RunSqlModel("UPDATE order_details t SET t.state = 0 WHERE t.orderid = '"+map.get("orderid")+"' AND t.id = '"+map.get("odid")+"'"));
-			sendMQ.sendMsg(new RunSqlModel("UPDATE orderinfo t SET t.state = 1 WHERE t.order_no = '"+map.get("orderid")+"'"));
-			sendMQ.closeConn();
+			SendMQ.sendMsg(new RunSqlModel("UPDATE order_details t SET t.state = 0 WHERE t.orderid = '"+map.get("orderid")+"' AND t.id = '"+map.get("odid")+"'"));
+			SendMQ.sendMsg(new RunSqlModel("UPDATE orderinfo t SET t.state = 1 WHERE t.order_no = '"+map.get("orderid")+"'"));
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -744,7 +744,7 @@ public class OrderinfoService implements IOrderinfoService {
 		map.put("admName",orderinfoMapper.getAdmName(map));
 		int row=0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			row=orderinfoMapper.queryAdmin(map);
 			if(row>0){
                 //更新商业询盘中分配的数据
@@ -752,17 +752,17 @@ public class OrderinfoService implements IOrderinfoService {
                 //更新销售人
                 row=orderinfoMapper.updateAdminUser(map);
 				if(row>0){
-					sendMQ.sendMsg(new RunSqlModel("update admin_r_user set adminid="+map.get("adminid")+",admName='"+map.get("admName")+"' where userid="+map.get("userid")+""));
+					SendMQ.sendMsg(new RunSqlModel("update admin_r_user set adminid="+map.get("adminid")+",admName='"+map.get("admName")+"' where userid="+map.get("userid")+""));
 				}
 			}else{
 				//新增销售记录
 				row=orderinfoMapper.insertAdminUser(map);
 				if(row>0){
-					sendMQ.sendMsg(new RunSqlModel("insert into admin_r_user(userid,username,useremail,adminid,createdate,admName) " +
+					SendMQ.sendMsg(new RunSqlModel("insert into admin_r_user(userid,username,useremail,adminid,createdate,admName) " +
 							"values('"+map.get("userid")+"','"+map.get("email")+"','"+map.get("email")+"','"+map.get("adminid")+"',now(),'"+map.get("admName")+"')"));
 				}
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -828,32 +828,32 @@ public class OrderinfoService implements IOrderinfoService {
 			int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
 			if (isDropshipOrder == 1) {
 				orderinfoMapper.updateOrderDetails(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+orderid+"' and id='"+map.get("odid")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+orderid+"' and id='"+map.get("odid")+"'"));
 				int counts=orderinfoMapper.getDtailsState(map);
 				if(counts == 0){
 					orderinfoMapper.updateDropshiporder(map);
-					sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+orderid+"' " +
+					SendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+orderid+"' " +
 							"and id='"+map.get("odid")+"')"));
 				}
 				//判断主单下所有的子单是否到库
 				counts=orderinfoMapper.getAllChildOrderState(map);
 				if(counts == 0){
 					orderinfoMapper.updateOrderInfoState(map);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
 				}
 			}else{
 				// 非dropshi订单
 				orderinfoMapper.updateOrderDetails(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+orderid+"' and id='"+map.get("odid")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+orderid+"' and id='"+map.get("odid")+"'"));
 				//判断订单是否全部到库
 				int counts=orderinfoMapper.getDetailsState(map);
 				if(counts == 0){
 					System.err.println("orderNo:" + orderid + ",验货无误");
 					orderinfoMapper.updateOrderInfoState(map);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
 				}
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -1138,8 +1138,8 @@ public class OrderinfoService implements IOrderinfoService {
 		try{
 			SendMQ sendMQ=new SendMQ();
 			row=orderinfoMapper.cancelOrder(orderid);
-			sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=-1 where order_no='"+orderid+"'"));
-			sendMQ.closeConn();
+			SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=-1 where order_no='"+orderid+"'"));
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -1152,8 +1152,8 @@ public class OrderinfoService implements IOrderinfoService {
 		try{
 			SendMQ sendMQ=new SendMQ();
 			row=orderinfoMapper.cancelPayment(pid);
-			sendMQ.sendMsg(new RunSqlModel("update payment set paystatus=0  where id='"+pid+"'"));
-			sendMQ.closeConn();
+			SendMQ.sendMsg(new RunSqlModel("update payment set paystatus=0  where id='"+pid+"'"));
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}

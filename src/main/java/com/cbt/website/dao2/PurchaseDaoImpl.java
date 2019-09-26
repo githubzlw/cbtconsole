@@ -2975,11 +2975,11 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		PreparedStatement stmt = null;
 		ResultSet rs=null;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			String sql="update order_details set state=1,checked=1 where orderid='"+orderid+"' and goodsid='"+goodsid+"'";
 			stmt=conn.prepareStatement(sql);
 			stmt.executeUpdate();
-			sendMQ.sendMsg(new RunSqlModel(sql));
+			SendMQ.sendMsg(new RunSqlModel(sql));
 			sql="SELECT IFNULL(SUM(od.state),0) AS states,COUNT(od.id) AS counts FROM orderinfo oi " +
 					"INNER JOIN order_details od ON oi.order_no=od.orderid AND oi.state=1 AND od.state<2 AND od.orderid='"+orderid+"'";
 			stmt=conn.prepareStatement(sql);
@@ -2988,9 +2988,9 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				sql="update orderinfo set  state=2 where order_no='"+orderid+"'";
 				stmt=conn.prepareStatement(sql);
 				stmt.executeUpdate();
-				sendMQ.sendMsg(new RunSqlModel(sql));
+				SendMQ.sendMsg(new RunSqlModel(sql));
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {

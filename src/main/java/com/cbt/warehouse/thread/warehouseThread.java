@@ -39,12 +39,12 @@ public class warehouseThread extends Thread {
 
 			// 出库日志记录
 			iWarehouseService.batchInsertSPLog(list);
-			// SendMQ sendMQ = new SendMQ();
+			//
 			// 同步更新线上数据
 			// 删除原来orderid对应的数据
 
 			if (iWarehouseService.selectShippingPackage(m2) > 0) {
-				// sendMQ.sendMsg(new RunSqlModel("delete from shipping_package where orderid='"+m2.get("orderid")+"'"));
+				// SendMQ.sendMsg(new RunSqlModel("delete from shipping_package where orderid='"+m2.get("orderid")+"'"));
 			}
 			//StringBuilder sqls=new StringBuilder("delete from shipping_package where orderid='"+m2.get("orderid")+"';");
 			for(Map<String, String> map:list){
