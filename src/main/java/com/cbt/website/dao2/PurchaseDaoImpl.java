@@ -2011,7 +2011,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 
 		String orderNew = orderno;
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null, stmtf = null, stmtf2 = null, stmtfee = null, mergeStmt, gxzt, stmtid = null;
 		ResultSet rs = null;
 		try {
@@ -2037,8 +2036,8 @@ public class PurchaseDaoImpl implements PurchaseDao {
 						"update orderinfo set state='3' where order_no in ("
 								+ orderNew + ")");
 			} else {
-				PreparedStatement stmt2 = conn2.prepareStatement(sqlorderinfo);
-				stmt2.executeUpdate();
+
+				SendMQ.sendMsgByRPC(new RunSqlModel(sqlorderinfo));
 			}
 			// new Thread(new Runnable() {
 			// @Override
@@ -2156,7 +2155,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 	}
 
@@ -5255,16 +5253,18 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		// purchase_state=0,
 		String sql = "update orderinfo set state=1 where order_no=?";
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null, stmt2 = null;
+		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, orderNo);
 			stmt.executeUpdate();
 
-			stmt2 = conn2.prepareStatement(sql);
-			stmt2.setString(1, orderNo);
-			stmt2.executeUpdate();
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(orderNo);
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 			i++;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -5289,26 +5289,22 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				+ price
 				+ ", goods_p_url=?,tb_1688_itemid=? where orderid=? and goods_url='"
 				+ goods_url + "'";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, goodspurl);
-			stmt.setString(2, itemid);
-			stmt.setString(3, orderNo);
-			stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(goodspurl);
+			lstValues.add(itemid);
+			lstValues.add(orderNo);
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 			i++;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+
 		}
 		return i;
 	}

@@ -660,26 +660,22 @@ public static void main(String[] args) {
 	@Override
 	public int upPostageD(int id, int type, String handleman) {
 		String sql = "update postage_discounts set handleman=?,handletime=now(),state=? where id=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
 		int res = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, handleman);
-			stmt.setInt(2, type);
-			stmt.setInt(3, id);
-			res = stmt.executeUpdate();
+
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(handleman);
+			lstValues.add(String.valueOf(type));
+			lstValues.add(String.valueOf(id));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			res=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+
 	}
 		return res;
 	}

@@ -8966,35 +8966,50 @@ public class WarehouseCtrl {
 			// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
 			flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + storePath.substring(0,storePath.lastIndexOf("/")), 0);
 			if(flag){
-				Connection conn = DBHelper.getInstance().getConnection2();// 仓库不用
 				Connection conn1 = DBHelper.getInstance().getConnection();
 				PreparedStatement stmt = null;
 				String sql = "UPDATE order_details t SET t.picturepath = ? WHERE t.orderid = ? AND t.goodsid = ?;";
 				try {
-					stmt = conn.prepareStatement(sql);// 仓库不用
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, StringUtil.isBlank(orderid)?"999999":orderid);
-					stmt.setString(3, goodsid);
-					stmt.executeUpdate();
-					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, StringUtil.isBlank(orderid)?"999999":orderid);
-					stmt.setString(3, goodsid);
-					stmt.executeUpdate();
+					List<String> lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(StringUtil.isBlank(orderid)?"999999":orderid);
+					lstValues.add(goodsid);
+
+					String runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
+					lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(StringUtil.isBlank(orderid)?"999999":orderid);
+					lstValues.add(goodsid);
+
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
 					sql="UPDATE id_relationtable set picturepath='"+storePath+"' where orderid=? and goodid=?";
-					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, StringUtil.isBlank(orderid)?"999999":orderid);
-					stmt.setString(2, goodsid);
-					stmt.executeUpdate();
+
+					lstValues = new ArrayList<>();
+					lstValues.add(StringUtil.isBlank(orderid)?"999999":orderid);
+					lstValues.add(goodsid);
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
 					sql="update inspection_picture set pic_path=? where id=? and isdelete=0";
-					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, i_id);
-					stmt.executeUpdate();
-					stmt = conn.prepareStatement(sql);
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, i_id);
-					stmt.executeUpdate();
+
+					lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(i_id);
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
+					lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(i_id);
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
 				} catch (SQLException e) {
 					e.printStackTrace();
 				} finally {
@@ -9006,7 +9021,6 @@ public class WarehouseCtrl {
 						e.printStackTrace();
 					}
 					DBHelper.getInstance().closePreparedStatement(stmt);
-					DBHelper.getInstance().closeConnection(conn);
 					DBHelper.getInstance().closeConnection(conn1);
 				}
 			}

@@ -13,6 +13,7 @@ import com.importExpress.pojo.ShopMd5Bean;
 import com.importExpress.pojo.SkuValPO;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import com.importExpress.utli.UpdateTblModel;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -3274,27 +3275,22 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public boolean deleteWordSizeInfoByPid(String pid) {
 
-        Connection connOnline = DBHelper.getInstance().getConnection2();
         String updateSql = "update  custom_benchmark_ready_size_info  set del_flag = 1 where  goods_pid = ? ";
-        PreparedStatement stmt = null;
         int count = 0;
         try {
-            stmt = connOnline.prepareStatement(updateSql);
-            stmt.setString(1, pid);
-            count = stmt.executeUpdate();
+
+
+            List<String> lstValues = new ArrayList<>();
+            lstValues.add(pid);
+            String runSql = DBHelper.covertToSQL(updateSql,lstValues);
+            count=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("pid:" + pid + " deleteWordSizeInfoByPid error :" + e.getMessage());
             LOG.error("pid:" + pid + " deleteWordSizeInfoByPid error :" + e.getMessage());
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            DBHelper.getInstance().closeConnection(connOnline);
+
         }
         return count > 0;
     }

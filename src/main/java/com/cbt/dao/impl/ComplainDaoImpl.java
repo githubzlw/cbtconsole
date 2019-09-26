@@ -10,6 +10,8 @@ import com.cbt.pojo.page.Page;
 import com.cbt.util.SqlSplitUtil;
 import com.cbt.warehouse.util.StringUtil;
 import com.importExpress.utli.MultiSiteUtil;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -157,42 +159,25 @@ public class ComplainDaoImpl implements IComplainDao{
 
 	@Override
 	public Integer responseCustomer(ComplainChat t, String dealAdmin, Integer dealAdminId, Integer complainid) {
-		// TODO Auto-generated method stub
 		if(t.getChatAdminid()==0){
-			Connection conn = null;
-			PreparedStatement stmt = null;
-			ResultSet rs = null;
 			int result = 0;
 			//回复客户的投诉后 状态改为 沟通中1
 			String sql3 = "UPDATE tb_complain SET dealAdmin=?,dealAdminid=?,complainState=1 WHERE id=?";
-			conn = DBHelper.getInstance().getConnection2();
 			try {
-				stmt=conn.prepareStatement(sql3);
-				stmt.setString(1, dealAdmin);
-				stmt.setInt(2, dealAdminId);
-				stmt.setInt(3, t.getComplainid());
-				stmt.executeUpdate();
+
+				List<String> lstValues = new ArrayList<>();
+				lstValues.add(dealAdmin);
+				lstValues.add(String.valueOf(dealAdminId));
+				lstValues.add(String.valueOf(t.getComplainid()));
+
+				String runSql = DBHelper.covertToSQL(sql3,lstValues);
+				SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
 				sql3 = "update tb_complain_chat set readorno=1 where complainid ="+t.getComplainid()+" and flag=0";
-				stmt=conn.prepareStatement(sql3);
-				result = stmt.executeUpdate();
+				SendMQ.sendMsgByRPC(new RunSqlModel(sql3));
 			} catch (Exception e) {
 				e.printStackTrace();
-			} finally {
-				if (rs != null) {
-					try {
-						rs.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
-				if (stmt != null) {
-					try {
-						stmt.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
-				DBHelper.getInstance().closeConnection(conn);
 			}
 			return result;
 		}else{
