@@ -16,7 +16,7 @@ public class UploadByOkHttp {
     private static final String TOKEN = "cerong2018jack";
     private static final String DELETE_URL_NEW = "http://108.61.142.103:3008/image/delete";
 
-    private static OkHttpClient initClient(){
+    public static OkHttpClient initClient(){
 		OkHttpClient client = new OkHttpClient.Builder().connectTimeout(300, TimeUnit.SECONDS)
                     .readTimeout(150, TimeUnit.SECONDS).writeTimeout(150, TimeUnit.SECONDS).build();
 		return client;
