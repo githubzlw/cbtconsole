@@ -1,7 +1,7 @@
 package com.cbt.util;
 
-import com.cbt.warehouse.ctrl.HotGoodsCtrl;
 import org.slf4j.LoggerFactory;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -99,8 +99,18 @@ public class Redis {
 	  * @param value
 	  * @return
 	  */
-	 @SuppressWarnings("deprecation")
 	public static Long hset(String key,String field,String value){
+	        int expiredTime = Integer.parseInt(SysParamUtil.getParam("ExpiredTime"));
+	        return hset(key, field, value,expiredTime);
+	    }
+	 /**
+	  * 设置redis哈希内容, 对哈希进行hset不会修改已经设置的key过期时间
+	  * @param key
+	  * @param field
+	  * @param value
+	  * @return
+	  */
+	public static Long hset(String key,String field,String value,int expire){
 	        Long res = 0L;
 	        
 	        JedisPool pool = null;
@@ -114,12 +124,12 @@ public class Redis {
 				}else{
 					res = jedis.hset(key, field, value);
 					//设置过期时间:(时间单位:秒),2880*60=172800
-					jedis.expire(key, Integer.parseInt(SysParamUtil.getParam("ExpiredTime")));
+					jedis.expire(key, expire);
 				}
 	        } catch (Exception e) {
 	            //释放redis对象
 				e.printStackTrace();
-	            pool.returnBrokenResource(jedis);
+				jedis.close();
 	            logger.error("error",e);
 	        } finally {
 	            //返还到连接池

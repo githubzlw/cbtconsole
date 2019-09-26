@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.RecommendCatalogMapper" >
+
+	  <resultMap id="recommendCatalogResultMap" type="com.importExpress.pojo.RecommendCatalog" >
+	    <id column="id" property="id" />
+	    <result column="catalog_name" property="catalogName" />
+	    <result column="template" property="template" />
+	    <result column="create_admin" property="createAdmin" />
+	    <result column="create_time" property="createTime" />
+	    <result column="product_count" property="productCount" />
+	    <result column="product_id_list" property="productIdList" />
+	    <result column="catalog_file" property="catalogFile" />
+	    <result column="status" property="status" />
+
+	  </resultMap>
+
+    <!--更新目录-->
+	<update id="updateCatalogProduct">
+
+
+	</update>
+
+
+	<insert id="insertCatalog">
+	  insert into recommend_catalog (userid,price,type,remark,datatime,currency,balanceAfter)
+	  values(#{bean.userid},#{bean.price},#{bean.type},#{bean.remark},#{bean.datatime},
+	  #{bean.currency},#{bean.balanceAfter})
+	</insert>
+
+</mapper>
