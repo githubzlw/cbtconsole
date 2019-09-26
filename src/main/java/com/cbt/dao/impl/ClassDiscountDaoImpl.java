@@ -192,7 +192,7 @@ public class ClassDiscountDaoImpl implements ClassDiscountDao {
 			}
 			
 		} catch (Exception e) {
-			LOG.error("",e);
+			LOG.error("isExsis",e);
 		} finally {
 			if (stmt != null) {
 				try {

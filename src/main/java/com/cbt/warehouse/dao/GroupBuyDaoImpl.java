@@ -198,57 +198,57 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
 
     @Override
     public int insertGroupBuyInfos(GroupBuyManageBean gbmInfo) {
-
-        Connection remoteConn = DBHelper.getInstance().getConnection2();
-        PreparedStatement remoteStmt = null;
-        String sqlManage = "insert into group_buy_manage(final_price_need_num,final_price,init_virtual_num,effective_day,"
-                + "active_begin_time,active_end_time,active_desc,is_on,admin_id,type)"
-                + " values(?,?,?,?,?,?,?,?,?,?)";
-        ResultSet rsSet = null;
-
-        int mainId = 0;
-        try {
-            int remoteCount = 1;
-            remoteStmt = remoteConn.prepareStatement(sqlManage, Statement.RETURN_GENERATED_KEYS);
-            remoteStmt.setInt(remoteCount++, gbmInfo.getFinalPriceNeedNum());
-            remoteStmt.setDouble(remoteCount++, gbmInfo.getFinalPrice());
-            remoteStmt.setInt(remoteCount++, gbmInfo.getInitVirtualNum());
-            remoteStmt.setInt(remoteCount++, gbmInfo.getEffectiveDay());
-            remoteStmt.setString(remoteCount++, gbmInfo.getActiveBeginTime());
-            remoteStmt.setString(remoteCount++, gbmInfo.getActiveEndTime());
-            remoteStmt.setString(remoteCount++, gbmInfo.getActiveDesc());
-            remoteStmt.setInt(remoteCount++, gbmInfo.getIsOn());
-            remoteStmt.setInt(remoteCount++, gbmInfo.getAdminId());
-            remoteStmt.setInt(remoteCount++, gbmInfo.getType());
-
-            remoteStmt.executeUpdate();
-            rsSet = remoteStmt.getGeneratedKeys();
-            if (rsSet.next()) {
-                mainId = rsSet.getInt(1);
-            } else {
-                System.err.println("gbmInfo:" + gbmInfo.toString() + ",插入失败");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (remoteStmt != null) {
-                try {
-                    remoteStmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (rsSet != null) {
-                try {
-                    rsSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            DBHelper.getInstance().closeConnection(remoteConn);
-        }
-        return mainId;
+        throw new RuntimeException("already cancel method called");
+//        Connection remoteConn = DBHelper.getInstance().getConnection2();
+//        PreparedStatement remoteStmt = null;
+//        String sqlManage = "insert into group_buy_manage(final_price_need_num,final_price,init_virtual_num,effective_day,"
+//                + "active_begin_time,active_end_time,active_desc,is_on,admin_id,type)"
+//                + " values(?,?,?,?,?,?,?,?,?,?)";
+//        ResultSet rsSet = null;
+//
+//        int mainId = 0;
+//        try {
+//            int remoteCount = 1;
+//            remoteStmt = remoteConn.prepareStatement(sqlManage, Statement.RETURN_GENERATED_KEYS);
+//            remoteStmt.setInt(remoteCount++, gbmInfo.getFinalPriceNeedNum());
+//            remoteStmt.setDouble(remoteCount++, gbmInfo.getFinalPrice());
+//            remoteStmt.setInt(remoteCount++, gbmInfo.getInitVirtualNum());
+//            remoteStmt.setInt(remoteCount++, gbmInfo.getEffectiveDay());
+//            remoteStmt.setString(remoteCount++, gbmInfo.getActiveBeginTime());
+//            remoteStmt.setString(remoteCount++, gbmInfo.getActiveEndTime());
+//            remoteStmt.setString(remoteCount++, gbmInfo.getActiveDesc());
+//            remoteStmt.setInt(remoteCount++, gbmInfo.getIsOn());
+//            remoteStmt.setInt(remoteCount++, gbmInfo.getAdminId());
+//            remoteStmt.setInt(remoteCount++, gbmInfo.getType());
+//
+//            remoteStmt.executeUpdate();
+//            rsSet = remoteStmt.getGeneratedKeys();
+//            if (rsSet.next()) {
+//                mainId = rsSet.getInt(1);
+//            } else {
+//                System.err.println("gbmInfo:" + gbmInfo.toString() + ",插入失败");
+//            }
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (remoteStmt != null) {
+//                try {
+//                    remoteStmt.close();
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if (rsSet != null) {
+//                try {
+//                    rsSet.close();
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            DBHelper.getInstance().closeConnection(remoteConn);
+//        }
+//        return mainId;
     }
 
     @Override

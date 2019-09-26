@@ -2387,22 +2387,14 @@ public class OrderwsDao implements IOrderwsDao {
     @Override
     public int updateClinetAndServerUpdateState(String orderNo, int clientUpdate, int serverUpdate) {
         String sql = "update orderinfo set client_update=?,server_update=? where order_no=?";
-        Connection conn = DBHelper.getInstance().getConnection2();
-        PreparedStatement stmt = null;
-        int result = 0;
-        try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, clientUpdate);
-            stmt.setInt(2, serverUpdate);
-            stmt.setString(3, orderNo);
-            result = stmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            DBHelper.getInstance().closeStatement(stmt);
-            DBHelper.getInstance().closeConnection(conn);
-        }
-        return result;
+
+        List<String> lstValues = new ArrayList<>(3);
+        lstValues.add(String.valueOf(clientUpdate) );
+        lstValues.add(String.valueOf(serverUpdate ));
+        lstValues.add(orderNo );
+
+        String runSql = DBHelper.covertToSQL(sql,lstValues);
+        return Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
     }
 
     @Override
