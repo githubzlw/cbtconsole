@@ -1155,27 +1155,18 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public int updateValidList(int valid, String pids) {
         String sql = "update custom_benchmark_ready set valid=? and goodsstate =? where pid in ( " + pids + ")";
-        Connection conn = DBHelper.getInstance().getConnection2();
         int rs = 0;
-        PreparedStatement stmt = null;
         try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, valid);
-            stmt.setInt(2, (valid == 0 ? 2 : 4));
-            rs = stmt.executeUpdate();
+            List<String> lstValues = new ArrayList<>();
+            lstValues.add(String.valueOf(valid));
+            lstValues.add(String.valueOf(valid == 0 ? 2 : 4));
+
+            String runSql = DBHelper.covertToSQL(sql,lstValues);
+            rs=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("updateValidList error :" + e.getMessage());
             LOG.error("updateValidList error :" + e.getMessage());
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            DBHelper.getInstance().closeConnection(conn);
         }
         return rs;
     }

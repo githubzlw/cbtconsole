@@ -2011,6 +2011,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 
 		String orderNew = orderno;
 		Connection conn = DBHelper.getInstance().getConnection();
+		Connection conn2 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null, stmtf = null, stmtf2 = null, stmtfee = null, mergeStmt, gxzt, stmtid = null;
 		ResultSet rs = null;
 		try {
@@ -5322,7 +5323,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rse = null;
 		PreparedStatement stmtfind = null;
-		PreparedStatement stmttt = null;
 		try {
 			i++;
 			int res = 0;
@@ -5337,24 +5337,29 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				String sqlll = "insert into order_product_source(adminid,userid,addtime,orderid,confirm_userid,confirm_time,"
 						+ "goodsid,goodsdataid,goods_url,goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,"
 						+ "usecount,buycount,purchase_state,od_id,tb_1688_itemid,tborderid) values(?,?,now(),?,?,now(),?,?,?,?,?,?,?,?,?,?,1,?,?,'重复10') ";
-				stmttt = conn.prepareStatement(sqlll);
-				stmttt.setDouble(1, admid);
-				stmttt.setInt(2, userid);
-				stmttt.setString(3, orderNo);
-				stmttt.setInt(4, userid);
-				stmttt.setInt(5, goodid);
-				stmttt.setInt(6, goodsdataid);
-				stmttt.setString(7, goodsurl);
-				stmttt.setString(8, newValue);
-				stmttt.setString(9, googsimg);
-				stmttt.setString(10, goodsprice);
-				stmttt.setString(11, oldValue);
-				stmttt.setString(12, goodstitle);
-				stmttt.setInt(13, googsnumber);
-				stmttt.setInt(14, purchaseCount);
-				stmttt.setInt(15, od_id);
-				stmttt.setString(16, itemid);
-				stmttt.executeUpdate();
+
+				List<String> lstValues = new ArrayList<>();
+				lstValues.add(String.valueOf(admid));
+				lstValues.add(String.valueOf(userid));
+				lstValues.add(String.valueOf(orderNo));
+				lstValues.add(String.valueOf(userid));
+				lstValues.add(String.valueOf(goodid));
+				lstValues.add(String.valueOf(goodsdataid));
+				lstValues.add(String.valueOf(goodsurl));
+				lstValues.add(String.valueOf(newValue));
+				lstValues.add(String.valueOf(googsimg));
+				lstValues.add(String.valueOf(goodsprice));
+				lstValues.add(String.valueOf(oldValue));
+				lstValues.add(String.valueOf(goodstitle));
+				lstValues.add(String.valueOf(googsnumber));
+				lstValues.add(String.valueOf(googsnumber));
+				lstValues.add(String.valueOf(purchaseCount));
+				lstValues.add(String.valueOf(od_id));
+				lstValues.add(String.valueOf(itemid));
+
+				String runSql = DBHelper.covertToSQL(sqlll,lstValues);
+				Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 				i++;
 			} else {
 				String sqlll = "update order_product_source set confirm_userid="
@@ -5364,8 +5369,8 @@ public class PurchaseDaoImpl implements PurchaseDao {
 						+ orderNo
 						+ "' and goodsid="
 						+ goodid + " and del=0";
-				stmttt = conn.prepareStatement(sqlll);
-				stmttt.executeUpdate();
+
+				SendMQ.sendMsgByRPC(new RunSqlModel(sqlll));
 				i++;
 			}
 
@@ -5387,13 +5392,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				}
 			}
 
-			if (stmttt != null) {
-				try {
-					stmttt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+
 
 			DBHelper.getInstance().closeConnection(conn);
 		}

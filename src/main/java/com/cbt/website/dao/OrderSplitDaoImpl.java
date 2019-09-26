@@ -25,6 +25,8 @@ import com.cbt.pojo.Admuser;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.pojo.Dropshiporder;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 public class OrderSplitDaoImpl implements IOrderSplitDao {
 //	private static final Log   SLOG = (Log) LogFactory.getLog("source");
@@ -2343,7 +2345,6 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 	@Override
 	public int insertIntoPayment(int userId, String nwOrderNo, String oldOrderNo) {
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		String sql = "INSERT into payment "
 				+ "( userid, orderid, paymentid, payment_amount, payment_cc, orderdesc, username, "
 				+ "paystatus, createtime , paySID, payflag, paytype,  payment_other  ,paymentno,transaction_fee ) "
@@ -2351,26 +2352,16 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ "where order_no='" + nwOrderNo + "'), payment_cc, orderdesc, username, paystatus, NOW(),"
 				+ " paySID, payflag, 3 , 3,paymentno,0 from payment  where  payment.orderid='" + oldOrderNo
 				+ "' limit 1;";
-		Statement stmt = null;
 		try {
 			if (GetConfigureInfo.openSync()) {
 				SaveSyncTable.InsertOnlineDataInfo(userId, nwOrderNo, "拆单支付", "payment", sql);
 			} else {
-				stmt = conn2.createStatement();
-				stmt.execute(sql);
+
+				SendMQ.sendMsgByRPC(new RunSqlModel(sql));
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 		return 0;
 	}
