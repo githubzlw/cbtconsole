@@ -6875,28 +6875,30 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				context += "<br>" + map.get("text");
 				if("2".equals(map.get("type"))){
 					//销售回复采购
-					sql = "update goods_communication_info set context=?,is_read=0 where odid=? and orderid=?";
+					sql = "update goods_communication_info set context=?,is_read=0,goodsid=? where odid=? and orderid=?";
 				}else{
 					//采购回复销售
-					sql = "update goods_communication_info set context=?,is_read_sale=0 where odid=? and orderid=?";
+					sql = "update goods_communication_info set context=?,is_read_sale=0,goodsid=? where odid=? and orderid=?";
 				}
 				stmt = conn.prepareStatement(sql);
 				stmt.setString(1, context);
-				stmt.setString(2, map.get("odid"));
-				stmt.setString(3, map.get("orderid"));
+				stmt.setInt(2, Integer.valueOf(map.get("goodsid")));
+				stmt.setString(3, map.get("odid"));
+				stmt.setString(4, map.get("orderid"));
 				stmt.executeUpdate();
 				rk = context;
 			} else {
 				if("1".equals(map.get("type"))){
-					sql = "insert into goods_communication_info (context,orderid,odid,create_time,is_read) values(?,?,?,now(),?)";
+					sql = "insert into goods_communication_info (context,orderid,odid,goodsid,create_time,is_read) values(?,?,?,?,now(),?)";
 				}else{
-					sql = "insert into goods_communication_info (context,orderid,odid,create_time,is_read_sale) values(?,?,?,now(),?)";
+					sql = "insert into goods_communication_info (context,orderid,odid,goodsid,create_time,is_read_sale) values(?,?,?,?,now(),?)";
 				}
 				stmt = conn.prepareStatement(sql);
 				stmt.setString(1, map.get("text"));
 				stmt.setString(2, map.get("orderid"));
 				stmt.setString(3, map.get("odid"));
-				stmt.setInt(4,1);
+				stmt.setInt(4, Integer.valueOf(map.get("goodsid")));
+				stmt.setInt(5,1);
 				stmt.executeUpdate();
 				rk = map.get("text");
 			}

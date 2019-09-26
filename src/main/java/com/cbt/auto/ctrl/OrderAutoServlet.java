@@ -496,7 +496,7 @@ public class OrderAutoServlet extends HttpServlet {
         try {
             for(int i=0;i<=6;i++){
                 System.out.println("开始抓取第【"+i+"】级下的类别数据");
-                String sql="select * from 1688_category_0828 where lv="+i+"";
+                String sql="select * from 1688_category_0925 where lv="+i+"";
                 stmt=conn.prepareStatement(sql);
                 rs=stmt.executeQuery();
                 int k=1;
@@ -555,7 +555,7 @@ public class OrderAutoServlet extends HttpServlet {
         String category_id="";
         String childID="";
         try{
-            String sql="select * from 1688_category_0828 where category_id="+catid+"";
+            String sql="select * from 1688_category_0925 where category_id="+catid+"";
             stmt=conn.prepareStatement(sql);
             rs=stmt.executeQuery();
             if(!rs.next()){
@@ -592,30 +592,44 @@ public class OrderAutoServlet extends HttpServlet {
                     String lv=jsons.split("isLeaf")[0].split(":")[jsons.split("isLeaf")[0].split(":").length-1].replaceAll("\"","");
                     lv=lv.substring(0,lv.length()-1);
                     lvs=lv;
-                    String msg=jsons.split("errorMsg")[0].split("childIDs")[1].split(":")[1].split("]")[0];
-                    msg=msg.substring(1,msg.length());
-                    Thread.sleep(500);
-                    if(msg.indexOf(",")>-1){
-                        String [] childid_s=msg.split(",");
-                        int a[]=new int[childid_s.length];
-                        for(int m=0;m<childid_s.length;m++){
-                            a[m]=Integer.valueOf(childid_s[m]);
-                        }
-                        for(int k=0;k<a.length-1;k++){
-                            for(int o=k+1;o<a.length;o++){
-                                if (a[k]>a[o]){
-                                    int temp=a[k];
-                                    a[k]=a[o];
-                                    a[o]=temp;
-                                }
+
+//                    String msg=jsons.split("errorMsg")[0].split("childIDs")[1].split(":")[1].split("]")[0];
+//                    msg=msg.substring(1,msg.length());
+//                    Thread.sleep(500);
+//                    if(msg.indexOf(",")>-1){
+//                        String [] childid_s=msg.split(",");
+//                        int a[]=new int[childid_s.length];
+//                        for(int m=0;m<childid_s.length;m++){
+//                            a[m]=Integer.valueOf(childid_s[m]);
+//                        }
+//                        for(int k=0;k<a.length-1;k++){
+//                            for(int o=k+1;o<a.length;o++){
+//                                if (a[k]>a[o]){
+//                                    int temp=a[k];
+//                                    a[k]=a[o];
+//                                    a[o]=temp;
+//                                }
+//                            }
+//                        }
+//                        for(int p=0;p<a.length;p++){
+//                            bf.append(a[p]).append(",");
+//                        }
+//                        childID=bf.toString().substring(0,bf.toString().length()-1);
+//                    }
+
+                    Thread.sleep(100);
+                    if(jsons.contains("\"id\":")) {
+                        List<Integer> catidList = new ArrayList<Integer>();
+                        for (String cid : jsons.split(",")) {
+                            if (cid != null && cid.contains("\"id\":")) {
+                                catidList.add(Integer.valueOf(cid.substring(cid.indexOf("id\":") + 4)));
                             }
                         }
-                        for(int p=0;p<a.length;p++){
-                            bf.append(a[p]).append(",");
-                        }
-                        childID=bf.toString().substring(0,bf.toString().length()-1);
+                        Collections.sort(catidList);
+                        childID = org.apache.commons.lang.StringUtils.join(catidList, ",");
                     }
-                    sql="insert into 1688_category_0828 (lv,category_id,name,childids,parent_id,createtime) values(?,?,?,?,?,now())";
+
+                    sql="insert into 1688_category_0925 (lv,category_id,name,childids,parent_id,createtime) values(?,?,?,?,?,now())";
                     stmt=conn.prepareStatement(sql);
                     stmt.setInt(1, (i+1));
                     stmt.setString(2, category_id);

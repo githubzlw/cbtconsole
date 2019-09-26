@@ -75,6 +75,7 @@ public class ShopUrlController {
     private static final String SHOP_GOODS_LOCAL_PATH_J = "J:/shopimages";//J:/shopimages
     private FtpConfig ftpConfig;
     private static List<ConfirmUserInfo> allAdminList = UserInfoUtils.queryAllAdminList();
+    private static List<String> allShopBlackList = new ArrayList<>();
 
     @Autowired
     private IShopUrlService shopUrlService;
@@ -211,7 +212,19 @@ public class ShopUrlController {
                 timeTo, isOn, state, isAuto, readyDel, shopType, authorizedFlag, authorizedFileFlag, ennameBrandFlag, shopids,
                 translateDescription, isShopFlag, catid);
         List<ShopGoodsSalesAmount> shopGoodsSalesAmountList = customGoodsService.queryShopGoodsSalesAmountAll();
+
+        if(allShopBlackList == null || allShopBlackList.size() == 0){
+            allShopBlackList = customGoodsService.queryAllShopBlackList();
+        }
         for (ShopUrl shopUrlBean : findAll) {
+            if(allShopBlackList.contains(shopUrlBean.getShopId())){
+                shopUrlBean.setIsBlack(1);
+                if(StringUtils.isBlank(shopUrlBean.getInputShopDescription())){
+                    shopUrlBean.setInputShopDescription("<b style='color:red'>黑名单店铺</b>");
+                }else{
+                    shopUrlBean.setInputShopDescription(shopUrlBean.getInputShopDescription() + "<b style='color:red'>黑名单店铺</b>");
+                }
+            }
             genShopPrice(shopUrlBean, shopGoodsSalesAmountList);
             List<ShopBrandAuthorization> authorizationList =  shopUrlService.queryBrandAuthorizationByShopId(shopUrlBean.getShopId());
             if(authorizationList == null || authorizationList.size() == 0){
@@ -570,6 +583,14 @@ public class ShopUrlController {
         }
 
         try {
+            if(allShopBlackList == null || allShopBlackList.size() == 0){
+                allShopBlackList = customGoodsService.queryAllShopBlackList();
+            }
+            if(allShopBlackList.contains(shopId)){
+                 mv.addObject("isBlack", 1);
+            }else{
+                 mv.addObject("isBlack", 0);
+            }
             List<ShopInfoBean> infos = shopUrlService.queryInfoByShopId(shopId, "");
             List<ShopGoodsInfo> goodsList = shopUrlService.query1688GoodsByShopId(shopId);
             boolean is = false;

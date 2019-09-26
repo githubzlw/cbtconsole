@@ -182,6 +182,7 @@ public class NewOrderSplitCtr {
                     return 0;
                 }
                  bo=this.iWarehouseService.setInventoryCountBySkuAndPid(list);
+                 bo=this.iWarehouseService.addprocurement(list);
                 return 1;
             }catch (Exception e){
                 return 0;
@@ -612,10 +613,11 @@ public class NewOrderSplitCtr {
                         newTotalGoodsCost += goodsNumBean.getGoodsPrice() * goodsNumBean.getNum();
                         // 执行修改产品数量操作
                         orderDetail.setYourorder(goodsNumBean.getOldNum() - goodsNumBean.getNum());
-                        oldOrderDeatisMap.put(orderDetail.getId(), orderDetail);
+                        oldOrderDeatisMap.put(orderDetail.getGoodsid(), orderDetail);
                         //
                         OrderDetailsBean orderDetailTemp = (OrderDetailsBean) orderDetail.clone();
                         orderDetailTemp.setYourorder(goodsNumBean.getNum());
+                        orderDetailTemp.setOldGoodsNum(goodsNumBean.getOldNum() - goodsNumBean.getNum());
                         nwOrderDetails.add(orderDetailTemp);
                         break;
                     }
@@ -645,7 +647,8 @@ public class NewOrderSplitCtr {
             orderBeans.add(orderBeanTemp);
             splitDao.saveOrderInfoLogByList(orderBeans, admuser);
             // 3.开始执行拆单
-            boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails, OrderInfoConstantUtil.REVIEW, 1);
+            boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails,
+                    OrderInfoConstantUtil.REVIEW,  1);
             if (isOk) {
                 json.setOk(true);
             } else {
@@ -1020,6 +1023,20 @@ public class NewOrderSplitCtr {
         LOG.info("getOrderSplit sendEmailInfo end");
         return message;
     }
-
+   @RequestMapping("/orderdtail")
+   public void getorderdtail(HttpServletResponse response,HttpServletRequest request ) throws IOException {
+       try {
+           int i=this.iWarehouseService.orderdtailDetail();
+           if (i==0){
+               i=1/0;
+           }
+       } catch (Exception e) {
+           response.getWriter().write("{\"code\":500,\"message\":\"fail newPreOrderAutoDistribution " + e.getMessage() + "\",\"data\":null}");
+           LOG.error("fail newPreOrderAutoDistribution error ", e);
+           return;
+       }
+       response.setContentType("text/html;charset=UTF-8");
+       response.getWriter().write("{\"code\":200,\"message\":\"success\",\"data\":null}");
+   }
 
 }

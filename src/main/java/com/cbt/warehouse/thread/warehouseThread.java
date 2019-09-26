@@ -53,6 +53,7 @@ public class warehouseThread extends Thread {
 				sqls.append("'"+map.get("shipmentno")+"','"+map.get("orderid")+"','"+map.get("remarks")+"',now()");
 				sqls.append(") on duplicate key update shipmentno ='" + map.get("shipmentno")
 						+ "',createtime = now(),remarks='" + map.get("remarks") +"'");
+				iWarehouseService.insertMqLog(sqls.toString(), map.get("shipmentno"), map.get("orderid"),map.toString());
 				NotifyToCustomerUtil.sendSqlByMq(sqls.toString());
 			}
 		} catch (Exception e) {

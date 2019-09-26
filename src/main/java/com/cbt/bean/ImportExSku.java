@@ -18,6 +18,8 @@ public class ImportExSku {
      */
     private double volumeWeight;
 
+    private String wholesalePrice;
+
     public double getVolumeWeight() {
         return volumeWeight;
     }
@@ -74,6 +76,14 @@ public class ImportExSku {
         this.skuId = skuId;
     }
 
+    public String getWholesalePrice() {
+        return wholesalePrice;
+    }
+
+    public void setWholesalePrice(String wholesalePrice) {
+        this.wholesalePrice = wholesalePrice;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("{");
@@ -91,6 +101,8 @@ public class ImportExSku {
                 .append(volumeWeight);
         sb.append(",\"skuVal\":")
                 .append(skuVal);
+        sb.append(",\"wholesalePrice\":")
+                .append(wholesalePrice);
         sb.append('}');
         return sb.toString();
     }
