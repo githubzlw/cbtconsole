@@ -107,36 +107,36 @@ public class EditorController {
                 mapList.clear();
             }
 
-        // 取出1688商品的全部信息
-        CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+            // 取出1688商品的全部信息
+            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
 
-        if (goods == null) {
-            mv.addObject("uid", -1);
-            return mv;
-        } else if (user.getId() == 63) {
-            goods.setCanEdit(0);
-        }
-
-        if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
-            if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
-                goods.setOffReason(null);
-            } else {
-                goods.setOffReason("老数据");
+            if (goods == null) {
+                mv.addObject("uid", -1);
+                return mv;
+            } else if (user.getId() == 63) {
+                goods.setCanEdit(0);
             }
-        } else if (goods.getValid() == 2) {
-            if (goods.getGoodsState() == 1) {
-                goods.setOffReason(null);
-            } else {
-                String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()), "");
-                if (StringUtils.isNotBlank(rsStr)) {
-                    goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
+
+            if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
+                if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
+                    goods.setOffReason(null);
                 } else {
-                    goods.setUnsellAbleReasonDesc("未知下架原因");
+                    goods.setOffReason("老数据");
                 }
+            } else if (goods.getValid() == 2) {
+                if (goods.getGoodsState() == 1) {
+                    goods.setOffReason(null);
+                } else {
+                    String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()), "");
+                    if (StringUtils.isNotBlank(rsStr)) {
+                        goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
+                    } else {
+                        goods.setUnsellAbleReasonDesc("未知下架原因");
+                    }
+                }
+            } else if (goods.getGoodsState() == 1) {
+                goods.setOffReason(null);
             }
-        }else if (goods.getGoodsState() == 1) {
-            goods.setOffReason(null);
-        }
 
             if (goods == null) {
                 mv.addObject("uid", -1);
