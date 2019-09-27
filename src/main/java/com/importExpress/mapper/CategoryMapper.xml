@@ -38,5 +38,11 @@
 	update 1688_category set en_name=#{categoryname} where id=#{id}
 	
 	</update>
+	<select id="geCategoryList" resultType="java.util.Map">
+	select category_id,en_name from 1688_category where flag=0
+	</select>
+	<select id="getCategoryByCatid" resultType="String">
+	select en_name from 1688_category where flag=0 and category_id=#{catid}
+	</select>
 	
 </mapper>

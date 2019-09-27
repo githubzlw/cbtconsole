@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
 <style type="text/css">
-.main{width: 80%;}
+.main{width: 80%;background:#dff0d8;}
 .main-body .form-control{display: inline-block;width: 70%;}
 .product-name{padding: 0 3px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px;}
  .product-img{height:200px;z-index: 100;margin:0 auto;}
@@ -30,7 +30,7 @@
 	height: 100%;
 	background-color: rgba(0, 0, 0, .5);
 	position: fixed;
-	z-index: 999;
+	z-index: 800;
 	display: none;
 	text-align: center;
 }
@@ -41,9 +41,9 @@
 	left: 0;
 }
 /* 产品弹窗 tc1 */
-.tc1 {
+.tc1{
     position: absolute;
-    z-index: 10;
+    z-index: 999;
     display: none;
     top: 100px;
     left: 50%;
@@ -51,7 +51,9 @@
     background-color: #fff;
     padding: 20px;
     max-height: 800px;
+    border-radius: 12px;
 }
+.tc1{overflow-y: auto;}
 .tc,.tc *{font-size:16px;}
 .tc1 .form-horizontal .control-label{text-align: left;}
 .tc1 th{font-weight: normal;}
@@ -62,7 +64,7 @@
 .tc1 .container{margin-top:50px;}
 .tc1 table td:last-child{text-align: center;}
 .tc1 table input[type="radio"]{width:20px;height:20px;}
-.tc1,.tc2,.tc3{position:absolute;z-index:10;display:none;top:100px;left:50%;margin-left:-600px;background-color:#fff;
+.tc1{position:absolute;z-index:999;display:none;top:100px;left:50%;margin-left:-600px;background-color:#fff;
 padding: 20px;max-height: 800px;}
 .tc1_table,.tc2_table{max-height:500px;height:auto;overflow-y:auto;}
 
@@ -72,6 +74,46 @@ padding: 20px;max-height: 800px;}
 input[type=checkbox], input[type=radio]{position: absolute;top: 0;right: 20px;}
 .product_in{border:1px solid #999; padding-top: 10px;}
 .product{margin-bottom:20px;}
+.h3-c{text-align: left;}
+.close-x{
+    position: absolute;
+    top: 0;
+    right: 3px;
+}
+#catalog_name{border-radius: 6px;width:333px;height:50px;}
+.boutique_goods_cancel{width:90px;}
+.container-row{width:600px;}
+/* 产品弹窗 tc2 */
+.tc2{
+    position: absolute;
+    z-index: 999;
+    display: none;
+    top: 100px;
+    left: 37%;
+    background-color: #fff;
+    padding: 20px;
+    max-height: 800px;
+    border-radius: 12px;
+    width: 600px;
+}
+.row-button{margin-top: 10px;}
+.title-contro{margin-bottom: 9px;}
+.form-control-q{
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
 </style>
 </head>
 <body>
@@ -80,13 +122,13 @@ input[type=checkbox], input[type=radio]{position: absolute;top: 0;right: 20px;}
 <div class="row co-search-param">
 <div class="col-xs-10 title-contro">
 
-<label class="w200">模板: <select class="form-control" id="query_temp" >
+<label class="w200">模板: <select class="form-control-q" id="query_temp" >
 						<option value="1" selected="selected">IMPORT</option>
 						<option value="2" >KIDS</option>
 						<option value="4">PETS</option>
 				</select>
 				</label>
-<label>关键词:<input class="form-control" name="" id="query-keyword" value=""></label>
+<label>关键词:<input class="form-control-q" name="" id="query-keyword" value=""></label>
 <label><button class="btn btn-info"  id="query_button">搜索</button></label>
 <label><button class="btn btn-info"  id="catalog_preview">预览</button></label>
 <label><button class="btn btn-info"  id="catalog_create">生成目录</button></label>
@@ -147,7 +189,7 @@ input[type=checkbox], input[type=radio]{position: absolute;top: 0;right: 20px;}
 		<div class="row">
         <h3 class="text-center">推荐商品类目页预览</h3>
         <label>
-        <input class="btn btn-info boutique_goods_create" type="button" value="一键生成目录页"  style="margin-right: 80px;">
+        <input class="btn btn-info boutique_goods_create" type="button" value="生成目录页"  style="margin-right: 80px;">
         </label>
         <label>
         <input class="btn btn-info boutique_goods_clear" type="button" value="清空所有勾选的商品"  style="margin-right: 20px;">
@@ -155,88 +197,32 @@ input[type=checkbox], input[type=radio]{position: absolute;top: 0;right: 20px;}
         </div>
         <br>
         
-        
         <div class="row window-bd">
                 <div class="row ain-list">
-                    <div class="row pre-row">
-                        <div class="row category-row-product">
-                        <h3>category id: 1031910 -------- category name: Dress</h3>
-                        <div class="row catalog_ul clearfix">
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/bohemian-skirt-fairy-perfect-goddess-neck-up-chiffon-dress-long-10166-1031910-1529761268860.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/shopimg12/529761268860/2933052962_2133493095.400x400.jpg"></a>
-                        <span name="529761268860">X</span></div>
+                    <div class="pre-row">
                         
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/5xl-women-clothing-large-size-hollow-medium-long-short-sleeve-10166-1031910-145124061540.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/singleimg1/45124061540/2705186418_1323413341.400x400.jpg"></a>
-                        <span name="45124061540">X</span>
-                        </div>
-                        
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/spring-summer-pattern-printing-dress-halter-tops-dresses-female-backless-10166-1031910-1528135652474.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/shopimg2/528135652474/8652358851_261461903.400x400.jpg"></a>
-                        <span name="528135652474">X</span>
-                        </div>
-                        
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/suspended-wave-point-v-neck-pocket-pendant-dress-skir-10166-1031910-1529726453219.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/shopimg12/529726453219/2930459409_2133493095.400x400.jpg">
-                        </a><span name="529726453219">X</span>
-                        </div>
-                        
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/beach-long-dress-dress-style-one-piece-dres-10166-1031910-1547330269761.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/img/547330269761/4003766371_645783683.400x400.jpg">
-                        </a><span name="547330269761">X</span>
-                        </div>
-                        
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/sexy-worn-tie-and-tie-dress-with-double-lotus-leaf-10166-1031910-1548056914614.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/coreimg/548056914614/4046150784_249331157.400x400.jpg">
-                        </a><span name="548056914614">X</span>
-                        </div>
-                        
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/sexy-show-shoulder-lotus-leaf-edge-irregular-dresses-for-wome-10166-1031910-1531694642861.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/singleimg1/531694642861/4656046443_261461903.400x400.jpg">
-                        </a><span name="531694642861">X</span>
-                        </div>
-                        
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/women-able-sexy-crew-neck-sleeveless-wave-dot-high-waisted-10166-1031910-1568409142550.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/coreimg2/568409142550/8810216750_1522744806.400x400.jpg">
-                        </a><span name="568409142550">X</span>
-                        </div>
-                        
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/lace-splicing-chiffon-sexy-dress-skirt-lace-dres-10166-1031910-1545977543808.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/img/545977543808/4029415809_1120896168.400x400.jpg">
-                        </a><span name="545977543808">X</span>
-                        </div>
-                        
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/ladies-sexy-backless-deep-v-neck-sleeveless-a-line-women-10166-1031910-1543504393478.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/img/543504393478/3739498199_1899553315.400x400.jpg">
-                        </a><span name="543504393478">X</span>
-                        </div>
-                        
-                        <div class="col-xs-3">
-                        <a href="/goodsinfo/short-sleeve-dress-printing-max-hem-long-dress-short-sleev-10166-1031910-1549166867365.html" class="catalog_link">
-                        <img class="catalog_img img_lazy" src="https://img.import-express.com/importcsvimg/img/549166867365/4107457433_1729601586.400x400.jpg">
-                        </a><span name="549166867365">X</span>
-                        </div>
-                        
-                        </div>
-                    </div>
                 </div>
             </div>
     </div>
 		
 </div>
-
+	<div class="container tc2">
+		<div class="row container-row">
+		<div class="row"><h3>提示</h3></div>
+       <div class="row">
+       <label>目录名称:<input type="text" value="" id="catalog_name" class="" placeholder="请输入目录名称"></label>
+       </div>
+       <div class="row row-button">
+       <label><input class="btn btn-info boutique_goods_ok" type="button" value="确认生成"  style="margin-right: 20px;"></label>
+       <label><input class="btn boutique_goods_cancel" type="button" value="返回"  style="margin-right: 20px;"></label>
+       </div>
+        </div>
+        <br>
+</div>
+</div>
 </body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script src='/cbtconsole/js/jquery.lazyload.js'></script>
+<script type="text/javascript" src="/cbtconsole/js/msg-confirm.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/catelog-search.js"></script>
 </html>

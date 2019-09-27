@@ -9,23 +9,40 @@
 	    <result column="create_admin" property="createAdmin" />
 	    <result column="create_time" property="createTime" />
 	    <result column="product_count" property="productCount" />
-	    <result column="product_id_list" property="productIdList" />
+	    <result column="product_list" property="productList" />
 	    <result column="catalog_file" property="catalogFile" />
 	    <result column="status" property="status" />
 
 	  </resultMap>
 
     <!--更新目录-->
-	<update id="updateCatalogProduct">
-
-
+	<update id="updateCatalogProduct" parameterType="com.importExpress.pojo.RecommendCatalog">
+		update recommend_catalog set status=0 where id=#{id}
+	</update>
+    <!--更新目录-->
+	<update id="deleteCatalog">
+		update recommend_catalog set status=0 where id=#{id}
 	</update>
 
-
-	<insert id="insertCatalog">
-	  insert into recommend_catalog (userid,price,type,remark,datatime,currency,balanceAfter)
-	  values(#{bean.userid},#{bean.price},#{bean.type},#{bean.remark},#{bean.datatime},
-	  #{bean.currency},#{bean.balanceAfter})
+	<!-- 保存 -->
+	<insert id="insertCatalog" parameterType="com.importExpress.pojo.RecommendCatalog">
+	  insert into recommend_catalog (catalog_name,template,create_admin,create_time,product_count,product_list,catalog_file,status)
+	  values(#{catalogName},#{template},#{createAdmin},now(),#{productCount},
+	  #{productList},#{catalogFile},#{status})
 	</insert>
+	
+	<select id="catalogList" resultMap="recommendCatalogResultMap">
+	select  id,catalog_name,template,create_admin,create_time,product_count,product_list,catalog_file,status
+	from recommend_catalog where status=1 
+	<if test="template !=0"> and template=#{template}</if>
+	<if test="catalogName !=null"> and catalog_name=#{catalogName}</if>
+	limit #{page},40
+	</select>
+	
+	<select id="catalogCount" resultType="Integer">
+	select  count(*) from recommend_catalog where status=1 
+	<if test="template !=0"> and template=#{template}</if>
+	<if test="catalogName !=null"> and catalog_name=#{catalogName}</if>
+	</select>
 
 </mapper>

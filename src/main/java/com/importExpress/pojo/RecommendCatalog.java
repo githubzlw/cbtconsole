@@ -32,7 +32,7 @@ public class RecommendCatalog {
     /**
      *包含商品id
      */
-    private String productIdList;
+    private String productList;
     /**
      *目录存放位置
      */
