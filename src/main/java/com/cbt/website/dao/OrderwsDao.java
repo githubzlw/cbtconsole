@@ -1273,54 +1273,49 @@ public class OrderwsDao implements IOrderwsDao {
             sql += ",mode_transport=?";
         }
         sql += " ,pay_price = CONVERT(pay_price +?,decimal(12,2)  )  where order_no = ?";
-        Connection conn = DBHelper.getInstance().getConnection2();
-        PreparedStatement stmt = null;
         int res = 0;
-        try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(1, actual_ffreight);
-            stmt.setString(2, custom_discuss_other);
-            if (utilDate != null) {
-                Timestamp time = new Timestamp(utilDate.getTime());
-                stmt.setTimestamp(3, time);
-            } else {
-                stmt.setTimestamp(3, null);
-            }
-            stmt.setString(4, actual_weight);
-            stmt.setString(5, actual_volume);
 
-            double actual_allincost_d = 0;
-            if (actual_allincost != null) {
-                if (!actual_allincost.trim().equals("")) {
-                    actual_allincost_d = Double.parseDouble(actual_allincost);
-                }
-            }
-            stmt.setDouble(6, actual_allincost_d);
-            stmt.setInt(7, state);
-            stmt.setDouble(8, remaining_price_d);
-            stmt.setDouble(9, order_ac);
-            stmt.setString(10, service_fee);
-            stmt.setString(11, domestic_freight);
-            stmt.setDouble(12, actual_freight_c_);
-            int i = 13;
-            if (expect_arrive_date != null) {
-                Timestamp time1 = new Timestamp(expect_arrive_date.getTime());
-                stmt.setTimestamp(13, time1);
-                i++;
-            }
-            if (Utility.getStringIsNull(mode_transport)) {
-                stmt.setString(i, mode_transport);
-                i++;
-            }
-            stmt.setDouble(i, payPrice);
-            stmt.setString(i + 1, orderNo);
-            res = stmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            DBHelper.getInstance().closeStatement(stmt);
-            DBHelper.getInstance().closeConnection(conn);
+        List<String> lstValues = new ArrayList<>();
+        lstValues.add(actual_ffreight);
+        lstValues.add(custom_discuss_other);
+        if (utilDate != null) {
+            Timestamp time = new Timestamp(utilDate.getTime());
+            lstValues.add(String.valueOf(time));
+        } else {
+            lstValues.add(null);
         }
+        lstValues.add(actual_weight);
+        lstValues.add(actual_volume);
+
+        double actual_allincost_d = 0;
+        if (actual_allincost != null) {
+            if (!actual_allincost.trim().equals("")) {
+                actual_allincost_d = Double.parseDouble(actual_allincost);
+            }
+        }
+        lstValues.add( String.valueOf(actual_allincost_d));
+        lstValues.add( String.valueOf(state));
+        lstValues.add( String.valueOf(remaining_price_d));
+        lstValues.add(String.valueOf(order_ac));
+        lstValues.add( service_fee);
+        lstValues.add( domestic_freight);
+        lstValues.add( String.valueOf(actual_freight_c_));
+        int i = 13;
+        if (expect_arrive_date != null) {
+            Timestamp time1 = new Timestamp(expect_arrive_date.getTime());
+            lstValues.add( String.valueOf(time1));
+            i++;
+        }
+        if (Utility.getStringIsNull(mode_transport)) {
+            lstValues.add( String.valueOf(mode_transport));
+            i++;
+        }
+        lstValues.add( String.valueOf(payPrice));
+        lstValues.add( orderNo);
+
+        String runSql = DBHelper.covertToSQL(sql,lstValues);
+        res=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
         return res;
     }
 
@@ -2292,28 +2287,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public int updateOrderStatus(String orderNo, int orderStatus) {
-//        String sql = "update orderinfo set state=? where order_no=?";
-//        Connection conn = DBHelper.getInstance().getConnection2();
-//        PreparedStatement stmt = null;
-//        int result = 0;
-//        try {
-//            stmt = conn.prepareStatement(sql);
-//            stmt.setInt(1, orderStatus);
-//            stmt.setString(2, orderNo);
-//            result = stmt.executeUpdate();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (stmt != null) {
-//                try {
-//                    stmt.close();
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            DBHelper.getInstance().closeConnection(conn);
-//        }
-//        return result;
+
     	//更新线上数据改为mq方式
     	String sql = "update orderinfo set state="+ orderStatus +" where order_no='" + orderNo + "'";
     	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
@@ -2322,27 +2296,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public int updateOrderStatus(String orderNo) {
-//        String sql = "update orderinfo set state =2 where order_no=? and ( select count(id) from order_details where orderid=order_no and state=0)=0";
-//        Connection conn = DBHelper.getInstance().getConnection2();
-//        PreparedStatement stmt = null;
-//        int result = 0;
-//        try {
-//            stmt = conn.prepareStatement(sql);
-//            stmt.setString(1, orderNo);
-//            result = stmt.executeUpdate();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (stmt != null) {
-//                try {
-//                    stmt.close();
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            DBHelper.getInstance().closeConnection(conn);
-//        }
-//        return result;
+
         //更新线上数据改为mq方式
     	String sql = "update orderinfo set state =2 where order_no='" + orderNo + "' and ( select count(id) from order_details where orderid=order_no and state=0)=0";
     	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
@@ -2833,20 +2787,17 @@ public class OrderwsDao implements IOrderwsDao {
         } else {
             sql = "update goods_car set notfreeprice=? where id=?";
         }
-        Connection conn = DBHelper.getInstance().getConnection2();
-        PreparedStatement stmt = null;
+
         int res = 0;
-        try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(1, value);
-            stmt.setInt(2, goodsid);
-            res = stmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            DBHelper.getInstance().closeStatement(stmt);
-            DBHelper.getInstance().closeConnection(conn);
-        }
+
+        List<String> lstValues = new ArrayList<>();
+        lstValues.add(value);
+        lstValues.add(String.valueOf(goodsid));
+
+        String runSql = DBHelper.covertToSQL(sql,lstValues);
+        res=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
+
         return res;
     }
 
@@ -3081,20 +3032,26 @@ public class OrderwsDao implements IOrderwsDao {
     @Override
     public int upOrderPurchase(int orderdetailid, String orderNo, String purchase_confirmation) {
         String sql = "update order_details set purchase_state=1,purchase_confirmation=?,purchase_time=now()  where id = ?";
-        Connection conn = DBHelper.getInstance().getConnection2();
         PreparedStatement stmt = null;
         PreparedStatement stmt2 = null;
         int res = 0;
         try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(1, purchase_confirmation);
-            stmt.setInt(2, orderdetailid);
-            res = stmt.executeUpdate();
+
+            List<String> lstValues = new ArrayList<>();
+            lstValues.add(purchase_confirmation);
+            lstValues.add(String.valueOf(orderdetailid));
+
+            String runSql = DBHelper.covertToSQL(sql,lstValues);
+            res=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
             if (res > 0) {
                 sql = "update orderinfo set purchase_number=purchase_number+1 where order_no = ?";
-                stmt2 = conn.prepareStatement(sql);
-                stmt2.setString(1, orderNo);
-                res = stmt2.executeUpdate();
+
+                lstValues = new ArrayList<>();
+                lstValues.add(orderNo);
+
+                runSql = DBHelper.covertToSQL(sql,lstValues);
+                res=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(sql)));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -3107,7 +3064,6 @@ public class OrderwsDao implements IOrderwsDao {
                     e.printStackTrace();
                 }
             }
-            DBHelper.getInstance().closeConnection(conn);
         }
         return res;
     }
@@ -3286,10 +3242,8 @@ public class OrderwsDao implements IOrderwsDao {
     public int updateUserInCharge(int userid, int adminid, String admName) {
         String sql = "update admin_r_user set adminid=?,admName=(select admName from admuser where id=?) where userid=?";
         Connection conn = DBHelper.getInstance().getConnection();
-        Connection conn2 = DBHelper.getInstance().getConnection2();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        PreparedStatement stmt2 = null;
         int result = 0;
         try {
             stmt = conn.prepareStatement(sql);
@@ -3298,25 +3252,21 @@ public class OrderwsDao implements IOrderwsDao {
             stmt.setInt(3, userid);
             result = stmt.executeUpdate();
 
-            stmt2 = conn2.prepareStatement(sql);
-            stmt2.setInt(1, adminid);
-            stmt2.setString(2, admName);
-            stmt2.setInt(3, userid);
-            result = stmt2.executeUpdate();
+            List<String> lstValues = new ArrayList<>();
+            lstValues.add(String.valueOf(adminid));
+            lstValues.add(admName);
+            lstValues.add(String.valueOf(userid));
+
+            String runSql = DBHelper.covertToSQL(sql,lstValues);
+            result =Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeStatement(stmt);
-            if (stmt2 != null) {
-                try {
-                    stmt2.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+
             DBHelper.getInstance().closeConnection(conn);
-            DBHelper.getInstance().closeConnection(conn2);
         }
         return result;
     }
@@ -4583,20 +4533,15 @@ public class OrderwsDao implements IOrderwsDao {
     public int updatePurchaseDays(String orderid, int days) {
         // TODO Auto-generated method stub
         String sql = "update orderinfo set purchase_days=? where order_no=?";
-        Connection conn = DBHelper.getInstance().getConnection2();
-        PreparedStatement stmt = null;
         int res = 0;
-        try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, days);
-            stmt.setString(2, orderid);
-            res = stmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            DBHelper.getInstance().closeStatement(stmt);
-            DBHelper.getInstance().closeConnection(conn);
-        }
+
+        List<String> lstValues = new ArrayList<>();
+        lstValues.add(String.valueOf(days));
+        lstValues.add(orderid);
+
+        String runSql = DBHelper.covertToSQL(sql,lstValues);
+        res=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
         return res;
     }
 
@@ -4604,20 +4549,16 @@ public class OrderwsDao implements IOrderwsDao {
     public int updateOrderState(String orderid, int state) {
         // TODO Auto-generated method stub
         String sql = "update orderinfo set state=? where order_no=?";
-        Connection conn = DBHelper.getInstance().getConnection2();
-        PreparedStatement stmt = null;
         int res = 0;
-        try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, state);
-            stmt.setString(2, orderid);
-            res = stmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            DBHelper.getInstance().closeStatement(stmt);
-            DBHelper.getInstance().closeConnection(conn);
-        }
+
+
+        List<String> lstValues = new ArrayList<>();
+        lstValues.add(String.valueOf(state));
+        lstValues.add(orderid);
+
+        String runSql = DBHelper.covertToSQL(sql,lstValues);
+        res=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
         return res;
     }
 
@@ -4904,22 +4845,19 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public int upOrder_remainingPrice(String orderNo, double remainingPrice, double order_ac) {
-        Connection conn = DBHelper.getInstance().getConnection2();
+
         String sql = "update orderinfo set order_ac=?,remaining_price=? where order_no = ?";
-        PreparedStatement stmt = null;
+
         int result = 0;
-        try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setDouble(1, order_ac);
-            stmt.setDouble(2, remainingPrice);
-            stmt.setString(3, orderNo);
-            result = stmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            DBHelper.getInstance().closeStatement(stmt);
-            DBHelper.getInstance().closeConnection(conn);
-        }
+
+
+        List<String> lstValues = new ArrayList<>();
+        lstValues.add(String.valueOf(order_ac));
+        lstValues.add(String.valueOf(remainingPrice));
+        lstValues.add(orderNo);
+
+        String runSql = DBHelper.covertToSQL(sql,lstValues);
+        result=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
         return result;
     }
 
@@ -5539,22 +5477,26 @@ public class OrderwsDao implements IOrderwsDao {
                     sql = "insert into order_address (AddressID,orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,Updatetimr,admUserID,street,recipients,flag) "
                             + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                     stmt = conn.prepareStatement(sql);
-                    stmt.setString(1, rs.getString("AddressID"));
-                    stmt.setString(2, newOrderid);
-                    stmt.setString(3, rs.getString("Country"));
-                    stmt.setString(4, rs.getString("statename"));
-                    stmt.setString(5, rs.getString("address"));
-                    stmt.setString(6, rs.getString("address2"));
-                    stmt.setString(7, rs.getString("phoneNumber"));
-                    stmt.setString(8, rs.getString("zipcode"));
-                    stmt.setString(9, rs.getString("Adstatus"));
-                    stmt.setString(10, rs.getString("Updatetimr"));
-                    stmt.setString(11, rs.getString("admUserID"));
-                    stmt.setString(12, rs.getString("street"));
-                    stmt.setString(13, rs.getString("recipients"));
-                    stmt.setString(14, rs.getString("flag"));
+
+                    List<String> lstValues = new ArrayList<>();
+                    lstValues.add(rs.getString("AddressID"));
+                    lstValues.add(newOrderid);
+                    lstValues.add(rs.getString("Country"));
+                    lstValues.add(rs.getString("statename"));
+                    lstValues.add(rs.getString("address"));
+                    lstValues.add(rs.getString("address2"));
+                    lstValues.add(rs.getString("phoneNumber"));
+                    lstValues.add(rs.getString("zipcode"));
+                    lstValues.add(rs.getString("Adstatus"));
+                    lstValues.add( rs.getString("Updatetimr"));
+                    lstValues.add( rs.getString("admUserID"));
+                    lstValues.add( rs.getString("street"));
+                    lstValues.add( rs.getString("recipients"));
+                    lstValues.add( rs.getString("flag"));
+                    String runSql = DBHelper.covertToSQL(sql,lstValues);
+                    row=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
                 }
-                row = stmt.executeUpdate();
+
                 sql = "select * from orderinfo where order_no='" + orderid + "'";
                 stmt = conn.prepareStatement(sql);
                 rs = stmt.executeQuery();
@@ -5564,38 +5506,39 @@ public class OrderwsDao implements IOrderwsDao {
                     sql = "insert into orderinfo(order_no,user_id,product_cost,state,delivery_time,service_fee,ip,mode_transport,create_time,details_number,pay_price_three,"
                             + "foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,share_discount,order_ac,actual_lwh,actual_weight,actual_weight_estimate,"
                             + "extra_freight,orderRemark,cashback,isDropshipOrder,address_id,packag_number,coupon_discount,orderpaytime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now())";
-                    stmt = conn.prepareStatement(sql);
-                    stmt.setString(1, newOrderid);
-                    stmt.setString(2, rs.getString("user_id"));
-                    stmt.setString(3, "0");
-                    stmt.setString(4, "5");// 订单状态
-                    stmt.setString(5, rs.getString("delivery_time"));
-                    stmt.setString(6, rs.getString("service_fee"));
-                    stmt.setString(7, "0");
-                    stmt.setString(8, rs.getString("mode_transport"));
-                    stmt.setString(9, sdf.format(date).toString());
-                    stmt.setInt(10, length);
-                    stmt.setString(11, "-999");
-                    stmt.setString(12, rs.getString("foreign_freight"));
-                    stmt.setString(13, "0");
-                    stmt.setString(14, rs.getString("pay_price_tow"));
-                    stmt.setString(15, rs.getString("currency"));
-                    stmt.setString(16, rs.getString("actual_ffreight"));
-                    stmt.setString(17, rs.getString("discount_amount"));
-                    stmt.setString(18, rs.getString("share_discount"));
-                    stmt.setString(19, rs.getString("order_ac"));
-                    stmt.setString(20, rs.getString("actual_lwh"));
-                    stmt.setString(21, rs.getString("actual_weight"));
-                    stmt.setString(22, rs.getString("actual_weight_estimate"));
-                    stmt.setString(23, rs.getString("extra_freight"));
-                    stmt.setString(24, rs.getString("orderRemark"));
-                    stmt.setString(25, rs.getString("cashback"));
-                    stmt.setString(26, "2");// 售后补货订单
-                    stmt.setString(27, rs.getString("address_id"));
-                    stmt.setString(28, rs.getString("packag_number"));
-                    stmt.setString(29, rs.getString("coupon_discount"));
-//                    stmt.setString(30, sdf.format(date).toString());
-                    row = stmt.executeUpdate();
+                    List<String> lstValues = new ArrayList<>();
+                    lstValues.add(newOrderid);
+                    lstValues.add(rs.getString("user_id"));
+                    lstValues.add("0");
+                    lstValues.add("5");// 订单状态
+                    lstValues.add(rs.getString("delivery_time"));
+                    lstValues.add(rs.getString("service_fee"));
+                    lstValues.add("0");
+                    lstValues.add(rs.getString("mode_transport"));
+                    lstValues.add(sdf.format(date).toString());
+                    stmt.setInt(10ength);
+                    lstValues.add( "-999");
+                    lstValues.add( rs.getString("foreign_freight"));
+                    lstValues.add( "0");
+                    lstValues.add( rs.getString("pay_price_tow"));
+                    lstValues.add( rs.getString("currency"));
+                    lstValues.add( rs.getString("actual_ffreight"));
+                    lstValues.add( rs.getString("discount_amount"));
+                    lstValues.add( rs.getString("share_discount"));
+                    lstValues.add( rs.getString("order_ac"));
+                    lstValues.add( rs.getString("actual_lwh"));
+                    lstValues.add( rs.getString("actual_weight"));
+                    lstValues.add( rs.getString("actual_weight_estimate"));
+                    lstValues.add( rs.getString("extra_freight"));
+                    lstValues.add( rs.getString("orderRemark"));
+                    lstValues.add( rs.getString("cashback"));
+                    lstValues.add( "2");// 售后补货订单
+                    lstValues.add( rs.getString("address_id"));
+                    lstValues.add( rs.getString("packag_number"));
+                    lstValues.add( rs.getString("coupon_discount"));
+
+                    String runSql = DBHelper.covertToSQL(sql,lstValues);
+                    row=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
                 }
             }
         } catch (Exception e) {
@@ -5615,25 +5558,27 @@ public class OrderwsDao implements IOrderwsDao {
         PreparedStatement stmt = null;
         Connection conn = DBHelper.getInstance().getConnection2();
         String Dsql = "delete from orderinfo where order_no=?";
-        try {
-            stmt = conn.prepareStatement(Dsql);
-            stmt.setString(1, newOrderid);
-            stmt.execute();
-            Dsql = "delete from order_details where orderid=?";
-            stmt = conn.prepareStatement(Dsql);
-            stmt.setString(1, newOrderid);
-            stmt.execute();
-            Dsql = "delete from goods_distribution where orderid=?";
-            stmt = conn.prepareStatement(Dsql);
-            stmt.setString(1, newOrderid);
-            stmt.execute();
-            flag = true;
-        } catch (SQLException e) {
-            flag = false;
-        } finally {
-            DBHelper.getInstance().closeStatement(stmt);
-            DBHelper.getInstance().closeConnection(conn);
-        }
+
+        List<String> lstValues = new ArrayList<>();
+        lstValues.add(newOrderid);
+        String runSql = DBHelper.covertToSQL(Dsql,lstValues);
+        SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
+        Dsql = "delete from order_details where orderid=?";
+        lstValues = new ArrayList<>();
+        lstValues.add(newOrderid);
+        runSql = DBHelper.covertToSQL(Dsql,lstValues);
+        SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+        Dsql = "delete from goods_distribution where orderid=?";
+        lstValues = new ArrayList<>();
+        lstValues.add(newOrderid);
+        runSql = DBHelper.covertToSQL(Dsql,lstValues);
+        SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+        flag = true;
+
         return flag;
     }
 
@@ -5904,38 +5849,36 @@ public class OrderwsDao implements IOrderwsDao {
     public int updateMainOrderNoTotalPriceAndFreight(int userId, String mainOrderNo, float totalPrice, float orderAc,float extraFreight,
                                                      float weight) throws Exception {
 
-        PreparedStatement stmt = null;
         int rs = 0;
-        Connection conn = DBHelper.getInstance().getConnection2();
         String qSql = "update orderinfo set product_cost = convert(product_cost, decimal(11,2)) - ? ," +
                 "extra_freight = convert(extra_freight, decimal(11,2)) - ?,order_ac = "
                 + "convert(order_ac, decimal(11,2)) - ? ,pay_price = convert(pay_price, decimal(11,2)) - ? "
                 + ",actual_weight_estimate = actual_weight_estimate - ? where order_no = ? ";
         float childPrice = new BigDecimal(totalPrice + orderAc + extraFreight).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
-        try {
-            if (GetConfigureInfo.openSync()) {
-                String syncSql = "update orderinfo set product_cost = convert(product_cost, decimal(11,2)) - "
-                        + totalPrice + " ,order_ac = convert(order_ac, decimal(11,2)) - " + orderAc
-                        + " ,pay_price = convert(pay_price, decimal(11,2)) - " + childPrice
-                        + ",actual_weight_estimate = actual_weight_estimate - " + weight + " where order_no = '"
-                        + mainOrderNo + "'";
-                SaveSyncTable.InsertOnlineDataInfo(userId, mainOrderNo, "更新dropship主订单总价", "orderinfo", syncSql);
-                rs = 1;
-            } else {
-                stmt = conn.prepareStatement(qSql);
-                stmt.setFloat(1, totalPrice);
-                stmt.setFloat(2, extraFreight);
-                stmt.setFloat(3, orderAc);
-                stmt.setFloat(4, childPrice);
-                stmt.setFloat(5, weight);
-                stmt.setString(6, mainOrderNo);
-                rs = stmt.executeUpdate();
-            }
 
-        } finally {
-            DBHelper.getInstance().closeStatement(stmt);
-            DBHelper.getInstance().closeConnection(conn);
+        if (GetConfigureInfo.openSync()) {
+            String syncSql = "update orderinfo set product_cost = convert(product_cost, decimal(11,2)) - "
+                    + totalPrice + " ,order_ac = convert(order_ac, decimal(11,2)) - " + orderAc
+                    + " ,pay_price = convert(pay_price, decimal(11,2)) - " + childPrice
+                    + ",actual_weight_estimate = actual_weight_estimate - " + weight + " where order_no = '"
+                    + mainOrderNo + "'";
+            SaveSyncTable.InsertOnlineDataInfo(userId, mainOrderNo, "更新dropship主订单总价", "orderinfo", syncSql);
+            rs = 1;
+        } else {
+            List<String> lstValues = new ArrayList<>();
+            lstValues.add(String.valueOf(totalPrice));
+            lstValues.add(String.valueOf(extraFreight));
+            lstValues.add(String.valueOf(orderAc));
+            lstValues.add(String.valueOf(childPrice));
+            lstValues.add(String.valueOf(weight));
+            lstValues.add(mainOrderNo);
+
+
+            String runSql = DBHelper.covertToSQL(qSql,lstValues);
+            rs=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
         }
+
+
         return rs;
     }
 
