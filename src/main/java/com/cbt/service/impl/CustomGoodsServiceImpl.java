@@ -245,7 +245,6 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public CustomGoodsPublish queryGoodsDetails(String pid, int type) {
-        DataSourceSelector.restore();
         CustomGoodsPublish bean = customGoodsMapper.queryGoodsDetailsByPid(pid);
         if(bean != null){
             bean.setOnlineUrl(GoodsInfoUtils.genOnlineUrl(bean));
