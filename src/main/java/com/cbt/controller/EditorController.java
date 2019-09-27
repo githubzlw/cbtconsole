@@ -77,7 +77,7 @@ public class EditorController {
 
     @SuppressWarnings({"static-access", "unchecked"})
     @RequestMapping(value = "/detalisEdit", method = {RequestMethod.POST, RequestMethod.GET})
-    public ModelAndView detalisEdit(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ModelAndView detalisEdit(HttpServletRequest request, HttpServletResponse response) {
         DataSourceSelector.restore();
         // ModelAndView mv = new ModelAndView("customgoods_detalis");
         ModelAndView mv = new ModelAndView("customgoods_detalis_new");
@@ -87,73 +87,75 @@ public class EditorController {
         Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
         if (user == null || user.getId() == 0) {
             mv.addObject("uid", 0);
+            mv.addObject("message", "未登录");
             return mv;
         } else {
             mv.addObject("uid", user.getId());
             mv.addObject("roletype", user.getRoletype());
         }
-        // 获取需要编辑的内容
-        String pid = request.getParameter("pid");
-        if (pid == null || pid.isEmpty()) {
-            return mv;
-        }
-        if (offLineMap.size() == 0) {
-            List<Map<String, String>> mapList = customGoodsService.queryAllOffLineReason();
-            for (Map<String, String> tempMap : mapList) {
-                offLineMap.put(String.valueOf(tempMap.get("unsellablereason_id")), tempMap.get("unsellablereason_name"));
+        try {
+            // 获取需要编辑的内容
+            String pid = request.getParameter("pid");
+            if (pid == null || pid.isEmpty()) {
+                return mv;
             }
-            mapList.clear();
-        }
-
-        // 取出1688商品的全部信息
-        CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-        if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
-            if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
-                goods.setOffReason(null);
-            } else {
-                goods.setOffReason("老数据");
-            }
-        } else if (goods.getValid() == 2) {
-            if (goods.getGoodsState() == 1) {
-                goods.setOffReason(null);
-            } else {
-                String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()), "");
-                if (StringUtils.isNotBlank(rsStr)) {
-                    goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
-                } else {
-                    goods.setUnsellAbleReasonDesc("未知下架原因");
+            if (offLineMap.size() == 0) {
+                List<Map<String, String>> mapList = customGoodsService.queryAllOffLineReason();
+                for (Map<String, String> tempMap : mapList) {
+                    offLineMap.put(String.valueOf(tempMap.get("unsellablereason_id")), tempMap.get("unsellablereason_name"));
                 }
+                mapList.clear();
             }
-        }else if (goods.getGoodsState() == 1) {
-            goods.setOffReason(null);
-        }
 
-        if (goods == null) {
-            mv.addObject("uid", -1);
-            return mv;
-        } else if (user.getId() == 63) {
-            goods.setCanEdit(0);
-        }
+            // 取出1688商品的全部信息
+            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+            if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
+                if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
+                    goods.setOffReason(null);
+                } else {
+                    goods.setOffReason("老数据");
+                }
+            } else if (goods.getValid() == 2) {
+                if (goods.getGoodsState() == 1) {
+                    goods.setOffReason(null);
+                } else {
+                    String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()), "");
+                    if (StringUtils.isNotBlank(rsStr)) {
+                        goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
+                    } else {
+                        goods.setUnsellAbleReasonDesc("未知下架原因");
+                    }
+                }
+            } else if (goods.getGoodsState() == 1) {
+                goods.setOffReason(null);
+            }
 
-        if (StringUtils.isNotBlank(goods.getFeeprice())) {
-            goods.setFeeprice(goods.getFeeprice().replace("[", "").replace("]", "").replace("$", "@"));
-        }
+            if (goods == null) {
+                mv.addObject("uid", -1);
+                return mv;
+            } else if (user.getId() == 63) {
+                goods.setCanEdit(0);
+            }
 
-        if (StringUtils.isNotBlank(goods.getWprice())) {
-            goods.setWprice(goods.getWprice().replace("[", "").replace("]", "").replace("$", "@"));
-        }
+            if (StringUtils.isNotBlank(goods.getFeeprice())) {
+                goods.setFeeprice(goods.getFeeprice().replace("[", "").replace("]", "").replace("$", "@"));
+            }
 
-        if (!"".equals(goods.getOcrSizeInfo1())) {
-            request.setAttribute("ocrSizeInfo1", goods.getOcrSizeInfo1());
-        }
-        if (!"".equals(goods.getOcrSizeInfo2())) {
-            request.setAttribute("ocrSizeInfo2", goods.getOcrSizeInfo2());
-        }
-        if (!"".equals(goods.getOcrSizeInfo3())) {
-            request.setAttribute("ocrSizeInfo3", goods.getOcrSizeInfo3());
-        }
+            if (StringUtils.isNotBlank(goods.getWprice())) {
+                goods.setWprice(goods.getWprice().replace("[", "").replace("]", "").replace("$", "@"));
+            }
 
-        // 根据shopid查询店铺数据
+            if (!"".equals(goods.getOcrSizeInfo1())) {
+                request.setAttribute("ocrSizeInfo1", goods.getOcrSizeInfo1());
+            }
+            if (!"".equals(goods.getOcrSizeInfo2())) {
+                request.setAttribute("ocrSizeInfo2", goods.getOcrSizeInfo2());
+            }
+            if (!"".equals(goods.getOcrSizeInfo3())) {
+                request.setAttribute("ocrSizeInfo3", goods.getOcrSizeInfo3());
+            }
+
+            // 根据shopid查询店铺数据
         /*int queryId = 0;
         if (!(goods.getShopId() == null || "".equals(goods.getShopId()))) {
             ShopManagerPojo spmg = customGoodsService.queryByShopId(goods.getShopId());
@@ -162,152 +164,152 @@ public class EditorController {
             }
         }*/
 
-        mv.addObject("shopId", goods.getShopId());
-        //查询商品评论信息
-        List<CustomGoodsPublish> reviewList = customGoodsService.getAllReviewByPid(pid);
-        request.setAttribute("reviewList", JSONArray.fromObject(reviewList));
-        // 取出主图筛选数量
-        GoodsPictureQuantity pictureQt = customGoodsService.queryPictureQuantityByPid(pid);
-        pictureQt.setImgDeletedSize(pictureQt.getTypeOriginalSize() + pictureQt.getImgOriginalSize()
-                - pictureQt.getImgSize() - pictureQt.getTypeSize());
-        // pictureQt.setTypeDeletedSize(pictureQt.getTypeOriginalSize()-pictureQt.getTypeSize());
-        pictureQt.setInfoDeletedSize(pictureQt.getInfoOriginalSize() - pictureQt.getInfoSize());
-        request.setAttribute("pictureQt", pictureQt);
+            mv.addObject("shopId", goods.getShopId());
+            //查询商品评论信息
+            List<CustomGoodsPublish> reviewList = customGoodsService.getAllReviewByPid(pid);
+            request.setAttribute("reviewList", JSONArray.fromObject(reviewList));
+            // 取出主图筛选数量
+            GoodsPictureQuantity pictureQt = customGoodsService.queryPictureQuantityByPid(pid);
+            pictureQt.setImgDeletedSize(pictureQt.getTypeOriginalSize() + pictureQt.getImgOriginalSize()
+                    - pictureQt.getImgSize() - pictureQt.getTypeSize());
+            // pictureQt.setTypeDeletedSize(pictureQt.getTypeOriginalSize()-pictureQt.getTypeSize());
+            pictureQt.setInfoDeletedSize(pictureQt.getInfoOriginalSize() - pictureQt.getInfoSize());
+            request.setAttribute("pictureQt", pictureQt);
 
-        // 取出1688原货源链接
+            // 取出1688原货源链接
 
-        // 将goods的entype属性值取出来,即规格图
-        List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
+            // 将goods的entype属性值取出来,即规格图
+            List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
 
-        // 将goods的img属性值取出来,即橱窗图
-        request.setAttribute("showimgs", JSONArray.fromObject("[]"));
-        List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
-        if (imgs.size() > 0) {
-            request.setAttribute("showimgs", JSONArray.fromObject(imgs));
-            String firstImg = imgs.get(0);
+            // 将goods的img属性值取出来,即橱窗图
+            request.setAttribute("showimgs", JSONArray.fromObject("[]"));
+            List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
+            if (imgs.size() > 0) {
+                request.setAttribute("showimgs", JSONArray.fromObject(imgs));
+                String firstImg = imgs.get(0);
 
-            goods.setShowMainImage(firstImg.replace(".60x60.", ".400x400."));
-        }
+                goods.setShowMainImage(firstImg.replace(".60x60.", ".400x400."));
+            }
 
-        HashMap<String, String> pInfo = GoodsInfoUtils.deal1688Sku(goods);
-        request.setAttribute("showattribute", pInfo);
-
-
-        request.setAttribute("isSoldFlag", goods.getIsSoldFlag());
+            HashMap<String, String> pInfo = GoodsInfoUtils.deal1688Sku(goods);
+            request.setAttribute("showattribute", pInfo);
 
 
-        // 处理Sku数据
-        // 判断是否是区间价格，含有区间价格的获取sku数据进行处理
-        if (StringUtils.isNotBlank(goods.getRangePrice()) && StringUtils.isNotBlank(goods.getSku())) {
-            List<ImportExSku> skuList = new ArrayList<ImportExSku>();
-            JSONArray sku_json = JSONArray.fromObject(goods.getSku());
-            skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-            // 规格标题名称集合
-            List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
-            // 集合排序
-            Collections.sort(cbSkus, new Comparator<ImportExSkuShow>() {
-                public int compare(ImportExSkuShow o1, ImportExSkuShow o2) {
-                    return o1.getPpIds().compareTo(o2.getPpIds());
+            request.setAttribute("isSoldFlag", goods.getIsSoldFlag());
+
+
+            // 处理Sku数据
+            // 判断是否是区间价格，含有区间价格的获取sku数据进行处理
+            if (StringUtils.isNotBlank(goods.getRangePrice()) && StringUtils.isNotBlank(goods.getSku())) {
+                List<ImportExSku> skuList = new ArrayList<ImportExSku>();
+                JSONArray sku_json = JSONArray.fromObject(goods.getSku());
+                skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                // 规格标题名称集合
+                List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
+                // 集合排序
+                Collections.sort(cbSkus, new Comparator<ImportExSkuShow>() {
+                    public int compare(ImportExSkuShow o1, ImportExSkuShow o2) {
+                        return o1.getPpIds().compareTo(o2.getPpIds());
+                    }
+                });
+                request.setAttribute("showSku", JSONArray.fromObject(cbSkus));
+
+                Map<String, Object> typeNames = new HashMap<String, Object>();
+                for (TypeBean tyb : typeList) {
+                    if (!typeNames.containsKey(tyb.getTypeId())) {
+                        typeNames.put(tyb.getTypeId(), tyb.getType());
+                    }
                 }
-            });
-            request.setAttribute("showSku", JSONArray.fromObject(cbSkus));
-
-            Map<String, Object> typeNames = new HashMap<String, Object>();
-            for (TypeBean tyb : typeList) {
-                if (!typeNames.containsKey(tyb.getTypeId())) {
-                    typeNames.put(tyb.getTypeId(), tyb.getType());
-                }
+                request.setAttribute("typeNames", typeNames);
             }
-            request.setAttribute("typeNames", typeNames);
-        }
 
-        //判断是否是免邮商品(isSoldFlag > 0)，如果是则显示免邮价格显示
-        if (Integer.valueOf(goods.getIsSoldFlag()) > 0) {
-            if (StringUtils.isNotBlank(goods.getFeeprice())) {
-                request.setAttribute("feePrice", goods.getFeeprice());
-            } else {
-                request.setAttribute("feePrice", "");
-            }
-        }
-
-
-        if (typeList.size() > 0) {
-            request.setAttribute("showtypes", JSONArray.fromObject(typeList));
-        } else {
-            request.setAttribute("showtypes", JSONArray.fromObject("[]"));
-        }
-
-        //进行利润率计算,区分免邮和费免邮商品
-        goods.setWeight(StrUtils.matchStr(goods.getWeight(), "(\\d+\\.*\\d*)"));
-        //运费计算公式
-        double freight = 0.076 * Double.valueOf(goods.getFinalWeight()) * 1000;
-        //获取1688价格(1piece)
-        String wholePriceStr = goods.getWholesalePrice();
-        if (StringUtils.isNotBlank(wholePriceStr)) {
-            String firstPrice = wholePriceStr.split(",")[0].split("\\$")[1].trim();
-            firstPrice = firstPrice.replace("]", "");
-            double wholePrice = 0;
-            if (firstPrice.contains("-")) {
-                wholePrice = Double.valueOf(firstPrice.split("-")[1].trim());
-            } else {
-                wholePrice = Double.valueOf(firstPrice.trim());
-            }
-            //判断免邮非免邮
-            double oldProfit = 0;
-            double singlePrice = 0;
-            String singlePriceStr = "0";
+            //判断是否是免邮商品(isSoldFlag > 0)，如果是则显示免邮价格显示
             if (Integer.valueOf(goods.getIsSoldFlag()) > 0) {
-                //先取range_price 为空则再取feeprice
-                if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                    if (goods.getRangePrice().contains("-")) {
-                        singlePriceStr = goods.getRangePrice().split("-")[1].trim();
-                    } else {
-                        singlePriceStr = goods.getRangePrice().trim();
-                    }
-                } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
-                    singlePriceStr = goods.getFeeprice().split(",")[0];
-                    if (singlePriceStr.contains("\\$")) {
-                        singlePriceStr = singlePriceStr.split("\\$")[1].trim();
-                    } else if (singlePriceStr.contains("@")) {
-                        singlePriceStr = singlePriceStr.split("@")[1].trim();
-                    } else {
-                        singlePriceStr = singlePriceStr.trim();
-                    }
+                if (StringUtils.isNotBlank(goods.getFeeprice())) {
+                    request.setAttribute("feePrice", goods.getFeeprice());
+                } else {
+                    request.setAttribute("feePrice", "");
                 }
+            }
+
+
+            if (typeList.size() > 0) {
+                request.setAttribute("showtypes", JSONArray.fromObject(typeList));
             } else {
-                //先取range_price 为空则wprice 再为空取price
-                if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                    if (goods.getRangePrice().contains("-")) {
-                        singlePriceStr = goods.getRangePrice().split("-")[1].trim();
-                    } else {
-                        singlePriceStr = goods.getRangePrice().trim();
-                    }
-                } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
-                    singlePriceStr = goods.getFeeprice().split(",")[0];
-                    if (singlePriceStr.contains("\\$")) {
-                        singlePriceStr = singlePriceStr.split("\\$")[1].trim();
-                    } else if (singlePriceStr.contains("@")) {
-                        singlePriceStr = singlePriceStr.split("@")[1].trim();
-                    } else {
-                        singlePriceStr = singlePriceStr.trim();
+                request.setAttribute("showtypes", JSONArray.fromObject("[]"));
+            }
+
+            //进行利润率计算,区分免邮和费免邮商品
+            goods.setWeight(StrUtils.matchStr(goods.getWeight(), "(\\d+\\.*\\d*)"));
+            //运费计算公式
+            double freight = 0.076 * Double.valueOf(goods.getFinalWeight()) * 1000;
+            //获取1688价格(1piece)
+            String wholePriceStr = goods.getWholesalePrice();
+            if (StringUtils.isNotBlank(wholePriceStr)) {
+                String firstPrice = wholePriceStr.split(",")[0].split("\\$")[1].trim();
+                firstPrice = firstPrice.replace("]", "");
+                double wholePrice = 0;
+                if (firstPrice.contains("-")) {
+                    wholePrice = Double.valueOf(firstPrice.split("-")[1].trim());
+                } else {
+                    wholePrice = Double.valueOf(firstPrice.trim());
+                }
+                //判断免邮非免邮
+                double oldProfit = 0;
+                double singlePrice = 0;
+                String singlePriceStr = "0";
+                if (Integer.valueOf(goods.getIsSoldFlag()) > 0) {
+                    //先取range_price 为空则再取feeprice
+                    if (StringUtils.isNotBlank(goods.getRangePrice())) {
+                        if (goods.getRangePrice().contains("-")) {
+                            singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                        } else {
+                            singlePriceStr = goods.getRangePrice().trim();
+                        }
+                    } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
+                        singlePriceStr = goods.getFeeprice().split(",")[0];
+                        if (singlePriceStr.contains("\\$")) {
+                            singlePriceStr = singlePriceStr.split("\\$")[1].trim();
+                        } else if (singlePriceStr.contains("@")) {
+                            singlePriceStr = singlePriceStr.split("@")[1].trim();
+                        } else {
+                            singlePriceStr = singlePriceStr.trim();
+                        }
                     }
                 } else {
-                    singlePriceStr = goods.getPrice();
+                    //先取range_price 为空则wprice 再为空取price
+                    if (StringUtils.isNotBlank(goods.getRangePrice())) {
+                        if (goods.getRangePrice().contains("-")) {
+                            singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                        } else {
+                            singlePriceStr = goods.getRangePrice().trim();
+                        }
+                    } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
+                        singlePriceStr = goods.getFeeprice().split(",")[0];
+                        if (singlePriceStr.contains("\\$")) {
+                            singlePriceStr = singlePriceStr.split("\\$")[1].trim();
+                        } else if (singlePriceStr.contains("@")) {
+                            singlePriceStr = singlePriceStr.split("@")[1].trim();
+                        } else {
+                            singlePriceStr = singlePriceStr.trim();
+                        }
+                    } else {
+                        singlePriceStr = goods.getPrice();
+                    }
                 }
-            }
-            singlePriceStr = singlePriceStr.replace("[", "").replace("]", "");
-            //获取1piece的最高价格
-            if (singlePriceStr.contains("-")) {
-                singlePrice = Double.valueOf(singlePriceStr.split("-")[1].trim());
-            } else {
-                singlePrice = Double.valueOf(singlePriceStr);
-            }
-            //计算利润率
-            //oldProfit = (singlePrice * 6.6 - wholePrice) / wholePrice * 100;
-            //goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit,2));
+                singlePriceStr = singlePriceStr.replace("[", "").replace("]", "");
+                //获取1piece的最高价格
+                if (singlePriceStr.contains("-")) {
+                    singlePrice = Double.valueOf(singlePriceStr.split("-")[1].trim());
+                } else {
+                    singlePrice = Double.valueOf(singlePriceStr);
+                }
+                //计算利润率
+                //oldProfit = (singlePrice * 6.6 - wholePrice) / wholePrice * 100;
+                //goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit,2));
 
 
-            //计算加价率
+                //计算加价率
             /*if ((goods.getIsBenchmark() == 1 && goods.getBmFlag() == 1) || goods.getIsBenchmark() == 2) {
                 //对标时
                 //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/StrUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/StrUtils.EXCHANGE_RATE(6.6));
@@ -329,124 +331,129 @@ public class EditorController {
                 oldProfit = 0.55 + catXs;
                 goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit, 2));
             }*/
-        } else {
-            System.err.println("pid:" + pid + ",wholePrice is null");
-        }
-
-        // 判断是精准对标的
-        if (goods.getBmFlag() == 1 && goods.getIsBenchmark() == 1) {
-            // 获取实时对标信息
-            Map<String, String> priceMap = customGoodsService.queryNewAliPriceByAliPid(goods.getAliGoodsPid());
-            if (priceMap.size() > 1) {
-                goods.setCrawlAliDate(priceMap.get("new_time"));
-                goods.setCrawlAliPrice(priceMap.get("new_price"));
-            }
-        }
-
-        // 直接使用远程路径
-        String localpath = goods.getRemotpath();
-        // 设置默认图的路径
-        if (!(goods.getShowMainImage().indexOf("http://") > -1 || goods.getShowMainImage().indexOf("https://") > -1)) {
-            goods.setShowMainImage(localpath + goods.getShowMainImage());
-        }
-        // 分割eninfo数据，不替换remotepath相同的路径
-        String enInfo = goods.getEninfo().replaceAll("<br><img", "<img").replaceAll("<br /><img", "<img");
-        // 使用img标签进行分割
-        String[] enInfoLst = enInfo.split("<img");
-        StringBuffer textBf = new StringBuffer();
-        for (String srcStr : enInfoLst) {
-            // 判断是否含有全路径的图片
-            if (srcStr.indexOf("http:") > -1 || srcStr.indexOf("https:") > -1) {
-                // 是否存在img标签的判断，使用img含有src的判断
-                if (srcStr.indexOf("src=") > -1) {
-                    textBf.append("<br><img " + srcStr);
-                } else {
-                    textBf.append(srcStr);
-                }
             } else {
-                // 是否存在img标签的判断，使用img含有src的判断
-                if (srcStr.indexOf("src=") > -1) {
-                    textBf.append("<br><img " + srcStr.replaceAll("src=\"", "src=\"" + localpath));
-                } else {
-                    textBf.append(srcStr);
+                System.err.println("pid:" + pid + ",wholePrice is null");
+            }
+
+            // 判断是精准对标的
+            if (goods.getBmFlag() == 1 && goods.getIsBenchmark() == 1) {
+                // 获取实时对标信息
+                Map<String, String> priceMap = customGoodsService.queryNewAliPriceByAliPid(goods.getAliGoodsPid());
+                if (priceMap.size() > 1) {
+                    goods.setCrawlAliDate(priceMap.get("new_time"));
+                    goods.setCrawlAliPrice(priceMap.get("new_price"));
                 }
             }
-        }
-        // 使用完成后清理数据
-        enInfoLst = null;
 
-        // 判断是否是人为修改的重量，如果是则显示修改的重量，否则显示默认的重量
-        if (goods.getReviseWeight() == null || "".equals(goods.getReviseWeight())) {
-            goods.setReviseWeight(goods.getFinalWeight());
-        }
-
-        String text = textBf.toString();
-
-        // 已经放入产品表的size_info_en字段
-        //获取文字尺码数据
-        // String wordSizeInfo = customGoodsService.getWordSizeInfoByPid(pid);
-        String wordSizeInfo = goods.getSizeInfoEn();
-        if (StringUtils.isNotBlank(wordSizeInfo)) {
-            if (wordSizeInfo.indexOf("[") == 0) {
-                wordSizeInfo = wordSizeInfo.substring(1);
+            // 直接使用远程路径
+            String localpath = goods.getRemotpath();
+            // 设置默认图的路径
+            if (!(goods.getShowMainImage().indexOf("http://") > -1 || goods.getShowMainImage().indexOf("https://") > -1)) {
+                goods.setShowMainImage(localpath + goods.getShowMainImage());
             }
-            if (wordSizeInfo.lastIndexOf("]") == wordSizeInfo.length() - 1) {
-                wordSizeInfo = wordSizeInfo.substring(0, wordSizeInfo.length() - 1);
+            // 分割eninfo数据，不替换remotepath相同的路径
+            String enInfo = goods.getEninfo().replaceAll("<br><img", "<img").replaceAll("<br /><img", "<img");
+            // 使用img标签进行分割
+            String[] enInfoLst = enInfo.split("<img");
+            StringBuffer textBf = new StringBuffer();
+            for (String srcStr : enInfoLst) {
+                // 判断是否含有全路径的图片
+                if (srcStr.indexOf("http:") > -1 || srcStr.indexOf("https:") > -1) {
+                    // 是否存在img标签的判断，使用img含有src的判断
+                    if (srcStr.indexOf("src=") > -1) {
+                        textBf.append("<br><img " + srcStr);
+                    } else {
+                        textBf.append(srcStr);
+                    }
+                } else {
+                    // 是否存在img标签的判断，使用img含有src的判断
+                    if (srcStr.indexOf("src=") > -1) {
+                        textBf.append("<br><img " + srcStr.replaceAll("src=\"", "src=\"" + localpath));
+                    } else {
+                        textBf.append(srcStr);
+                    }
+                }
             }
-            goods.setSizeInfoEn(wordSizeInfo);
-        }
+            // 使用完成后清理数据
+            enInfoLst = null;
 
-        // 当前抓取aliexpress的商品数据
-        boolean isLocal = true;
-        if (!(goods.getAliGoodsPid() == null || "".equals(goods.getAliGoodsPid()))) {
-            GoodsBean algood = null;
-            String aliUrl = "https://www.aliexpress.com/item/"
-                    + (goods.getAliGoodsName() == null ? "ali goods" : goods.getAliGoodsName())
-                    + "/" + goods.getAliGoodsPid() + ".html";
-            goods.setAliGoodsUrl(aliUrl);
-            System.err.println("url:" + aliUrl);
-            if (isLocal) {
-                // 本地直接获取ali商品信息
-                algood = ParseGoodsUrl.parseGoodsw(aliUrl, 3);
-            } else {
-                // 远程访问获取ali商品信息
-                String resultJson = DownloadMain.getContentClient(ContentConfig.CRAWL_ALI_URL + aliUrl,
-                        null);
-                JSONObject goodsObj = JSONObject.fromObject(resultJson);
-                algood = (GoodsBean) JSONObject.toBean(goodsObj, GoodsBean.class);
+            // 判断是否是人为修改的重量，如果是则显示修改的重量，否则显示默认的重量
+            if (goods.getReviseWeight() == null || "".equals(goods.getReviseWeight())) {
+                goods.setReviseWeight(goods.getFinalWeight());
             }
 
-            if (algood == null || algood.getValid() == 0) {
-                goods.setAliGoodsName("get aliexpress goodsinfo failure this is a test goods");
-                goods.setAliGoodsImgUrl(
-                        "https://ae01.alicdn.com/kf/HTB1AYzjSpXXXXbHXpXXq6xXFXXXx/960P-1-3MP-HD-Wireless-IP-Camera-wi-fi-Robot-camera-Wifi-Night-Vision-Camera-IP.jpg");
-            } else {
-                // goods.setAliGoodsName(algood.getpName());
-                // if (algood.getImgSize().length >= 2) {
-                // goods.setAliGoodsImgUrl(algood.getpImage().get(0) +
-                // algood.getImgSize()[1]);
-                // } else {
-                // goods.setAliGoodsImgUrl(algood.getpImage().get(0) +
-                // algood.getImgSize()[0]);
-                // }
-                // 获取ali商品的详情文字，并去掉文字中敏感词的数据
+            String text = textBf.toString();
 
-                getTextByHtml(goods, algood, isLocal);
+            // 已经放入产品表的size_info_en字段
+            //获取文字尺码数据
+            // String wordSizeInfo = customGoodsService.getWordSizeInfoByPid(pid);
+            String wordSizeInfo = goods.getSizeInfoEn();
+            if (StringUtils.isNotBlank(wordSizeInfo)) {
+                if (wordSizeInfo.indexOf("[") == 0) {
+                    wordSizeInfo = wordSizeInfo.substring(1);
+                }
+                if (wordSizeInfo.lastIndexOf("]") == wordSizeInfo.length() - 1) {
+                    wordSizeInfo = wordSizeInfo.substring(0, wordSizeInfo.length() - 1);
+                }
+                goods.setSizeInfoEn(wordSizeInfo);
             }
-        }
-        // 返回待编辑数据到编辑页面
-        mv.addObject("text", text);
-        mv.addObject("pid", pid);
 
-        mv.addObject("goods", goods);
-        // 上传图片保存路径----酌情配置
-        String savePath = localpath.replace(localIP, rootPath);
-        if (IpCheckUtil.checkIsIntranet(request)) {
-            savePath = localpath.replace(wanlIP, rootPath);
-        }
-        mv.addObject("savePath", savePath);
-        mv.addObject("localpath", localpath);
+            // 当前抓取aliexpress的商品数据
+            boolean isLocal = true;
+            if (!(goods.getAliGoodsPid() == null || "".equals(goods.getAliGoodsPid()))) {
+                GoodsBean algood = null;
+                String aliUrl = "https://www.aliexpress.com/item/"
+                        + (goods.getAliGoodsName() == null ? "ali goods" : goods.getAliGoodsName())
+                        + "/" + goods.getAliGoodsPid() + ".html";
+                goods.setAliGoodsUrl(aliUrl);
+                System.err.println("url:" + aliUrl);
+                if (isLocal) {
+                    // 本地直接获取ali商品信息
+                    algood = ParseGoodsUrl.parseGoodsw(aliUrl, 3);
+                } else {
+                    // 远程访问获取ali商品信息
+                    String resultJson = DownloadMain.getContentClient(ContentConfig.CRAWL_ALI_URL + aliUrl,
+                            null);
+                    JSONObject goodsObj = JSONObject.fromObject(resultJson);
+                    algood = (GoodsBean) JSONObject.toBean(goodsObj, GoodsBean.class);
+                }
 
+                if (algood == null || algood.getValid() == 0) {
+                    goods.setAliGoodsName("get aliexpress goodsinfo failure this is a test goods");
+                    goods.setAliGoodsImgUrl(
+                            "https://ae01.alicdn.com/kf/HTB1AYzjSpXXXXbHXpXXq6xXFXXXx/960P-1-3MP-HD-Wireless-IP-Camera-wi-fi-Robot-camera-Wifi-Night-Vision-Camera-IP.jpg");
+                } else {
+                    // goods.setAliGoodsName(algood.getpName());
+                    // if (algood.getImgSize().length >= 2) {
+                    // goods.setAliGoodsImgUrl(algood.getpImage().get(0) +
+                    // algood.getImgSize()[1]);
+                    // } else {
+                    // goods.setAliGoodsImgUrl(algood.getpImage().get(0) +
+                    // algood.getImgSize()[0]);
+                    // }
+                    // 获取ali商品的详情文字，并去掉文字中敏感词的数据
+
+                    getTextByHtml(goods, algood, isLocal);
+                }
+            }
+            // 返回待编辑数据到编辑页面
+            mv.addObject("text", text);
+            mv.addObject("pid", pid);
+
+            mv.addObject("goods", goods);
+            // 上传图片保存路径----酌情配置
+            String savePath = localpath.replace(localIP, rootPath);
+            if (IpCheckUtil.checkIsIntranet(request)) {
+                savePath = localpath.replace(wanlIP, rootPath);
+            }
+            mv.addObject("savePath", savePath);
+            mv.addObject("localpath", localpath);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mv.addObject("uid", 0);
+            mv.addObject("message", e.getMessage());
+        }
         return mv;
     }
 
