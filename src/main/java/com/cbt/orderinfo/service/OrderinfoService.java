@@ -1454,6 +1454,7 @@ public class OrderinfoService implements IOrderinfoService {
 	public boolean genSampleOrderByInfoList(String orderNo, int userId, List<SampleOrderBean> sampleOrderBeanList) {
 		// 插入订单详情
 		String spOrderNo = orderNo + "_SP";
+		String urlmd5=this.orderinfoMapper.getUrlMd5ByOrder(orderNo);
 		//生成order-details
 		List<OrderDetailsBeans> odbList = new ArrayList<>();
 		for (SampleOrderBean sampleOrderBean : sampleOrderBeanList) {
@@ -1483,7 +1484,7 @@ public class OrderinfoService implements IOrderinfoService {
 			temp.setFreight("0");
 			temp.setRemark("sample goods");
 			temp.setGoods_url(sampleOrderBean.getOnlineUrl());
-			temp.setGoodsUrlMD5(sampleOrderBean.getUrlMd5());
+			temp.setGoodsUrlMD5(urlmd5);
 			temp.setGoods_img(sampleOrderBean.getImgUrl());
 			temp.setGoods_type(sampleOrderBean.getEnType());
 			temp.setTotal_weight(sampleOrderBean.getWeight());
