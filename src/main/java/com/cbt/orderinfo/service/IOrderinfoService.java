@@ -560,6 +560,14 @@ public interface IOrderinfoService {
 
     boolean setSampleGoodsIsOrder(String orderNo, Integer userId, List<SampleOrderBean> list);
 
+    /**
+	 * 订单详情线下采购
+	 * @param oldOrderNo
+	 * @param newOrderNo
+	 * @return
+	 */
+	int updateOrderSplitNumOrderDetailsData(String oldOrderNo, String newOrderNo);
+
 	/**
 	 * 更新数量拆单的采购数据
 	 * @return

@@ -128,12 +128,19 @@ public class NewOrderDetailsCtr {
 		}
 
 		if(orderNo.contains("_SN") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)){
-			// 数量拆单采购数据处理
-			iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
-			// 数量拆单入库数据处理
-			iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
-			// 数量拆单商品备注沟通数据处理
-			iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+		    try {
+                // 详情数据处理
+                iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderNo.substring(0, orderNo.indexOf("_")), orderNo);
+                // 数量拆单采购数据处理
+                iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
+                // 数量拆单入库数据处理
+                iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
+                // 数量拆单商品备注沟通数据处理
+                iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+            }catch (Exception e){
+		        e.printStackTrace();
+            }
+
 		}
 
 		//获取实际运费

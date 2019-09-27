@@ -272,8 +272,15 @@ public class OrderInfoController{
 		for (SearchResultInfo searchResultInfo : list) {
 			if (searchResultInfo.getOrderid().contains("_SN")) {
 				// 数量拆单入库数据处理
-				iOrderinfoService.updateOrderSplitNumIdRelationtableData(searchResultInfo.getOrderid());
-				iOrderinfoService.updateOrderSplitNumIdRelationtableData(searchResultInfo.getOrderid());
+                String orderNo = searchResultInfo.getOrderid();
+                // 详情数据处理
+				iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderNo.substring(0, orderNo.indexOf("_")), orderNo);
+				// 数量拆单采购数据处理
+				iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
+				// 数量拆单入库数据处理
+				iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
+				// 数量拆单商品备注沟通数据处理
+			    iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
 			}
 		}
 		out.print(net.minidev.json.JSONArray.toJSONString(list));
