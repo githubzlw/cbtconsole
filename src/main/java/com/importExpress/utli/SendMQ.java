@@ -189,6 +189,40 @@ public class SendMQ {
         sendMessageStr( model.toString(), website);
     }
 
+    /**
+     * 通过消息队列更新线上数据 直接执行对应sql集合 批量带事务
+     * @param model 需要执行的sql对象集合 (type=3)
+     *      {"type":"3","sqls":["insert into test values(1);","insert into test values(2);"]}
+     * @throws Exception
+     */
+    public void sendMsg(RunBatchSqlModel model) throws Exception {
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        JSONObject jsonObject = JSONObject.fromObject(model);
+        System.out.println(jsonObject.toString().getBytes("UTF-8"));
+
+        channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
+        System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
+    }
+
+
+    public static void sendMqSql(RunBatchSqlModel model) {
+        SendMQ sendMQ = null;
+        try {
+            sendMQ = new SendMQ();
+            sendMQ.sendMsg(model);
+        } catch (Exception e){
+            throw new RuntimeException("sendMQ exception!");
+        } finally {
+            if (null != sendMQ){
+                try {
+                    sendMQ.closeConn();
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
+
+
     private void sendMessageStr(String json, int website) throws Exception{
         if (website == 0) {
             channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
