@@ -2982,32 +2982,31 @@ public class OrderwsDao implements IOrderwsDao {
     @Override
     public int closeOrder(String orderNo) {
         String sql = "update orderinfo set state=-1, cancel_obj=1 where order_no=?";
-        Connection conn = DBHelper.getInstance().getConnection2();
-        PreparedStatement stmt = null;
-        int result = 0;
-        try {
-            if (GetConfigureInfo.openSync()) {
-                String upSql = "update orderinfo set state=-1, cancel_obj=1 where order_no='" + orderNo + "'";
-                SaveSyncTable.InsertOnlineDataInfo(0, orderNo, "取消订单", "orderinfo", upSql);
-                upSql = "update order_details set state=-1 where orderid='" + orderNo + "'";
-                SaveSyncTable.InsertOnlineDataInfo(0, orderNo, "取消订单详情", "order_details", upSql);
-                result = 1;
-            } else {
-                stmt = conn.prepareStatement(sql);
-                stmt.setString(1, orderNo);
-                result = stmt.executeUpdate();
-                sql = "update order_details set state=-1 where orderid=?";
-                stmt = conn.prepareStatement(sql);
-                stmt.setString(1, orderNo);
-                result = stmt.executeUpdate();
-            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            DBHelper.getInstance().closeStatement(stmt);
-            DBHelper.getInstance().closeConnection(conn);
+        int result = 0;
+
+        if (GetConfigureInfo.openSync()) {
+            String upSql = "update orderinfo set state=-1, cancel_obj=1 where order_no='" + orderNo + "'";
+            SaveSyncTable.InsertOnlineDataInfo(0, orderNo, "取消订单", "orderinfo", upSql);
+            upSql = "update order_details set state=-1 where orderid='" + orderNo + "'";
+            SaveSyncTable.InsertOnlineDataInfo(0, orderNo, "取消订单详情", "order_details", upSql);
+            result = 1;
+        } else {
+
+            List<String> lstValues = new ArrayList<>();
+            lstValues.add(orderNo);
+
+            String runSql = DBHelper.covertToSQL(sql,lstValues);
+            result+=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
+            sql = "update order_details set state=-1 where orderid=?";
+            lstValues = new ArrayList<>();
+            lstValues.add(orderNo);
+
+            runSql = DBHelper.covertToSQL(sql,lstValues);
+            result+=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
         }
+
         return result;
     }
 
