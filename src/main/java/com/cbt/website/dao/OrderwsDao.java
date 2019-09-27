@@ -5516,7 +5516,7 @@ public class OrderwsDao implements IOrderwsDao {
                     lstValues.add("0");
                     lstValues.add(rs.getString("mode_transport"));
                     lstValues.add(sdf.format(date).toString());
-                    stmt.setInt(10ength);
+                    lstValues.add(String.valueOf(length));
                     lstValues.add( "-999");
                     lstValues.add( rs.getString("foreign_freight"));
                     lstValues.add( "0");
