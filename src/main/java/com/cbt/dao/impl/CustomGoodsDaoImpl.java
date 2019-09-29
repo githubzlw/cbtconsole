@@ -13,6 +13,7 @@ import com.importExpress.pojo.ShopMd5Bean;
 import com.importExpress.pojo.SkuValPO;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import com.importExpress.utli.UpdateTblModel;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -1154,27 +1155,18 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public int updateValidList(int valid, String pids) {
         String sql = "update custom_benchmark_ready set valid=? and goodsstate =? where pid in ( " + pids + ")";
-        Connection conn = DBHelper.getInstance().getConnection2();
         int rs = 0;
-        PreparedStatement stmt = null;
         try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, valid);
-            stmt.setInt(2, (valid == 0 ? 2 : 4));
-            rs = stmt.executeUpdate();
+            List<String> lstValues = new ArrayList<>();
+            lstValues.add(String.valueOf(valid));
+            lstValues.add(String.valueOf(valid == 0 ? 2 : 4));
+
+            String runSql = DBHelper.covertToSQL(sql,lstValues);
+            rs=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("updateValidList error :" + e.getMessage());
             LOG.error("updateValidList error :" + e.getMessage());
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            DBHelper.getInstance().closeConnection(conn);
         }
         return rs;
     }
@@ -2289,53 +2281,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public boolean batchDeletePids(String[] pidLst) {
 
-        Connection conn = DBHelper.getInstance().getConnection();
-        Connection remoteConn = DBHelper.getInstance().getConnection2();
-        String deSql = "delete from custom_benchmark_ready where pid = ?";
-        PreparedStatement stmt = null;
-        PreparedStatement remoteStmt = null;
-        String deRemoteSql = "delete from custom_benchmark_ready where pid = ?";
-        boolean rs = false;
-        try {
-            stmt = conn.prepareStatement(deSql);
-            remoteStmt = remoteConn.prepareStatement(deRemoteSql);
-            for (int i = 0; i < pidLst.length; i++) {
-                stmt.setString(1, pidLst[i]);
-                stmt.addBatch();
-                remoteStmt.setString(1, pidLst[i]);
-                remoteStmt.addBatch();
-            }
-
-            int[] countArr = stmt.executeBatch();
-            if (countArr.length > 0) {
-                return remoteStmt.executeBatch().length > 0;
-            } else {
-                return rs;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("batchDeletePids error :" + e.getMessage());
-            LOG.error("batchDeletePids error :" + e.getMessage());
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (remoteStmt != null) {
-                try {
-                    remoteStmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            DBHelper.getInstance().closeConnection(conn);
-            DBHelper.getInstance().closeConnection(remoteConn);
-        }
-        return rs;
+        throw new RuntimeException("already cancel method called");
     }
 
     @Override
@@ -2988,101 +2934,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
 
     @Override
     public boolean updateGoodsFlag(String pid, int moq, String rangePrice, String priceContent, int isSoldFlag, int benchmarkingFlag) {
-        Connection conn28 = DBHelper.getInstance().getConnection8();
-        Connection conn27 = DBHelper.getInstance().getConnection();
-        Connection connAws = DBHelper.getInstance().getConnection2();
-        PreparedStatement stmt28 = null;
-        PreparedStatement stmt27 = null;
-        PreparedStatement stmtAws = null;
-        String updateSql28 = "update custom_benchmark_ready_newest set morder = ?,range_price = ?,is_sold_flag = ?,isBenchmark = ?";
-        String updateSqlAws = "update custom_benchmark_ready set morder = ?,range_price = ?,is_sold_flag = ?,isBenchmark = ?";
-        if (isSoldFlag > 0) {
-            updateSql28 += ",feeprice = ?";
-            updateSqlAws += ",feeprice = ?";
-        } else {
-            updateSql28 += ",wprice = ?";
-            updateSqlAws += ",wprice = ?";
-        }
-        updateSql28 += " where pid = ?";
-        updateSqlAws += " where pid = ?";
-        int rs = 0;
-        try {
-
-            connAws.setAutoCommit(false);
-            conn28.setAutoCommit(false);
-            conn27.setAutoCommit(false);
-
-            stmtAws = connAws.prepareStatement(updateSqlAws);
-            stmt28 = conn28.prepareStatement(updateSql28);
-            stmt27 = conn27.prepareStatement(updateSqlAws);
-
-
-            stmtAws.setInt(1, moq);
-            stmtAws.setString(2, rangePrice);
-            stmtAws.setInt(3, isSoldFlag);
-            stmtAws.setInt(4, benchmarkingFlag);
-            stmtAws.setString(5, priceContent);
-            stmtAws.setString(6, pid);
-
-
-            stmt28.setInt(1, moq);
-            stmt28.setString(2, rangePrice);
-            stmt28.setInt(3, isSoldFlag);
-            stmt28.setInt(4, benchmarkingFlag);
-            stmt28.setString(5, priceContent);
-            stmt28.setString(6, pid);
-
-
-            stmt27.setInt(1, moq);
-            stmt27.setString(2, rangePrice);
-            stmt27.setInt(3, isSoldFlag);
-            stmt27.setInt(4, benchmarkingFlag);
-            stmt27.setString(5, priceContent);
-            stmt27.setString(6, pid);
-
-            rs = stmtAws.executeUpdate();
-            if (rs > 0) {
-                rs = 0;
-                rs = stmt28.executeUpdate();
-                if (rs > 0) {
-                    rs = 0;
-                    rs = stmt27.executeUpdate();
-                    if (rs > 0) {
-                        connAws.commit();
-                        conn28.commit();
-                        conn27.commit();
-                    } else {
-                        connAws.rollback();
-                        conn28.rollback();
-                        conn27.rollback();
-                    }
-                } else {
-                    connAws.rollback();
-                    conn28.rollback();
-                }
-            } else {
-                connAws.rollback();
-            }
-        } catch (Exception e) {
-            try {
-                connAws.rollback();
-                conn28.rollback();
-                conn27.rollback();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
-            e.printStackTrace();
-            System.out.println("pid:" + pid + ",updateGoodsFlag error :" + e.getMessage());
-            LOG.error("pid:" + pid + ",updateGoodsFlag error :" + e.getMessage());
-        } finally {
-            DBHelper.getInstance().closePreparedStatement(stmt28);
-            DBHelper.getInstance().closePreparedStatement(stmt27);
-            DBHelper.getInstance().closePreparedStatement(stmtAws);
-            DBHelper.getInstance().closeConnection(conn28);
-            DBHelper.getInstance().closeConnection(conn27);
-            DBHelper.getInstance().closeConnection(connAws);
-        }
-        return rs > 0;
+        throw new RuntimeException("already cancel method called");
     }
 
     @Override
@@ -3414,27 +3266,22 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public boolean deleteWordSizeInfoByPid(String pid) {
 
-        Connection connOnline = DBHelper.getInstance().getConnection2();
         String updateSql = "update  custom_benchmark_ready_size_info  set del_flag = 1 where  goods_pid = ? ";
-        PreparedStatement stmt = null;
         int count = 0;
         try {
-            stmt = connOnline.prepareStatement(updateSql);
-            stmt.setString(1, pid);
-            count = stmt.executeUpdate();
+
+
+            List<String> lstValues = new ArrayList<>();
+            lstValues.add(pid);
+            String runSql = DBHelper.covertToSQL(updateSql,lstValues);
+            count=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("pid:" + pid + " deleteWordSizeInfoByPid error :" + e.getMessage());
             LOG.error("pid:" + pid + " deleteWordSizeInfoByPid error :" + e.getMessage());
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            DBHelper.getInstance().closeConnection(connOnline);
+
         }
         return count > 0;
     }

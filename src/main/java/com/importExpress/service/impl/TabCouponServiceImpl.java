@@ -70,7 +70,7 @@ public class TabCouponServiceImpl implements TabCouponService {
             throw new RuntimeException("mq发送失败");
         } finally {
             if (sendMQ != null){
-                sendMQ.closeConn();
+
             }
         }
         result.put("state", "true");
@@ -199,7 +199,7 @@ public class TabCouponServiceImpl implements TabCouponService {
             throw new RuntimeException("mq发送失败");
         } finally {
             if (sendMQ != null){
-                sendMQ.closeConn();
+
             }
         }
     }
@@ -278,7 +278,7 @@ public class TabCouponServiceImpl implements TabCouponService {
             result.put("message", "删除折扣卷成功");
         } finally {
             if (sendMQ != null){
-                sendMQ.closeConn();
+
             }
         }
 //        String res = HttpUtil.postCoupon("/coupon/deleteCoupon", "pass", "huisj123lo", "type", "1", "couponcode", couponCode);

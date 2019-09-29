@@ -117,8 +117,8 @@ public class GoodsCommentCtrl {
 							sql.append("show_flag='"+commentsBean.getShowFlag()+"',");
 						}
 						String sqls=sql.toString().substring(0,sql.toString().length()-1);
-						sendMQ.sendMsg(new RunSqlModel(sqls+" where id ='"+commentsBean.getId()+"'"));
-						sendMQ.closeConn();
+						SendMQ.sendMsg(new RunSqlModel(sqls+" where id ='"+commentsBean.getId()+"'"));
+
 						map.put("success", true);
 						map.put("cmid", id);
 						return map;
@@ -129,7 +129,7 @@ public class GoodsCommentCtrl {
 						map.put("cmid", commentsBean.getId());
 						return map;
 					}
-					sendMQ.closeConn();
+
 				} catch (Exception e) {
 					LOG.error("处理评论是出现错误"+e.getMessage());
 					map.put("success", false);
@@ -230,7 +230,7 @@ public class GoodsCommentCtrl {
 		@ResponseBody
 		public String updateXComments(HttpServletRequest request){
 			try {
-				SendMQ sendMQ = new SendMQ();
+
 				GoodsCommentsBean commentsBean = new GoodsCommentsBean();
 				commentsBean.setId(Integer.parseInt(request.getParameter("id")));
 				commentsBean.setShowFlag(Integer.parseInt(request.getParameter("showFlag")));
@@ -268,12 +268,12 @@ public class GoodsCommentCtrl {
 					sqls.append(" show_flag = '"+commentsBean.getShowFlag()+"',");
 				}
 				if(sqls.indexOf("=")>-1){
-					sendMQ.sendMsg(new RunSqlModel(sqls.substring(0,sqls.length()-1)+" where id = '"+commentsBean.getId()+""));
+					SendMQ.sendMsg(new RunSqlModel(sqls.substring(0,sqls.length()-1)+" where id = '"+commentsBean.getId()+""));
 				}
 				if(i==1){
 					return "success";
 				}
-				sendMQ.closeConn();
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

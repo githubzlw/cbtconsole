@@ -345,8 +345,8 @@ public class WarehouseCtrl {
 				SendMQ sendMQ=new SendMQ();
 				String sql="";
 				sql="update priority_category set minPrice="+minPrice+" where id="+id+"";
-				sendMQ.sendMsg(new RunSqlModel(sql));
-				sendMQ.closeConn();
+				SendMQ.sendMsg(new RunSqlModel(sql));
+
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -411,11 +411,11 @@ public class WarehouseCtrl {
 				row=iWarehouseService.saveCommentContent(map);
 				if(row>0){
 					SendMQ sendMQ=new SendMQ();
-					sendMQ.sendMsg(new RunSqlModel("insert into goods_comments_real(oid,car_type,order_no,user_id,user_name,country_id,goods_pid,comments_content," +
+					SendMQ.sendMsg(new RunSqlModel("insert into goods_comments_real(oid,car_type,order_no,user_id,user_name,country_id,goods_pid,comments_content," +
 							"comments_time,admin_id,goodsid,picPath) VALUES" +
 							"('"+map.get("od_id")+"','"+map.get("car_type")+"','"+map.get("orderid")+"','"+map.get("uid")+"','"+map.get("email")+"','"+map.get("countryid")+"'" +
 							",'"+map.get("goods_pid")+"','"+map.get("commentsContent")+"',now(),'"+map.get("admuserid")+"','"+map.get("goodsid")+"','"+map.get("picPath")+"')"));
-					sendMQ.closeConn();
+
 					flag=true;
 				}
 			}
@@ -620,9 +620,9 @@ public class WarehouseCtrl {
 				map.put("state",state);
 				map.put("picture",picture);
 				row=iWarehouseService.disabled(map);
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update inspection_picture set state='"+map.get("state")+"' where pic_path='"+map.get("picture")+"' and isdelete=0"));
-				sendMQ.closeConn();
+
+				SendMQ.sendMsg(new RunSqlModel("update inspection_picture set state='"+map.get("state")+"' where pic_path='"+map.get("picture")+"' and isdelete=0"));
+
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -655,10 +655,10 @@ public class WarehouseCtrl {
 			map.put("path",path);
 			map.put("i_id",i_id);
 			iWarehouseService.delInPic(map);
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("update order_details set picturepath='' where orderid='"+map.get("orderid")+"' and goodsid='"+map.get("goods_pid")+"'"));
-			sendMQ.sendMsg(new RunSqlModel("update inspection_picture set isdelete=1 where pic_path='"+map.get("path")+"'"));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel("update order_details set picturepath='' where orderid='"+map.get("orderid")+"' and goodsid='"+map.get("goods_pid")+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update inspection_picture set isdelete=1 where pic_path='"+map.get("path")+"'"));
+
 			row=1;
 		}catch (Exception e){
 			e.printStackTrace();
@@ -2286,7 +2286,7 @@ public class WarehouseCtrl {
 		String pwd = admuser.getEmailpass();
 		int res=0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			res = SendEmail.send(sendemail,pwd,toEmail,sbBuffer.toString(),"Attention! Shipping fee needed before we deliver out your ImportExpress order!","", orderNo, 1);
 			// 设置订单还需付款
 			String remaining_price = request.getParameter("remaining_price");
@@ -2297,13 +2297,13 @@ public class WarehouseCtrl {
 					map2.put("orderid", orderNo);
 					map2.put("remaining_price", remaining_price);
 					iWarehouseService.updateRemainingPrice(map2);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set remaining_price='"+remaining_price+"' where order_no='"+orderNo+"'"));
-					sendMQ.sendMsg(new RunSqlModel("update shipping_package set issendmail=1 where orderid='"+orderNo+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set remaining_price='"+remaining_price+"' where order_no='"+orderNo+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update shipping_package set issendmail=1 where orderid='"+orderNo+"'"));
 					// 标志位已发送邮件
 					iWarehouseService.updateSendMail(map2);
 				}
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -2568,18 +2568,18 @@ public class WarehouseCtrl {
 //			DataSourceSelector.set("dataSource127hop");
 //			iWarehouseService.updateOrderinfoAll(mapOrderinf); // 如果合并订单
 //			DataSourceSelector.restore();
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set remaining_price=0 where order_no in(select orderno from order_fee where mergeOrders='"+mapOrderinf.get("order_no")+"')"));
+
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set remaining_price=0 where order_no in(select orderno from order_fee where mergeOrders='"+mapOrderinf.get("order_no")+"')"));
 				mapOrderinf.put("remaining_price", fy); // 差的钱
 				mapOrderinf.put("actual_ffreight", mainMap.get("actualFreight")); // 运费
 				mapOrderinf.put("actual_freight_c",mainMap.get("actualFreight"));// 运费
 				// 本地
 				iWarehouseService.updateOrderinfo(mapOrderinf); // 在将钱，存放合并的主订单
 				// 线上
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set  remaining_price='"+mapOrderinf.get("remaining_price")+"' , actual_ffreight='"+mapOrderinf.get("actual_ffreight")+"' , " +
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set  remaining_price='"+mapOrderinf.get("remaining_price")+"' , actual_ffreight='"+mapOrderinf.get("actual_ffreight")+"' , " +
 						"actual_freight_c='"+mapOrderinf.get("actual_freight_c")+"' where order_no = '"+mapOrderinf.get("order_no")+"'"));
 				msg="1003";
-				sendMQ.closeConn();
+
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -2958,7 +2958,7 @@ public class WarehouseCtrl {
 	public Map<String, String> vimeoUpload(HttpServletRequest request) {
 		Map<String, String> map = new HashMap<String, String>();
 		try {
-			SendMQ sendMQ = new SendMQ();
+
 			String goods_pid=request.getParameter("pid");
 			if(StringUtil.isBlank(goods_pid)){
 				map.put("msg","0");
@@ -3007,7 +3007,7 @@ public class WarehouseCtrl {
 			}else{
 				map.put("msg","0");
 			}
-			sendMQ.closeConn();
+
 		} catch (Exception e) {
 			map.put("msg","0");
 		}
@@ -5126,7 +5126,7 @@ public class WarehouseCtrl {
 				oi.setOrderNo(order_no);
 				oi.setDetailsNumber(goods_pids.split(",").length);
 //				row+=iWarehouseService.insertOrderInfo(oi);
-				sendMQ.sendMsg(new RunSqlModel("insert into orderinfo (order_no,orderRemark,isDropshipOrder,details_number,create_time,user_id,state,delivery_time,mode_transport,product_cost,pay_price) " +
+				SendMQ.sendMsg(new RunSqlModel("insert into orderinfo (order_no,orderRemark,isDropshipOrder,details_number,create_time,user_id,state,delivery_time,mode_transport,product_cost,pay_price) " +
 						"values('"+oi.getOrderNo()+"','采样订单',3,"+oi.getDetailsNumber()+",now(),13653,1,'3-6','Epacket@3-6@USA@all',0,0)"));
 				//生成order_details
 				StringBuilder sqls=new StringBuilder();
@@ -5164,7 +5164,7 @@ public class WarehouseCtrl {
 				}
 				if(od_list.size()>0){
 //					row+=iWarehouseService.insertOrderDetails(od_list);
-					sendMQ.sendMsg(new RunSqlModel(sqls.toString().substring(0,sqls.toString().length()-1)));
+					SendMQ.sendMsg(new RunSqlModel(sqls.toString().substring(0,sqls.toString().length()-1)));
 					//分配采购
 					String adminid=String.valueOf(user.getId());
 //					List<OrderDetailsBean> list_od=iWarehouseService.getOrderDetailsByOrderid(order_no);
@@ -5175,7 +5175,7 @@ public class WarehouseCtrl {
 					iWarehouseService.updateGdOdid();
 					for(int i=0;i<od_list.size();i++){
 						iWarehouseService.updateCrossShopr(od_list.get(i).getGoods_pid());
-						sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
+						SendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
 					}
 				}
 			}
@@ -5183,7 +5183,7 @@ public class WarehouseCtrl {
 			LOG.error("createBuyOrder:",e);
 			row=0;
 		}finally {
-			sendMQ.closeConn();
+
 		}
 		return "1";
 	}
@@ -5274,7 +5274,7 @@ public class WarehouseCtrl {
 				oi.setOrderNo(order_no);
 				oi.setDetailsNumber(pids.length);
 //				row+=iWarehouseService.insertOrderInfo(oi);
-				sendMQ.sendMsg(new RunSqlModel("insert into orderinfo (order_no,orderRemark,isDropshipOrder,details_number,create_time,user_id,state,delivery_time,mode_transport,product_cost,pay_price) " +
+				SendMQ.sendMsg(new RunSqlModel("insert into orderinfo (order_no,orderRemark,isDropshipOrder,details_number,create_time,user_id,state,delivery_time,mode_transport,product_cost,pay_price) " +
 							"values('"+oi.getOrderNo()+"','采样订单',3,"+oi.getDetailsNumber()+",now(),13653,1,'3-6','Epacket@3-6@USA@all',0,0)"));
 				row=1;
 				if(row>0){
@@ -5325,7 +5325,7 @@ public class WarehouseCtrl {
 					}
 					if(od_list.size()>0){
 //						row+=iWarehouseService.insertOrderDetails(od_list);
-						sendMQ.sendMsg(new RunSqlModel(sqls.toString().substring(0,sqls.toString().length()-1)));
+						SendMQ.sendMsg(new RunSqlModel(sqls.toString().substring(0,sqls.toString().length()-1)));
 						//分配采购
 						String adminid=String.valueOf(user.getId());
 //						List<OrderDetailsBean> list_od=iWarehouseService.getOrderDetailsByOrderid(order_no);
@@ -5336,7 +5336,7 @@ public class WarehouseCtrl {
 						for(int i=0;i<od_list.size();i++){
 							//更新本地
 							iWarehouseService.updateCrossShopr(od_list.get(i).getGoods_pid());
-							sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
+							SendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
 						}
 //						if(row==od_list.size()+1){
 //							//分配采购
@@ -5349,7 +5349,7 @@ public class WarehouseCtrl {
 //							for(int i=0;i<od_list.size();i++){
 //								//更新本地
 //								iWarehouseService.updateCrossShopr(od_list.get(i).getGoods_pid());
-////								sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
+////								SendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
 //							}
 //						}
 					}
@@ -5969,7 +5969,7 @@ public class WarehouseCtrl {
 		int row2 = 0;
 		int row=0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("orderid", orderid);
 			map.put("goodsid", goodsid);
@@ -5978,13 +5978,13 @@ public class WarehouseCtrl {
 			if (row1 == 0) {
 				row2 = iWarehouseService.updateOrderState(map);
 			}
-			sendMQ.sendMsg(new RunSqlModel("update order_details set state=1,checked=1 where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update order_details set state=1,checked=1 where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
 			DataSourceSelector.set("dataSource127hop");
 			iWarehouseService.queryOrderState(map);
 			if (row1 == 0) {
 				row2 =1;
 				// iWarehouseService.updateOrderState(map);
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
 			}
 			DataSourceSelector.restore();
 		}catch (Exception e){
@@ -6001,7 +6001,7 @@ public class WarehouseCtrl {
 		String state = request.getParameter("state");
 		int row = 0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			if (state.equals("0")) {
 				return "0";
 			} else {
@@ -6026,10 +6026,10 @@ public class WarehouseCtrl {
 				}
 				row = iWarehouseService.updateAllDetailsState(map);
 				row =1;
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state='"+map.get("order_details_state")+"',checked='"+map.get("order_details_state")+"' where orderid='"+map.get("orderid")+"'"));
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set state='"+map.get("order_state")+"' where order_no='"+map.get("orderid")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set state='"+map.get("order_details_state")+"',checked='"+map.get("order_details_state")+"' where orderid='"+map.get("orderid")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set state='"+map.get("order_state")+"' where order_no='"+map.get("orderid")+"'"));
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -7458,7 +7458,7 @@ public class WarehouseCtrl {
 		map.put("goodsurl", goodsurl);
 		int r = 0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			int ret = iWarehouseService.updateOpsState(map);
 			// 入库增加入库详情
 			int ret1 = iWarehouseService.insertId_relationtable(map);
@@ -7466,7 +7466,7 @@ public class WarehouseCtrl {
 			if (ret > 0) {
 				ret = iWarehouseService.updateorderDetailsState(map);
 				r += ret;
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1,purchase_confirmation='"+map.get("admid")+"',purchase_state=3 where orderid='"+map.get("orderid")+"'" +
+				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1,purchase_confirmation='"+map.get("admid")+"',purchase_state=3 where orderid='"+map.get("orderid")+"'" +
 						" and id='"+map.get("odid")+"'"));
 			}
 			if (ret > 0) {
@@ -7474,11 +7474,11 @@ public class WarehouseCtrl {
 				if (1 == ret) {
 					map.put("state", "2");
 					iWarehouseService.updateOrder(map);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '"+map.get("state")+"' where order_no='"+map.get("orderid")+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '"+map.get("state")+"' where order_no='"+map.get("orderid")+"'"));
 				}
 				r += ret;
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -7570,11 +7570,11 @@ public class WarehouseCtrl {
 			map.put("goodsid", goodsid);
 			map.put("purchase_state", "3");
 			try{
-				SendMQ sendMQ = new SendMQ();
+
 				// 修改order_product_source 状态
 				int ret = iWarehouseService.updateOpsState(map);
 				iWarehouseService.updateODPState(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set purchase_state='"+map.get("purchase_state")+"',purchase_time ="+("3".equals(map.get("purchase_state"))?"now()":"null")+" where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set purchase_state='"+map.get("purchase_state")+"',purchase_time ="+("3".equals(map.get("purchase_state"))?"now()":"null")+" where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
 				if (ret > 0) {
 					ret = iWarehouseService.updateOrderinfoNumber(map);
 				}
@@ -7582,9 +7582,9 @@ public class WarehouseCtrl {
 					ret = iWarehouseService.updateOrderinfoState(map);
 					int state = iWarehouseService.GetSetOrdrerState(map);
 					map.put("state", state + "");
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '"+map.get("state")+"' where order_no='"+map.get("orderid")+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '"+map.get("state")+"' where order_no='"+map.get("orderid")+"'"));
 				}
-				sendMQ.closeConn();
+
 			}catch (Exception e){
 				e.printStackTrace();
 			}
@@ -7736,13 +7736,13 @@ public class WarehouseCtrl {
 			map.put("goodsid", goodsid);
 			map.put("purchase_state", "1");
 			try{
-				SendMQ sendMQ = new SendMQ();
+
 				// 修改order_product_source 状态
 				int ret = iWarehouseService.updateOpsState(map);
 				iWarehouseService.updateODPState(map);
 				DataSourceSelector.set("dataSource127hop");
 				iWarehouseService.updateODPState(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set purchase_state='"+map.get("purchase_state")+"',purchase_time ="+("3".equals(map.get("purchase_state"))?"now()":"null")+" where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set purchase_state='"+map.get("purchase_state")+"',purchase_time ="+("3".equals(map.get("purchase_state"))?"now()":"null")+" where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
 				DataSourceSelector.restore();
 				if (ret > 0) {
 					ret = iWarehouseService.updateOrderinfoNumber(map);
@@ -8025,9 +8025,9 @@ public class WarehouseCtrl {
 //				DataSourceSelector.set("dataSource127hop");// 操作本地数据源切换到线上数据源
 //				int orderid_flag = iWarehouseService.upOrderInfo(map);
 //				LOG.info("更新线上orderinfo订单状态:" + orderid_flag);
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '3'  where order_no  in ("+map.get("orders")+")"));
-				sendMQ.closeConn();
+
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '3'  where order_no  in ("+map.get("orders")+")"));
+
 				//通知客户
 				//查询客户ID
 				int userId = orderinfoService.queryUserIdByOrderNo(orderNo);
@@ -8090,17 +8090,17 @@ public class WarehouseCtrl {
 		@Override
 		public synchronized void run() {
 			try {
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state = '3'  where child_order_no = '"+map.get("orders")+"'"));
+
+				SendMQ.sendMsg(new RunSqlModel("update dropshiporder set state = '3'  where child_order_no = '"+map.get("orders")+"'"));
 				if (StrUtils.isNotNullEmpty(mainOrder)) {
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '3' where  order_no  ='"+mainOrder+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '3' where  order_no  ='"+mainOrder+"'"));
 					//查询客户ID
 					int userId = orderinfoService.queryUserIdByOrderNo(mainOrder);
 					//发送消息给客户
 					NotifyToCustomerUtil.updateOrderState(userId,mainOrder,2,3);
 				}
-				sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state = '3'  where child_order_no = '"+map.get("orders")+"'"));
-				sendMQ.closeConn();
+				SendMQ.sendMsg(new RunSqlModel("update dropshiporder set state = '3'  where child_order_no = '"+map.get("orders")+"'"));
+
 			} catch (Exception e) {
 				e.getStackTrace();
 				LOG.error("更新线上dropshipOrder订单失败，订单号：" + mainOrder, e);
@@ -8199,7 +8199,7 @@ public class WarehouseCtrl {
 		public synchronized void run() {
 			try {
 				LOG.info("更新线上order_details采购确认状态:" + map.get("purchase_state"));
-				SendMQ sendMQ = new SendMQ();
+
 				StringBuilder sql=new StringBuilder();
 				sql.append("update order_details set purchase_state='"+map.get("purchase_state")+"',purchase_time =");
 				if(!"3".equals(map.get("purchase_state"))){
@@ -8210,8 +8210,8 @@ public class WarehouseCtrl {
 				}
 				sql.append(" where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'");
 //				map.clear();
-				sendMQ.sendMsg(new RunSqlModel(sql.toString()));
-				sendMQ.closeConn();
+				SendMQ.sendMsg(new RunSqlModel(sql.toString()));
+
 			} catch (Exception e) {
 				LOG.error("更新线上order_details采购确认状态", e);
 			}
@@ -8287,10 +8287,10 @@ public class WarehouseCtrl {
 			try {
 				LOG.info("更新线上dropshiporder state为" + map.get("state")
 						+ ",订单号:" + map.get("child_order_no"));
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state= (SELECT IF ((select count(*) from ( select * from order_details where dropshipid='"+map.get("child_order_no")+"' " +
+
+				SendMQ.sendMsg(new RunSqlModel("update dropshiporder set state= (SELECT IF ((select count(*) from ( select * from order_details where dropshipid='"+map.get("child_order_no")+"' " +
 						"and state!=2 AND purchase_state=3) a)>0,'1','5')) where child_order_no='"+map.get("child_order_no")+"'"));
-				sendMQ.closeConn();
+
 			} catch (Exception e) {
 				e.getStackTrace();
 				LOG.error(
@@ -8351,15 +8351,15 @@ public class WarehouseCtrl {
 								businessType, tableName, sqlStr);
 					}
 				} else {
-					SendMQ sendMQ = new SendMQ();
+
 					StringBuilder sql=new StringBuilder();
 					sql.append("insert into shipping_package(orderid,remarks,createtime,sweight,svolume,volumeweight ,sflag ,transportcompany ,expressno, estimatefreight  ,flag) values ");
 					for(int i=0;i<bgList.size();i++){
 						Map<String, Object> map=bgList.get(i);
 						sql.append("('"+map.get("orderid")+"','"+map.get("remarks")+"','"+map.get("createtime")+"','"+map.get("weight")+"','"+map.get("svolume")+"','"+map.get("volumeweight")+"',3,'"+map.get("transport")+"','"+map.get("expressno")+"','"+map.get("estimatefreight")+"',1),");
 					}
-					sendMQ.sendMsg(new RunSqlModel(sql.toString().substring(0,sql.toString().length()-1)));
-					sendMQ.closeConn();
+					SendMQ.sendMsg(new RunSqlModel(sql.toString().substring(0,sql.toString().length()-1)));
+
 				}
 			} catch (Exception e) {
 				LOG.error("线上出运插入补录订单 shipping_package ", e);
@@ -8525,9 +8525,9 @@ public class WarehouseCtrl {
                     rr.setCurrency(currency);
 					// 更新order_details信息状态为2
 					try {
-                        SendMQ sendMQ = new SendMQ();
-                        sendMQ.sendMsg(new RunSqlModel("update order_details set state = 2 where goodsid='"+goodId+"' and dropshipid='"+orderNo+"'"));
-                        sendMQ.sendMsg(new RunSqlModel("update order_change set del_state=1 where goodId='"+goodId+"' and orderNo='"+dropShipOrder.getParentOrderNo()+"'"));
+
+                        SendMQ.sendMsg(new RunSqlModel("update order_details set state = 2 where goodsid='"+goodId+"' and dropshipid='"+orderNo+"'"));
+                        SendMQ.sendMsg(new RunSqlModel("update order_change set del_state=1 where goodId='"+goodId+"' and orderNo='"+dropShipOrder.getParentOrderNo()+"'"));
                         StringBuilder sql=new StringBuilder();
                         sql.append("update orderinfo set product_cost = round(product_cost-"+updateMap.get("productcost")+",2),foreign_freight = round(foreign_freight-"+updateMap.get("foreignfreight")+",2)," +
                                 "pay_price = round(pay_price-"+updateMap.get("productcost")+"-"+updateMap.get("foreignfreight")+",2),pay_price_tow = round(pay_price_tow-"+updateMap.get("foreignfreight")+",2)," +
@@ -8539,9 +8539,9 @@ public class WarehouseCtrl {
                             sql.append(",server_update = '"+updateMap.get("server_update")+"'  ");
                         }
                         sql.append("where order_no = '"+updateMap.get("orderno")+"' and user_id ='"+updateMap.get("userid")+"'");
-                        sendMQ.sendMsg(new RunSqlModel(sql.toString()));
-                        sendMQ.sendMsg(new RunSqlModel("insert recharge_record(userid,price,type,remark,remark_id,datatime,usesign,currency,balanceAfter) values('"+rr.getUserid()+"', '"+rr.getPrice()+"','"+rr.getType()+"', '"+rr.getRemark()+"','"+rr.getRemark_id()+"', now(), '"+rr.getUsesign()+"','"+rr.getCurrency()+"','"+rr.getBalanceAfter()+"')"));
-                        sendMQ.closeConn();
+                        SendMQ.sendMsg(new RunSqlModel(sql.toString()));
+                        SendMQ.sendMsg(new RunSqlModel("insert recharge_record(userid,price,type,remark,remark_id,datatime,usesign,currency,balanceAfter) values('"+rr.getUserid()+"', '"+rr.getPrice()+"','"+rr.getType()+"', '"+rr.getRemark()+"','"+rr.getRemark_id()+"', now(), '"+rr.getUsesign()+"','"+rr.getCurrency()+"','"+rr.getBalanceAfter()+"')"));
+
 						LOG.info("更新子订单详情表信息 :"+ dropShipOrder.getChildOrderNo());
 					} catch (Exception e) {
 						LOG.error("更新子订单详情表信息", e);
@@ -8580,10 +8580,10 @@ public class WarehouseCtrl {
 					}
 					// 更新order_details信息状态为2
 					try {
-                        SendMQ sendMQ = new SendMQ();
-                        sendMQ.sendMsg(new RunSqlModel("update order_details set state = 2 where goodsid='"+goodId+"' and dropshipid='"+orderNo+"'"));
-                        sendMQ.sendMsg(new RunSqlModel("update order_change set del_state=1 where goodId='"+goodId+"' and orderNo='"+dropShipOrder.getParentOrderNo()+"'"));
-                        sendMQ.closeConn();
+
+                        SendMQ.sendMsg(new RunSqlModel("update order_details set state = 2 where goodsid='"+goodId+"' and dropshipid='"+orderNo+"'"));
+                        SendMQ.sendMsg(new RunSqlModel("update order_change set del_state=1 where goodId='"+goodId+"' and orderNo='"+dropShipOrder.getParentOrderNo()+"'"));
+
 					} catch (Exception e) {
 						LOG.error("更新order_details信息状态为2", e);
 					}
@@ -8623,8 +8623,8 @@ public class WarehouseCtrl {
                             sql.append(",server_update = '"+updateMap.get("server_update")+"'  ");
                         }
                         sql.append("where order_no = '"+updateMap.get("orderno")+"' and user_id ='"+updateMap.get("userid")+"'");
-                        sendMQ.sendMsg(new RunSqlModel(sql.toString()));
-                        sendMQ.closeConn();
+                        SendMQ.sendMsg(new RunSqlModel(sql.toString()));
+
 					} catch (Exception e) {
 						LOG.error("更新orderinfo信息", e);
 					}
@@ -8639,9 +8639,9 @@ public class WarehouseCtrl {
 					rr.setRemark("cancel:" + orderNo + ",goodsid:" + goodId);
 					rr.setCurrency(currency);
 					try {
-                        SendMQ sendMQ = new SendMQ();
-                        sendMQ.sendMsg(new RunSqlModel("insert recharge_record(userid,price,type,remark,remark_id,datatime,usesign,currency,balanceAfter) values('"+rr.getUserid()+"', '"+rr.getPrice()+"','"+rr.getType()+"', '"+rr.getRemark()+"','"+rr.getRemark_id()+"', now(), '"+rr.getUsesign()+"','"+rr.getCurrency()+"','"+rr.getBalanceAfter()+"')"));
-                        sendMQ.closeConn();
+
+                        SendMQ.sendMsg(new RunSqlModel("insert recharge_record(userid,price,type,remark,remark_id,datatime,usesign,currency,balanceAfter) values('"+rr.getUserid()+"', '"+rr.getPrice()+"','"+rr.getType()+"', '"+rr.getRemark()+"','"+rr.getRemark_id()+"', now(), '"+rr.getUsesign()+"','"+rr.getCurrency()+"','"+rr.getBalanceAfter()+"')"));
+
 					} catch (Exception e) {
 						LOG.error("更新余额变更表(rechagerecord)", e);
 					}
@@ -8864,8 +8864,8 @@ public class WarehouseCtrl {
 					if(row>0){
 						json.setOk(true);
 						SendMQ sendMQ=new SendMQ();
-						sendMQ.sendMsg(new RunSqlModel("update guestbook set picPath='"+Util.PIC_URL+localFilePath+"' where id="+gbookid+""));
-						sendMQ.closeConn();
+						SendMQ.sendMsg(new RunSqlModel("update guestbook set picPath='"+Util.PIC_URL+localFilePath+"' where id="+gbookid+""));
+
 					}
 				}
 			}
@@ -8972,37 +8972,51 @@ public class WarehouseCtrl {
 			// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
 			flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + storePath.substring(0,storePath.lastIndexOf("/")), 0);
 			if(flag){
-				Connection conn = DBHelper.getInstance().getConnection2();// 仓库不用
 				Connection conn1 = DBHelper.getInstance().getConnection();
 				PreparedStatement stmt = null;
 				String sql = "UPDATE order_details t SET t.picturepath = ? WHERE t.orderid = ? AND t.goodsid = ?;";
 				try {
-					stmt = conn.prepareStatement(sql);// 仓库不用
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, StringUtil.isBlank(orderid)?"999999":orderid);
-					stmt.setString(3, goodsid);
-					stmt.executeUpdate();
-					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, StringUtil.isBlank(orderid)?"999999":orderid);
-					stmt.setString(3, goodsid);
-					stmt.executeUpdate();
+					List<String> lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(StringUtil.isBlank(orderid)?"999999":orderid);
+					lstValues.add(goodsid);
+
+					String runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
+					lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(StringUtil.isBlank(orderid)?"999999":orderid);
+					lstValues.add(goodsid);
+
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
 					sql="UPDATE id_relationtable set picturepath='"+storePath+"' where orderid=? and goodid=?";
-					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, StringUtil.isBlank(orderid)?"999999":orderid);
-					stmt.setString(2, goodsid);
-					stmt.executeUpdate();
+
+					lstValues = new ArrayList<>();
+					lstValues.add(StringUtil.isBlank(orderid)?"999999":orderid);
+					lstValues.add(goodsid);
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
 					sql="update inspection_picture set pic_path=? where id=? and isdelete=0";
-					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, i_id);
-					stmt.executeUpdate();
-					stmt = conn.prepareStatement(sql);
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, i_id);
-					stmt.executeUpdate();
-				} catch (SQLException e) {
-					e.printStackTrace();
+
+					lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(i_id);
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
+					lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(i_id);
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
 				} finally {
 					try {
 						if (stmt != null) {
@@ -9012,7 +9026,6 @@ public class WarehouseCtrl {
 						e.printStackTrace();
 					}
 					DBHelper.getInstance().closePreparedStatement(stmt);
-					DBHelper.getInstance().closeConnection(conn);
 					DBHelper.getInstance().closeConnection(conn1);
 				}
 			}
@@ -9135,7 +9148,7 @@ public class WarehouseCtrl {
 		Map<String,String> map = new HashMap<String,String>();
 		List<String> list=new ArrayList<>();
 		try {
-			SendMQ sendMQ = new SendMQ();
+
 			String filePath="";
 			MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 			List<MultipartFile> fileList = multipartRequest.getFiles("file");
@@ -9193,7 +9206,7 @@ public class WarehouseCtrl {
 			}
 
 			}
-			sendMQ.closeConn();
+
 			if (list.size()==fileList.size()){
 				list.clear();
 				list.add("0");
@@ -9213,7 +9226,7 @@ public class WarehouseCtrl {
 		String filename1 = file.getOriginalFilename();
 		String pid = filename1.replaceAll(".mp4", "").replaceAll("[^0-9]", "");
 		try {
-		SendMQ sendMQ = new SendMQ();
+
 		Map<String, String> map = new HashMap<String, String>();
 
 				String VidoPath = this.iWarehouseService.getRepathByPid(pid);
@@ -9256,7 +9269,7 @@ public class WarehouseCtrl {
 				} else {
 					list="0";
 				}
-			sendMQ.closeConn();
+
 			} catch (Exception e) {
 				list=pid;
 			}

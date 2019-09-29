@@ -44,7 +44,7 @@ public class OrderProductSourceLogJob implements Job {
 					//同步本地标记和保存记录
 					count = customGoodsDao.updateOrderProductSourceLog(orderProductSourceLogBean, model);
 					//发送mq消息
-					sendMQ.sendMsg(model);	
+					SendMQ.sendMsg(model);
 					System.out.println("OrderProductSourceLogJob id:" + orderProductSourceLogBean.getId() 
 							+ ",update result:" + (count > 0?"success":"fail"));
 				}
@@ -58,7 +58,7 @@ public class OrderProductSourceLogJob implements Job {
 		} finally {
 			if (sendMQ != null) {
 				try {
-					sendMQ.closeConn();
+
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("GoodsSoldUnsellableReasonJob error:" + e.getMessage());

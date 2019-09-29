@@ -43,7 +43,7 @@ public class GoodsSoldUnsellableReasonJob implements Job {
 					//更新线上数据(发送mq)
 					model.setPk(pidMap.getKey());
 			        model.setUnsellableReason(pidMap.getValue() + "");
-			        sendMQ.sendMsg(model);			        
+			        SendMQ.sendMsg(model);
 					//更新本地数据
 					boolean isSuccess = customGoodsDao.updateOnlineSoldUnsellableReason(pidMap.getKey(), pidMap.getValue(), model);;
 					System.out.println("pid:" + pidMap.getKey() + ",update sold unsellableReason result:" + isSuccess);
@@ -57,7 +57,7 @@ public class GoodsSoldUnsellableReasonJob implements Job {
 		} finally {
 			if (sendMQ != null) {
 				try {
-					sendMQ.closeConn();
+
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("GoodsSoldUnsellableReasonJob error:" + e.getMessage());

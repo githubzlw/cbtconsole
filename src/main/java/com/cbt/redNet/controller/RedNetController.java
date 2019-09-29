@@ -213,7 +213,7 @@ public class RedNetController {
 				}
 				ret = redNetService.addRedNet(bean);
 			}
-			SendMQ sendMQ = new SendMQ();
+
 			StringBuilder sql=new StringBuilder();
 			//切换数据源
 			if(StrUtils.isNotNullEmpty(id)){
@@ -244,7 +244,7 @@ public class RedNetController {
 					sql.append("bz ='"+bean.getBz()+"' ,");
 				}
 				sql.append(" where  id  = '"+bean.getId()+"'");
-				sendMQ.sendMsg(new RunSqlModel(sql.toString()));
+				SendMQ.sendMsg(new RunSqlModel(sql.toString()));
 			}else{
 				DataSourceSelector.set("dataSource127hop");
 				if(redNetService.selectRedNetByName(redNetName)>0){
@@ -252,9 +252,9 @@ public class RedNetController {
 				}
 				sql.append("insert into  rednet(redNetName,site,tomosonUrl,pushSum,redNetOffer,email,cooperationTime,bz) " +
 						"values('"+bean.getRedNetName()+"','"+bean.getSite()+"','"+bean.getTomosonUrl()+"','"+bean.getPushSum()+"','"+bean.getRedNetOffer()+"','"+bean.getEmail()+"','"+bean.getCooperationTime()+"','"+bean.getBz()+"')");
-				sendMQ.sendMsg(new RunSqlModel(sql.toString()));
+				SendMQ.sendMsg(new RunSqlModel(sql.toString()));
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {

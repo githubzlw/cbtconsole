@@ -26,6 +26,8 @@ import com.cbt.pojo.Admuser;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.pojo.Dropshiporder;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 public class OrderSplitDaoImpl implements IOrderSplitDao {
 //	private static final Log   SLOG = (Log) LogFactory.getLog("source");
@@ -2344,7 +2346,6 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 	@Override
 	public int insertIntoPayment(int userId, String nwOrderNo, String oldOrderNo) {
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		String sql = "INSERT into payment "
 				+ "( userid, orderid, paymentid, payment_amount, payment_cc, orderdesc, username, "
 				+ "paystatus, createtime , paySID, payflag, paytype,  payment_other  ,paymentno,transaction_fee ) "
@@ -2352,26 +2353,16 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ "where order_no='" + nwOrderNo + "'), payment_cc, orderdesc, username, paystatus, NOW(),"
 				+ " paySID, payflag, 3 , 3,paymentno,0 from payment  where  payment.orderid='" + oldOrderNo
 				+ "' limit 1;";
-		Statement stmt = null;
 		try {
 			if (GetConfigureInfo.openSync()) {
 				SaveSyncTable.InsertOnlineDataInfo(userId, nwOrderNo, "拆单支付", "payment", sql);
 			} else {
-				stmt = conn2.createStatement();
-				stmt.execute(sql);
+
+				SendMQ.sendMsgByRPC(new RunSqlModel(sql));
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 		return 0;
 	}
@@ -2958,11 +2949,10 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	                                List<OrderDetailsBean> nwOrderDetails,String state, int isSplitNum) {
 
 		String orderNoOld = orderBeanTemp.getOrderNo();
-		Connection remoteConn = DBHelper.getInstance().getConnection2();
 		Connection localConn = DBHelper.getInstance().getConnection();
-		Statement ppStamt = null;
 		Statement wStamt = null;
 		Statement localStamt = null;
+		//Statement ppStamt = null;
 		boolean isSuccess = false;
 		// 远程执行SQL队列
 		List<String> remoteSqlList = new ArrayList<String>();
@@ -3213,16 +3203,15 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
         }
 
 		try {
-			remoteConn.setAutoCommit(false);
 			localConn.setAutoCommit(false);
-			ppStamt = remoteConn.createStatement();
 			System.err.println("exSql begin");
+			int count=0;
 			for (String exSql : remoteSqlList) {
 				System.err.println(exSql + ";");
-				ppStamt.addBatch(exSql);
+				count+=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(exSql)));
 			}
 
-			isSuccess = ppStamt.executeBatch().length > 0;
+			isSuccess = count > 0;
 			if(isSuccess){
 				wStamt = localConn.createStatement();
 				for(String loSql : localSqlList){
@@ -3231,10 +3220,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				//ppStamt.executeUpdate(localSql);
 				isSuccess = wStamt.executeBatch().length > 0;
 				if(isSuccess){
-				    remoteConn.commit();
 				    localConn.commit();
                 }else{
-				    remoteConn.rollback();
 				    localConn.rollback();
                 }
 				//拆单取消时记录拆单的商品
@@ -3243,30 +3230,18 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 					wStamt = localConn.createStatement();
 					wStamt.executeUpdate(insert_split_details);
 				}
-			}else{
-				remoteConn.rollback();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			isSuccess = false;
-			try {
-				remoteConn.rollback();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
+
 			try {
 				localConn.rollback();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
 		} finally {
-			if (ppStamt != null) {
-				try {
-					ppStamt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+
 			if (wStamt != null) {
 				try {
 					wStamt.close();
@@ -3282,7 +3257,6 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(localConn);
-			DBHelper.getInstance().closeConnection(remoteConn);
 		}
 		return isSuccess;
 	}

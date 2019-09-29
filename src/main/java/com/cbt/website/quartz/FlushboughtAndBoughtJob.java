@@ -121,7 +121,7 @@ public class FlushboughtAndBoughtJob implements Job{
 					sendMQ.sendRecommend(json.toString());
 				}
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}

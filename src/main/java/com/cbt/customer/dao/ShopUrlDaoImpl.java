@@ -2338,31 +2338,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
 
     @Override
     public int batchUpdateCatidPath(String shopId) {
-        Connection remoteConn = null;
-        Statement stmt = null;
-        int rs = 0;
-
-        String sql = "update custom_benchmark_ready a,1688_category b set  a.path_catid = b.path  "
-                + "where a.catid1 = b.category_id and shop_id = '" + shopId + "' and ifnull(a.path_catid,'') = '' ";
-        try {
-            remoteConn = DBHelper.getInstance().getConnection2();
-            stmt = remoteConn.createStatement();
-            rs = stmt.executeUpdate(sql);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("batchUpdateCatidPath error: " + e.getMessage());
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            DBHelper.getInstance().closeConnection(remoteConn);
-        }
-        return rs;
+        throw new RuntimeException("already cancel method called");
     }
 
     @Override

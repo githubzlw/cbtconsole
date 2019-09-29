@@ -3,6 +3,8 @@ package com.cbt.customer.dao;
 import com.cbt.bean.GuestBookBean;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -349,7 +351,6 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 		PreparedStatement stmt = null;
 		int result = 0;
 		conn = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		ResultSet rs=null;
 		try {
 			sql="select reply_content from guestbook where id=?";
@@ -369,12 +370,17 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 			result = stmt.executeUpdate();
 			//将评论更新到aws库中以便回复在产品单页展示  王宏杰 2018-04-27
 			sql = "update guestbook set reply_content=?,reply_time=?,status=? where status=0 and id=? ";
-			stmt = conn2.prepareStatement(sql);
-			stmt.setString(1, replyContent);
-			stmt.setString(2, date);
-			stmt.setInt(3, 1);// 状态改为已回复
-			stmt.setInt(4, id);
-			stmt.executeUpdate();
+
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(replyContent);
+			lstValues.add(date);
+			lstValues.add("1");
+			lstValues.add(String.valueOf(id));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -386,7 +392,6 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 		return result;
 	}

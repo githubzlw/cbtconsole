@@ -9,6 +9,8 @@ import com.cbt.refund.bean.RefundBean;
 import com.cbt.refund.bean.RefundBeanExtend;
 import com.cbt.util.Util;
 import com.cbt.website.bean.PaymentBean;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -1318,8 +1320,6 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	@Override
 	public int confirmAndRemark(int id, int userid, String refundOrderNo, String remark, double account, int status, String admName) {
 
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
 		int rs = 0;
 
 		String sql;
@@ -1332,33 +1332,26 @@ public class RefundDaoImpl implements RefundDaoPlus{
 		}
 
 		try {
-			int count = 1;
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(count++, refundOrderNo);
-			stmt.setDouble(count++, account);
-			stmt.setInt(count++, status);
-			stmt.setString(count++, "<br>" + remark);
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(refundOrderNo);
+			lstValues.add(String.valueOf(account));
+			lstValues.add(String.valueOf(status));
+			lstValues.add("<br>" + remark);
 
 			if (status == 1) {
-				stmt.setString(count++, admName);
-				stmt.setInt(count++, id);
-				stmt.setInt(count++, userid);
+				lstValues.add(admName);
+				lstValues.add(String.valueOf(id));
+				lstValues.add(String.valueOf(userid));
 			} else {
-				stmt.setInt(count++, id);
-				stmt.setInt(count++, userid);
+				lstValues.add(String.valueOf(id));
+				lstValues.add(String.valueOf(userid));
 			}
-			rs = stmt.executeUpdate();
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs;
 	}

@@ -2239,11 +2239,11 @@ public class EditorController {
             int index = customGoodsService.updateReviewRemark(paramMap);
             if (index > 0) {
                 //插入数据到线上
-                SendMQ sendMQ = new SendMQ();
+
 //                String sql = "update goods_review set review_remark='" + edit_remark + "',country='" + editcountry + "',review_score='" + edit_score + "',review_flag='" + update_flag + "',updatetime=now() where goods_pid='" + goods_pid + "' and createtime='" + oldCreateTime + "'";
                 String sql = "update goods_review set review_remark='" + edit_remark + "',country='" + editcountry + "',review_score='" + edit_score + "',review_flag='" + update_flag + "',updatetime=now() where id='" + id + "';";
-                sendMQ.sendMsg(new RunSqlModel(sql));
-                sendMQ.closeConn();
+                SendMQ.sendMsg(new RunSqlModel(sql));
+
             }
             json.setOk(index > 0 ? true : false);
             json.setMessage(index > 0 ? "修改成功" : "修改失败");
@@ -2289,10 +2289,10 @@ public class EditorController {
             int index = customGoodsService.addReviewRemark(paramMap);
             if (index > 0) {
                 //插入数据到线上
-                SendMQ sendMQ = new SendMQ();
+
                 String sql = "insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('" + goods_pid + "','" + country + "','" + adm.getAdmName() + "','" + createTime + "','" + SendMQ.repCha(review_remark) + "','" + review_score + "')";
-                sendMQ.sendMsg(new RunSqlModel(sql));
-                sendMQ.closeConn();
+                SendMQ.sendMsg(new RunSqlModel(sql));
+
             }
             json.setOk(index > 0 ? true : false);
             json.setMessage("线上产品单页对应评论数据已增加, 后台对应新增评论10分钟后会显示. ");

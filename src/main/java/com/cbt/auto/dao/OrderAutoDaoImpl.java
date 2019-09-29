@@ -743,9 +743,9 @@ public class OrderAutoDaoImpl implements OrderAutoDao {
 		ResultSet rs=null;
 		String sql="";
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			String sqls="update custom_benchmark_ready set is_stock_flag=0 where is_stock_flag=1 and valid=1";
-			sendMQ.sendMsg(new RunSqlModel(sqls));
+			SendMQ.sendMsg(new RunSqlModel(sqls));
 			sqls="update custom_benchmark_ready set is_stock_flag=0 where is_stock_flag=1 and valid=1";
 			stmt = conn.prepareStatement(sqls);
 			stmt.executeUpdate();
@@ -765,9 +765,9 @@ public class OrderAutoDaoImpl implements OrderAutoDao {
 				stmt.executeUpdate();
 				//线上表
 				sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-				sendMQ.sendMsg(new RunSqlModel(sql));
+				SendMQ.sendMsg(new RunSqlModel(sql));
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {
@@ -1217,11 +1217,11 @@ public class OrderAutoDaoImpl implements OrderAutoDao {
 				stmt.setString(5,admName);
 				row=stmt.executeUpdate();
 				if(row>0){
-					SendMQ sendMQ = new SendMQ();
-					sendMQ.sendMsg(new RunSqlModel("delete from admin_r_user where userid='"+userId+"'"));
-					sendMQ.sendMsg(new RunSqlModel("insert into admin_r_user(userid,username,useremail,adminid,createdate,admName) " +
+
+					SendMQ.sendMsg(new RunSqlModel("delete from admin_r_user where userid='"+userId+"'"));
+					SendMQ.sendMsg(new RunSqlModel("insert into admin_r_user(userid,username,useremail,adminid,createdate,admName) " +
 							"values("+userId+",'"+email+"','"+email+"',"+adminid+",now(),'"+admName+"')"));
-					sendMQ.closeConn();
+
 				}
 			}
 		}catch (Exception e){

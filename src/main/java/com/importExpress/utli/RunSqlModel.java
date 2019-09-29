@@ -8,9 +8,9 @@ public class RunSqlModel {
     public String getType() {
         return type;
     }
-    public void setType(String type) {
-        this.type = type;
-    }
+//    public void setType(String type) {
+//        this.type = type;
+//    }
     public String getSql() {
         return sql;
     }

@@ -1623,7 +1623,7 @@ public class NewOrderDetailsCtr {
 				}
 
 			} catch (Exception e) {
-				LOG.error("closeOrder error, orderNo : " + orderNo + ",reason : " + e.getMessage());
+				LOG.error("closeOrder error, orderNo : " + orderNo , e);
 				json.setOk(false);
 				json.setMessage("取消订单失败,原因：" + e.getMessage());
 			}

@@ -6,6 +6,8 @@ import com.cbt.bean.Preferential;
 import com.cbt.bean.PreferentialWeb;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.Utility;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -658,26 +660,22 @@ public static void main(String[] args) {
 	@Override
 	public int upPostageD(int id, int type, String handleman) {
 		String sql = "update postage_discounts set handleman=?,handletime=now(),state=? where id=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
 		int res = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, handleman);
-			stmt.setInt(2, type);
-			stmt.setInt(3, id);
-			res = stmt.executeUpdate();
+
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(handleman);
+			lstValues.add(String.valueOf(type));
+			lstValues.add(String.valueOf(id));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			res=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+
 	}
 		return res;
 	}
@@ -824,20 +822,23 @@ public static void main(String[] args) {
 //		String sql = "update preferential_application set discountedunitprice=?,state=1 where id=?";
 		String sql = "update preferential_application set pay_price=?  where itemId=?";
 		Connection con = DBHelper.getInstance().getConnection();
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement ps1=null,ps2=null;
+		PreparedStatement ps1=null;
 		int i =0;
 		try {
 			ps1 = con.prepareStatement(sql);
 			ps1.setDouble(1, payPrice);
 			ps1.setString(2, itemId);
-			
-			ps2 = conn.prepareStatement(sql);
-			ps2.setDouble(1, payPrice);
-			ps2.setString(2, itemId);
-			
+
+			List<String> lstValues = new ArrayList<>(2);
+			lstValues.add( String.valueOf(payPrice));
+			lstValues.add( itemId);
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+
+			SendMQ.sendMsg(new RunSqlModel(runSql));
+
+
 			i = ps1.executeUpdate();
-			i+= ps2.executeUpdate();
+			++i;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -848,15 +849,7 @@ public static void main(String[] args) {
 					e.printStackTrace();
 				}
 			}
-			if(ps2!=null){
-				try {
-					ps2.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
 		}
-		DBHelper.getInstance().closeConnection(conn);
 		DBHelper.getInstance().closeConnection(con);
 		return i;
 	}
