@@ -107,6 +107,14 @@ public class EditorController {
 
         // 取出1688商品的全部信息
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+
+        if (goods == null) {
+            mv.addObject("uid", -1);
+            return mv;
+        } else if (user.getId() == 63) {
+            goods.setCanEdit(0);
+        }
+
         if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
             if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
                 goods.setOffReason(null);
@@ -128,12 +136,7 @@ public class EditorController {
             goods.setOffReason(null);
         }
 
-        if (goods == null) {
-            mv.addObject("uid", -1);
-            return mv;
-        } else if (user.getId() == 63) {
-            goods.setCanEdit(0);
-        }
+
 
         if (StringUtils.isNotBlank(goods.getFeeprice())) {
             goods.setFeeprice(goods.getFeeprice().replace("[", "").replace("]", "").replace("$", "@"));

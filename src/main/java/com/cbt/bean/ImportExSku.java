@@ -101,8 +101,8 @@ public class ImportExSku {
                 .append(volumeWeight);
         sb.append(",\"skuVal\":")
                 .append(skuVal);
-        sb.append(",\"wholesalePrice\":")
-                .append(wholesalePrice);
+        sb.append(",\"wholesalePrice\":\"")
+                .append(wholesalePrice).append('\"');
         sb.append('}');
         return sb.toString();
     }

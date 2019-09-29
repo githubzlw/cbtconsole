@@ -760,4 +760,6 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	int updateOrderSplitNumGoodsCommunicationInfoData(@Param("orderNo") String orderNo);
+    @Select("SELECT car_urlMd5 from order_details WHERE orderid='2190927K687' LIMIT 1")
+    String getUrlMd5ByOrder(@Param("orderNo") String orderNo);
 }
