@@ -16,8 +16,8 @@
 	  </resultMap>
 
     <!--更新目录-->
-	<update id="updateCatalogProduct" parameterType="com.importExpress.pojo.RecommendCatalog">
-		update recommend_catalog set status=0 where id=#{id}
+	<update id="updateCatalog" parameterType="com.importExpress.pojo.RecommendCatalog">
+		update recommend_catalog set product_count=#{productCount},product_list=#{productList},template=#{template},catalog_name=#{catalogName} where id=#{id}
 	</update>
     <!--更新目录-->
 	<update id="deleteCatalog">
@@ -31,6 +31,7 @@
 	  #{productList},#{catalogFile},#{status})
 	</insert>
 	
+	<!-- 目录列表 -->
 	<select id="catalogList" resultMap="recommendCatalogResultMap">
 	select  id,catalog_name,template,create_admin,create_time,product_count,product_list,catalog_file,status
 	from recommend_catalog where status=1 
@@ -39,6 +40,14 @@
 	limit #{page},40
 	</select>
 	
+	<!-- 目录 -->
+	<select id="catalogById" resultMap="recommendCatalogResultMap">
+	select  id,catalog_name,template,create_admin,create_time,product_count,product_list,catalog_file,status
+	from recommend_catalog where status=1 and id=#{id}
+	limit 1
+	</select>
+	
+	<!-- 目录数量 -->
 	<select id="catalogCount" resultType="Integer">
 	select  count(*) from recommend_catalog where status=1 
 	<if test="template !=0"> and template=#{template}</if>

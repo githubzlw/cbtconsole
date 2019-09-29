@@ -257,4 +257,15 @@ public class RecommendCatalogServiceImpl implements RecommendCatalogService {
 	public int deleteCatalog(int id) {
 		return recommendCatalogMapper.deleteCatalog(id);
 	}
+
+	@Override
+	public RecommendCatalog catalogById(int id) {
+		return recommendCatalogMapper.catalogById(id);
+	}
+
+	@Override
+	public int updateCatalog(RecommendCatalog cataLog) {
+		// TODO Auto-generated method stub
+		return recommendCatalogMapper.updateCatalog(cataLog);
+	}
 }

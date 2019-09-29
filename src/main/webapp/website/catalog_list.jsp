@@ -47,8 +47,9 @@
 .report b {
 	font-size: 18px;
 }
-.table-catalog{    margin-left: 1%;width: 98%;border: 4px solid #ccc;}
-.table-catalog td{border: 4px solid #ccc;}
+.table-catalog{margin-left: 1%;width: 98%;border: 3px solid #3c763d;}
+.div-catalog table tbody td{border: 1px solid #3c763d;}
+.div-catalog table thead th{border: 1px solid #3c763d;}
 .div-catalog{min-height: 980px;}
 .report .w200 {
 	width: 200px;
@@ -76,6 +77,20 @@
 	left: 0;
 }
 /* 产品弹窗 tc1 */
+/* 产品弹窗 tc1 */
+.tc1{
+    position: absolute;
+    z-index: 888;
+    display: none;
+    top: 100px;
+    left: 50%;
+    margin-left: -600px;
+    background-color: #fff;
+    padding: 20px;
+    max-height: 800px;
+    border-radius: 12px;
+    overflow-y: auto;
+}
 .tc,.tc *{font-size:16px;}
 .tc1 .form-horizontal .control-label{text-align: left;}
 .tc1 th{font-weight: normal;}
@@ -86,8 +101,6 @@
 .tc1 .container{margin-top:50px;}
 .tc1 table td:last-child{text-align: center;}
 .tc1 table input[type="radio"]{width:20px;height:20px;}
-.tc1{position:absolute;z-index:10;display:none;top:100px;left:50%;margin-left:-600px;background-color:#fff;
-padding: 20px;max-height: 800px;}
 .tc1_table{max-height:500px;height:auto;overflow-y:auto;}
 .transparent,.transparent-bg{width:100%;height:100%;background-color:rgba(0,0,0,0);position: fixed;z-index:1;display: none;text-align: center;}
 em,i{font-style: normal;}
@@ -116,6 +129,15 @@ em,i{font-style: normal;}
     -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
+.category-row-product {
+    margin-left: 150px;
+}
+.h3-c{text-align: left;}
+.close-x{position: absolute;top: 0;right: 3px;z-index: 999;}
+.window-bd {width: 90%;}
+.col-xs-3-product{height:200px;}
+.h-tc{font-size: 23px;font-weight: bolder;}
+.catalog_img{max-height: 200px;}
 </style>
 </head>
 <body>
@@ -135,7 +157,7 @@ em,i{font-style: normal;}
 			</select>
 			</label>
 		<label>目录名称:<input class="form-control-q" name="" id="catalog-name" value="${catalogName}"></label>
-		<label><button class="btn btn-success query_button">搜索</button></label>
+		<label><button class="btn btn-success btn-query-list">搜索</button></label>
 		</div>
 		</div>
 		<div class="row mt20 div-catalog">
@@ -197,61 +219,27 @@ em,i{font-style: normal;}
 	
 <div class="tc">
 	<div class="trnasparent"></div>
-	<div class="container tc1">
-		<div class="wrap row">
-			<div class="col-xs-9">
-				<div class="form-horizontal">
-					<div class="form-group">
-						<label class="col-xs-2 control-label text-left">产品ID:</label>
-						<div class="col-xs-10">
-							<input type="text" class="form-control" id="lu_pid" onchange="getProduct()">
-							<input type="hidden"  id="lu_catid" value="">
-							<input type="hidden"  id="lu_price" value="">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-xs-2 control-label text-left">产品名称:</label>
-						<div class="col-xs-10">
-							<span id="lu_name">产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称</span>
-						</div>
-					</div>
-				</div>
-				<div class="tc1_table">
-				<table class="table table-bordered table-primary">
-					<thead>
-						<tr>
-							<th>产品规格</th>
-							<th>录入数量</th>
-							<th>库位</th>
-							<th>是否录入</th>
-						</tr>
-					</thead>
-					<tbody id="lu_tr">
-						<tr >
-							<td><span class="lu_sku">xxx</span><br>
-						<span class="lu_specid">ssss</span><br>
-						<span class="lu_skuid">cccc</span></td>
-							<td><input type="text" class="form-control lu_count" value="0"></td>
-							<td class="lu_barcode">
-							<input type='text' placeholder='请输入库位条形码' class='lu_barcode_a'>
-							<!-- <a onclick="getbarcode()" class="lu_barcode_a">获取库位</a> --></td>
-							<td><input type="checkbox" name="entry" class="lu_is"></td>
-						</tr>
-						
-					</tbody>
-				</table>
-				</div>
-			</div>
-			<div class="col-xs-3">
-				<img
-					src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg"
-					alt="" class="img-responsive" id="lu_img">
-			</div>
-		</div>
+		<div class="container tc1">
+		<div class="row">
+        <h3 class="text-center h-tc">推荐商品类目页预览</h3>
+       <!--  <label>
+        <input class="btn btn-info boutique_goods_create" type="button" value="生成目录页"  style="margin-right: 80px;">
+        </label>
+        <label>
+        <input class="btn btn-info boutique_goods_clear" type="button" value="清空所有勾选的商品"  style="margin-right: 20px;">
+        </label> -->
+        </div>
+        <br>
+        
+        <div class="row window-bd">
+                <div class="row ain-list">
+                    <div class="pre-row">
+                        
+                </div>
+            </div>
+    </div>
 		
-	</div>
-	
-	
+</div>
 </div>
 </body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>

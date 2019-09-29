@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -16,10 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-
 import com.cbt.parse.service.StrUtils;
 import com.cbt.service.CategoryService;
-import com.cbt.util.Md5Util;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -35,6 +31,7 @@ public class RecommendCatalogController {
 	private RecommendCatalogService recommendCatalogService;
 	@Autowired
 	private CategoryService categoryService;
+	private String saveKey = "catalogkey";
 	
 	/**挑选产品临时保存
 	 * @param request
@@ -44,29 +41,36 @@ public class RecommendCatalogController {
 	@RequestMapping("/save")
 	@ResponseBody
 	public Map<String,Object> catalogSave(HttpServletRequest request, HttpServletResponse response) {
-		Map<String,Object> result = new HashMap<>();
-		String pid = request.getParameter("pid");
-		String del = request.getParameter("del");
-		String tem = request.getParameter("tem");
-		int site = Integer.parseInt(tem);
-		String saveKey = request.getParameter("saveKey");
-		if(StringUtils.isBlank(saveKey) ) {
-			if("1".equals(del)) {
-				result.put("status", 100);
-				result.put("message", "无数据可删除,请先挑选产品！！");
-				return result;
-			}
-			saveKey = Md5Util.md5Operation("catalog"+System.currentTimeMillis());
-		}
 		Subject currentUser = SecurityUtils.getSubject();
 		Admuser admuser = (Admuser)currentUser.getPrincipal();
 		String redisKey  = "catalog"+admuser.getId();
-		String catalog = Redis.hget(redisKey, saveKey);
+		
+		Map<String,Object> result = new HashMap<>();
+		String pid = request.getParameter("pid");
+		String del = request.getParameter("del");
+		String editid = request.getParameter("editid");
+		String tem = request.getParameter("tem");
+		int site = Integer.parseInt(tem);
+		String redisCatalog = Redis.hget(redisKey, saveKey);
+		if(StringUtils.isBlank(redisCatalog) ) {
+			//若是从管理页面过来的，先获取产品数据
+			redisCatalog = catalogProduct(editid);
+			if(StringUtils.isBlank(redisCatalog) && "1".equals(del)) {
+				result.put("status", 100);
+				result.put("message", "无数据可删除,请先挑选产品！！");
+				return result;
+			}else {
+				if(StringUtils.isBlank(redisCatalog)) {
+					Redis.hset(redisKey, saveKey, redisCatalog,2*60*60);
+				}
+			}
+		}
+		
 		List<Object> redisWrap = new ArrayList<>();
-		if(StringUtils.isNotBlank(catalog)) {
+		if(StringUtils.isNotBlank(redisCatalog)) {
 			Map<Object,Object> clazzMap = new HashMap<>();
 			clazzMap.put("products",CatalogProduct.class);
-			redisWrap = SerializeUtil.JsonToList(catalog, CatalogProductWrap.class,clazzMap );
+			redisWrap = SerializeUtil.JsonToList(redisCatalog, CatalogProductWrap.class,clazzMap );
 		}
 		List<CatalogProductWrap> wraps = null;
 		if("1".equals(del)) {
@@ -83,16 +87,67 @@ public class RecommendCatalogController {
 		}
 		
 		result.put("status", 200);
-		catalog =  wraps==null||wraps.isEmpty() ? "" : SerializeUtil.ListToJson(wraps);
-		result.put("product", catalog);
+		redisCatalog =  wraps==null||wraps.isEmpty() ? "" : SerializeUtil.ListToJson(wraps);
+		result.put("product", redisCatalog);
 		result.put("productSize", wraps==null ? 0:wraps.size());
-		result.put("saveKey", saveKey);
-		Redis.hset(redisKey, saveKey, catalog,2*60*60);
+//		result.put("saveKey", saveKey);
+		Redis.hset(redisKey, saveKey, redisCatalog,2*60*60);
 		return result;
 		
 	}
 	
-	/**目录预览与生成
+	/**目录预览
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/product")
+	@ResponseBody
+	public Map<String,Object> catalogProduct(HttpServletRequest request, HttpServletResponse response) {
+		Map<String,Object> result = new HashMap<>();
+		Subject currentUser = SecurityUtils.getSubject();
+		Admuser admuser = (Admuser)currentUser.getPrincipal();
+		String redisKey  = "catalog"+admuser.getId();
+		String isManag = request.getParameter("isManag");
+		List<CatalogProductWrap> redisWrap = new ArrayList<>();
+		String redisCatalog = "";
+		if("true".equals(isManag)) {
+			String id = request.getParameter("id");
+			//仅预览
+			if(!StrUtils.isNum(id)) {
+				result.put("status", 100);
+				result.put("message", "数据不存在！！！");
+				return result;
+			}
+			RecommendCatalog catalogById = recommendCatalogService.catalogById(Integer.parseInt(id));
+			if(catalogById == null) {
+				result.put("status", 101);
+				result.put("message", "数据不存在！！！");
+				return result;
+			}
+			result.put("productSize", 0);
+			redisCatalog = catalogById.getProductList();
+			if(StringUtils.isBlank(redisCatalog)) {
+				result.put("status", 101);
+				result.put("message", "无产品可预览！！！");
+				return result;
+			}
+			redisWrap = SerializeUtil.JsonToListT(redisCatalog, CatalogProductWrap.class);
+			result.put("productSize", redisWrap.size());
+			Redis.hset(redisKey, saveKey, redisCatalog,2*60*60);
+		}else {
+			redisCatalog = Redis.hget(redisKey, saveKey);
+			if(StringUtils.isNotBlank(redisCatalog)) {
+				redisWrap = SerializeUtil.JsonToListT(redisCatalog, CatalogProductWrap.class);
+			}
+		}
+		result.put("status", 200);
+		result.put("productSize", redisWrap.size());
+		result.put("product", redisCatalog);
+		return result;
+		
+	}
+	/**目录生成
 	 * @param request
 	 * @param response
 	 * @return
@@ -101,15 +156,7 @@ public class RecommendCatalogController {
 	@ResponseBody
 	public Map<String,Object> catalogCreate(HttpServletRequest request, HttpServletResponse response) {
 		Map<String,Object> result = new HashMap<>();
-		String preview = request.getParameter("preview");
 		//仅预览
-		String saveKey = request.getParameter("saveKey");
-		if(StringUtils.isBlank(saveKey)) {
-			result.put("status", 100);
-			result.put("message", "请先挑选产品后再预览！！！");
-			return result;
-		}
-		
 		Subject currentUser = SecurityUtils.getSubject();
 		Admuser admuser = (Admuser)currentUser.getPrincipal();
 		String redisKey  = "catalog"+admuser.getId();
@@ -120,21 +167,16 @@ public class RecommendCatalogController {
 			redisWrap = SerializeUtil.JsonToListT(redisCatalog, CatalogProductWrap.class);
 		}else {
 			result.put("status", 101);
-			result.put("message", "请先挑选产品后再预览！！！");
-			return result;
-		}
-		if("true".equals(preview)) {
-			result.put("status", 200);
-			result.put("productSize", redisWrap.size());
-			result.put("product", redisCatalog);
+			result.put("message", "请先挑选产品！！！");
 			return result;
 		}
 		String tem = request.getParameter("tem");
 		int template = Integer.parseInt(tem);
+		String id = request.getParameter("id");
 		String catalogName = request.getParameter("catalogname");
 		//生成目录
+		int addCatelog = 0;
 		RecommendCatalog catalog = new RecommendCatalog();
-//			catalog.setCatalogFile(catalogFile);
 		catalog.setCatalogName(catalogName);
 		catalog.setCreateAdmin(admuser.getAdmName());
 		int productCount = redisWrap.stream().mapToInt(CatalogProductWrap::getProductCount).sum();
@@ -142,11 +184,11 @@ public class RecommendCatalogController {
 		catalog.setProductList(redisCatalog);
 		catalog.setStatus(1);
 		catalog.setTemplate(template);
-		int addCatelog = 0;
-		try {
+		if(StrUtils.isNum(id)) {
+			catalog.setId(Integer.parseInt(id));
+			addCatelog = recommendCatalogService.updateCatalog(catalog);
+		}else {
 			addCatelog = recommendCatalogService.addCatelog(catalog);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		if(addCatelog < 1) {
 			result.put("status", 102);
@@ -167,13 +209,6 @@ public class RecommendCatalogController {
 	@ResponseBody
 	public Map<String,Object> catalogClear(HttpServletRequest request, HttpServletResponse response) {
 		Map<String,Object> result = new HashMap<>();
-		//仅预览
-		String saveKey = request.getParameter("saveKey");
-		if(StringUtils.isBlank(saveKey)) {
-			result.put("status", 100);
-			result.put("message", "无产品可清空,请先挑选产品！！！");
-			return result;
-		}
 		Subject currentUser = SecurityUtils.getSubject();
 		Admuser admuser = (Admuser)currentUser.getPrincipal();
 		String redisKey  = "catalog"+admuser.getId();
@@ -181,7 +216,7 @@ public class RecommendCatalogController {
 		result.put("status", 200);
 		return result;
 	}
-	/**预览时清空产品
+	/**删除目录
 	 * @param request
 	 * @param response
 	 * @return
@@ -304,6 +339,7 @@ public class RecommendCatalogController {
 				List<CatalogProduct> newProducts = new ArrayList<>();
 				for(CatalogProduct p : products) {
 					if(p.getPid().equals(pid)) {
+						result.put("pid", pid);
 						continue;
 					}
 					newProducts.add(p);
@@ -339,8 +375,14 @@ public class RecommendCatalogController {
 			CatalogProductWrap w = (CatalogProductWrap)wrap;
 			if(w.getCatid().equals(product.getCatid())) {
 				List<CatalogProduct> products = w.getProducts();
-				products.add(product);
-				w.setProductCount(products.size());
+				boolean exsis = false;
+				for(int i=0,size=products.size();i<size &&!exsis;i++) {
+					exsis = products.get(i).getPid().equals(product.getPid());
+				}
+				if(!exsis) {
+					products.add(product);
+					w.setProductCount(products.size());
+				}
 				isadd = false;
 			}
 			wraps.add(w);
@@ -349,5 +391,23 @@ public class RecommendCatalogController {
 			addProduct(product, wraps);
 		}
 		return wraps;
+	}
+	/**
+	 * 获取持久化的数据
+	 */
+	private String  catalogProduct(String id) {
+		if(!StrUtils.isNum(id)) {
+			return "";
+		}
+		
+		RecommendCatalog catalogById = recommendCatalogService.catalogById(Integer.parseInt(id));
+		if(catalogById == null) {
+			return "";
+		}
+		String productList = catalogById.getProductList();
+		if(StringUtils.isBlank(productList)) {
+			return productList;
+		}
+		return "";
 	}
 }

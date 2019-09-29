@@ -19,7 +19,7 @@ public interface RecommendCatalogMapper {
      * @param cataLog
      * @return
      */
-    int updateCatalogProduct(RecommendCatalog cataLog);
+    int updateCatalog(RecommendCatalog cataLog);
     
     /**删除目录
      * @param cataLog
@@ -42,5 +42,11 @@ public interface RecommendCatalogMapper {
 	 * @return
 	 */
 	int catalogCount(@Param("template")int template,@Param("catalogName")String catalogName);
+	
+	/**获取数据
+     * @param id
+     * @return
+     */
+    RecommendCatalog catalogById(int id);
 
 }

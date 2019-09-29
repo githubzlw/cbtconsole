@@ -19,7 +19,11 @@ public interface RecommendCatalogService {
 	 * @return
 	 */
 	int  addCatelog(RecommendCatalog catalog);
-	
+	/**更新
+     * @param cataLog
+     * @return
+     */
+    int updateCatalog(RecommendCatalog cataLog);
 	
 	/**目录列表
 	 * @param page
@@ -39,6 +43,12 @@ public interface RecommendCatalogService {
      * @return
      */
     int deleteCatalog(int id);
+    
+    /**获取数据
+     * @param id
+     * @return
+     */
+    RecommendCatalog catalogById(int id);
 
 
 }
