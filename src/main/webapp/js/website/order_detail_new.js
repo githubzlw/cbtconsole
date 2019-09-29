@@ -433,10 +433,10 @@ function deliver(orderno, usid, paytime,paymoney) {
         alert('获取订单号失败');
         return ;
     }
-    if (paymoney<50){
-        alert('订单金额不足无法送样');
-        return;
-    }
+    // if (paymoney<50){
+    //     alert('订单金额不足无法送样');
+    //     return;
+    // }
     url="/cbtconsole/orderSplit/deliverOrder?orderno="+orderno+"&&userid="+usid;
     var param = "height=860,width=1500,top=80,left=200,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
      window.open(url, "windows", param);
