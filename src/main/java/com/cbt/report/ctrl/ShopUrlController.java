@@ -2791,6 +2791,9 @@ public class ShopUrlController {
         }
         try {
 
+            // 给错误商品使用的，直接更新
+            shopUrlService.setShopGoodsFailureGoodsToReady(shopId);
+
             Map<String, Integer> rsMap = shopUrlService.queryDealState(shopId);
             if (rsMap == null || rsMap.size() == 0) {
                 json.setOk(false);

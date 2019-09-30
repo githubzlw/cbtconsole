@@ -113,6 +113,10 @@
 
 	}
 
+	function setShopGoodsNoSold(shopId) {
+
+    }
+
 	function publishGoods(shopId) {
 		$.messager.confirm('系统提醒', '是否发布店铺商品到线上？', function(r) {
 			if (r) {
@@ -248,8 +252,8 @@
 					onclick="readyToOnline('${shopId}')" />
 					&nbsp;&nbsp;&nbsp;
 					<input class="del_btn" type="button" value="删除商品" onclick="deleteShopReadyGoods('${shopId}')">	
-					<a target="_blank"
-					href="http://192.168.1.27:9089/pap/translation.jsp">翻译词典管理</a>		
+					<a target="_blank" href="http://192.168.1.27:9089/pap/translation.jsp">翻译词典管理</a>
+					<input class="s_btn_2" type="button" value="标记上线不过滤销量" onclick="setShopGoodsNoSold('${shopId}')">
 					<h3 style="color:red;" align="center">(请注意“已经在线上”的商品，如果不需要上线，请删除，否则“已经在线上”的商品点击“发布”按钮后，将进行数据更新)</h3>	
 			</div>
 			<br>

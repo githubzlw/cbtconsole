@@ -3313,4 +3313,24 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         return count;
     }
 
+    @Override
+    public int setShopGoodsFailureGoodsToReady(String shopId) {
+        Connection conn = DBHelper.getInstance().getConnection7();
+        Statement stmt = null;
+        String upShopSql = "update shop_goods_ready set sync_flag = 0 where shop_id = '" + shopId + "' and sync_flag = 2 ";
+        int count = 0;
+        try {
+            stmt = conn.createStatement();
+            count = stmt.executeUpdate(upShopSql);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("shopId:" + shopId + ",setShopGoodsFailureGoodsToReady error: " + e.getMessage());
+            LOG.error("shopId:" + shopId + ",setShopGoodsFailureGoodsToReady error: " + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return count;
+    }
+
 }

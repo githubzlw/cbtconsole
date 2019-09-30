@@ -313,4 +313,9 @@ public class ShopUrlServiceImpl implements IShopUrlService {
     }
 
 
+    @Override
+    public int setShopGoodsFailureGoodsToReady(String shopId) {
+        return dao.setShopGoodsFailureGoodsToReady(shopId);
+    }
+
 }

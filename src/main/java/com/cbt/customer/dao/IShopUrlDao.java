@@ -468,4 +468,11 @@ public interface IShopUrlDao {
      */
     int reUpdateShopAdminId(String shopId, int adminId, String adminName);
 
+    /**
+     * 设置店铺上线失败的商品为待上线状态
+     * @param shopId
+     * @return
+     */
+    int setShopGoodsFailureGoodsToReady(String shopId);
+
 }
