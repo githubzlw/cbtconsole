@@ -121,6 +121,10 @@ public class ShopUrlServiceImpl implements IShopUrlService {
         return dao.deleteShopOfferGoods(shopId, pids);
     }
 
+    @Override
+    public boolean setShopGoodsNoSold(String shopId, String pids) {
+        return dao.setShopGoodsNoSold(shopId, pids);
+    }
 
     @Override
     public List<ShopGoodsEnInfo> queryDealGoodsWithInfoByShopId(String shopId) {
@@ -312,5 +316,10 @@ public class ShopUrlServiceImpl implements IShopUrlService {
         return dao.reUpdateShopAdminId(shopId, adminId, adminName);
     }
 
+
+    @Override
+    public int setShopGoodsFailureGoodsToReady(String shopId) {
+        return dao.setShopGoodsFailureGoodsToReady(shopId);
+    }
 
 }

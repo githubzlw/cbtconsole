@@ -125,6 +125,15 @@ public interface IShopUrlDao {
      */
     public boolean deleteShopOfferGoods(String shopId, String pids);
 
+    /**
+     * @param shopId
+     * @param pids
+     * @return boolean
+     * @Title deleteShopOfferGoods
+     * @Description 置店铺商品不过滤销量
+     */
+    public boolean setShopGoodsNoSold(String shopId, String pids);
+
 
     /**
      * @param shopId
@@ -467,5 +476,12 @@ public interface IShopUrlDao {
      * @return
      */
     int reUpdateShopAdminId(String shopId, int adminId, String adminName);
+
+    /**
+     * 设置店铺上线失败的商品为待上线状态
+     * @param shopId
+     * @return
+     */
+    int setShopGoodsFailureGoodsToReady(String shopId);
 
 }

@@ -1478,6 +1478,9 @@
 <c:if test="${uid < 0}">
     <div>
         <p style="margin-left: 700px;font-size: 28px;color: red;margin-top: 200px;">获取产品失败</p>
+        <c:if test="${not empty message}">
+            <p>${message}</p>
+        </c:if>
     </div>
 </c:if>
 
