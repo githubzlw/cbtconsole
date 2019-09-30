@@ -54,6 +54,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -1300,6 +1302,53 @@ public class ShopUrlController {
         }
         return json;
     }
+
+
+     /**
+     * @param request
+     * @param response
+     * @return JsonResult
+     * @Title setShopGoodsNoSold
+     * @Description 设置店铺商品不过滤销量
+     */
+    @ResponseBody
+    @RequestMapping("/setShopGoodsNoSold.do")
+    public JsonResult setShopGoodsNoSold(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String userJson = Redis.hget(request.getSession().getId(), "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        String shopId = request.getParameter("shopId");
+        if (shopId == null && "".equals(shopId)) {
+            json.setOk(false);
+            json.setMessage("获取shopId失败");
+            return json;
+        }
+        String pids = request.getParameter("pids");
+        if (pids == null && "".equals(pids)) {
+            json.setOk(false);
+            json.setMessage("获取pid失败");
+            return json;
+        }
+        try {
+
+            shopUrlService.setShopGoodsNoSold(shopId, pids);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.getStackTrace();
+            json.setOk(false);
+            json.setMessage("执行失败，原因：" + e.getMessage());
+            System.err.println("shopId:" + shopId + ",pids:" + pids + ",setShopGoodsNoSold error:" + e.getMessage());
+            LOG.error("shopId:" + shopId + ",pids:" + pids + ",setShopGoodsNoSold error:", e);
+        }
+        return json;
+    }
+
+
 
     /**
      * @param request
@@ -2791,9 +2840,6 @@ public class ShopUrlController {
         }
         try {
 
-            // 给错误商品使用的，直接更新
-            shopUrlService.setShopGoodsFailureGoodsToReady(shopId);
-
             Map<String, Integer> rsMap = shopUrlService.queryDealState(shopId);
             if (rsMap == null || rsMap.size() == 0) {
                 json.setOk(false);
@@ -2806,9 +2852,34 @@ public class ShopUrlController {
                         return json;
                     } else if (rsMap.get("shop_state") == 2) {
                         if (rsMap.get("online_state") == 1) {
-                            json.setOk(false);
-                            json.setMessage("店铺数据正在上线，拒绝执行操作！");
-                            return json;
+                            // 判断更新时间，超过两天的就放行
+                            String updateTime = null;
+                            for (Entry<String, Integer> stateMap : rsMap.entrySet()) {
+                                if ("shop_state".equals(stateMap.getKey()) || "online_state".equals(stateMap.getKey())) {
+                                    continue;
+                                } else {
+                                    updateTime = stateMap.getKey();
+                                }
+                            }
+                            if (StringUtils.isNotBlank(updateTime)) {
+                                LocalDateTime today = LocalDateTime.now().minusDays(2);
+                                int subLength = "2019-09-30 15:35:30".length();
+                                if(updateTime.length() > subLength){
+                                    updateTime = updateTime.substring(0,subLength);
+                                }
+                                DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                                LocalDateTime upTime = LocalDateTime.parse(updateTime, df);
+                                if (upTime.isAfter(today)) {
+                                    json.setOk(false);
+                                    json.setMessage("店铺数据正在上线，拒绝执行操作！");
+                                    return json;
+                                }
+                            } else {
+                                json.setOk(false);
+                                json.setMessage("店铺数据正在上线，拒绝执行操作！");
+                                return json;
+                            }
+
                         } else if (rsMap.get("online_state") == 2) {
                             json.setOk(false);
                             json.setMessage("店铺数据已经上线，拒绝执行操作！");
@@ -2838,6 +2909,9 @@ public class ShopUrlController {
              * thread.start(); } gdRdList.clear(); gdList.clear();
              * syncPidsMap.clear();
              */
+
+            // 给错误商品使用的，直接更新待上线状态
+            shopUrlService.setShopGoodsFailureGoodsToReady(shopId);
 
             // 异步调用商品上传图片和同步数据的方法
             Thread thread = new Thread(new ShopGoodsSyncThread(shopId));

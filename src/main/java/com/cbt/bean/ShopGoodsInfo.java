@@ -25,6 +25,16 @@ public class ShopGoodsInfo {
 	private int onlineValid;
 	private int onlineEdit;
 
+	private int noSold; // 0 过滤销量 1不过滤销量
+
+	public int getNoSold() {
+		return noSold;
+	}
+
+	public void setNoSold(int noSold) {
+		this.noSold = noSold;
+	}
+
 	public String getShopId() {
 		return shopId;
 	}

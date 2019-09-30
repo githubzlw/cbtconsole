@@ -28,7 +28,7 @@
 
 .s_btn {
 	display: inline-block;
-	width: 200px;
+	width: 160px;
 	height: 40px;
 	background: #169bd4;
 	margin: 2px 20px;
@@ -113,8 +113,36 @@
 
 	}
 
-	function setShopGoodsNoSold(shopId) {
-
+    function setShopGoodsNoSold(shopId) {
+        var pids = "";
+        $(".isChoose").each(function () {
+            var checkVal = $(this).val();
+            pids += "," + checkVal;
+        });
+        if (pids == "") {
+            $.messager.alert("提醒", "请选择需要过滤销量的商品", "info");
+        } else {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: '/cbtconsole/ShopUrlC/setShopGoodsNoSold.do',
+                data: {
+                    shopId: shopId,
+                    pids: pids.substring(1)
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        $.messager.alert("提醒", "执行成功", "info");
+                        window.location.reload();
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (XMLResponse) {
+                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                }
+            });
+        }
     }
 
 	function publishGoods(shopId) {
@@ -228,6 +256,26 @@
 			$(obj).parent().parent().removeClass("checkBg");
 		}
 	}
+
+    function selectAll() {
+	    var obj;
+        $("#new_table").find(".div_sty").each(function () {
+            obj = $(this).find(".check_sty");
+            $(obj).prop("checked", true);
+            $(obj).addClass("isChoose");
+            $(obj).parent().parent().addClass("checkBg");
+        });
+    }
+
+    function selectNotAll() {
+	    var obj;
+        $("#new_table").find(".div_sty").each(function () {
+            obj = $(this).find(".check_sty");
+            $(obj).prop("checked", false);
+            $(obj).removeClass("isChoose");
+			$(obj).parent().parent().removeClass("checkBg");
+        });
+    }
 </script>
 </head>
 <body>
@@ -246,14 +294,14 @@
 				&nbsp;&nbsp;&nbsp; --%>
 				<a target="_blank" style="color: #f50595;" title="打开较慢，请先点击“查看公共图片”，等待图片处理完成后再点击"
 					href="/cbtconsole/ShopUrlC/showShopPublicImgTest.do?shopId=${shopId}&useHm=1">查看公共图片(含图片识别)</a>
-				<input class="s_btn_2" type="button" value="发布"
+				<input class="s_btn" type="button" value="发布/重新上线"
 					onclick="publishGoods('${shopId}')" />
-				<input class="s_btn" type="button" value="标识全部处理完成（待上线）"
+				<input class="s_btn" type="button" value="标识处理完成（待上线）"
 					onclick="readyToOnline('${shopId}')" />
 					&nbsp;&nbsp;&nbsp;
 					<input class="del_btn" type="button" value="删除商品" onclick="deleteShopReadyGoods('${shopId}')">	
 					<a target="_blank" href="http://192.168.1.27:9089/pap/translation.jsp">翻译词典管理</a>
-					<input class="s_btn_2" type="button" value="标记上线不过滤销量" onclick="setShopGoodsNoSold('${shopId}')">
+					<input class="s_btn" type="button" value="标记上线不过滤销量" onclick="setShopGoodsNoSold('${shopId}')">
 					<h3 style="color:red;" align="center">(请注意“已经在线上”的商品，如果不需要上线，请删除，否则“已经在线上”的商品点击“发布”按钮后，将进行数据更新)</h3>	
 			</div>
 			<br>
@@ -377,8 +425,18 @@
 			</c:if>
 			<c:if test="${fn:length(newList) > 0}">
 			
-			<table border="3" cellpadding="0" cellspacing="0" align="left">
-			<thead> <tr> <td colspan="5"><b style="color:red;font-size:18px;">新的商品(总数${fn:length(newList)})</b> </td>  </tr> </thead>
+			<table id="new_table" border="3" cellpadding="0" cellspacing="0" align="left">
+			<thead>
+                <tr>
+                    <td colspan="5">
+                        <b style="color:red;font-size:18px;">新的商品(总数${fn:length(newList)})</b>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input class="s_btn_2" type="button" value="全选" onclick="selectAll()"/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input class="s_btn_2" type="button" value="清除选中" onclick="selectNotAll()"/>
+                    </td>
+                </tr>
+            </thead>
 				<c:set var="total3" value="${fn:length(newList)}" />
 				<c:set var="count3" value="0" />
 				<c:forEach items="${newList}" var="goods" varStatus="index">
@@ -396,6 +454,9 @@
 							<br>
 							<div style="margin-bottom: 2px;">
 								<span style="color:${goods.valid == 1 ? 'green':'red'};">数据清洗:${goods.valid == 1 ? '有效数据' : '无效数据'}</span>
+                                <c:if test="${goods.noSold > 0}">
+                                    <em style="color: red;">(不过滤销量)</em>
+                                </c:if>
 								<br>
 								<span style="color:${goods.syncFlag == 1 ? 'green':'red'};">商品状态:${goods.syncDescribe}</span>
 								<br>

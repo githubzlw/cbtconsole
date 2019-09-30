@@ -125,6 +125,15 @@ public interface IShopUrlDao {
      */
     public boolean deleteShopOfferGoods(String shopId, String pids);
 
+    /**
+     * @param shopId
+     * @param pids
+     * @return boolean
+     * @Title deleteShopOfferGoods
+     * @Description 置店铺商品不过滤销量
+     */
+    public boolean setShopGoodsNoSold(String shopId, String pids);
+
 
     /**
      * @param shopId
