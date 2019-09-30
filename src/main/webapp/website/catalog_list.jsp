@@ -8,7 +8,7 @@
 </style>
 
 
-<title>推荐目录管理</title>
+<title>目录管理</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet"
 	href="/cbtconsole/css/bootstrap/bootstrap.min.css">

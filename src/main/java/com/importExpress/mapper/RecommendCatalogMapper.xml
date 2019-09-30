@@ -25,7 +25,7 @@
 	</update>
 
 	<!-- 保存 -->
-	<insert id="insertCatalog" parameterType="com.importExpress.pojo.RecommendCatalog">
+	<insert id="insertCatalog" parameterType="com.importExpress.pojo.RecommendCatalog" keyProperty="id" useGeneratedKeys="true">
 	  insert into recommend_catalog (catalog_name,template,create_admin,create_time,product_count,product_list,catalog_file,status)
 	  values(#{catalogName},#{template},#{createAdmin},now(),#{productCount},
 	  #{productList},#{catalogFile},#{status})

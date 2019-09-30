@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
 import com.cbt.parse.service.StrUtils;
 import com.cbt.service.CategoryService;
 import com.cbt.util.Redis;
@@ -23,6 +26,7 @@ import com.importExpress.pojo.CatalogProduct;
 import com.importExpress.pojo.CatalogProductWrap;
 import com.importExpress.pojo.RecommendCatalog;
 import com.importExpress.service.RecommendCatalogService;
+import com.importExpress.utli.UserInfoUtils;
 
 @Controller
 @RequestMapping("/catalog")
@@ -43,6 +47,7 @@ public class RecommendCatalogController {
 	public Map<String,Object> catalogSave(HttpServletRequest request, HttpServletResponse response) {
 		Subject currentUser = SecurityUtils.getSubject();
 		Admuser admuser = (Admuser)currentUser.getPrincipal();
+//		com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
 		String redisKey  = "catalog"+admuser.getId();
 		
 		Map<String,Object> result = new HashMap<>();
@@ -107,6 +112,7 @@ public class RecommendCatalogController {
 		Map<String,Object> result = new HashMap<>();
 		Subject currentUser = SecurityUtils.getSubject();
 		Admuser admuser = (Admuser)currentUser.getPrincipal();
+//		com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
 		String redisKey  = "catalog"+admuser.getId();
 		String isManag = request.getParameter("isManag");
 		List<CatalogProductWrap> redisWrap = new ArrayList<>();
@@ -159,6 +165,7 @@ public class RecommendCatalogController {
 		//仅预览
 		Subject currentUser = SecurityUtils.getSubject();
 		Admuser admuser = (Admuser)currentUser.getPrincipal();
+//		com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
 		String redisKey  = "catalog"+admuser.getId();
 		
 		String redisCatalog = Redis.hget(redisKey, saveKey);
@@ -184,7 +191,7 @@ public class RecommendCatalogController {
 		catalog.setProductList(redisCatalog);
 		catalog.setStatus(1);
 		catalog.setTemplate(template);
-		if(StrUtils.isNum(id)) {
+		if(StrUtils.isNum(id) && Integer.parseInt(id) > 0) {
 			catalog.setId(Integer.parseInt(id));
 			addCatelog = recommendCatalogService.updateCatalog(catalog);
 		}else {
@@ -209,8 +216,9 @@ public class RecommendCatalogController {
 	@ResponseBody
 	public Map<String,Object> catalogClear(HttpServletRequest request, HttpServletResponse response) {
 		Map<String,Object> result = new HashMap<>();
-		Subject currentUser = SecurityUtils.getSubject();
-		Admuser admuser = (Admuser)currentUser.getPrincipal();
+//		Subject currentUser = SecurityUtils.getSubject();
+//		Admuser admuser = (Admuser)currentUser.getPrincipal();
+		com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
 		String redisKey  = "catalog"+admuser.getId();
 		Redis.hdel(redisKey);
 		result.put("status", 200);
