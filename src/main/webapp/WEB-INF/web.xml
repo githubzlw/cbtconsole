@@ -466,6 +466,7 @@
     <url-pattern>/ckfinder/core/connector/java/connector.java</url-pattern>
   </filter-mapping>
   <session-config>
+    <!-- 设置过期时间：2天 -->
     <session-timeout>2880</session-timeout>
   </session-config>
   <error-page>

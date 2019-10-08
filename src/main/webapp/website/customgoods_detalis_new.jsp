@@ -866,7 +866,8 @@
             $("#review_remark").val("");
         }
 
-        function openEditReview(id, country, review_remark, review_score, review_flag, createtime, pid) {
+        function openEditReview(id, country, review_score, review_flag, createtime, pid) {
+            var review_remark= $("#review_remark_" + id).text();
             $("#oldCreateTime").val(createtime);
             $("#goods_pid").val(pid);
             $("#goods_id").val(id);
@@ -1477,6 +1478,9 @@
 <c:if test="${uid < 0}">
     <div>
         <p style="margin-left: 700px;font-size: 28px;color: red;margin-top: 200px;">获取产品失败</p>
+        <c:if test="${not empty message}">
+            <p>${message}</p>
+        </c:if>
     </div>
 </c:if>
 
@@ -2285,7 +2289,8 @@
                 <span style="font-size: 22px; color: red; margin-top: 15px;">商品评论:</span><br>
                 <c:forEach items="${reviewList}" var="review">
                     <span style="font-size: 15px;  margin-top: 15px;">评论人:${review.review_name};评论时间:${review.createtime};国家:${review.country};评论内容:${review.review_remark};评分:${review.review_score};${review.review_flag};编辑时间:${review.updatetime}</span>
-                    <button onclick="openEditReview('${review.aliId}','${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}','${review.createtime}','${review.goods_pid}');">
+                    <span id="review_remark_${review.aliId}" style="display: none">${review.review_remark}</span>
+                    <button onclick="openEditReview('${review.aliId}','${review.country}','${review.review_score}','${review.review_flag}','${review.createtime}','${review.goods_pid}');">
                         编辑
                     </button>
                     <br>
