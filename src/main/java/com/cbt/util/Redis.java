@@ -27,6 +27,7 @@ public class Redis {
 	 */
 	public synchronized static JedisPool getPool() {
 		if (pool == null) {
+			logger.info("redis begin init");
 			String redisIP = SysParamUtil.getParam("RedisIP");
 			String redisPort = SysParamUtil.getParam("RedisPort");
 			logger.info("Redis config:{} {}",redisIP,redisPort);
@@ -41,6 +42,7 @@ public class Redis {
 			config.setTestOnReturn(true);
 			//如果一个连接300秒内没有任何的返回Jedis将关闭这个连接
 			pool = new JedisPool(config, redisIP, Integer.parseInt(redisPort),Integer.parseInt(SysParamUtil.getParam("PoolTimeout")),SysParamUtil.getParam("RedisAuthPass"));
+			logger.info("redis end init");
 		}
 		return pool;
 	}
@@ -54,6 +56,7 @@ public class Redis {
      */
 	public static void returnResource(Jedis redis) {
         if (redis != null) {
+	        logger.info("close redis connect");
 	        redis.close();
         }
     }
@@ -63,6 +66,7 @@ public class Redis {
 		try {
 			pool = getPool();
 			jedis = pool.getResource();
+			logger.info("get redis connect");
 			return jedis;
 		}catch(Exception e){
 			logger.error("error",e);
