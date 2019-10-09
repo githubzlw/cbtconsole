@@ -1,20 +1,24 @@
 package com.cbt.website.quartz;
 
-import com.cbt.jdbc.DBHelper;
-import com.cbt.util.NewFtpUtil;
-import com.cbt.util.Util;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.List;
+
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import com.cbt.jdbc.DBHelper;
+import com.cbt.util.NewFtpUtil;
+import com.cbt.util.Util;
+import com.google.common.collect.Lists;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 public class PicUploadReloadjob implements Job{
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
-		Connection conn70 = DBHelper.getInstance().getConnection2();// 仓库不用
 		Connection conn27 = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs=null;
@@ -42,11 +46,18 @@ public class PicUploadReloadjob implements Job{
 					stmt.setString(2, orderid);
 					stmt.setString(3, goodsid);
 					stmt.executeUpdate();
-					stmt = conn70.prepareStatement(sql);
+					/*stmt = conn70.prepareStatement(sql);
 					stmt.setString(1, Util.PIC_URL+storePath+"");
 					stmt.setString(2, orderid);
 					stmt.setString(3, goodsid);
-					stmt.executeUpdate();
+					stmt.executeUpdate();*/
+					List<String> lstValues = Lists.newArrayList();
+					lstValues.add(Util.PIC_URL+storePath);
+					lstValues.add(orderid);
+					lstValues.add(goodsid);
+					String runSql = DBHelper.covertToSQL(sql, lstValues);
+					SendMQ.sendMsg(new RunSqlModel(runSql));
+					
 					sql="select id from inspection_picture where orderid=? and goods_id=? and isdelete=0";
 					stmt=conn27.prepareStatement(sql);
 					stmt.setString(1, orderid);
@@ -59,11 +70,17 @@ public class PicUploadReloadjob implements Job{
 						stmt.setString(2, orderid);
 						stmt.setString(3, goodsid);
 						stmt.executeUpdate();
-						stmt=conn70.prepareStatement(sql);
+						/*stmt=conn70.prepareStatement(sql);
 						stmt.setString(1, Util.PIC_URL+storePath+"");
 						stmt.setString(2, orderid);
 						stmt.setString(3, goodsid);
-						stmt.executeUpdate();
+						stmt.executeUpdate();*/
+						lstValues = Lists.newArrayList();
+						lstValues.add(Util.PIC_URL+storePath);
+						lstValues.add(orderid);
+						lstValues.add(goodsid);
+						runSql = DBHelper.covertToSQL(sql, lstValues);
+						SendMQ.sendMsg(new RunSqlModel(runSql));
 					}else{
 						String goods_pid="";
 						sql="select goods_pid from order_details where orderid=? and goodsid=?";
@@ -81,12 +98,19 @@ public class PicUploadReloadjob implements Job{
 						stmt.setString(3, orderid);
 						stmt.setString(4, goodsid);
 						stmt.executeUpdate();
-						stmt=conn70.prepareStatement(sql);
+						/*stmt=conn70.prepareStatement(sql);
 						stmt.setString(1, goods_pid);
 						stmt.setString(2, Util.PIC_URL+storePath+"");
 						stmt.setString(3, orderid);
 						stmt.setString(4, goodsid);
-						stmt.executeUpdate();
+						stmt.executeUpdate();*/
+						lstValues = Lists.newArrayList();
+						lstValues.add(goods_pid);
+						lstValues.add(Util.PIC_URL+storePath);
+						lstValues.add(orderid);
+						lstValues.add(goodsid);
+						runSql = DBHelper.covertToSQL(sql, lstValues);
+						SendMQ.sendMsg(new RunSqlModel(runSql));
 					}
 				}
 			}
@@ -95,7 +119,6 @@ public class PicUploadReloadjob implements Job{
 		}finally {
 			DBHelper.getInstance().closeResultSet(rs);
 			DBHelper.getInstance().closePreparedStatement(stmt);
-			DBHelper.getInstance().closeConnection(conn70);
 			DBHelper.getInstance().closeConnection(conn27);
 		}
 	}

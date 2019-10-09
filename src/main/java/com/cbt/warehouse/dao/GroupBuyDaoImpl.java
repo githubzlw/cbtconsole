@@ -8,6 +8,10 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.util.BigDecimalUtil;
 import com.cbt.warehouse.pojo.GroupBuyManageBean;
 import com.cbt.warehouse.pojo.UserCouponBean;
+import com.google.common.collect.Lists;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.sql.*;
@@ -205,7 +209,6 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
 //                + "active_begin_time,active_end_time,active_desc,is_on,admin_id,type)"
 //                + " values(?,?,?,?,?,?,?,?,?,?)";
 //        ResultSet rsSet = null;
-//
 //        int mainId = 0;
 //        try {
 //            int remoteCount = 1;
@@ -254,7 +257,6 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
     @Override
     public boolean updateGroupBuyInfos(GroupBuyManageBean gbmInfo) {
 
-        Connection reomteConn = DBHelper.getInstance().getConnection2();
         PreparedStatement remoteRtmt = null;
         Connection localConn = DBHelper.getInstance().getConnection();
         PreparedStatement localRtmt = null;
@@ -264,11 +266,10 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
 
         int isUpdate = 0;
         try {
-            reomteConn.setAutoCommit(false);
-            localConn.setAutoCommit(false);
+//            reomteConn.setAutoCommit(false);
+//            localConn.setAutoCommit(false);
             int remoteCount = 1;
-            remoteRtmt = reomteConn.prepareStatement(sql);
-
+            /*remoteRtmt = reomteConn.prepareStatement(sql);
             remoteRtmt.setInt(remoteCount++, gbmInfo.getFinalPriceNeedNum());
             remoteRtmt.setDouble(remoteCount++, gbmInfo.getFinalPrice());
             remoteRtmt.setInt(remoteCount++, gbmInfo.getInitVirtualNum());
@@ -278,7 +279,19 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
             remoteRtmt.setString(remoteCount++, gbmInfo.getActiveDesc());
             remoteRtmt.setInt(remoteCount++, gbmInfo.getIsOn());
             remoteRtmt.setInt(remoteCount++, gbmInfo.getType());
-            remoteRtmt.setInt(remoteCount++, gbmInfo.getId());
+            remoteRtmt.setInt(remoteCount++, gbmInfo.getId());*/
+            List<String> lstValues = Lists.newArrayList();
+            lstValues.add(String.valueOf(gbmInfo.getFinalPriceNeedNum()));
+            lstValues.add(String.valueOf(gbmInfo.getFinalPrice()));
+            lstValues.add(String.valueOf(gbmInfo.getInitVirtualNum()));
+            lstValues.add(String.valueOf( gbmInfo.getEffectiveDay()));
+            lstValues.add(gbmInfo.getActiveBeginTime());
+            lstValues.add(gbmInfo.getActiveEndTime());
+            lstValues.add(gbmInfo.getActiveDesc());
+            lstValues.add(String.valueOf(gbmInfo.getIsOn()));
+            lstValues.add(String.valueOf(gbmInfo.getType()));
+            lstValues.add(String.valueOf(gbmInfo.getId()));
+
 
             int localCount = 1;
             localRtmt = localConn.prepareStatement(sql);
@@ -293,32 +306,34 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
             localRtmt.setInt(localCount++, gbmInfo.getType());
             localRtmt.setInt(localCount++, gbmInfo.getId());
 
-            isUpdate = remoteRtmt.executeUpdate();
+            String runSql = DBHelper.covertToSQL(sql, lstValues);
+            
+            isUpdate = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));//remoteRtmt.executeUpdate();
             if (isUpdate > 0) {
                 isUpdate = 0;
                 isUpdate = localRtmt.executeUpdate();
-                if (isUpdate > 0) {
+                /*if (isUpdate > 0) {
                     reomteConn.commit();
                     localConn.commit();
                 } else {
                     reomteConn.rollback();
                     localConn.rollback();
-                }
+                }*/
             } else {
-                reomteConn.rollback();
+//                reomteConn.rollback();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            try {
+            /*try {
                 reomteConn.rollback();
             } catch (SQLException e1) {
                 e1.printStackTrace();
-            }
-            try {
+            }*/
+            /*try {
                 localConn.rollback();
             } catch (SQLException e1) {
                 e1.printStackTrace();
-            }
+            }*/
         } finally {
             if (remoteRtmt != null) {
                 try {
@@ -334,7 +349,7 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
                     e.printStackTrace();
                 }
             }
-            DBHelper.getInstance().closeConnection(reomteConn);
+//            DBHelper.getInstance().closeConnection(reomteConn);
             DBHelper.getInstance().closeConnection(localConn);
         }
         return isUpdate > 0;
@@ -343,7 +358,6 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
     @Override
     public boolean deleteGroupBuyInfos(int id) {
 
-        Connection reomteConn = DBHelper.getInstance().getConnection2();
         PreparedStatement remoteRtmt = null;
         Connection localConn = DBHelper.getInstance().getConnection();
         PreparedStatement localRtmt = null;
@@ -351,32 +365,33 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
 
         int isDelete = 0;
         try {
-            reomteConn.setAutoCommit(false);
-            localConn.setAutoCommit(false);
-            remoteRtmt = reomteConn.prepareStatement(sql);
-
-            remoteRtmt.setInt(1, id);
-
+//            reomteConn.setAutoCommit(false);
+//            localConn.setAutoCommit(false);
+//            remoteRtmt = reomteConn.prepareStatement(sql);
+//            remoteRtmt.setInt(1, id);
+        	List<String> lstValues = Lists.newArrayList();
+        	lstValues.add(String.valueOf(id));
+        	
             localRtmt = localConn.prepareStatement(sql);
             localRtmt.setInt(1, id);
-
-            isDelete = remoteRtmt.executeUpdate();
+            String runSql = DBHelper.covertToSQL(sql, lstValues);
+            isDelete = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));//remoteRtmt.executeUpdate();
             if (isDelete > 0) {
                 isDelete = 0;
                 isDelete = localRtmt.executeUpdate();
-                if (isDelete > 0) {
+                /*if (isDelete > 0) {
                     reomteConn.commit();
                     localConn.commit();
                 } else {
                     reomteConn.rollback();
                     localConn.rollback();
-                }
+                }*/
             } else {
-                reomteConn.rollback();
+//                reomteConn.rollback();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            try {
+           /* try {
                 reomteConn.rollback();
             } catch (SQLException e1) {
                 e1.printStackTrace();
@@ -385,7 +400,7 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
                 localConn.rollback();
             } catch (SQLException e1) {
                 e1.printStackTrace();
-            }
+            }*/
         } finally {
             if (remoteRtmt != null) {
                 try {
@@ -401,7 +416,7 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
                     e.printStackTrace();
                 }
             }
-            DBHelper.getInstance().closeConnection(reomteConn);
+//            DBHelper.getInstance().closeConnection(reomteConn);
             DBHelper.getInstance().closeConnection(localConn);
         }
         return isDelete > 0;
