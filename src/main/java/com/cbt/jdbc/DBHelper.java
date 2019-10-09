@@ -137,8 +137,8 @@ public class DBHelper {
         dataSource.setPassword(p.getProperty("userPass"));
         dataSource.setJdbcUrl(p.getProperty("url"));
         dataSource.setDriverClass(p.getProperty("driver"));
-        dataSource.setInitialPoolSize(20);
-        dataSource.setMinPoolSize(10);
+        dataSource.setInitialPoolSize(100);
+        dataSource.setMinPoolSize(100);
         dataSource.setMaxPoolSize(100);
         dataSource.setMaxStatements(50);
         dataSource.setMaxIdleTime(60);
