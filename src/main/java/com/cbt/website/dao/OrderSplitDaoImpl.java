@@ -3031,7 +3031,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ "' as orderno_new,paymentid,'" + odbeanNew.getPay_price()
 				+ "' as payprice_new,payment_cc,'order split' as orderdesc,username,"
 				+ "paystatus,NOW(),paySID,payflag,3 as paytype,3 as payment_other,paymentno,"
-				+ "0 as transaction_fee from payment where orderid='" + orderNoOld + "' limit 1";
+				+ "0 as transaction_fee from payment where orderid='" + orderNoOld + "' and paystatus = 1 limit 1";
 		remoteSqlList.add(insertPaymentSql);
 		insertPaymentSql = null;
 
