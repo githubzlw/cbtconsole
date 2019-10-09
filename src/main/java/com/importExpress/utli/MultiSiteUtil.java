@@ -146,8 +146,9 @@ public class MultiSiteUtil {
                 return "https://www.kidsproductwholesale.com";
             case 3:
                 return "https://www.lovelypetsupply.com";
+            default:
+                return "";
         }
-        return "";
     }
 
     public static Map<String, String> webSiteMap = new HashMap<String, String>(){{
