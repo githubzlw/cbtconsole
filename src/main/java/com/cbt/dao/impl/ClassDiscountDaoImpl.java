@@ -4,6 +4,8 @@ import com.cbt.bean.DiscountBean;
 import com.cbt.dao.ClassDiscountDao;
 import com.cbt.jdbc.DBHelper;
 
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
@@ -89,29 +91,41 @@ public class ClassDiscountDaoImpl implements ClassDiscountDao {
 		String sql = "insert into class_discount (showname,classname,price,"
 				+ "deposit_rate,cid,classtype) values(?,?,?,?,?,?) ";
 		
-		Connection conn = DBHelper.getInstance().getConnection2();
+//		Connection conn = DBHelper.getInstance().getConnection2();
 		int rs = 0;
-		PreparedStatement stmt = null;
+//		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, bean.getShowName());
-			stmt.setString(2, bean.getClassName());
-			stmt.setInt(3, bean.getPrice());
-			stmt.setDouble(4, bean.getDepositRate());
-			stmt.setString(5, bean.getCatid());
-			stmt.setInt(6, bean.getClassType());
-			rs = stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setString(1, bean.getShowName());
+//			stmt.setString(2, bean.getClassName());
+//			stmt.setInt(3, bean.getPrice());
+//			stmt.setDouble(4, bean.getDepositRate());
+//			stmt.setString(5, bean.getCatid());
+//			stmt.setInt(6, bean.getClassType());
+//			rs = stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(bean.getShowName());
+			lstValues.add(bean.getClassName());
+			lstValues.add(String.valueOf(bean.getPrice()));
+			lstValues.add(String.valueOf(bean.getDepositRate()));
+			lstValues.add(bean.getCatid());
+			lstValues.add(String.valueOf(bean.getClassType()));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			LOG.error("",e);
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					LOG.error("",e);
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					LOG.error("",e);
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs;
 	}
@@ -120,24 +134,31 @@ public class ClassDiscountDaoImpl implements ClassDiscountDao {
 	public int delete(int id) {
 		String sql = "delete from class_discount where id=?";
 		
-		Connection conn = DBHelper.getInstance().getConnection2();
+//		Connection conn = DBHelper.getInstance().getConnection2();
 		int rs = 0;
-		PreparedStatement stmt = null;
+//		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1,id);
-			rs = stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setInt(1,id);
+//			rs = stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(id));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			LOG.error("",e);
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					LOG.error("",e);
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					LOG.error("",e);
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs;
 	}
@@ -147,30 +168,43 @@ public class ClassDiscountDaoImpl implements ClassDiscountDao {
 		String sql = "update class_discount set showname=?,classname=?,price=?,"
 				+ " deposit_rate=?,cid=?,classtype=? where id=?";
 		
-		Connection conn = DBHelper.getInstance().getConnection2();
+//		Connection conn = DBHelper.getInstance().getConnection2();
 		int rs = 0;
-		PreparedStatement stmt = null;
+//		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, bean.getShowName());
-			stmt.setString(2, bean.getClassName());
-			stmt.setInt(3, bean.getPrice());
-			stmt.setDouble(4, bean.getDepositRate());
-			stmt.setString(5, bean.getCatid());
-			stmt.setInt(6, bean.getClassType());
-			stmt.setInt(7, bean.getId());
-			rs = stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setString(1, bean.getShowName());
+//			stmt.setString(2, bean.getClassName());
+//			stmt.setInt(3, bean.getPrice());
+//			stmt.setDouble(4, bean.getDepositRate());
+//			stmt.setString(5, bean.getCatid());
+//			stmt.setInt(6, bean.getClassType());
+//			stmt.setInt(7, bean.getId());
+//			rs = stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(bean.getShowName());
+			lstValues.add(bean.getClassName());
+			lstValues.add(String.valueOf(bean.getPrice()));
+			lstValues.add(String.valueOf(bean.getDepositRate()));
+			lstValues.add(bean.getCatid());
+			lstValues.add(String.valueOf(bean.getClassType()));
+			lstValues.add(String.valueOf(bean.getId()));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			LOG.error("",e);
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					LOG.error("",e);
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					LOG.error("",e);
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs;
 	}

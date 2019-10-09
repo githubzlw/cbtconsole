@@ -832,6 +832,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 + "feeprice,method,posttime,fprice,remotpath,localpath,"
                 + "createtime,updatetime,valid from custom_goods_temporary where updateflag=0)";
 
+        //线上没有当前表custom_goods，该方法应该不需要
         Connection conn = DBHelper.getInstance().getConnection2();
         PreparedStatement stmtDrop = null;
         PreparedStatement stmtCreate = null;
@@ -1127,27 +1128,35 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public int updateValid(int valid, String pid) {
         String sql = "update custom_goods set valid=? where pid=? ";
-        Connection conn = DBHelper.getInstance().getConnection2();
+//        Connection conn = DBHelper.getInstance().getConnection2();
         int rs = 0;
         PreparedStatement stmt = null;
         try {
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, valid);
-            stmt.setString(2, pid);
-            rs = stmt.executeUpdate();
+//            stmt = conn.prepareStatement(sql);
+//            stmt.setInt(1, valid);
+//            stmt.setString(2, pid);
+//            rs = stmt.executeUpdate();
+
+            List<String> lstValues = new ArrayList<String>();
+            lstValues.add(String.valueOf(valid));
+            lstValues.add(String.valueOf(pid));
+
+            String runSql = DBHelper.covertToSQL(sql,lstValues);
+            rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("updateValid error :" + e.getMessage());
             LOG.error("updateValid error :" + e.getMessage());
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            DBHelper.getInstance().closeConnection(conn);
+//            if (stmt != null) {
+//                try {
+//                    stmt.close();
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            DBHelper.getInstance().closeConnection(conn);
         }
         return rs;
     }
@@ -2478,6 +2487,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public boolean batchInsertSimilarGoods(String mainPid, String similarPids, int adminId, List<String> existPids) {
 
+        //该表没有操作similar_goods_relation 2018-02-09
         Connection remoteConn = DBHelper.getInstance().getConnection2();
         Connection conn = DBHelper.getInstance().getConnection();
         String insertSql = "insert into similar_goods_relation(main_pid,similar_pid,admin_id) values(?,?,?)";
@@ -3131,6 +3141,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public boolean updateOnlineUnsellableReason(String pid, int flag) {
 
+        //该表线上没有不需要操作custom_benchmark_ready
         Connection connOnline = DBHelper.getInstance().getConnection2();
         String querySql = "update custom_benchmark_ready set unsellableReason = ?,cur_time = now() where pid = ? ";
         PreparedStatement stmt = null;
@@ -3856,6 +3867,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public int deleteSkuByPid(String pid) {
         Connection conn28 = DBHelper.getInstance().getConnection8();
+        //该表线上没有不需要操作 custom_benchmark_sku
         Connection connAws = DBHelper.getInstance().getConnection2();
         PreparedStatement stmt28 = null;
         PreparedStatement stmtAws = null;
@@ -3899,6 +3911,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public int insertIntoSkuToOnline(List<CustomBenchmarkSkuNew> insertList) {
         Connection conn28 = DBHelper.getInstance().getConnection8();
+        //该表线上不存在不需要操作custom_benchmark_sku
         Connection connAws = DBHelper.getInstance().getConnection2();
         PreparedStatement stmt28 = null;
         PreparedStatement stmtAws = null;

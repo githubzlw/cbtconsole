@@ -4,6 +4,8 @@ import com.cbt.bean.LevelPageBean;
 import com.cbt.dao.LevelPageDao;
 import com.cbt.jdbc.DBHelper;
 
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
@@ -91,28 +93,39 @@ public class LevelPageDaoImpl implements LevelPageDao {
 		String sql = "update level_page set name=?,page=?,valid=?,catid=?,"
 				+ "createtime=now() where 1=1 and id=? ";
 		
-		Connection conn = DBHelper.getInstance().getConnection2();
+//		Connection conn = DBHelper.getInstance().getConnection2();
 		int rs = 0;
-		PreparedStatement stmt = null;
+//		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, bean.getName());
-			stmt.setString(2, bean.getPage());
-			stmt.setInt(3, bean.getValid());
-			stmt.setString(4, bean.getCatid());
-			stmt.setInt(5, bean.getId());
-			rs = stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setString(1, bean.getName());
+//			stmt.setString(2, bean.getPage());
+//			stmt.setInt(3, bean.getValid());
+//			stmt.setString(4, bean.getCatid());
+//			stmt.setInt(5, bean.getId());
+//			rs = stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(bean.getName());
+			lstValues.add(bean.getPage());
+			lstValues.add(String.valueOf(bean.getValid()));
+			lstValues.add(bean.getCatid());
+			lstValues.add(String.valueOf(bean.getId()));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			LOG.error("",e);
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					LOG.error("",e);
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					LOG.error("",e);
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs;
 	}
@@ -122,27 +135,35 @@ public class LevelPageDaoImpl implements LevelPageDao {
 		String sql = "insert into level_page(name,page,catid,valid,createtime) "
 				+ "value (?,?,?,1,now()) ";
 		
-		Connection conn = DBHelper.getInstance().getConnection2();
+//		Connection conn = DBHelper.getInstance().getConnection2();
 		int rs = 0;
-		PreparedStatement stmt = null;
+//		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, bean.getName());
-			stmt.setString(2, bean.getPage());
-			stmt.setString(3, bean.getCatid());
-			rs = stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setString(1, bean.getName());
+//			stmt.setString(2, bean.getPage());
+//			stmt.setString(3, bean.getCatid());
+//			rs = stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(bean.getName());
+			lstValues.add(bean.getPage());
+			lstValues.add(bean.getCatid());
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 			
 		} catch (Exception e) {
 			LOG.error("",e);
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					LOG.error("",e);
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					LOG.error("",e);
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs;
 	}
