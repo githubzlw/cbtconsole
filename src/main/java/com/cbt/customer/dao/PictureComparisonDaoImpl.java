@@ -9,7 +9,7 @@ import com.cbt.parse.service.TypeUtils;
 import com.cbt.util.StrUtils;
 import com.cbt.util.Util;
 import com.cbt.warehouse.util.StringUtil;
-
+import com.google.common.collect.Lists;
 import com.importExpress.utli.RunBatchSqlModel;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -4301,7 +4301,6 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 
 
 		Connection conn = DBHelper.getInstance().getConnection();
-//		Connection conn1 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null,stmt1 = null;
 		int res = 0;
 		try {
@@ -4395,7 +4394,6 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		
 		String sql1 = "insert into changegooddata (orderno,goodscarid,goodid,aliname,aliimg,aliurl,aliprice,chagoodname,chagoodimg,chagoodurl,chagoodprice,delflag,changeflag,goodstype,emailsendflag) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
 		String sqlDel ="delete from changegooddata where orderno=? ";
-//		Connection conn1 = DBHelper.getInstance().getConnection2();
 //		PreparedStatement stmt0=null,stmt1 = null;
 		int res = 0;
 		try {
@@ -5309,7 +5307,6 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		
 
 		Connection conn = DBHelper.getInstance().getConnection();
-//		Connection conn1 = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
 		PreparedStatement stmt0 = null,stmt = null,stmt1 = null,stmt2 = null,stmt3 = null;
 		GoodsCheckBean goodsCheckBean = null;
@@ -5949,24 +5946,14 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			sql = "update custom_benchmark_ready set rebid_flag=4 where pid=? ";
 		}
 
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
 		int res = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, tbGoodBean.getSourceYlpid());
-			res = stmt.executeUpdate();
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(tbGoodBean.getSourceYlpid());
+			String runSql = DBHelper.covertToSQL(sql, lstValues );
+			res = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
 		}
 	 return res;
 	}

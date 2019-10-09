@@ -5,7 +5,11 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.util.StrUtils;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.google.common.collect.Lists;
+import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SearchFileUtils;
+import com.importExpress.utli.SendMQ;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -481,7 +485,6 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs=null;
-        int result = 0;
         try{
             conn=DBHelper.getInstance().getConnection5();
             StringBuilder sql=new StringBuilder();
@@ -546,8 +549,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     public int insertOrUpdate(ShopUrl su, String[] urls) {
         int result = 0;
         int id = 0;
-        Connection conn = null, conn1 = null;
-        PreparedStatement stmt = null, stmt1 = null;
+        Connection conn = null;
+        PreparedStatement stmt = null;
         String sql = "";
         if (su.getId() != null) {
             sql = "update shop_url_bak set shop_id=?,shop_url=?,is_valid=?,sales_volume_threshold=?,download_num=?,admuser=?,admin_id=?,url_type=?,input_shop_name=?, flag =?,updatetime=?,input_shop_description=?,shop_enname=?,shop_brand=? where id=?";
@@ -558,7 +561,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
 
         conn = DBHelper.getInstance().getConnection5();
-        conn1 = DBHelper.getInstance().getConnection2();
+//        conn1 = DBHelper.getInstance().getConnection2();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
         String nowDate = df.format(date);
@@ -636,11 +639,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             }
 
             String sql3 = "replace into shop_description(shop_id,input_shop_description) values(?,?) ";
-            stmt1 = conn1.prepareStatement(sql3);
-            stmt1.setString(1, su.getShopId());
-            stmt1.setString(2, StringUtils.isBlank(su.getInputShopDescription()) ? "" : su.getInputShopDescription());
-            stmt1.executeUpdate();
-
+            
+            List<String> lstValues = Lists.newArrayList();
+            lstValues.add(su.getShopId());
+            lstValues.add(StringUtils.isBlank(su.getInputShopDescription()) ? "" : su.getInputShopDescription());
+            
+			String runSql = DBHelper.covertToSQL(sql3, lstValues );
+			SendMQ.sendMsg(new RunSqlModel(runSql ));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -651,14 +656,6 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (stmt1 != null) {
-                try {
-                    stmt1.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            DBHelper.getInstance().closeConnection(conn);
             DBHelper.getInstance().closeConnection(conn);
         }
         return result;
