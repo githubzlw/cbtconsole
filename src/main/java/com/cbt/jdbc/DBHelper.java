@@ -119,6 +119,8 @@ public class DBHelper {
         dataSource.setRemoveAbandoned(true);
         dataSource.setRemoveAbandonedTimeout(1800);
         dataSource.setLogAbandoned(true);
+        dataSource.setDefaultTransactionIsolation(2);
+
         try {
             dataSource.setFilters("stat,log4j");
         } catch (SQLException e) {
