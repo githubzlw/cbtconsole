@@ -30,25 +30,33 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	public int agreeRefund(int rid,String admuser) {
 		String  sql = "update refund set status=1,agreetime = now(),agreepeople = ? "
 				+ "where id = ? and status = 0 and valid = 1;";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+//		Connection conn = DBHelper.getInstance().getConnection2();
+//		PreparedStatement stmt = null;
 		int  row = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, admuser);
-			stmt.setInt(2, rid);
-			row =stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setString(1, admuser);
+//			stmt.setInt(2, rid);
+//			row =stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(admuser));
+			lstValues.add(String.valueOf(rid));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return row;
 	}
@@ -79,19 +87,27 @@ public class RefundDaoImpl implements RefundDaoPlus{
 
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null,rs1 =null,rs2=null;
-		PreparedStatement stmt = null;
-		PreparedStatement stmt1 = null;
-		PreparedStatement stmt2 = null;
+//		PreparedStatement stmt = null;
+//		PreparedStatement stmt1 = null;
+//		PreparedStatement stmt2 = null;
 		PreparedStatement stmt3 = null;
-		PreparedStatement stmt4 = null;
+//		PreparedStatement stmt4 = null;
 		PreparedStatement stmt5 = null;
-		PreparedStatement stmt6 = null;
+//		PreparedStatement stmt6 = null;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, admuser);
-			stmt.setString(2, refuse);
-			stmt.setInt(3, rid);
-			row =stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setString(1, admuser);
+//			stmt.setString(2, refuse);
+//			stmt.setInt(3, rid);
+//			row =stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(admuser));
+			lstValues.add(String.valueOf(refuse));
+			lstValues.add(String.valueOf(rid));
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 			//用户余额提现
 			if(type==0&&row>0){
 //				若管理员拒绝
@@ -104,14 +120,26 @@ public class RefundDaoImpl implements RefundDaoPlus{
 				}
 				double rebackMoney =appcount/rate;
 //				2.3 ：给用户回款
-				stmt4 = conn.prepareStatement(sql3);
-				stmt4.setDouble(1, rebackMoney);
-				stmt4.setInt(2, uid);
-				row+=stmt4.executeUpdate();
+//				stmt4 = conn.prepareStatement(sql3);
+//				stmt4.setDouble(1, rebackMoney);
+//				stmt4.setInt(2, uid);
+//				row+=stmt4.executeUpdate();
 
-				stmt6 = conn.prepareStatement(sql5);
-				stmt6.setString(1, rid+"");
-				stmt6.executeUpdate();
+				List<String> lstValues1 = new ArrayList<String>();
+				lstValues1.add(String.valueOf(rebackMoney));
+				lstValues1.add(String.valueOf(uid));
+				String runSql1 = DBHelper.covertToSQL(sql3,lstValues1);
+				row += Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql1)));
+
+//				stmt6 = conn.prepareStatement(sql5);
+//				stmt6.setString(1, rid+"");
+//				stmt6.executeUpdate();
+
+				List<String> lstValues2 = new ArrayList<String>();
+				lstValues2.add(String.valueOf(rid));
+				String runSql2 = DBHelper.covertToSQL(sql5,lstValues2);
+				SendMQ.sendMsg(new RunSqlModel(runSql2));
+
 //				System.out.println(n);
 //				2.5:查出用户余额，用于修改余额变更表
 				stmt5 = conn.prepareStatement(sql1);
@@ -121,39 +149,50 @@ public class RefundDaoImpl implements RefundDaoPlus{
 					userBalance = rs2.getDouble(1);
 				}
 //				2.4：添加余额变更记录
-				stmt1 = conn.prepareStatement(sql2);
-				stmt1.setInt(1, uid);
-				stmt1.setDouble(2, appcount);
-				stmt1.setInt(3, rid);
-				stmt1.setString(4, admuser);
-				stmt1.setString(5, appcurrency);
-				stmt1.setDouble(6, userBalance);
-				row +=stmt1.executeUpdate();
+//				stmt1 = conn.prepareStatement(sql2);
+//				stmt1.setInt(1, uid);
+//				stmt1.setDouble(2, appcount);
+//				stmt1.setInt(3, rid);
+//				stmt1.setString(4, admuser);
+//				stmt1.setString(5, appcurrency);
+//				stmt1.setDouble(6, userBalance);
+//				row +=stmt1.executeUpdate();
+				List<String> lstValues3 = new ArrayList<String>();
+				lstValues3.add(String.valueOf(uid));
+				lstValues3.add(String.valueOf(appcount));
+				lstValues3.add(String.valueOf(rid));
+				lstValues3.add(String.valueOf(admuser));
+				lstValues3.add(String.valueOf(appcurrency));
+				lstValues3.add(String.valueOf(userBalance));
+
+				String runSql3 = DBHelper.covertToSQL(sql2,lstValues3);
+				row += Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql3)));
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (stmt1 != null) {
-				try {
-					stmt1.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (stmt2 != null) {
-				try {
-					stmt2.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			if (stmt1 != null) {
+//				try {
+//					stmt1.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			if (stmt2 != null) {
+//				try {
+//					stmt2.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
 			if (rs != null) {
 				try {
 					rs.close();
@@ -343,31 +382,38 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	public int finishRefund(int refundId) {
 		int row=0;
 		String sql = "update refund set status=2,endtime=now() where id=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		ResultSet rs = null;
-		PreparedStatement stmt = null;
+//		Connection conn = DBHelper.getInstance().getConnection2();
+//		ResultSet rs = null;
+//		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, refundId);
-			row=stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setInt(1, refundId);
+//			row=stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(refundId));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (rs != null) {
+//				try {
+//					rs.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return row;
 	}
@@ -732,24 +778,33 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	public int addFeedback(int rid,String feedback) {
 		int res=0;
 		String sql = "update refund set feedback = ?  where  id = ? ";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+//		Connection conn = DBHelper.getInstance().getConnection2();
+//		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, feedback);
-			stmt.setInt(2, rid);
-			res = stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setString(1, feedback);
+//			stmt.setInt(2, rid);
+//			res = stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(feedback));
+			lstValues.add(String.valueOf(rid));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			res = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return res;
 	}
@@ -759,30 +814,43 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	public int addRemark(double account,int rid, String remark,String agreepeople,int additionId,int status,int resontype) {
 		String sql = "update refund set account=?,remark=?,status=?,agreetime=now(),"
 				+ "agreepeople=?,additionid=?,refundtype=? where id = ?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+//		Connection conn = DBHelper.getInstance().getConnection2();
+//		PreparedStatement stmt = null;
 		int result = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setDouble(1, account);
-			stmt.setString(2, remark);
-			stmt.setInt(3, status);
-			stmt.setString(4, agreepeople);
-			stmt.setInt(5, additionId);
-			stmt.setInt(6, resontype);
-			stmt.setInt(7, rid);
-			result = stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setDouble(1, account);
+//			stmt.setString(2, remark);
+//			stmt.setInt(3, status);
+//			stmt.setString(4, agreepeople);
+//			stmt.setInt(5, additionId);
+//			stmt.setInt(6, resontype);
+//			stmt.setInt(7, rid);
+//			result = stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(account));
+			lstValues.add(String.valueOf(remark));
+			lstValues.add(String.valueOf(status));
+			lstValues.add(String.valueOf(agreepeople));
+			lstValues.add(String.valueOf(additionId));
+			lstValues.add(String.valueOf(resontype));
+			lstValues.add(String.valueOf(rid));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			result = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return result;
 	}
@@ -1014,33 +1082,47 @@ public class RefundDaoImpl implements RefundDaoPlus{
 		String sql = "insert into refund(userid,appcount,account,apptime,currency,paypalname,type,orderid,payid)"
 				+ "values(?,?,?,now(),?,?,?,?,?) ";
 
-		Connection conn = DBHelper.getInstance().getConnection2();
+//		Connection conn = DBHelper.getInstance().getConnection2();
 		int rs = 0;
-		PreparedStatement stmt = null;
+//		PreparedStatement stmt = null;
 		try {
 
-			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, uid);
-			stmt.setDouble(2, appcount);
-			stmt.setDouble(3, appcount);
-			stmt.setString(4, currency);
-			stmt.setString(5, paypalname);
-			stmt.setInt(6, type);
-			stmt.setString(7, ordeid);
-			stmt.setString(8, payid);
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setInt(1, uid);
+//			stmt.setDouble(2, appcount);
+//			stmt.setDouble(3, appcount);
+//			stmt.setString(4, currency);
+//			stmt.setString(5, paypalname);
+//			stmt.setInt(6, type);
+//			stmt.setString(7, ordeid);
+//			stmt.setString(8, payid);
+//
+//			rs = stmt.executeUpdate();
 
-			rs = stmt.executeUpdate();
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(uid));
+			lstValues.add(String.valueOf(appcount));
+			lstValues.add(String.valueOf(appcount));
+			lstValues.add(String.valueOf(currency));
+			lstValues.add(String.valueOf(paypalname));
+			lstValues.add(String.valueOf(type));
+			lstValues.add(String.valueOf(ordeid));
+			lstValues.add(String.valueOf(payid));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs;
 	}
@@ -1222,27 +1304,37 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	@Override
 	public int updateRefund(int id, int userid, String orerid, String paypalname) {
 		String sql = "update refund set userid=?,orderid=?,paypalname=? where id=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+//		Connection conn = DBHelper.getInstance().getConnection2();
+//		PreparedStatement stmt = null;
 		int rs = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, userid);
-			stmt.setString(2, orerid);
-			stmt.setString(3, paypalname);
-			stmt.setInt(4, id);
-			rs = stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setInt(1, userid);
+//			stmt.setString(2, orerid);
+//			stmt.setString(3, paypalname);
+//			stmt.setInt(4, id);
+//			rs = stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(userid));
+			lstValues.add(String.valueOf(orerid));
+			lstValues.add(String.valueOf(paypalname));
+			lstValues.add(String.valueOf(id));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs;
 	}
@@ -1402,29 +1494,39 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	@Override
 	public boolean updateRefundState(int userId, int refundId, int state) {
 
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+//		Connection conn = DBHelper.getInstance().getConnection2();
+//		PreparedStatement stmt = null;
 		int rs = 0;
 
 		String sql = "update refund set status=? where id=? and userid = ?";
 
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, state);
-			stmt.setInt(2, refundId);
-			stmt.setInt(3, userId);
-			rs = stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setInt(1, state);
+//			stmt.setInt(2, refundId);
+//			stmt.setInt(3, userId);
+//			rs = stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(state));
+			lstValues.add(String.valueOf(refundId));
+			lstValues.add(String.valueOf(userId));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs > 0;
 	}
@@ -1485,19 +1587,28 @@ public class RefundDaoImpl implements RefundDaoPlus{
 				"select userid,orderid,paymentid,(0 - payment_amount) as payment_amount,payment_cc,orderdesc,username," +
 				"paystatus,createtime,paySID,payflag,paytype,payment_other,paymentno,transaction_fee from payment"
 				+ " where orderid =? and userid = ? and paytype in(0,5) and paystatus = 1 ";
-		Connection connAws = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+//		Connection connAws = DBHelper.getInstance().getConnection2();
+//		PreparedStatement stmt = null;
 		int total = 0;
 		try {
-			stmt = connAws.prepareStatement(querySql);
-			stmt.setString(1, orderNo);
-			stmt.setInt(2, userId);
-			total = stmt.executeUpdate();
+//			stmt = connAws.prepareStatement(querySql);
+//			stmt.setString(1, orderNo);
+//			stmt.setInt(2, userId);
+//			total = stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(orderNo));
+			lstValues.add(String.valueOf(userId));
+
+			String runSql = DBHelper.covertToSQL(querySql,lstValues);
+			total = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			DBHelper.getInstance().closePreparedStatement(stmt);
-			DBHelper.getInstance().closeConnection(connAws);
+//			DBHelper.getInstance().closePreparedStatement(stmt);
+//			DBHelper.getInstance().closeConnection(connAws);
 		}
 		return total;
 	}

@@ -131,6 +131,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
     @Override
     public boolean syncSingleGoodsToOnline(CustomOnlineGoodsBean goods) {
 
+        //线上产品表不需要
         int rs = 0;
         Connection connOnline = DBHelper.getInstance().getConnection2();
         Connection conn27 = DBHelper.getInstance().getConnection();
@@ -293,6 +294,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
     @Override
     public boolean updateSameTypeGoodsError(String pid) {
 
+        //线上该表不需要
         int rs = 0;
         Connection connOnline = DBHelper.getInstance().getConnection2();
         Connection conn28 = DBHelper.getInstance().getConnection6();
