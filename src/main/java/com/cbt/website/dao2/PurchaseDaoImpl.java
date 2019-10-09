@@ -6348,7 +6348,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				PreparedStatement stmt = null;
 				ResultSet rs = null;
 				String sql = "";
-
 				public void run() {
 					try {
 						sql = "select goods_pid,car_urlMD5,goodsname from order_details where orderid=? and goodsid=?";
@@ -6380,7 +6379,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 							if (rs.next()) {
 								int pg_id = rs.getInt("id");
 								sql = "insert into preferential_goods_price (pgid,goods_p_itemid,begin,end,price,is_manual) values(?,?,?,?,?,1)";
-								stmt = conn2.prepareStatement(sql);
+								/*stmt = conn2.prepareStatement(sql);
 								stmt.setInt(1, pg_id);
 								stmt.setString(2, goods_p_itemid);
 								stmt.setInt(3, Integer.valueOf(map.get(
@@ -6389,10 +6388,29 @@ public class PurchaseDaoImpl implements PurchaseDao {
 										"add_end").toString()));
 								stmt.setDouble(5, Double.valueOf(map.get(
 										"add_price").toString()));
-								stmt.executeUpdate();
+								stmt.executeUpdate();*/
+								List<String> lstValues = Lists.newArrayList();
+								lstValues.add(String.valueOf(pg_id));
+								lstValues.add(goods_p_itemid);
+								lstValues.add(map.get(
+										"add_begin").toString());
+								lstValues.add(map.get(
+										"add_end").toString());
+								lstValues.add(map.get(
+										"add_price").toString());
+								String runSql = DBHelper.covertToSQL(sql, lstValues);
+								SendMQ.sendMsg(new RunSqlModel(runSql));
 							} else {
+								sql = "select id from preferential_goods order by id desc limit 1";
+								stmt = conn2.prepareStatement(sql);
+								rs = stmt.executeQuery();
+								int id = 0;
+								if(rs.next()) {
+									id = rs.getInt("id");
+								}
+								
 								sql = "insert into preferential_goods (goods_pid,goods_url,goods_p_url,goods_p_itemid,createtime,price,uuid,is_manual) values(?,?,?,?,now(),?,?,1)";
-								stmt = conn2.prepareStatement(sql,
+								/*stmt = conn2.prepareStatement(sql,
 										Statement.RETURN_GENERATED_KEYS);
 								stmt.setString(1, goods_pid);
 								stmt.setString(2, goods_url);
@@ -6403,11 +6421,23 @@ public class PurchaseDaoImpl implements PurchaseDao {
 										.toString());
 								stmt.setString(6, uuid);
 								stmt.executeUpdate();
-								rs = stmt.getGeneratedKeys();
-								if (rs.next()) {
-									int id = rs.getInt(1);
+								rs = stmt.getGeneratedKeys();*/
+								List<String> lstValues = Lists.newArrayList();
+								lstValues.add(goods_pid);
+								lstValues.add(goods_url);
+								lstValues.add(map.get("goods_p_url")
+										.toString());
+								lstValues.add(goods_p_itemid);
+								lstValues.add(map.get("goods_p_price")
+										.toString());
+								lstValues.add(uuid);
+								String runSql = DBHelper.covertToSQL(sql, lstValues);
+								int r = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+								if (r > 0) {
+									id = id+1;
+//									int id = rs.getInt(1);
 									sql = "insert into preferential_goods_price (pgid,goods_p_itemid,begin,end,price,is_manual) values(?,?,?,?,?,1)";
-									stmt = conn2.prepareStatement(sql);
+									/*stmt = conn2.prepareStatement(sql);
 									stmt.setInt(1, id);
 									stmt.setString(2, goods_p_itemid);
 									stmt.setInt(3, Integer.valueOf(map.get(
@@ -6416,7 +6446,18 @@ public class PurchaseDaoImpl implements PurchaseDao {
 											"add_end").toString()));
 									stmt.setDouble(5, Double.valueOf(map.get(
 											"add_price").toString()));
-									stmt.executeUpdate();
+									stmt.executeUpdate();*/
+									lstValues = Lists.newArrayList();
+									lstValues.add(String.valueOf(id));
+									lstValues.add(goods_p_itemid);
+									lstValues.add(map.get(
+											"add_begin").toString());
+									lstValues.add(map.get(
+											"add_end").toString());
+									lstValues.add(map.get(
+											"add_price").toString());
+									runSql = DBHelper.covertToSQL(sql, lstValues);
+									SendMQ.sendMsg(new RunSqlModel(runSql));
 								}
 							}
 						}
@@ -6552,7 +6593,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				row = stmt.executeUpdate();
 			}
 			new Thread() {
-				Connection conn2 = DBHelper.getInstance().getConnection2();
 				PreparedStatement stmt = null;
 
 				public void run() {
@@ -6560,30 +6600,41 @@ public class PurchaseDaoImpl implements PurchaseDao {
 						String sql = "";
 						if ("1".equals(map.get("type"))) {
 							sql = "update preferential_goods_price set begin=?,end=?,price=? where begin=? and end=? and goods_p_itemid=?";
-							stmt = conn2.prepareStatement(sql);
-							stmt.setInt(1, Integer.valueOf(map.get("new_begin")
-									.toString()));
-							stmt.setInt(2, Integer.valueOf(map.get("new_end")
-									.toString()));
-							stmt.setDouble(3, Double.valueOf(map.get(
-									"new_price").toString()));
-							stmt.setInt(4, Integer.valueOf(map.get("old_begin")
-									.toString()));
-							stmt.setInt(5, Integer.valueOf(map.get("old_end")
-									.toString()));
-							stmt.setString(6, map.get("goods_p_itemid")
+//							stmt = conn2.prepareStatement(sql);
+							List<String> lstValues = Lists.newArrayList();
+							lstValues.add(map.get("new_begin").toString());
+							lstValues.add(map.get("new_end")
 									.toString());
-							stmt.executeUpdate();
+							lstValues.add(map.get(
+									"new_price").toString());
+							lstValues.add(map.get("old_begin")
+									.toString());
+							lstValues.add(map.get("old_end")
+									.toString());
+							lstValues.add(map.get("goods_p_itemid")
+									.toString());
+							String runSql = DBHelper.covertToSQL(sql, lstValues);
+							SendMQ.sendMsg(new RunSqlModel(runSql));
+//							stmt.executeUpdate();
 						} else if ("2".equals(map.get("type"))) {
 							sql = "update preferential_goods_price set is_delete=1 where begin=? and end=? and goods_p_itemid=?";
-							stmt = conn2.prepareStatement(sql);
+							/*stmt = conn2.prepareStatement(sql);
 							stmt.setInt(1, Integer.valueOf(map.get("old_begin")
 									.toString()));
 							stmt.setInt(2, Integer.valueOf(map.get("old_end")
 									.toString()));
 							stmt.setString(3, map.get("goods_p_itemid")
 									.toString());
-							stmt.executeUpdate();
+							stmt.executeUpdate();*/
+							List<String> lstValues = Lists.newArrayList();
+							lstValues.add(map.get("old_begin")
+									.toString());
+							lstValues.add(map.get("old_end")
+									.toString());
+							lstValues.add(map.get("goods_p_itemid")
+									.toString());
+							String runSql = DBHelper.covertToSQL(sql, lstValues);
+							SendMQ.sendMsg(new RunSqlModel(runSql));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -6595,7 +6646,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 								e.printStackTrace();
 							}
 						}
-						DBHelper.getInstance().closeConnection(conn2);
+//						DBHelper.getInstance().closeConnection(conn2);
 					}
 				};
 			}.start();

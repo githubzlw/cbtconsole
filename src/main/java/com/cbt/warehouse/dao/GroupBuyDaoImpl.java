@@ -535,21 +535,25 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
         int count = 0;
         try {
             localConn = DBHelper.getInstance().getConnection();
-            remoteConn = DBHelper.getInstance().getConnection2();
-            localConn.setAutoCommit(false);
-            remoteConn.setAutoCommit(false);
+//            remoteConn = DBHelper.getInstance().getConnection2();
+//            localConn.setAutoCommit(false);
+//            remoteConn.setAutoCommit(false);
 
-            remoteStmt = remoteConn.prepareStatement(insertSql);
+//            remoteStmt = remoteConn.prepareStatement(insertSql);
             
             localStmt = localConn.prepareStatement(insertSql);
             for (GroupBuyGoodsBean gbGoods : infos) {
-                remoteStmt.setInt(1, gbGoods.getGbId());
-                remoteStmt.setString(2, gbGoods.getPid());
-                remoteStmt.setString(3, gbGoods.getShopId());
-                remoteStmt.setInt(4, gbGoods.getIsMain());
-                remoteStmt.setInt(5, gbGoods.getAdminId());
-                remoteStmt.setInt(6, gbGoods.getIsOn());
-                remoteStmt.addBatch();
+            	List<String> lstValues = Lists.newArrayList();
+            	lstValues.add(String.valueOf(gbGoods.getGbId()));
+            	lstValues.add(gbGoods.getPid());
+            	lstValues.add(gbGoods.getShopId());
+            	lstValues.add(String.valueOf(gbGoods.getIsMain()));
+            	lstValues.add(String.valueOf(gbGoods.getAdminId()));
+            	lstValues.add(String.valueOf(gbGoods.getIsOn()));
+            	String runSql = DBHelper.covertToSQL(insertSql, lstValues);
+				//                remoteStmt.addBatch();
+            	count = count +Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql )));
+            	
                 localStmt.setInt(1, gbGoods.getGbId());
                 localStmt.setString(2, gbGoods.getPid());
                 localStmt.setString(3, gbGoods.getShopId());
@@ -559,27 +563,27 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
                 localStmt.addBatch();
 
             }
-            count = remoteStmt.executeBatch().length;
+//            count = remoteStmt.executeBatch().length;
             if (count > 0) {
                 count = 0;
                 count = localStmt.executeBatch().length;
-                if (count > 0) {
+                /*if (count > 0) {
                     localConn.commit();
                     remoteConn.commit();
                 } else {
                     localConn.rollback();
                     remoteConn.rollback();
-                }
+                }*/
 
             } else {
-                remoteConn.rollback();
+//                remoteConn.rollback();
             }
         } catch (Exception e) {
-            try {
+           /* try {
                 remoteConn.rollback();
             } catch (SQLException e1) {
                 e1.printStackTrace();
-            }
+            }*/
             e.printStackTrace();
             System.err.println("insertGroupBuyShopGoods error: " + e.getMessage());
         } finally {
@@ -613,35 +617,40 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
         int count = 0;
         try {
             localConn = DBHelper.getInstance().getConnection();
-            remoteConn = DBHelper.getInstance().getConnection2();
-            localConn.setAutoCommit(false);
-            remoteConn.setAutoCommit(false);
+//            remoteConn = DBHelper.getInstance().getConnection2();
+//            localConn.setAutoCommit(false);
+//            remoteConn.setAutoCommit(false);
 
-            remoteStmt = remoteConn.prepareStatement(deleteSql);
+//            remoteStmt = remoteConn.prepareStatement(deleteSql);
             localStmt = localConn.prepareStatement(deleteSql);
             for (GroupBuyGoodsBean gbGoods : infos) {
-                remoteStmt.setString(1, gbGoods.getPid());
-                remoteStmt.addBatch();
+//                remoteStmt.setString(1, gbGoods.getPid());
+//                remoteStmt.addBatch();
 
+            	List<String> lstValues = Lists.newArrayList();
+            	lstValues.add(gbGoods.getPid());
+            	String runSql = DBHelper.covertToSQL(deleteSql, lstValues);
+            	count +=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+            	
                 localStmt.setString(1, gbGoods.getPid());
                 localStmt.addBatch();
             }
-            count = remoteStmt.executeBatch().length;
+//            count = remoteStmt.executeBatch().length;
             if (count > 0) {
                 count = 0;
                 count = localStmt.executeBatch().length;
-                if (count > 0) {
+                /*if (count > 0) {
                     remoteConn.commit();
                     localConn.commit();
                 } else {
                     remoteConn.rollback();
                     localConn.rollback();
-                }
+                }*/
             } else {
-                remoteConn.rollback();
+//                remoteConn.rollback();
             }
         } catch (Exception e) {
-            try {
+          /*  try {
                 remoteConn.rollback();
             } catch (SQLException e1) {
                 e1.printStackTrace();
@@ -650,7 +659,7 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
                 localConn.rollback();
             } catch (SQLException e1) {
                 e1.printStackTrace();
-            }
+            }*/
             e.printStackTrace();
             System.err.println("deleteGroupBuyShopGoods error: " + e.getMessage());
         } finally {
@@ -842,7 +851,7 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
     public boolean insertAndUpdateUserCoupon(List<UserCouponBean> couponList, Map<Integer, Double> userCpMap, String gbIds) {
         Connection localConn = null;
         Statement localStmt = null;
-        Connection remoteConn = null;
+//        Connection remoteConn = null;
         PreparedStatement remoteIsStmt = null;
         Statement remoteUpStmt = null;
 
@@ -855,30 +864,42 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
         String uudateGroupBuy = "update group_buy_manage set end_flag =1,end_time = now() where id = ?";
         int count = 0;
         try {
-            remoteConn = DBHelper.getInstance().getConnection2();
-            remoteConn.setAutoCommit(false);
+//            remoteConn = DBHelper.getInstance().getConnection2();
+//            remoteConn.setAutoCommit(false);
             localConn = DBHelper.getInstance().getConnection();
-            localConn.setAutoCommit(false);
+//            localConn.setAutoCommit(false);
 
-            remoteIsStmt = remoteConn.prepareStatement(insertSql);
+//            remoteIsStmt = remoteConn.prepareStatement(insertSql);
             for (UserCouponBean ucb : couponList) {
-                remoteIsStmt.setInt(1, ucb.getUserId());
+            	List<String> lstValues = Lists.newArrayList();
+            	lstValues.add(String.valueOf(ucb.getUserId()));
+            	lstValues.add(ucb.getOrderNo());
+            	lstValues.add(String.valueOf(ucb.getCouponValue()));
+            	lstValues.add(String.valueOf(ucb.getType()));
+            	lstValues.add(ucb.getGoodsPid());
+            	lstValues.add(String.valueOf(ucb.getSourceFlag()));
+            	lstValues.add(String.valueOf(ucb.getGoodsId()));
+                /*remoteIsStmt.setInt(1, ucb.getUserId());
                 remoteIsStmt.setString(2, ucb.getOrderNo());
                 remoteIsStmt.setDouble(3, ucb.getCouponValue());
                 remoteIsStmt.setInt(4, ucb.getType());
                 remoteIsStmt.setString(5, ucb.getGoodsPid());
                 remoteIsStmt.setInt(6, ucb.getSourceFlag());
                 remoteIsStmt.setInt(7, ucb.getGoodsId());
-                remoteIsStmt.addBatch();
+                remoteIsStmt.addBatch();*/
+            	String runSql = DBHelper.covertToSQL(insertSql, lstValues);
+            	count = count + Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
             }
 
-            remoteUpStmt = remoteConn.createStatement();
+//            remoteUpStmt = remoteConn.createStatement();
             localStmt = localConn.createStatement();
             List<String> sqlList = new ArrayList<String>();
+            int count1 = 0;
             for (int userId : userCpMap.keySet()) {
                 String tempStr = "update user set coupon_value = coupon_value + "
                         + BigDecimalUtil.truncateDouble(userCpMap.get(userId), 2) + " where id = " + userId;
-                remoteUpStmt.addBatch(tempStr);
+//                remoteUpStmt.addBatch(tempStr);
+                count1 = count1 + Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(tempStr)));
                 sqlList.add(tempStr);
             }
             String[] gbIdList = gbIds.split(",");
@@ -886,7 +907,8 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
                 if(StringUtils.isNotBlank(gbId)){
                     String tempSql = "update group_buy_manage set end_flag =1,end_time = now() where id = " + gbId;
                     sqlList.add(tempSql);
-                    remoteUpStmt.addBatch(tempSql);
+//                    remoteUpStmt.addBatch(tempSql);
+                    count1 = count1 + Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(tempSql)));
                     localStmt.addBatch(tempSql);
                 }
 
@@ -895,29 +917,29 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
 
             sqlList.clear();
 
-            count = remoteIsStmt.executeBatch().length;
-            if (count > 0) {
+//            count = remoteIsStmt.executeBatch().length;
+           if (count > 0) {
                 count = 0;
-                count = remoteUpStmt.executeBatch().length;
+                count = count1;//remoteUpStmt.executeBatch().length;
                 if (count > 0) {
                     count = 0;
                     count = localStmt.executeBatch().length;
-                    if (count > 0) {
+                    /*if (count > 0) {
                         remoteConn.commit();
                         localConn.commit();
                     } else {
                         remoteConn.rollback();
                         localConn.rollback();
-                    }
+                    }*/
                 } else {
-                    remoteConn.rollback();
+//                    remoteConn.rollback();
                 }
 
             } else {
-                remoteConn.rollback();
+//                remoteConn.rollback();
             }
         } catch (Exception e) {
-            try {
+           /* try {
                 remoteConn.rollback();
             } catch (SQLException e1) {
                 e1.printStackTrace();
@@ -926,7 +948,7 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
                 localConn.rollback();
             } catch (SQLException e1) {
                 e1.printStackTrace();
-            }
+            }*/
             e.printStackTrace();
             System.err.println("insertAndUpdateUserCoupon error: " + e.getMessage());
         } finally {
@@ -951,7 +973,7 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
                     e.printStackTrace();
                 }
             }
-            DBHelper.getInstance().closeConnection(remoteConn);
+//            DBHelper.getInstance().closeConnection(remoteConn);
             DBHelper.getInstance().closeConnection(localConn);
         }
         return count > 0;
