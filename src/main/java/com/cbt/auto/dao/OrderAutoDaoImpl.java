@@ -856,10 +856,6 @@ public class OrderAutoDaoImpl implements OrderAutoDao {
 					DBHelper.getInstance().closeConnection(conn28);
 					//线上表
 					sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
-					/*Connection conn2 = DBHelper.getInstance().getConnection2();
-					stmt = conn2.prepareStatement(sql);
-					stmt.executeUpdate();
-					DBHelper.getInstance().closeConnection(conn2);*/
 					SendMQ.sendMsg(new RunSqlModel(sql));
 				}
 				//增加库存锁定记录

@@ -18,6 +18,9 @@ import com.cbt.bean.OrderDetailsBean;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.Md5Util;
+import com.google.common.collect.Lists;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import com.mysql.jdbc.Statement;
 
 public class OrderDetailsDao implements IOrderDetailsDao {
@@ -568,17 +571,43 @@ public class OrderDetailsDao implements IOrderDetailsDao {
 						if (rs.next()) {
 							row = rs.getInt("id");
 							sql = "update preferential_goods set price=?,createtime=now() where goods_p_itemid=? and goods_pid=?";
-							stmt = conn2.prepareStatement(sql.toString());
+							List<String> lstValues = Lists.newArrayList();
+							lstValues.add(String.valueOf(goods_p_price));
+							lstValues.add(goods_p_itemid);
+							lstValues.add(goods_pid);
+							/*stmt = conn2.prepareStatement(sql.toString());
 							stmt.setDouble(1, goods_p_price);
 							stmt.setString(2, goods_p_itemid);
 							stmt.setString(3, goods_pid);
-							row = stmt.executeUpdate();
+							row = stmt.executeUpdate();*/
+							String runSql = DBHelper.covertToSQL(sql, lstValues);
+							row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+							
 							new OrderDetailsDao().addPreferentialPrice(row, goods_p_url,
 									Integer.valueOf(begin), 0, Double.valueOf(price),
 									goods_url);
 						} else {
+							
+							sql = "select id from preferential_goods order id desc limit 1";
+							stmt = conn2.prepareStatement(sql.toString());
+							rs = stmt.executeQuery();
+							int id = 0;
+							if (rs.next()) {
+								id = rs.getInt("id");
+							}
 							sql = "INSERT INTO preferential_goods (goods_pid,goods_url,goods_p_url,goods_p_itemid,createtime,price,uuid) VALUES(?,?,?,?,now(),?,?)";
-							stmt = conn2.prepareStatement(sql,
+							List<String> lstValues = Lists.newArrayList();
+							
+							lstValues.add(goods_pid);
+							lstValues.add(goods_url);
+							lstValues.add(goods_p_url);
+							lstValues.add(goods_p_itemid);
+							lstValues.add(String.valueOf(goods_p_price));
+							lstValues.add(uuid);
+							String runSql = DBHelper.covertToSQL(sql, lstValues);
+							row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+							
+							/*stmt = conn2.prepareStatement(sql,
 									Statement.RETURN_GENERATED_KEYS);
 							stmt.setString(1, goods_pid);
 							stmt.setString(2, goods_url);
@@ -586,10 +615,10 @@ public class OrderDetailsDao implements IOrderDetailsDao {
 							stmt.setString(4, goods_p_itemid);
 							stmt.setDouble(5, goods_p_price);
 							stmt.setString(6, uuid);
-							row = stmt.executeUpdate();
+							row = stmt.executeUpdate();*/
 							rs = stmt.getGeneratedKeys();
-							if (rs.next()) {
-								int id = rs.getInt(1);
+							if (row > 0) {
+								id = id+1;
 								row = id;
 							}
 							new OrderDetailsDao().addPreferentialPrice(row, goods_p_url,
