@@ -540,6 +540,7 @@ public class GroupBuyDaoImpl implements GroupBuyDao {
             remoteConn.setAutoCommit(false);
 
             remoteStmt = remoteConn.prepareStatement(insertSql);
+            
             localStmt = localConn.prepareStatement(insertSql);
             for (GroupBuyGoodsBean gbGoods : infos) {
                 remoteStmt.setInt(1, gbGoods.getGbId());
