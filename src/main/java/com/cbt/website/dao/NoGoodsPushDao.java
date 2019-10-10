@@ -2,6 +2,9 @@ package com.cbt.website.dao;
 
 import com.cbt.jdbc.DBHelper;
 import com.cbt.website.bean.NoGoodsPushBean;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -61,11 +64,19 @@ public class NoGoodsPushDao implements INoGoodsPushDao {
 	public int pushGoods(String carUrl){
 		int i = 0;
 		String sql = "update goodsdata_write set valid=0 where url='"+carUrl+"'";
-		Connection conn = DBHelper.getInstance().getConnection2();
+		String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(sql));
+			int countRs = 0;
+			if (StringUtils.isBlank(rsStr)) {
+				countRs = Integer.valueOf(rsStr);
+			}
+			i = countRs;
+
+		/*Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement pst = null;
 		try {
 			pst = conn.prepareStatement(sql);
 			i = pst.executeUpdate();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -76,8 +87,8 @@ public class NoGoodsPushDao implements INoGoodsPushDao {
 					e.printStackTrace(); 
 				}
 			}
-		}
-		DBHelper.getInstance().closeConnection(conn);
+		}*/
+		// DBHelper.getInstance().closeConnection(conn);
 		return i;
 	}
 

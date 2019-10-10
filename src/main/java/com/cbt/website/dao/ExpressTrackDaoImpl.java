@@ -1323,7 +1323,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 						SendMQ.sendMsg(new RunSqlModel(sql2));
 						sql2 = "SELECT DISTINCT COUNT(b.id)-SUM(b.state) as counts FROM order_details o INNER JOIN order_details b ON o.dropshipid=b.dropshipid WHERE o.orderid='"
 								+ map.get("orderid")
-								+ "' AND o.goodsid='"
+								+ "' AND o.goodsid="
 								+ map.get("goodsid") + " and b.state<2";
 						stmt = conn1.prepareStatement(sql2);
 						rs = stmt.executeQuery();
