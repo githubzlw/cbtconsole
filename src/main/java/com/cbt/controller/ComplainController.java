@@ -155,39 +155,34 @@ public class ComplainController {
 		
 		if(complain!=null) {
 			try {
-				if (StringUtils.isNotBlank(complain.getCreatTime())) {
-					// 判断是否是修改后的时间，如果存在，设置显示图片服务器图片
-					LocalDateTime createTime = DateFormatUtil.getTimeWithStr(complain.getCreatTime());
-					LocalDateTime endTime = DateFormatUtil.getTimeWithStr("2019-10-09 12:00:00");
-					if (createTime.isAfter(endTime)) {
-						for (ComplainFile complainFile : imgs) {
-							if(StringUtils.isNotBlank(complainFile.getImgUrl())
-									&& !(complainFile.getImgUrl().contains("http") || complainFile.getImgUrl().contains("https"))){
-								String preHttp = "";
-								if(StringUtils.isNotBlank(complain.getRefOrderId())){
-									preHttp = MultiSiteUtil.getImgSiteUrl(MultiSiteUtil.getSiteTypeNum(complain.getRefOrderId()));
-								}else{
-									preHttp = MultiSiteUtil.getImgSiteUrl(1);
-
+				for (ComplainFile complainFile : imgs) {
+					if (StringUtils.isNotBlank(complainFile.getImgUrl())
+							&& !(complainFile.getImgUrl().contains("http") || complainFile.getImgUrl().contains("https"))) {
+						String preHttp = "";
+						if (StringUtils.isNotBlank(complain.getRefOrderId())) {
+							preHttp = MultiSiteUtil.getImgSiteUrl(MultiSiteUtil.getSiteTypeNum(complain.getRefOrderId()));
+						} else {
+							preHttp = MultiSiteUtil.getImgSiteUrl(1);
+						}
+						String[] imgArr = complainFile.getImgUrl().split(",");
+						StringBuffer sb = new StringBuffer();
+						for (int i = 0; i < imgArr.length; i++) {
+							if (imgArr[i].contains("/servicerequest")) {
+								if (i < imgArr.length - 1) {
+									sb.append(preHttp + imgArr[i] + ",");
+								} else {
+									sb.append(preHttp + imgArr[i]);
 								}
-								String[] imgArr = complainFile.getImgUrl().split(",");
-								StringBuffer sb = new StringBuffer();
-								for(int i = 0;i<imgArr.length ;i++){
-									if(i < imgArr.length - 1){
-										sb.append(preHttp + imgArr[i] + ",");
-									}else{
-										sb.append(preHttp + imgArr[i]);
-									}
-								}
-								complainFile.setImgUrl( sb.toString());
+							} else {
+								sb.append(imgArr[i]);
 							}
 						}
+						complainFile.setImgUrl(sb.toString());
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 //            mv.addObject("websiteType",MultiSiteUtil.getSiteTypeNum(complain.getRefOrderId()));
 			mv.addObject("status", "1");
 			mv.addObject("complain", complain);
@@ -211,43 +206,33 @@ public class ComplainController {
 			if(list!=null && list.size()!=0) {
 				map.put("status", true);
 				for (ComplainVO complainVO : list) {
-					if (complainVO.getCcchatTime() != null) {
-						// 判断是否是修改后的时间，如果存在，设置显示图片服务器图片
-						LocalDateTime createTime = DateFormatUtil.getTimeWithStr(DateFormatUtil.getWithSeconds(complainVO.getCcchatTime()));
-						LocalDateTime endTime = DateFormatUtil.getTimeWithStr("2019-10-09 12:00:00");
-						if (createTime.isAfter(endTime)) {
-							if (StringUtils.isNotBlank(complainVO.getImgUrl())
-									&& !(complainVO.getImgUrl().contains("http") || complainVO.getImgUrl().contains("https"))) {
-								String preHttp = "";
-								if (StringUtils.isNotBlank(complainVO.getRefOrderId())) {
-									preHttp = MultiSiteUtil.getImgSiteUrl(MultiSiteUtil.getSiteTypeNum(complainVO.getRefOrderId()));
-								} else {
-									preHttp = MultiSiteUtil.getImgSiteUrl(1);
-								}
-								String[] imgArr = complainVO.getImgUrl().split(",");
-								StringBuffer sb = new StringBuffer();
-								for (int i = 0; i < imgArr.length; i++) {
-									if (i < imgArr.length - 1) {
-										sb.append(preHttp + imgArr[i] + ",");
-									} else {
-										sb.append(preHttp + imgArr[i]);
-									}
-								}
-								complainVO.setImgUrl(sb.toString());
-							}
+					if (StringUtils.isNotBlank(complainVO.getImgUrl())
+							&& !(complainVO.getImgUrl().contains("http") || complainVO.getImgUrl().contains("https"))) {
+						String preHttpNew = "";
+						if (StringUtils.isNotBlank(complainVO.getRefOrderId())) {
+							preHttpNew = MultiSiteUtil.getImgSiteUrl(MultiSiteUtil.getSiteTypeNum(complainVO.getRefOrderId()));
 						} else {
-							String preHttp = "https://img.import-express.com/importcsvimg/stock_picture/2018-20/";
-							String[] imgArr = complainVO.getImgUrl().split(",");
-							StringBuffer sb = new StringBuffer();
-							for (int i = 0; i < imgArr.length; i++) {
+							preHttpNew = MultiSiteUtil.getImgSiteUrl(1);
+						}
+						String preHttpOld = "https://img.import-express.com/importcsvimg/stock_picture/2018-20/";
+						String[] imgArr = complainVO.getImgUrl().split(",");
+						StringBuffer sb = new StringBuffer();
+						for (int i = 0; i < imgArr.length; i++) {
+							if (imgArr[i].contains("/servicerequest")) {
 								if (i < imgArr.length - 1) {
-									sb.append(preHttp + imgArr[i] + ",");
+									sb.append(preHttpNew + imgArr[i] + ",");
 								} else {
-									sb.append(preHttp + imgArr[i]);
+									sb.append(preHttpNew + imgArr[i]);
+								}
+							} else {
+								if (i < imgArr.length - 1) {
+									sb.append(preHttpOld + imgArr[i] + ",");
+								} else {
+									sb.append(preHttpOld + imgArr[i]);
 								}
 							}
-							complainVO.setImgUrl(sb.toString());
 						}
+						complainVO.setImgUrl(sb.toString());
 					}
 				}
 
