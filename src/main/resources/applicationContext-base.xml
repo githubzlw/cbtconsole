@@ -69,6 +69,9 @@
         <property name="removeAbandoned" value="true" /> <!-- 打开removeAbandoned功能 -->
         <property name="removeAbandonedTimeout" value="1800" /> <!-- 1800秒，也就是30分钟 -->
         <property name="logAbandoned" value="true" /> <!-- 关闭abanded连接时输出错误日志 -->
+
+        <property name="defaultTransactionIsolation" value="2" />
+
     </bean>
 
     <!-- 数据库连接池 -->

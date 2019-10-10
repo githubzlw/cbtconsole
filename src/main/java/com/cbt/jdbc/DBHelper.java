@@ -22,7 +22,8 @@ public class DBHelper {
 
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(DBHelper.class);
 
-    private static DruidDataSource dataSource = null;
+//    private static DruidDataSource dataSource = null;
+    private static ComboPooledDataSource dataSource = null;
     private static ComboPooledDataSource dataSource2 = null;
     private static ComboPooledDataSource dataSource3 = null;
     private static ComboPooledDataSource dataSource4 = null;
@@ -99,31 +100,48 @@ public class DBHelper {
         }
     }
 
-    private void initDataSource(Properties p) {
-        dataSource = new DruidDataSource();
+//    private void initDataSource(Properties p) {
+//        dataSource = new DruidDataSource();
+//
+//        dataSource.setDriverClassName(p.getProperty("driver"));
+//        dataSource.setUrl(p.getProperty("url"));
+//        dataSource.setUsername(p.getProperty("userName"));
+//        dataSource.setPassword(p.getProperty("userPass"));
+//        dataSource.setInitialSize(30);
+//        dataSource.setMinIdle(30);
+//        dataSource.setMaxActive(300);
+//        dataSource.setMaxWait(3000);
+//        dataSource.setTimeBetweenEvictionRunsMillis(60000);
+//        dataSource.setMinEvictableIdleTimeMillis(60000);
+//        dataSource.setValidationQuery("select 1");
+//        dataSource.setTestWhileIdle(true);
+//        dataSource.setTestOnBorrow(true);
+//        dataSource.setTestOnReturn(true);
+//        dataSource.setRemoveAbandoned(true);
+//        dataSource.setRemoveAbandonedTimeout(1800);
+//        dataSource.setLogAbandoned(true);
+//        dataSource.setDefaultTransactionIsolation(2);
+//
+//        try {
+//            dataSource.setFilters("stat,log4j");
+//        } catch (SQLException e) {
+//            logger.error("initDataSource",e);
+//        }
+//
+//        logger.info("初始化数据库1完成");
+//    }
 
-        dataSource.setDriverClassName(p.getProperty("driver"));
-        dataSource.setUrl(p.getProperty("url"));
-        dataSource.setUsername(p.getProperty("userName"));
+    private void initDataSource(Properties p) throws PropertyVetoException {
+        dataSource = new ComboPooledDataSource();
+        dataSource.setUser(p.getProperty("userName"));
         dataSource.setPassword(p.getProperty("userPass"));
-        dataSource.setInitialSize(30);
-        dataSource.setMinIdle(30);
-        dataSource.setMaxActive(300);
-        dataSource.setMaxWait(3000);
-        dataSource.setTimeBetweenEvictionRunsMillis(60000);
-        dataSource.setMinEvictableIdleTimeMillis(60000);
-        dataSource.setValidationQuery("select 1");
-        dataSource.setTestWhileIdle(true);
-        dataSource.setTestOnBorrow(true);
-        dataSource.setTestOnReturn(true);
-        dataSource.setRemoveAbandoned(true);
-        dataSource.setRemoveAbandonedTimeout(1800);
-        dataSource.setLogAbandoned(true);
-        try {
-            dataSource.setFilters("stat,log4j");
-        } catch (SQLException e) {
-            logger.error("initDataSource",e);
-        }
+        dataSource.setJdbcUrl(p.getProperty("url"));
+        dataSource.setDriverClass(p.getProperty("driver"));
+        dataSource.setInitialPoolSize(100);
+        dataSource.setMinPoolSize(100);
+        dataSource.setMaxPoolSize(100);
+        dataSource.setMaxStatements(50);
+        dataSource.setMaxIdleTime(60);
 
         logger.info("初始化数据库1完成");
     }

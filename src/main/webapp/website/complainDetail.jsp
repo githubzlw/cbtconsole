@@ -561,7 +561,12 @@ $(function(){
 							html+="<td colspan='4' style='text-align:right;border:none'>"+sdate+"</td></tr>";
 							html+="<tr><td style='border:none;' colspan='2'>&nbsp;</td><td colspan='2' style='text-align:right;border:none;padding-right:20px;word-break: break-word;'>"+obj["ccchatText"]+':'+obj["ccchatAdmin"]+""
 							if(obj["imgUrl"] !=null && obj["imgUrl"] != "" && obj["imgUrl"]!=undefined){
-                                html+="<br><img src='"+obj["imgUrl"]+"' style='max-width:840px;max-height:200px'></img>";
+							    html+="<br>";
+							    var imgArr = obj["imgUrl"].split(",");
+							    for(var i = 0;i< imgArr.length ;i++){
+							        html+="<img src='"+imgArr[i]+"' style='max-width:840px;max-height:200px'/>";
+								}
+								html+="<br>";
 							}
 							html+="</td></tr>";
 						}	
@@ -618,7 +623,11 @@ $(function(){
 			if(imgArray[i]){
 				var html ="<ul id='img_sf_1'><li><a><img class='showImg' style='float:left;'  id='" + i + "' /></a></li></ul>";
 				$("#user_info").append(html);
-				$("#" + i).attr("src","http:///www.import-express.com/"+imgArray[i]+"");
+				if(imgArray[i].indexOf("http") > -1 || imgArray[i].indexOf("https") > -1){
+				    $("#" + i).attr("src",imgArray[i]+"");
+				}else{
+				    $("#" + i).attr("src","http:///www.import-express.com/"+imgArray[i]+"");
+				}
 			}
 		 } 
 // 	 for(var i in imgArray){
