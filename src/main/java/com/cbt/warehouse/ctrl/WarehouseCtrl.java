@@ -9287,11 +9287,19 @@ public class WarehouseCtrl {
 				}
 			});
 		}
-		try {
-			Thread.sleep(30000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		int count=0;
+		while (list.size()!=fileList.size()){
+			try {
+				Thread.sleep(1000);
+				count++;
+				if (count>300){
+					break;
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+
 		if (list.size()>0) {
 			for (int i = list.size() - 1; i >= 0; i--) {
 				if ("1".equals(list.get(i))) {
@@ -9307,7 +9315,6 @@ public class WarehouseCtrl {
 				list.add("1");
 			}
 		}
-		System.out.println(list);
 		return list;
 	}
 
