@@ -264,11 +264,11 @@ function search(){
 	var editid = $("#list-product-edit").val();
 	
 	var temp = $("#query_temp").val();
-	var requestHost = "http://localhost:10004";
+	var requestHost = "https://www.import-express.com";
 	if(temp == '2'){
-		requestHost = "http://localhost:10004";
+		requestHost = "https://www.kidsproductwholesale.com/";
 	}else if(temp == '4'){
-		requestHost = "http://localhost:10004";
+		requestHost = "https://www.lovelypetsupply.com/";
 	}
 	productArray = [];
 	//本地已经生成的目录商品优先展示

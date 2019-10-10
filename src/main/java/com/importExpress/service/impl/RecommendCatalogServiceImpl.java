@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.cbt.jdbc.DBHelper;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.parse.service.TypeUtils;
+import com.google.common.collect.Lists;
 import com.importExpress.mapper.RecommendCatalogMapper;
 import com.importExpress.pojo.CatalogProduct;
 import com.importExpress.pojo.PriceBean;
@@ -39,9 +41,18 @@ public class RecommendCatalogServiceImpl implements RecommendCatalogService {
 
 	@Override
 	public int addCatelog(RecommendCatalog catalog) {
-		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel("insert into recommend_catalog (catalog_name,template,create_admin,create_time,product_count,product_list,status)" + 
-				" values("+catalog.getCatalogName()+","+catalog.getTemplate()+","+catalog.getCreateAdmin()+",now(),"+catalog.getProductCount()+"," + 
-				catalog.getProductList()+",1)"));
+		String sql  ="insert into recommend_catalog (catalog_name,template,create_admin,"
+				+ "create_time,product_count,product_list,status)values(?,?,?,now(),?,?,?)";
+		List<String> lstValues = Lists.newArrayList();
+		lstValues.add(catalog.getCatalogName());
+		lstValues.add(String.valueOf(catalog.getTemplate()));
+		lstValues.add(catalog.getCreateAdmin());
+		lstValues.add(String.valueOf(catalog.getProductCount()));
+		lstValues.add(catalog.getProductList());
+		lstValues.add("1");
+		
+		String runSql = DBHelper.covertToSQL(sql, lstValues );
+		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
 		return StrUtils.isNum(sendMsgByRPC) ? Integer.parseInt(sendMsgByRPC) : 0;
 //		return recommendCatalogMapper.insertCatalog(catalog);
 	}
@@ -257,7 +268,8 @@ public class RecommendCatalogServiceImpl implements RecommendCatalogService {
 
 	@Override
 	public int deleteCatalog(int id) {
-		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel("update recommend_catalog set status=0 where id="+id));
+		String sql = "update recommend_catalog set status=0 where id="+id;
+		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(sql));
 		return StrUtils.isNum(sendMsgByRPC) ? Integer.parseInt(sendMsgByRPC) : 0;
 //		return recommendCatalogMapper.deleteCatalog(id);
 	}
@@ -269,8 +281,16 @@ public class RecommendCatalogServiceImpl implements RecommendCatalogService {
 
 	@Override
 	public int updateCatalog(RecommendCatalog cataLog) {
-		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel("update recommend_catalog set product_count="+cataLog.getProductCount()
-		+",product_list="+cataLog.getProductList()+",template="+cataLog.getTemplate()+",catalog_name="+cataLog.getCatalogName()+" where id="+cataLog.getId()));
+		String sql = "update recommend_catalog set product_count=?,product_list=?,template=?,catalog_name=? where id=?";
+		List<String> lstValues = Lists.newArrayList();
+		lstValues.add(String.valueOf(cataLog.getProductCount()));
+		lstValues.add(cataLog.getProductList());
+		lstValues.add(String.valueOf(cataLog.getTemplate()));
+		lstValues.add(cataLog.getCatalogName());
+		lstValues.add(String.valueOf(cataLog.getId()));
+		
+		String runSql = DBHelper.covertToSQL(sql, lstValues );
+		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
 		return StrUtils.isNum(sendMsgByRPC) ? Integer.parseInt(sendMsgByRPC) : 0;
 //		return recommendCatalogMapper.updateCatalog(cataLog);
 	}
