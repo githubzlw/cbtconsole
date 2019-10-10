@@ -241,32 +241,39 @@ public class ComplainDaoImpl implements IComplainDao{
 	@Override
 	public Integer closeComplain(Integer complainid) {
 		String sql1 = "update tb_complain set complainState=2,closeTime=now() where id = ?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		ResultSet rs = null;
-		PreparedStatement stmt = null;
+//		Connection conn = DBHelper.getInstance().getConnection2();
+//		ResultSet rs = null;
+//		PreparedStatement stmt = null;
 		int row =0;
 		try {
-			stmt = conn.prepareStatement(sql1);
-			stmt.setInt(1, complainid);
-			row+=stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sql1);
+//			stmt.setInt(1, complainid);
+//			row+=stmt.executeUpdate();
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(complainid));
+
+			String runSql = DBHelper.covertToSQL(sql1,lstValues);
+			row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (rs != null) {
+//				try {
+//					rs.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return row;
 	}

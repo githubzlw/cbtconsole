@@ -1,7 +1,5 @@
 package com.cbt.util;
 
-import com.cbt.jdbc.DBHelper;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Connection;
@@ -9,7 +7,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
+
+import com.cbt.jdbc.DBHelper;
+import com.google.common.collect.Lists;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 /***
  * 邮件中个人中心自动登录辅助功能
@@ -70,11 +74,13 @@ public class UUIDUtil {
 				pst1.setString(2, time);
 				pst1.setInt(3, userid);
 				i = pst1.executeUpdate();
-				pst2 = conn.prepareStatement(sql2);
-				pst2.setString(1, uuid);
-				pst2.setString(2, time);
-				pst2.setInt(3, userid);
-				i = pst2.executeUpdate();
+				
+				List<String> lstValues = Lists.newArrayList();
+				lstValues.add(uuid);
+				lstValues.add(time);
+				lstValues.add(String.valueOf(userid));
+				String runSql = DBHelper.covertToSQL(sql2, lstValues);
+				i = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

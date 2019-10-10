@@ -669,7 +669,6 @@ public class OrderAutoDaoImpl implements OrderAutoDao {
 			}
 		}
 		Connection conn = DBHelper.getInstance().getConnection();
-		//Connection conn1 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
 		//PreparedStatement stmt1 = null;
 		int res = 0;
@@ -856,11 +855,8 @@ public class OrderAutoDaoImpl implements OrderAutoDao {
 					stmt.executeUpdate();
 					DBHelper.getInstance().closeConnection(conn28);
 					//线上表
-					Connection conn2 = DBHelper.getInstance().getConnection2();
 					sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
-					stmt = conn2.prepareStatement(sql);
-					stmt.executeUpdate();
-					DBHelper.getInstance().closeConnection(conn2);
+					SendMQ.sendMsg(new RunSqlModel(sql));
 				}
 				//增加库存锁定记录
 				sql="INSERT INTO lock_inventory (in_id,lock_remaining,od_id,createtime,lock_inventory_amount) select "+rs.getInt("iid")+","+use_remaining+","+rs.getInt("odid")+",now(),'"+(Double.valueOf(goods_p_price)*Integer.valueOf(use_remaining))+"' from dual where not exists (select * from lock_inventory where in_id='"+rs.getInt("iid")+"' and od_id='"+rs.getInt("odid")+"')";

@@ -5,7 +5,11 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.util.StrUtils;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.google.common.collect.Lists;
+import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SearchFileUtils;
+import com.importExpress.utli.SendMQ;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -481,7 +485,6 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs=null;
-        int result = 0;
         try{
             conn=DBHelper.getInstance().getConnection5();
             StringBuilder sql=new StringBuilder();
@@ -546,8 +549,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     public int insertOrUpdate(ShopUrl su, String[] urls) {
         int result = 0;
         int id = 0;
-        Connection conn = null, conn1 = null;
-        PreparedStatement stmt = null, stmt1 = null;
+        Connection conn = null;
+        PreparedStatement stmt = null;
         String sql = "";
         if (su.getId() != null) {
             sql = "update shop_url_bak set shop_id=?,shop_url=?,is_valid=?,sales_volume_threshold=?,download_num=?,admuser=?,admin_id=?,url_type=?,input_shop_name=?, flag =?,updatetime=?,input_shop_description=?,shop_enname=?,shop_brand=? where id=?";
@@ -558,7 +561,6 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
 
         conn = DBHelper.getInstance().getConnection5();
-        conn1 = DBHelper.getInstance().getConnection2();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
         String nowDate = df.format(date);
@@ -636,11 +638,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             }
 
             String sql3 = "replace into shop_description(shop_id,input_shop_description) values(?,?) ";
-            stmt1 = conn1.prepareStatement(sql3);
-            stmt1.setString(1, su.getShopId());
-            stmt1.setString(2, StringUtils.isBlank(su.getInputShopDescription()) ? "" : su.getInputShopDescription());
-            stmt1.executeUpdate();
-
+            
+            List<String> lstValues = Lists.newArrayList();
+            lstValues.add(su.getShopId());
+            lstValues.add(StringUtils.isBlank(su.getInputShopDescription()) ? "" : su.getInputShopDescription());
+            
+			String runSql = DBHelper.covertToSQL(sql3, lstValues );
+			SendMQ.sendMsg(new RunSqlModel(runSql ));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -651,14 +655,6 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (stmt1 != null) {
-                try {
-                    stmt1.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            DBHelper.getInstance().closeConnection(conn);
             DBHelper.getInstance().closeConnection(conn);
         }
         return result;
@@ -1714,9 +1710,14 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 // 同步Online
                 connOnline.setAutoCommit(false);
                 stmtOnline.clearParameters();
-                stmtOnline = connOnline.prepareStatement("insert into custom_benchmark_ready" + insertSql);
-                setSingleParam(stmtOnline, goods, true);
-                count = stmtOnline.executeUpdate();
+//                stmtOnline = connOnline.prepareStatement("insert into custom_benchmark_ready" + insertSql);
+                List<String> lstValues = Lists.newArrayList();
+                setSingleParam(lstValues, goods, true);
+                
+                String runSql = DBHelper.covertToSQL("insert into custom_benchmark_ready" + insertSql, lstValues);
+                count = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+                
+//                count = stmtOnline.executeUpdate();
                 if (count > 0) {
 
                     // 更新同步
@@ -1817,6 +1818,106 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         return rs == 3;
     }
 
+    private void setSingleParam(List<String> stmt, CustomOnlineGoodsBean goods, boolean no27) {
+    	
+    	try {
+    		int i = 1;
+    		stmt.add(goods.getAliFreight() == null ? "" : goods.getAliFreight());
+    		stmt.add( goods.getAliImg() == null ? "" : goods.getAliImg());
+    		stmt.add( goods.getAliMorder() == null ? "0" : goods.getAliMorder());
+    		if (no27) {
+    			stmt.add(goods.getAliName() == null ? "" : goods.getAliName());
+    		}
+    		stmt.add(goods.getAliPid() == null ? "" : goods.getAliPid());
+    		stmt.add(goods.getAliPrice() == null ? "" : goods.getAliPrice());
+    		
+    		stmt.add(goods.getAliSellunit() == null ? "" : goods.getAliSellunit());
+    		stmt.add(String.valueOf(goods.getAliSold()));
+    		stmt.add(goods.getAliUnit() == null ? "" : goods.getAliUnit());
+    		stmt.add(goods.getAliWeight() == null ? "" : goods.getAliWeight());
+    		stmt.add(String.valueOf(goods.getBmFlag()));
+    		
+    		stmt.add(goods.getCatid() == null ? "" : goods.getCatid());
+    		stmt.add(goods.getCatid1() == null ? "" : goods.getCatid1());
+    		stmt.add(goods.getCatidb() == null ? "" : goods.getCatidb());
+    		stmt.add(goods.getCatidParenta() == null ? "" : goods.getCatidParenta());
+    		stmt.add(goods.getCatidParentb() == null ? "" : goods.getCatidParentb());
+    		
+    		stmt.add(goods.getCatpath() == null ? "" : goods.getCatpath());
+    		stmt.add(goods.getCustomMainImage() == null ? "" : goods.getCustomMainImage());
+    		stmt.add(goods.getEndetail() == null ? "" : goods.getEndetail());
+    		stmt.add(goods.getEninfo() == null ? "" : goods.getEninfo());
+    		
+    		stmt.add(goods.getEnname() == null ? "" : goods.getEnname());
+    		
+    		stmt.add(goods.getEntype() == null ? "" : goods.getEntype());
+    		stmt.add(goods.getFeeprice() == null ? "" : goods.getFeeprice());
+    		if (no27) {
+    			stmt.add(goods.getFinalName() == null ? "" : goods.getFinalName());
+    		}
+    		stmt.add(goods.getFinalWeight() == null ? "" : goods.getFinalWeight());
+    		stmt.add(goods.getFprice() == null ? "" : goods.getFprice());
+    		if (no27) {
+    			stmt.add(goods.getFpriceStr() == null ? "" : goods.getFpriceStr());
+    		}
+    		stmt.add(goods.getImg() == null ? "" : goods.getImg());
+    		stmt.add(String.valueOf(goods.getImgCheck()));
+    		if (no27) {
+    			stmt.add( String.valueOf(goods.getInfoReviseFlag()));
+    		}
+    		stmt.add(String.valueOf(goods.getIsAddCarFlag()));
+    		stmt.add(String.valueOf(goods.getIsBenchmark()));
+    		stmt.add( String.valueOf(goods.getIsNewCloud()));
+    		if (no27) {
+    			stmt.add(String.valueOf(goods.getIsShowDetImgFlag()));
+    			stmt.add(String.valueOf(goods.getIsShowDetTableFlag()));
+    		}
+    		stmt.add(String.valueOf(goods.getIsSoldFlag()));
+    		
+    		stmt.add( goods.getKeyword() == null ? "" : goods.getKeyword());
+    		stmt.add( goods.getLocalPath() == null ? "" : goods.getLocalPath());
+    		stmt.add( String.valueOf(goods.getMorder()));
+    		if (no27) {
+    			stmt.add(goods.getName() == null ? "" : goods.getName());
+    		}
+    		
+    		stmt.add( String.valueOf(goods.getOcrMatchFlag()));
+    		stmt.add( goods.getOriginalCatid() == null ? "" : goods.getOriginalCatid());
+    		
+    		stmt.add(goods.getOriginalCatpath() == null ? "" : goods.getOriginalCatpath());
+    		stmt.add(goods.getPid() == null ? "" : goods.getPid());
+    		stmt.add(String.valueOf(goods.getPrice()));
+    		if (no27) {
+    			stmt.add(String.valueOf(goods.getPriceReviseFlag()));
+    		}
+    		stmt.add(String.valueOf(goods.getPriorityFlag()));
+    		if (no27) {
+    			stmt.add(goods.getPvids() == null ? "" : goods.getPvids());
+    		}
+    		stmt.add(goods.getRangePrice() == null ? "" : goods.getRangePrice());
+    		stmt.add(goods.getRemotPath() == null ? "" : goods.getRemotPath());
+    		stmt.add(goods.getReviseWeight() == null ? "" : goods.getReviseWeight());
+    		if (no27) {
+    			stmt.add(goods.getSellUnit() == null ? "" : goods.getSellUnit());
+    		}
+    		stmt.add(goods.getShopId() == null ? "" : goods.getShopId());
+    		stmt.add(goods.getSku() == null ? "" : goods.getSku());
+    		stmt.add(String.valueOf(goods.getSold()));
+    		stmt.add(String.valueOf(goods.getSourceProFlag()));
+    		stmt.add(String.valueOf(goods.getSourceUsedFlag()));
+    		stmt.add(String.valueOf(goods.getValid()));
+    		stmt.add(goods.getWeight() == null ? "" : goods.getWeight());
+    		if (no27) {
+    			stmt.add(goods.getWholesalePrice() == null ? "" : goods.getWholesalePrice());
+    		}
+    		
+    		stmt.add(goods.getWprice() == null ? "" : goods.getWprice());
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		System.err.println("setSingleParam error :" + e.getMessage());
+    		LOG.error("setSingleParam error :" + e.getMessage());
+    	}
+    }
     private void setSingleParam(PreparedStatement stmt, CustomOnlineGoodsBean goods, boolean no27) {
 
         try {

@@ -59,7 +59,7 @@ public class RPCClient implements AutoCloseable {
         });
 
         //超过指定时间后强制结束
-        String result = response.poll(10, TimeUnit.SECONDS);
+        String result = response.poll(60, TimeUnit.SECONDS);
         channel.basicCancel(ctag);
         return result;
     }
