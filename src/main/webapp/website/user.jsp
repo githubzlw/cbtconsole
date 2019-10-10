@@ -634,15 +634,15 @@ tr .td_class{width:230px;}
             <button onclick="userloginJump()">模拟登陆</button>
         </div>
     </div>
-    <div id="user_type" class="easyui-window" title="用户类型"
+    <div id="user_type" class="easyui-window" title="授权"
          data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
          style="width:400px;height:200px;display: none;font-size: 16px;">
         <div style="margin-left:20px;">
             <input type="hidden" name="userid">
             <br /><br />
-            <input type="radio" name="user_type" value="0">未满足$70美国用户
+            <input type="radio" name="user_type" value="0">取消授权
             <br /><br />
-            <input type="radio" name="user_type" value="1">满足$70美国用户
+            <input type="radio" name="user_type" value="1">进行授权
         </div>
         <div style="margin-left: 260px;">
         </div>
