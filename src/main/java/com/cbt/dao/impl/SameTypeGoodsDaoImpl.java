@@ -22,6 +22,7 @@ public class SameTypeGoodsDaoImpl implements SameTypeGoodsDao {
 	@Override
 	public JsonResult batchAddUrl(String mainUrl, String urls, int adminId, int typeFlag, double aveWeight) {
 
+		//线上该表不需要
 		JsonResult json = new JsonResult();
 		Connection conn28 = DBHelper.getInstance().getConnection5();
 		Connection remoteConn = DBHelper.getInstance().getConnection2();
@@ -227,6 +228,7 @@ public class SameTypeGoodsDaoImpl implements SameTypeGoodsDao {
 	@Override
 	public JsonResult batchAddTypeUrl(String mainUrl, String urls, int adminId, int typeFlag, double aveWeight) {
 
+		//线上该表不需要
 		JsonResult json = new JsonResult();
 		Connection conn28 = DBHelper.getInstance().getConnection5();
 		Connection remoteConn = DBHelper.getInstance().getConnection2();
@@ -460,6 +462,7 @@ public class SameTypeGoodsDaoImpl implements SameTypeGoodsDao {
 	@Override
 	public boolean updateSameTypeGoodsError(String pid) {
 
+		//线上该表不需要
 		int rs = 0;
 		Connection connOnline = DBHelper.getInstance().getConnection2();
 		Connection conn28 = DBHelper.getInstance().getConnection5();
@@ -1042,6 +1045,7 @@ public class SameTypeGoodsDaoImpl implements SameTypeGoodsDao {
 	public boolean deleteGoodsByMainPid(String mainPid) {
 
 		// 非物理删除数据
+		//线上该表不需要
 		Connection conn28 = DBHelper.getInstance().getConnection5();
 		Connection connOnline = DBHelper.getInstance().getConnection2();
 		String delete28 = "update same_1688_goods_relation set del_flag =1,update_time=sysdate()"
@@ -1099,6 +1103,7 @@ public class SameTypeGoodsDaoImpl implements SameTypeGoodsDao {
 	public boolean deleteGoodsByPid(String mainPid, String pid) {
 
 		// 非物理删除数据
+		//线上该表不需要
 		Connection conn28 = DBHelper.getInstance().getConnection5();
 		Connection connOnline = DBHelper.getInstance().getConnection2();
 		String delete28 = "update same_1688_goods_relation set del_flag =1,update_time=sysdate()" + " where low_pid = '"
@@ -1233,6 +1238,7 @@ public class SameTypeGoodsDaoImpl implements SameTypeGoodsDao {
 	@Override
 	public boolean replaceGoodsMainPid(String newPid, String oldPid) {
 
+		//线上该表不需要
 		Connection conn28 = DBHelper.getInstance().getConnection5();
 		Connection remotrConn = DBHelper.getInstance().getConnection2();
 		String updateLowSql = "update same_1688_goods_relation set  main_pid = '" + newPid + "',low_pid = '" + newPid
@@ -1304,6 +1310,7 @@ public class SameTypeGoodsDaoImpl implements SameTypeGoodsDao {
 	@Override
 	public boolean useGoodsByState(int state, String pids) {
 
+		//线上该表不需要
 		Connection conn28 = DBHelper.getInstance().getConnection5();
 		Connection remotrConn = DBHelper.getInstance().getConnection2();
 		String update28Sql = "update same_1688_goods_relation set  is_on = " + state + " where main_pid in(";

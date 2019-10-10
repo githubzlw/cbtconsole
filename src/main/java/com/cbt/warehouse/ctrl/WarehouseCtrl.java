@@ -63,6 +63,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.google.common.collect.Lists;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.IPurchaseMapper;
@@ -7141,10 +7142,8 @@ public class WarehouseCtrl {
 				+ orderno + "'";
 		List<String> list = new ArrayList<String>();
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null, stmtfee = null, mergeStmt = null, stmtid = null;
 		ResultSet rs = null;
-		PreparedStatement stmt2 = null;
 		try {
 			// 先查询合并订单
 			mergeStmt = conn.prepareStatement(sql);
@@ -7191,12 +7190,13 @@ public class WarehouseCtrl {
 			 * 更新线上数据库 orderinfo 表 状态
 			 *
 			 */
-			stmt2 = conn2.prepareStatement(sqlorderinfo);
+			List<String> lstValues = Lists.newArrayList();
 			for (int i = 0; i < list.size(); i++) {
-				stmt2.setString(i + 1, list.get(i));
+				lstValues.add(list.get(i));
 			}
 			if (list.size() > 0) {
-				stmt2.executeUpdate();
+				String runSql = DBHelper.covertToSQL(sqlorderinfo, lstValues);
+				SendMQ.sendMsg(new RunSqlModel(runSql));;
 			}
 
 			/**
@@ -7280,13 +7280,6 @@ public class WarehouseCtrl {
 					e.printStackTrace();
 				}
 			}
-			if (stmt2 != null) {
-				try {
-					stmt2.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
 			if (stmtfee != null) {
 				try {
 					stmtfee.close();
@@ -7295,7 +7288,6 @@ public class WarehouseCtrl {
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 	}
 

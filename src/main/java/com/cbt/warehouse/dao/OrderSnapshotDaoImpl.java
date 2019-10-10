@@ -2,6 +2,9 @@ package com.cbt.warehouse.dao;
 
 import com.cbt.jdbc.DBHelper;
 import com.cbt.warehouse.pojo.OrderSnapshot;
+import com.google.common.collect.Lists;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +15,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.criteria.CriteriaBuilder.In;
+
 public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderSnapshotDaoImpl.class);
@@ -21,7 +26,6 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 	public boolean syncOfflineToOnline() {
 
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection remoteConn = DBHelper.getInstance().getConnection2();
 		ResultSet rsSet = null;
 		// 获取数据SQL
 		String querySql = "select  odss.*,cbr.endetail as goods_details,cbr.eninfo as goods_eninfo,cbr.remotpath,"
@@ -32,7 +36,6 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 				+ "left join custom_benchmark_ready cbr  on odss.goods_pid = cbr.pid and cbr.goodsstate = 4 "
 				+ "left join goods_car gdc on odss.goodsid = gdc.id";
 		PreparedStatement stmt = null;
-		PreparedStatement remoteStmt = null;
 		// 插入线上SQL
 		String inRemoteSql = "insert into order_snapshot(od_id,userid,goodsid,goodsname,car_type,car_url,"
 				+ "car_img,orderid,dropshipid,yourorder,goodsprice,delivery_time,"
@@ -78,27 +81,26 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 
 			if (orderSnapshots.size() > 0) {
 				System.out.println("--syncOfflineToOnline orderSnapshots size:" + orderSnapshots.size());
-				remoteStmt = remoteConn.prepareStatement(inRemoteSql);
 				stmt = conn.prepareStatement(upSql);
 				for (OrderSnapshot odspst : orderSnapshots) {
-					remoteStmt.clearParameters();
+					List<String> lstValues = Lists.newArrayList();
 					int k = 1;
-					remoteStmt.setInt(k++, odspst.getOdId());
-					remoteStmt.setInt(k++, odspst.getUserid());
-					remoteStmt.setInt(k++, odspst.getGoodsid());
-					remoteStmt.setString(k++, odspst.getGoodsname());
-					remoteStmt.setString(k++, odspst.getGoods_type());
-					remoteStmt.setString(k++, odspst.getGoods_url());
-					remoteStmt.setString(k++, odspst.getGoods_img());
-					remoteStmt.setString(k++, odspst.getOrderid());
-					remoteStmt.setString(k++, odspst.getDropshipid());
-					remoteStmt.setInt(k++, odspst.getYourorder());
-					remoteStmt.setString(k++, odspst.getGoodsprice());
-					remoteStmt.setString(k++, odspst.getDelivery_time());
-					remoteStmt.setInt(k++, odspst.getGoods_class());
-					remoteStmt.setString(k++, odspst.getCar_urlMD5());
-					remoteStmt.setString(k++, odspst.getGoods_pid());
-					remoteStmt.setString(k++, odspst.getGoods_details() == null ? "" : odspst.getGoods_details());
+					lstValues.add(String.valueOf(odspst.getOdId()));
+					lstValues.add(String.valueOf(odspst.getUserid()));
+					lstValues.add(String.valueOf(odspst.getGoodsid()));
+					lstValues.add(odspst.getGoodsname());
+					lstValues.add(odspst.getGoods_type());
+					lstValues.add( odspst.getGoods_url());
+					lstValues.add(odspst.getGoods_img());
+					lstValues.add(odspst.getOrderid());
+					lstValues.add(odspst.getDropshipid());
+					lstValues.add(String.valueOf(odspst.getYourorder()));
+					lstValues.add(odspst.getGoodsprice());
+					lstValues.add(odspst.getDelivery_time());
+					lstValues.add(String.valueOf(odspst.getGoods_class()));
+					lstValues.add(odspst.getCar_urlMD5());
+					lstValues.add(odspst.getGoods_pid());
+					lstValues.add(odspst.getGoods_details() == null ? "" : odspst.getGoods_details());
 
 					// eninfo（详情图片）的处理，替换本地链接
 					String eninfo = odspst.getGoods_eninfo();
@@ -113,10 +115,11 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 									"https://img.import-express.com/importcsvimg/");
 						}
 					}
-					remoteStmt.setString(k++, eninfo);
-					remoteStmt.setString(k++, odspst.getRemotpath());
-					remoteStmt.setString(k++, odspst.getGoodsUnit());
-					int count = remoteStmt.executeUpdate();
+					lstValues.add(eninfo);
+					lstValues.add(odspst.getRemotpath());
+					lstValues.add(odspst.getGoodsUnit());
+					String runSql = DBHelper.covertToSQL(inRemoteSql, lstValues);
+					int count = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));//remoteStmt.executeUpdate();
 					if (count > 0) {
 						rs = true;
 						stmt.clearParameters();
@@ -153,16 +156,7 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 					e.printStackTrace();
 				}
 			}
-			if (remoteStmt != null) {
-				try {
-					remoteStmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(remoteConn);
 		}
 		return rs;
 	}

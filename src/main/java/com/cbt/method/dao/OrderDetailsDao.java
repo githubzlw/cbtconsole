@@ -615,8 +615,8 @@ public class OrderDetailsDao implements IOrderDetailsDao {
 							stmt.setString(4, goods_p_itemid);
 							stmt.setDouble(5, goods_p_price);
 							stmt.setString(6, uuid);
-							row = stmt.executeUpdate();*/
-							rs = stmt.getGeneratedKeys();
+							row = stmt.executeUpdate();
+							rs = stmt.getGeneratedKeys()*/;
 							if (row > 0) {
 								id = id+1;
 								row = id;
@@ -749,21 +749,38 @@ public class OrderDetailsDao implements IOrderDetailsDao {
 						rs = stmt.executeQuery();
 						if (rs.next()) {
 							sql = "update preferential_goods set price=? where goods_pid=? and goods_p_itemid=?";
-							stmt = conn2.prepareStatement(sql);
+							/*stmt = conn2.prepareStatement(sql);
 							stmt.setDouble(1, goods_p_price);
 							stmt.setString(2, goods_pid);
 							stmt.setString(3, goods_p_itemid);
-							stmt.executeUpdate();
+							stmt.executeUpdate();*/
+							
+							List<String> lstValues = Lists.newArrayList();
+							lstValues.add(String.valueOf(goods_p_price));
+							lstValues.add(goods_pid);
+							lstValues.add(goods_p_itemid);
+							String runSql = DBHelper.covertToSQL(sql, lstValues);
+							SendMQ.sendMsg(new RunSqlModel(runSql));
 						} else {
 							sql = "insert into preferential_goods (goods_pid,goods_url,goods_p_url,goods_p_itemid,createtime,price,uuid) values(?,?,?,?,now(),?,?)";
-							stmt = conn2.prepareStatement(sql);
+							/*stmt = conn2.prepareStatement(sql);
 							stmt.setString(1, goods_pid);
 							stmt.setString(2, goods_url);
 							stmt.setString(3, goods_p_url);
 							stmt.setString(4, goods_p_itemid);
 							stmt.setDouble(5, goods_p_price);
 							stmt.setString(6, uuid);
-							stmt.executeUpdate();
+							stmt.executeUpdate();*/
+							
+							List<String> lstValues = Lists.newArrayList();
+							lstValues.add(goods_pid);
+							lstValues.add(goods_url);
+							lstValues.add(goods_p_url);
+							lstValues.add(goods_p_itemid);
+							lstValues.add(String.valueOf(goods_p_price));
+							lstValues.add(uuid);
+							String runSql = DBHelper.covertToSQL(sql, lstValues);
+							SendMQ.sendMsg(new RunSqlModel(runSql));
 						}
 					}catch(Exception e){
 						e.printStackTrace();
@@ -904,13 +921,22 @@ public class OrderDetailsDao implements IOrderDetailsDao {
 						if (rs.next()) {
 							pg_id = rs.getInt("pgid");
 							sql = "update preferential_goods_price set price=? where pgid=? and goods_p_itemid=? and begin=? and end=?";
-							stmt = conn2.prepareStatement(sql);
+							List<String> lstValues = Lists.newArrayList();
+							lstValues.add(String.valueOf(price));
+							lstValues.add(String.valueOf(pg_id));
+							lstValues.add(goods_p_itemid);
+							lstValues.add(String.valueOf(begin));
+							lstValues.add(String.valueOf(end));
+							/*stmt = conn2.prepareStatement(sql);
 							stmt.setDouble(1, price);
 							stmt.setInt(2, pg_id);
 							stmt.setString(3, goods_p_itemid);
 							stmt.setInt(4, begin);
 							stmt.setInt(5, end);
-							stmt.executeUpdate();
+							stmt.executeUpdate();*/
+							String runSql = DBHelper.covertToSQL(sql, lstValues );
+							SendMQ.sendMsg(new RunSqlModel(runSql));
+							
 						} else {
 							sql = "select id from preferential_goods where goods_p_itemid=? and goods_pid=?";
 							stmt = conn2.prepareStatement(sql);
@@ -920,13 +946,21 @@ public class OrderDetailsDao implements IOrderDetailsDao {
 							if (rs.next()) {
 								pg_id = rs.getInt("id");
 								sql = "insert into preferential_goods_price (pgid,goods_p_itemid,begin,end,price) values(?,?,?,?,?)";
-								stmt = conn2.prepareStatement(sql);
+								/*stmt = conn2.prepareStatement(sql);
 								stmt.setInt(1, pg_id);
 								stmt.setString(2, goods_p_itemid);
 								stmt.setInt(3, begin);
 								stmt.setInt(4, end);
 								stmt.setDouble(5, price);
-								stmt.executeUpdate();
+								stmt.executeUpdate();*/
+								List<String> lstValues = Lists.newArrayList();
+								lstValues.add(String.valueOf(pg_id));
+								lstValues.add(goods_p_itemid);
+								lstValues.add(String.valueOf(begin));
+								lstValues.add(String.valueOf(end));
+								lstValues.add(String.valueOf(price));
+								String runSql = DBHelper.covertToSQL(sql, lstValues );
+								SendMQ.sendMsg(new RunSqlModel(runSql));
 							}
 						}
 					}catch(Exception e){
