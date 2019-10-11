@@ -174,7 +174,11 @@ public class ComplainController {
 									sb.append(preHttp + imgArr[i]);
 								}
 							} else {
-								sb.append(imgArr[i]);
+								if (i < imgArr.length - 1) {
+									sb.append(imgArr[i] + ",");
+								} else {
+									sb.append(imgArr[i]);
+								}
 							}
 						}
 						complainFile.setImgUrl(sb.toString());
