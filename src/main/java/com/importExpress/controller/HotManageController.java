@@ -204,6 +204,10 @@ public class HotManageController {
             return json;
         }
 
+        String view_more_url = request.getParameter("view_more_url");
+        if (StringUtils.isBlank(view_more_url)) {
+            view_more_url = "";
+        }
 
         String hot_typeStr = request.getParameter("hot_type");
         int hot_type = -1;
@@ -249,6 +253,7 @@ public class HotManageController {
             param.setSorting(enter_sort);
             param.setUpdateAdminId(user.getId());
             param.setWebSite(webSite);
+            param.setViewMoreUrl(view_more_url);
             int isCheck = hotManageService.checkHotCategoryIsExists(param);
             if (isCheck > 0) {
                 json.setOk(false);
@@ -313,6 +318,11 @@ public class HotManageController {
         }
 
 
+        String view_more_url = request.getParameter("view_more_url");
+        if (StringUtils.isBlank(view_more_url)) {
+            view_more_url = "";
+        }
+
         String hot_typeStr = request.getParameter("hot_type");
         int hot_type = -1;
         if (StringUtils.isBlank(hot_typeStr)) {
@@ -357,6 +367,7 @@ public class HotManageController {
             param.setSorting(enter_sort);
             param.setUpdateAdminId(user.getId());
             param.setWebSite(webSite);
+            param.setViewMoreUrl(view_more_url);
             int isCheck = hotManageService.checkHotCategoryIsExists(param);
             if (isCheck > 0) {
                 json.setOk(false);
@@ -1209,9 +1220,10 @@ public class HotManageController {
     private void insertCategoryOnline(HotCategory param) {
         String show_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getShowName());
         String category_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getCategoryName());
-        String sql = "insert into hot_category(category_name,show_name,show_img,is_on,sorting,hot_type,admin_id,web_site)" +
+        String sql = "insert into hot_category(category_name,show_name,show_img,is_on,sorting,hot_type,admin_id,web_site,view_more_url)" +
                 " values('" + category_name + "','" + show_name + "','" + param.getShowImg() + "'," + param.getIsOn()
-                + "," + param.getSorting() + "," + param.getHotType() + "," + param.getAdminId() + "," + param.getWebSite() +")";
+                + "," + param.getSorting() + "," + param.getHotType() + "," + param.getAdminId() + ","
+                + param.getWebSite() + ",'" + param.getViewMoreUrl() + "')";
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
@@ -1223,6 +1235,7 @@ public class HotManageController {
                 + "',is_on=" + param.getIsOn()
                 + ",sorting=" + param.getSorting() + ",hot_type=" + param.getHotType() + ",update_admin_id=" + param.getAdminId()
                 + ",web_site=" + param.getWebSite()
+                + ",view_more_url='" + param.getViewMoreUrl() + "'"
                 + " where id = " + param.getId();
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }

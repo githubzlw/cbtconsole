@@ -204,6 +204,10 @@
                 content = '商品厨房';
             }else if (val == 22) {
                 content = '家纺落地页';
+            }else if (val == 23) {
+                content = '医疗设备';
+            }else if (val == 24) {
+                content = '限制首页分组';
             }
             return content;
         }
@@ -259,6 +263,7 @@
                         $("#category_name").val(json.categoryName);
                         $("#show_name").val(json.showName);
                         $("#show_img").val(json.showImg);
+                        $("#view_more_url").val(json.viewMoreUrl);
                     } else {
                         $.messager.alert("提醒", '查询失败:' + data.message, "info");
                     }
@@ -274,6 +279,7 @@
             var category_name = $("#category_name").val();
             var show_name = $("#show_name").val();
             var show_img = $("#show_img").val();
+            var view_more_url = $("#view_more_url").val();
 
             if (category_name == "" || category_name == null) {
                 $.messager.alert("提醒", '请输入类别名称', "info");
@@ -286,6 +292,9 @@
             if (show_img == "" || show_img == null) {
                 $.messager.alert("提醒", '请输入显示图片链接', "info");
                 return false;
+            }
+            if (view_more_url == "" || view_more_url == null) {
+                view_more_url = "";
             }
             var hot_type = $("#hot_type").val();
             var is_on = $("#is_on").val();
@@ -307,6 +316,7 @@
                         category_name: category_name,
                         show_name: show_name,
                         show_img: show_img,
+                        view_more_url: view_more_url,
                         hot_type: hot_type,
                         is_on: is_on,
                         enter_sort: enter_sort,
@@ -315,6 +325,7 @@
                     success: function (data) {
                         $.messager.progress('close');
                         if (data.ok) {
+                            closeDialog();
                             $('#hot_easyui-datagrid').datagrid('reload');
                         } else {
                             $.messager.alert("提醒", '执行错误:' + data.message, "info");
@@ -342,6 +353,7 @@
                     success: function (data) {
                         $.messager.progress('close');
                         if (data.ok) {
+                            closeDialog();
                             $.messager.alert("提醒", '保存成功，请等待数据拉取', "info");
                         } else {
                             $.messager.alert("提醒", '执行错误:' + data.message, "info");
@@ -407,6 +419,9 @@
 		    url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?webType="+webType;
         }else if(webType == 4){
 		    url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson?webType="+webType;
+        }else{
+		    $("#gen_show_notice").text("选择分组失败，不刷新！");
+		    return;
         }
         if(window.location.href.indexOf("127.0.0.1") > -1){
 		    url =  "http://127.0.0.1:8087/popProducts/refreshHotJson?webType="+webType;
@@ -438,6 +453,9 @@
                 url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?html=1&webType="+webType;
             }else if(webType == 4){
                 url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson?html=1&webType="+webType;
+            }else{
+                $("#gen_show_notice").text("选择分组失败，不刷新！");
+                return;
             }
     		$.ajax({
     			type : "POST",
@@ -486,6 +504,8 @@
                     <option value="20">家具落地页</option>
                     <option value="21">商品厨房</option>
                     <option value="22">家纺落地页</option>
+                    <option value="23">医疗设备</option>
+                    <option value="24">限制首页分组</option>
 			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>是否启用: <select
             id="query_is_on"
             style="font-size: 16px; height: 24px; width: 120px;">
@@ -564,6 +584,12 @@
                         placeholder="请输入显示图片"/></td>
             </tr>
             <tr>
+                <td>View More:</td>
+                <td><input
+                        id="view_more_url" value="" style="width: 555px; height: 28px;"
+                        placeholder="请输入View More链接"/></td>
+            </tr>
+            <tr>
                 <td>所属类别：</td>
                 <td><select id="hot_type" style="width: 190px;height: 28px;">
                     <option value="1">热卖区(原始)</option>
@@ -588,6 +614,8 @@
                     <option value="20">家具落地页</option>
                     <option value="21">商品厨房</option>
                     <option value="22">家纺落地页</option>
+                    <option value="23">医疗设备</option>
+                    <option value="24">限制首页分组</option>
                 </select></td>
             </tr>
             <tr>
