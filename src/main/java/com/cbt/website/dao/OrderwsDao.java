@@ -2535,7 +2535,7 @@ public class OrderwsDao implements IOrderwsDao {
         String sql = "update order_change set del_state=1 where  orderNo=? and goodId=? and ropType=?";
         String sql1 = "update orderinfo set server_update=0 where 1>(select count(id) from order_change where orderno=? and del_state=0) and order_no=?";
         Connection conn = DBHelper.getInstance().getConnection();
-        Connection conn2 = DBHelper.getInstance().getConnection2();
+        // Connection conn2 = DBHelper.getInstance().getConnection2();
         PreparedStatement stmt = null;
         PreparedStatement stmt1 = null;
         PreparedStatement stmt2 = null;
@@ -2548,16 +2548,34 @@ public class OrderwsDao implements IOrderwsDao {
             stmt.setInt(3, changeType);
             result = stmt.executeUpdate();
 
-            stmt2 = conn2.prepareStatement(sql);
+            /*stmt2 = conn2.prepareStatement(sql);
             stmt2.setString(1, orderNo);
             stmt2.setInt(2, goodId);
             stmt2.setInt(3, changeType);
-            result = stmt2.executeUpdate();
+            result = stmt2.executeUpdate();*/
 
-            stmt1 = conn2.prepareStatement(sql1);
+            List<String> listValues = new ArrayList<>();
+            listValues.add(String.valueOf(orderNo));
+            listValues.add(String.valueOf(goodId));
+            listValues.add(String.valueOf(changeType));
+            String runSql = DBHelper.covertToSQL(sql, listValues);
+            String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+            int countRs = 0;
+            if(org.apache.commons.lang3.StringUtils.isBlank(rsStr)){
+                countRs = Integer.valueOf(rsStr);
+            }
+            result = countRs;
+
+            /*stmt1 = conn2.prepareStatement(sql1);
             stmt1.setString(1, orderNo);
             stmt1.setString(2, orderNo);
-            stmt1.execute();
+            stmt1.execute();*/
+
+            listValues.clear();
+            listValues.add(String.valueOf(orderNo));
+            listValues.add(String.valueOf(orderNo));
+            runSql = DBHelper.covertToSQL(sql1, listValues);
+            SendMQ.sendMsg(new RunSqlModel(runSql));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -2577,7 +2595,7 @@ public class OrderwsDao implements IOrderwsDao {
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
-            DBHelper.getInstance().closeConnection(conn2);
+            // DBHelper.getInstance().closeConnection(conn2);
         }
         return result;
     }

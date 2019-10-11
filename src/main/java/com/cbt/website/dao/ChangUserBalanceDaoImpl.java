@@ -86,13 +86,13 @@ public class ChangUserBalanceDaoImpl implements ChangUserBalanceDao {
 				List<String> listValues = new ArrayList<>();
 				listValues.add(String.valueOf(afterBalance));
 				listValues.add(String.valueOf(userId));
+				listValues.add(String.valueOf(userId));
 				String runSql = DBHelper.covertToSQL(updateSql, listValues);
 				String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
 				int countRs = 0;
 				if(StringUtils.isBlank(rsStr)){
 					countRs = Integer.valueOf(rsStr);
 				}
-
 
 				// 判断远程更新是否成功
 				if (countRs > 0) {

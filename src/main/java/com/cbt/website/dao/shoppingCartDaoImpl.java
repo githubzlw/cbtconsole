@@ -480,26 +480,37 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 	public int updateGoodsCarPrice(List<Integer> carid, List<Double> price){
 		String sql = "update goods_car set notfreeprice=? where id=? ;";
 		Connection con = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
+		// Connection conn2 = DBHelper.getInstance().getConnection2();
 		PreparedStatement pst = null,pst2 = null;;
 		int i = 0;
 		try {
 			pst = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-			pst2 = conn2.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+			// pst2 = conn2.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 			for(int j=0;j<carid.size();j++){
 				pst.setDouble(1, price.get(j));
 				pst.setInt(2, carid.get(j));
 				pst.addBatch();
 				
-				pst2.setDouble(1, price.get(j));
+				/*pst2.setDouble(1, price.get(j));
 				pst2.setInt(2, carid.get(j));
-				pst2.addBatch();
+				pst2.addBatch();*/
+
+				List<String> listValues = new ArrayList<>();
+				listValues.add(String.valueOf(price.get(j)));
+				listValues.add(String.valueOf(carid.get(j)));
+				String runSql = DBHelper.covertToSQL(sql, listValues);
+				String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+				int countRs = 0;
+				if(StringUtils.isBlank(rsStr)){
+					countRs = Integer.valueOf(rsStr);
+				}
+				i += countRs;
 			}
 			
 			int[] arr = pst.executeBatch();
 			
-			int[] brr = pst2.executeBatch();
-			i = arr.length+brr.length;
+			//  int[] brr = pst2.executeBatch();
+			i = arr.length;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -517,8 +528,8 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(con);
-			DBHelper.getInstance().closeConnection(conn2);
+			// DBHelper.getInstance().closeConnection(con);
+			// DBHelper.getInstance().closeConnection(conn2);
 		}
 		return i;
 	}
@@ -905,10 +916,10 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 	public int savePreshoppingcarInfo(TblPreshoppingcarInfo preshoppingcar) {
 		String sql = "insert into tbl_preshoppingcar_info(userid,goods_car_id,goods_data_id,old_goods_title,old_goods_img,old_goods_url,old_goods_type,old_goods_price,new_goods_title,new_goods_img,new_goods_url,new_goods_price,goods_source_type,confirm_price) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		PreparedStatement stmt = null;
-		Connection conn = DBHelper.getInstance().getConnection2();
+		// Connection conn = DBHelper.getInstance().getConnection2();
 		int result = 0;
 		try {
-			stmt = conn.prepareStatement(sql,
+			/*stmt = conn.prepareStatement(sql,
 					Statement.RETURN_GENERATED_KEYS);
 			stmt.setInt(1, preshoppingcar.getUserid());
 			stmt.setInt(2, preshoppingcar.getGoodscarid());
@@ -928,7 +939,31 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 			if (result == 1) {
 				stmt.getGeneratedKeys();
 			}
-			stmt.close();
+			stmt.close();*/
+
+			List<String> listValues = new ArrayList<>();
+			listValues.add(String.valueOf(preshoppingcar.getUserid()));
+			listValues.add(String.valueOf(preshoppingcar.getGoodscarid()));
+			listValues.add(String.valueOf(preshoppingcar.getGoodsdataid()));
+			listValues.add(String.valueOf(preshoppingcar.getOldgoodstitle()));
+			listValues.add(String.valueOf(preshoppingcar.getOldgoodsimg()));
+			listValues.add(String.valueOf(preshoppingcar.getOldgoodsurl()));
+			listValues.add(String.valueOf(preshoppingcar.getOldgoodstype()));
+			listValues.add(String.valueOf(preshoppingcar.getOldgoodsprice()));
+			listValues.add(String.valueOf(preshoppingcar.getNewgoodstitle()));
+			listValues.add(String.valueOf(preshoppingcar.getNewgoodsimg()));
+			listValues.add(String.valueOf(preshoppingcar.getNewgoodsurl()));
+			listValues.add(String.valueOf(preshoppingcar.getNewgoodsprice()));
+			listValues.add(String.valueOf(preshoppingcar.getGoodssourcetype()));
+			listValues.add(String.valueOf(preshoppingcar.getConfirmprice()));
+			String runSql = DBHelper.covertToSQL(sql, listValues);
+			String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+			int countRs = 0;
+			if (StringUtils.isBlank(rsStr)) {
+				countRs = Integer.valueOf(rsStr);
+			}
+			result = countRs;
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -939,7 +974,7 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			// DBHelper.getInstance().closeConnection(conn);
 		}
 		return result;
 	}
@@ -1133,22 +1168,30 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 		presql.append(userId+",'"+goodscarid+"',"+new BigDecimal(oldprice)+","+new BigDecimal(newprice)+","+new BigDecimal(reduPrice)+")");
 		
 		
-		Connection conn = DBHelper.getInstance().getConnection2();
-		conn.setAutoCommit(false);
+		// Connection conn = DBHelper.getInstance().getConnection2();
+		// conn.setAutoCommit(false);
 		PreparedStatement pst = null;
 		try {
-			pst = conn.prepareStatement(sql.toString());
-			pst.executeUpdate();
-			pst = conn.prepareStatement(presql.toString());
-			pst.execute();
+			// pst = conn.prepareStatement(sql.toString());
+			//pst.executeUpdate();
+
+			SendMQ.sendMsg(new RunSqlModel(sql.toString()));
+
+//			pst = conn.prepareStatement(presql.toString());
+//			pst.execute();
+
+			SendMQ.sendMsg(new RunSqlModel(presql.toString()));
+
 			String[] goodcarsplit = goodscarid.split(",");
 			String[] countsplit = countList.split(",");
 			for (int i = 0; i < goodcarsplit.length; i++) {
 				String numbersql = "update goods_car set googs_number = " + Integer.parseInt(countsplit[i]) + " where id = " + goodcarsplit[i];
-				pst = conn.prepareStatement(numbersql);
-				pst.executeUpdate();
+				/*pst = conn.prepareStatement(numbersql);
+				pst.executeUpdate();*/
+
+				SendMQ.sendMsg(new RunSqlModel(numbersql));
 			}
-			conn.commit();
+			// conn.commit();
 			res = 1;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1160,7 +1203,7 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			// DBHelper.getInstance().closeConnection(conn);
 		}
 		return res;
 	}

@@ -664,6 +664,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	                      int state, double order_ac, double balance_pay, String gId_last, String adminUserName, String pay_time,
 	                      List<OrderDetailsBean> updateOrderDetaildList, List<OrderDetailsBean> insertOrderDetaildList,
 	                      String splitGoodsId) {
+		// 不用方法
 		// 修改拆分后原订单orderinfo
 		String sql_up = "UPDATE orderinfo SET product_cost=?,pay_price=?,pay_price_tow=?,pay_price_three=?,actual_ffreight=?,service_fee=?,order_ac=?,details_number=?,foreign_freight=?,discount_amount=?,purchase_number=0,state=?,purchase_number=?,extra_freight=?,remaining_price=?,packag_style=0,share_discount=?,extra_discount=?,coupon_discount=?  WHERE order_no = ?";
 		// 更新本地orderinfo主单的替换标志
