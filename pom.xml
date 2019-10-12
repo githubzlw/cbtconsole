@@ -601,9 +601,9 @@
             <properties>
                 <package.environment>dev</package.environment>
             </properties>
-<!--            <activation>-->
-<!--                <activeByDefault>true</activeByDefault>-->
-<!--            </activation>-->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
         <profile>
             <!-- 生产环境 -->
@@ -611,9 +611,9 @@
             <properties>
                 <package.environment>prod</package.environment>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+<!--            <activation>-->
+<!--                <activeByDefault>true</activeByDefault>-->
+<!--            </activation>-->
         </profile>
     </profiles>
     <build>
