@@ -850,4 +850,20 @@ public interface CustomGoodsService {
      * @return
      */
     List<String> queryAllShopBlackList();
+
+    /**
+     * 插入描述很精彩日志
+     *
+     * @param pid
+     * @param adminId
+     * @return
+     */
+    int insertIntoDescribeLog(String pid, int adminId);
+
+    /**
+     * 查询描述很精彩日志数据
+     * @param pid
+     * @return
+     */
+    Map<String, String> queryDescribeLogInfo(String pid);
 }

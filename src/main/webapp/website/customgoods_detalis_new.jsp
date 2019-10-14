@@ -2132,7 +2132,12 @@
                     <b style="font-size: 16px;">数据状态:${goods.abnormalValue}</b>
                 </c:if> <c:if test="${goods.describeGoodFlag > 0}">
                     <br>
-                    <b style="font-size: 16px;color: red;">描述很精彩标记</b>
+                    <c:if test="${empty describeGoodFlagStr}">
+                        <b style="font-size: 16px;color: red;">描述很精彩标记</b>
+                    </c:if>
+                    <c:if test="${not empty describeGoodFlagStr}">
+                        <b style="font-size: 16px;color: red;">描述很精彩:(${describeGoodFlagStr})</b>
+                    </c:if>
                 </c:if><c:if test="${goods.isBenchmark >0}">
                     <br>
                     <b style="font-size: 16px;">货源对标情况:${goods.isBenchmark ==1 ? '精确对标':'近似对标'}</b>

@@ -844,5 +844,14 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryAllShopBlackList();
     }
 
+    @Override
+    public int insertIntoDescribeLog(String pid, int adminId) {
+        return customGoodsMapper.insertIntoDescribeLog(pid, adminId);
+    }
+
+    @Override
+    public Map<String, String> queryDescribeLogInfo(String pid) {
+        return customGoodsMapper.queryDescribeLogInfo(pid);
+    }
 
 }
