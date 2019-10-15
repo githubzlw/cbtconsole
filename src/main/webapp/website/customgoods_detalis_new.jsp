@@ -52,6 +52,7 @@
             $('#update_review_dlg').dialog('close');
             closeNewAliPidDlg('close');
             closeMultiFileDialog();
+            closeGoodsDescDialog();
         });
 
         function relieveDisabled(obj) {
@@ -1430,9 +1431,15 @@
             $(this).siblings().removeClass("img_choose");
         });
 
+
         function closeMultiFileDialog() {
             $('#multi_file_dlg').dialog('close');
             $("#multiFileForm")[0].reset();
+        }
+
+        function closeGoodsDescDialog() {
+            $('#set_goods_desc_type').dialog('close');
+            $("#set_desc_form")[0].reset();
         }
 
         function uploadMultiFile() {
@@ -1466,6 +1473,62 @@
                 }
             });
         }
+
+        function setGoodsDescType() {
+            $("#set_desc_form")[0].reset();
+            getHotTypeList();
+            $('#set_goods_desc_type').dialog('open');
+        }
+
+        function getHotTypeList() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: '/cbtconsole/hotManage/getHotTypeList',
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        var content = "";
+                        var jsonData = data.data;
+                        for (var hotType in jsonData) {
+                            content += '<option value="' + hotType.id + '">"' + hotType.showName + '"</option>';
+                        }
+                        $("#hot_type_id").val(content);
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (XMLResponse) {
+                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                }
+            });
+        }
+
+        function saveGoodsDescInfo(pid) {
+            var hotTypeId = $("#hot_type_id").val();
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: '/cbtconsole/editc/saveGoodsDescInfo',
+                data: {
+                    pid: pid,
+                    hotTypeId: hotTypeId
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        showMessage("执行成功");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (XMLResponse) {
+                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                }
+            });
+        }
     </script>
 </head>
 
@@ -1487,6 +1550,26 @@
 <c:if test="${uid > 0}">
 
     <div class="mask"></div>
+
+    <div id="set_goods_desc_type" class="easyui-dialog" title="设置描述很精彩"
+         data-options="modal:true"
+         style="width: 300px; height: 180px; padding: 10px;">
+        <form style="margin-left: 44px;" id="set_desc_form" method="post" enctype="multipart/form-data">
+            <span>分组:</span><select id="hot_type_id">
+
+        </select>
+        </form>
+
+        <br><br>
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="saveGoodsDescInfo('${goods.pid}')" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeGoodsDescDialog()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
 
 
     <div id="multi_file_dlg" class="easyui-dialog" title="详情多文件上传"
@@ -1767,7 +1850,8 @@
                 <span class="s_btn" >下架该商品</span>
                 <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>--%>
             <c:if test="${goods.describeGoodFlag == 0}">
-                <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>
+                <%--<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>--%>
+                <span class="s_btn" onclick="setGoodsDescWithHotType('${goods.pid}')">设置描述很精彩</span>
             </c:if>
                 <%--<span class="s_last">*点击后数据直接更新线上</span>--%>
             <span class="s_btn" onclick="setNoBenchmarking('${goods.pid}',${goods.finalWeight})">标识非对标商品</span>
