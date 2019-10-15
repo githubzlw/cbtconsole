@@ -567,6 +567,11 @@ public class NewOrderSplitCtr {
             // 判断是否是Drop Ship订单，根据订单号获取订单信息
             IOrderSplitDao splitDao = new OrderSplitDaoImpl();
             OrderBean orderBean = splitDao.getOrders(orderNo);
+            if(orderBean == null || StringUtils.isBlank(orderBean.getOrderNo())){
+                json.setOk(false);
+                json.setMessage("获取订单信息失败!");
+                return json;
+            }
             if (orderBean.getIsDropshipOrder() == 1) {
                 // Drop Ship 拆单，不可数量拆单
                 json.setOk(false);

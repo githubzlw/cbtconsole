@@ -17,6 +17,7 @@ import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.pojo.GoodsParseBean;
+import com.importExpress.pojo.InputData;
 import com.importExpress.thread.DeleteImgByMd5Thread;
 import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
@@ -456,6 +457,16 @@ public class EditorController {
             }
             mv.addObject("savePath", savePath);
             mv.addObject("localpath", localpath);
+
+            // 描述很精彩标识
+            if(goods.getDescribeGoodFlag() > 0){
+                Map<String,String> rsMap =  customGoodsService.queryDescribeLogInfo(pid);
+                if(rsMap == null || StringUtils.isBlank(rsMap.get("admName"))){
+                    mv.addObject("describeGoodFlagStr", "");
+                }else{
+                    mv.addObject("describeGoodFlagStr", "标识人:" + rsMap.get("admName") + ",时间:" + rsMap.get("create_time"));
+                }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -2674,6 +2685,17 @@ public class EditorController {
             customGoodsService.insertIntoGoodsEditBean(editBean);
             if (promotion_flag > 0) {
                 customGoodsService.updatePromotionFlag(pid);
+            }
+            if(describe_good_flag > 0){
+                // 更新MongoDB,记录日志
+                //u表示更新；c表示创建，d表示删除
+                InputData inputData = new InputData('u');
+                inputData.setPid(pid);
+                inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+                inputData.setDescribe_good_flag(String.valueOf(describe_good_flag));
+                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData,1);
+                // 记录日志
+                customGoodsService.insertIntoDescribeLog(pid,user.getId());
             }
             json.setOk(true);
             json.setMessage("执行成功");
