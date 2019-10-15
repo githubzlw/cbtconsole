@@ -16,6 +16,7 @@ public class ImportExSkuVal {
 	private float skuCalPrice;
 	private float skuMultiCurrencyCalPrice;
 	private float skuMultiCurrencyDisplayPrice;
+	private String freeSkuPrice;
 
 	public float getActSkuCalPrice() {
 		return actSkuCalPrice;
@@ -89,6 +90,14 @@ public class ImportExSkuVal {
 		this.skuMultiCurrencyDisplayPrice = skuMultiCurrencyDisplayPrice;
 	}
 
+	public String getFreeSkuPrice() {
+		return freeSkuPrice;
+	}
+
+	public void setFreeSkuPrice(String freeSkuPrice) {
+		this.freeSkuPrice = freeSkuPrice;
+	}
+
 	@Override
 	public String toString() {
 		return "{\"actSkuCalPrice\":\"" + actSkuCalPrice + "\", \"actSkuMultiCurrencyCalPrice\":\""
@@ -96,7 +105,8 @@ public class ImportExSkuVal {
 				+ actSkuMultiCurrencyDisplayPrice + "\", \"availQuantity\":\"" + availQuantity + "\", \"inventory\":\""
 				+ inventory + "\", \"isActivity\":\"" + isActivity + "\", \"skuCalPrice\":\"" + skuCalPrice
 				+ "\", \"skuMultiCurrencyCalPrice\":\"" + skuMultiCurrencyCalPrice
-				+ "\", \"skuMultiCurrencyDisplayPrice\":\"" + skuMultiCurrencyDisplayPrice + "\"}";
+				+ "\", \"skuMultiCurrencyDisplayPrice\":\"" + skuMultiCurrencyDisplayPrice
+				+ "\", \"freeSkuPrice\":\"" + freeSkuPrice + "\"}";
 	}
 
 }
