@@ -2177,11 +2177,11 @@
                 </c:if><c:if test="${goods.valid == 0}">
                     <c:if test="${not empty goods.offReason}">
                         <br>
-                        <b style="font-size: 16px;color: red;">下架原因:${goods.offReason}(人为下架)</b>
+                        <b style="font-size: 16px;color: red;">硬下架原因:${goods.offReason}(人为下架)</b>
                     </c:if>
                     <c:if test="${empty goods.offReason && not empty goods.unsellAbleReasonDesc}">
                         <br>
-                        <b style="font-size: 16px;color: red;">下架原因:${goods.unsellAbleReasonDesc}(系统下架)</b>
+                        <b style="font-size: 16px;color: red;">硬下架原因:${goods.unsellAbleReasonDesc}(系统下架)</b>
                     </c:if>
                     </c:if>
                     <c:if test="${goods.valid == 2}">
