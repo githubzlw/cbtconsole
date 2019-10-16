@@ -1100,6 +1100,33 @@ public class HotManageController {
     }
 
 
+    @RequestMapping("/getHotTypeList")
+    @ResponseBody
+    public EasyUiJsonResult getHotTypeList(HttpServletRequest request, HttpServletResponse response) {
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+
+        HotCategory param = new HotCategory();
+        try {
+
+            param.setHotType(24);
+            param.setIsOn(-1);
+
+            List<HotCategory> res = hotManageService.queryForList(param);
+            int count = hotManageService.queryForListCount(param);
+
+            json.setSuccess(true);
+            json.setRows(res);
+            json.setTotal(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("查询失败，原因 :" + e.getMessage());
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
 
 	/**
 	 * 热卖json信息写入
