@@ -35,6 +35,16 @@ public class HotCategory implements Serializable {
      */
     private int webSite;
 
+    private String viewMoreUrl;
+
+    public String getViewMoreUrl() {
+        return viewMoreUrl;
+    }
+
+    public void setViewMoreUrl(String viewMoreUrl) {
+        this.viewMoreUrl = viewMoreUrl;
+    }
+
     public int getWebSite() {
         return webSite;
     }
@@ -179,6 +189,7 @@ public class HotCategory implements Serializable {
                 ", categoryName='" + categoryName + '\'' +
                 ", showName='" + showName + '\'' +
                 ", showImg='" + showImg + '\'' +
+                ", viewMoreUrl='" + viewMoreUrl + '\'' +
                 ", isOn=" + isOn +
                 ", sorting=" + sorting +
                 ", hotType=" + hotType +
