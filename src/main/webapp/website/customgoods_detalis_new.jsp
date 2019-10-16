@@ -1474,26 +1474,28 @@
             });
         }
 
-        function setGoodsDescType() {
-            $("#set_desc_form")[0].reset();
+        function setGoodsDescWithHotType() {
             getHotTypeList();
-            $('#set_goods_desc_type').dialog('open');
+
         }
 
         function getHotTypeList() {
             $.ajax({
                 type: 'POST',
+                sync: true,
                 dataType: 'json',
                 url: '/cbtconsole/hotManage/getHotTypeList',
                 data: {},
                 success: function (data) {
-                    if (data.ok) {
+                    if (data.success) {
                         var content = "";
-                        var jsonData = data.data;
-                        for (var hotType in jsonData) {
-                            content += '<option value="' + hotType.id + '">"' + hotType.showName + '"</option>';
+                        var jsonData = data.rows;
+                        for (var i=0;i< jsonData.length;i++) {
+                            content += '<option value="' + jsonData[i].id + '">' + jsonData[i].showName + '</option>';
                         }
-                        $("#hot_type_id").val(content);
+                        $("#hot_type_id").empty();
+                        $("#hot_type_id").append(content);
+                        $('#set_goods_desc_type').dialog('open');
                     } else {
                         $.messager.alert("提醒", data.message, "error");
                     }
@@ -1553,14 +1555,13 @@
 
     <div id="set_goods_desc_type" class="easyui-dialog" title="设置描述很精彩"
          data-options="modal:true"
-         style="width: 300px; height: 180px; padding: 10px;">
+         style="width: 330px; height: 180px; padding: 10px;">
         <form style="margin-left: 44px;" id="set_desc_form" method="post" enctype="multipart/form-data">
-            <span>分组:</span><select id="hot_type_id">
+            <span>分组:</span><select id="hot_type_id" style="height: 26px;width: 220px;">
 
         </select>
         </form>
-
-        <br><br>
+        <br>
         <div style="text-align: center; padding: 5px 0">
             <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
                class="easyui-linkbutton"

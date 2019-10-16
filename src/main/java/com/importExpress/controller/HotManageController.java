@@ -1110,7 +1110,7 @@ public class HotManageController {
         try {
 
             param.setHotType(24);
-            param.setIsOn(1);
+            param.setIsOn(-1);
 
             List<HotCategory> res = hotManageService.queryForList(param);
             int count = hotManageService.queryForListCount(param);
