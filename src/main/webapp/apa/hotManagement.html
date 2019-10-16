@@ -208,6 +208,10 @@
                 content = '医疗设备';
             }else if (val == 24) {
                 content = '限制首页分组';
+            }else if (val == 25) {
+                content = 'kids海外仓专区';
+            }else if (val == 26) {
+                content = 'pets海外仓专区';
             }
             return content;
         }
@@ -413,7 +417,9 @@
 		$(".refresh_color").css("background","#aaa");
 		$(".refresh_color").attr("disabled",true);
 		var url = "https://www.import-express.com/popProducts/refreshHotJson?webType="+webType;
-		if(webType == 2){
+		if(webType == 1){
+		    url = "https://www.import-express.com/popProducts/refreshHotJson?webType="+webType;
+        } else if(webType == 2){
 		    url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?webType="+webType;
         } else if(webType == 3){
 		    url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?webType="+webType;
@@ -447,7 +453,9 @@
     		$(".refresh_color").css("background","#aaa");
     		$(".refresh_color").attr("disabled",true);
             var url = "https://www.import-express.com/popProducts/refreshHotJson?html=1&webType="+webType;
-            if(webType == 2){
+            if(webType == 1){
+                url = "https://www.import-express.com/popProducts/refreshHotJson?html=1&webType="+webType;
+            }else if(webType == 2){
                 url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?html=1&webType="+webType;
             }else if(webType == 3){
                 url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?html=1&webType="+webType;
@@ -506,6 +514,8 @@
                     <option value="22">家纺落地页</option>
                     <option value="23">医疗设备</option>
                     <option value="24">限制首页分组</option>
+                    <option value="25">kids海外仓专区</option>
+                    <option value="26">pets海外仓专区</option>
 			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>是否启用: <select
             id="query_is_on"
             style="font-size: 16px; height: 24px; width: 120px;">
@@ -616,6 +626,8 @@
                     <option value="22">家纺落地页</option>
                     <option value="23">医疗设备</option>
                     <option value="24">限制首页分组</option>
+                    <option value="25">kids海外仓专区</option>
+                    <option value="26">pets海外仓专区</option>
                 </select></td>
             </tr>
             <tr>
