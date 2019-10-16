@@ -314,7 +314,7 @@ public class OrderinfoService implements IOrderinfoService {
 				orderinfoMapper.updateIdRationtable(map);
 			}
 			if("1".equals(map.get("status"))){
-				//点击到库时根据spec_id关联抓取订单的id
+				/*//点击到库时根据spec_id关联抓取订单的id
 				String typeName=orderinfoMapper.getTypeNameByOdid(map);
 				//查询入库对应的淘宝订单
 				List<TaoBaoOrderInfo> tList=orderinfoMapper.getTaobaoInfoByOrderid(map);
@@ -327,7 +327,9 @@ public class OrderinfoService implements IOrderinfoService {
 				}else if(StringUtil.isNotBlank(typeName)){
 					tbId=UtilAll.getTbId(tList,typeName,"");
 				}
-				map.put("tbId",String.valueOf(tbId));
+				map.put("tbId",String.valueOf(tbId));*/
+
+				map.put("tbId",map.get("taobaoId"));
 				//更新订单详情表状态为已经到仓库
 				orderinfoMapper.updateState(map);
 				if("0".equals(map.get("repState"))){
@@ -592,6 +594,10 @@ public class OrderinfoService implements IOrderinfoService {
 					searchresultinfo.setSpecId(map.get("specid")!=null?map.get("specid") : "");
 					searchresultinfo.setSkuID(map.get("skuid")!=null?map.get("skuid") : "");
 				}
+				if(org.apache.commons.lang3.StringUtils.isNotBlank(map.get("taobao_id"))){
+					searchresultinfo.setTaobaoId(Integer.parseInt(map.get("taobao_id")));
+				}
+
 				info.add(searchresultinfo);
 			}
 			//一个1688包裹对应的采购订单数量
