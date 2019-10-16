@@ -495,4 +495,20 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<String> queryAllShopBlackList();
+
+    /**
+     * 插入描述很精彩日志
+     *
+     * @param pid
+     * @param adminId
+     * @return
+     */
+    int insertIntoDescribeLog(@Param("pid") String pid, @Param("adminId") int adminId);
+
+    /**
+     * 查询描述很精彩日志数据
+     * @param pid
+     * @return
+     */
+    Map<String, String> queryDescribeLogInfo(@Param("pid") String pid);
 }
