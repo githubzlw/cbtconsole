@@ -16,6 +16,7 @@
         <result column="update_admin_id" property="updateAdminId"/>
         <result column="update_time" property="updateTime"/>
         <result column="web_site" property="webSite"/>
+        <result column="view_more_url" property="viewMoreUrl"/>
     </resultMap>
 
 
@@ -114,7 +115,7 @@
     </select>
 
     <select id="getCategoryById" resultMap="hotCategoryResultMap">
-        select a.id,a.category_name,a.show_name,a.show_img,a.is_on,a.sorting,a.hot_type,
+        select a.id,a.category_name,a.show_name,a.show_img,a.is_on,a.sorting,a.hot_type,a.view_more_url,
         a.admin_id,b.admName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.update_admin_id,
         DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.web_site
         from hot_category a left join admuser b on a.admin_id =b.id
@@ -140,7 +141,7 @@
 
     <update id="updateHotCategory" parameterType="com.cbt.warehouse.pojo.HotCategory">
         update hot_category set category_name = #{categoryName},show_name = #{showName},show_img = #{showImg},
-        is_on = #{isOn},sorting = #{sorting},hot_type = #{hotType},update_admin_id = #{adminId}
+        view_more_url = #{viewMoreUrl} ,is_on = #{isOn},sorting = #{sorting},hot_type = #{hotType},update_admin_id = #{adminId}
         where id = #{id}
     </update>
 
