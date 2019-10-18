@@ -817,6 +817,11 @@
                            style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;" id="spilt_num"
                            onclick="openSplitNumPage('${order.orderNo}')" value="数量拆单">
                 </td>
+                <td>
+                    <input type="button"
+                           style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;"
+                           onclick="openOverSeaSplit('${order.orderNo}')" value="海外仓拆单">
+                </td>
                 <td>分配采购（整单）： <select id="Abuyer" onchange="changeAllBuyer('${order.orderNo}',this.value)">
                     <option value=""></option>
                     <c:forEach var="aub" items="${aublist }">
@@ -1193,6 +1198,11 @@
                                     非免邮商品
                                 </c:if>
 									)</span>
+                            <c:if test="${orderd.overSeaFlag > 0}">
+                                <br>
+                                <span style="color: red;background-color: #35de2a;">海外仓商品</span>
+                                <br>
+                            </c:if>
                             <span style="color: red">成交价格：</span>$
                                 ${orderd.goodsprice} <em id="change_price_${sd.index}"
                                                          style="color: red;"> <c:if

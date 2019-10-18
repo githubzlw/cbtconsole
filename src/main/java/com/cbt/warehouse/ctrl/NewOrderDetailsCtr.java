@@ -24,6 +24,7 @@ import com.cbt.processes.dao.IUserDao;
 import com.cbt.processes.service.SendEmail;
 import com.cbt.processes.service.UserServer;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
+import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
 import com.cbt.warehouse.service.GoodsCommentsService;
 import com.cbt.warehouse.service.InventoryService;
@@ -36,6 +37,7 @@ import com.cbt.website.service.*;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.GoodsOverSea;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.OrderSplitChild;
 import com.importExpress.pojo.PurchaseInfoBean;
@@ -47,6 +49,7 @@ import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -93,6 +96,8 @@ public class NewOrderDetailsCtr {
 	private OrderSplitRecordService orderSplitRecordService;
 	@Autowired
 	private InventoryService inventoryService;
+	@Autowired
+    private CustomGoodsService customGoodsService;
 	/**
 	/**
 	 * 根据订单号获取订单详情
@@ -253,6 +258,14 @@ public class NewOrderDetailsCtr {
 				es_prices+=o.getEs_price();
 				if(o.getIs_sold_flag() != 0){
 					feeWeight+=o.getOd_total_weight();
+				}
+				// 海外仓标识
+				List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(o.getGoods_pid());
+				if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
+					Long count = goodsOverSeaList.stream().filter(e-> e.getIsSupport() > 0).count();
+					if(count > 0){
+						o.setOverSeaFlag(1);
+					}
 				}
 			}
 			distributionList.clear();
@@ -2527,4 +2540,50 @@ public class NewOrderDetailsCtr {
 		return "orderSplitNum";
 	}
 
+	@RequestMapping(value = "/OverSeaSplitPage")
+	public String OverSeaSplitPage(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+			String orderNo = request.getParameter("orderNo");
+			if (StringUtils.isBlank(orderNo)) {
+				request.setAttribute("isShow", 0);
+				request.setAttribute("message", "获取订单号失败");
+			} else {
+				request.setAttribute("orderNo", orderNo);
+			}
+			// 订单信息
+			DataSourceSelector.restore();
+			OrderBean orderInfo = iOrderinfoService.getOrders(orderNo);
+			// 订单商品详情
+			List<OrderDetailsBean> odbList = iOrderinfoService.getOrdersDetails(orderNo);
+
+			List<OrderDetailsBean> nwOdbList = new ArrayList<>();
+			List<GoodsOverSea> goodsOverSeaList;
+			if(CollectionUtils.isNotEmpty(odbList)){
+				for(OrderDetailsBean orderDetailsBean: odbList){
+					goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(orderDetailsBean.getGoods_pid());
+					if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
+						Long count = goodsOverSeaList.stream().filter(e-> e.getIsSupport() > 0).count();
+						if(count > 0){
+							orderDetailsBean.setOverSeaFlag(1);
+							nwOdbList.add(orderDetailsBean);
+						}
+					}
+				}
+			}
+
+			odbList.clear();
+
+			request.setAttribute("odList", nwOdbList);
+			request.setAttribute("orderInfo", orderInfo);
+			request.setAttribute("isShow", 1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("isShow", 0);
+			request.setAttribute("message", e.getMessage());
+			LOG.error("OverSeaSplitPage error:", e);
+		}
+
+		return "orderOverSeaSplit";
+	}
 }

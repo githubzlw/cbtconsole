@@ -154,7 +154,7 @@ public class OrderInfoUtil {
      * @param isSplitNum ： 是否数量拆单标识  0不是 1是
      * @return
      */
-    public static String getNewOrderNo(String orderNo, OrderBean orderBean, int isSplitNum) {
+    public static String getNewOrderNo(String orderNo, OrderBean orderBean, int isSplitNum, int isOverSea) {
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         String nwOrderNo = null;
         // 拆单新生成的订单号
@@ -173,6 +173,8 @@ public class OrderInfoUtil {
                 orderNo1 = n[0];
                 if (isSplitNum > 0) {
                     nwOrderNo = orderNo1 + "_" + (splitIndex + 1) + "_SN";
+                } else if (isOverSea > 0) {
+                    nwOrderNo = orderNo1 + "_" + (splitIndex + 1) + "_H";
                 } else {
                     nwOrderNo = orderNo1 + "_" + (splitIndex + 1);
                 }
@@ -180,6 +182,8 @@ public class OrderInfoUtil {
         } else {
             if (isSplitNum > 0) {
                 nwOrderNo = orderNo + "_1_SN";
+            } else if (isOverSea > 0) {
+                nwOrderNo = orderNo + "_1_H";
             } else {
                 nwOrderNo = orderNo + "_1";
             }
