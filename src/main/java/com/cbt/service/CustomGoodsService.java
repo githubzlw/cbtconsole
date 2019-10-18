@@ -866,4 +866,10 @@ public interface CustomGoodsService {
      * @return
      */
     Map<String, String> queryDescribeLogInfo(String pid);
+
+    /**
+     * 获取全部描述很精彩pid
+     * @return
+     */
+    List<String> queryDescribeLogList();
 }

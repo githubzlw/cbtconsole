@@ -511,4 +511,10 @@ public interface CustomGoodsMapper {
      * @return
      */
     Map<String, String> queryDescribeLogInfo(@Param("pid") String pid);
+
+    /**
+     * 获取全部描述很精彩pid
+     * @return
+     */
+    List<String> queryDescribeLogList();
 }

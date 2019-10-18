@@ -10,6 +10,7 @@ import com.cbt.refund.bean.AdminUserBean;
 import com.cbt.service.AdditionalBalanceService;
 import com.cbt.service.IComplainService;
 import com.cbt.service.RefundSSService;
+import com.cbt.util.DateFormatUtil;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.util.StringUtil;
@@ -18,6 +19,7 @@ import com.importExpress.pojo.CustomerDisputeBean;
 import com.importExpress.pojo.CustomerDisputeVO;
 import com.importExpress.service.CustomComplainService;
 import com.importExpress.service.CustomerDisputeService;
+import com.importExpress.utli.MultiSiteUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Controller
@@ -148,14 +151,47 @@ public class ComplainController {
 		ComplainVO complain = new ComplainVO();
 		complain = complainService.getComplainByCid(cid);
 		List<ComplainFile> imgs = complainService.getImgsByCid(cid);
-		double moneyAmountByCid = additionalBalanceService.getMoneyAmountByCid(cid+"");
+		double moneyAmountByCid = additionalBalanceService.getMoneyAmountByCid(cid.toString());
 		
-		if(complain!=null){
+		if(complain!=null) {
+			try {
+				for (ComplainFile complainFile : imgs) {
+					if (StringUtils.isNotBlank(complainFile.getImgUrl())
+							&& !(complainFile.getImgUrl().contains("http") || complainFile.getImgUrl().contains("https"))) {
+						String preHttp = "";
+						if (StringUtils.isNotBlank(complain.getRefOrderId())) {
+							preHttp = MultiSiteUtil.getImgSiteUrl(MultiSiteUtil.getSiteTypeNum(complain.getRefOrderId()));
+						} else {
+							preHttp = MultiSiteUtil.getImgSiteUrl(1);
+						}
+						String[] imgArr = complainFile.getImgUrl().split(",");
+						StringBuffer sb = new StringBuffer();
+						for (int i = 0; i < imgArr.length; i++) {
+							if (imgArr[i].contains("/servicerequest")) {
+								if (i < imgArr.length - 1) {
+									sb.append(preHttp + imgArr[i] + ",");
+								} else {
+									sb.append(preHttp + imgArr[i]);
+								}
+							} else {
+								if (i < imgArr.length - 1) {
+									sb.append(imgArr[i] + ",");
+								} else {
+									sb.append(imgArr[i]);
+								}
+							}
+						}
+						complainFile.setImgUrl(sb.toString());
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 //            mv.addObject("websiteType",MultiSiteUtil.getSiteTypeNum(complain.getRefOrderId()));
-			mv.addObject("status","1");
-			mv.addObject("complain",complain);
-			mv.addObject("imgsList",imgs);
-			mv.addObject("money",moneyAmountByCid);
+			mv.addObject("status", "1");
+			mv.addObject("complain", complain);
+			mv.addObject("imgsList", imgs);
+			mv.addObject("money", moneyAmountByCid);
 		}else{
 			mv.addObject("status","-1");
 			mv.addObject("message","未查询到数据");
@@ -171,8 +207,39 @@ public class ComplainController {
 		if(complainId!=0){
 			List<ComplainVO> list = new ArrayList<ComplainVO>();
 			list = complainService.getCommunicatingByCidBG(complainId);
-			if(list!=null && list.size()!=0){
+			if(list!=null && list.size()!=0) {
 				map.put("status", true);
+				for (ComplainVO complainVO : list) {
+					if (StringUtils.isNotBlank(complainVO.getImgUrl())
+							&& !(complainVO.getImgUrl().contains("http") || complainVO.getImgUrl().contains("https"))) {
+						String preHttpNew = "";
+						if (StringUtils.isNotBlank(complainVO.getRefOrderId())) {
+							preHttpNew = MultiSiteUtil.getImgSiteUrl(MultiSiteUtil.getSiteTypeNum(complainVO.getRefOrderId()));
+						} else {
+							preHttpNew = MultiSiteUtil.getImgSiteUrl(1);
+						}
+						String preHttpOld = "https://img.import-express.com/importcsvimg/stock_picture/2018-20/";
+						String[] imgArr = complainVO.getImgUrl().split(",");
+						StringBuffer sb = new StringBuffer();
+						for (int i = 0; i < imgArr.length; i++) {
+							if (imgArr[i].contains("/servicerequest")) {
+								if (i < imgArr.length - 1) {
+									sb.append(preHttpNew + imgArr[i] + ",");
+								} else {
+									sb.append(preHttpNew + imgArr[i]);
+								}
+							} else {
+								if (i < imgArr.length - 1) {
+									sb.append(preHttpOld + imgArr[i] + ",");
+								} else {
+									sb.append(preHttpOld + imgArr[i]);
+								}
+							}
+						}
+						complainVO.setImgUrl(sb.toString());
+					}
+				}
+
 				map.put("complainList", list);
 			}else{
 				map.put("status", false);

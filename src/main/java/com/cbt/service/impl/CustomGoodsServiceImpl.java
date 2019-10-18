@@ -854,4 +854,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryDescribeLogInfo(pid);
     }
 
+    @Override
+    public List<String> queryDescribeLogList() {
+        return customGoodsMapper.queryDescribeLogList();
+    }
+
+
 }

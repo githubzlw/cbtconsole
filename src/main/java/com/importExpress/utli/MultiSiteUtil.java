@@ -151,6 +151,19 @@ public class MultiSiteUtil {
         }
     }
 
+    public static String getImgSiteUrl(Integer site) {
+        switch (site) {
+            case 1:
+                return "https://img.import-express.com";
+            case 2:
+                return "https://img.kidsproductwholesale.com";
+            case 3:
+                return "https://img.lovelypetsupply.com";
+            default:
+                return "";
+        }
+    }
+
     public static Map<String, String> webSiteMap = new HashMap<String, String>(){{
         put("ImportExpress", "https://www.import-express.com");
         put("KidsProductWholesale", "https://www.kidsproductwholesale.com");

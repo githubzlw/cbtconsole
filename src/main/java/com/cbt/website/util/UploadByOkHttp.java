@@ -16,6 +16,12 @@ public class UploadByOkHttp {
     private static final String TOKEN = "cerong2018jack";
     private static final String DELETE_URL_NEW = "http://108.61.142.103:3008/image/delete";
 
+    public static final String SERVICE_LOCAL_IMPORT_PATH = "/usr/local/goodsimg";
+    /**
+     * 客户投诉上传图片位置
+     */
+    public static final String SERVICE_LOCAL_SERVICE_REQUEST = "/usr/local/goodsimg/importcsvimg/servicerequest/";
+
     public static OkHttpClient initClient(){
 		OkHttpClient client = new OkHttpClient.Builder().connectTimeout(300, TimeUnit.SECONDS)
                     .readTimeout(150, TimeUnit.SECONDS).writeTimeout(150, TimeUnit.SECONDS).build();
