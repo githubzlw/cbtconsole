@@ -19,7 +19,12 @@
     <result column="ac_there" property="acThere" jdbcType="INTEGER" />
     <result column="currency" property="currency" jdbcType="VARCHAR" />
     <result column="adminname" property="adminname" jdbcType="VARCHAR" />
-    <result column="businessName" property="businessname" jdbcType="VARCHAR" />
+    <result column="businessinfo" property="businessinfo" jdbcType="VARCHAR" />
+      <result column="productone" property="productone" jdbcType="VARCHAR" />
+      <result column="businessName" property="businessname" jdbcType="VARCHAR" />
+      <result column="businessName" property="businessname" jdbcType="VARCHAR" />
+      <result column="businessName" property="businessname" jdbcType="VARCHAR" />
+      <result column="businessName" property="businessname" jdbcType="VARCHAR" />
   </resultMap>
   
   <resultMap id="UserExResultMap" type="com.cbt.pojo.UserEx" >
@@ -118,6 +123,17 @@
         update user set follow_code = #{followCode} where id = #{userId}
     </update>
 
+    <select id="queryAllInfoById" resultType="com.cbt.website.bean.UserInfo">
+        select a.id,a.email,DATE_FORMAT(a.createtime,'%Y-%m-%d %H:%i:%S') as creattime,b.businessinfo,
+        b.productone,b.producttwo,b.requirementone,b.requirementtwo
+        from user a left join user_regist_info b on a.id  = b.userid where a.id = #{userId} limit 1
+    </select>
 
+    <select id="queryRecommendEmailInfo" resultType="com.importExpress.pojo.UserRecommendEmail">
+        select a.id,a.user_id as userId,a.email_content as emailContent,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,
+        a.admin_id as adminId,b.admName as adminName
+        from user_recommend_email a,admuser b where a.admin_id = b.id and a.user_id = #{userId}
+    </select>
 
 </mapper>

@@ -1,6 +1,8 @@
 package com.cbt.userinfo.service;
 
 import com.cbt.pojo.UserEx;
+import com.cbt.website.bean.UserInfo;
+import com.importExpress.pojo.UserRecommendEmail;
 
 import java.util.List;
 import java.util.Map;
@@ -69,4 +71,18 @@ public interface IUserInfoService {
     int checkFollowMeCode(String followCode);
 
     int updateUserFollowCode(String followCode,int userId);
+
+    /**
+	 * 查询用户所有信息
+	 * @param userId
+	 * @return
+	 */
+	UserInfo queryAllInfoById(int userId);
+
+	/**
+	 * 根据客户ID查询所有的推荐邮箱
+	 * @param userId
+	 * @return
+	 */
+	List<UserRecommendEmail> queryRecommendEmailInfo(int userId);
 }

@@ -278,6 +278,61 @@ tr .td_class{width:230px;}
         $('#user_type').window('open');
     }
 
+    function openRecommendEmail(userId) {
+
+		$.ajax({
+			type:'post',
+			url:'../userinfo/getUserAllInfoById',
+			data:{
+				userId:userId
+			},
+			success:function(data){
+				if(data != null){
+					if(data.ok){
+						var json = data.data;
+						$("#send_user_email").val(json.email);
+						$("#user_create_time").val(json.creattime);
+						$("#user_buniess_info").val(json.businessinfo);
+						if(json.productone && json.productone.length > 2){
+							$("#user_goods_need").val(json.productone);
+							$("#user_goods_require").val(json.requirementone);
+						}else if(json.productone && json.producttwo.length > 2){
+							$("#user_goods_need").val(json.producttwo);
+							$("#user_goods_require").val(json.requirementtwo);
+						}
+						$("#sell_email").val(json.admuser);
+						$("#send_recommend_id").window('open');
+					}else{
+						alert("获取信息失败");
+					}
+				}else{
+					alert("网络错误");
+				}
+			}
+		});
+	}
+
+	function sendRecommendEmail(userId) {
+		$.ajax({
+			type:'post',
+			url:'../userinfo/sendRecommendEmail',
+			data:{
+				userId:userId
+			},
+			success:function(data){
+				if(data != null){
+					userid = data;
+					window.open(
+							"http://www.import-express.com/simulateLogin/login?userName="
+							+ userid + "&password=" + name.replace(/\s+/g,'') + "&currency="
+							+ currency, "_blank");
+				}else{
+					alert("加密用户名报错勒！！");
+				}
+			}
+		});
+	}
+
 	function userlogin(userid, name, currency) {
         $('#user_login_message input[name=userid]').val(userid);
         $('#user_login_message').window('open');
@@ -646,6 +701,41 @@ tr .td_class{width:230px;}
         </div>
         <div style="margin-left: 260px;">
         </div>
+    </div>
+	<div id="send_recommend_id" class="easyui-window" title="推荐目录推送"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:400px;height:200px;display: none;font-size: 16px;">
+        <table>
+			<tr>
+				<td>用户邮箱:</td><td><input id="send_user_email" /></td>
+			</tr>
+			<tr>
+				<td>注册日期:</td><td><input id="user_create_time" /></td>
+			</tr>
+			<tr>
+				<td>商务信息:</td><td><input id="user_buniess_info" /></td>
+			</tr>
+			<tr>
+				<td>产品需求:</td><td><input id="user_goods_need" />
+			<br>
+			<input id="user_goods_require" /></td>
+			</tr>
+			<tr>
+				<td>目录地址:</td><td><input id="send_url" /></td>
+			</tr>
+			<tr>
+				<td>推送邮箱:</td><td><input id="sell_email" /></td>
+			</tr>
+			<tr>
+				<td><button>推送</button></td>
+			</tr>
+		</table>
+		<table>
+			<caption>推送历史记录</caption>
+			<tr>
+				<td>用户邮箱:</td><td></td>
+			</tr>
+		</table>
     </div>
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div>

@@ -23,13 +23,17 @@ import com.cbt.util.SerializeUtil;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.CustomerFinancialBean;
+import com.cbt.website.bean.UserInfo;
 import com.cbt.website.dao.IOrderwsDao;
 import com.cbt.website.dao.OrderwsDao;
 import com.cbt.website.dao.PaymentDao;
 import com.cbt.website.dao.PaymentDaoImp;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.UserRecommendEmail;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -551,4 +555,32 @@ public class UserController {
         return orderList;
     }
 
+
+    @RequestMapping(value = "/getUserAllInfoById", method = RequestMethod.POST)
+    @ResponseBody
+    public JsonResult getUserAllInfoById(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String userId = request.getParameter("userId");
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        try {
+            UserInfo useInfo = userInfoService.queryAllInfoById(Integer.parseInt(userId));
+            useInfo.setAdmuser(admuser.getEmail());
+
+            List<UserRecommendEmail>  list =  userInfoService.queryRecommendEmailInfo(Integer.parseInt(userId));
+
+            json.setOk(true);
+            json.setData(useInfo);
+            json.setAllData(list);
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("获取失败");
+            e.printStackTrace();
+        }
+        return json;
+    }
 }

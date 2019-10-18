@@ -5,6 +5,8 @@ import com.cbt.processes.dao.IUserDao;
 import com.cbt.processes.dao.UserDao;
 import com.cbt.processes.service.SendEmail;
 import com.cbt.userinfo.dao.UserMapper;
+import com.cbt.website.bean.UserInfo;
+import com.importExpress.pojo.UserRecommendEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -129,6 +131,16 @@ public static void main(String[] args) {
 	@Override
 	public int updateUserFollowCode(String followCode, int userId) {
 		return mapper.updateUserFollowCode(followCode, userId);
+	}
+
+	@Override
+	public UserInfo queryAllInfoById(int userId) {
+		return mapper.queryAllInfoById(userId);
+	}
+
+	@Override
+	public List<UserRecommendEmail> queryRecommendEmailInfo(int userId) {
+		return mapper.queryRecommendEmailInfo(userId);
 	}
 
 }
