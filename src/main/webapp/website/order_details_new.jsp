@@ -817,12 +817,6 @@
                            style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;" id="spilt_num"
                            onclick="openSplitNumPage('${order.orderNo}')" value="数量拆单">
                 </td>
-                <td>
-                    <input type="button"
-                           style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;" id="over_sea_spilt"
-                           onclick="openOverSeaSplitPage('${order.orderNo}')" value="数量拆单">
-                </td>
-
                 <td>分配采购（整单）： <select id="Abuyer" onchange="changeAllBuyer('${order.orderNo}',this.value)">
                     <option value=""></option>
                     <c:forEach var="aub" items="${aublist }">
