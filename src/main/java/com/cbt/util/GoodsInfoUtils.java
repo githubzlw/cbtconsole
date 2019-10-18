@@ -4,8 +4,11 @@ import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.ImportExSku;
 import com.cbt.bean.ImportExSkuShow;
 import com.cbt.bean.TypeBean;
+import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.GoodsEditBean;
+import com.importExpress.utli.OKHttpUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +18,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,9 +51,9 @@ public class GoodsInfoUtils {
             + "|([hH]igh\\s*[qQ]uality,*!*\\:*)|(20\\d+,*!*\\:*)|([pP][aA][nN][dD][oO][rR][aA])";
 
     /**
-	 * 产品单页静态化文件中的名字，
-	 */
-	private static final String[] goodsNameWords={"hotsale","aliexpress","free-shipping","new","shipping","HOT","fashion","Hot sale","Hot Worldwide"};
+     * 产品单页静态化文件中的名字，
+     */
+    private static final String[] goodsNameWords = {"hotsale", "aliexpress", "free-shipping", "new", "shipping", "HOT", "fashion", "Hot sale", "Hot Worldwide"};
 
     /**
      * 产品类型:自定义上传商品
@@ -324,7 +329,7 @@ public class GoodsInfoUtils {
             if (typeVal.contains(mapKey)) {
                 tempVal = typeVal.replace(mapKey, REPLACE_SIZE_MAP.get(mapKey));
                 break;
-            }else if(typeVal.contains(mapKey.toUpperCase())){
+            } else if (typeVal.contains(mapKey.toUpperCase())) {
                 tempVal = typeVal.replace(mapKey.toUpperCase(), REPLACE_SIZE_MAP.get(mapKey).toUpperCase());
                 break;
             }
@@ -344,7 +349,7 @@ public class GoodsInfoUtils {
         } else if (remotepath.contains(SERVICE_SHOW_IMPORT_URL_4)) {
             localPathByRemote = remotepath.replace(SERVICE_SHOW_IMPORT_URL_4, SERVICE_LOCAL_IMPORT_PATH);
         }
-        if(isKids > 0){
+        if (isKids > 0) {
             localPathByRemote = localPathByRemote.replace(SERVICE_LOCAL_IMPORT_PATH, SERVICE_LOCAL_KIDS_PATH);
         }
         return localPathByRemote;
@@ -844,11 +849,11 @@ public class GoodsInfoUtils {
 
     public static String changeLocalPathToRemotePath(String localPath) {
         if (StringUtils.isNotBlank(localPath)) {
-            if(localPath.contains(SERVICE_LOCAL_IMPORT_PATH)){
+            if (localPath.contains(SERVICE_LOCAL_IMPORT_PATH)) {
                 return localPath.replace(SERVICE_LOCAL_IMPORT_PATH, SERVICE_SHOW_IMPORT_URL_3);
-            }else if(localPath.contains(SERVICE_LOCAL_KIDS_PATH)){
+            } else if (localPath.contains(SERVICE_LOCAL_KIDS_PATH)) {
                 return localPath.replace(SERVICE_LOCAL_KIDS_PATH, SERVICE_SHOW_KIDS_URL_3);
-            }else{
+            } else {
                 return localPath;
             }
         } else {
@@ -858,13 +863,14 @@ public class GoodsInfoUtils {
 
     /**
      * 全部图片数据
+     *
      * @param gd
      * @return
      */
-    public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids){
-		List<String> changeImglist = new ArrayList<>();
-		// 主图
-		String orMainImg220x220 = null;
+    public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids) {
+        List<String> changeImglist = new ArrayList<>();
+        // 主图
+        String orMainImg220x220 = null;
         if (StringUtils.isNotBlank(gd.getShowMainImage())) {
             if (gd.getShowMainImage().contains("http://") || gd.getShowMainImage().contains("https://")) {
                 orMainImg220x220 = gd.getShowMainImage().trim();
@@ -885,133 +891,511 @@ public class GoodsInfoUtils {
             mainImgList.clear();
         }
 
-		// 橱窗图
-		List<String> imgList = deal1688GoodsImg(gd.getImg(), gd.getRemotpath(), 1);
-		changeImglist.addAll(imgList);
-		imgList.clear();
+        // 橱窗图
+        List<String> imgList = deal1688GoodsImg(gd.getImg(), gd.getRemotpath(), 1);
+        changeImglist.addAll(imgList);
+        imgList.clear();
 
-		// 详情图
-		List<String> detailsImgList = genDetailsImgList(gd.getEninfo(), gd.getRemotpath());
-		if (detailsImgList != null && detailsImgList.size() > 0) {
-			changeImglist.addAll(detailsImgList);
-		}
-		// 规格图片
-		List<String> entypeImgList = genEntypeImgList(gd);
-		if (entypeImgList != null && entypeImgList.size() > 0) {
-			changeImglist.addAll(entypeImgList);
-			entypeImgList.clear();
-		}
-		List<String> nwList = new ArrayList<>();
-        for(String imgL : changeImglist){
+        // 详情图
+        List<String> detailsImgList = genDetailsImgList(gd.getEninfo(), gd.getRemotpath());
+        if (detailsImgList != null && detailsImgList.size() > 0) {
+            changeImglist.addAll(detailsImgList);
+        }
+        // 规格图片
+        List<String> entypeImgList = genEntypeImgList(gd);
+        if (entypeImgList != null && entypeImgList.size() > 0) {
+            changeImglist.addAll(entypeImgList);
+            entypeImgList.clear();
+        }
+        List<String> nwList = new ArrayList<>();
+        for (String imgL : changeImglist) {
             nwList.add(changeRemotePathToLocal(imgL, isKids));
         }
         changeImglist.clear();
         return nwList;
-	}
+    }
 
-	public static List<String> getMainImgByPath(String remotPathImg) {
-		String changeRemote;
-		if (remotPathImg.contains("http:")) {
-			changeRemote = remotPathImg.replace("http:", "https:");
-		} else {
-			changeRemote = remotPathImg;
-		}
-		List<String> imgList = new ArrayList<String>();
-		if (changeRemote.contains("220x220")) {
-			imgList.add(changeRemote);
-			imgList.add(changeRemote.replace("220x220", "285x285"));
-		} else if (changeRemote.contains("400x400")) {
-			imgList.add(changeRemote);
-			imgList.add(changeRemote.replace("400x400", "220x220"));
-			imgList.add(changeRemote.replace("400x400", "285x285"));
-		}
-		return imgList;
-	}
+    public static List<String> getMainImgByPath(String remotPathImg) {
+        String changeRemote;
+        if (remotPathImg.contains("http:")) {
+            changeRemote = remotPathImg.replace("http:", "https:");
+        } else {
+            changeRemote = remotPathImg;
+        }
+        List<String> imgList = new ArrayList<String>();
+        if (changeRemote.contains("220x220")) {
+            imgList.add(changeRemote);
+            imgList.add(changeRemote.replace("220x220", "285x285"));
+        } else if (changeRemote.contains("400x400")) {
+            imgList.add(changeRemote);
+            imgList.add(changeRemote.replace("400x400", "220x220"));
+            imgList.add(changeRemote.replace("400x400", "285x285"));
+        }
+        return imgList;
+    }
 
-	// 处理1688商品的规格图片数据
-	public static List<String> deal1688GoodsImg(String img, String remotPath, int is400) {
+    // 处理1688商品的规格图片数据
+    public static List<String> deal1688GoodsImg(String img, String remotPath, int is400) {
 
-		String changeRemote;
-		if (remotPath.contains("http:")) {
-			changeRemote = remotPath.replace("http:", "https:");
-		} else {
-			changeRemote = remotPath;
-		}
-		List<String> imgList = new ArrayList<String>();
+        String changeRemote;
+        if (remotPath.contains("http:")) {
+            changeRemote = remotPath.replace("http:", "https:");
+        } else {
+            changeRemote = remotPath;
+        }
+        List<String> imgList = new ArrayList<String>();
 
-		if (StringUtils.isNotBlank(img)) {
-			img = img.replace("[", "").replace("]", "").trim();
-			String[] imgs = img.split(",\\s*");
+        if (StringUtils.isNotBlank(img)) {
+            img = img.replace("[", "").replace("]", "").trim();
+            String[] imgs = img.split(",\\s*");
 
-			for (int i = 0; i < imgs.length; i++) {
-				if (!imgs[i].isEmpty()) {
-					if (imgs[i].indexOf("http://") > -1 || imgs[i].indexOf("https://") > -1) {
-						imgList.add(imgs[i].replace("http:", "https:"));
-						if (is400 > 0) {
-							imgList.add(imgs[i].replace("http:", "https:").replace("60x60", "400x400"));
-						}
-					} else {
-						imgList.add(changeRemote + imgs[i]);
-						if (is400 > 0) {
-							imgList.add(changeRemote + imgs[i].replace("60x60", "400x400"));
-						}
-					}
-				}
-			}
-		}
-		return imgList;
-	}
+            for (int i = 0; i < imgs.length; i++) {
+                if (!imgs[i].isEmpty()) {
+                    if (imgs[i].indexOf("http://") > -1 || imgs[i].indexOf("https://") > -1) {
+                        imgList.add(imgs[i].replace("http:", "https:"));
+                        if (is400 > 0) {
+                            imgList.add(imgs[i].replace("http:", "https:").replace("60x60", "400x400"));
+                        }
+                    } else {
+                        imgList.add(changeRemote + imgs[i]);
+                        if (is400 > 0) {
+                            imgList.add(changeRemote + imgs[i].replace("60x60", "400x400"));
+                        }
+                    }
+                }
+            }
+        }
+        return imgList;
+    }
 
-	public static List<String> genDetailsImgList(String detailStr, String remotPath) {
-		String changeRemote;
-		// 详情数据的获取和解析img数据
-		List<String> imgList = new ArrayList<String>();
-		if (StringUtils.isNotBlank(detailStr)) {
-			if (remotPath.contains("http:")) {
-				changeRemote = remotPath.replace("http:", "https:");
-			} else {
-				changeRemote = remotPath;
-			}
+    public static List<String> genDetailsImgList(String detailStr, String remotPath) {
+        String changeRemote;
+        // 详情数据的获取和解析img数据
+        List<String> imgList = new ArrayList<String>();
+        if (StringUtils.isNotBlank(detailStr)) {
+            if (remotPath.contains("http:")) {
+                changeRemote = remotPath.replace("http:", "https:");
+            } else {
+                changeRemote = remotPath;
+            }
 
-			Document nwDoc = Jsoup.parseBodyFragment(detailStr);
-			Elements imgEls = nwDoc.getElementsByTag("img");
-			if (imgEls.size() > 0) {
-				for (Element imel : imgEls) {
-					String imgUrl = imel.attr("src");
-					if (StringUtils.isBlank(imgUrl)) {
-						continue;
-					} else if (imgUrl.contains("http")) {
-						if (imgUrl.length() > 500) {
-							continue;
-						} else {
-							imgList.add(imgUrl.replace("http:", "https:"));
-						}
-					} else {
-						if (imgUrl.length() > 500) {
-							continue;
-						} else {
-							imgList.add(changeRemote + imgUrl);
-						}
-					}
-				}
-				imgEls.clear();
-			}
-		}
+            Document nwDoc = Jsoup.parseBodyFragment(detailStr);
+            Elements imgEls = nwDoc.getElementsByTag("img");
+            if (imgEls.size() > 0) {
+                for (Element imel : imgEls) {
+                    String imgUrl = imel.attr("src");
+                    if (StringUtils.isBlank(imgUrl)) {
+                        continue;
+                    } else if (imgUrl.contains("http")) {
+                        if (imgUrl.length() > 500) {
+                            continue;
+                        } else {
+                            imgList.add(imgUrl.replace("http:", "https:"));
+                        }
+                    } else {
+                        if (imgUrl.length() > 500) {
+                            continue;
+                        } else {
+                            imgList.add(changeRemote + imgUrl);
+                        }
+                    }
+                }
+                imgEls.clear();
+            }
+        }
 
-		return imgList;
-	}
+        return imgList;
+    }
 
-	public static List<String> genEntypeImgList(CustomGoodsPublish gd) {
-		List<TypeBean> typeList = deal1688GoodsType(gd, true);
-		List<String> imgList = new ArrayList<>();
-		for (TypeBean typeBean : typeList) {
-			if (StringUtils.isNotBlank(typeBean.getImg()) && typeBean.getImg().length() > 10) {
-				if (typeBean.getImg().contains("http://") || typeBean.getImg().contains("https://")) {
-					imgList.add(typeBean.getImg().replace("60x60", "400x400"));
-				}
-			}
-		}
-		typeList.clear();
-		return imgList;
-	}
+    public static List<String> genEntypeImgList(CustomGoodsPublish gd) {
+        List<TypeBean> typeList = deal1688GoodsType(gd, true);
+        List<String> imgList = new ArrayList<>();
+        for (TypeBean typeBean : typeList) {
+            if (StringUtils.isNotBlank(typeBean.getImg()) && typeBean.getImg().length() > 10) {
+                if (typeBean.getImg().contains("http://") || typeBean.getImg().contains("https://")) {
+                    imgList.add(typeBean.getImg().replace("60x60", "400x400"));
+                }
+            }
+        }
+        typeList.clear();
+        return imgList;
+    }
+
+
+    /**
+     * 处理阿里详情数据
+     *
+     * @param content
+     * @return
+     * @author jxw
+     * @date 2017-11-10
+     */
+    public static String dealAliInfoData(String content) {
+
+        Document nwDoc = Jsoup.parseBodyFragment(content);
+        // 移除所有的页面效果 kse标签,实际div
+        Elements divLst = nwDoc.getElementsByTag("div");
+        for (Element dEl : divLst) {
+            if (!(dEl.attr("name") == null || "".equals(dEl.attr("name").trim()))) {
+                if ("productItem".equalsIgnoreCase(dEl.attr("name").trim())) {
+                    dEl.remove();
+                    continue;
+                }
+            }
+            // 移除所有div下面包含a标签的数据
+            Elements aLst = dEl.getElementsByTag("a");
+            if (aLst.size() > 0) {
+                dEl.remove();
+            }
+        }
+        // 移除所有的 a标签
+        Elements aLst = nwDoc.getElementsByTag("a");
+        for (Element ael : aLst) {
+            ael.remove();
+        }
+
+        // 移除所有的 包裹列表div主体
+        nwDoc.select(".pnl-packaging-main").remove();
+        // 移除所有的 买家交易信息div主体
+        nwDoc.select(".transaction-feedback-main").remove();
+        // 移除所有的 更多产品，相关产品
+        nwDoc.select(".related-products-main").remove();
+        // 移除所有的 相关产品搜索
+        nwDoc.select("#j-related-searches").remove();
+
+        // 移除所有的 img属性含有以下字符的图片
+        Elements imgLst = nwDoc.getElementsByTag("img");
+        for (Element imel : imgLst) {
+            if (imel.hasAttr("alt")) {
+                String attrVal = imel.attr("alt");
+                if ("Shipping".equalsIgnoreCase(attrVal)) {
+                    imel.remove();
+                } else if ("Payment".equalsIgnoreCase(attrVal)) {
+                    imel.remove();
+                } else if ("Feedback".equalsIgnoreCase(attrVal)) {
+                    imel.remove();
+                } else if ("Contact us".equalsIgnoreCase(attrVal)) {
+                    imel.remove();
+                } else if ("Return".equalsIgnoreCase(attrVal)) {
+                    imel.remove();
+                }
+            }
+        }
+        Elements ckImgLst = nwDoc.getElementsByTag("img");
+        if (ckImgLst.size() == 0) {
+            nwDoc = Jsoup.parseBodyFragment(content);
+            // 移除所有的 a标签
+            Elements nwALst = nwDoc.getElementsByTag("a");
+            for (Element nael : nwALst) {
+                nael.remove();
+            }
+        }
+        return nwDoc.html();
+    }
+
+    public static boolean checkPriceIsUpdate(CustomGoodsPublish cgp, CustomGoodsPublish orGoods, GoodsEditBean editBean) {
+        // 插入日志记录
+        int count = 0;
+        // 判断是否改价 wprice range_price feeprice price  fprice_str,判断相同的，加一
+        // wprice
+        if (StringUtils.isNotBlank(cgp.getWprice()) && StringUtils.isNotBlank(orGoods.getWprice())) {
+            if (cgp.getWprice().equals(orGoods.getWprice())) {
+                count++;
+            } else {
+                editBean.setWprice_old(orGoods.getWprice());
+                editBean.setWprice_new(cgp.getWprice());
+            }
+        } else if (StringUtils.isBlank(cgp.getWprice()) && StringUtils.isBlank(orGoods.getWprice())) {
+            count++;
+        } else {
+            editBean.setWprice_old(orGoods.getWprice());
+            editBean.setWprice_new(cgp.getWprice());
+        }
+        // range_price
+        if (StringUtils.isNotBlank(cgp.getRangePrice()) && StringUtils.isNotBlank(orGoods.getRangePrice())) {
+            if (cgp.getRangePrice().equals(orGoods.getRangePrice())) {
+                count++;
+            } else {
+                editBean.setRange_price_old(orGoods.getRangePrice());
+                editBean.setRange_price_new(cgp.getRangePrice());
+            }
+        } else if (StringUtils.isBlank(cgp.getRangePrice()) && StringUtils.isBlank(orGoods.getRangePrice())) {
+            count++;
+        } else {
+            editBean.setRange_price_old(orGoods.getRangePrice());
+            editBean.setRange_price_new(cgp.getRangePrice());
+        }
+        // feeprice
+        if (StringUtils.isNotBlank(cgp.getFeeprice()) && StringUtils.isNotBlank(orGoods.getFeeprice())) {
+            if (cgp.getFeeprice().equals(orGoods.getFeeprice())) {
+                count++;
+            } else {
+                editBean.setFeeprice_old(orGoods.getFeeprice());
+                editBean.setFeeprice_new(cgp.getFeeprice());
+            }
+        } else if (StringUtils.isBlank(cgp.getFeeprice()) && StringUtils.isBlank(orGoods.getFeeprice())) {
+            count++;
+        } else {
+            editBean.setFeeprice_old(orGoods.getFeeprice());
+            editBean.setFeeprice_new(cgp.getFeeprice());
+        }
+        // price
+        if (StringUtils.isNotBlank(cgp.getPrice()) && StringUtils.isNotBlank(orGoods.getPrice())) {
+            if (cgp.getPrice().equals(orGoods.getPrice())) {
+                count++;
+            } else {
+                editBean.setPrice_old(orGoods.getPrice());
+                editBean.setPrice_new(cgp.getPrice());
+            }
+        } else if (StringUtils.isBlank(cgp.getPrice()) && StringUtils.isBlank(orGoods.getPrice())) {
+            count++;
+        } else {
+            editBean.setPrice_old(orGoods.getPrice());
+            editBean.setPrice_new(cgp.getPrice());
+        }
+        // fprice_str
+        if (StringUtils.isNotBlank(cgp.getFpriceStr()) && StringUtils.isNotBlank(orGoods.getFpriceStr())) {
+            if (cgp.getFpriceStr().equals(orGoods.getFpriceStr())) {
+                count++;
+            } else {
+                editBean.setFprice_str_old(orGoods.getFpriceStr());
+                editBean.setFprice_str_new(cgp.getFpriceStr());
+            }
+        } else if (StringUtils.isBlank(cgp.getFpriceStr()) && StringUtils.isBlank(orGoods.getFpriceStr())) {
+            count++;
+        } else {
+            editBean.setFprice_str_old(orGoods.getFpriceStr());
+            editBean.setFprice_str_new(cgp.getFpriceStr());
+        }
+        return count == 5;
+    }
+
+    // 处理sku数据，跟参数传递过来的价格数据进行赋值
+    public static boolean dealSkuByParam(List<ImportExSku> skuList, String sku, CustomGoodsPublish cgp) {
+        List<ImportExSku> newSkuList = new ArrayList<ImportExSku>();
+
+        float minPrice = 0;
+        float maxPrice = 0;
+        int count = 1;
+        String[] skuSplits = sku.split(";");
+        for (String skuIds : skuSplits) {
+            String[] idAndPrice = skuIds.split("@");
+            String ppids = idAndPrice[0].replace("_", ",");
+            for (ImportExSku ies : skuList) {
+                if (ppids.equals(ies.getSkuPropIds())) {
+                    float tempPrice = Float.valueOf(idAndPrice[1]);
+                    if (count == 1) {
+                        minPrice = tempPrice;
+                        maxPrice = tempPrice;
+                        count++;
+                    }
+                    if (minPrice > tempPrice) {
+                        minPrice = tempPrice;
+                    }
+                    if (maxPrice < tempPrice) {
+                        maxPrice = tempPrice;
+                    }
+                    ies.getSkuVal().setActSkuCalPrice(tempPrice);
+                    ies.getSkuVal().setActSkuMultiCurrencyCalPrice(tempPrice);
+                    ies.getSkuVal().setActSkuMultiCurrencyDisplayPrice(tempPrice);
+                    ies.getSkuVal().setSkuCalPrice(tempPrice);
+                    ies.getSkuVal().setSkuMultiCurrencyCalPrice(tempPrice);
+                    ies.getSkuVal().setSkuMultiCurrencyDisplayPrice(tempPrice);
+                    newSkuList.add(ies);
+                    break;
+                }
+            }
+            ppids = null;
+        }
+        cgp.setRangePrice(genFloatWidthTwoDecimalPlaces(minPrice) + "-" + genFloatWidthTwoDecimalPlaces(maxPrice));
+        cgp.setSku(newSkuList.toString());
+        if (minPrice == 0 || maxPrice == 0 || newSkuList.size() == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * 生成两位小数的float类型数据
+     *
+     * @param numVal
+     * @return
+     */
+    public static float genFloatWidthTwoDecimalPlaces(float numVal) {
+        BigDecimal bd = new BigDecimal(numVal);
+        return bd.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+    }
+
+
+    public static JsonResult uploadAliImgToLocal(String pid, String eninfo, FtpConfig ftpConfig) {
+
+        JsonResult json = new JsonResult();
+        String tempEninfo = "";
+        try {
+            // 详情数据的获取和解析img数据
+            if (StringUtils.isNotBlank(eninfo)) {
+                //循环上传图片到本地
+
+                // 获取配置文件信息
+                if (ftpConfig == null) {
+                    ftpConfig = GetConfigureInfo.getFtpConfig();
+                }
+                //解析eninfo数据
+                Document nwDoc = Jsoup.parseBodyFragment(eninfo);
+                Elements imgEls = nwDoc.getElementsByTag("img");
+                if (imgEls.size() > 0) {
+                    json.setOk(true);
+                    Random random = new Random();
+                    for (Element imel : imgEls) {
+                        String imgUrl = imel.attr("src");
+                        if (imgUrl == null || "".equals(imgUrl)) {
+                            continue;
+                        } else if (imgUrl.contains("http://") || imgUrl.contains("https://")) {
+                            if (imgUrl.contains("192.168.")) {
+                                continue;
+                            } else if (imgUrl.contains(".import-express.")) {
+                                //
+                                if (!imgUrl.contains(pid)) {
+                                    imel.remove();
+                                    json.setMessage("非当前PID图片删除");
+                                }
+                                continue;
+                            }
+                            // 检查配置文件信息是否正常读取
+                            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
+                            if (json.isOk()) {
+                                String localDiskPath = ftpConfig.getLocalDiskPath();
+                                if (!(imgUrl == null || "".equals(imgUrl.trim()) || imgUrl.length() < 10)) {
+                                    // 得到文件保存的名称
+                                    if (imgUrl.indexOf("?") > -1) {
+                                        imgUrl = imgUrl.substring(0, imgUrl.indexOf("?"));
+                                    }
+                                    // 兼容没有http头部的src
+                                    if (imgUrl.indexOf("//") == 0) {
+                                        imgUrl = "http:" + imgUrl;
+                                    }
+                                    // 文件的后缀取出来
+                                    String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
+                                    // 生成唯一文件名称
+                                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                                    // 本地服务器磁盘全路径
+                                    String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
+                                    // 下载网络图片到本地
+                                    boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
+                                    if (is) {
+                                        // 判断图片的分辨率是否小于100*100
+                                        boolean checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 40, 40);
+                                        if (checked) {
+                                            // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
+                                            checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
+                                            if (checked) {
+                                                String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
+                                                checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
+                                                        localDiskPath + newLocalPath);
+                                                if (checked) {
+                                                    imel.attr("src", ftpConfig.getLocalShowPath() + newLocalPath);
+                                                } else {
+                                                    json.setOk(false);
+                                                    json.setMessage("压缩图片到700*700失败，终止执行");
+                                                    break;
+                                                }
+                                            } else {
+                                                imel.attr("src", ftpConfig.getLocalShowPath() + localFilePath);
+                                            }
+                                        } else {
+                                            // 判断分辨率不通过删除图片
+                                            File file = new File(localDiskPath + localFilePath);
+                                            if (file.exists()) {
+                                                file.delete();
+                                            }
+                                            json.setOk(false);
+                                            json.setMessage("[" + imgUrl + "]图片分辨率小于40*40，终止执行");
+                                            break;
+                                        }
+                                    } else {
+                                        json.setOk(false);
+                                        json.setMessage("下载网路图片到本地失败，请重试");
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (!json.isOk()) {
+                        return json;
+                    }
+                    json.setOk(true);
+                    tempEninfo = nwDoc.toString();
+                } else {
+                    json.setOk(true);
+                    tempEninfo = eninfo;
+                }
+            } else {
+                tempEninfo = "";
+                json.setOk(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("pid:" + pid + ",uploadAliImgToLocal error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("pid:" + pid + ",uploadAliImgToLocal error:" + e.getMessage());
+            json.setData(null);
+        }
+        if (json.isOk()) {
+            json.setData(tempEninfo);
+        }
+        return json;
+
+    }
+
+
+    public static boolean deleteImgByUrl(String pid) {
+        /*boolean isSu = false;
+        CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+        if (checkIsKidsCatid(goods.getCatid1()) && goods.getValid() == 0) {
+            // 接口调用
+            isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
+                    *//*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
+                    boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                    if (!isSu) {
+                        isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                    }
+                    if (!isSu) {
+                        LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
+                    }*//*
+
+        } else {
+            isSu = true;
+        }*/
+        return OKHttpUtils.optionGoodsInterface(pid, 0, 6, 2);
+    }
+
+    public static boolean checkListContains(List<String> list, String str) {
+        boolean isOk = false;
+        if (list == null || list.isEmpty() || StringUtils.isBlank(str)) {
+            return isOk;
+        } else {
+            for (String tempStr : list) {
+                if (str.equals(tempStr)) {
+                    isOk = true;
+                    break;
+                }
+            }
+        }
+        return isOk;
+    }
+
+
+    /**
+     * @param filename 文件的原始名称
+     * @return uuid+"_"+文件的原始名称
+     * @Method: makeFileName
+     * @Description: 生成上传文件的文件名，文件名以：uuid+"_"+文件的原始名称
+     */
+    public static String makeFileName(String filename) { // 2.jpg
+        // 为防止文件覆盖的现象发生，要为上传文件产生一个唯一的文件名
+        return UUID.randomUUID().toString() + "_" + filename;
+    }
+
 }

@@ -1,14 +1,17 @@
 package com.cbt.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.cbt.bean.*;
 import com.cbt.bean.TypeBean;
+import com.cbt.bean.ZoneBean;
+import com.cbt.bean.*;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.customer.service.IShopUrlService;
+import com.cbt.fee.service.IZoneServer;
+import com.cbt.fee.service.ZoneServer;
 import com.cbt.parse.bean.Set;
-import com.cbt.parse.service.*;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
+import com.cbt.parse.service.*;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
 import com.cbt.warehouse.pojo.HotCategory;
@@ -17,10 +20,7 @@ import com.cbt.warehouse.service.HotGoodsService;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.UploadByOkHttp;
-import com.importExpress.pojo.GoodsEditBean;
-import com.importExpress.pojo.GoodsMd5Bean;
-import com.importExpress.pojo.GoodsParseBean;
-import com.importExpress.pojo.InputData;
+import com.importExpress.pojo.*;
 import com.importExpress.service.HotManageService;
 import com.importExpress.thread.DeleteImgByMd5Thread;
 import com.importExpress.utli.*;
@@ -53,10 +53,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "/editc")
@@ -477,6 +477,15 @@ public class EditorController {
                 }
             }
 
+            // 获取海外仓标识信息
+            List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
+            if(CollectionUtils.isEmpty(goodsOverSeaList)){
+                mv.addObject("goodsOverSeaList","[]");
+            }else{
+                mv.addObject("goodsOverSeaList",goodsOverSeaList);
+                goods.setOverSeaFlag(1);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             mv.addObject("uid", 0);
@@ -516,7 +525,7 @@ public class EditorController {
             if (page == null || page.isEmpty() || "".equals(page.trim()) || "httperror".equals(page.trim())) {
                 System.err.println(algood.getInfourl() + ":获取失败");
             } else {
-                goods.setAliGoodsInfo(dealAliInfoData(page.replaceAll("window.productDescription=\'", "")));
+                goods.setAliGoodsInfo(GoodsInfoUtils.dealAliInfoData(page.replaceAll("window.productDescription=\'", "")));
             }
             page = null;
         }
@@ -664,76 +673,7 @@ public class EditorController {
         return json;
     }
 
-    /**
-     * 处理阿里详情数据
-     *
-     * @param content
-     * @return
-     * @author jxw
-     * @date 2017-11-10
-     */
-    private String dealAliInfoData(String content) {
 
-        Document nwDoc = Jsoup.parseBodyFragment(content);
-        // 移除所有的页面效果 kse标签,实际div
-        Elements divLst = nwDoc.getElementsByTag("div");
-        for (Element dEl : divLst) {
-            if (!(dEl.attr("name") == null || "".equals(dEl.attr("name").trim()))) {
-                if ("productItem".equalsIgnoreCase(dEl.attr("name").trim())) {
-                    dEl.remove();
-                    continue;
-                }
-            }
-            // 移除所有div下面包含a标签的数据
-            Elements aLst = dEl.getElementsByTag("a");
-            if (aLst.size() > 0) {
-                dEl.remove();
-            }
-        }
-        // 移除所有的 a标签
-        Elements aLst = nwDoc.getElementsByTag("a");
-        for (Element ael : aLst) {
-            ael.remove();
-        }
-
-        // 移除所有的 包裹列表div主体
-        nwDoc.select(".pnl-packaging-main").remove();
-        // 移除所有的 买家交易信息div主体
-        nwDoc.select(".transaction-feedback-main").remove();
-        // 移除所有的 更多产品，相关产品
-        nwDoc.select(".related-products-main").remove();
-        // 移除所有的 相关产品搜索
-        nwDoc.select("#j-related-searches").remove();
-
-        // 移除所有的 img属性含有以下字符的图片
-        Elements imgLst = nwDoc.getElementsByTag("img");
-        for (Element imel : imgLst) {
-            if (imel.hasAttr("alt")) {
-                String attrVal = imel.attr("alt");
-                if ("Shipping".equalsIgnoreCase(attrVal)) {
-                    imel.remove();
-                } else if ("Payment".equalsIgnoreCase(attrVal)) {
-                    imel.remove();
-                } else if ("Feedback".equalsIgnoreCase(attrVal)) {
-                    imel.remove();
-                } else if ("Contact us".equalsIgnoreCase(attrVal)) {
-                    imel.remove();
-                } else if ("Return".equalsIgnoreCase(attrVal)) {
-                    imel.remove();
-                }
-            }
-        }
-        Elements ckImgLst = nwDoc.getElementsByTag("img");
-        if (ckImgLst.size() == 0) {
-            nwDoc = Jsoup.parseBodyFragment(content);
-            // 移除所有的 a标签
-            Elements nwALst = nwDoc.getElementsByTag("a");
-            for (Element nael : nwALst) {
-                nael.remove();
-            }
-        }
-        return nwDoc.html();
-    }
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/saveEditDetalis")
@@ -857,7 +797,7 @@ public class EditorController {
                     // 产品详情
                     // String eninfo = contentStr.replaceAll(remotepath, "");
                     //解析和上传阿里商品的图片
-                    json = uploadAliImgToLocal(pidStr, contentStr);
+                    json = GoodsInfoUtils.uploadAliImgToLocal(pidStr, contentStr, ftpConfig);
                     if (json.isOk()) {
                         cgp.setEninfo(json.getData().toString().replace(remotepath, ""));
                     } else {
@@ -945,7 +885,7 @@ public class EditorController {
                 } else {
                     JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
                     List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-                    boolean isSuccess = dealSkuByParam(skuList, sku, cgp);
+                    boolean isSuccess = GoodsInfoUtils.dealSkuByParam(skuList, sku, cgp);
                     if (!isSuccess) {
                         json.setOk(false);
                         json.setMessage("商品单规格价格生成异常，请确认价格！");
@@ -956,7 +896,7 @@ public class EditorController {
 
             GoodsEditBean editBean = new GoodsEditBean();
             // 判断是否改价 wprice range_price feeprice price  fprice_str
-            if (checkPriceIsUpdate(cgp, orGoods, editBean)) {
+            if (GoodsInfoUtils.checkPriceIsUpdate(cgp, orGoods, editBean)) {
                 System.err.println("pid:" + pidStr + ",not update price");
             } else {
                 cgp.setPriceIsEdit(1);
@@ -1127,139 +1067,7 @@ public class EditorController {
         return json;
     }
 
-    private boolean checkPriceIsUpdate(CustomGoodsPublish cgp, CustomGoodsPublish orGoods, GoodsEditBean editBean) {
-        // 插入日志记录
-        int count = 0;
-        // 判断是否改价 wprice range_price feeprice price  fprice_str,判断相同的，加一
-        // wprice
-        if (StringUtils.isNotBlank(cgp.getWprice()) && StringUtils.isNotBlank(orGoods.getWprice())) {
-            if (cgp.getWprice().equals(orGoods.getWprice())) {
-                count++;
-            } else {
-                editBean.setWprice_old(orGoods.getWprice());
-                editBean.setWprice_new(cgp.getWprice());
-            }
-        } else if (StringUtils.isBlank(cgp.getWprice()) && StringUtils.isBlank(orGoods.getWprice())) {
-            count++;
-        } else {
-            editBean.setWprice_old(orGoods.getWprice());
-            editBean.setWprice_new(cgp.getWprice());
-        }
-        // range_price
-        if (StringUtils.isNotBlank(cgp.getRangePrice()) && StringUtils.isNotBlank(orGoods.getRangePrice())) {
-            if (cgp.getRangePrice().equals(orGoods.getRangePrice())) {
-                count++;
-            } else {
-                editBean.setRange_price_old(orGoods.getRangePrice());
-                editBean.setRange_price_new(cgp.getRangePrice());
-            }
-        } else if (StringUtils.isBlank(cgp.getRangePrice()) && StringUtils.isBlank(orGoods.getRangePrice())) {
-            count++;
-        } else {
-            editBean.setRange_price_old(orGoods.getRangePrice());
-            editBean.setRange_price_new(cgp.getRangePrice());
-        }
-        // feeprice
-        if (StringUtils.isNotBlank(cgp.getFeeprice()) && StringUtils.isNotBlank(orGoods.getFeeprice())) {
-            if (cgp.getFeeprice().equals(orGoods.getFeeprice())) {
-                count++;
-            } else {
-                editBean.setFeeprice_old(orGoods.getFeeprice());
-                editBean.setFeeprice_new(cgp.getFeeprice());
-            }
-        } else if (StringUtils.isBlank(cgp.getFeeprice()) && StringUtils.isBlank(orGoods.getFeeprice())) {
-            count++;
-        } else {
-            editBean.setFeeprice_old(orGoods.getFeeprice());
-            editBean.setFeeprice_new(cgp.getFeeprice());
-        }
-        // price
-        if (StringUtils.isNotBlank(cgp.getPrice()) && StringUtils.isNotBlank(orGoods.getPrice())) {
-            if (cgp.getPrice().equals(orGoods.getPrice())) {
-                count++;
-            } else {
-                editBean.setPrice_old(orGoods.getPrice());
-                editBean.setPrice_new(cgp.getPrice());
-            }
-        } else if (StringUtils.isBlank(cgp.getPrice()) && StringUtils.isBlank(orGoods.getPrice())) {
-            count++;
-        } else {
-            editBean.setPrice_old(orGoods.getPrice());
-            editBean.setPrice_new(cgp.getPrice());
-        }
-        // fprice_str
-        if (StringUtils.isNotBlank(cgp.getFpriceStr()) && StringUtils.isNotBlank(orGoods.getFpriceStr())) {
-            if (cgp.getFpriceStr().equals(orGoods.getFpriceStr())) {
-                count++;
-            } else {
-                editBean.setFprice_str_old(orGoods.getFpriceStr());
-                editBean.setFprice_str_new(cgp.getFpriceStr());
-            }
-        } else if (StringUtils.isBlank(cgp.getFpriceStr()) && StringUtils.isBlank(orGoods.getFpriceStr())) {
-            count++;
-        } else {
-            editBean.setFprice_str_old(orGoods.getFpriceStr());
-            editBean.setFprice_str_new(cgp.getFpriceStr());
-        }
-        return count == 5;
-    }
 
-    // 处理sku数据，跟参数传递过来的价格数据进行赋值
-    private boolean dealSkuByParam(List<ImportExSku> skuList, String sku, CustomGoodsPublish cgp) {
-        List<ImportExSku> newSkuList = new ArrayList<ImportExSku>();
-
-        float minPrice = 0;
-        float maxPrice = 0;
-        int count = 1;
-        String[] skuSplits = sku.split(";");
-        for (String skuIds : skuSplits) {
-            String[] idAndPrice = skuIds.split("@");
-            String ppids = idAndPrice[0].replace("_", ",");
-            for (ImportExSku ies : skuList) {
-                if (ppids.equals(ies.getSkuPropIds())) {
-                    float tempPrice = Float.valueOf(idAndPrice[1]);
-                    if (count == 1) {
-                        minPrice = tempPrice;
-                        maxPrice = tempPrice;
-                        count++;
-                    }
-                    if (minPrice > tempPrice) {
-                        minPrice = tempPrice;
-                    }
-                    if (maxPrice < tempPrice) {
-                        maxPrice = tempPrice;
-                    }
-                    ies.getSkuVal().setActSkuCalPrice(tempPrice);
-                    ies.getSkuVal().setActSkuMultiCurrencyCalPrice(tempPrice);
-                    ies.getSkuVal().setActSkuMultiCurrencyDisplayPrice(tempPrice);
-                    ies.getSkuVal().setSkuCalPrice(tempPrice);
-                    ies.getSkuVal().setSkuMultiCurrencyCalPrice(tempPrice);
-                    ies.getSkuVal().setSkuMultiCurrencyDisplayPrice(tempPrice);
-                    newSkuList.add(ies);
-                    break;
-                }
-            }
-            ppids = null;
-        }
-        cgp.setRangePrice(genFloatWidthTwoDecimalPlaces(minPrice) + "-" + genFloatWidthTwoDecimalPlaces(maxPrice));
-        cgp.setSku(newSkuList.toString());
-        if (minPrice == 0 || maxPrice == 0 || newSkuList.size() == 0) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * 生成两位小数的float类型数据
-     *
-     * @param numVal
-     * @return
-     */
-    private float genFloatWidthTwoDecimalPlaces(float numVal) {
-        BigDecimal bd = new BigDecimal(numVal);
-        return bd.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
-    }
 
     @RequestMapping(value = "/setGoodsOff")
     @ResponseBody
@@ -1295,7 +1103,7 @@ public class EditorController {
             int count = customGoodsService.setGoodsValid(pidStr, user.getAdmName(), user.getId(), -1, reason);
             if (count > 0) {
                 // 判断是否是kids商品，如果是，则删除图片服务器图片
-                boolean isSu = deleteImgByUrl(pidStr);
+                boolean isSu = GoodsInfoUtils.deleteImgByUrl(pidStr);
                 // boolean isSu = true;
                 if (isSu) {
                     json.setOk(true);
@@ -1344,7 +1152,7 @@ public class EditorController {
             int count = customGoodsService.setGoodsValid(pidStr, user.getAdmName(), user.getId(), 1, "");
             if (count > 0) {
                 // 判断是否是kids商品，如果是，则删除图片服务器图片
-                boolean isSu = deleteImgByUrl(pidStr);
+                boolean isSu = GoodsInfoUtils.deleteImgByUrl(pidStr);
                 if (isSu) {
                     json.setOk(true);
                     json.setMessage("执行成功");
@@ -1657,7 +1465,7 @@ public class EditorController {
                             String originalName = mf.getOriginalFilename();
                             // 文件的后缀取出来
                             String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
-                            String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                            String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                             // 本地服务器磁盘全路径
                             String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
                             // 文件流输出到本地服务器指定路径
@@ -1739,7 +1547,7 @@ public class EditorController {
                         String originalName = mf.getOriginalFilename();
                         // 文件的后缀取出来
                         String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
-                        String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                        String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                         // 本地服务器磁盘全路径
                         String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
                         // 文件流输出到本地服务器指定路径
@@ -1838,7 +1646,7 @@ public class EditorController {
                     // 文件的后缀取出来
                     String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
                     // 生成唯一文件名称
-                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                    String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                     // 本地服务器磁盘全路径
                     String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
                     // 下载网络图片到本地
@@ -1904,127 +1712,6 @@ public class EditorController {
     }
 
 
-    private JsonResult uploadAliImgToLocal(String pid, String eninfo) {
-
-        JsonResult json = new JsonResult();
-        String tempEninfo = "";
-        try {
-            // 详情数据的获取和解析img数据
-            if (StringUtils.isNotBlank(eninfo)) {
-                //循环上传图片到本地
-
-                // 获取配置文件信息
-                if (ftpConfig == null) {
-                    ftpConfig = GetConfigureInfo.getFtpConfig();
-                }
-                //解析eninfo数据
-                Document nwDoc = Jsoup.parseBodyFragment(eninfo);
-                Elements imgEls = nwDoc.getElementsByTag("img");
-                if (imgEls.size() > 0) {
-                    json.setOk(true);
-                    Random random = new Random();
-                    for (Element imel : imgEls) {
-                        String imgUrl = imel.attr("src");
-                        if (imgUrl == null || "".equals(imgUrl)) {
-                            continue;
-                        } else if (imgUrl.contains("http://") || imgUrl.contains("https://")) {
-                            if (imgUrl.contains("192.168.")) {
-                                continue;
-                            }else if(imgUrl.contains(".import-express.")){
-                                //
-                                if(!imgUrl.contains(pid)){
-                                    imel.remove();
-                                    json.setMessage("非当前PID图片删除");
-                                }
-                                continue;
-                            }
-                            // 检查配置文件信息是否正常读取
-                            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
-                            if (json.isOk()) {
-                                String localDiskPath = ftpConfig.getLocalDiskPath();
-                                if (!(imgUrl == null || "".equals(imgUrl.trim()) || imgUrl.length() < 10)) {
-                                    // 得到文件保存的名称
-                                    if (imgUrl.indexOf("?") > -1) {
-                                        imgUrl = imgUrl.substring(0, imgUrl.indexOf("?"));
-                                    }
-                                    // 兼容没有http头部的src
-                                    if (imgUrl.indexOf("//") == 0) {
-                                        imgUrl = "http:" + imgUrl;
-                                    }
-                                    // 文件的后缀取出来
-                                    String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
-                                    // 生成唯一文件名称
-                                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
-                                    // 本地服务器磁盘全路径
-                                    String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
-                                    // 下载网络图片到本地
-                                    boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
-                                    if (is) {
-                                        // 判断图片的分辨率是否小于100*100
-                                        boolean checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 40, 40);
-                                        if (checked) {
-                                            // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
-                                            checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
-                                            if (checked) {
-                                                String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
-                                                checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
-                                                        localDiskPath + newLocalPath);
-                                                if (checked) {
-                                                    imel.attr("src", ftpConfig.getLocalShowPath() + newLocalPath);
-                                                } else {
-                                                    json.setOk(false);
-                                                    json.setMessage("压缩图片到700*700失败，终止执行");
-                                                    break;
-                                                }
-                                            } else {
-                                                imel.attr("src", ftpConfig.getLocalShowPath() + localFilePath);
-                                            }
-                                        } else {
-                                            // 判断分辨率不通过删除图片
-                                            File file = new File(localDiskPath + localFilePath);
-                                            if (file.exists()) {
-                                                file.delete();
-                                            }
-                                            json.setOk(false);
-                                            json.setMessage("[" + imgUrl + "]图片分辨率小于40*40，终止执行");
-                                            break;
-                                        }
-                                    } else {
-                                        json.setOk(false);
-                                        json.setMessage("下载网路图片到本地失败，请重试");
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if(!json.isOk()){
-                        return json;
-                    }
-                    json.setOk(true);
-                    tempEninfo = nwDoc.toString();
-                } else {
-                    json.setOk(true);
-                    tempEninfo = eninfo;
-                }
-            } else {
-                tempEninfo = "";
-                json.setOk(true);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("pid:" + pid + ",uploadAliImgToLocal error:" + e.getMessage());
-            json.setOk(false);
-            json.setMessage("pid:" + pid + ",uploadAliImgToLocal error:" + e.getMessage());
-            json.setData(null);
-        }
-        if (json.isOk()) {
-            json.setData(tempEninfo);
-        }
-        return json;
-
-    }
-
     /**
      * 橱窗图网路图片下载本地并上传服务器
      */
@@ -2076,7 +1763,7 @@ public class EditorController {
                     // 文件的后缀取出来
                     String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
                     // 生成唯一文件名称
-                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                    String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                     // 本地服务器磁盘全路径
                     String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
                     // 下载网络图片到本地
@@ -2174,7 +1861,7 @@ public class EditorController {
                     String originalName = file.getOriginalFilename();
                     // 文件的后缀取出来
                     String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
-                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                    String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                     // 本地服务器磁盘全路径
                     String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
                     // 文件流输出到本地服务器指定路径
@@ -2392,7 +2079,7 @@ public class EditorController {
                         // 文件的后缀取出来
                         String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
                         // 生成唯一文件名称
-                        String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                        String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                         // 本地服务器磁盘全路径
                         String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
 
@@ -3073,16 +2760,6 @@ public class EditorController {
     }
 
 
-    /**
-     * @param filename 文件的原始名称
-     * @return uuid+"_"+文件的原始名称
-     * @Method: makeFileName
-     * @Description: 生成上传文件的文件名，文件名以：uuid+"_"+文件的原始名称
-     */
-    public static String makeFileName(String filename) { // 2.jpg
-        // 为防止文件覆盖的现象发生，要为上传文件产生一个唯一的文件名
-        return UUID.randomUUID().toString() + "_" + filename;
-    }
 
 
     @RequestMapping(value = "/goodsEditLog")
@@ -3347,7 +3024,7 @@ public class EditorController {
                 }
                 if (pidMapOlds.containsKey(gdEd.getPid())) {
                     if (StringUtils.isNotBlank(gdEd.getOld_title())) {
-                        if (checkListContains(pidMapOlds.get(gdEd.getPid()), gdEd.getOld_title())) {
+                        if (GoodsInfoUtils.checkListContains(pidMapOlds.get(gdEd.getPid()), gdEd.getOld_title())) {
                             gdEd.setOld_title("");
                         } else {
                             pidMapOlds.get(gdEd.getPid()).add(gdEd.getOld_title());
@@ -3360,7 +3037,7 @@ public class EditorController {
                 }
                 if (pidMapNews.containsKey(gdEd.getPid())) {
                     if (StringUtils.isNotBlank(gdEd.getNew_title())) {
-                        if (checkListContains(pidMapNews.get(gdEd.getPid()), gdEd.getNew_title())) {
+                        if (GoodsInfoUtils.checkListContains(pidMapNews.get(gdEd.getPid()), gdEd.getNew_title())) {
                             gdEd.setNew_title("");
                         } else {
                             pidMapNews.get(gdEd.getPid()).add(gdEd.getNew_title());
@@ -3817,7 +3494,7 @@ public class EditorController {
                     // 本地生成新的文件
                     Random random = new Random();
                     String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
-                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                    String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                     String changeLocalFilePath = prePath + saveFilename + fileSuffix;
 
                     BASE64Decoder decoder = new BASE64Decoder();
@@ -3903,6 +3580,123 @@ public class EditorController {
         return json;
     }
 
+
+    @RequestMapping(value = "/setGoodsOverSea")
+    @ResponseBody
+    public JsonResult setGoodsOverSea(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        com.cbt.pojo.Admuser admuser =UserInfoUtils.getUserInfo(request);
+        if(admuser == null || admuser.getId() == 0){
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return  json;
+        }
+        String pid = request.getParameter("pid");
+        if(StringUtils.isBlank(pid)){
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return  json;
+        }
+        String countryId = request.getParameter("countryId");
+        if(StringUtils.isBlank(countryId)){
+            json.setOk(false);
+            json.setMessage("获取countryId失败");
+            return  json;
+        }
+        String isSupport = request.getParameter("isSupport");
+        if(StringUtils.isBlank(isSupport)){
+            json.setOk(false);
+            json.setMessage("获取是否支持失败");
+            return  json;
+        }
+        try {
+            int isUpdate = 0;
+            List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
+            if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
+                for(GoodsOverSea goods: goodsOverSeaList){
+                    if(goods.getCountryId() == Integer.parseInt(countryId)){
+                        isUpdate = 1;
+                        break;
+                    }
+                }
+            }
+            if(isUpdate > 0) {
+                json.setOk(false);
+                json.setMessage("此国家已经被设置");
+                return json;
+            }
+            GoodsOverSea overSea = new GoodsOverSea();
+            overSea.setAdminId(admuser.getId());
+            overSea.setPid(pid);
+            overSea.setCountryId(Integer.parseInt(countryId));
+            overSea.setIsSupport(Integer.parseInt(isSupport));
+
+            customGoodsService.insertIntoGoodsOverSeaInfo(overSea);
+            String sql = "insert into custom_goods_oversea(pid,country_id,admin_id,is_support)" +
+                    " values('" + pid + "'," + countryId + "," + admuser.getId() + "," + isSupport + ")";
+            NotifyToCustomerUtil.sendSqlByMq(sql);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+    @RequestMapping(value = "/getAllZone")
+    @ResponseBody
+    public JsonResult getAllZone(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String isUsd = request.getParameter("isUsd");
+        try {
+            IZoneServer os = new ZoneServer();
+            List<ZoneBean> zoneBeanList = os.getAllZone();
+            if (StringUtils.isNotBlank(isUsd) && Integer.parseInt(isUsd) > 0) {
+                List<ZoneBean> listNew = zoneBeanList.stream().filter(e -> {
+                    return "USA".equalsIgnoreCase(e.getCountry());
+                }).collect(Collectors.toList());
+
+                json.setData(listNew);
+                zoneBeanList.clear();
+            } else {
+                json.setData(zoneBeanList);
+            }
+
+            json.setOk(true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/getGoodsOverSeaList")
+    @ResponseBody
+    public JsonResult getGoodsOverSeaList(HttpServletRequest request, String pid) {
+        JsonResult json = new JsonResult();
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+        try {
+            List<GoodsOverSea> list = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
+            json.setData(list);
+            json.setOk(true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
     private void praseEninfoAndUpdate(GoodsParseBean gd) {
         try {
             // 获取配置文件信息
@@ -3945,7 +3739,7 @@ public class EditorController {
                                 // 文件的后缀取出来
                                 String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
                                 // 生成唯一文件名称
-                                String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                                String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                                 // 本地服务器磁盘全路径
                                 String localFilePath = "checkImg/" + gd.getPid() + "/desc/" + saveFilename + fileSuffix;
                                 // 下载网络图片到本地
@@ -4027,7 +3821,8 @@ public class EditorController {
         }
     }
 
-    private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
+
+     private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
         try {
 
             Document nwDoc = Jsoup.parseBodyFragment(gd.getEninfo());
@@ -4049,43 +3844,6 @@ public class EditorController {
         }
     }
 
-
-    private boolean deleteImgByUrl(String pid) {
-        /*boolean isSu = false;
-        CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-        if (checkIsKidsCatid(goods.getCatid1()) && goods.getValid() == 0) {
-            // 接口调用
-            isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
-                    *//*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
-                    boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
-                    if (!isSu) {
-                        isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
-                    }
-                    if (!isSu) {
-                        LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
-                    }*//*
-
-        } else {
-            isSu = true;
-        }*/
-        return OKHttpUtils.optionGoodsInterface(pid, 0, 6, 2);
-    }
-
-    private boolean checkListContains(List<String> list, String str) {
-        boolean isOk = false;
-        if (list == null || list.isEmpty() || StringUtils.isBlank(str)) {
-            return isOk;
-        } else {
-            for (String tempStr : list) {
-                if (str.equals(tempStr)) {
-                    isOk = true;
-                    break;
-                }
-            }
-        }
-        return isOk;
-    }
-
     private boolean checkIsKidsCatid(String catid) {
         boolean isCheck = false;
         if (kidsCatidList == null || kidsCatidList.size() == 0) {
@@ -4099,4 +3857,5 @@ public class EditorController {
         }
         return isCheck;
     }
+
 }

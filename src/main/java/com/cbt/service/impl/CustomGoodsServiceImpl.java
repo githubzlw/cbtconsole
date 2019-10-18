@@ -859,5 +859,15 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryDescribeLogList();
     }
 
+    @Override
+    public int insertIntoGoodsOverSeaInfo(GoodsOverSea goodsOverSea) {
+        return customGoodsMapper.insertIntoGoodsOverSeaInfo(goodsOverSea);
+    }
+
+    @Override
+    public List<GoodsOverSea> queryGoodsOverSeaInfoByPid(String pid) {
+        return customGoodsMapper.queryGoodsOverSeaInfoByPid(pid);
+    }
+
 
 }

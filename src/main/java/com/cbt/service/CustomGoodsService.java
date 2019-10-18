@@ -872,4 +872,18 @@ public interface CustomGoodsService {
      * @return
      */
     List<String> queryDescribeLogList();
+
+    /**
+     * 插入海外仓数据
+     * @param goodsOverSea
+     * @return
+     */
+    int insertIntoGoodsOverSeaInfo(GoodsOverSea goodsOverSea);
+
+    /**
+     * 查询海外仓数据
+     * @param pid
+     * @return
+     */
+    List<GoodsOverSea> queryGoodsOverSeaInfoByPid(String pid);
 }
