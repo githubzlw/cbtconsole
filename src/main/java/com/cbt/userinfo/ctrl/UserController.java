@@ -30,6 +30,8 @@ import com.cbt.website.dao.PaymentDao;
 import com.cbt.website.dao.PaymentDaoImp;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.UserRecommendEmail;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -59,6 +61,8 @@ import java.util.Map;
 public class UserController {
 
 
+    @Autowired
+    private SendMailFactory sendMailFactory;
 
     @Autowired
     private RefundSSService refundSSService;
@@ -558,9 +562,13 @@ public class UserController {
 
     @RequestMapping(value = "/getUserAllInfoById", method = RequestMethod.POST)
     @ResponseBody
-    public JsonResult getUserAllInfoById(HttpServletRequest request, HttpServletResponse response) {
+    public JsonResult getUserAllInfoById(HttpServletRequest request, Integer userId) {
         JsonResult json = new JsonResult();
-        String userId = request.getParameter("userId");
+        if(userId == null || userId < 0){
+            json.setOk(false);
+            json.setMessage("获取用户ID失败");
+            return json;
+        }
         com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
         if (admuser == null) {
             json.setOk(false);
@@ -568,14 +576,101 @@ public class UserController {
             return json;
         }
         try {
-            UserInfo useInfo = userInfoService.queryAllInfoById(Integer.parseInt(userId));
+            UserInfo useInfo = userInfoService.queryAllInfoById(userId);
             useInfo.setAdmuser(admuser.getEmail());
 
-            List<UserRecommendEmail>  list =  userInfoService.queryRecommendEmailInfo(Integer.parseInt(userId));
+            List<UserRecommendEmail>  list =  userInfoService.queryRecommendEmailInfo(userId);
 
             json.setOk(true);
             json.setData(useInfo);
             json.setAllData(list);
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("获取失败");
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    @RequestMapping(value = "/sendRecommendEmail", method = RequestMethod.POST)
+    @ResponseBody
+    public JsonResult sendRecommendEmail(HttpServletRequest request, Integer userId, String userEmail,String createTime
+    ,String buniessInfo,String goodsNeed,String sendUrl,String sellEmail,String goodsRequire ,Integer webSite) {
+        JsonResult json = new JsonResult();
+
+        if (userId == null || userId < 0) {
+            json.setOk(false);
+            json.setMessage("获取客户ID失败");
+            return json;
+        }
+        if (webSite == null || webSite < 0) {
+            json.setOk(false);
+            json.setMessage("获取网站类别失败");
+            return json;
+        }
+        if (StringUtils.isBlank(userEmail)) {
+            json.setOk(false);
+            json.setMessage("获取客户邮箱失败");
+            return json;
+        }
+        if (StringUtils.isBlank(createTime)) {
+            json.setOk(false);
+            json.setMessage("获取客户创建时间失败");
+            return json;
+        }
+        if (StringUtils.isBlank(buniessInfo)) {
+            buniessInfo = "";
+        }
+        if (StringUtils.isBlank(goodsNeed)) {
+            goodsNeed = "";
+        }
+        if (StringUtils.isBlank(goodsRequire)) {
+            goodsRequire = "";
+        }
+        if (StringUtils.isBlank(sendUrl)) {
+            json.setOk(false);
+            json.setMessage("获取目录地址失败");
+            return json;
+        }
+        if (StringUtils.isBlank(sellEmail)) {
+            json.setOk(false);
+            json.setMessage("获取销售邮箱失败");
+            return json;
+        }
+
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        try {
+            Map<String,Object> sendMap = new HashMap<>();
+            sendMap.put("userId",String.valueOf(userId));
+            sendMap.put("createTime",createTime);
+            sendMap.put("buniessInfo",buniessInfo);
+            sendMap.put("goodsNeed",goodsNeed);
+            sendMap.put("goodsRequire",goodsRequire);
+            sendMap.put("sendUrl",sendUrl);
+            sendMap.put("webSite",webSite);
+
+            String title = "Our Recommendation";
+            sendMap.put("title",title);
+
+            TemplateType emailHtml = TemplateType.OUR_RECOMMENDATION;
+            sendMailFactory.sendMail(userEmail, sellEmail, title, sendMap, emailHtml);
+
+
+            UserRecommendEmail userRecommendEmail = new UserRecommendEmail();
+            userRecommendEmail.setAdminId(admuser.getId());
+            userRecommendEmail.setCreateTime(createTime);
+            userRecommendEmail.setSendUrl(sendUrl);
+            userRecommendEmail.setEmailContent(sendMap.toString());
+            userRecommendEmail.setUserId(userId);
+
+            userInfoService.insertIntoUserRecommendEmail(userRecommendEmail);
+
+            json.setOk(true);
         } catch (Exception e) {
             json.setOk(false);
             json.setMessage("获取失败");

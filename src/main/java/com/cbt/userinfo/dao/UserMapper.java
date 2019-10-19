@@ -86,4 +86,11 @@ public interface UserMapper {
 	 */
 	List<UserRecommendEmail> queryRecommendEmailInfo(int userId);
 
+	/**
+     * 插入发送消息
+     * @param userRecommendEmail
+     * @return
+     */
+	int insertIntoUserRecommendEmail(UserRecommendEmail userRecommendEmail);
+
 }

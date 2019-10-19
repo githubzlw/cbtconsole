@@ -41,7 +41,53 @@ public class UserInfo {
 	 */
 	private int site;
 	private String webSite;
-	
+
+	private String businessinfo;
+	private String productone;
+	private String producttwo;
+	private String requirementone;
+	private String requirementtwo;
+
+	public String getBusinessinfo() {
+		return businessinfo;
+	}
+
+	public void setBusinessinfo(String businessinfo) {
+		this.businessinfo = businessinfo;
+	}
+
+	public String getProductone() {
+		return productone;
+	}
+
+	public void setProductone(String productone) {
+		this.productone = productone;
+	}
+
+	public String getProducttwo() {
+		return producttwo;
+	}
+
+	public void setProducttwo(String producttwo) {
+		this.producttwo = producttwo;
+	}
+
+	public String getRequirementone() {
+		return requirementone;
+	}
+
+	public void setRequirementone(String requirementone) {
+		this.requirementone = requirementone;
+	}
+
+	public String getRequirementtwo() {
+		return requirementtwo;
+	}
+
+	public void setRequirementtwo(String requirementtwo) {
+		this.requirementtwo = requirementtwo;
+	}
+
 	public String getCar_info() {
 		return car_info;
 	}

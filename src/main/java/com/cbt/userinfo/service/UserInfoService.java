@@ -143,4 +143,9 @@ public static void main(String[] args) {
 		return mapper.queryRecommendEmailInfo(userId);
 	}
 
+    @Override
+    public int insertIntoUserRecommendEmail(UserRecommendEmail userRecommendEmail) {
+        return mapper.insertIntoUserRecommendEmail(userRecommendEmail);
+    }
+
 }

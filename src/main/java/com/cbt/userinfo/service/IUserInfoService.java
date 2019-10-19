@@ -85,4 +85,11 @@ public interface IUserInfoService {
 	 * @return
 	 */
 	List<UserRecommendEmail> queryRecommendEmailInfo(int userId);
+
+    /**
+     * 插入发送消息
+     * @param userRecommendEmail
+     * @return
+     */
+	int insertIntoUserRecommendEmail(UserRecommendEmail userRecommendEmail);
 }
