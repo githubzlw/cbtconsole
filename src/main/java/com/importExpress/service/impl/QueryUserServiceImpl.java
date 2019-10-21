@@ -847,6 +847,11 @@ public class QueryUserServiceImpl implements QueryUserService {
     }
 
     @Override
+    public List<Integer> queryAllCheckout(int flag) {
+        return queryUserMapper.queryAllCheckout(flag);
+    }
+
+    @Override
     public List<TimingWarningInfo> queryTimingWarningInfo(Integer valid, Integer day) {
         return queryUserMapper.queryTimingWarningInfo(valid, day);
     }
