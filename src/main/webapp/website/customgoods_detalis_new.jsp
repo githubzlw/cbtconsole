@@ -52,6 +52,7 @@
             $('#update_review_dlg').dialog('close');
             closeNewAliPidDlg('close');
             closeMultiFileDialog();
+            closeGoodsDescDialog();
         });
 
         function relieveDisabled(obj) {
@@ -866,7 +867,8 @@
             $("#review_remark").val("");
         }
 
-        function openEditReview(id, country, review_remark, review_score, review_flag, createtime, pid) {
+        function openEditReview(id, country, review_score, review_flag, createtime, pid) {
+            var review_remark= $("#review_remark_" + id).text();
             $("#oldCreateTime").val(createtime);
             $("#goods_pid").val(pid);
             $("#goods_id").val(id);
@@ -1429,9 +1431,15 @@
             $(this).siblings().removeClass("img_choose");
         });
 
+
         function closeMultiFileDialog() {
             $('#multi_file_dlg').dialog('close');
             $("#multiFileForm")[0].reset();
+        }
+
+        function closeGoodsDescDialog() {
+            $('#set_goods_desc_type').dialog('close');
+            $("#set_desc_form")[0].reset();
         }
 
         function uploadMultiFile() {
@@ -1465,6 +1473,64 @@
                 }
             });
         }
+
+        function setGoodsDescWithHotType() {
+            getHotTypeList();
+
+        }
+
+        function getHotTypeList() {
+            $.ajax({
+                type: 'POST',
+                sync: true,
+                dataType: 'json',
+                url: '/cbtconsole/hotManage/getHotTypeList',
+                data: {},
+                success: function (data) {
+                    if (data.success) {
+                        var content = "";
+                        var jsonData = data.rows;
+                        for (var i=0;i< jsonData.length;i++) {
+                            content += '<option value="' + jsonData[i].id + '">' + jsonData[i].showName + '</option>';
+                        }
+                        $("#hot_type_id").empty();
+                        $("#hot_type_id").append(content);
+                        $('#set_goods_desc_type').dialog('open');
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (XMLResponse) {
+                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                }
+            });
+        }
+
+        function saveGoodsDescInfo(pid) {
+            var hotTypeId = $("#hot_type_id").val();
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: '/cbtconsole/editc/saveGoodsDescInfo',
+                data: {
+                    pid: pid,
+                    hotTypeId: hotTypeId
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        showMessage("执行成功");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (XMLResponse) {
+                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                }
+            });
+        }
     </script>
 </head>
 
@@ -1477,12 +1543,34 @@
 <c:if test="${uid < 0}">
     <div>
         <p style="margin-left: 700px;font-size: 28px;color: red;margin-top: 200px;">获取产品失败</p>
+        <c:if test="${not empty message}">
+            <p>${message}</p>
+        </c:if>
     </div>
 </c:if>
 
 <c:if test="${uid > 0}">
 
     <div class="mask"></div>
+
+    <div id="set_goods_desc_type" class="easyui-dialog" title="设置描述很精彩"
+         data-options="modal:true"
+         style="width: 330px; height: 180px; padding: 10px;">
+        <form style="margin-left: 44px;" id="set_desc_form" method="post" enctype="multipart/form-data">
+            <span>分组:</span><select id="hot_type_id" style="height: 26px;width: 220px;">
+
+        </select>
+        </form>
+        <br>
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="saveGoodsDescInfo('${goods.pid}')" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeGoodsDescDialog()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
 
 
     <div id="multi_file_dlg" class="easyui-dialog" title="详情多文件上传"
@@ -1763,7 +1851,8 @@
                 <span class="s_btn" >下架该商品</span>
                 <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>--%>
             <c:if test="${goods.describeGoodFlag == 0}">
-                <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>
+                <%--<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>--%>
+                <span class="s_btn" onclick="setGoodsDescWithHotType('${goods.pid}')">设置描述很精彩</span>
             </c:if>
                 <%--<span class="s_last">*点击后数据直接更新线上</span>--%>
             <span class="s_btn" onclick="setNoBenchmarking('${goods.pid}',${goods.finalWeight})">标识非对标商品</span>
@@ -2128,7 +2217,12 @@
                     <b style="font-size: 16px;">数据状态:${goods.abnormalValue}</b>
                 </c:if> <c:if test="${goods.describeGoodFlag > 0}">
                     <br>
-                    <b style="font-size: 16px;color: red;">描述很精彩标记</b>
+                    <c:if test="${empty describeGoodFlagStr}">
+                        <b style="font-size: 16px;color: red;">描述很精彩标记</b>
+                    </c:if>
+                    <c:if test="${not empty describeGoodFlagStr}">
+                        <b style="font-size: 16px;color: red;">描述很精彩:(${describeGoodFlagStr})</b>
+                    </c:if>
                 </c:if><c:if test="${goods.isBenchmark >0}">
                     <br>
                     <b style="font-size: 16px;">货源对标情况:${goods.isBenchmark ==1 ? '精确对标':'近似对标'}</b>
@@ -2173,11 +2267,11 @@
                 </c:if><c:if test="${goods.valid == 0}">
                     <c:if test="${not empty goods.offReason}">
                         <br>
-                        <b style="font-size: 16px;color: red;">下架原因:${goods.offReason}(人为下架)</b>
+                        <b style="font-size: 16px;color: red;">硬下架原因:${goods.offReason}(人为下架)</b>
                     </c:if>
                     <c:if test="${empty goods.offReason && not empty goods.unsellAbleReasonDesc}">
                         <br>
-                        <b style="font-size: 16px;color: red;">下架原因:${goods.unsellAbleReasonDesc}(系统下架)</b>
+                        <b style="font-size: 16px;color: red;">硬下架原因:${goods.unsellAbleReasonDesc}(系统下架)</b>
                     </c:if>
                     </c:if>
                     <c:if test="${goods.valid == 2}">
@@ -2285,7 +2379,8 @@
                 <span style="font-size: 22px; color: red; margin-top: 15px;">商品评论:</span><br>
                 <c:forEach items="${reviewList}" var="review">
                     <span style="font-size: 15px;  margin-top: 15px;">评论人:${review.review_name};评论时间:${review.createtime};国家:${review.country};评论内容:${review.review_remark};评分:${review.review_score};${review.review_flag};编辑时间:${review.updatetime}</span>
-                    <button onclick="openEditReview('${review.aliId}','${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}','${review.createtime}','${review.goods_pid}');">
+                    <span id="review_remark_${review.aliId}" style="display: none">${review.review_remark}</span>
+                    <button onclick="openEditReview('${review.aliId}','${review.country}','${review.review_score}','${review.review_flag}','${review.createtime}','${review.goods_pid}');">
                         编辑
                     </button>
                     <br>

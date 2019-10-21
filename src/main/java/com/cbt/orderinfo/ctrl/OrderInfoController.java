@@ -269,6 +269,20 @@ public class OrderInfoController{
 		}catch (Exception e){
 			e.printStackTrace();
 		}
+		for (SearchResultInfo searchResultInfo : list) {
+			if (searchResultInfo.getOrderid().contains("_SN")) {
+				// 数量拆单入库数据处理
+                String orderNo = searchResultInfo.getOrderid();
+                // 详情数据处理
+				iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderNo.substring(0, orderNo.indexOf("_")), orderNo);
+				// 数量拆单采购数据处理
+				iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
+				// 数量拆单入库数据处理
+				iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
+				// 数量拆单商品备注沟通数据处理
+			    iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+			}
+		}
 		out.print(net.minidev.json.JSONArray.toJSONString(list));
 		out.flush();
 		out.close();
@@ -487,14 +501,18 @@ public class OrderInfoController{
 			map.put("itemid", request.getParameter("itemid"));
 			map.put("repState", request.getParameter("repState"));
 			map.put("warehouseRemark", warehouseRemark);
-			// 验货有误时的验货数量
-			int count = Integer.valueOf(request.getParameter("count"));
-			map.put("count",String.valueOf(count));
-			res = iOrderinfoService.updateGoodStatus(map);
-			String goods_pid=request.getParameter("goods_pid");//统计质量差的商品
-			if (!("1".equals(goods_pid)||"".equals(goods_pid)||goods_pid==null)){
-				Boolean b=this.iOrderinfoService.UpdateGoodsState(goods_pid);
+			map.put("taobaoId", request.getParameter("taobaoId"));
+			if(StringUtils.isNotBlank(request.getParameter("taobaoId"))) {
+				// 验货有误时的验货数量
+				int count = Integer.valueOf(request.getParameter("count"));
+				map.put("count", String.valueOf(count));
+				res = iOrderinfoService.updateGoodStatus(map);
+				String goods_pid = request.getParameter("goods_pid");//统计质量差的商品
+				if (!("1".equals(goods_pid) || "".equals(goods_pid) || goods_pid == null)) {
+					Boolean b = this.iOrderinfoService.UpdateGoodsState(goods_pid);
+				}
 			}
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}

@@ -991,7 +991,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                     + userInfo.getAvailable()
                     + "')\">修改余额</button><br /><button id='but2' onclick='fnsetDropshipUser()'>设置为Drop ship客户</button>"
                     + "<button onclick=\"showRemark(\'" + userInfo.getUserid() + "\')\">备注</button>"
-                    + "<button onclick=\"showUserType(\'" + userInfo.getUserid() + "\', \'" + (userCheck.contains(userInfo.getUserid())?1:0) + "\')\">用户类型</button>");
+                    + "<button onclick=\"showUserType(\'" + userInfo.getUserid() + "\', \'" + (userCheck.contains(userInfo.getUserid())?1:0) + "\')\">授权</button>");
             for (int j = 0; j < list.size(); j++) {
                 ConfirmUserInfo c = list.get(j);
                 if (c.getConfirmusername().equals(userInfo.getAdminname())) {
@@ -3001,6 +3001,43 @@ public class WarehouseServiceImpl implements IWarehouseService {
             return false;
     }
 
+    }
+
+    @Override
+    public boolean addprocurement(List<SampleOrderBean> orderNos) {
+        try {
+        SampleOrderBean ben=this.orderinfoMapper.addprocurement(orderNos.get(0).getOrderNo().replace("_SP",""));
+        boolean bo=false;
+        for (SampleOrderBean sob:orderNos) {
+            if (ben != null) {
+                ben.setPid(sob.getPid());
+                ben.setOrderNo(sob.getOrderNo());
+                  this.orderinfoMapper.addOrder(ben);
+            }else {
+                return false;
+            }
+        }
+        return true;
+        }  catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public int orderdtailDetail() {
+        try {
+         this.warehouseMapper.orderdtailDetail();
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    @Override
+    public int insertMqLog(String sqlStr, String shopNo, String orderNo, String paramStr) {
+        return warehouseMapper.insertMqLog(sqlStr, shopNo, orderNo, paramStr);
     }
 
     public List<String> getSkulist(String sku,String weight) {

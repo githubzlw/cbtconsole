@@ -280,7 +280,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // MQ
         // GoodsInfoUpdateOnlineUtil.setGoodsValidByMq(pid,type);
         // MongoDB
-        // GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid, type);
+        GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid, type);
         return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6, remark);
     }
 
@@ -838,5 +838,26 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public String queryChTypeBySkuId(String skuId) {
         return customGoodsMapper.queryChTypeBySkuId(skuId);
     }
+
+    @Override
+    public List<String> queryAllShopBlackList() {
+        return customGoodsMapper.queryAllShopBlackList();
+    }
+
+    @Override
+    public int insertIntoDescribeLog(String pid, int adminId) {
+        return customGoodsMapper.insertIntoDescribeLog(pid, adminId);
+    }
+
+    @Override
+    public Map<String, String> queryDescribeLogInfo(String pid) {
+        return customGoodsMapper.queryDescribeLogInfo(pid);
+    }
+
+    @Override
+    public List<String> queryDescribeLogList() {
+        return customGoodsMapper.queryDescribeLogList();
+    }
+
 
 }

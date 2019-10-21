@@ -337,7 +337,7 @@ function fn(va) {
 		uname = user.username;
 		uemail = user.email;
         var emailFlag = json[i].emailFlag;
-		if(adminName=="Ling"){
+		if(adminName=="ling"){
 		    var html_="<td style='"+show_changeState+"'><a target='_blank' href='javascript:void(0)' "
                 +"onclick='window.open(\"/cbtconsole/website/updateorderstate.jsp?orderNo="
                 + json[i].order_no+ "&state="+ state + "\",\"windows\",\"height=280,width=530,"

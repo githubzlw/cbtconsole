@@ -7,6 +7,7 @@ import com.cbt.pojo.GoodsDistribution;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
+import com.cbt.warehouse.pojo.OrderDetailsBeans;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
@@ -18,6 +19,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -714,5 +716,50 @@ public interface OrderinfoMapper {
 	int  cancelOrderState(int odid);
 
 	int updateOrderInfoFreight(@Param("orderNo") String orderNo, @Param("amount") String amount);
-	
+
+
+
+	int insertSampleOrderInfo(@Param("orderNo") String orderNo, @Param("nwOrderNo") String nwOrderNo);
+
+	int insertSampleOrderAddress(@Param("orderNo") String orderNo, @Param("nwOrderNo") String nwOrderNo);
+
+	void batchAddOrderDetail(@Param("detailsList")List<OrderDetailsBeans> odbList);
+
+	void updateSampleOrderGoods(List<com.cbt.warehouse.pojo.SampleOrderBean> sampleOrderBeanList);
+
+	void batchInsertIntoSampleOrderGoods(List<com.cbt.warehouse.pojo.SampleOrderBean> sampleOrderBeanList);
+    @Select("SELECT orderid as orderNo,admuserid as userId from goods_distribution WHERE orderid=#{orderNo} LIMIT 1")
+	com.cbt.warehouse.pojo.SampleOrderBean addprocurement(@Param("orderNo") String orderNo);
+     @Select("INSERT INTO goods_distribution (orderid,odid,goodsid,admuserid,createtime,goods_pid) VALUES (#{ben.orderNo},'0','0', #{ben.userId}, NOW(),#{ben.pid});")
+	void addOrder(@Param("ben") com.cbt.warehouse.pojo.SampleOrderBean ben);
+
+	/**
+	 * 订单详情线下采购
+	 * @param oldOrderNo
+	 * @param newOrderNo
+	 * @return
+	 */
+	int updateOrderSplitNumOrderDetailsData(@Param("oldOrderNo") String oldOrderNo, @Param("newOrderNo") String newOrderNo);
+
+	/**
+	 * 更新数量拆单的采购数据
+	 * @return
+	 */
+	int updateOrderSplitNumPurchaseData(@Param("orderNo") String orderNo);
+
+	/**
+	 * 更新数量拆单的入库数据
+	 * @param orderNo
+	 * @return
+	 */
+	int updateOrderSplitNumIdRelationtableData(@Param("orderNo") String orderNo);
+
+	/**
+	 * 更新商品备注沟通数据
+	 * @param orderNo
+	 * @return
+	 */
+	int updateOrderSplitNumGoodsCommunicationInfoData(@Param("orderNo") String orderNo);
+    @Select("SELECT car_urlMd5 from order_details WHERE orderid='2190927K687' LIMIT 1")
+    String getUrlMd5ByOrder(@Param("orderNo") String orderNo);
 }

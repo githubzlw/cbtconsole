@@ -977,7 +977,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String sql = "select shop_id,pid,custom_main_image,remotpath,enname,price,range_price,wprice,sync_flag,"
-                + "eninfo,sync_remark,valid from shop_goods_ready where shop_id = ? and p_d_flag < 2";
+                + "eninfo,sync_remark,valid,no_sold from shop_goods_ready where shop_id = ? and p_d_flag < 2";
         try {
             conn = DBHelper.getInstance().getConnection7();
             stmt = conn.prepareStatement(sql);
@@ -997,6 +997,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 spGoods.setSyncFlag(rs.getInt("sync_flag"));
                 spGoods.setSyncRemark(rs.getString("sync_remark"));
                 spGoods.setEnInfo(rs.getString("eninfo"));
+                spGoods.setNoSold(rs.getInt("no_sold"));
                 goodsList.add(spGoods);
             }
         } catch (Exception e) {
@@ -1215,6 +1216,55 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("shopId:" + shopId + ",pids:" + pids + ",deleteShopOfferGoods error: " + e.getMessage());
+            try {
+                conn.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return rs == count && rs > 0;
+    }
+
+
+    @Override
+    public boolean setShopGoodsNoSold(String shopId, String pids) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        String upSql = "update shop_goods_ready set no_sold = 1 where shop_id = ? and pid = ? ";
+        int rs = 0;
+        int count = 0;
+        try {
+            conn = DBHelper.getInstance().getConnection7();
+            conn.setAutoCommit(false);
+            stmt = conn.prepareStatement(upSql);
+            String[] pidList = pids.split(",");
+            for (String pid : pidList) {
+                if (pid == null || "".equals(pid)) {
+                    continue;
+                }
+                count++;
+                stmt.setString(1, shopId);
+                stmt.setString(2, pid);
+                stmt.addBatch();
+            }
+            rs = stmt.executeBatch().length;
+            if (rs == count && rs > 0) {
+                conn.commit();
+            } else {
+                conn.rollback();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("shopId:" + shopId + ",pids:" + pids + ",setShopGoodsNoSold error: " + e.getMessage());
             try {
                 conn.rollback();
             } catch (SQLException e1) {
@@ -2108,7 +2158,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        String sql = "select shop_state,online_state from shop_clear_state where shop_id = ?";
+        String sql = "select shop_state,online_state,update_time from shop_clear_state where shop_id = ?";
         Map<String, Integer> rsMap = new HashMap<String, Integer>();
         try {
             conn = DBHelper.getInstance().getConnection5();
@@ -2118,6 +2168,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             if (rs.next()) {
                 rsMap.put("shop_state", rs.getInt("shop_state"));
                 rsMap.put("online_state", rs.getInt("online_state"));
+                rsMap.put(rs.getString("update_time"), 88);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -3306,6 +3357,26 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             e.printStackTrace();
             System.err.println("shopId:" + shopId + ",reUpdateShopAdminId error: " + e.getMessage());
             LOG.error("shopId:" + shopId + ",reUpdateShopAdminId error: " + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return count;
+    }
+
+    @Override
+    public int setShopGoodsFailureGoodsToReady(String shopId) {
+        Connection conn = DBHelper.getInstance().getConnection7();
+        Statement stmt = null;
+        String upShopSql = "update shop_goods_ready set sync_flag = 0 where shop_id = '" + shopId + "' and sync_flag = 2 ";
+        int count = 0;
+        try {
+            stmt = conn.createStatement();
+            count = stmt.executeUpdate(upShopSql);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("shopId:" + shopId + ",setShopGoodsFailureGoodsToReady error: " + e.getMessage());
+            LOG.error("shopId:" + shopId + ",setShopGoodsFailureGoodsToReady error: " + e.getMessage());
         } finally {
             DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);

@@ -45,7 +45,7 @@
 		<listener-class>com.cbt.website.quartz.genHotCategoryAndGoods</listener-class>
 	</listener> -->
 	
-  <filter>
+  <!-- <filter>
     <filter-name>shiroFilter</filter-name>
     <filter-class>  
 	        org.springframework.web.filter.DelegatingFilterProxy  
@@ -54,7 +54,26 @@
   <filter-mapping>
     <filter-name>shiroFilter</filter-name>
     <url-pattern>/*</url-pattern>
-  </filter-mapping>
+  </filter-mapping> -->
+  <!-- Shiro Filter is defined in the spring application context: -->
+	<!-- 
+	1. 配置  Shiro 的 shiroFilter.  
+	2. DelegatingFilterProxy 实际上是 Filter 的一个代理对象. 默认情况下, Spring 会到 IOC 容器中查找和 
+	<filter-name> 对应的 filter bean. 也可以通过 targetBeanName 的初始化参数来配置 filter bean 的 id. 
+	-->
+    <filter>
+        <filter-name>shiroFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetFilterLifecycle</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>shiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
   <filter>
     <filter-name>adminInterceptor</filter-name>
     <filter-class>com.cbt.website.interceptor.HeadInterceptor</filter-class>
@@ -447,6 +466,7 @@
     <url-pattern>/ckfinder/core/connector/java/connector.java</url-pattern>
   </filter-mapping>
   <session-config>
+    <!-- 设置过期时间：2天 -->
     <session-timeout>2880</session-timeout>
   </session-config>
   <error-page>
@@ -460,6 +480,10 @@
   <error-page>
     <error-code>404</error-code>
     <location>/WEB-INF/views/error/404.jsp</location>
+  </error-page>
+  <error-page>
+	<exception-type>org.apache.shiro.authz.UnauthorizedException</exception-type>
+	<location>/apa/unauth.html</location>
   </error-page>
   <servlet>
     <description></description>
@@ -903,6 +927,17 @@
     <filter-name>CharacterEncodingFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  <!-- <filter>
+	    <filter-name>LoginFilter</filter-name>
+	    <filter-class>com.cbt.filter.LoginFilter</filter-class>
+	</filter>
+	<filter-mapping>
+	    <filter-name>LoginFilter</filter-name>
+	    <url-pattern>/*</url-pattern>
+	    <dispatcher>REQUEST</dispatcher>
+	    <dispatcher>FORWARD</dispatcher>
+	</filter-mapping> -->
+	
   <servlet>
     <description></description>
     <display-name>EmailReceiveServlet</display-name>

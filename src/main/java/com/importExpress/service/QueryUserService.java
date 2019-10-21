@@ -61,7 +61,7 @@ public interface QueryUserService {
 
     GoodsReview queryGoodsReviewById(Integer id);
 
-    void updateNeedoffshelfByPid(String pid, String noShelfInfo);
+    void upNeedoffshelfByPid(String pid, String noShelfInfo);
 
     Map<String,Object> querySameGoodsInfoByPid(String pid);
 
@@ -76,6 +76,8 @@ public interface QueryUserService {
     UserBean insertLoginLog(Integer userid, Integer admid, Integer site);
 
     Map<String, Object> updateUserCheckout(Integer userid, Integer type);
+
+    List<Integer> queryAllCheckout(int flag);
 
     List<TimingWarningInfo> queryTimingWarningInfo(Integer valid, Integer day);
 

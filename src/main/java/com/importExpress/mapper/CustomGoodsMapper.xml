@@ -1434,4 +1434,22 @@
         where spec_id= #{skuId}
     </select>
 
+    <select id="queryAllShopBlackList" resultType="string">
+        select shop_id from shop_blacklist_list
+    </select>
+
+    <insert id="insertIntoDescribeLog">
+        insert into custom_pid_describe_log(pid,admin_id)
+        values(#{pid},#{adminId} )
+    </insert>
+
+    <select id="queryDescribeLogInfo" resultType="hashmap">
+        select  a.id,a.pid,a.admin_id,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time, b.admName
+        from custom_pid_describe_log a,admuser b where a.pid = #{pid} and  a.admin_id = b.id
+        order by a.create_time limit 1
+    </select>
+
+    <select id="queryDescribeLogList" resultType="string">
+        select pid from custom_pid_describe_log
+    </select>
 </mapper>

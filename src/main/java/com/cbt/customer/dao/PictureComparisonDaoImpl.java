@@ -10,6 +10,9 @@ import com.cbt.util.StrUtils;
 import com.cbt.util.Util;
 import com.cbt.warehouse.util.StringUtil;
 
+import com.importExpress.utli.RunBatchSqlModel;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -4294,21 +4297,24 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 	public int updateCgdEmailFlag(String orderNo) {
 
 		String sql = "update orderinfo set packag_style = 2 where order_no = ? ";
-		String sql2 = "update orderinfo set packag_style = 2 where order_no = ? ";
+//		String sql2 = "update orderinfo set packag_style = 2 where order_no = ? ";
 
-		
+
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection conn1 = DBHelper.getInstance().getConnection2();
+//		Connection conn1 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null,stmt1 = null;
 		int res = 0;
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, orderNo);
 			res = stmt.executeUpdate();
-			stmt1 = conn1.prepareStatement(sql2);
-			stmt1.setString(1, orderNo);
-			res = stmt1.executeUpdate();
-			
+//			stmt1 = conn1.prepareStatement(sql2);
+//			stmt1.setString(1, orderNo);
+//			res = stmt1.executeUpdate();
+			SendMQ sendMQ=new SendMQ();
+			sendMQ.sendMsg(new RunSqlModel("update orderinfo set packag_style = 2 where order_no ='"+orderNo+"' "));
+			sendMQ.closeConn();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -4327,7 +4333,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn1);
+//			DBHelper.getInstance().closeConnection(conn1);
 		}
 		return res;
 	}
@@ -4389,52 +4395,84 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		
 		String sql1 = "insert into changegooddata (orderno,goodscarid,goodid,aliname,aliimg,aliurl,aliprice,chagoodname,chagoodimg,chagoodurl,chagoodprice,delflag,changeflag,goodstype,emailsendflag) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
 		String sqlDel ="delete from changegooddata where orderno=? ";
-		Connection conn1 = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt0=null,stmt1 = null;
+//		Connection conn1 = DBHelper.getInstance().getConnection2();
+//		PreparedStatement stmt0=null,stmt1 = null;
 		int res = 0;
 		try {
-			stmt0 = conn1.prepareStatement(sqlDel);
-			stmt0.setString(1, orderNo);
-			res = stmt0.executeUpdate();
-			
-			for(int i=0; i<gsfList.size(); i++){
-				stmt1 = conn1.prepareStatement(sql1);
-				stmt1.setString(1, gsfList.get(i).getOrderno());
-				stmt1.setInt(2, Integer.valueOf(gsfList.get(i).getGoodsCarId()));
-				stmt1.setInt(3, Integer.valueOf(gsfList.get(i).getGoodid()));
-				stmt1.setString(4, gsfList.get(i).getAliname());
-				stmt1.setString(5, gsfList.get(i).getAliimg());
-				stmt1.setString(6, gsfList.get(i).getAliurl());
-				stmt1.setString(7, gsfList.get(i).getAliprice());
-				stmt1.setString(8, gsfList.get(i).getChagoodname());
-				stmt1.setString(9, gsfList.get(i).getChagoodimg());
-				stmt1.setString(10, gsfList.get(i).getChagoodurl());
-				stmt1.setString(11, gsfList.get(i).getChagoodprice());
-				stmt1.setInt(12, Integer.valueOf(gsfList.get(i).getDelFlag()));
-				stmt1.setInt(13, Integer.valueOf(gsfList.get(i).getChangeFlag()));
-				stmt1.setString(14, gsfList.get(i).getGoodsType());
-				stmt1.setInt(15, Integer.valueOf(gsfList.get(i).getEmailsendFlag()));
-				res = stmt1.executeUpdate();
+//			stmt0 = conn1.prepareStatement(sqlDel);
+//			stmt0.setString(1, orderNo);
+//			res = stmt0.executeUpdate();
+			SendMQ sendMQ=new SendMQ();
+			sendMQ.sendMsg(new RunSqlModel("delete from changegooddata where orderno='"+orderNo+"'"));
+			sendMQ.closeConn();
+
+//			for(int i=0; i<gsfList.size(); i++){
+//				stmt1 = conn1.prepareStatement(sql1);
+//				stmt1.setString(1, gsfList.get(i).getOrderno());
+//				stmt1.setInt(2, Integer.valueOf(gsfList.get(i).getGoodsCarId()));
+//				stmt1.setInt(3, Integer.valueOf(gsfList.get(i).getGoodid()));
+//				stmt1.setString(4, gsfList.get(i).getAliname());
+//				stmt1.setString(5, gsfList.get(i).getAliimg());
+//				stmt1.setString(6, gsfList.get(i).getAliurl());
+//				stmt1.setString(7, gsfList.get(i).getAliprice());
+//				stmt1.setString(8, gsfList.get(i).getChagoodname());
+//				stmt1.setString(9, gsfList.get(i).getChagoodimg());
+//				stmt1.setString(10, gsfList.get(i).getChagoodurl());
+//				stmt1.setString(11, gsfList.get(i).getChagoodprice());
+//				stmt1.setInt(12, Integer.valueOf(gsfList.get(i).getDelFlag()));
+//				stmt1.setInt(13, Integer.valueOf(gsfList.get(i).getChangeFlag()));
+//				stmt1.setString(14, gsfList.get(i).getGoodsType());
+//				stmt1.setInt(15, Integer.valueOf(gsfList.get(i).getEmailsendFlag()));
+//				res = stmt1.executeUpdate();
+//			}
+
+			// 添加新数据
+			List<String> sqlList = new ArrayList<String>();
+			StringBuffer sqlStr;
+			for (int i=0; i<gsfList.size(); i++) {
+				sqlStr = new StringBuffer();
+				sqlStr.append("insert into changegooddata (orderno,goodscarid,goodid,aliname,aliimg,aliurl,aliprice,chagoodname,chagoodimg,chagoodurl,chagoodprice,delflag,changeflag,goodstype,emailsendflag) values(")
+						.append("\'").append(gsfList.get(i).getOrderno()).append("\', ")
+						.append("\'").append(gsfList.get(i).getGoodsCarId()).append("\', ")
+						.append("\'").append(gsfList.get(i).getGoodid()).append("\', ")
+						.append("\'").append(SendMQ.repCha(gsfList.get(i).getAliname())).append("\', ")
+						.append("\'").append(gsfList.get(i).getAliimg()).append("\', ")
+						.append("\'").append(gsfList.get(i).getAliurl()).append("\', ")
+						.append("\'").append(gsfList.get(i).getAliprice()).append("\', ")
+						.append("\'").append(SendMQ.repCha(gsfList.get(i).getChagoodname())).append("\', ")
+						.append("\'").append(gsfList.get(i).getChagoodimg()).append("\', ")
+						.append("\'").append(gsfList.get(i).getChagoodurl()).append("\', ")
+						.append("\'").append(gsfList.get(i).getChagoodprice()).append("\', ")
+						.append("\'").append(gsfList.get(i).getDelFlag()).append("\', ")
+						.append("\'").append(gsfList.get(i).getChangeFlag()).append("\', ")
+						.append("\'").append(SendMQ.repCha(gsfList.get(i).getGoodsType())).append("\', ")
+						.append("\'").append(gsfList.get(i).getEmailsendFlag()).append("\');");
+				sqlList.add(sqlStr.toString());
+
 			}
+			RunBatchSqlModel sqlModel = new RunBatchSqlModel();//存储待更新线上数据 mq方式更新
+			sqlModel.setSqls(sqlList);
+			SendMQ.sendMqSql(sqlModel);
+
 
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt0 != null) {
-				try { 
-					stmt0.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (stmt != null) {
-				try { 
-					stmt1.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+//			if (stmt0 != null) {
+//				try {
+//					stmt0.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			if (stmt != null) {
+//				try {
+//					stmt1.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
 			DBHelper.getInstance().closeConnection(conn);
 		}
 		return res;
@@ -5271,9 +5309,9 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		
 
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection conn1 = DBHelper.getInstance().getConnection2();
+//		Connection conn1 = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
-		PreparedStatement stmt0 = null,stmt = null,stmt1 = null,stmt2 = null,stmt3 = null,stmt4 = null;
+		PreparedStatement stmt0 = null,stmt = null,stmt1 = null,stmt2 = null,stmt3 = null;
 		GoodsCheckBean goodsCheckBean = null;
 		
 		PreparedStatement stmtfind = null;
@@ -5339,10 +5377,14 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 				stmt1.setString(1, orderNo);
 				res = stmt1.executeUpdate();
 				//更新有替换产品标识线上
-				String sqlChangeOnLine = "update orderinfo set packag_style = 1 where order_no = ? ";
-				stmt4 = conn1.prepareStatement(sqlChangeOnLine);
-				stmt4.setString(1, orderNo);
-				res = stmt4.executeUpdate();
+//				String sqlChangeOnLine = "update orderinfo set packag_style = 1 where order_no = ? ";
+//				stmt4 = conn1.prepareStatement(sqlChangeOnLine);
+//				stmt4.setString(1, orderNo);
+//				res = stmt4.executeUpdate();
+				SendMQ sendMQ=new SendMQ();
+				sendMQ.sendMsg(new RunSqlModel("update orderinfo set packag_style = 1 where order_no ='"+orderNo+"' "));
+				sendMQ.closeConn();
+
 				//更新货源表替换产品标识
 				String sqlGoods = "update goods_source set change_flag = 1 where goods_url = ? and goods_purl=? ";
 				stmt2 = conn.prepareStatement(sqlGoods);
@@ -5538,15 +5580,15 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 					e.printStackTrace();
 				}
 			}
-			if (stmt4 != null) {
-				try {
-					stmt4.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+//			if (stmt4 != null) {
+//				try {
+//					stmt4.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn1);
+//			DBHelper.getInstance().closeConnection(conn1);
 		}
 		return goodsCheckBean;
 	}

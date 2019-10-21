@@ -22,7 +22,8 @@ public class DBHelper {
 
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(DBHelper.class);
 
-    private static DruidDataSource dataSource = null;
+//    private static DruidDataSource dataSource = null;
+    private static ComboPooledDataSource dataSource = null;
     private static ComboPooledDataSource dataSource2 = null;
     private static ComboPooledDataSource dataSource3 = null;
     private static ComboPooledDataSource dataSource4 = null;
@@ -99,31 +100,48 @@ public class DBHelper {
         }
     }
 
-    private void initDataSource(Properties p) {
-        dataSource = new DruidDataSource();
+//    private void initDataSource(Properties p) {
+//        dataSource = new DruidDataSource();
+//
+//        dataSource.setDriverClassName(p.getProperty("driver"));
+//        dataSource.setUrl(p.getProperty("url"));
+//        dataSource.setUsername(p.getProperty("userName"));
+//        dataSource.setPassword(p.getProperty("userPass"));
+//        dataSource.setInitialSize(30);
+//        dataSource.setMinIdle(30);
+//        dataSource.setMaxActive(300);
+//        dataSource.setMaxWait(3000);
+//        dataSource.setTimeBetweenEvictionRunsMillis(60000);
+//        dataSource.setMinEvictableIdleTimeMillis(60000);
+//        dataSource.setValidationQuery("select 1");
+//        dataSource.setTestWhileIdle(true);
+//        dataSource.setTestOnBorrow(true);
+//        dataSource.setTestOnReturn(true);
+//        dataSource.setRemoveAbandoned(true);
+//        dataSource.setRemoveAbandonedTimeout(1800);
+//        dataSource.setLogAbandoned(true);
+//        dataSource.setDefaultTransactionIsolation(2);
+//
+//        try {
+//            dataSource.setFilters("stat,log4j");
+//        } catch (SQLException e) {
+//            logger.error("initDataSource",e);
+//        }
+//
+//        logger.info("初始化数据库1完成");
+//    }
 
-        dataSource.setDriverClassName(p.getProperty("driver"));
-        dataSource.setUrl(p.getProperty("url"));
-        dataSource.setUsername(p.getProperty("userName"));
+    private void initDataSource(Properties p) throws PropertyVetoException {
+        dataSource = new ComboPooledDataSource();
+        dataSource.setUser(p.getProperty("userName"));
         dataSource.setPassword(p.getProperty("userPass"));
-        dataSource.setInitialSize(30);
-        dataSource.setMinIdle(30);
-        dataSource.setMaxActive(300);
-        dataSource.setMaxWait(3000);
-        dataSource.setTimeBetweenEvictionRunsMillis(60000);
-        dataSource.setMinEvictableIdleTimeMillis(60000);
-        dataSource.setValidationQuery("select 1");
-        dataSource.setTestWhileIdle(true);
-        dataSource.setTestOnBorrow(true);
-        dataSource.setTestOnReturn(true);
-        dataSource.setRemoveAbandoned(true);
-        dataSource.setRemoveAbandonedTimeout(1800);
-        dataSource.setLogAbandoned(true);
-        try {
-            dataSource.setFilters("stat,log4j");
-        } catch (SQLException e) {
-            logger.error("initDataSource",e);
-        }
+        dataSource.setJdbcUrl(p.getProperty("url"));
+        dataSource.setDriverClass(p.getProperty("driver"));
+        dataSource.setInitialPoolSize(100);
+        dataSource.setMinPoolSize(100);
+        dataSource.setMaxPoolSize(100);
+        dataSource.setMaxStatements(50);
+        dataSource.setMaxIdleTime(60);
 
         logger.info("初始化数据库1完成");
     }
@@ -147,8 +165,7 @@ public class DBHelper {
         dataSource3 = new ComboPooledDataSource();
         dataSource3.setUser(p.getProperty("new_name"));
         dataSource3.setPassword(p.getProperty("new_pass"));
-        dataSource3.setJdbcUrl(p.getProperty("new_url")
-                + "?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useCompression=true&allowMultiQueries=true");
+        dataSource3.setJdbcUrl(p.getProperty("new_url"));
         dataSource3.setDriverClass(p.getProperty("driver"));
         dataSource3.setInitialPoolSize(20);
         dataSource3.setMinPoolSize(10);
@@ -168,8 +185,7 @@ public class DBHelper {
         dataSource4 = new ComboPooledDataSource();
         dataSource4.setUser(p.getProperty("jdbc.userName28hop"));
         dataSource4.setPassword(p.getProperty("jdbc.userPass28hop"));
-        dataSource4.setJdbcUrl(p.getProperty("jdbc.url28hop")
-                + "?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useCompression=true&allowMultiQueries=true");
+        dataSource4.setJdbcUrl(p.getProperty("jdbc.url28hop"));
         dataSource4.setDriverClass(p.getProperty("driver"));
         dataSource4.setInitialPoolSize(20);
         dataSource4.setMinPoolSize(10);
@@ -184,8 +200,7 @@ public class DBHelper {
         dataSource5 = new ComboPooledDataSource();
         dataSource5.setUser(p.getProperty("jdbc.userName28hop"));
         dataSource5.setPassword(p.getProperty("jdbc.userPass28hop"));
-        dataSource5.setJdbcUrl(p.getProperty("jdbc.url28hop")
-                + "?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useCompression=true&allowMultiQueries=true");
+        dataSource5.setJdbcUrl(p.getProperty("jdbc.url28hop"));
         dataSource5.setDriverClass(p.getProperty("jdbc.driver28hop"));
         dataSource5.setInitialPoolSize(20);
         dataSource5.setMinPoolSize(10);
@@ -201,9 +216,7 @@ public class DBHelper {
         dataSource6 = new ComboPooledDataSource();
         dataSource6.setUser(p.getProperty("name31source"));
         dataSource6.setPassword(p.getProperty("pass31source"));
-        dataSource6.setJdbcUrl(p.getProperty("url31source")
-                + "?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true"
-                + "&useCompression=true&rewriteBatchedStatements=true");
+        dataSource6.setJdbcUrl(p.getProperty("url31source"));
         dataSource6.setDriverClass(p.getProperty("driver"));
         dataSource6.setInitialPoolSize(20);
         dataSource6.setMinPoolSize(10);
@@ -219,9 +232,7 @@ public class DBHelper {
         dataSource7 = new ComboPooledDataSource();
         dataSource7.setUser(p.getProperty("name31userful"));
         dataSource7.setPassword(p.getProperty("pass31userful"));
-        dataSource7.setJdbcUrl(p.getProperty("url31userful")
-                + "?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true"
-                + "&useCompression=true&rewriteBatchedStatements=true");
+        dataSource7.setJdbcUrl(p.getProperty("url31userful"));
         dataSource7.setDriverClass(p.getProperty("driver"));
         dataSource7.setInitialPoolSize(20);
         dataSource7.setMinPoolSize(10);
@@ -237,8 +248,7 @@ public class DBHelper {
         dataSource8 = new ComboPooledDataSource();
         dataSource8.setUser(p.getProperty("userName28"));
         dataSource8.setPassword(p.getProperty("userPass28"));
-        dataSource8.setJdbcUrl(p.getProperty("url28")
-                + "?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useCompression=true&allowMultiQueries=true");
+        dataSource8.setJdbcUrl(p.getProperty("url28"));
         dataSource8.setDriverClass(p.getProperty("driver"));
         dataSource8.setInitialPoolSize(20);
         dataSource8.setMinPoolSize(10);

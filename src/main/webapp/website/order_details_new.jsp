@@ -371,6 +371,7 @@
     <input id="rk_orderNo" type="hidden" value="">
     <input id="rk_odid" type="hidden" value="">
     <input type="hidden" id="ordercountry_value">
+    <input type="hidden" id="rk_goodsid">
     回复内容:
     <textarea name="remark_content" rows="8" cols="50" style="margin-top: 20px;" id="remark_content_"></textarea>
     <input type="button" id="repalyBtnId" onclick="saveRepalyContent()" value="提交回复">
@@ -652,7 +653,7 @@
                             +运费<span>(${order.extra_freight})</span>
                         </c:if>
                         <c:if test="${order.actual_freight_c>0}">
-                            +$50国际费用<span>（${order.actual_freight_c}） </span>
+                            +EUB handling fee<span>（${order.actual_freight_c}） </span>
                         </c:if>
                         <c:if test="${order.order_ac != 0}">
                             - 批量优惠金额<span>（${preferential_price}） </span>
@@ -1538,7 +1539,7 @@
                                 </div>
                             </div>
                             <div class="w-margin-top">
-                                <input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.id});"
+                                <input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.id},${orderd.goodsid});"
                                        class="repalyBtn"/>
                             </div>
 
@@ -1883,7 +1884,7 @@
                                     </div>
                                     <div class="w-margin-top">
                                         <input type="button" value="回复"
-                                               onclick="doReplay1('${order.orderNo}',${orderd.id});" class="repalyBtn"/>
+                                               onclick="doReplay1('${order.orderNo}',${orderd.id},${orderd.goodsid});" class="repalyBtn"/>
                                     </div>
 
                                 </td>

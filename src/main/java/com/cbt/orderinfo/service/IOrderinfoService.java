@@ -6,6 +6,7 @@ import com.cbt.pojo.Admuser;
 import com.cbt.pojo.GoodsDistribution;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
+import com.cbt.warehouse.pojo.SampleOrderBean;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.SearchResultInfo;
@@ -556,4 +557,34 @@ public interface IOrderinfoService {
     String checkCountryMsg(String orderid);
 
     int updateOrderInfoFreight(String orderNo, String amount);
+
+    boolean setSampleGoodsIsOrder(String orderNo, Integer userId, List<SampleOrderBean> list);
+
+    /**
+	 * 订单详情线下采购
+	 * @param oldOrderNo
+	 * @param newOrderNo
+	 * @return
+	 */
+	int updateOrderSplitNumOrderDetailsData(String oldOrderNo, String newOrderNo);
+
+	/**
+	 * 更新数量拆单的采购数据
+	 * @return
+	 */
+	int updateOrderSplitNumPurchaseData(String orderNo);
+
+	/**
+	 * 更新数量拆单的入库数据
+	 * @param orderNo
+	 * @return
+	 */
+	int updateOrderSplitNumIdRelationtableData(String orderNo);
+
+	/**
+	 * 更新商品备注沟通数据
+	 * @param orderNo
+	 * @return
+	 */
+	int updateOrderSplitNumGoodsCommunicationInfoData(String orderNo);
 }

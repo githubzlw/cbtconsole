@@ -126,6 +126,23 @@ public class NewOrderDetailsCtr {
 				orderInfo.setOrderRemark(orderRemark);
 			}
 		}
+
+		if(orderNo.contains("_SN") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)){
+		    try {
+                // 详情数据处理
+                iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderNo.substring(0, orderNo.indexOf("_")), orderNo);
+                // 数量拆单采购数据处理
+                iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
+                // 数量拆单入库数据处理
+                iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
+                // 数量拆单商品备注沟通数据处理
+                iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+            }catch (Exception e){
+		        e.printStackTrace();
+            }
+
+		}
+
 		//获取实际运费
 			Long start = System.currentTimeMillis();
 			double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
@@ -2484,6 +2501,7 @@ public class NewOrderDetailsCtr {
 			List<PurchaseInfoBean> purchaseInfoList = iPurchaseService.queryOrderProductSourceByOrderNo(orderNo);
 
 			List<OrderDetailsBean> nwOdbList;
+			/*过滤条件去除
 			if (purchaseInfoList != null && purchaseInfoList.size() > 0) {
 				Set<Integer> hasPurchaseSet = purchaseInfoList.stream()
 						.filter(e -> e.getConfirmUserId() != null && e.getConfirmUserId() > 0)
@@ -2495,7 +2513,8 @@ public class NewOrderDetailsCtr {
 				odbList.clear();
 			} else {
 				request.setAttribute("odList", odbList);
-			}
+			}*/
+			request.setAttribute("odList", odbList);
 			request.setAttribute("orderInfo", orderInfo);
 			request.setAttribute("isShow", 1);
 		} catch (Exception e) {

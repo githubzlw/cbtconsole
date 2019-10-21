@@ -14,11 +14,19 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.service.QueryUserService;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.SessionKey;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
@@ -48,7 +56,105 @@ public class UserLoginController {
         }
 
     }
+    @RequestMapping("/checkUserInfo.do")
+	public String login(HttpServletRequest request, HttpServletResponse response){
+    	String username = request.getParameter("userName");
+        String password = request.getParameter("passWord");
+		Subject currentUser = SecurityUtils.getSubject();
+		String sessionId = request.getSession().getId();
+		JsonResult json = new JsonResult();
+		json.setOk(true);
+		System.out.println("currentUser.isAuthenticated():"+currentUser.isAuthenticated());
+		if (!currentUser.isAuthenticated()) {
+        	// 把用户名和密码封装为 UsernamePasswordToken 对象
+            UsernamePasswordToken token = new UsernamePasswordToken(username.toLowerCase(),password);
+            // rememberme
+            token.setRememberMe(true);
+            try {
+            	System.out.println("1. " + token.hashCode());
+            	// 执行登录. 
+                currentUser.login(token);
+                json.setOk(true);
+                Admuser admuser = (Admuser)currentUser.getPrincipal();
+                Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
+            } 
+            // ... catch more exceptions here (maybe custom ones specific to your application?
+            // 所有认证时异常的父类. 
+            catch (AuthenticationException e) {
+            	e.printStackTrace();
+                //unexpected condition?  error?
+            	System.out.println("登录失败: " + e.getMessage());
+            	json.setOk(false);
+                json.setMessage("校检用户信息失败，原因：" + e.getMessage());
+                LOG.error("校检用户信息失败，原因：", e);
+            }catch (Exception e) {
+            	System.out.println("登录失败: " + e.getMessage());
+            	json.setOk(false);
+                json.setMessage("登录失败，原因：" + e.getMessage());
+                LOG.error("登录失败，原因：", e);
+			}
+        }
+		
+		 return "redirect:/website/main_menu.jsp";
+	}
 
+    /**
+           * 判断用户权限信息
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/authlist.do")
+    @ResponseBody
+    public JsonResult authlist(HttpServletRequest request, HttpServletResponse response) {
+    	
+    	LOG.info("step into the checkUserInfo()");
+    	String sessionId = request.getSession().getId();
+    	JsonResult json = new JsonResult();
+    	json.setOk(false);
+    	Subject currentUser = SecurityUtils.getSubject();
+    	if(currentUser.isAuthenticated()) {
+    		json.setOk(true);
+    	}
+    	Admuser admuser = (Admuser)currentUser.getPrincipal();
+    	try {
+    		
+    		List<AuthInfo> authlist;
+    		if (admuser != null) {
+    			authlist = userauthDao.getUserAuth(admuser.getAdmName());
+    			// 数据放入redis
+    	        Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
+    			Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
+    			LOG.info("authlist:{}", authlist);
+    			LOG.info("save sessionId:[]", sessionId);
+    			LOG.info("login is ok!");
+    			json.setData(authlist);
+    			json.setOk(true);
+    			//清除页面保存的用户名密码
+    			/*Cookie usName = new Cookie("usName", username);
+    			usName.setMaxAge(3600 * 24 * 6);
+    			usName.setPath("/");
+    			response.addCookie(usName);
+    			Cookie usPass = new Cookie("usPass", admuser.getPassword());
+    			usPass.setMaxAge(3600 * 24 * 6);
+    			usPass.setPath("/");
+    			response.addCookie(usPass);*/
+    		} else {
+    			json.setOk(false);
+    			LOG.info("login is NG!");
+    			json.setMessage("登录信息错误");
+    		}
+    		
+    		
+    	} catch (Exception e) {
+    		e.getStackTrace();
+    		json.setOk(false);
+    		json.setMessage("校检用户信息失败，原因：" + e.getMessage());
+    		LOG.error("校检用户信息失败，原因：", e);
+    	}
+    	return json;
+    }
     /**
      * 判断用户信息
      *
@@ -56,7 +162,7 @@ public class UserLoginController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/checkUserInfo.do")
+    @RequestMapping(value = "/checkUserInfoss.do")
     @ResponseBody
     public JsonResult checkUserInfo(HttpServletRequest request, HttpServletResponse response) {
 
@@ -111,7 +217,14 @@ public class UserLoginController {
     }
 
     private Admuser checkUserPassword(String userName, String password) {
-        Admuser adm = null;
+        
+        Admuser adm = admuserDao.queryForListByName(userName);
+        if(adm != null) {
+        	if (adm.getPassword().equals(password) || adm.getPassword().equals(Md5Util.md5Operation(password))) {
+                return adm;
+            }
+        }
+        /*Admuser adm = null;
         if (admuserList == null || admuserList.size() == 0) {
             try {
                 admuserList = admuserDao.queryForList();
@@ -126,8 +239,8 @@ public class UserLoginController {
                 }
                 break;
             }
-        }
-        return adm;
+        }*/
+        return null;
     }
 
     /**
@@ -144,6 +257,11 @@ public class UserLoginController {
             request.getSession().removeAttribute("admuser");
             request.getSession().removeAttribute("userauth");
             Redis.hdel(request.getSession().getId());
+            Subject currentUser = SecurityUtils.getSubject();
+            Admuser admuser = (Admuser)currentUser.getPrincipal();
+            if(admuser != null) {
+            	Redis.hdel("authPremession"+admuser.getId());
+            }
             //清除页面保存的用户名密码
             Cookie usName = new Cookie("usName", null);
             usName.setMaxAge(0);
@@ -153,6 +271,7 @@ public class UserLoginController {
             usPass.setMaxAge(0);
             usPass.setPath("/");
             response.addCookie(usPass);
+            currentUser.logout();
         } catch (Exception e) {
             e.getStackTrace();
             LOG.error("退出失败，原因：" + e.getMessage());
@@ -255,7 +374,7 @@ public class UserLoginController {
         return json;
     }
 
-    @RequestMapping(value = "/autoLoginByCookie")
+    @RequestMapping(value = "/autoLoginByCookiei")
     @ResponseBody
     public JsonResult autoLoginByCookie(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();

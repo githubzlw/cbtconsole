@@ -3434,7 +3434,8 @@ public class WarehouseCtrl {
 		String svolume = request.getParameter("svolume");
 		String freight = request.getParameter("freight");
 		String estimatefreight = request.getParameter("estimatefreight");
-		if (shipmentno == null && "".equals(shipmentno)) {
+		if (org.apache.commons.lang3.StringUtils.isBlank(shipmentno)
+                || org.apache.commons.lang3.StringUtils.isBlank(express_no)) {
 			return "0";
 		}
 		if (estimatefreight.length() == 0) {
@@ -3657,7 +3658,7 @@ public class WarehouseCtrl {
 		}
 
 		int shipmentnoLen = 1;
-		for (int i = 0; i < Integer.parseInt(length); i++) {
+		for (int i = 0; i < 1; i++) {
 			Map<String, String> m = new HashMap<String, String>();
 			m.put("shipmentno", (Integer.parseInt(shipmentno) + i) + "");
 			m.put("orderid", orderid);
@@ -3828,10 +3829,12 @@ public class WarehouseCtrl {
 			ret = iWarehouseService.deleteShippingPackage(m);
 		}
 		// 开启线程
+
 		new Thread() {
+			@Override
 			public void run() {
 				try {
-					DataSourceSelector.set("dataSource127hop");
+					/*DataSourceSelector.set("dataSource127hop");
 					// 删除原来orderid对应的数据
 					if (iWarehouseService.selectShippingPackage(m) > 0) {
 						// 判断是否开启线下同步线上配置
@@ -3849,7 +3852,8 @@ public class WarehouseCtrl {
 									.selectShippingPackage(m);
 						}
 					}
-					DataSourceSelector.restore();
+					DataSourceSelector.restore();*/
+					NotifyToCustomerUtil.sendSqlByMq("delete from shipping_package where orderid ='"+orderid+"'");
 				} catch (Exception e) {
 					LOG.error("删除线上打印标签纸记录异常【订单号:" + m.get("orderid") + "】", e);
 				}
@@ -6270,6 +6274,21 @@ public class WarehouseCtrl {
                           @RequestBody Map<String, Object> mainMap) {
 		List<Map<String, String>> listmap = (List<Map<String, String>>) mainMap
 				.get("listmap");
+
+		if(listmap == null || listmap.size() == 0){
+			return "0";
+		} else {
+			int count = 0;
+			for(Map<String, String> map : listmap){
+				if(org.apache.commons.lang3.StringUtils.isBlank(map.get("shipmentno"))){
+					count ++;
+					break;
+				}
+			}
+			if(count > 0){
+				return "0";
+			}
+		}
 		int ret = iWarehouseService.batchUpdateShippingPackage(listmap);
 
 		// 异步更新线上自动测量
@@ -7957,9 +7976,10 @@ public class WarehouseCtrl {
 				// 加入日志
 				iWarehouseService.bgUpdateLog(bgList);
 
-				StringBuffer upSql = new StringBuffer();
+				StringBuffer upAllSql = new StringBuffer();
 				if (bgList != null && bgList.size() > 0) {
 					for (Map<String, String> param : bgList) {
+						StringBuffer upSql = new StringBuffer();
 						upSql.append("update shipping_package set ")
 								.append("transportcompany = '" + param.get("transportcompany") + "',")
 								.append("shippingtype = '" + param.get("fpxProductCode") + "',")
@@ -7970,8 +7990,11 @@ public class WarehouseCtrl {
 								.append("pdfUrl = '" + param.get("pdfUrl") + "',")
 								.append("sflag='3',createtime=now() ")
 								.append(" where shipmentno ='" + param.get("shipmentno") + "';");
+						iWarehouseService.insertMqLog(upSql.toString(), param.get("shipmentno"), "出库更新线上",param.toString());
+						upAllSql.append(upSql.toString());
 					}
-					NotifyToCustomerUtil.sendSqlByMq(upSql.toString());
+
+					NotifyToCustomerUtil.sendSqlByMq(upAllSql.toString());
 				}
 			} catch (Exception e) {
 				LOG.error("更新线上出库信息", e);
@@ -8041,10 +8064,12 @@ public class WarehouseCtrl {
 		@Override
 		public synchronized void run() {
 			try {
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update shipping_package set expressno='"+map.get("express_no")+"',transportcompany='"+map.get("logistics_name")+"',sweight='"+map.get("sweight")+"'," +
-						"svolume='"+map.get("svolume")+"',volumeweight='"+map.get("volumeweight")+"',freight = '"+map.get("freight")+"'where shipmentno='"+map.get("shipmentno")+"'"));
-				sendMQ.closeConn();
+				String sql = "update shipping_package set expressno='" + map.get("express_no") + "',transportcompany='"
+						+ map.get("logistics_name") + "',sweight='" + map.get("sweight") + "'," + "svolume='" + map.get("svolume")
+						+ "',volumeweight='" + map.get("volumeweight") + "',freight = '" + map.get("freight") + "' where shipmentno='"
+						+ map.get("shipmentno") + "'";
+				iWarehouseService.insertMqLog(sql, String.valueOf(map.get("shipmentno")), String.valueOf(map.get("express_no")),map.toString());
+				NotifyToCustomerUtil.sendSqlByMq(sql);
 			} catch (Exception e) {
 				LOG.error("更新线上运单信息", e);
 			}
@@ -8130,9 +8155,9 @@ public class WarehouseCtrl {
 		@Override
 		public synchronized void run() {
 			try {
-				SendMQ sendMQ = new SendMQ();
-				StringBuilder sqls=new StringBuilder();
+				StringBuilder sqls;
 				for(Map<String, String> map:listmap){
+					sqls=new StringBuilder();
 					sqls.append("update shipping_package set sflag='2'");
 					if(map.get("sweight")!=null){
 						sqls.append(",sweight='"+map.get("sweight")+"'");
@@ -8144,11 +8169,11 @@ public class WarehouseCtrl {
 						sqls.append(",volumeweight='"+map.get("volumeweight")+"'");
 					}
 					if(map.get("shipmentno")!=null){
-						sqls.append(" where shipmentno="+map.get("shipmentno")+"");
-						sendMQ.sendMsg(new RunSqlModel(sqls.toString()));
+						sqls.append(" where shipmentno='"+map.get("shipmentno")+"'");
+						iWarehouseService.insertMqLog(sqls.toString(), map.get("shipmentno"), "自动测量",map.toString());
+						NotifyToCustomerUtil.sendSqlByMq(sqls.toString());
 					}
 				}
-				sendMQ.closeConn();
 			} catch (Exception e) {
 				LOG.error("更新线上自动测量 重量", e);
 			}
@@ -9262,11 +9287,19 @@ public class WarehouseCtrl {
 				}
 			});
 		}
-		try {
-			Thread.sleep(30000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		int count=0;
+		while (list.size()!=fileList.size()){
+			try {
+				Thread.sleep(1000);
+				count++;
+				if (count>300){
+					break;
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+
 		if (list.size()>0) {
 			for (int i = list.size() - 1; i >= 0; i--) {
 				if ("1".equals(list.get(i))) {
@@ -9282,7 +9315,6 @@ public class WarehouseCtrl {
 				list.add("1");
 			}
 		}
-		System.out.println(list);
 		return list;
 	}
 

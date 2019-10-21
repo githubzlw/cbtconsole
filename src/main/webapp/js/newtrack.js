@@ -114,7 +114,7 @@ function updatecanceltatus(isok, orderid, odid, goodid, index, repState) {
  * @param repState
  */
 function updategoodstatus(isok, goodspid, orderid, goodid, itemid, taobaoprice, shipno,
-                          strcartype, usid, goodspprice, position, odid, goodurl, status, index, repState) {
+                          strcartype, usid, goodspprice, position, odid,taobaoId, goodurl, status, index, repState) {
     position = position.replace("CR-", "");
     var warehouseRemark = $('textarea[name ="warehouseRemark' + index + '"]')
         .val();
@@ -190,7 +190,8 @@ function updategoodstatus(isok, goodspid, orderid, goodid, itemid, taobaoprice, 
                 'taobaoprice': taobaoprice,
                 'repState': repState,
                 'warehouseRemark': warehouseRemark,
-                'count': count
+                'count': count,
+                'taobaoId':taobaoId
             },
             dataType: 'text',
             success: function (res) {
@@ -1068,6 +1069,8 @@ function search() {
                                 + '\',\''
                                 + json[i].odid
                                 + '\',\''
+                                + json[i].taobaoId
+                                + '\',\''
                                 + json[i].goods_url.replace("'", "").replace(/[\r\n]/g, "")
                                 + '\',1,' + i + ',1);">到货</button>';
                             str += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button style="height: 30px;width:80px;" onclick="updatecanceltatus(this,\''
@@ -1099,6 +1102,10 @@ function search() {
                                 + '\',\''
                                 + json[i].odid
                                 + '\',\''
+                                + json[i].skuID
+                                + '\',\''
+                                + json[i].specId
+                                + '\',\''
                                 + json[i].isDropshipOrder
                                 + '\',\''
                                 + json[i].goods_url.replace("'", "").replace(/[\r\n]/g, "")
@@ -1127,6 +1134,8 @@ function search() {
                                 + '\',\''
                                 + json[i].odid
                                 + '\',\''
+                                + json[i].taobaoId
+                                + '\',\''
                                 + json[i].goods_url.replace("'", "").replace(/[\r\n]/g, "")
                                 + '\',2,' + i + ',1)">该货没到</button><button style="height: 30px;width:80px;" onclick="updategoodstatus(this,\''
                                 + json[i].goods_pid
@@ -1150,6 +1159,8 @@ function search() {
                                 + json[i].position
                                 + '\',\''
                                 + json[i].odid
+                                + '\',\''
+                                + json[i].taobaoId
                                 + '\',\''
                                 + json[i].goods_url.replace("'", "")
                                 + '\',3,' + i + ',1)">破损</button><button style="height: 30px;width:80px;" onclick="updategoodstatus(this,\''
@@ -1175,6 +1186,8 @@ function search() {
                                 + '\',\''
                                 + json[i].odid
                                 + '\',\''
+                                + json[i].taobaoId
+                                + '\',\''
                                 + json[i].goods_url.replace("'", "")
                                 + '\',4,' + i + ',1)">有疑问</button><button style="height: 30px;width:80px;" onclick="updategoodstatus(this,\''
                                 + json[i].goods_pid
@@ -1198,6 +1211,8 @@ function search() {
                                 + json[i].position
                                 + '\',\''
                                 + json[i].odid
+                                + '\',\''
+                                + json[i].taobaoId
                                 + '\',\''
                                 + json[i].goods_url.replace("'", "")
                                 + '\',5,' + i + ',1)">数量不够</button><button style="height: 30px;width:80px;" onclick="updatecancelChecktatus(this,\''
@@ -1456,6 +1471,8 @@ function search() {
                                     + json[i].position
                                     + '\',\''
                                     + json[i].odid
+                                    + '\',\''
+                                    + json[i].taobaoId
                                     + '\',\''
                                     + json[i].goods_url
                                     + '\',1,' + i + ',0)">到货</button>';

@@ -5,6 +5,7 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
@@ -39,6 +40,12 @@ public class SendMQ {
     private final static String QUEUE_REDIS_NAME_PETS = "redis_pets";
     private static long totalConnect = 0;
     private static long totalDisConnect = 0;
+
+    /**
+     * 客户授权MQ
+     */
+    private final static String QUEUE_USER_AUTH_NAME = "usersauth";
+    private final static String EXCHANGE_USER_AUTH_NAME = "usersauth";
 
     private final static HashMap<String,String> config = new HashMap(10);
 
@@ -188,6 +195,79 @@ public class SendMQ {
         System.err.println(" [x] Sent '" + json + "'");
     }
 
+    /**
+     * 通过消息队列更新线上数据 直接执行对应sql集合 批量带事务
+     * @param model 需要执行的sql对象集合 (type=3)
+     *      {"type":"3","sqls":["insert into test values(1);","insert into test values(2);"]}
+     * @throws Exception
+     */
+    public void sendMsg(RunBatchSqlModel model) throws Exception {
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        JSONObject jsonObject = JSONObject.fromObject(model);
+        System.out.println(jsonObject.toString().getBytes("UTF-8"));
+
+        channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
+        System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
+    }
+
+
+    /**
+     * 授权的，仅限import
+     * @param json
+     * @throws Exception
+     */
+    private void sendAuthorizationFlagStr(String json) throws Exception{
+        channel.exchangeDeclare(EXCHANGE_USER_AUTH_NAME,"fanout",true);
+        channel.basicPublish(EXCHANGE_USER_AUTH_NAME, "", null, json.getBytes("UTF-8"));
+
+        // channel.queueDeclare(QUEUE_USER_AUTH_NAME, false, false, false, null);
+        // channel.basicPublish("", QUEUE_USER_AUTH_NAME, null, json.getBytes("UTF-8"));
+        System.err.println(" [x] Sent '" + json + "'");
+    }
+
+    public static void sendMqSql(RunBatchSqlModel model) {
+        SendMQ sendMQ = null;
+        try {
+            sendMQ = new SendMQ();
+            sendMQ.sendMsg(model);
+        } catch (Exception e){
+            throw new RuntimeException("sendMQ exception!");
+        } finally {
+            if (null != sendMQ){
+                try {
+                    sendMQ.closeConn();
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
+
+    /**
+     * 授权使用MQ
+     * @param userId
+     * @param flag
+     */
+    public static void sendAuthorizationFlagMqSql(int userId, int flag) {
+        SendMQ sendMQ = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("userid",String.valueOf(userId));
+            // 1是添加，2是删除
+            json.put("type",flag > 0 ? "1" : "2");
+            sendMQ = new SendMQ();
+            sendMQ.sendAuthorizationFlagStr(json.toString());
+        } catch (Exception e){
+            e.printStackTrace();
+            // throw new RuntimeException("sendMQ exception!");
+        } finally {
+            if (null != sendMQ){
+                try {
+                    sendMQ.closeConn();
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
 
     public static void main(String[] argv) throws Exception {
         SendMQ sendMQ = new SendMQ();
@@ -206,11 +286,12 @@ public class SendMQ {
 //        sendMQ.sendMsg(new RedisModel(new String[]{"15937"}), 1);
 
 
-        String[] userIds = {"13895"};
+        /*String[] userIds = {"13895"};
         RedisModel redisModel = new RedisModel(userIds);
         redisModel.setType("3");
         sendMQ.sendMsg(redisModel, 1);
-        sendMQ.closeConn();
+        sendMQ.closeConn();*/
+        sendAuthorizationFlagMqSql(15937,1);
     	
     }
     

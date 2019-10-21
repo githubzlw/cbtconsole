@@ -11,6 +11,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.cbt.warehouse.util.StringUtil;
 
@@ -3030,25 +3031,25 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ "' as orderno_new,paymentid,'" + odbeanNew.getPay_price()
 				+ "' as payprice_new,payment_cc,'order split' as orderdesc,username,"
 				+ "paystatus,NOW(),paySID,payflag,3 as paytype,3 as payment_other,paymentno,"
-				+ "0 as transaction_fee from payment where orderid='" + orderNoOld + "' limit 1";
+				+ "0 as transaction_fee from payment where orderid='" + orderNoOld + "' and paystatus = 1 limit 1";
 		remoteSqlList.add(insertPaymentSql);
 		insertPaymentSql = null;
 
 		// 本地执行SQL队列
 		List<String> localSqlList = new ArrayList<String>();
 
-		String localSql ="update id_relationtable set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
+		String idRelationSql ="update id_relationtable set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
 				+ orderNoOld + "' and goodid in(" ;
-		String localSql1 ="update goods_distribution set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
+		String goodsDistributionSql ="update goods_distribution set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
 				+ orderNoOld + "' and goodsid in(" ;
-		String localSql2 ="update goods_communication_info set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
+		String goodsCommunicationSql ="update goods_communication_info set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
 				+ orderNoOld + "' and goodsid in(" ;
 		//将拆单后的订单号和商品号数据保存到split_details表中，用定时任务去执行采购商品退回操作  王宏杰2018-05-14
 		String insert_split_details="insert into split_details(new_orderid,goodsid) values";
 		String tempSql ="";
 
-		String goodsDistributionSqlBegin = "insert into goods_distribution(orderid,odid,goodsid,admuserid,goodscatid,goods_pid,createtime) " +
-                "select '"+odbeanNew.getOrderNo()+"' as orderid,odid,goodsid,admuserid,goodscatid,goods_pid,now() " +
+		String goodsDistributionSqlBegin = "insert into goods_distribution(orderid,odid,goodsid,admuserid,goodscatid,goods_pid,goods_url,createtime) " +
+                "select '"+odbeanNew.getOrderNo()+"' as orderid,odid,goodsid,admuserid,goodscatid,goods_pid,goods_url,now() " +
                 "from goods_distribution where orderid = '"+orderNoOld +"' and odid in(";
         String goodsDistributionSqlEnd="";
 		for (OrderDetailsBean oddsb : nwOrderDetails) {
@@ -3062,31 +3063,38 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				String orderDetails = "update order_details set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
 						+ orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
 				remoteSqlList.add(orderDetails);
-			}else{
-				// 数量拆单商品
-				// 插入新的订单详情
-				String orderDetails = "insert into order_details(userid,goodsid,goodsdata_id, goodsname, orderid,dropshipid, " +
-						"delivery_time, yourorder,car_url, car_type, car_img,goodsprice, goodsfreight, checkprice_fee, checkproduct_fee, " +
-						"actual_price,actual_freight,actual_weight, actual_volume, state,fileupload, od_state, paytime," +
-						"createtime, freight_free, purchase_state, purchase_time, purchase_confirmation, remark," +
-						"sprice, goods_class, extra_freight, od_bulk_volume, od_total_weight, discount_ratio, " +
-						"flag, goodscatid, isAuto,buy_for_me, checked, " +
-						"seilUnit, picturepath, car_urlMD5,goods_pid," +
-						"bizPriceDiscount, isFreeShipProduct, shopCount)" +
-						" select userid,goodsid,goodsdata_id, goodsname, '"+odbeanNew.getOrderNo()+"' as orderid,dropshipid, " +
-						"delivery_time, "+oddsb.getYourorder()+" as yourorder,car_url, car_type, car_img,goodsprice, goodsfreight, " +
-						"checkprice_fee, checkproduct_fee," +
-						"actual_price,actual_freight,actual_weight, actual_volume, state,fileupload, od_state, paytime," +
-						"createtime, freight_free, purchase_state, purchase_time, purchase_confirmation, remark," +
-						"sprice, goods_class, extra_freight, od_bulk_volume, od_total_weight, discount_ratio," +
-						"flag, goodscatid, isAuto,buy_for_me, checked,seilUnit, picturepath, " +
-						"car_urlMD5,goods_pid,bizPriceDiscount, isFreeShipProduct, shopCount " +
-						" from order_details where orderid='" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
-				String oldOdSql = "update order_details set yourorder = yourorder - "+ oddsb.getYourorder()
-                        +" where orderid='" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
-				remoteSqlList.add(orderDetails);
-				remoteSqlList.add(oldOdSql);
-			}
+			}else {
+                // 数量拆单商品
+                if (oddsb.getOldGoodsNum() == 0) {
+                    // 数量拆单拆掉所有数量时
+                    String orderDetails = "update order_details set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
+                            + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+                    remoteSqlList.add(orderDetails);
+                } else {
+                    // 插入新的订单详情
+                    String orderDetails = "insert into order_details(userid,goodsid,goodsdata_id, goodsname, orderid,dropshipid, " +
+                            "delivery_time, yourorder,car_url, car_type, car_img,goodsprice, goodsfreight, checkprice_fee, checkproduct_fee, " +
+                            "actual_price,actual_freight,actual_weight, actual_volume, state,fileupload, od_state, paytime," +
+                            "createtime, freight_free, purchase_state, purchase_time, purchase_confirmation, remark," +
+                            "sprice, goods_class, extra_freight, od_bulk_volume, od_total_weight, discount_ratio, " +
+                            "flag, goodscatid, isAuto,buy_for_me, checked, " +
+                            "seilUnit, picturepath, car_urlMD5,goods_pid," +
+                            "bizPriceDiscount, isFreeShipProduct, shopCount)" +
+                            " select userid,goodsid,goodsdata_id, goodsname, '" + odbeanNew.getOrderNo() + "' as orderid,dropshipid, " +
+                            "delivery_time, " + oddsb.getYourorder() + " as yourorder,car_url, car_type, car_img,goodsprice, goodsfreight, " +
+                            "checkprice_fee, checkproduct_fee," +
+                            "actual_price,actual_freight,actual_weight, actual_volume, state,fileupload, od_state, paytime," +
+                            "createtime, freight_free, purchase_state, purchase_time, purchase_confirmation, remark," +
+                            "sprice, goods_class, extra_freight, od_bulk_volume, od_total_weight, discount_ratio," +
+                            "flag, goodscatid, isAuto,buy_for_me, checked,seilUnit, picturepath, " +
+                            "car_urlMD5,goods_pid,bizPriceDiscount, isFreeShipProduct, shopCount " +
+                            " from order_details where orderid='" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+                    String oldOdSql = "update order_details set yourorder = yourorder - " + oddsb.getYourorder()
+                            + " where orderid='" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+                    remoteSqlList.add(orderDetails);
+                    remoteSqlList.add(oldOdSql);
+                }
+            }
 
 			// 更新order_change表信息
 			String updateChange = "update order_change set orderNo='" + odbeanNew.getOrderNo() + "' where orderNo='"
@@ -3097,37 +3105,111 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 					+ orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
 			//localSqlList.add(orderReplenishment);
 
-			//更新order_product_source表数据
-			String order_product_source_sql = "update order_product_source set orderid='" + odbeanNew.getOrderNo() + "' where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
-			localSqlList.add(order_product_source_sql);
 
+			if(isSplitNum > 0) {
+                // 数量拆单的单独处理
+                if (oddsb.getOldGoodsNum() == 0) {
+                    // 数量拆单拆掉所有数量时
+                    // 采购分配
+                    String updateGoodsDistributionSql ="update goods_distribution set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
+				        + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+                    localSqlList.add(updateGoodsDistributionSql);
+                    // 商品沟通备注数据
+                    String updateGoodsCommunicationSql ="update goods_communication_info set orderid='" + odbeanNew.getOrderNo()
+                            + "' where orderid='" + orderNoOld + "' and goodsid =" + oddsb.getGoodsid();
+                    localSqlList.add(updateGoodsCommunicationSql);
+                    // 新增货源数据
+                    String updateOrderProductSourceSql = "update order_product_source set orderid='" + odbeanNew.getOrderNo()
+                            + "' where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+				    localSqlList.add(updateOrderProductSourceSql);
+                    // 入库
+                    String updateIdRelationSql ="update id_relationtable set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
+				        + orderNoOld + "' and goodid=" + oddsb.getGoodsid();
+                    localSqlList.add(updateIdRelationSql);
+                    // 入库照片信息
+                    String updateInspectionPictureSql = "update inspection_picture set orderid = '" + odbeanNew.getOrderNo()
+                            + "' where orderid = '" + orderNoOld + "' and goods_id=" + oddsb.getGoodsid() + "";
+                    remoteSqlList.add(updateInspectionPictureSql);
+                    localSqlList.add(updateInspectionPictureSql);
+                } else {
+                    // 采购分配
+                    String insertGoodsDistributionSql = "insert into goods_distribution(orderid,odid,goodsid,admuserid,goodscatid,goods_pid," +
+                            "goods_url,createtime) select '"+odbeanNew.getOrderNo()+"' as orderid,0 as odid,goodsid,admuserid,goodscatid," +
+                            "goods_pid,goods_url,now() from goods_distribution where orderid = '"+orderNoOld +"' and goodsid=" + oddsb.getGoodsid();
+                    localSqlList.add(insertGoodsDistributionSql);
+                    // 商品沟通备注数据
+                    String insertGoodsCommunicationInfoSql = "insert into goods_communication_info(context,is_read,send_id,accept_id," +
+                            "create_time,orderid,goodsid,odid) " +
+                            " select context,is_read,send_id,accept_id,create_time,'" + odbeanNew.getOrderNo() + "' as orderid,goodsid, 0 as odid " +
+                            " from goods_communication_info where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+                    localSqlList.add(insertGoodsCommunicationInfoSql);
+                    // 新增货源数据
+                    String insertOrderProductSql = "insert into order_product_source(od_id,adminid,userid,addtime,orderid,confirm_userid,confirm_time,goodsid,goodsdataid,goods_url," +
+                            "goods_p_url,last_goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,usecount,buycount,currency," +
+                            "goods_p_name,bargainRemark,deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks,questionsRemarks," +
+                            "unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime,old_shopid,tborderid,offline_purchase,tb_id) " +
+                            " select 0 as od_id,adminid,userid,addtime,'" + odbeanNew.getOrderNo() + "' as orderid,confirm_userid,confirm_time," +
+                            "goodsid,goodsdataid,goods_url,goods_p_url,last_goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,"
+                            + oddsb.getYourorder() + " as usecount," + oddsb.getYourorder() + " as buycount,currency," +
+                            "goods_p_name,bargainRemark,deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks,questionsRemarks," +
+                            "unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime,old_shopid,tborderid,offline_purchase,tb_id from order_product_source " +
+                            " where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+                    localSqlList.add(insertOrderProductSql);
+
+                    String updateOrderProductSql1 = "update order_product_source set usecount = usecount -" + oddsb.getYourorder()
+                            + " where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid() + " and usecount > 0";
+                    String updateOrderProductSql2 = "update order_product_source set buycount = buycount -" + oddsb.getYourorder()
+                            + " where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid() + " and buycount > 0";
+                    localSqlList.add(updateOrderProductSql1);
+                    localSqlList.add(updateOrderProductSql2);
+
+                    // 入库
+                    String insertIdRelationSql = "insert into id_relationtable(orderid,goodid,goodstatus,goodurl,barcode,picturepath,createtime," +
+                            "POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,itemqty,itemid,odid)" +
+                            " select '" + odbeanNew.getOrderNo() + "',goodid,goodstatus,goodurl,barcode," +
+                            "CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'/','" + odbeanNew.getOrderNo() + "','_',goodid,'.jpg'),createtime," +
+                            "POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,"
+                            + oddsb.getYourorder() + " as itemqty,itemid,0 as odid " +
+                            "from id_relationtable " + " where orderid = '" + orderNoOld + "' and goodid=" + oddsb.getGoodsid();
+                    localSqlList.add(insertIdRelationSql);
+                    String updateRelationSql = "update id_relationtable set itemqty = itemqty - " + oddsb.getYourorder()
+                            + " where orderid='" + orderNoOld + "' and goodid=" + oddsb.getGoodsid() + " and itemqty > 0";
+                    localSqlList.add(updateRelationSql);
+                    // 入库照片信息
+                }
+            }else {
+                //更新order_product_source表数据
+                String order_product_source_sql = "update order_product_source set orderid='" + odbeanNew.getOrderNo() + "' where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+                localSqlList.add(order_product_source_sql);
+                // 入库照片信息
+                String inspection_pictureSql = "update inspection_picture set orderid = '" + odbeanNew.getOrderNo()
+                        + "' where orderid = '" + orderNoOld + "' and goods_id=" + oddsb.getGoodsid() + "";
+                remoteSqlList.add(inspection_pictureSql);
+                localSqlList.add(inspection_pictureSql);
+            }
 
 			// 替换拆单的入库商品单号
 			tempSql += "," + oddsb.getGoodsid();
 			insert_split_details += "'"+oddsb.getGoodsid()+"','"+odbeanNew.getOrderNo()+"'),";
 //			insert_split_details += ")";
 			updateChange = null;
-			String inspection_pictureSql = "update inspection_picture set orderid = '"+ odbeanNew.getOrderNo()
-					+"' where orderid = '"+ orderNoOld  +"' and goods_id="+oddsb.getGoodsid()+"";
-			if(isSplitNum == 0){
-				remoteSqlList.add(inspection_pictureSql);
-			}
-			localSqlList.add(inspection_pictureSql);
 		}
 		insert_split_details=insert_split_details.substring(0,insert_split_details.length()-1)+";";
-		localSql += tempSql.substring(1) + ")";
-		localSqlList.add(localSql);
+
 		if(isSplitNum == 0){
-			localSql1 += tempSql.substring(1) + ")";
-			localSqlList.add(localSql1);
+			idRelationSql += tempSql.substring(1) + ")";
+			localSqlList.add(idRelationSql);
+			goodsDistributionSql += tempSql.substring(1) + ")";
+			localSqlList.add(goodsDistributionSql);
+			goodsCommunicationSql += tempSql.substring(1) + ")";
+			localSqlList.add(goodsCommunicationSql);
 		}
-		localSql2 += tempSql.substring(1) + ")";
-		localSqlList.add(localSql2);
+
 		//localSqlList.add(insert_split_details);
 
         if(isSplitNum > 0){
             // 采购分配的
-            localSqlList.add(goodsDistributionSqlBegin + goodsDistributionSqlEnd.substring(1) + ")");
+            // localSqlList.add(goodsDistributionSqlBegin + goodsDistributionSqlEnd.substring(1) + ")");
         }
 
 		try {

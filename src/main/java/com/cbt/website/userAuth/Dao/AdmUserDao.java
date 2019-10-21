@@ -3,6 +3,7 @@ package com.cbt.website.userAuth.Dao;
 import com.cbt.website.userAuth.bean.Admuser;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AdmUserDao {
 
@@ -35,6 +36,12 @@ public interface AdmUserDao {
 	 * @return
 	 */
 	public List<Admuser> queryForList() throws Exception;
+	/**
+	 * 获取所有用户信息
+	 * 
+	 * @return
+	 */
+	public Admuser queryForListByName(String name);
 
 	/**
 	 * 根据角色查询用户信息
@@ -78,5 +85,7 @@ public interface AdmUserDao {
 	 * @throws Exception
 	 */
 	public Admuser querySalesByOrderNoAndGoodid(String orderNo, int goodid) throws Exception;
+	
+	List<Map<String,String>> getAllAnth();
 
 }

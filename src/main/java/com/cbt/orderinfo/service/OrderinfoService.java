@@ -1,9 +1,6 @@
 package com.cbt.orderinfo.service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -18,6 +15,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import com.cbt.warehouse.pojo.OrderDetailsBeans;
+import com.cbt.warehouse.pojo.SampleOrderBean;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -315,7 +314,7 @@ public class OrderinfoService implements IOrderinfoService {
 				orderinfoMapper.updateIdRationtable(map);
 			}
 			if("1".equals(map.get("status"))){
-				//点击到库时根据spec_id关联抓取订单的id
+				/*//点击到库时根据spec_id关联抓取订单的id
 				String typeName=orderinfoMapper.getTypeNameByOdid(map);
 				//查询入库对应的淘宝订单
 				List<TaoBaoOrderInfo> tList=orderinfoMapper.getTaobaoInfoByOrderid(map);
@@ -328,7 +327,9 @@ public class OrderinfoService implements IOrderinfoService {
 				}else if(StringUtil.isNotBlank(typeName)){
 					tbId=UtilAll.getTbId(tList,typeName,"");
 				}
-				map.put("tbId",String.valueOf(tbId));
+				map.put("tbId",String.valueOf(tbId));*/
+
+				map.put("tbId",map.get("taobaoId"));
 				//更新订单详情表状态为已经到仓库
 				orderinfoMapper.updateState(map);
 				if("0".equals(map.get("repState"))){
@@ -593,6 +594,10 @@ public class OrderinfoService implements IOrderinfoService {
 					searchresultinfo.setSpecId(map.get("specid")!=null?map.get("specid") : "");
 					searchresultinfo.setSkuID(map.get("skuid")!=null?map.get("skuid") : "");
 				}
+				if(org.apache.commons.lang3.StringUtils.isNotBlank(map.get("taobao_id"))){
+					searchresultinfo.setTaobaoId(Integer.parseInt(map.get("taobao_id")));
+				}
+
 				info.add(searchresultinfo);
 			}
 			//一个1688包裹对应的采购订单数量
@@ -1396,7 +1401,173 @@ public class OrderinfoService implements IOrderinfoService {
 		return orderinfoMapper.updateOrderInfoFreight(orderNo, amount);
 	}
 
+    @Override
+    public boolean setSampleGoodsIsOrder(String orderNo, Integer userId, List<SampleOrderBean> sampleOrderBeanList) {
+		SendMQ sendMQ = null;
+    	try {
+			if (sampleOrderBeanList != null && sampleOrderBeanList.size() > 0) {
+				for(SampleOrderBean sm : sampleOrderBeanList){
+					sm.setOrderNo(orderNo);
+					sm.setUserId(userId);
+				}
+				// 保存客户选择的样品信息到数据库
+//				this.orderinfoMapper.batchInsertIntoSampleOrderGoods(sampleOrderBeanList);
+				sendMQ = new SendMQ();
+				for (SampleOrderBean sob:sampleOrderBeanList){
+					String sql=" insert into sample_order_info(user_id,order_no,pid,img_url,sku_id,en_type,is_choose)" +
+							"        values " +
+							"            ('"+sob.getUserId()+"','"+sob.getOrderNo()+"','"+sob.getPid()+"','"+sob.getImgUrl()+"','"+sob.getSkuId()+"','"+sob.getEnType()+"','"+sob.getIsChoose()+"')";
+					sendMQ.sendMsg(new RunSqlModel(sql));
+					System.out.println(sql);
+				}
+
+			    sendMQ.closeConn();
+				// 更新客户选择的样品信息
+				// sampleOrderService.updateSampleOrderGoods(sampleOrderBeanList);
+				// 生成样品订单数据
+				boolean bo=this.genSampleOrderByInfoList(orderNo, userId, sampleOrderBeanList);
+//				sampleOrderBeanList.clear();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("userId:" + userId + "orderNo:" + orderNo + ",setSampleGoodsIsOrder error: ", e);
+			return false;
+		}
+
+    	return true;
+    }
+
 	@Override
+	public int updateOrderSplitNumOrderDetailsData(String oldOrderNo, String newOrderNo) {
+		return orderinfoMapper.updateOrderSplitNumOrderDetailsData(oldOrderNo, "'" + newOrderNo + "'");
+	}
+
+	@Override
+	public int updateOrderSplitNumPurchaseData(String orderNo) {
+		return orderinfoMapper.updateOrderSplitNumPurchaseData(orderNo);
+	}
+
+	@Override
+	public int updateOrderSplitNumIdRelationtableData(String orderNo) {
+		return orderinfoMapper.updateOrderSplitNumIdRelationtableData(orderNo);
+	}
+
+	@Override
+	public int updateOrderSplitNumGoodsCommunicationInfoData(String orderNo) {
+		return orderinfoMapper.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+	}
+
+	public boolean genSampleOrderByInfoList(String orderNo, int userId, List<SampleOrderBean> sampleOrderBeanList) {
+		// 插入订单详情
+		String spOrderNo = orderNo + "_SP";
+		String urlmd5=this.orderinfoMapper.getUrlMd5ByOrder(orderNo);
+		//生成order-details
+		List<OrderDetailsBeans> odbList = new ArrayList<>();
+		for (SampleOrderBean sampleOrderBean : sampleOrderBeanList) {
+			sampleOrderBean.setOrderNo(spOrderNo);
+			sampleOrderBean.setUserId(userId);
+
+			OrderDetailsBeans temp = new OrderDetailsBeans();
+			temp.setGoodsid((int) ((Math.random() * 9 + 1) * 500000));
+			temp.setIsStockFlag(0);
+			temp.setShopCount(0);
+			temp.setDelivery_time("");
+			temp.setIsFreeShipProduct(3);
+			temp.setGoods_pid(sampleOrderBean.getPid());
+			temp.setIsFeight(3);
+			temp.setStartPrice("0");
+			temp.setBizPriceDiscount("0");
+			temp.setCheckprice_fee(0);
+			temp.setCheckproduct_fee(0);
+			temp.setState(0);
+			temp.setFileupload("/temp/pic");
+			temp.setActual_weight("0");
+			temp.setFreight_free(0);
+			temp.setYourorder(sampleOrderBean.getGoodsNum());
+			temp.setUserid(userId);
+			temp.setGoodsname(sampleOrderBean.getEnName());
+			temp.setGoodsprice("0");
+			temp.setFreight("0");
+			temp.setRemark("sample goods");
+			temp.setGoods_url(sampleOrderBean.getOnlineUrl());
+			temp.setGoodsUrlMD5(urlmd5);
+			temp.setGoods_img(sampleOrderBean.getImgUrl());
+			temp.setGoods_type(sampleOrderBean.getEnType());
+			temp.setTotal_weight(sampleOrderBean.getWeight());
+			temp.setGoodscatid(sampleOrderBean.getCatid());
+			temp.setSerUnit(sampleOrderBean.getSellUnit());
+			temp.setActual_volume(sampleOrderBean.getSkuId());
+			temp.setOrderid(spOrderNo);
+			temp.setExtra_freight(0);
+			odbList.add(temp);
+		}
+
+		SendMQ sendMQ = null;
+		try {
+//			//添加订单详细信息
+//			this.orderinfoMapper.batchAddOrderDetail(odbList);
+//			// 插入地址信息
+//			this.orderinfoMapper.insertSampleOrderAddress(orderNo, spOrderNo);
+//			// 插入订单信息
+//			this.orderinfoMapper.insertSampleOrderInfo(orderNo, spOrderNo);
+//			// 设置样品商品订单号
+//			this.orderinfoMapper.updateSampleOrderGoods(sampleOrderBeanList);
+			sendMQ = new SendMQ();
+
+			for (OrderDetailsBeans od:odbList){
+				String sql="insert order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder," +
+						"userid,goodsname,goodsprice,goodsfreight,goodsdata_id,remark,goods_class,extra_freight,car_url,car_urlMD5,goods_pid," +
+						"car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,isFeight,seilUnit," +
+						"startPrice,bizPriceDiscount,group_buy_id,actual_volume,actual_weight,isFreeShipProduct,shopCount) values";
+               String value="('"+od.getGoodsid()+"','"+od.getOrderid()+"','"+od.getDropshipid()+"','"+od.getDelivery_time()+"','"+od.getCheckprice_fee()+"','"+od.getCheckproduct_fee()+"','0','"+od.getFileupload()+"','"+od.getYourorder()+"','" +
+					   od.getUserid()+"','"+SendMQ.repCha(od.getGoodsname())+"','"+od.getGoodsprice()+"','"+od.getGoodsfreight()+"','"+od.getGoodsdata_id()+"','"+od.getRemark()+"','"+od.getGoods_class()+"','"+od.getExtra_freight()+"','"+od.getGoods_url()+"','"+od.getGoodsUrlMD5()+"','"+od.getGoods_pid()+"','" +
+					   od.getGoods_img()+"','"+SendMQ.repCha(od.getGoods_type())+"','"+od.getFreight_free()+"','"+od.getBulk_volume()+"','"+od.getTotal_weight()+"','"+od.getDiscount_ratio()+"','"+od.getGoodscatid()+"','"+od.getIsFeight()+"','"+od.getSerUnit()+"','" +
+					   od.getStartPrice()+"','"+od.getBizPriceDiscount()+"','"+od.getGroupBuyId()+"','"+od.getActual_volume()+"','"+od.getActual_weight()+"','"+od.getIsFreeShipProduct()+"','"+od.getShopCount()+"')";
+			sql+=value;
+				//添加订单详细信息
+
+				sendMQ.sendMsg(new RunSqlModel(sql));
+				System.out.println(sql);
+			}
+			// 插入地址信息
+			sendMQ.sendMsg(new RunSqlModel("insert into order_address(AddressID,orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,street,recipients)" +
+					"select AddressID,'"+spOrderNo+"' as orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,street,recipients " +
+					"FROM order_address WHERE  orderNo='"+orderNo+"' and NOT EXISTS (SELECT orderNo FROM order_address WHERE orderNo='"+spOrderNo+"')"));
+
+			// 插入订单信息
+			sendMQ.sendMsg(new RunSqlModel(" insert orderinfo(order_no,user_id,product_cost,state,delivery_time,service_fee,ip,mode_transport,create_time,details_number," +
+					"        pay_price_three,actual_allincost,foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,share_discount," +
+					"        order_ac,actual_lwh,actual_weight,actual_weight_estimate,extra_freight,orderRemark,cashback,firstdiscount," +
+					"        isDropshipOrder,address_id,packag_number,coupon_discount,exchange_rate,grade_discount,vatbalance,ordertype,actual_freight_c," +
+					"        memberFee,processingfee) " +
+					"        select '"+spOrderNo+"' as order_no,user_id,0 as product_cost,5 as state,delivery_time,0 as service_fee,ip,mode_transport,create_time," +
+					"        2 as details_number, 0 as pay_price_three,actual_allincost,0 as foreign_freight,0 as pay_price,0 as pay_price_tow,currency," +
+					"        0 as actual_ffreight,0 as discount_amount,0 as share_discount," +
+					"        0 as order_ac,0 as actual_lwh,actual_weight,actual_weight_estimate,0 as extra_freight,'sampleOrder' as orderRemark," +
+					"        0 as cashback,0 as firstdiscount,isDropshipOrder,address_id,packag_number,0 as coupon_discount," +
+					"        exchange_rate,grade_discount,vatbalance,ordertype,actual_freight_c,0 as memberFee,processingfee" +
+					"        FROM orderinfo WHERE order_no ='"+orderNo+"' and NOT EXISTS (SELECT order_no FROM orderinfo WHERE order_no='"+spOrderNo+"')"));
+
+			for (SampleOrderBean sb:sampleOrderBeanList){
+				String sql="";
+				if (sb.getIsChoose()>0){
+					sql = " update sample_order_info set order_no = '"+sb.getOrderNo()+"',is_choose = '"+sb.getIsChoose()+"' where user_id = '"+sb.getUserId()+"' and pid = '"+sb.getPid()+"'";
+				}else {
+					sql = " update sample_order_info set order_no = '"+sb.getOrderNo()+"' where user_id = '"+sb.getUserId()+"' and pid = '"+sb.getPid()+"'";
+				}
+				// 设置样品商品订单号
+				sendMQ.sendMsg(new RunSqlModel(sql));
+			}
+
+
+			sendMQ.closeConn();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return true;
+	}
+    @Override
 	public OrderBean getOrders(String orderNo) {
 		OrderBean ob=orderinfoMapper.getOrder(orderNo);
 		if(ob != null){

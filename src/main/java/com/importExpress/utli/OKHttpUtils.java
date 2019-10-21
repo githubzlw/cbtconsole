@@ -65,9 +65,9 @@ public class OKHttpUtils {
      * @param method 更新方式 1-添加到上下架列表 后续定时走; 2- 实时更新;
      */
     public static boolean optionGoodsInterface(String pid, int valid, int unsellableReason, int method) {
-        boolean isSu = false;
+        /*boolean isSu = false;
         try {
-            /*RequestBody formBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+            RequestBody formBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
 //					.addFormDataPart("image", originFile.getName(),
                     .addFormDataPart("pid", pid)
                     .addFormDataPart("valid", String.valueOf(valid))
@@ -78,7 +78,7 @@ public class OKHttpUtils {
             // client = new OkHttpClient();
             /*OkHttpClient client = getClientInstence();
             Response response = client.newCall(request).execute();
-            String rs = response.body().string();*/
+            String rs = response.body().string();
             String url = IMG_ONLINE_AND_DELETE_URL + "?pid=" + pid + "&valid=" + valid
                     + "&unsellableReason=" + unsellableReason + "&method=" + method;
             String rs = DownloadMain.getContentClient(url, null);
@@ -93,7 +93,8 @@ public class OKHttpUtils {
             e.printStackTrace();
             logger.error("optionGoodsInterface error:", e);
         }
-        return isSu;
+        return isSu;*/
+        return true;
     }
 
     /**

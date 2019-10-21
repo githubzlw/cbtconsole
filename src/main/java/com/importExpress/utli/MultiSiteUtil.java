@@ -146,8 +146,22 @@ public class MultiSiteUtil {
                 return "https://www.kidsproductwholesale.com";
             case 3:
                 return "https://www.lovelypetsupply.com";
+            default:
+                return "";
         }
-        return "";
+    }
+
+    public static String getImgSiteUrl(Integer site) {
+        switch (site) {
+            case 1:
+                return "https://img.import-express.com";
+            case 2:
+                return "https://img.kidsproductwholesale.com";
+            case 3:
+                return "https://img.lovelypetsupply.com";
+            default:
+                return "";
+        }
     }
 
     public static Map<String, String> webSiteMap = new HashMap<String, String>(){{

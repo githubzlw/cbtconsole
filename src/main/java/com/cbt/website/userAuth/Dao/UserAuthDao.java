@@ -37,4 +37,5 @@ public interface UserAuthDao {
 	 * @throws Exception
 	 */
 	public int[] insertUserAuth(String admName, String[] auth) throws Exception;
+	List<AuthInfo> getUserAuthPremession(String admName) throws Exception;
 }

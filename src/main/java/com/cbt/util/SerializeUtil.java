@@ -75,6 +75,20 @@ public class SerializeUtil {
         }
         return list;
     }
+	/**
+	 * json反序列化为对象集合
+	 * @param jsonStr
+	 * @param clazz
+	 * @return
+	 */
+	public static <T>List<T> JsonToListT(String jsonStr, Class<T> clazz) {
+        JSONArray jsonArray = JSONArray.fromObject(jsonStr);
+        List<T> list = new ArrayList<T>();
+        for (int i = 0; i < jsonArray.size(); i++) {
+            list.add((T)JSONObject.toBean(jsonArray.getJSONObject(i), clazz));
+        }
+        return list;
+    }
 	
 	/**
 	 * json反序列化为对象集合对象,属性中包含实体类等; 如List<Student> 而Student中含有属性List<Teacher>

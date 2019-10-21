@@ -1044,4 +1044,8 @@
         WHERE id = #{bean.id}
     </update>
 
+    <select id="queryAllCheckout" resultType="int">
+        select id from user_checkout where flag = #{flag}
+    </select>
+
 </mapper>
