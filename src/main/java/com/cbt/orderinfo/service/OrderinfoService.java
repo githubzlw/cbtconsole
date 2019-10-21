@@ -2230,6 +2230,15 @@ public class OrderinfoService implements IOrderinfoService {
 		}
 		return result;
 	}
+
+
+
+
+	@Override
+	public Map<String, Object> getOverseasWarehouseStockOrderDetail(String orderno, int userid) {
+		
+		return orderinfoMapper.getOverseasWarehouseStockOrderDetail(orderno, userid);
+	}
 }
 
 

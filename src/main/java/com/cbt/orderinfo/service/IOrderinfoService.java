@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 public interface IOrderinfoService {
 
 	public List<Map<String, String>> getOrders(int userID, int state, Date startdate, Date enddate, String email,
@@ -587,4 +589,11 @@ public interface IOrderinfoService {
 	 * @return
 	 */
 	int updateOrderSplitNumGoodsCommunicationInfoData(String orderNo);
+	/**
+	 * 订单信息
+	 * @param orderno
+	 * @param userid
+	 * @return
+	 */
+	Map<String,Object> getOverseasWarehouseStockOrderDetail(String orderno,int userid);
 }
