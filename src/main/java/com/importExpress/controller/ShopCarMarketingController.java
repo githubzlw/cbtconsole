@@ -1844,11 +1844,11 @@ public class ShopCarMarketingController {
     public JsonResult queryAllWebSizeList(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
         try {
-            Map<Integer,String> webSizeMap = new HashMap<>(10);
-            for(WebSizeEnum ws :  WebSizeEnum.values()){
-                webSizeMap.put(ws.getCode(),ws.name());
+            Map<Integer,String> webSiteMap = new HashMap<>(10);
+            for(WebSiteEnum ws :  WebSiteEnum.values()){
+                webSiteMap.put(ws.getCode(),ws.name());
             }
-            json.setData(webSizeMap);
+            json.setData(webSiteMap);
         } catch (Exception e) {
             e.printStackTrace();
         }

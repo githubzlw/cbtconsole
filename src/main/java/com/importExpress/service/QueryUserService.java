@@ -77,6 +77,8 @@ public interface QueryUserService {
 
     Map<String, Object> updateUserCheckout(Integer userid, Integer type);
 
+    List<Integer> queryAllCheckout(int flag);
+
     List<TimingWarningInfo> queryTimingWarningInfo(Integer valid, Integer day);
 
     TimingWarningInfo queryQuotaData(Integer id);

@@ -11,6 +11,9 @@ import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
+import com.cbt.warehouse.pojo.HotCategory;
+import com.cbt.warehouse.pojo.HotSellingGoods;
+import com.cbt.warehouse.service.HotGoodsService;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.UploadByOkHttp;
@@ -18,11 +21,13 @@ import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.pojo.GoodsParseBean;
 import com.importExpress.pojo.InputData;
+import com.importExpress.service.HotManageService;
 import com.importExpress.thread.DeleteImgByMd5Thread;
 import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -75,6 +80,10 @@ public class EditorController {
 
     @Autowired
     private IShopUrlService shopUrlService;
+    @Autowired
+    private HotGoodsService hotGoodsService;
+    @Autowired
+    private HotManageService hotManageService;
 
     @SuppressWarnings({"static-access", "unchecked"})
     @RequestMapping(value = "/detalisEdit", method = {RequestMethod.POST, RequestMethod.GET})
@@ -2706,6 +2715,176 @@ public class EditorController {
             LOG.error("pid:" + pid + " setGoodsFlagByPid 执行错误：" + e.getMessage());
         }
         return json;
+    }
+
+
+    @RequestMapping(value = "/saveGoodsDescInfo", method = {RequestMethod.POST})
+    @ResponseBody
+    public JsonResult saveGoodsDescInfo(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        GoodsEditBean editBean = new GoodsEditBean();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        } else {
+            editBean.setAdmin_id(user.getId());
+        }
+
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取商品PID失败");
+            return json;
+        } else {
+            editBean.setPid(pid);
+        }
+
+        String hotTypeId = request.getParameter("hotTypeId");
+        if (StringUtils.isBlank(hotTypeId)) {
+            json.setOk(false);
+            json.setMessage("获取类别ID失败");
+            return json;
+        }
+
+        editBean.setDescribe_good_flag(1);
+
+        try {
+            customGoodsService.updatePidIsEdited(editBean);
+            customGoodsService.insertIntoGoodsEditBean(editBean);
+            // 更新MongoDB,记录日志
+            //u表示更新；c表示创建，d表示删除
+            InputData inputData = new InputData('u');
+            inputData.setPid(pid);
+            inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+            inputData.setDescribe_good_flag("1");
+            GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            // 记录日志
+            customGoodsService.insertIntoDescribeLog(pid, user.getId());
+
+            // 插入热卖区数据
+            saveHotGoods(pid, Integer.parseInt(hotTypeId), user.getId());
+
+            json.setOk(true);
+            json.setMessage("执行成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("pid:" + pid + " setGoodsFlagByPid 执行错误：" + e.getMessage());
+            LOG.error("pid:" + pid + " setGoodsFlagByPid 执行错误：" + e.getMessage());
+        }
+        return json;
+    }
+
+    @RequestMapping(value = "/saveGoodsDescInfoByList")
+    @ResponseBody
+    public JsonResult saveGoodsDescInfoByList(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        GoodsEditBean editBean = new GoodsEditBean();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        } else {
+            editBean.setAdmin_id(user.getId());
+        }
+        try {
+            HotCategory param = new HotCategory();
+            param.setHotType(24);
+            param.setIsOn(-1);
+
+            List<HotCategory> res = hotManageService.queryForList(param);
+            Map<Integer, Integer> categoryMap = new HashMap<>();
+            if (CollectionUtils.isNotEmpty(res)) {
+                for (int i = 0; i < res.size(); i++) {
+                    categoryMap.put(i, res.get(i).getId());
+                }
+            } else {
+                json.setOk(false);
+                json.setMessage("无分类数据");
+                return json;
+            }
+
+            int categorySize = categoryMap.size();
+            List<String> pidList = customGoodsService.queryDescribeLogList();
+            if (CollectionUtils.isNotEmpty(pidList)) {
+                for (int j = 0; j < pidList.size(); j++) {
+                    // 插入热卖区数据
+                    saveHotGoods(pidList.get(j), categoryMap.get((j % categorySize)), user.getId());
+                }
+            }
+            json.setOk(true);
+            json.setMessage("执行成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("saveGoodsDescInfoByPid 执行错误：" + e.getMessage());
+            LOG.error("saveGoodsDescInfoByPid 执行错误：" + e.getMessage());
+        }
+        return json;
+    }
+
+    private void saveHotGoods(String goodsPid, int categoryId, int adminId) {
+
+        try {
+            CustomGoodsBean goods = hotGoodsService.queryFor1688Goods(goodsPid);
+            SendMQ sendMQ = new SendMQ();
+            // 校检存在的goodsPid数据
+            boolean isExists = hotGoodsService.checkExistsGoods(categoryId, goodsPid);
+            if (isExists) {
+                System.err.println("goodsPid:" + goodsPid + ",categoryIdStr:" + categoryId + ",插入热卖区数据已经存在");
+            } else {
+                HotSellingGoods hsGoods = new HotSellingGoods();
+                hsGoods.setHotSellingId(categoryId);
+
+                hsGoods.setGoodsName(goods.getName());
+                hsGoods.setShowName(goods.getEnname());
+                hsGoods.setGoodsImg(goods.getImg().split(",")[0].replace("[", "").replace("]", ""));
+                if (StringUtils.isNotBlank(hsGoods.getGoodsImg())
+                        && !(hsGoods.getGoodsImg().contains("http:") || hsGoods.getGoodsImg().contains("https:"))) {
+                    hsGoods.setGoodsImg(goods.getRemotpath() + hsGoods.getGoodsImg());
+                }
+                hsGoods.setGoodsUrl("https://www.import-express.com/product/detail?&source=D"
+                        + Md5Util.encoder(goods.getPid()) + "&item=" + goods.getPid());
+                hsGoods.setGoodsPid(goodsPid);
+
+                hsGoods.setAsinCode("");
+                hsGoods.setCreateAdmid(adminId);
+                hsGoods.setIsOn("1");
+
+                String showName = hsGoods.getShowName();
+
+
+                if (showName.contains("'")) {
+                    showName = showName.replace("'", "\\'");
+                }
+                if (showName.contains("\"")) {
+                    showName = showName.replace("\"", "\\\"");
+                }
+                sendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
+                        "goods_url,goods_img,goods_price,is_on,profit_margin,selling_price,wholesale_price_1,wholesale_price_2," +
+                        "wholesale_price_3,wholesale_price_4,wholesale_price_5,create_admid,amazon_price,asin_code) values(" + hsGoods.getHotSellingId() + "," + hsGoods.getGoodsPid() + "," +
+                        "'" + showName + "'," +
+                        "'" + hsGoods.getGoodsUrl() + "','" + hsGoods.getGoodsImg() + "','" + hsGoods.getGoodsPrice() + "','" + hsGoods.getIsOn() + "'," +
+                        "'" + hsGoods.getProfitMargin() + "','" + hsGoods.getSellingPrice() + "','" + hsGoods.getWholesalePrice_1() + "','" + hsGoods.getWholesalePrice_2() + "'," +
+                        "'" + hsGoods.getWholesalePrice_3() + "','" + hsGoods.getWholesalePrice_4() + "','" + hsGoods.getWholesalePrice_5() + "'," +
+                        "'" + hsGoods.getCreateAdmid() + "','" + hsGoods.getAmazonPrice() + "','" + hsGoods.getAsinCode() + "')"));
+
+                sendMQ.closeConn();
+            }
+
+        } catch (Exception e) {
+            e.getStackTrace();
+            LOG.error("保存类别商品失败，原因：" + e.getMessage());
+        }
     }
 
 

@@ -2,7 +2,10 @@ package com.cbt.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * 时间格式化
@@ -11,6 +14,27 @@ import java.util.Date;
  *
  */
 public class DateFormatUtil {
+
+	/**
+     * 获取给定时间的年月
+     * @param dateTime
+     * @return
+     */
+    public static String formatDateToYearAndMonthString(LocalDateTime dateTime) {
+        return format(dateTime, "yyyy-MM");
+    }
+
+
+    /**
+     * 根据规格格式化日式为字符串
+     * @param dateTime
+     * @param patternStr
+     * @return
+     */
+    private static String format(LocalDateTime dateTime, String patternStr) {
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern(patternStr, Locale.US);
+        return pattern.format(dateTime);
+    }
 
 	/**
 	 * 获取 yyyy-MM-dd HH:mm:ss:SSS 格式的时间字符串
@@ -88,6 +112,28 @@ public class DateFormatUtil {
 		return df.format(date);
 	}
 
+
+	/**
+	 * 根据字符串获取时间
+	 * @param dateStr
+	 * @return
+	 */
+	public static LocalDateTime getTimeWithStr(String dateStr){
+		return getTimeByStr(dateStr,"yyyy-MM-dd HH:mm:ss");
+	}
+
+	/**
+	 * 根据给出规格格式化字符串为时间
+	 * @param dateStr
+	 * @param patternStr
+	 * @return
+	 */
+	 public static LocalDateTime getTimeByStr(String dateStr,String patternStr){
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(patternStr);
+     return LocalDateTime.parse(dateStr, dtf);
+
+
+	 }
 	public static void main(String[] args) {
 		System.err.println(formatDateToStringByYear(new Date()));
 	}

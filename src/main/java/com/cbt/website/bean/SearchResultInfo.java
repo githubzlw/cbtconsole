@@ -110,6 +110,18 @@ public class SearchResultInfo {
 	private String dp_city;
 	private String dp_province;
 	private String dp_country;
+	/**
+	 * 淘宝订单表id
+	 */
+	private int taobaoId;
+
+	public int getTaobaoId() {
+		return taobaoId;
+	}
+
+	public void setTaobaoId(int taobaoId) {
+		this.taobaoId = taobaoId;
+	}
 
 	public int getDp_num() {
 		return dp_num;
