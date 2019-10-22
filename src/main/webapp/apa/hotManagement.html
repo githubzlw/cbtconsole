@@ -448,40 +448,49 @@
 
         function refreshOnlineGoodsJson(){
         var webType = $("#web_size_type").val();
-		$("#gen_show_notice").show();
-		$(".refresh_color").css("background","#aaa");
-		$(".refresh_color").attr("disabled",true);
-		var url = "https://www.import-express.com/popProducts/refreshHotJson?webType="+webType;
+        var hotType = $("#query_hot_type").val();
+		// $("#gen_show_notice").show();
+		//$(".refresh_color").css("background","#aaa");
+		//$(".refresh_color").attr("disabled",true);
+		var url = "http://52.34.56.133:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
 		if(webType == 1){
-		    url = "https://www.import-express.com/popProducts/refreshHotJson?webType="+webType;
+		    url = "http://52.34.56.133:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         } else if(webType == 2){
-		    url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?webType="+webType;
+		    url = "http://52.34.56.133:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         } else if(webType == 3){
-		    url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?webType="+webType;
+		    url = "http://52.34.56.133:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         }else if(webType == 4){
-		    url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson?webType="+webType;
+		    url = "http://52.34.56.133:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         }else{
 		    $("#gen_show_notice").text("选择分组失败，不刷新！");
 		    return;
         }
         if(window.location.href.indexOf("127.0.0.1") > -1){
-		    url =  "http://127.0.0.1:8087/popProducts/refreshHotJson?webType="+webType;
+		    url =  "http://127.0.0.1:8383/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         }
-		$.ajax({
-			type : "POST",
+        if(hotType > 0){
+            url += "&hotClassId="+hotType;
+        }
+        var param = "height=400,width=600,top=140,left=500,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        window.open(url, "windows", param);
+		/*$.ajax({
+			type : "GET",
 			url : url,
 			data : {},
 			success : function(data) {
 				$(".refresh_color").attr("disabled",false);
 				$(".refresh_color").css("background","#44a823");
-				if(data.code==200){
+				if(data){
+				    // data.code==200
 					$("#gen_show_notice").text("刷新成功！");
 				}else{
 					$("#gen_show_notice").text("刷新失败，"+ data.message);
 				}
 			}
-		});
+		});*/
 	}
+
+
         function refreshOnlineGoodsHtml(){
     		$("#gen_show_notice").show();
     		var webType = $("#web_size_type").val();
@@ -501,7 +510,7 @@
                 return;
             }
     		$.ajax({
-    			type : "POST",
+    			type : "GET",
     			url : url,
     			data : {},
     			success : function(data) {
