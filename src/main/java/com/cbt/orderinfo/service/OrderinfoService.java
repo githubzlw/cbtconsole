@@ -314,22 +314,24 @@ public class OrderinfoService implements IOrderinfoService {
 				orderinfoMapper.updateIdRationtable(map);
 			}
 			if("1".equals(map.get("status"))){
-				/*//点击到库时根据spec_id关联抓取订单的id
+				//点击到库时根据spec_id关联抓取订单的id
 				String typeName=orderinfoMapper.getTypeNameByOdid(map);
 				//查询入库对应的淘宝订单
 				List<TaoBaoOrderInfo> tList=orderinfoMapper.getTaobaoInfoByOrderid(map);
 				int tbId=0;
 				if(StringUtil.isNotBlank(typeName) && typeName.contains("&gt;")){
 					String [] types=typeName.split("&gt;");
-					String sku1=types[0];
-					String sku2=types[1];
-					tbId=UtilAll.getTbId(tList,sku1,sku2);
+					if(types.length >= 2){
+						String sku1=types[0];
+						String sku2=types[1];
+						tbId=UtilAll.getTbId(tList,sku1,sku2);
+					}
 				}else if(StringUtil.isNotBlank(typeName)){
 					tbId=UtilAll.getTbId(tList,typeName,"");
 				}
-				map.put("tbId",String.valueOf(tbId));*/
+				map.put("tbId",String.valueOf(tbId));
 
-				map.put("tbId",map.get("taobaoId"));
+				// map.put("tbId",map.get("taobaoId"));
 				//更新订单详情表状态为已经到仓库
 				orderinfoMapper.updateState(map);
 				if("0".equals(map.get("repState"))){
