@@ -170,7 +170,7 @@ public class ComplainChatController {
 			try {
 				// 保存文件名
 				newFileName = getNewFileName(mpf);
-				if(!newFileName.toLowerCase().contains("jpg") || !newFileName.toLowerCase().contains("png")){
+				if(!newFileName.toLowerCase().contains("jpg") && !newFileName.toLowerCase().contains("png")){
 					newFileName=newFileName+".jpg";
 				}
 				// 去除中文
