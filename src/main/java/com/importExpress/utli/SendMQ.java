@@ -53,8 +53,6 @@ public class SendMQ {
     private final static String QUEUE_USER_AUTH_NAME = "usersauth";
     private final static String EXCHANGE_USER_AUTH_NAME = "usersauth";
 
-    private final static HashMap<String,String> config = new HashMap(10);
-
     private Connection connection;
     private Channel channel;
 
@@ -211,6 +209,20 @@ public class SendMQ {
         System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
     }
 
+    /**
+     * 授权的，仅限import
+     * @param json
+     * @throws Exception
+     */
+    private void sendAuthorizationFlagStr(String json) throws Exception{
+        channel.exchangeDeclare(EXCHANGE_USER_AUTH_NAME,"fanout",true);
+        channel.basicPublish(EXCHANGE_USER_AUTH_NAME, "", null, json.getBytes("UTF-8"));
+
+        // channel.queueDeclare(QUEUE_USER_AUTH_NAME, false, false, false, null);
+        // channel.basicPublish("", QUEUE_USER_AUTH_NAME, null, json.getBytes("UTF-8"));
+        System.err.println(" [x] Sent '" + json + "'");
+    }
+
 
     public static void sendMqSql(RunBatchSqlModel model) {
         SendMQ sendMQ = null;
@@ -267,6 +279,7 @@ public class SendMQ {
         //执行sql并保存记录，对应可以注入
 //    	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
 //    	sendMQ.runSqlOnline("543232153010", sql);
+    }
 
     private void sendMessageStr(String json, int website) throws Exception{
         if (website == 0) {
