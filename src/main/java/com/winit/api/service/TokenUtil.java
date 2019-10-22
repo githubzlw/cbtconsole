@@ -19,7 +19,7 @@ public class TokenUtil {
 	 * @return
 	 */
 	public static String getToken() {
-	        String token = null;
+			/*String token = null;
 	        RequestMsg requestMsg = new RequestMsg();
 	        requestMsg.setAction("user.getToken");
 	        Map<String, String> data = new TreeMap<String, String>();
@@ -33,6 +33,8 @@ public class TokenUtil {
 	            JSONObject dataResult = json.getJSONObject("data");
 	            token = dataResult.getString("token");
 	        }
-	        return token;
+	        System.out.println(token);
+	        return token;*/
+	        return "9DCD2E78E326449EF8288A6A2B248CE5";
 	    }
 }

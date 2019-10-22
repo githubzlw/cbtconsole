@@ -42,7 +42,7 @@ public abstract class QueryBase {
         // 3.构建RequestMsg调用的业务参数，需要排序
         setdBusinessData(requestMsg);
         // 4.构建RequestMsg调用的用户签名
-        setRequestUserSign(requestMsg, TokenUtil.getToken());
+        setRequestUserSign(requestMsg, RequestParam.TOKEN);
         // 5.构建RequestMsg调用的应用签名
         // 此处clientSecret即创建应用时系统分配的client_secret
         setRequestClientSign(requestMsg, RequestParam.CLIENT_SECRET);
@@ -116,10 +116,10 @@ public abstract class QueryBase {
             String code = json.getString("code");
             // 错误码"0"表示业务请求成功，非"0"标识业务操作异常
             if ("0".equals(code)) {
-                System.out.println("成功");
-                System.out.println(result);
+//                System.out.println("成功");
+//                System.out.println(result);
             } else {
-                System.err.println(result);
+//                System.err.println(result);
             }
         }
 

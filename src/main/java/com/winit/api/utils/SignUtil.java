@@ -1,9 +1,12 @@
 package com.winit.api.utils;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.google.common.collect.Maps;
 import com.winit.api.model.RequestMsg;
 
 public class SignUtil {
@@ -24,7 +27,7 @@ public class SignUtil {
         String data = "";
         if (requestMsg.getData() != null && StringUtils.isNotBlank(requestMsg.getData().toString())) {
             // 此处需要注意com.alibaba.fastjson.JSONObject的默认行为是不显示值为null的键，且默认字段是强制排序的。故如果使用其他JSON工具需要注意这两点，不然会认证不过
-            data = JSONObject.toJSONString(requestMsg.getData(), SerializerFeature.MapSortField);
+            data = JSONObject.toJSONString(requestMsg.getData(), SerializerFeature.SortField);
         }
         buf.append("data").append(data);
         buf.append("format").append(requestMsg.getFormat() == null ? "" : requestMsg.getFormat());

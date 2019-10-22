@@ -14,7 +14,7 @@ public class RequestParam {
     /**
      * 调用者账号密码：即卖家账号的密码
      */
-    public static String PASSWORD      = "S520309";
+    public static String PASSWORD      = "cccc";
 
     /**
      * 应用ID，标识应用身份。由开发者创建应用时系统分配
@@ -28,6 +28,8 @@ public class RequestParam {
      * 即platform:平台值。与Client_id一一对应，即应用创建时填写的CODE，推荐使用公司英文简称或中文汉语首字母组合，大写
      */
     public static String CLIENT_CODE = "RTYU";//"WINIT";
+    
+    public static String TOKEN = "9DCD2E78E326449EF8288A6A2B248CE5";
     
     
 
