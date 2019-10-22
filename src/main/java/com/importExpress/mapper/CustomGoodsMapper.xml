@@ -1452,4 +1452,9 @@
     <select id="queryDescribeLogList" resultType="string">
         select pid from custom_pid_describe_log
     </select>
+     <select id="getGoodsByPid" resultType="java.util.HashMap">
+    
+    select  pid,sku,entype from custom_benchmark_ready where pid=#{pid} limit 1
+    </select>
+    
 </mapper>

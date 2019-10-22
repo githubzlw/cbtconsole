@@ -1,4 +1,4 @@
-package com.winit.api.constants;
+package com.cbt.winit.api.constants;
 
 public class RequestParam {
 

@@ -1,4 +1,4 @@
-package com.winit.api.utils;
+package com.cbt.winit.api.utils;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -7,7 +7,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.IOUtils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.winit.api.model.RequestMsg;
+import com.cbt.winit.api.model.RequestMsg;
 
 /**
  * 

@@ -872,4 +872,6 @@ public interface CustomGoodsService {
      * @return
      */
     List<String> queryDescribeLogList();
+    
+    Map<String,String>  getGoodsByPid(String pid);
 }

@@ -1,4 +1,4 @@
-package com.winit.api.model;
+package com.cbt.winit.api.model;
 
 
 /**

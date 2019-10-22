@@ -1,4 +1,4 @@
-package com.winit.api.test;
+package com.cbt.winit.api.test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
-import com.winit.api.model.RequestMsg;
+import com.cbt.winit.api.model.RequestMsg;
 
 public class CreateOutboundOrderTest extends BaseTest {
 

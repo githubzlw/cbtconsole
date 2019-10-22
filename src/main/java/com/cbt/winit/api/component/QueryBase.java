@@ -1,15 +1,15 @@
-package com.winit.api.service;
+package com.cbt.winit.api.component;
 
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.winit.api.constants.RequestParam;
-import com.winit.api.model.RequestMsg;
-import com.winit.api.utils.ApiClient;
-import com.winit.api.utils.DateUtil;
-import com.winit.api.utils.SignUtil;
+import com.cbt.winit.api.constants.RequestParam;
+import com.cbt.winit.api.model.RequestMsg;
+import com.cbt.winit.api.utils.ApiClient;
+import com.cbt.winit.api.utils.DateUtil;
+import com.cbt.winit.api.utils.SignUtil;
 
 public abstract class QueryBase {
 

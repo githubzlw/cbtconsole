@@ -1,8 +1,5 @@
 package com.importExpress.service;
 
-import java.util.List;
-import java.util.Map;
-
 import com.importExpress.pojo.GoodsSkuAttr;
 
 public interface GoodsSkuAttrService {
@@ -18,16 +15,11 @@ public interface GoodsSkuAttrService {
 	 */
 	GoodsSkuAttr countGoodsSku(String pid,String skuattr);
 	
-	/**更新order_detail_sku_match 状态
-	 * @param id
-	 * @param goodsSkuAttrId
-	 * @return
-	 */
-	int updateWaitMatch(int id,GoodsSkuAttr goodsSkuAttrId);
 	
-	/**获取带解析的产品
+	
+	/**海外仓商品解析sku
+	 * @param code
 	 * @return
 	 */
-	List<Map<String,Object>> getWaitMatch();
-
+	GoodsSkuAttr parseGoodsSku(String code);
 }

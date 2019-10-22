@@ -1,9 +1,9 @@
-package com.winit.api.test;
+package com.cbt.winit.api.test;
 
 import org.junit.Test;
 
 import com.alibaba.fastjson.JSONObject;
-import com.winit.api.model.RequestMsg;
+import com.cbt.winit.api.model.RequestMsg;
 
 public class QueryDeliveryWayTest extends BaseTest {
 

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.cbt.parse.service.StrUtils;
+import com.cbt.winit.api.model.WarehouseWrap;
+import com.cbt.winit.api.service.WinitService;
 import com.google.common.collect.Maps;
 import com.importExpress.pojo.OverseasWarehouseStock;
 import com.importExpress.pojo.OverseasWarehouseStockParamter;
@@ -30,6 +32,8 @@ import com.importExpress.service.OverseasWarehouseStockService;
 public class OverseasWarehouseStockController {
 	@Autowired
 	private OverseasWarehouseStockService stockService;
+	@Autowired
+	private WinitService winitService;
 	
 	/**
 	 * 库存列表
@@ -131,7 +135,10 @@ public class OverseasWarehouseStockController {
 	public Map<String,Object> syncStock(HttpServletRequest request, HttpServletResponse response){
 		Map<String,Object> result = Maps.newHashMap();
 		
-		
+		List<WarehouseWrap> queryWarehouse = winitService.queryWarehouse();
+		for(WarehouseWrap w : queryWarehouse) {
+			winitService.queryInventory(w);
+		}
 		return result;
 		
 	} 

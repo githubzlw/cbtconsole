@@ -1,13 +1,10 @@
-package com.winit.api.utils;
-
-import java.util.Map;
+package com.cbt.winit.api.utils;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.google.common.collect.Maps;
-import com.winit.api.model.RequestMsg;
+import com.cbt.winit.api.model.RequestMsg;
 
 public class SignUtil {
 

@@ -13,7 +13,7 @@ public class GoodsSkuAttr {
 	
 	/**
 	 * 默认200
-	 * 错误代码 101 sku数据格式错误;102产品表查询不到数据;103无sku内容; 104 无匹配规格
+	 * 错误代码    100-sku数据格式错误; 101-产品表查询不到数据;  102-无匹配规格; 103-无sku内容
 	 */
 	private int errorCode;
 

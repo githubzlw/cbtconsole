@@ -1,12 +1,12 @@
-package com.winit.api.test;
+package com.cbt.winit.api.test;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 import com.alibaba.fastjson.JSONObject;
-import com.winit.api.constants.RequestParam;
-import com.winit.api.model.RequestMsg;
-import com.winit.api.utils.ApiClient;
+import com.cbt.winit.api.constants.RequestParam;
+import com.cbt.winit.api.model.RequestMsg;
+import com.cbt.winit.api.utils.ApiClient;
 
 public class TokenTest {
 

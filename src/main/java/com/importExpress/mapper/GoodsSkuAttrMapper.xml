@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.GoodsSkuAttrMapper" >
+  <resultMap id="goodsSkuAttrMap" type="com.importExpress.pojo.GoodsSkuAttr" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="pid" property="pid" jdbcType="VARCHAR" />
+    <result column="specid" property="specid" jdbcType="VARCHAR" />
+    <result column="skuid" property="skuid" jdbcType="VARCHAR" />
+    <result column="skuattr" property="skuattr" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+   
+  </resultMap>
+  
+ 
+  <insert id="insertGoodsSku" useGeneratedKeys="true" parameterType="com.importExpress.pojo.GoodsSkuAttr" >
+  <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">  
+        SELECT LAST_INSERT_ID(); 
+   </selectKey>
+    insert into goods_sku_attr (pid,specid,skuid,skuattr,type)
+    values (#{pid}, #{specid}, #{skuid}, #{skuattr}, #{type})
+  </insert>
+  
+  <select id="countGoodsSku"  resultMap="goodsSkuAttrMap" >
+    select id,pid,specid,skuid,skuattr,type from goods_sku_attr where pid=#{pid} and skuattr=#{skuattr} limit 1;
+  </select>
+ 
+</mapper>

@@ -1,4 +1,4 @@
-package com.winit.api.utils;
+package com.cbt.winit.api.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
