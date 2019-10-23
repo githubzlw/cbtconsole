@@ -26,9 +26,15 @@ import com.cbt.pojo.Admuser;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.pojo.Dropshiporder;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class OrderSplitDaoImpl implements IOrderSplitDao {
 //	private static final Log   SLOG = (Log) LogFactory.getLog("source");
+	private static final Log logger = LogFactory.getLog(OrderSplitDaoImpl.class);
 
 	@Override
 	public List<OrderDetailsBean> getOrdersDetails_split(String orderNo) {
@@ -652,11 +658,13 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		return res;
 	}
 
+	@Deprecated
 	@Override
 	public int splitOrder(OrderBean ob, OrderBean orderBeannew, String odId_now, String selSplitArr, Payment pay,
 	                      int state, double order_ac, double balance_pay, String gId_last, String adminUserName, String pay_time,
 	                      List<OrderDetailsBean> updateOrderDetaildList, List<OrderDetailsBean> insertOrderDetaildList,
 	                      String splitGoodsId) {
+		// 不用方法
 		// 修改拆分后原订单orderinfo
 		String sql_up = "UPDATE orderinfo SET product_cost=?,pay_price=?,pay_price_tow=?,pay_price_three=?,actual_ffreight=?,service_fee=?,order_ac=?,details_number=?,foreign_freight=?,discount_amount=?,purchase_number=0,state=?,purchase_number=?,extra_freight=?,remaining_price=?,packag_style=0,share_discount=?,extra_discount=?,coupon_discount=?  WHERE order_no = ?";
 		// 更新本地orderinfo主单的替换标志
@@ -1777,8 +1785,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	@Override
 	public void addOrderAddress(OrderAddress orderAddress) {
 		String sql = "insert order_address(AddressID,orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,Updatetimr,admUserID,street,recipients,flag) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+		// Connection conn = DBHelper.getInstance().getConnection2();
+		// PreparedStatement stmt = null;
 		try {
 			// 判断是否开启线下同步线上配置
 			if (GetConfigureInfo.openSync()) {
@@ -1793,7 +1801,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 						+ orderAddress.getFlag() + ")";
 				SaveSyncTable.InsertOnlineDataInfo(0, orderAddress.getOrderNo(), "dropship拆单", "order_address", sqlTwo);
 			} else {
-				stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+				/*stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 				stmt.setInt(1, orderAddress.getId());
 				stmt.setString(2, orderAddress.getOrderNo());
 				stmt.setString(3, orderAddress.getCountry());
@@ -1808,19 +1816,30 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				stmt.setString(12, orderAddress.getStreet());
 				stmt.setString(13, orderAddress.getRecipients());
 				stmt.setInt(14, orderAddress.getFlag());
-				stmt.executeUpdate();
+				stmt.executeUpdate();*/
+
+				String sqlTwo = "insert order_address(AddressID,orderNo,Country,statename,address,address2,phoneNumber,"
+						+ "zipcode,Adstatus,Updatetimr,admUserID,street,recipients,flag) values(" + orderAddress.getId()
+						+ ",'" + orderAddress.getOrderNo() + "','" + orderAddress.getCountry() + "','"
+						+ orderAddress.getStatename() + "','" + orderAddress.getAddress() + "','"
+						+ orderAddress.getAddress2() + "','" + orderAddress.getPhoneNumber() + "','"
+						+ orderAddress.getZipcode() + "','" + orderAddress.getAdstatus() + "','"
+						+ orderAddress.getUpdatetimr() + "','" + orderAddress.getAdmUserID() + "','"
+						+ orderAddress.getStreet() + "','" + orderAddress.getRecipients() + "',"
+						+ orderAddress.getFlag() + ")";
+				SendMQ.sendMsg(new RunSqlModel(sqlTwo));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
+			/*if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeConnection(conn);*/
 		}
 	}
 
@@ -1830,8 +1849,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	@Override
 	public void updateOrderDetails(OrderDetailsBean orderDetailsBean) {
 		String sql = "update order_details set dropshipid =? where orderid = ? and id = ?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+		// Connection conn = DBHelper.getInstance().getConnection2();
+		// PreparedStatement stmt = null;
 		try {
 			// 判断是否开启线下同步线上配置
 			if (GetConfigureInfo.openSync()) {
@@ -1841,23 +1860,28 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				SaveSyncTable.InsertOnlineDataInfo(0, orderDetailsBean.getOrderid(), "dropship拆单", "order_details",
 						sqlStr);
 			} else {
-				stmt = conn.prepareStatement(sql);
+				/*stmt = conn.prepareStatement(sql);
 				stmt.setString(1, orderDetailsBean.getDropshipid());
 				stmt.setString(2, orderDetailsBean.getOrderid());
 				stmt.setLong(3, orderDetailsBean.getGoodsid());
-				stmt.executeUpdate();
+				stmt.executeUpdate();*/
+
+				String sqlStr = "update order_details set dropshipid ='" + orderDetailsBean.getDropshipid()
+						+ "' where orderid = '" + orderDetailsBean.getOrderid() + "' and id = "
+						+ orderDetailsBean.getGoodsid();
+				SendMQ.sendMsg(new RunSqlModel(sqlStr));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
+			/*if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeConnection(conn);*/
 		}
 	}
 
@@ -1974,8 +1998,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				"create_time,client_update,server_update,ip,order_ac,purchase_number,ipnaddress,currency,discount_amount,purchase_days,actual_lwh,actual_weight_estimate,actual_freight_c,extra_freight,order_show,");
 		sqlBuffer.append(
 				"packag_number,orderRemark,orderpaytime,details_number,cashback) VALUE(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+		// Connection conn = DBHelper.getInstance().getConnection2();
+		// PreparedStatement stmt = null;
 		try {
 			// 判断是否开启线下同步线上配置
 			if (GetConfigureInfo.openSync()) {
@@ -2013,7 +2037,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				SaveSyncTable.InsertOnlineDataInfo(dropshiporder.getUserId(), dropshiporder.getParentOrderNo(),
 						"dropship拆单", "dropshiporder", sqlTwo);
 			} else {
-				stmt = conn.prepareStatement(sqlBuffer.toString(), Statement.RETURN_GENERATED_KEYS);
+				/*stmt = conn.prepareStatement(sqlBuffer.toString(), Statement.RETURN_GENERATED_KEYS);
 				stmt.setString(1, dropshiporder.getParentOrderNo());
 				stmt.setString(2, dropshiporder.getChildOrderNo());
 				stmt.setInt(3, dropshiporder.getUserId());
@@ -2062,20 +2086,53 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				stmt.setDate(44, (Date) dropshiporder.getOrderpaytime());
 				stmt.setInt(45, dropshiporder.getDetailsNumber());
 				stmt.setDouble(46, dropshiporder.getCashback());
-				stmt.executeUpdate();
+				stmt.executeUpdate();*/
+
+				String sqlTwo = "insert dropshiporder(parent_order_no,child_order_no,user_id,address_id,delivery_time,"
+						+ "packag_style,mode_transport,service_fee,product_cost,domestic_freight,foreign_freight,"
+						+ "actual_allincost,pay_price,pay_price_tow,pay_price_three,actual_ffreight,remaining_price,"
+						+ "actual_volume,actual_weight,custom_discuss_other,custom_discuss_fright,transport_time,state,"
+						+ "cancel_obj,expect_arrive_time,arrive_time,create_time,client_update,server_update,ip,order_ac,"
+						+ "purchase_number,ipnaddress,currency,discount_amount,purchase_days,actual_lwh,"
+						+ "actual_weight_estimate,actual_freight_c,extra_freight,order_show,packag_number,orderRemark,"
+						+ "orderpaytime,details_number,cashback) values('" + dropshiporder.getParentOrderNo() + "','"
+						+ dropshiporder.getChildOrderNo() + "'," + dropshiporder.getUserId() + ","
+						+ dropshiporder.getAddressId() + ", '" + dropshiporder.getDeliveryTime() + "',"
+						+ dropshiporder.getPackagStyle() + ",'" + dropshiporder.getModeTransport() + "','"
+						+ dropshiporder.getServiceFee() + "','" + dropshiporder.getProductCost() + "','"
+						+ dropshiporder.getDomesticFreight() + "','" + dropshiporder.getForeignFreight() + "','"
+						+ dropshiporder.getActualAllincost() + "','" + dropshiporder.getPayPrice() + "','"
+						+ dropshiporder.getPayPriceTow() + "','" + dropshiporder.getPayPriceThree() + "','"
+						+ dropshiporder.getActualFfreight() + "','" + dropshiporder.getRemainingPrice() + "','"
+						+ dropshiporder.getActualVolume() + "','" + dropshiporder.getActualWeight() + "','"
+						+ dropshiporder.getCustomDiscussOther() + "','" + dropshiporder.getCustomDiscussFright() + "','"
+						+ dropshiporder.getTransportTime() + "','" + dropshiporder.getState() + "',"
+						+ dropshiporder.getCancelObj() + ",'" + dropshiporder.getExpectArriveTime() + "','"
+						+ dropshiporder.getArriveTime() + "','" + dropshiporder.getCreateTime() + "',"
+						+ dropshiporder.getClientUpdate() + "," + dropshiporder.getServerUpdate() + ",'"
+						+ dropshiporder.getIp() + "','" + dropshiporder.getState() + "','" + dropshiporder.getOrderAc()
+						+ "'," + dropshiporder.getPurchaseNumber() + ",'" + dropshiporder.getIpnaddress() + "','"
+						+ dropshiporder.getCurrency() + "','" + dropshiporder.getDiscountAmount() + "',"
+						+ dropshiporder.getPurchaseDays() + ",'" + dropshiporder.getActualLwh() + "','"
+						+ dropshiporder.getActualWeightEstimate() + "','" + dropshiporder.getActualFreightC() + "','"
+						+ dropshiporder.getExtraFreight() + "'," + dropshiporder.getOrderShow() + ","
+						+ dropshiporder.getPackagNumber() + ",'" + dropshiporder.getOrderAc() + "','"
+						+ dropshiporder.getOrderremark() + "','" + dropshiporder.getOrderpaytime() + "',"
+						+ dropshiporder.getDetailsNumber() + ",'" + dropshiporder.getCashback() + "')";
+				SendMQ.sendMsg(new RunSqlModel(sqlTwo));
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
+			/*if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeConnection(conn);*/
 		}
 	}
 
@@ -2085,8 +2142,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	@Override
 	public void updateDropShiporder(Dropshiporder dropshiporder) {
 		String sql = "update dropshiporder set product_cost=?,foreign_freight=?,pay_price=?,pay_price_tow=?, details_number=?,actual_weight_estimate=? where child_order_no=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+		// Connection conn = DBHelper.getInstance().getConnection2();
+		// PreparedStatement stmt = null;
 		try {
 			// 判断是否开启线下同步线上配置
 			if (GetConfigureInfo.openSync()) {
@@ -2099,7 +2156,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				SaveSyncTable.InsertOnlineDataInfo(0, dropshiporder.getChildOrderNo(), "dropship拆单", "dropshiporder",
 						syncSql);
 			} else {
-				stmt = conn.prepareStatement(sql);
+				/*stmt = conn.prepareStatement(sql);
 				stmt.setString(1, dropshiporder.getProductCost());
 				stmt.setString(2, dropshiporder.getForeignFreight());
 				stmt.setString(3, dropshiporder.getPayPrice());
@@ -2107,19 +2164,27 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				stmt.setInt(5, dropshiporder.getDetailsNumber());
 				stmt.setDouble(6, dropshiporder.getActualWeightEstimate()==null ? 0:dropshiporder.getActualWeightEstimate());
 				stmt.setString(7, dropshiporder.getChildOrderNo());
-				stmt.executeUpdate();
+				stmt.executeUpdate();*/
+
+				String syncSql = "update dropshiporder set product_cost='" + dropshiporder.getProductCost() + "',"
+						+ "	foreign_freight='" + dropshiporder.getForeignFreight() + "',pay_price='"
+						+ dropshiporder.getPayPrice() + "'" + ",pay_price_tow='" + dropshiporder.getPayPriceTow()
+						+ "',details_number=" + dropshiporder.getDetailsNumber() + "" + ",actual_weight_estimate="
+						+ dropshiporder.getActualWeightEstimate() + " where child_order_no='"
+						+ dropshiporder.getChildOrderNo() + "'";
+				SendMQ.sendMsg(new RunSqlModel(syncSql));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
+			/*if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeConnection(conn);*/
 		}
 	}
 
@@ -2227,8 +2292,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	@Override
 	public int updateDropShipOrderStates(String dropShipOrderId) {
 		String checkupdatedropship_orderstates = "{call checkupdatedropship_orderstates(?)}";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		CallableStatement callSta = null;
+		// Connection conn = DBHelper.getInstance().getConnection2();
+		// CallableStatement callSta = null;
 		int res = 0;
 		try {
 			// 判断是否开启线下同步线上配置
@@ -2236,24 +2301,24 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				String sqlStr = "{call checkupdatedropship_orderstates('" + dropShipOrderId + "')}";
 				SaveSyncTable.InsertOnlineDataInfo(0, dropShipOrderId, "dropship拆单", "dropshiporder", sqlStr);
 			} else {
-				callSta = conn.prepareCall(checkupdatedropship_orderstates);
+				/*callSta = conn.prepareCall(checkupdatedropship_orderstates);
 				callSta.setString(1, dropShipOrderId);
-				callSta.executeUpdate();
+				callSta.executeUpdate();*/
 			}
 			res = 1;
-
-		} catch (SQLException e) {
+			logger.error("dropShipOrderId:" + dropShipOrderId + ",updateDropShipOrderStates 调用线上");
+		} catch (Exception e) {
 			res = 0;
 			e.printStackTrace();
 		} finally {
-			if (callSta != null) {
+			/*if (callSta != null) {
 				try {
 					callSta.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeConnection(conn);*/
 		}
 		return res;
 	}
@@ -2301,10 +2366,10 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	public boolean orderSplitByOrderNo(int userId, String orderNoOld, String orderNoNew, int updateGoodsId,
 	                                   int updateGoodsNum) {
 
-		Connection conn2 = DBHelper.getInstance().getConnection2();
+		/*Connection conn2 = DBHelper.getInstance().getConnection2();
 		String sql = "call order_split_by_orderno(?,?,?,?) ;";
 		CallableStatement cStmt = null;
-		ResultSet rs = null;
+		ResultSet rs = null;*/
 		try {
 			if (GetConfigureInfo.openSync()) {
 				String sqlStr = "{call order_split_by_orderno('" + orderNoOld + "','" + orderNoNew + "',"
@@ -2312,18 +2377,20 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				SaveSyncTable.InsertOnlineDataInfo(userId, orderNoOld, "拆单,新订单:" + orderNoNew, "orderinfo", sqlStr);
 				return true;
 			} else {
-				cStmt = conn2.prepareCall(sql);
+				/*cStmt = conn2.prepareCall(sql);
 				cStmt.setString(1, orderNoOld);
 				cStmt.setString(2, orderNoNew);
 				cStmt.setInt(3, updateGoodsId);
 				cStmt.setInt(4, updateGoodsNum);
-				return cStmt.execute();
+				return cStmt.execute();*/
+				logger.error("orderNoOld:" + orderNoOld + ",orderNoNew:" + orderNoNew + ",updateGoodsId:"
+						+ updateGoodsId + " orderSplitByOrderNo使用线上");
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (rs != null) {
+			/*if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException e) {
@@ -2337,14 +2404,13 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn2);
+			DBHelper.getInstance().closeConnection(conn2);*/
 		}
 		return false;
 	}
 
 	@Override
 	public int insertIntoPayment(int userId, String nwOrderNo, String oldOrderNo) {
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		String sql = "INSERT into payment "
 				+ "( userid, orderid, paymentid, payment_amount, payment_cc, orderdesc, username, "
 				+ "paystatus, createtime , paySID, payflag, paytype,  payment_other  ,paymentno,transaction_fee ) "
@@ -2352,26 +2418,16 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ "where order_no='" + nwOrderNo + "'), payment_cc, orderdesc, username, paystatus, NOW(),"
 				+ " paySID, payflag, 3 , 3,paymentno,0 from payment  where  payment.orderid='" + oldOrderNo
 				+ "' limit 1;";
-		Statement stmt = null;
 		try {
 			if (GetConfigureInfo.openSync()) {
 				SaveSyncTable.InsertOnlineDataInfo(userId, nwOrderNo, "拆单支付", "payment", sql);
 			} else {
-				stmt = conn2.createStatement();
-				stmt.execute(sql);
+
+				SendMQ.sendMsgByRPC(new RunSqlModel(sql));
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 		return 0;
 	}
@@ -2411,7 +2467,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 					SaveSyncTable.InsertOnlineDataInfo(userId, nwOrderNo, "拆单3取消修改详情状态", "order_details", sqlOdDs);
 					count = 4;
 				} else {
-					conn2.setAutoCommit(false);
+					/*conn2.setAutoCommit(false);
 					stmt = conn2.createStatement();
 					// stmt.addBatch(sqlRcRd);
 					stmt.addBatch(sqlOdIf);
@@ -2422,7 +2478,28 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 						conn2.commit();
 					} else {
 						conn2.rollback();
+					}*/
+
+					String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(sqlRcRd));
+					int countRs = 0;
+					if(StringUtils.isBlank(rsStr)){
+						countRs = Integer.valueOf(rsStr);
 					}
+					count = countRs;
+
+					rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(sqlOdIf));
+					countRs = 0;
+					if(StringUtils.isBlank(rsStr)){
+						countRs = Integer.valueOf(rsStr);
+					}
+					count += countRs;
+
+					rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(sqlOdIf));
+					countRs = 0;
+					if(StringUtils.isBlank(rsStr)){
+						countRs = Integer.valueOf(sqlOdDs);
+					}
+					count += countRs;
 				}
 			}
 		} catch (Exception e) {
@@ -2958,11 +3035,10 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	                                List<OrderDetailsBean> nwOrderDetails,String state, int isSplitNum) {
 
 		String orderNoOld = orderBeanTemp.getOrderNo();
-		Connection remoteConn = DBHelper.getInstance().getConnection2();
 		Connection localConn = DBHelper.getInstance().getConnection();
-		Statement ppStamt = null;
 		Statement wStamt = null;
 		Statement localStamt = null;
+		//Statement ppStamt = null;
 		boolean isSuccess = false;
 		// 远程执行SQL队列
 		List<String> remoteSqlList = new ArrayList<String>();
@@ -3213,16 +3289,15 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
         }
 
 		try {
-			remoteConn.setAutoCommit(false);
 			localConn.setAutoCommit(false);
-			ppStamt = remoteConn.createStatement();
 			System.err.println("exSql begin");
+			int count=0;
 			for (String exSql : remoteSqlList) {
 				System.err.println(exSql + ";");
-				ppStamt.addBatch(exSql);
+				count+=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(exSql)));
 			}
 
-			isSuccess = ppStamt.executeBatch().length > 0;
+			isSuccess = count > 0;
 			if(isSuccess){
 				wStamt = localConn.createStatement();
 				for(String loSql : localSqlList){
@@ -3231,10 +3306,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				//ppStamt.executeUpdate(localSql);
 				isSuccess = wStamt.executeBatch().length > 0;
 				if(isSuccess){
-				    remoteConn.commit();
 				    localConn.commit();
                 }else{
-				    remoteConn.rollback();
 				    localConn.rollback();
                 }
 				//拆单取消时记录拆单的商品
@@ -3243,30 +3316,18 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 					wStamt = localConn.createStatement();
 					wStamt.executeUpdate(insert_split_details);
 				}
-			}else{
-				remoteConn.rollback();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			isSuccess = false;
-			try {
-				remoteConn.rollback();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
+
 			try {
 				localConn.rollback();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
 		} finally {
-			if (ppStamt != null) {
-				try {
-					ppStamt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+
 			if (wStamt != null) {
 				try {
 					wStamt.close();
@@ -3282,7 +3343,6 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(localConn);
-			DBHelper.getInstance().closeConnection(remoteConn);
 		}
 		return isSuccess;
 	}
@@ -3336,7 +3396,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 		int count = 0;
 		try {
-			conn.setAutoCommit(false);
+			/*conn.setAutoCommit(false);
 			ppStamt = conn.createStatement();
 			ppStamt.addBatch(updateOldSql);
 			ppStamt.addBatch(updateNewSql);
@@ -3346,7 +3406,28 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				conn.commit();
 			} else {
 				conn.rollback();
+			}*/
+
+			String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(updateOldSql));
+			int countRs = 0;
+			if (StringUtils.isBlank(rsStr)) {
+				countRs = Integer.valueOf(rsStr);
 			}
+			count += countRs;
+
+			rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(updateNewSql));
+			countRs = 0;
+			if (StringUtils.isBlank(rsStr)) {
+				countRs = Integer.valueOf(rsStr);
+			}
+			count += countRs;
+
+			rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(updateParentSql));
+			countRs = 0;
+			if (StringUtils.isBlank(rsStr)) {
+				countRs = Integer.valueOf(rsStr);
+			}
+			count += countRs;
 
 		} catch (Exception e) {
 			e.printStackTrace();

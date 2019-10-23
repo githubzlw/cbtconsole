@@ -1,52 +1,81 @@
 package com.cbt.warehouse.ctrl;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.imageio.ImageIO;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
+import com.cbt.FreightFee.service.FreightFeeSerive;
+import com.cbt.FtpUtil.ContinueFTP2;
+import com.cbt.Specification.util.DateFormatUtil;
+import com.cbt.bean.*;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.TypeBean;
+import com.cbt.bean.ZoneBean;
+import com.cbt.change.util.ChangeRecordsDao;
+import com.cbt.change.util.CheckCanUpdateUtil;
+import com.cbt.change.util.ErrorLogDao;
+import com.cbt.change.util.OnlineOrderInfoDao;
+import com.cbt.common.StringUtils;
+import com.cbt.common.dynamics.DataSourceSelector;
+import com.cbt.customer.service.GuestBookServiceImpl;
+import com.cbt.customer.service.IGuestBookService;
+import com.cbt.fee.service.IZoneServer;
+import com.cbt.fee.service.ZoneServer;
+import com.cbt.jcys.bean.*;
+import com.cbt.jcys.util.HttpUtil;
+import com.cbt.jcys.util.JcgjSoapHttpPost;
+import com.cbt.jcys.util.Md5Helper;
+import com.cbt.jdbc.DBHelper;
+import com.cbt.jdbc.MiniConnectionPoolManager.TimeoutException;
+import com.cbt.messages.service.MessagesService;
+import com.cbt.method.service.OrderDetailsServiceImpl;
+import com.cbt.onlinesql.ctr.SaveSyncTable;
+import com.cbt.orderinfo.service.IOrderinfoService;
+import com.cbt.orderinfo.service.OrderinfoService;
+import com.cbt.parse.service.ImgDownload;
+import com.cbt.parse.service.StrUtils;
+import com.cbt.pojo.*;
+import com.cbt.processes.service.SendEmail;
+import com.cbt.processes.servlet.Currency;
+import com.cbt.report.service.GeneralReportService;
+import com.cbt.util.*;
+import com.cbt.warehouse.dao.WarehouseMapper;
+import com.cbt.warehouse.pojo.AdmuserPojo;
+import com.cbt.warehouse.pojo.*;
+import com.cbt.warehouse.service.IWarehouseService;
+import com.cbt.warehouse.service.MabangshipmentService;
+import com.cbt.warehouse.service.SkuinfoService;
+import com.cbt.warehouse.service.ZoneShippingService;
+import com.cbt.warehouse.thread.warehouseThread;
+import com.cbt.warehouse.util.*;
+import com.cbt.warehouse.util.Utility;
+import com.cbt.website.bean.*;
+import com.cbt.website.dao.ExpressTrackDaoImpl;
+import com.cbt.website.dao.IExpressTrackDao;
+import com.cbt.website.dao2.*;
+import com.cbt.website.server.PurchaseServer;
+import com.cbt.website.server.PurchaseServerImpl;
+import com.cbt.website.service.IOrderwsServer;
+import com.cbt.website.service.OrderwsServer;
+import com.cbt.website.servlet.Purchase;
+import com.cbt.website.thread.AddInventoryThread;
+import com.cbt.website.util.ContentConfig;
+import com.cbt.website.util.*;
+import com.cbt.website.util.EasyUiJsonResult;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.google.common.collect.*;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
+import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.service.IPurchaseService;
+import com.importExpress.service.TabCouponService;
+import com.importExpress.utli.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
@@ -67,165 +96,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.fastjson.JSON;
-import com.cbt.FreightFee.service.FreightFeeSerive;
-import com.cbt.FtpUtil.ContinueFTP2;
-import com.cbt.Specification.util.DateFormatUtil;
-import com.cbt.bean.AliInfoDataBean;
-import com.cbt.bean.BlackList;
-import com.cbt.bean.CustomGoodsBean;
-import com.cbt.bean.Forwarder;
-import com.cbt.bean.GuestBookBean;
-import com.cbt.bean.LocationManagementInfo;
-import com.cbt.bean.LocationTracking;
-import com.cbt.bean.Logisticsinfo;
-import com.cbt.bean.OrderBean;
-import com.cbt.bean.OrderDetailsBean;
-import com.cbt.bean.OrderInfoPrint;
-import com.cbt.bean.Orderinfo;
-import com.cbt.bean.RechargeRecord;
-import com.cbt.bean.ShippingBean;
-import com.cbt.bean.StorageInspectionLogPojo;
-import com.cbt.bean.StorageLocationBean;
-import com.cbt.bean.TrackBean;
-import com.cbt.bean.TypeBean;
-import com.cbt.bean.ZoneBean;
-import com.cbt.change.util.ChangeRecordsDao;
-import com.cbt.change.util.CheckCanUpdateUtil;
-import com.cbt.change.util.ErrorLogDao;
-import com.cbt.change.util.OnlineOrderInfoDao;
-import com.cbt.common.StringUtils;
-import com.cbt.common.dynamics.DataSourceSelector;
-import com.cbt.customer.service.GuestBookServiceImpl;
-import com.cbt.customer.service.IGuestBookService;
-import com.cbt.fee.service.IZoneServer;
-import com.cbt.fee.service.ZoneServer;
-import com.cbt.jcys.bean.DataInfo;
-import com.cbt.jcys.bean.GoodsPojo;
-import com.cbt.jcys.bean.PriceData;
-import com.cbt.jcys.bean.PriceReturnJsonNew;
-import com.cbt.jcys.bean.RecList;
-import com.cbt.jcys.util.HttpUtil;
-import com.cbt.jcys.util.JcgjSoapHttpPost;
-import com.cbt.jcys.util.Md5Helper;
-import com.cbt.jdbc.DBHelper;
-import com.cbt.jdbc.MiniConnectionPoolManager.TimeoutException;
-import com.cbt.messages.service.MessagesService;
-import com.cbt.method.service.OrderDetailsServiceImpl;
-import com.cbt.onlinesql.ctr.SaveSyncTable;
-import com.cbt.orderinfo.service.IOrderinfoService;
-import com.cbt.parse.service.ImgDownload;
-import com.cbt.parse.service.StrUtils;
-import com.cbt.pojo.Admuser;
-import com.cbt.pojo.BuyerCommentPojo;
-import com.cbt.pojo.CustomsRegulationsPojo;
-import com.cbt.pojo.RedManProductBean;
-import com.cbt.pojo.TaoBaoOrderInfo;
-import com.cbt.processes.service.SendEmail;
-import com.cbt.processes.servlet.Currency;
-import com.cbt.report.service.GeneralReportService;
-import com.cbt.util.FtpConfig;
-import com.cbt.util.GetConfigureInfo;
-import com.cbt.util.Md5Util;
-import com.cbt.util.NewFtpUtil;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.SpringContextUtil;
-import com.cbt.util.SysParamUtil;
-import com.cbt.util.Util;
-import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.pojo.AdmuserPojo;
-import com.cbt.warehouse.pojo.AllProblemPojo;
-import com.cbt.warehouse.pojo.DisplayBuyInfo;
-import com.cbt.warehouse.pojo.Dropshiporder;
-import com.cbt.warehouse.pojo.GoodsInventory;
-import com.cbt.warehouse.pojo.JcexPrintInfo;
-import com.cbt.warehouse.pojo.Mabangshipment;
-import com.cbt.warehouse.pojo.OrderFeePojo;
-import com.cbt.warehouse.pojo.OrderInfoCountPojo;
-import com.cbt.warehouse.pojo.OrderInfoPojo;
-import com.cbt.warehouse.pojo.OrderProductSurcePojo;
-import com.cbt.warehouse.pojo.OrderReplenishmentPojo;
-import com.cbt.warehouse.pojo.RefundSamplePojo;
-import com.cbt.warehouse.pojo.SbxxPojo;
-import com.cbt.warehouse.pojo.ShippingPackage;
-import com.cbt.warehouse.pojo.Skuinfo;
-import com.cbt.warehouse.pojo.Tb1688Account;
-import com.cbt.warehouse.pojo.Tb1688Pojo;
-import com.cbt.warehouse.pojo.returndisplay;
-import com.cbt.warehouse.service.IWarehouseService;
-import com.cbt.warehouse.service.MabangshipmentService;
-import com.cbt.warehouse.service.SkuinfoService;
-import com.cbt.warehouse.service.ZoneShippingService;
-import com.cbt.warehouse.thread.warehouseThread;
-import com.cbt.warehouse.util.ExcelUtil;
-import com.cbt.warehouse.util.OrderInfoPage;
-import com.cbt.warehouse.util.OrderPrintInfoUtil;
-import com.cbt.warehouse.util.StringUtil;
-import com.cbt.warehouse.util.UtilAll;
-import com.cbt.warehouse.util.Utility;
-import com.cbt.website.bean.ProductBean;
-import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
-import com.cbt.website.bean.SampleGoodsBean;
-import com.cbt.website.bean.SearchResultInfo;
-import com.cbt.website.bean.ShopManagerPojo;
-import com.cbt.website.bean.UserInfo;
-import com.cbt.website.bean.UserOrderDetails;
-import com.cbt.website.dao.ExpressTrackDaoImpl;
-import com.cbt.website.dao.IExpressTrackDao;
-import com.cbt.website.dao2.ChargeCalculateSample;
-import com.cbt.website.dao2.CreateAndPreAlertOrderSample;
-import com.cbt.website.dao2.FindOrderSample;
-import com.cbt.website.dao2.RemoveOrderSample;
-import com.cbt.website.dao2.feeCount;
-import com.cbt.website.server.PurchaseServer;
-import com.cbt.website.server.PurchaseServerImpl;
-import com.cbt.website.service.IOrderwsServer;
-import com.cbt.website.service.OrderwsServer;
-import com.cbt.website.servlet.Purchase;
-import com.cbt.website.thread.AddInventoryThread;
-import com.cbt.website.util.ContentConfig;
-import com.cbt.website.util.DownloadMain;
-import com.cbt.website.util.EasyUiJsonResult;
-import com.cbt.website.util.FileTool;
-import com.cbt.website.util.GetCompanyName;
-import com.cbt.website.util.JsonResult;
-import com.cbt.website.util.UploadByOkHttp;
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.google.common.collect.Maps;
-import com.importExpress.mail.SendMailFactory;
-import com.importExpress.mail.TemplateType;
-import com.importExpress.mapper.IPurchaseMapper;
-import com.importExpress.service.IPurchaseService;
-import com.importExpress.service.TabCouponService;
-import com.importExpress.utli.DESUtils;
-import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
-import com.importExpress.utli.MultiSiteUtil;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SearchFileUtils;
-import com.importExpress.utli.SendMQ;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import sun.misc.BASE64Encoder;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.imageio.ImageIO;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("deprecation")
 @Controller
@@ -234,11 +136,11 @@ public class WarehouseCtrl {
 	private static final String UPLOAD_IMG_PATH = "/usr/local/goodsimg/importcsvimg/inspectionImg/";
 	// 上传文件存储目录
 	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
-//	private static final String UPLOAD_DIRECTORY = "upload";
+	private static final String UPLOAD_DIRECTORY = "upload";
 	// 上传配置
-//	private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;
-//	private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40;
-//	private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 50;
+	private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;
+	private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40;
+	private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 50;
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(WarehouseCtrl.class);
 	IExpressTrackDao expressTrackDao= new ExpressTrackDaoImpl();
 
@@ -270,7 +172,7 @@ public class WarehouseCtrl {
 	IExpressTrackDao dao1 = new ExpressTrackDaoImpl();
 	IOrderwsServer server1 = new OrderwsServer();
 	@Autowired
-	private IOrderinfoService orderinfoService;
+	private OrderinfoService orderinfoService;
 	@Autowired
 	private IPurchaseService iPurchaseService;
 	@Autowired
@@ -446,8 +348,8 @@ public class WarehouseCtrl {
 				SendMQ sendMQ=new SendMQ();
 				String sql="";
 				sql="update priority_category set minPrice="+minPrice+" where id="+id+"";
-				sendMQ.sendMsg(new RunSqlModel(sql));
-				sendMQ.closeConn();
+				SendMQ.sendMsg(new RunSqlModel(sql));
+
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -721,9 +623,9 @@ public class WarehouseCtrl {
 				map.put("state",state);
 				map.put("picture",picture);
 				row=iWarehouseService.disabled(map);
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update inspection_picture set state='"+map.get("state")+"' where pic_path='"+map.get("picture")+"' and isdelete=0"));
-				sendMQ.closeConn();
+
+				SendMQ.sendMsg(new RunSqlModel("update inspection_picture set state='"+map.get("state")+"' where pic_path='"+map.get("picture")+"' and isdelete=0"));
+
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -2387,7 +2289,7 @@ public class WarehouseCtrl {
 		String pwd = admuser.getEmailpass();
 		int res=0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			res = SendEmail.send(sendemail,pwd,toEmail,sbBuffer.toString(),"Attention! Shipping fee needed before we deliver out your ImportExpress order!","", orderNo, 1);
 			// 设置订单还需付款
 			String remaining_price = request.getParameter("remaining_price");
@@ -2398,13 +2300,13 @@ public class WarehouseCtrl {
 					map2.put("orderid", orderNo);
 					map2.put("remaining_price", remaining_price);
 					iWarehouseService.updateRemainingPrice(map2);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set remaining_price='"+remaining_price+"' where order_no='"+orderNo+"'"));
-					sendMQ.sendMsg(new RunSqlModel("update shipping_package set issendmail=1 where orderid='"+orderNo+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set remaining_price='"+remaining_price+"' where order_no='"+orderNo+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update shipping_package set issendmail=1 where orderid='"+orderNo+"'"));
 					// 标志位已发送邮件
 					iWarehouseService.updateSendMail(map2);
 				}
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -2669,18 +2571,18 @@ public class WarehouseCtrl {
 //			DataSourceSelector.set("dataSource127hop");
 //			iWarehouseService.updateOrderinfoAll(mapOrderinf); // 如果合并订单
 //			DataSourceSelector.restore();
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set remaining_price=0 where order_no in(select orderno from order_fee where mergeOrders='"+mapOrderinf.get("order_no")+"')"));
+
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set remaining_price=0 where order_no in(select orderno from order_fee where mergeOrders='"+mapOrderinf.get("order_no")+"')"));
 				mapOrderinf.put("remaining_price", fy); // 差的钱
 				mapOrderinf.put("actual_ffreight", mainMap.get("actualFreight")); // 运费
 				mapOrderinf.put("actual_freight_c",mainMap.get("actualFreight"));// 运费
 				// 本地
 				iWarehouseService.updateOrderinfo(mapOrderinf); // 在将钱，存放合并的主订单
 				// 线上
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set  remaining_price='"+mapOrderinf.get("remaining_price")+"' , actual_ffreight='"+mapOrderinf.get("actual_ffreight")+"' , " +
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set  remaining_price='"+mapOrderinf.get("remaining_price")+"' , actual_ffreight='"+mapOrderinf.get("actual_ffreight")+"' , " +
 						"actual_freight_c='"+mapOrderinf.get("actual_freight_c")+"' where order_no = '"+mapOrderinf.get("order_no")+"'"));
 				msg="1003";
-				sendMQ.closeConn();
+
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -3059,7 +2961,7 @@ public class WarehouseCtrl {
 	public Map<String, String> vimeoUpload(HttpServletRequest request) {
 		Map<String, String> map = new HashMap<String, String>();
 		try {
-			SendMQ sendMQ = new SendMQ();
+
 			String goods_pid=request.getParameter("pid");
 			if(StringUtil.isBlank(goods_pid)){
 				map.put("msg","0");
@@ -3108,7 +3010,7 @@ public class WarehouseCtrl {
 			}else{
 				map.put("msg","0");
 			}
-			sendMQ.closeConn();
+
 		} catch (Exception e) {
 			map.put("msg","0");
 		}
@@ -5227,7 +5129,7 @@ public class WarehouseCtrl {
 				oi.setOrderNo(order_no);
 				oi.setDetailsNumber(goods_pids.split(",").length);
 //				row+=iWarehouseService.insertOrderInfo(oi);
-				sendMQ.sendMsg(new RunSqlModel("insert into orderinfo (order_no,orderRemark,isDropshipOrder,details_number,create_time,user_id,state,delivery_time,mode_transport,product_cost,pay_price) " +
+				SendMQ.sendMsg(new RunSqlModel("insert into orderinfo (order_no,orderRemark,isDropshipOrder,details_number,create_time,user_id,state,delivery_time,mode_transport,product_cost,pay_price) " +
 						"values('"+oi.getOrderNo()+"','采样订单',3,"+oi.getDetailsNumber()+",now(),13653,1,'3-6','Epacket@3-6@USA@all',0,0)"));
 				//生成order_details
 				StringBuilder sqls=new StringBuilder();
@@ -5265,7 +5167,7 @@ public class WarehouseCtrl {
 				}
 				if(od_list.size()>0){
 //					row+=iWarehouseService.insertOrderDetails(od_list);
-					sendMQ.sendMsg(new RunSqlModel(sqls.toString().substring(0,sqls.toString().length()-1)));
+					SendMQ.sendMsg(new RunSqlModel(sqls.toString().substring(0,sqls.toString().length()-1)));
 					//分配采购
 					String adminid=String.valueOf(user.getId());
 //					List<OrderDetailsBean> list_od=iWarehouseService.getOrderDetailsByOrderid(order_no);
@@ -5276,7 +5178,7 @@ public class WarehouseCtrl {
 					iWarehouseService.updateGdOdid();
 					for(int i=0;i<od_list.size();i++){
 						iWarehouseService.updateCrossShopr(od_list.get(i).getGoods_pid());
-						sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
+						SendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
 					}
 				}
 			}
@@ -5284,7 +5186,7 @@ public class WarehouseCtrl {
 			LOG.error("createBuyOrder:",e);
 			row=0;
 		}finally {
-			sendMQ.closeConn();
+
 		}
 		return "1";
 	}
@@ -5375,7 +5277,7 @@ public class WarehouseCtrl {
 				oi.setOrderNo(order_no);
 				oi.setDetailsNumber(pids.length);
 //				row+=iWarehouseService.insertOrderInfo(oi);
-				sendMQ.sendMsg(new RunSqlModel("insert into orderinfo (order_no,orderRemark,isDropshipOrder,details_number,create_time,user_id,state,delivery_time,mode_transport,product_cost,pay_price) " +
+				SendMQ.sendMsg(new RunSqlModel("insert into orderinfo (order_no,orderRemark,isDropshipOrder,details_number,create_time,user_id,state,delivery_time,mode_transport,product_cost,pay_price) " +
 							"values('"+oi.getOrderNo()+"','采样订单',3,"+oi.getDetailsNumber()+",now(),13653,1,'3-6','Epacket@3-6@USA@all',0,0)"));
 				row=1;
 				if(row>0){
@@ -5426,7 +5328,7 @@ public class WarehouseCtrl {
 					}
 					if(od_list.size()>0){
 //						row+=iWarehouseService.insertOrderDetails(od_list);
-						sendMQ.sendMsg(new RunSqlModel(sqls.toString().substring(0,sqls.toString().length()-1)));
+						SendMQ.sendMsg(new RunSqlModel(sqls.toString().substring(0,sqls.toString().length()-1)));
 						//分配采购
 						String adminid=String.valueOf(user.getId());
 //						List<OrderDetailsBean> list_od=iWarehouseService.getOrderDetailsByOrderid(order_no);
@@ -5437,7 +5339,7 @@ public class WarehouseCtrl {
 						for(int i=0;i<od_list.size();i++){
 							//更新本地
 							iWarehouseService.updateCrossShopr(od_list.get(i).getGoods_pid());
-							sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
+							SendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
 						}
 //						if(row==od_list.size()+1){
 //							//分配采购
@@ -5450,7 +5352,7 @@ public class WarehouseCtrl {
 //							for(int i=0;i<od_list.size();i++){
 //								//更新本地
 //								iWarehouseService.updateCrossShopr(od_list.get(i).getGoods_pid());
-////								sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
+////								SendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set samplingStatus=2 where pid='"+od_list.get(i).getGoods_pid()+"'"));
 //							}
 //						}
 					}
@@ -6070,7 +5972,7 @@ public class WarehouseCtrl {
 		int row2 = 0;
 		int row=0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("orderid", orderid);
 			map.put("goodsid", goodsid);
@@ -6079,13 +5981,13 @@ public class WarehouseCtrl {
 			if (row1 == 0) {
 				row2 = iWarehouseService.updateOrderState(map);
 			}
-			sendMQ.sendMsg(new RunSqlModel("update order_details set state=1,checked=1 where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update order_details set state=1,checked=1 where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
 			DataSourceSelector.set("dataSource127hop");
 			iWarehouseService.queryOrderState(map);
 			if (row1 == 0) {
 				row2 =1;
 				// iWarehouseService.updateOrderState(map);
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
 			}
 			DataSourceSelector.restore();
 		}catch (Exception e){
@@ -6102,7 +6004,7 @@ public class WarehouseCtrl {
 		String state = request.getParameter("state");
 		int row = 0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			if (state.equals("0")) {
 				return "0";
 			} else {
@@ -6127,10 +6029,10 @@ public class WarehouseCtrl {
 				}
 				row = iWarehouseService.updateAllDetailsState(map);
 				row =1;
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state='"+map.get("order_details_state")+"',checked='"+map.get("order_details_state")+"' where orderid='"+map.get("orderid")+"'"));
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set state='"+map.get("order_state")+"' where order_no='"+map.get("orderid")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set state='"+map.get("order_details_state")+"',checked='"+map.get("order_details_state")+"' where orderid='"+map.get("orderid")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set state='"+map.get("order_state")+"' where order_no='"+map.get("orderid")+"'"));
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -7242,10 +7144,8 @@ public class WarehouseCtrl {
 				+ orderno + "'";
 		List<String> list = new ArrayList<String>();
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null, stmtfee = null, mergeStmt = null, stmtid = null;
 		ResultSet rs = null;
-		PreparedStatement stmt2 = null;
 		try {
 			// 先查询合并订单
 			mergeStmt = conn.prepareStatement(sql);
@@ -7292,12 +7192,13 @@ public class WarehouseCtrl {
 			 * 更新线上数据库 orderinfo 表 状态
 			 *
 			 */
-			stmt2 = conn2.prepareStatement(sqlorderinfo);
+			List<String> lstValues = Lists.newArrayList();
 			for (int i = 0; i < list.size(); i++) {
-				stmt2.setString(i + 1, list.get(i));
+				lstValues.add(list.get(i));
 			}
 			if (list.size() > 0) {
-				stmt2.executeUpdate();
+				String runSql = DBHelper.covertToSQL(sqlorderinfo, lstValues);
+				SendMQ.sendMsg(new RunSqlModel(runSql));;
 			}
 
 			/**
@@ -7381,13 +7282,6 @@ public class WarehouseCtrl {
 					e.printStackTrace();
 				}
 			}
-			if (stmt2 != null) {
-				try {
-					stmt2.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
 			if (stmtfee != null) {
 				try {
 					stmtfee.close();
@@ -7396,7 +7290,6 @@ public class WarehouseCtrl {
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 	}
 
@@ -7559,7 +7452,7 @@ public class WarehouseCtrl {
 		map.put("goodsurl", goodsurl);
 		int r = 0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			int ret = iWarehouseService.updateOpsState(map);
 			// 入库增加入库详情
 			int ret1 = iWarehouseService.insertId_relationtable(map);
@@ -7567,7 +7460,7 @@ public class WarehouseCtrl {
 			if (ret > 0) {
 				ret = iWarehouseService.updateorderDetailsState(map);
 				r += ret;
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1,purchase_confirmation='"+map.get("admid")+"',purchase_state=3 where orderid='"+map.get("orderid")+"'" +
+				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1,purchase_confirmation='"+map.get("admid")+"',purchase_state=3 where orderid='"+map.get("orderid")+"'" +
 						" and id='"+map.get("odid")+"'"));
 			}
 			if (ret > 0) {
@@ -7575,11 +7468,11 @@ public class WarehouseCtrl {
 				if (1 == ret) {
 					map.put("state", "2");
 					iWarehouseService.updateOrder(map);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '"+map.get("state")+"' where order_no='"+map.get("orderid")+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '"+map.get("state")+"' where order_no='"+map.get("orderid")+"'"));
 				}
 				r += ret;
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -7671,11 +7564,11 @@ public class WarehouseCtrl {
 			map.put("goodsid", goodsid);
 			map.put("purchase_state", "3");
 			try{
-				SendMQ sendMQ = new SendMQ();
+
 				// 修改order_product_source 状态
 				int ret = iWarehouseService.updateOpsState(map);
 				iWarehouseService.updateODPState(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set purchase_state='"+map.get("purchase_state")+"',purchase_time ="+("3".equals(map.get("purchase_state"))?"now()":"null")+" where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set purchase_state='"+map.get("purchase_state")+"',purchase_time ="+("3".equals(map.get("purchase_state"))?"now()":"null")+" where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
 				if (ret > 0) {
 					ret = iWarehouseService.updateOrderinfoNumber(map);
 				}
@@ -7683,9 +7576,9 @@ public class WarehouseCtrl {
 					ret = iWarehouseService.updateOrderinfoState(map);
 					int state = iWarehouseService.GetSetOrdrerState(map);
 					map.put("state", state + "");
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '"+map.get("state")+"' where order_no='"+map.get("orderid")+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '"+map.get("state")+"' where order_no='"+map.get("orderid")+"'"));
 				}
-				sendMQ.closeConn();
+
 			}catch (Exception e){
 				e.printStackTrace();
 			}
@@ -7837,13 +7730,13 @@ public class WarehouseCtrl {
 			map.put("goodsid", goodsid);
 			map.put("purchase_state", "1");
 			try{
-				SendMQ sendMQ = new SendMQ();
+
 				// 修改order_product_source 状态
 				int ret = iWarehouseService.updateOpsState(map);
 				iWarehouseService.updateODPState(map);
 				DataSourceSelector.set("dataSource127hop");
 				iWarehouseService.updateODPState(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set purchase_state='"+map.get("purchase_state")+"',purchase_time ="+("3".equals(map.get("purchase_state"))?"now()":"null")+" where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set purchase_state='"+map.get("purchase_state")+"',purchase_time ="+("3".equals(map.get("purchase_state"))?"now()":"null")+" where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
 				DataSourceSelector.restore();
 				if (ret > 0) {
 					ret = iWarehouseService.updateOrderinfoNumber(map);
@@ -8126,9 +8019,9 @@ public class WarehouseCtrl {
 //				DataSourceSelector.set("dataSource127hop");// 操作本地数据源切换到线上数据源
 //				int orderid_flag = iWarehouseService.upOrderInfo(map);
 //				LOG.info("更新线上orderinfo订单状态:" + orderid_flag);
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '3'  where order_no  in ("+map.get("orders")+")"));
-				sendMQ.closeConn();
+
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '3'  where order_no  in ("+map.get("orders")+")"));
+
 				//通知客户
 				//查询客户ID
 				int userId = orderinfoService.queryUserIdByOrderNo(orderNo);
@@ -8191,17 +8084,17 @@ public class WarehouseCtrl {
 		@Override
 		public synchronized void run() {
 			try {
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state = '3'  where child_order_no = '"+map.get("orders")+"'"));
+
+				SendMQ.sendMsg(new RunSqlModel("update dropshiporder set state = '3'  where child_order_no = '"+map.get("orders")+"'"));
 				if (StrUtils.isNotNullEmpty(mainOrder)) {
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '3' where  order_no  ='"+mainOrder+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state = '3' where  order_no  ='"+mainOrder+"'"));
 					//查询客户ID
 					int userId = orderinfoService.queryUserIdByOrderNo(mainOrder);
 					//发送消息给客户
 					NotifyToCustomerUtil.updateOrderState(userId,mainOrder,2,3);
 				}
-				sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state = '3'  where child_order_no = '"+map.get("orders")+"'"));
-				sendMQ.closeConn();
+				SendMQ.sendMsg(new RunSqlModel("update dropshiporder set state = '3'  where child_order_no = '"+map.get("orders")+"'"));
+
 			} catch (Exception e) {
 				e.getStackTrace();
 				LOG.error("更新线上dropshipOrder订单失败，订单号：" + mainOrder, e);
@@ -8300,7 +8193,7 @@ public class WarehouseCtrl {
 		public synchronized void run() {
 			try {
 				LOG.info("更新线上order_details采购确认状态:" + map.get("purchase_state"));
-				SendMQ sendMQ = new SendMQ();
+
 				StringBuilder sql=new StringBuilder();
 				sql.append("update order_details set purchase_state='"+map.get("purchase_state")+"',purchase_time =");
 				if(!"3".equals(map.get("purchase_state"))){
@@ -8311,8 +8204,8 @@ public class WarehouseCtrl {
 				}
 				sql.append(" where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'");
 //				map.clear();
-				sendMQ.sendMsg(new RunSqlModel(sql.toString()));
-				sendMQ.closeConn();
+				SendMQ.sendMsg(new RunSqlModel(sql.toString()));
+
 			} catch (Exception e) {
 				LOG.error("更新线上order_details采购确认状态", e);
 			}
@@ -8388,10 +8281,10 @@ public class WarehouseCtrl {
 			try {
 				LOG.info("更新线上dropshiporder state为" + map.get("state")
 						+ ",订单号:" + map.get("child_order_no"));
-				SendMQ sendMQ = new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state= (SELECT IF ((select count(*) from ( select * from order_details where dropshipid='"+map.get("child_order_no")+"' " +
+
+				SendMQ.sendMsg(new RunSqlModel("update dropshiporder set state= (SELECT IF ((select count(*) from ( select * from order_details where dropshipid='"+map.get("child_order_no")+"' " +
 						"and state!=2 AND purchase_state=3) a)>0,'1','5')) where child_order_no='"+map.get("child_order_no")+"'"));
-				sendMQ.closeConn();
+
 			} catch (Exception e) {
 				e.getStackTrace();
 				LOG.error(
@@ -8452,15 +8345,15 @@ public class WarehouseCtrl {
 								businessType, tableName, sqlStr);
 					}
 				} else {
-					SendMQ sendMQ = new SendMQ();
+
 					StringBuilder sql=new StringBuilder();
 					sql.append("insert into shipping_package(orderid,remarks,createtime,sweight,svolume,volumeweight ,sflag ,transportcompany ,expressno, estimatefreight  ,flag) values ");
 					for(int i=0;i<bgList.size();i++){
 						Map<String, Object> map=bgList.get(i);
 						sql.append("('"+map.get("orderid")+"','"+map.get("remarks")+"','"+map.get("createtime")+"','"+map.get("weight")+"','"+map.get("svolume")+"','"+map.get("volumeweight")+"',3,'"+map.get("transport")+"','"+map.get("expressno")+"','"+map.get("estimatefreight")+"',1),");
 					}
-					sendMQ.sendMsg(new RunSqlModel(sql.toString().substring(0,sql.toString().length()-1)));
-					sendMQ.closeConn();
+					SendMQ.sendMsg(new RunSqlModel(sql.toString().substring(0,sql.toString().length()-1)));
+
 				}
 			} catch (Exception e) {
 				LOG.error("线上出运插入补录订单 shipping_package ", e);
@@ -8626,9 +8519,9 @@ public class WarehouseCtrl {
                     rr.setCurrency(currency);
 					// 更新order_details信息状态为2
 					try {
-                        SendMQ sendMQ = new SendMQ();
-                        sendMQ.sendMsg(new RunSqlModel("update order_details set state = 2 where goodsid='"+goodId+"' and dropshipid='"+orderNo+"'"));
-                        sendMQ.sendMsg(new RunSqlModel("update order_change set del_state=1 where goodId='"+goodId+"' and orderNo='"+dropShipOrder.getParentOrderNo()+"'"));
+
+                        SendMQ.sendMsg(new RunSqlModel("update order_details set state = 2 where goodsid='"+goodId+"' and dropshipid='"+orderNo+"'"));
+                        SendMQ.sendMsg(new RunSqlModel("update order_change set del_state=1 where goodId='"+goodId+"' and orderNo='"+dropShipOrder.getParentOrderNo()+"'"));
                         StringBuilder sql=new StringBuilder();
                         sql.append("update orderinfo set product_cost = round(product_cost-"+updateMap.get("productcost")+",2),foreign_freight = round(foreign_freight-"+updateMap.get("foreignfreight")+",2)," +
                                 "pay_price = round(pay_price-"+updateMap.get("productcost")+"-"+updateMap.get("foreignfreight")+",2),pay_price_tow = round(pay_price_tow-"+updateMap.get("foreignfreight")+",2)," +
@@ -8640,9 +8533,9 @@ public class WarehouseCtrl {
                             sql.append(",server_update = '"+updateMap.get("server_update")+"'  ");
                         }
                         sql.append("where order_no = '"+updateMap.get("orderno")+"' and user_id ='"+updateMap.get("userid")+"'");
-                        sendMQ.sendMsg(new RunSqlModel(sql.toString()));
-                        sendMQ.sendMsg(new RunSqlModel("insert recharge_record(userid,price,type,remark,remark_id,datatime,usesign,currency,balanceAfter) values('"+rr.getUserid()+"', '"+rr.getPrice()+"','"+rr.getType()+"', '"+rr.getRemark()+"','"+rr.getRemark_id()+"', now(), '"+rr.getUsesign()+"','"+rr.getCurrency()+"','"+rr.getBalanceAfter()+"')"));
-                        sendMQ.closeConn();
+                        SendMQ.sendMsg(new RunSqlModel(sql.toString()));
+                        SendMQ.sendMsg(new RunSqlModel("insert recharge_record(userid,price,type,remark,remark_id,datatime,usesign,currency,balanceAfter) values('"+rr.getUserid()+"', '"+rr.getPrice()+"','"+rr.getType()+"', '"+rr.getRemark()+"','"+rr.getRemark_id()+"', now(), '"+rr.getUsesign()+"','"+rr.getCurrency()+"','"+rr.getBalanceAfter()+"')"));
+
 						LOG.info("更新子订单详情表信息 :"+ dropShipOrder.getChildOrderNo());
 					} catch (Exception e) {
 						LOG.error("更新子订单详情表信息", e);
@@ -8681,10 +8574,10 @@ public class WarehouseCtrl {
 					}
 					// 更新order_details信息状态为2
 					try {
-                        SendMQ sendMQ = new SendMQ();
-                        sendMQ.sendMsg(new RunSqlModel("update order_details set state = 2 where goodsid='"+goodId+"' and dropshipid='"+orderNo+"'"));
-                        sendMQ.sendMsg(new RunSqlModel("update order_change set del_state=1 where goodId='"+goodId+"' and orderNo='"+dropShipOrder.getParentOrderNo()+"'"));
-                        sendMQ.closeConn();
+
+                        SendMQ.sendMsg(new RunSqlModel("update order_details set state = 2 where goodsid='"+goodId+"' and dropshipid='"+orderNo+"'"));
+                        SendMQ.sendMsg(new RunSqlModel("update order_change set del_state=1 where goodId='"+goodId+"' and orderNo='"+dropShipOrder.getParentOrderNo()+"'"));
+
 					} catch (Exception e) {
 						LOG.error("更新order_details信息状态为2", e);
 					}
@@ -8724,8 +8617,8 @@ public class WarehouseCtrl {
                             sql.append(",server_update = '"+updateMap.get("server_update")+"'  ");
                         }
                         sql.append("where order_no = '"+updateMap.get("orderno")+"' and user_id ='"+updateMap.get("userid")+"'");
-                        sendMQ.sendMsg(new RunSqlModel(sql.toString()));
-                        sendMQ.closeConn();
+                        SendMQ.sendMsg(new RunSqlModel(sql.toString()));
+
 					} catch (Exception e) {
 						LOG.error("更新orderinfo信息", e);
 					}
@@ -8740,9 +8633,9 @@ public class WarehouseCtrl {
 					rr.setRemark("cancel:" + orderNo + ",goodsid:" + goodId);
 					rr.setCurrency(currency);
 					try {
-                        SendMQ sendMQ = new SendMQ();
-                        sendMQ.sendMsg(new RunSqlModel("insert recharge_record(userid,price,type,remark,remark_id,datatime,usesign,currency,balanceAfter) values('"+rr.getUserid()+"', '"+rr.getPrice()+"','"+rr.getType()+"', '"+rr.getRemark()+"','"+rr.getRemark_id()+"', now(), '"+rr.getUsesign()+"','"+rr.getCurrency()+"','"+rr.getBalanceAfter()+"')"));
-                        sendMQ.closeConn();
+
+                        SendMQ.sendMsg(new RunSqlModel("insert recharge_record(userid,price,type,remark,remark_id,datatime,usesign,currency,balanceAfter) values('"+rr.getUserid()+"', '"+rr.getPrice()+"','"+rr.getType()+"', '"+rr.getRemark()+"','"+rr.getRemark_id()+"', now(), '"+rr.getUsesign()+"','"+rr.getCurrency()+"','"+rr.getBalanceAfter()+"')"));
+
 					} catch (Exception e) {
 						LOG.error("更新余额变更表(rechagerecord)", e);
 					}
@@ -8965,8 +8858,8 @@ public class WarehouseCtrl {
 					if(row>0){
 						json.setOk(true);
 						SendMQ sendMQ=new SendMQ();
-						sendMQ.sendMsg(new RunSqlModel("update guestbook set picPath='"+Util.PIC_URL+localFilePath+"' where id="+gbookid+""));
-						sendMQ.closeConn();
+						SendMQ.sendMsg(new RunSqlModel("update guestbook set picPath='"+Util.PIC_URL+localFilePath+"' where id="+gbookid+""));
+
 					}
 				}
 			}
@@ -9073,37 +8966,51 @@ public class WarehouseCtrl {
 			// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
 			flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + storePath.substring(0,storePath.lastIndexOf("/")), 0);
 			if(flag){
-				Connection conn = DBHelper.getInstance().getConnection2();// 仓库不用
 				Connection conn1 = DBHelper.getInstance().getConnection();
 				PreparedStatement stmt = null;
 				String sql = "UPDATE order_details t SET t.picturepath = ? WHERE t.orderid = ? AND t.goodsid = ?;";
 				try {
-					stmt = conn.prepareStatement(sql);// 仓库不用
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, StringUtil.isBlank(orderid)?"999999":orderid);
-					stmt.setString(3, goodsid);
-					stmt.executeUpdate();
-					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, StringUtil.isBlank(orderid)?"999999":orderid);
-					stmt.setString(3, goodsid);
-					stmt.executeUpdate();
+					List<String> lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(StringUtil.isBlank(orderid)?"999999":orderid);
+					lstValues.add(goodsid);
+
+					String runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
+					lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(StringUtil.isBlank(orderid)?"999999":orderid);
+					lstValues.add(goodsid);
+
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
 					sql="UPDATE id_relationtable set picturepath='"+storePath+"' where orderid=? and goodid=?";
-					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, StringUtil.isBlank(orderid)?"999999":orderid);
-					stmt.setString(2, goodsid);
-					stmt.executeUpdate();
+
+					lstValues = new ArrayList<>();
+					lstValues.add(StringUtil.isBlank(orderid)?"999999":orderid);
+					lstValues.add(goodsid);
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
 					sql="update inspection_picture set pic_path=? where id=? and isdelete=0";
-					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, i_id);
-					stmt.executeUpdate();
-					stmt = conn.prepareStatement(sql);
-					stmt.setString(1, Util.PIC_URL+storePath+"");
-					stmt.setString(2, i_id);
-					stmt.executeUpdate();
-				} catch (SQLException e) {
-					e.printStackTrace();
+
+					lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(i_id);
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
+
+					lstValues = new ArrayList<>();
+					lstValues.add(Util.PIC_URL+storePath+"");
+					lstValues.add(i_id);
+					runSql = DBHelper.covertToSQL(sql,lstValues);
+					SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+
 				} finally {
 					try {
 						if (stmt != null) {
@@ -9113,7 +9020,6 @@ public class WarehouseCtrl {
 						e.printStackTrace();
 					}
 					DBHelper.getInstance().closePreparedStatement(stmt);
-					DBHelper.getInstance().closeConnection(conn);
 					DBHelper.getInstance().closeConnection(conn1);
 				}
 			}
@@ -9236,7 +9142,7 @@ public class WarehouseCtrl {
 		Map<String,String> map = new HashMap<String,String>();
 		List<String> list=new ArrayList<>();
 		try {
-			SendMQ sendMQ = new SendMQ();
+
 			String filePath="";
 			MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 			List<MultipartFile> fileList = multipartRequest.getFiles("file");
@@ -9294,7 +9200,7 @@ public class WarehouseCtrl {
 			}
 
 			}
-			sendMQ.closeConn();
+
 			if (list.size()==fileList.size()){
 				list.clear();
 				list.add("0");
@@ -9314,7 +9220,7 @@ public class WarehouseCtrl {
 		String filename1 = file.getOriginalFilename();
 		String pid = filename1.replaceAll(".mp4", "").replaceAll("[^0-9]", "");
 		try {
-		SendMQ sendMQ = new SendMQ();
+
 		Map<String, String> map = new HashMap<String, String>();
 
 				String VidoPath = this.iWarehouseService.getRepathByPid(pid);
@@ -9357,7 +9263,7 @@ public class WarehouseCtrl {
 				} else {
 					list="0";
 				}
-			sendMQ.closeConn();
+
 			} catch (Exception e) {
 				list=pid;
 			}

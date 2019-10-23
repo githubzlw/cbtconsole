@@ -1192,7 +1192,7 @@ public class InventoryServiceImpl implements  InventoryService{
 	 */
 	private void updateOrderState(Map<String,String> map){
 		try {
-			SendMQ sendMQ = new SendMQ();
+
 			//订单产品要入库， 状态要验货无误
 //			order_details.state=1 order_details.checked=1 
 			orderinfoMapper.updateChecked(map);
@@ -1203,24 +1203,24 @@ public class InventoryServiceImpl implements  InventoryService{
 			Map<String,Object> orderinfoMap = pruchaseMapper.queryUserIdAndStateByOrderNo(map.get("orderid"));
 			
 			orderinfoMapper.updateOrderDetails(map);
-			sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 			
 			int counts=orderinfoMapper.getDtailsState(map);
 			
 			if (isDropshipOrder == 1) {
 //				orderinfoMapper.updateOrderDetails(map);
-//				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+//				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 //				int counts=orderinfoMapper.getDtailsState(map);
 				if(counts == 0){
 					orderinfoMapper.updateDropshiporder(map);
-					sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+map.get("orderid")+"' " +
+					SendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+map.get("orderid")+"' " +
 							"and id='"+map.get("odid")+"')"));
 				}
 				//判断主单下所有的子单是否到库
 				counts=orderinfoMapper.getAllChildOrderState(map);
 				/*if(counts == 0){
 					orderinfoMapper.updateOrderInfoState(map);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 					//判断订单状态是否一致
 					if(!orderinfoMap.get("old_state").toString().equals("2")){
 						//发送消息给客户
@@ -1231,12 +1231,12 @@ public class InventoryServiceImpl implements  InventoryService{
 			}else{
 				// 非dropshi订单
 //				orderinfoMapper.updateOrderDetails(map);
-//				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+//				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 				//判断订单是否全部到库
 //				int counts=orderinfoMapper.getDetailsState(map);
 				/*if(counts == 0){
 					orderinfoMapper.updateOrderInfoState(map);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 					//判断订单状态是否一致
 					if(!orderinfoMap.get("old_state").toString().equals("2")){
 						//发送消息给客户
@@ -1247,7 +1247,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			}
 			if(counts == 0){
 				orderinfoMapper.updateOrderInfoState(map);
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 				//判断订单状态是否一致
 				if(!orderinfoMap.get("old_state").toString().equals("2")){
 					//发送消息给客户
@@ -1262,7 +1262,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			map.put("remark", "有库存商品，采购自动匹配入库 inventory_sku_id:"+map.get("inventory_sku_id")+"/orderid:"+map.get("orderid")+"/od_id:"+map.get("od_id"));
 			orderinfoMapper.insertGoodsInventory(map);
 			LOG.info("--------------------结束记录商品入库--------------------");
-			sendMQ.closeConn();
+
 			
 			//insertOrderProductSource
 			pruchaseMapper.insertOrderProductSource(map);

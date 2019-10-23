@@ -3,6 +3,8 @@ package com.cbt.dao.impl;
 import com.cbt.bean.UserGradeBean;
 import com.cbt.dao.UserGradeDao;
 import com.cbt.jdbc.DBHelper;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -52,25 +54,33 @@ public class UserGradeDaoImpl implements UserGradeDao {
 	@Override
 	public int updateGrade(int gid, int uid) {
 		String sql = "update  user set grade=? where id=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+//		Connection conn = DBHelper.getInstance().getConnection2();
+//		PreparedStatement stmt = null;
 		int rs = 0;
 		try{
-			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, gid);
-			stmt.setInt(2, uid);
-			rs =stmt.executeUpdate(); 
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setInt(1, gid);
+//			stmt.setInt(2, uid);
+//			rs =stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(gid));
+			lstValues.add(String.valueOf(uid));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs;
 	}
@@ -128,30 +138,41 @@ public class UserGradeDaoImpl implements UserGradeDao {
 		}
 		
 		sql += ",valid=? where gid=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+//		Connection conn = DBHelper.getInstance().getConnection2();
+//		PreparedStatement stmt = null;
 		int rs = 0;
 		try{
-			stmt = conn.prepareStatement(sql);
-			int index = 1;
+//			stmt = conn.prepareStatement(sql);
+//			int index = 1;
+//			if(valid!=0){
+//				stmt.setDouble(index, discount);
+//				index ++;
+//			}
+//			stmt.setInt(index, valid);
+//			stmt.setInt(index+1, gid);
+//			rs =stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
 			if(valid!=0){
-				stmt.setDouble(index, discount);
-				index ++;
+				lstValues.add(String.valueOf(discount));
 			}
-			stmt.setInt(index, valid);
-			stmt.setInt(index+1, gid);
-			rs =stmt.executeUpdate(); 
+			lstValues.add(String.valueOf(valid));
+			lstValues.add(String.valueOf(gid));
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 
 		return rs;
@@ -200,27 +221,35 @@ public class UserGradeDaoImpl implements UserGradeDao {
 	public int addDicount(int gid, double discount) {
 		String sql = "insert into  grade_discount (gid,discount,valid,createtime) values(?,?,?,now())";
 		
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+//		Connection conn = DBHelper.getInstance().getConnection2();
+//		PreparedStatement stmt = null;
 		int result = 0;
 		try{
-			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, gid);
-			stmt.setDouble(2, discount);
-			stmt.setInt(3, 1);
-			result =stmt.executeUpdate(); 
-			
+//			stmt = conn.prepareStatement(sql);
+//			stmt.setInt(1, gid);
+//			stmt.setDouble(2, discount);
+//			stmt.setInt(3, 1);
+//			result =stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<String>();
+			lstValues.add(String.valueOf(gid));
+			lstValues.add(String.valueOf(discount));
+			lstValues.add(String.valueOf(1));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			result = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+//			if (stmt != null) {
+//				try {
+//					stmt.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			DBHelper.getInstance().closeConnection(conn);
 		}
 
 		return result;

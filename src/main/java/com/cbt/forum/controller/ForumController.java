@@ -90,8 +90,8 @@ public class ForumController {
 				//更新线上帖子状态
 				/*SendMQ sendMQ=new SendMQ();
 				String sql="";
-				sendMQ.sendMsg(new RunSqlModel(sql));
-				sendMQ.closeConn();*/
+				SendMQ.sendMsg(new RunSqlModel(sql));
+				*/
 
 				jsonResult.setOk(true);
 			}
@@ -132,8 +132,8 @@ public class ForumController {
 				//更新线上帖子状态
 				/*SendMQ sendMQ=new SendMQ();
 				String sql="";
-				sendMQ.sendMsg(new RunSqlModel(sql));
-				sendMQ.closeConn();*/
+				SendMQ.sendMsg(new RunSqlModel(sql));
+				*/
 
 				json.setOk(true);
 			}

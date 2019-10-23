@@ -3,6 +3,9 @@ package com.cbt.parse.dao;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.parse.bean.GoodsDaoBean;
 import com.cbt.parse.daoimp.IGoodsDao;
+import com.google.common.collect.Lists;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**goodsdata.sql
  * @author abc
@@ -45,53 +49,36 @@ public class GoodsDao implements IGoodsDao{
 				+ "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now())";
 		
 		
-		Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmtsqlupdate = null;
 		PreparedStatement stmtsqlinsert = null;
 		try {
-			stmtsqlupdate = conn.prepareStatement(sqlupdate);
-			stmtsqlupdate.setString(1, bean.getName());
-			stmtsqlupdate.setString(2, bean.getUrl());
-			stmtsqlupdate.setString(3, bean.getsPrice());
-			stmtsqlupdate.setString(4, bean.getoPrice());
-			stmtsqlupdate.setString(5, bean.getgUnit());
-			stmtsqlupdate.setString(6, bean.getpUnit());
-			stmtsqlupdate.setString(7, bean.getInfourl());
-			stmtsqlupdate.setString(8, bean.getUuid());
-			stmtsqlupdate.setInt(9, Integer.valueOf(bean.getValid()));
-			stmtsqlupdate.setString(10, bean.getImg());
-			stmtsqlupdate.setString(11, bean.getImgSize());
-			stmtsqlupdate.setString(12, bean.getSell());
-			stmtsqlupdate.setString(13, bean.getmOrder());
-			stmtsqlupdate.setString(14, bean.getsName());
-			stmtsqlupdate.setString(15, bean.getsID());
-			stmtsqlupdate.setString(16, bean.getFree());
-			stmtsqlupdate.setString(17, bean.getTypes());
-			stmtsqlupdate.setString(18, bean.getDetail());
-			stmtsqlupdate.setString(19, bean.getpID());
-			result = stmtsqlupdate.executeUpdate();
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(bean.getName());
+			lstValues.add(bean.getUrl());
+			lstValues.add(bean.getsPrice());
+			lstValues.add(bean.getoPrice());
+			lstValues.add(bean.getgUnit());
+			lstValues.add(bean.getpUnit());
+			lstValues.add(bean.getInfourl());
+			lstValues.add(bean.getUuid());
+			lstValues.add(bean.getValid());
+			lstValues.add(bean.getImg());
+			lstValues.add(bean.getImgSize());
+			lstValues.add(bean.getSell());
+			lstValues.add(bean.getmOrder());
+			lstValues.add(bean.getsName());
+			lstValues.add(bean.getsID());
+			lstValues.add(bean.getFree());
+			lstValues.add(bean.getTypes());
+			lstValues.add(bean.getDetail());
+			lstValues.add(bean.getpID());
+			
+			String runSql = DBHelper.covertToSQL(sqlupdate, lstValues );
+			result = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+			
 			if(result == 0){
-				stmtsqlinsert = conn.prepareStatement(sqlinsert);
-				stmtsqlinsert.setString(1, bean.getName());
-				stmtsqlinsert.setString(2, bean.getUrl());
-				stmtsqlinsert.setString(3, bean.getsPrice());
-				stmtsqlinsert.setString(4, bean.getoPrice());
-				stmtsqlinsert.setString(5, bean.getgUnit());
-				stmtsqlinsert.setString(6, bean.getpUnit());
-				stmtsqlinsert.setString(7, bean.getInfourl());
-				stmtsqlinsert.setString(8, bean.getUuid());
-				stmtsqlinsert.setInt(9, Integer.valueOf(bean.getValid()));
-				stmtsqlinsert.setString(10, bean.getImg());
-				stmtsqlinsert.setString(11, bean.getImgSize());
-				stmtsqlinsert.setString(12, bean.getSell());
-				stmtsqlinsert.setString(13, bean.getmOrder());
-				stmtsqlinsert.setString(14, bean.getsName());
-				stmtsqlinsert.setString(15, bean.getsID());
-				stmtsqlinsert.setString(16, bean.getFree());
-				stmtsqlinsert.setString(17, bean.getTypes());
-				stmtsqlinsert.setString(18, bean.getDetail());
-				stmtsqlinsert.setString(19, bean.getpID());
-				result = stmtsqlinsert.executeUpdate();
+				runSql = DBHelper.covertToSQL(sqlinsert, lstValues );
+				result = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -110,7 +97,6 @@ public class GoodsDao implements IGoodsDao{
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
 		}
 		return result;
 	}

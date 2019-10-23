@@ -1,11 +1,16 @@
 package com.cbt.website.dao2;
 
 import com.cbt.jdbc.DBHelper;
+import com.cbt.util.Util;
+import com.google.common.collect.Lists;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class WebsiteOrderDetailDaoImpl implements IWebsiteOrderDetailDao {
 
@@ -52,33 +57,19 @@ public class WebsiteOrderDetailDaoImpl implements IWebsiteOrderDetailDao {
 	public int websiteUpdateOrderState(String orderid,int state) {
 		// TODO Auto-generated method stub
 		String sql="update orderinfo set state=? where order_no=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
-		ResultSet rs=null;
 		int res=0;
 		try {
-			stmt = conn.prepareStatement(sql);
+			/*stmt = conn.prepareStatement(sql);
 			stmt.setInt(1, state);
 			stmt.setString(2, orderid);
-			res = stmt.executeUpdate();
+			res = stmt.executeUpdate();*/
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(String.valueOf(state));
+			lstValues.add(orderid);
+			String runSql = DBHelper.covertToSQL(sql, lstValues);
+			res = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
 		}
 		return res;
 	}
@@ -87,33 +78,19 @@ public class WebsiteOrderDetailDaoImpl implements IWebsiteOrderDetailDao {
 	public int websiteUpdateOrderPrice(String orderid,double price) {
 		// TODO Auto-generated method stub
 		String sql="update orderinfo set extra_discount=? where order_no=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
-		ResultSet rs=null;
 		int res=0;
 		try {
-			stmt = conn.prepareStatement(sql);
+			/*stmt = conn.prepareStatement(sql);
 			stmt.setDouble(1,price);
 			stmt.setString(2, orderid);
-			res = stmt.executeUpdate();
+			res = stmt.executeUpdate();*/
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(String.valueOf(price));
+			lstValues.add(orderid);
+			String runSql = DBHelper.covertToSQL(sql, lstValues);
+			res = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
 		}
 		return res;
 	}
@@ -147,41 +124,46 @@ public class WebsiteOrderDetailDaoImpl implements IWebsiteOrderDetailDao {
 	public boolean deleteRechangeRecord(int userId, String orderid) {
 		// TODO Auto-generated method stub
 		String sql = "delete from recharge_record  where userid = ? and remark_id = ? and type = 1 and remark like '%system closeOrder%'";
-		Connection connAws = DBHelper.getInstance().getConnection2();
 		Connection conn27 = DBHelper.getInstance().getConnection();
 		PreparedStatement stmtAws = null;
 		PreparedStatement stmt27 = null;
 		int rs = 0;
 		try {
-			connAws.setAutoCommit(false);
+//			connAws.setAutoCommit(false);
 			conn27.setAutoCommit(false);
 
-			stmtAws = connAws.prepareStatement(sql);
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(String.valueOf(userId));
+			lstValues.add(orderid);
+			String runSql = DBHelper.covertToSQL(sql, lstValues);
+			rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+			
+			/*stmtAws = connAws.prepareStatement(sql);
 			stmtAws.setInt(1, userId);
-			stmtAws.setString(2, orderid);
+			stmtAws.setString(2, orderid);*/
 
 			stmt27 = conn27.prepareStatement(sql);
 			stmt27.setInt(1, userId);
 			stmt27.setString(2, orderid);
-			rs = stmtAws.executeUpdate();
+//			rs = stmtAws.executeUpdate();
 			if (rs > 0) {
 				rs = stmt27.executeUpdate();
 				if (rs > 0) {
-					connAws.commit();
+//					connAws.commit();
 					conn27.commit();
 				} else {
-					connAws.rollback();
+//					connAws.rollback();
 					conn27.rollback();
 				}
 			} else {
-				connAws.rollback();
+//				connAws.rollback();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			DBHelper.getInstance().closePreparedStatement(stmtAws);
 			DBHelper.getInstance().closePreparedStatement(stmt27);
-			DBHelper.getInstance().closeConnection(connAws);
+//			DBHelper.getInstance().closeConnection(connAws);
 			DBHelper.getInstance().closeConnection(conn27);
 		}
 		return rs > 0;

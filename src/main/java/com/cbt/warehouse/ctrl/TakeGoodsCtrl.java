@@ -94,9 +94,9 @@ public class TakeGoodsCtrl extends UtilAll {
 		String express_code = request.getParameter("express_code");
 		String r="1";
 		try{
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("insert into express_record (create_time,express_code)values(now(),'"+express_code+"');"));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel("insert into express_record (create_time,express_code)values(now(),'"+express_code+"');"));
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -292,7 +292,7 @@ public class TakeGoodsCtrl extends UtilAll {
 		map.put("remark", remark);
 		map.put("ymx_discount", ymx_discount);
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 			Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
 			if (adm == null) {
@@ -302,14 +302,14 @@ public class TakeGoodsCtrl extends UtilAll {
 			map.put("category", map.get("category").toString().replaceAll("'", "&apos;"));
 			map.put("title", map.get("title").toString().replaceAll("'", "&apos;"));
 			int ret =1;// goodsService.insertTbGoodsSample(map);
-			sendMQ.sendMsg(new RunSqlModel("insert into tb_goods_sample_details (flag,type,weight,goodssampleid,goodsid,goodsname,goodsurl,goodsimg,goodsprice,amazongoosid," +
+			SendMQ.sendMsg(new RunSqlModel("insert into tb_goods_sample_details (flag,type,weight,goodssampleid,goodsid,goodsname,goodsurl,goodsimg,goodsprice,amazongoosid," +
 					"amazongoosprice,originalprice) values('"+map.get("flag")+"','"+map.get("type")+"','"+map.get("weight")+"','"+map.get("goodssampleid")+"','"+map.get("goodsid")+"'" +
 					",'"+map.get("goodsname")+"','"+map.get("goodsurl")+"'," +
 					"'"+map.get("goodsimg")+"','"+map.get("goodsprice")+"','"+map.get("amazongoosid")+"','"+map.get("amazongoosprice")+"','"+map.get("originalprice")+"')"));
 			if (ret > 0) {
 				return "1000";
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -348,13 +348,13 @@ public class TakeGoodsCtrl extends UtilAll {
 			return "1001";
 		}
 		try{
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("delete from tb_goods_sample_details where id='"+id+"'"));
+
+			SendMQ.sendMsg(new RunSqlModel("delete from tb_goods_sample_details where id='"+id+"'"));
 			int ret =1;// goodsService.delteCommodityByid(map);
 			if (ret > 0) {
 				return "1000";
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -368,13 +368,13 @@ public class TakeGoodsCtrl extends UtilAll {
 		String id = request.getParameter("id");
 		int ret =1;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			if (isStringNull(id)) {
 				return "1001";
 			}
-			sendMQ.sendMsg(new RunSqlModel("delete from tb_goods_sample where id='"+id+"'"));
-			sendMQ.sendMsg(new RunSqlModel("delete from tb_goods_sample_details where goodssampleid ='"+id+"'"));
-			sendMQ.closeConn();
+			SendMQ.sendMsg(new RunSqlModel("delete from tb_goods_sample where id='"+id+"'"));
+			SendMQ.sendMsg(new RunSqlModel("delete from tb_goods_sample_details where goodssampleid ='"+id+"'"));
+
 			if (ret > 0) {
 				return "1000";
 			} else {
@@ -404,15 +404,15 @@ public class TakeGoodsCtrl extends UtilAll {
 		String originalprice = request.getParameter("originalprice");
 		String flag = request.getParameter("flag");
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			if (isStringNull(goodssampleid)) {
 				return "1001";
 			}
-			sendMQ.sendMsg(new RunSqlModel("insert into tb_goods_sample_details (flag,type,weight,goodssampleid,goodsid,goodsname,goodsurl,goodsimg," +
+			SendMQ.sendMsg(new RunSqlModel("insert into tb_goods_sample_details (flag,type,weight,goodssampleid,goodsid,goodsname,goodsurl,goodsimg," +
 					"goodsprice,amazongoosid,amazongoosprice,originalprice)values('"+flag+"','"+type+"','"+weight+"','"+goodssampleid+"','"+goodsid+"','"+goodsname+"','"+goodsurl+"'," +
 					"'"+goodsimg+"','"+goodsprice+"','"+amazongoosid+"','"+amazongoosprice+"','"+originalprice+"')"));
 			int ret =1;
-			sendMQ.closeConn();
+
 			if (ret > 0) {
 				return "1000";
 			}
@@ -440,15 +440,15 @@ public class TakeGoodsCtrl extends UtilAll {
 		String originalprice = request.getParameter("originalprice");
 		String flag = request.getParameter("flag");
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			if (isStringNull(id)) {
 				return "1001";
 			}
 			int ret =1;
-			sendMQ.sendMsg(new RunSqlModel("update tb_goods_sample_details set flag='"+flag+"',originalprice='"+originalprice+"',type='"+type+"',weight='"+weight+"'," +
+			SendMQ.sendMsg(new RunSqlModel("update tb_goods_sample_details set flag='"+flag+"',originalprice='"+originalprice+"',type='"+type+"',weight='"+weight+"'," +
 					"goodsid='"+goodsid+"',goodsname='"+goodsname+"',goodsurl='"+goodsurl+"',goodsimg='"+goodsimg+"'," +
 					"goodsprice='"+goodsprice+"',amazongoosid='"+amazongoosid+"',amazongoosprice='"+amazongoosprice+"'where id='"+id+"'"));
-			sendMQ.closeConn();
+
 			if (ret > 0) {
 				return "1000";
 			} else {

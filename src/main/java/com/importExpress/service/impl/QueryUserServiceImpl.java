@@ -832,13 +832,13 @@ public class QueryUserServiceImpl implements QueryUserService {
             SendMQ sendMQ = null;
             try {
                 sendMQ = new SendMQ();
-                sendMQ.sendMsg(new RunSqlModel(sql));
+                SendMQ.sendMsg(new RunSqlModel(sql));
 
             } catch (Exception e) {
                 throw new RuntimeException("updateUserCheckout mq error");
             } finally {
                 if (sendMQ != null) {
-                    sendMQ.closeConn();
+
                 }
             }
             result.put("state", "true");

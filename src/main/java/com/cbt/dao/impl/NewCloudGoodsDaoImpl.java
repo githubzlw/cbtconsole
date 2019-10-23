@@ -552,6 +552,7 @@ public class NewCloudGoodsDaoImpl implements NewCloudGoodsDao {
 	@Override
 	public int publish(CustomGoodsPublish bean) {
 
+		//线上表没数据不需要修改
 		String upsql = "update custom_benchmark_ready_cloud set valid=1,keyword=?,eninfo=?,enname=?,"
 				+ "weight=?,img=?,endetail=?,feeprice=?,revise_weight=?,final_weight=?, "
 				+ "price=?,wprice=?,range_price=?,sku=?,createtime=now(),bm_flag=1,goodsstate=4,valid=1";
@@ -630,6 +631,7 @@ public class NewCloudGoodsDaoImpl implements NewCloudGoodsDao {
 
 	@Override
 	public int publishList(List<CustomGoodsBean> list) {
+		//线上表不存在不需要修改
 		String sqlDrop = "DROP TABLE IF EXISTS  custom_goods_temporary";
 
 		String sqlCreate = "CREATE temporary TABLE `custom_goods_temporary` (" + "`keyword` longtext COMMENT '置顶关键词',"
@@ -848,6 +850,7 @@ public class NewCloudGoodsDaoImpl implements NewCloudGoodsDao {
 
 	@Override
 	public boolean updateStateList(int state, String pids, int adminid) {
+		//线上表没数据不需要修改
 		Connection conn = DBHelper.getInstance().getConnection();
 		Connection remoteConn = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
@@ -934,6 +937,7 @@ public class NewCloudGoodsDaoImpl implements NewCloudGoodsDao {
 
 	@Override
 	public int updateValid(int valid, String pid) {
+		//线上表不存在不需要改
 		String sql = "update custom_goods set valid=? where pid=? ";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		int rs = 0;
@@ -962,6 +966,7 @@ public class NewCloudGoodsDaoImpl implements NewCloudGoodsDao {
 
 	@Override
 	public int updateValidList(int valid, String pids) {
+		//线上该逻辑不需要修改
 		String sql = "update custom_benchmark_ready_cloud set valid=? and goodsstate =? where pid in ( " + pids + ")";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		int rs = 0;
@@ -1637,6 +1642,7 @@ public class NewCloudGoodsDaoImpl implements NewCloudGoodsDao {
 	@Override
 	public int setGoodsValid(String pid, String adminName, int adminId, int type) {
 
+		//线上表不需要修改
 		Connection conn = DBHelper.getInstance().getConnection();
 		Connection remoteConn = DBHelper.getInstance().getConnection2();
 		String upSql = "update custom_benchmark_ready_cloud set valid=?,admin=?,goodsstate=?,admin_id=?,"
@@ -1705,53 +1711,7 @@ public class NewCloudGoodsDaoImpl implements NewCloudGoodsDao {
 	@Override
 	public boolean batchDeletePids(String[] pidLst) {
 
-		Connection conn = DBHelper.getInstance().getConnection();
-		Connection remoteConn = DBHelper.getInstance().getConnection2();
-		String deSql = "delete from custom_benchmark_ready_cloud where pid = ?";
-		PreparedStatement stmt = null;
-		PreparedStatement remoteStmt = null;
-		String deRemoteSql = "delete from custom_benchmark_ready_cloud where pid = ?";
-		boolean rs = false;
-		try {
-			stmt = conn.prepareStatement(deSql);
-			remoteStmt = remoteConn.prepareStatement(deRemoteSql);
-			for (int i = 0; i < pidLst.length; i++) {
-				stmt.setString(1, pidLst[i]);
-				stmt.addBatch();
-				remoteStmt.setString(1, pidLst[i]);
-				remoteStmt.addBatch();
-			}
-
-			int[] countArr = stmt.executeBatch();
-			if (countArr.length > 0) {
-				return remoteStmt.executeBatch().length > 0;
-			} else {
-				return rs;
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("batchDeletePids error :" + e.getMessage());
-			LOG.error("batchDeletePids error :" + e.getMessage());
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (remoteStmt != null) {
-				try {
-					remoteStmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(remoteConn);
-		}
-		return rs;
+		throw new RuntimeException("already cancel method called");
 	}
 
 	@Override
@@ -1941,6 +1901,7 @@ public class NewCloudGoodsDaoImpl implements NewCloudGoodsDao {
 	@Override
 	public boolean batchInsertSimilarGoods(String mainPid, String similarPids, int adminId,List<String> existPids) {
 
+		//线上表该逻辑不需要改
 		Connection remoteConn = DBHelper.getInstance().getConnection2();
 		Connection conn = DBHelper.getInstance().getConnection();
 		String insertSql = "insert into similar_goods_relation(main_pid,similar_pid,admin_id) values(?,?,?)";

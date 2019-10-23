@@ -1,11 +1,12 @@
 package com.importExpress.utli;
 
+import com.cbt.mq.RPCClient;
 import com.cbt.util.SysParamUtil;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import net.sf.json.JSON;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
@@ -19,12 +20,16 @@ import java.util.concurrent.TimeoutException;
  * @author luohao
  * @date 2018/6/25
  */
+@Slf4j
 public class SendMQ {
 
-    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(SendMQ.class);
-
     /** 直接执行的sql 及 下架*/
-    private final static String QUEUE_NAME = "updateTbl";
+    public final static String QUEUE_NAME = "updateTbl";
+
+    /** 直接执行的sql带返回值*/
+    public final static String QUEUE_NAME_RPC = "updateTbl_rpc";
+
+
 
     /** 优惠卷json数据*/
     private final static String COUPON_NAME = "coupon"; //发送优惠卷到线上 （mq 连接27更新线上，连接98更新153）
@@ -41,39 +46,40 @@ public class SendMQ {
     private static long totalConnect = 0;
     private static long totalDisConnect = 0;
 
+    public final static HashMap<String,String> config = new HashMap(10);
     /**
      * 客户授权MQ
      */
     private final static String QUEUE_USER_AUTH_NAME = "usersauth";
     private final static String EXCHANGE_USER_AUTH_NAME = "usersauth";
 
-    private final static HashMap<String,String> config = new HashMap(10);
-
     private Connection connection;
     private Channel channel;
 
     static{
-        System.err.println("host:" + SysParamUtil.getParam("rabbitmq.host"));
-        System.err.println("port:" + SysParamUtil.getParam("rabbitmq.port"));
-        System.err.println("username:" + SysParamUtil.getParam("rabbitmq.username"));
-        System.err.println("password:" + SysParamUtil.getParam("rabbitmq.password"));
+        log.info("host:" + SysParamUtil.getParam("rabbitmq.host"));
+        log.info("port:" + SysParamUtil.getParam("rabbitmq.port"));
         config.put("host",SysParamUtil.getParam("rabbitmq.host"));
         config.put("port",SysParamUtil.getParam("rabbitmq.port"));
         config.put("username",SysParamUtil.getParam("rabbitmq.username"));
         config.put("password",SysParamUtil.getParam("rabbitmq.password"));
     }
 
-    public SendMQ() throws IOException, TimeoutException {
+    public SendMQ()  {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(config.get("host"));
         factory.setPort(Integer.parseInt(config.get("port")));
         factory.setUsername(config.get("username"));
         factory.setPassword(config.get("password"));
-        connection= factory.newConnection();
-        channel = connection.createChannel();
-        ++totalConnect;
+        try {
+            connection= factory.newConnection();
+            channel = connection.createChannel();
+            ++totalConnect;
+        } catch (Exception e) {
+           log.error("SendMQ",e);
+        }
 
-        logger.info("取得MQ 返回总数/获取总数：" + totalDisConnect + "/" + totalConnect);
+        log.info("取得MQ 返回总数/获取总数：" + totalDisConnect + "/" + totalConnect);
     }
 
     public void closeConn() {
@@ -81,9 +87,9 @@ public class SendMQ {
             try {
                 channel.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("closeConn",e);
             } catch (TimeoutException e) {
-                e.printStackTrace();
+                log.error("closeConn",e);
             }
         }
         if(connection!=null){
@@ -91,7 +97,7 @@ public class SendMQ {
                 connection.close();
                 --totalDisConnect;
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("closeConn",e);
             }
         }
     }
@@ -101,11 +107,9 @@ public class SendMQ {
      * @param model 其中type为1 2值的更新低库存标志，4值的更新上下线状态信息
      * @throws Exception
      */
-    public void sendMsg(UpdateTblModel model) throws Exception {
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        JSONObject jsonObject = JSONObject.fromObject(model);
-        channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
-        System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
+    public static void sendMsg(UpdateTblModel model) {
+
+        sendMsg(JSONObject.fromObject(model).toString());
     }
 
     /**
@@ -113,11 +117,20 @@ public class SendMQ {
      * @param model 其中type为2 直接执行对应sql
      * @throws Exception
      */
-    public void sendMsg(RunSqlModel model) throws Exception {
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        JSONObject jsonObject = JSONObject.fromObject(model);
-        channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
-        System.err.println(" [x] Sent '" + jsonObject.toString() + "'");
+    public static void sendMsg(RunSqlModel model)  {
+        sendMsg(JSONObject.fromObject(model).toString());
+    }
+
+    public static void sendMsg(String data) {
+
+        try (RPCClient rpcClient = new RPCClient()) {
+            log.info(" [x] Sent [{}]" , data);
+            rpcClient.callNoReturn(data);
+            log.info(" [x] Sent [{}] is OK" , data);
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            log.error("MQ sendMsg",e);
+        }
+
     }
     
     /**
@@ -139,21 +152,21 @@ public class SendMQ {
             sendCouponMsg(couponJson, 2);
             sendCouponMsg(couponJson, 3);
         }
-    	System.err.println("Site=" + website + " [x] Sent '" + couponJson + "'");
+        log.info("Site=" + website + " [x] Sent '" + couponJson + "'");
     }
 
-    /**
-     * 通过消息将新购物车推荐商品数据传到线上
-     * @param recommendJson
-     * @throws Exception
-     */
-    public void sendRecommend(String recommendJson) throws Exception {
-        channel.exchangeDeclare(RECOMMEND_NAME, BuiltinExchangeType.FANOUT);
-        channel.basicPublish(RECOMMEND_NAME,"",null,recommendJson.getBytes("UTF-8"));
-//        channel.queueDeclare(RECOMMEND_NAME, false, false, false, null);
-//        channel.basicPublish("", RECOMMEND_NAME, null, recommendJson.getBytes("UTF-8"));
-        System.err.println(" [x] Sent '" + recommendJson + "'");
-    }
+//    /**
+//     * 通过消息将新购物车推荐商品数据传到线上
+//     * @param recommendJson
+//     * @throws Exception
+//     */
+//    public void sendRecommend(String recommendJson) throws Exception {
+//        channel.exchangeDeclare(RECOMMEND_NAME, BuiltinExchangeType.FANOUT);
+//        channel.basicPublish(RECOMMEND_NAME,"",null,recommendJson.getBytes("UTF-8"));
+////        channel.queueDeclare(RECOMMEND_NAME, false, false, false, null);
+////        channel.basicPublish("", RECOMMEND_NAME, null, recommendJson.getBytes("UTF-8"));
+//        log.info(" [x] Sent '" + recommendJson + "'");
+//    }
 
     public static String repCha(String str){
     	if (StringUtils.isBlank(str)) {
@@ -181,20 +194,6 @@ public class SendMQ {
         sendMessageStr( model.toString(), website);
     }
 
-    private void sendMessageStr(String json, int website) throws Exception{
-        if (website == 0) {
-            channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
-            channel.basicPublish("", QUEUE_REDIS_NAME, null, json.getBytes("UTF-8"));
-        }else if (website == 1) {
-            channel.queueDeclare(QUEUE_REDIS_NAME_KIDS, false, false, false, null);
-            channel.basicPublish("", QUEUE_REDIS_NAME_KIDS, null, json.getBytes("UTF-8"));
-        }else if (website == 2) {
-            channel.queueDeclare(QUEUE_REDIS_NAME_PETS, false, false, false, null);
-            channel.basicPublish("", QUEUE_REDIS_NAME_PETS, null, json.getBytes("UTF-8"));
-        }
-        System.err.println(" [x] Sent '" + json + "'");
-    }
-
     /**
      * 通过消息队列更新线上数据 直接执行对应sql集合 批量带事务
      * @param model 需要执行的sql对象集合 (type=3)
@@ -210,7 +209,6 @@ public class SendMQ {
         System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
     }
 
-
     /**
      * 授权的，仅限import
      * @param json
@@ -224,6 +222,7 @@ public class SendMQ {
         // channel.basicPublish("", QUEUE_USER_AUTH_NAME, null, json.getBytes("UTF-8"));
         System.err.println(" [x] Sent '" + json + "'");
     }
+
 
     public static void sendMqSql(RunBatchSqlModel model) {
         SendMQ sendMQ = null;
@@ -280,19 +279,40 @@ public class SendMQ {
         //执行sql并保存记录，对应可以注入
 //    	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
 //    	sendMQ.runSqlOnline("543232153010", sql);
-
-
-        //redis示例
-//        sendMQ.sendMsg(new RedisModel(new String[]{"15937"}), 1);
-
-
-        /*String[] userIds = {"13895"};
-        RedisModel redisModel = new RedisModel(userIds);
-        redisModel.setType("3");
-        sendMQ.sendMsg(redisModel, 1);
-        sendMQ.closeConn();*/
-        sendAuthorizationFlagMqSql(15937,1);
-    	
     }
-    
+
+    private void sendMessageStr(String json, int website) throws Exception{
+        if (website == 0) {
+            channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
+            channel.basicPublish("", QUEUE_REDIS_NAME, null, json.getBytes("UTF-8"));
+        }else if (website == 1) {
+            channel.queueDeclare(QUEUE_REDIS_NAME_KIDS, false, false, false, null);
+            channel.basicPublish("", QUEUE_REDIS_NAME_KIDS, null, json.getBytes("UTF-8"));
+        }else if (website == 2) {
+            channel.queueDeclare(QUEUE_REDIS_NAME_PETS, false, false, false, null);
+            channel.basicPublish("", QUEUE_REDIS_NAME_PETS, null, json.getBytes("UTF-8"));
+        }
+        log.info(" [x] Sent '" + json + "'");
+    }
+
+    /**
+     * RPC方式调用MQ（有返回值）
+     * 不需要关闭mq连接（mq执行完成后自动释放资源）
+     * @param model
+     * @return
+     */
+    public static String sendMsgByRPC(RunSqlModel model)  {
+        try (RPCClient rpcClient = new RPCClient()) {
+
+            JSONObject jsonObject = JSONObject.fromObject(model);
+            log.info(" [x] Sent [{}]" , jsonObject);
+            String response = rpcClient.call(jsonObject.toString());
+            log.info(" [x] response [{}]" , response );
+            return response;
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            log.error("sendMsgByRPC",e);
+            return  null;
+        }
+    }
+
 }

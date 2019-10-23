@@ -137,7 +137,7 @@ public class NotifyToCustomerUtil {
         try {
             System.err.println("MQ:[" + sql + "]");
             sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel(sql));
+            SendMQ.sendMsg(new RunSqlModel(sql));
             isSuccess = true;
         } catch (Exception e) {
             isSuccess = false;
@@ -146,7 +146,7 @@ public class NotifyToCustomerUtil {
         } finally {
             if (null != sendMQ) {
                 try {
-                    sendMQ.closeConn();
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

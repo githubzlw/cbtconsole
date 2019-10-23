@@ -41,7 +41,7 @@ public class SendMQServiceImpl implements SendMQService {
             stmt.setString(2, JSONObject.fromObject(model).toString());
             stmt.executeUpdate();
             //发送mq消息
-            sendMQ.sendMsg(model);	
+            SendMQ.sendMsg(model);
             return 1;
 		} catch (Exception e) {
 			e.getStackTrace();
@@ -56,7 +56,7 @@ public class SendMQServiceImpl implements SendMQService {
 			}
 			if (sendMQ != null) {
 				try {
-					sendMQ.closeConn();
+
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("GoodsSoldUnsellableReasonJob error:" + e.getMessage());

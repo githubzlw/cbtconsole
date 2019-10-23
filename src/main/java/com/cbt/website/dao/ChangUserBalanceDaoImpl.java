@@ -2,11 +2,16 @@ package com.cbt.website.dao;
 
 import com.cbt.jdbc.DBHelper;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChangUserBalanceDaoImpl implements ChangUserBalanceDao {
 
@@ -73,11 +78,24 @@ public class ChangUserBalanceDaoImpl implements ChangUserBalanceDao {
 
 				// 4.进行余额表更操作
 
-				rmStamt = remoteConn.prepareStatement(updateSql);
+				/*rmStamt = remoteConn.prepareStatement(updateSql);
 				rmStamt.setFloat(1, afterBalance);
 				rmStamt.setInt(2, userId);
+				rmStamt.executeUpdate() > 0;*/
+
+				List<String> listValues = new ArrayList<>();
+				listValues.add(String.valueOf(afterBalance));
+				listValues.add(String.valueOf(userId));
+				listValues.add(String.valueOf(userId));
+				String runSql = DBHelper.covertToSQL(updateSql, listValues);
+				String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+				int countRs = 0;
+				if(StringUtils.isBlank(rsStr)){
+					countRs = Integer.valueOf(rsStr);
+				}
+
 				// 判断远程更新是否成功
-				if (rmStamt.executeUpdate() > 0) {
+				if (countRs > 0) {
 					localConn.setAutoCommit(false);
 					lcStamt = localConn.prepareStatement(insertSql);
 					lcStamt.setInt(1, userId);
