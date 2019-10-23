@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>热卖分组</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #hot_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #hot_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 90px;
+            height: 28px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+
+        #enter_div_sty {
+            display: none;
+            position: fixed;
+            top: 25%;
+            background: #8cdab6;
+            padding: 50px;
+            right: 35%;
+            width: 320px;
+            height: 200px;
+            box-shadow: 1px 10px 15px #e2e2e2;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            closeDialog();
+            setDatagrid();
+
+        });
+
+
+        function setDatagrid() {
+            $('#hot_easyui-datagrid').datagrid({
+                title: '热卖分组管理',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#hot_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/hotManage/getClassInfoList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 40,//默认选择的分页是每页50行数据
+                pageList: [30, 40, 50],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.message.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        $.messager.alert(data.message);
+                    }
+                }
+            });
+        }
+
+        function doQuery() {
+            var className = $("#query_class_name").val();
+            var jsonName = $("#query_json_name").val();
+            $("#hot_easyui-datagrid").datagrid("load", {
+                "className": className,
+                "jsonName": jsonName
+            });
+        }
+
+
+        function closeDialog() {
+
+            $("#info_class_id").val(0);
+            $("#form_enter")[0].reset();
+            $('#enter_div_sty').hide();
+        }
+
+        function formatOperation(val, row, index) {
+            return '<button class="but_color" onclick="updateAndInsertClassIfo(' + row.id + ',1)">编辑</button>';
+        }
+
+        function updateAndInsertClassIfo(id, type) {
+            if (id > 0 && type > 0) {
+                $("#info_class_id").val(id);
+                getClassInfoById(id);
+                $("#add_title").text("编辑热卖分组");
+            } else {
+                $("#info_class_id").val(0);
+                $("#form_enter")[0].reset();
+                $("#add_title").text("新增热卖分组");
+            }
+            $('#enter_div_sty').show();
+        }
+
+        function getClassInfoById(classId) {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/hotManage/getClassInfoById",
+                data: {
+                    id: classId
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        var json = data.rows;
+                        $("#info_class_id").val(json.id);
+                        $("#class_name").val(json.className);
+                        $("#json_name").val(json.jsonName);
+                    } else {
+                        $.messager.alert("提醒", '查询失败:' + data.message, "info");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                }
+            });
+        }
+
+
+        function saveClassIfo() {
+            var infoClassId = $("#info_class_id").val();
+            if(!infoClassId){
+                infoClassId = 0;
+            }
+            var jsonName = $("#json_name").val();
+            var className = $("#class_name").val();
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/hotManage/setClassInfo",
+                data: {
+                    id: infoClassId,
+                    jsonName: jsonName,
+                    className: className
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        closeDialog();
+                        doQuery();
+                    } else {
+                        $.messager.alert("提醒", '查询失败:' + data.message, "info");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+
+<div id="hot_toolbar" style="padding: 5px; height: auto">
+    <form id="hot_query_form" action="#" onsubmit="return false;">
+        <span>分组名称:<input id="query_class_name"/></span>
+        <span>json文件名称:<input id="query_json_name"/></span>
+        <input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;
+        <span><input type="button" class="but_color" value="新增分组" onclick="updateAndInsertClassIfo(0,0)"/></span>
+        <span id="gen_show_notice" style="color: red; display: none;">正在执行中...</span>
+    </form>
+</div>
+
+<table id="hot_easyui-datagrid"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'className',width:'300px'">分组名称</th>
+        <th data-options="field:'jsonName',width:'300px'">json名称</th>
+        <th data-options="field:'adminName',align:'center',width:'100px'">创建人</th>
+        <th data-options="field:'createTime',align:'center',width:'150px'">创建时间</th>
+        <th data-options="field:'updateAdminName',align:'center',width:'100px'">修改人</th>
+        <th data-options="field:'updateTime',align:'center',width:'150px'">修改时间</th>
+        <th
+                data-options="field:'opFlag',align:'center',width:'200px',formatter:formatOperation">操作
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+<div id="enter_div_sty">
+    <form id="form_enter" action="#" onsubmit="return false">
+        <table>
+            <caption id="add_title" style="font-size: 24px;">新增热卖分组</caption>
+            <tr>
+                <td>热卖分组名称:</td>
+                <td><input id="class_name" value="" style="width: 200px; height: 28px;" placeholder="请输入分组名称"/>
+                </td>
+            </tr>
+            <tr>
+                <td>json文件名称:</td>
+                <td><input
+                        id="json_name" value="" style="width: 200px; height: 28px;"
+                        placeholder="json文件名称"/></td>
+            </tr>
+            <tr style="display: none;">
+                <td><input type="hidden" id="info_class_id" value="0"></td>
+            </tr>
+        </table>
+        <br>
+        <div style="text-align: center;">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton" onclick=" saveClassIfo()" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeDialog()"
+               style="width: 80px">取消</a>
+        </div>
+
+    </form>
+</div>
+</body>
+</html>
