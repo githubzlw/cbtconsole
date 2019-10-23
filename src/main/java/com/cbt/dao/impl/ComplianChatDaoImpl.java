@@ -98,7 +98,7 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 			lstValues.add(String.valueOf(t.getFlag()));
 
 			String runSql = DBHelper.covertToSQL(sql,lstValues);
-			SendMQ.sendMsg(new RunSqlModel(runSql));
+			SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
 
 
 

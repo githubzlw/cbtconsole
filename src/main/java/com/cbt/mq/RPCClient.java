@@ -32,6 +32,10 @@ public class RPCClient implements AutoCloseable {
         factory.setUsername(SendMQ.config.get("username"));
         factory.setPassword(SendMQ.config.get("password"));
 
+        System.err.println("host:" + SendMQ.config.get("host"));
+        System.err.println("port:" + SendMQ.config.get("port"));
+        System.err.println("username:" + SendMQ.config.get("username"));
+        System.err.println("password:" + SendMQ.config.get("password"));
         connection = factory.newConnection();
         channel = connection.createChannel();
     }
