@@ -1207,7 +1207,17 @@ public class HotManageController {
             List<HotClassInfo> list = hotManageService.getClassInfoList(classInfo);
             HotClassInfo classInfoRs = null;
             if (list != null && list.size() > 0) {
-                classInfoRs = list.get(0);
+                for(HotClassInfo info : list){
+                    if(info.getId() == id){
+                        classInfoRs = info;
+                        break;
+                    }
+                }
+                if(classInfoRs == null){
+                    json.setOk(false);
+                    json.setMessage("获取信息失败");
+                    return json;
+                }
                 list.clear();
             } else {
                 json.setOk(false);
@@ -1502,7 +1512,7 @@ public class HotManageController {
     private void insertHotClassInfoOnline(HotClassInfo hotClassInfo) {
 
         String sql = "insert into hot_class_info(class_name,json_name,admin_id) values(";
-        sql += "'" + hotClassInfo.getClassName() + "'," + hotClassInfo.getJsonName()
+        sql += "'" + hotClassInfo.getClassName() + "','" + hotClassInfo.getJsonName()
                 + "'," + hotClassInfo.getAdminId() + ")";
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
@@ -1510,8 +1520,8 @@ public class HotManageController {
 
     private void updateHotClassInfoOnline(HotClassInfo hotClassInfo) {
 
-        String sql = "update hot_class_info set class_name = " + hotClassInfo.getClassName()
-                + ",json_name = " + hotClassInfo.getJsonName() + ",update_admin_id = " + hotClassInfo.getUpdateTime()
+        String sql = "update hot_class_info set class_name = '" + hotClassInfo.getClassName()
+                + "', json_name = '" + hotClassInfo.getJsonName() + "',update_admin_id = " + hotClassInfo.getUpdateTime()
                 + " where id = " + hotClassInfo.getId();
         System.err.println(sql);
         NotifyToCustomerUtil.sendSqlByMq(sql);
