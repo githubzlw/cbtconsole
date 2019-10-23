@@ -2,14 +2,12 @@ package com.cbt.winit.api.component;
 
 import java.util.List;
 
-import org.junit.Test;
-
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.winit.api.model.RequestMsg;
 import com.cbt.winit.api.model.WarehouseWrap;
 import com.google.common.collect.Lists;
 
-import net.sf.json.JSONObject;
 /**
  * @author Administrator
  *
@@ -23,7 +21,6 @@ public class QueryWarehouse extends QueryBase{
 		return warehouses;
 	}
 
-	@Test
 	public void toDo() {
 		doAction();
 	}
@@ -43,8 +40,7 @@ public class QueryWarehouse extends QueryBase{
 	@Override
 	protected void parseRequestResult(String result) {
 		List<WarehouseWrap> lstWarehouse = Lists.newArrayList();
-		System.out.println(result);
-		JSONObject resultObject = JSONObject.fromObject(result);
+		JSONObject resultObject = JSONObject.parseObject(result);
 		JSONArray lstData = (JSONArray)resultObject.get("data");
 		for(int i=0,size=lstData.size();i<size;i++) {
 			JSONObject lstObject = (JSONObject)lstData.get(i);

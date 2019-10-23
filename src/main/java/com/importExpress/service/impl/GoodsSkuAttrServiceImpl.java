@@ -45,8 +45,11 @@ public class GoodsSkuAttrServiceImpl implements GoodsSkuAttrService {
 		String skuattr = codeArray.length > 1 ? codeArray[1] : "";
 		skuattr = codeArray.length > 2 ? skuattr + "," + codeArray[2] : skuattr;
 		skuattr = codeArray.length > 3 ? skuattr + "," + codeArray[3] : skuattr;
-		
-		return matchSkuId(pid, skuattr);
+		GoodsSkuAttr matchSkuId = matchSkuId(pid, skuattr);
+		if(matchSkuId.getErrorCode() != 200) {
+			goodsSkuAttrMapper.addGoodsSkuErrorlog(matchSkuId);
+		}
+		return matchSkuId;
 	}
 	
 	
@@ -66,6 +69,8 @@ public class GoodsSkuAttrServiceImpl implements GoodsSkuAttrService {
 		String sku = goodsByPid.get("sku");
 		if(StringUtils.isBlank(sku)) {
 			matchSkuId.setErrorCode(103);
+			matchSkuId.setSkuid(pid);
+			matchSkuId.setSpecid(pid);
 			return matchSkuId;
 		}
 		JSONArray parseArray = null ;

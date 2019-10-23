@@ -19,4 +19,10 @@ public interface GoodsSkuAttrMapper {
 	 */
 	GoodsSkuAttr countGoodsSku(@Param("pid")String pid,@Param("skuattr")String skuattr);
 	
+	/**产品sku解析匹配错误记录
+	 * @param sku
+	 * @return
+	 */
+	int addGoodsSkuErrorlog(GoodsSkuAttr sku);
+	
 }

@@ -134,10 +134,22 @@ public class OverseasWarehouseStockController {
 	@ResponseBody
 	public Map<String,Object> syncStock(HttpServletRequest request, HttpServletResponse response){
 		Map<String,Object> result = Maps.newHashMap();
-		
-		List<WarehouseWrap> queryWarehouse = winitService.queryWarehouse();
-		for(WarehouseWrap w : queryWarehouse) {
-			winitService.queryInventory(w);
+		try {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					List<WarehouseWrap> queryWarehouse = winitService.queryWarehouse();
+					for(WarehouseWrap w : queryWarehouse) {
+						winitService.queryInventory(w);
+					}
+				}
+			}).start();
+			result.put("status", 200);
+			result.put("message", "正在同步......");
+			
+		} catch (Exception e) {
+			result.put("status", 100);
+			result.put("message", "同步出现问题......"+e.toString());
 		}
 		return result;
 		

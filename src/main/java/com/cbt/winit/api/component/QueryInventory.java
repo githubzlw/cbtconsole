@@ -2,10 +2,10 @@ package com.cbt.winit.api.component;
 
 import java.util.Map;
 
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.winit.api.model.RequestMsg;
 import com.cbt.winit.api.model.WarehouseWrap;
 import com.google.common.collect.Maps;
@@ -14,7 +14,6 @@ import com.importExpress.pojo.OverseasWarehouseStock;
 import com.importExpress.service.GoodsSkuAttrService;
 import com.importExpress.service.OverseasWarehouseStockService;
 
-import net.sf.json.JSONObject;
 public class QueryInventory extends QueryBase{
 	@Autowired
 	private OverseasWarehouseStockService owsService;
@@ -26,7 +25,6 @@ public class QueryInventory extends QueryBase{
 	
 	private int pageTotal = 1;
 	
-	@Test
 	public void toDo() {
 		doAction();
 	}
@@ -50,6 +48,7 @@ public class QueryInventory extends QueryBase{
 		data.put("productCode", "");
 		//产品名称
 		data.put("name", "");
+		//规格
 		data.put("specification", "");
 		//	仓库ID（warehouseID、warehouseCode必填其中一个）
 		data.put("warehouseId", this.warehouse.getId());
@@ -68,19 +67,22 @@ public class QueryInventory extends QueryBase{
 	@Override
 	protected void parseRequestResult(String result) {
 		System.out.println(result);
-		JSONObject resultObject = JSONObject.fromObject(result);
+		JSONObject resultObject = JSONObject.parseObject(result);
 		JSONObject dataObject = (JSONObject)resultObject.get("data");
 		JSONObject pageObject = (JSONObject)dataObject.get("page");
 		
 		//总数量
-		int totalRows = pageObject.getInt("TotalRows");
+		int totalRows = pageObject.getInteger("TotalRows");
 		//每页返回数量
-		int numRows = pageObject.getInt("NumRows");
+		int numRows = pageObject.getInteger("NumRows");
 		//起始
 //		int startRow = pageObject.getInt("StartRow");
 		this.pageTotal = totalRows % numRows == 0 ? totalRows / numRows :  totalRows / numRows +1;
 		
 		JSONArray latArray= (JSONArray)dataObject.get("list");
+		if(latArray == null) {
+			return ;
+		}
 		for(int i=0,size=latArray.size();i<size;i++) {
 			JSONObject lstObject = (JSONObject)latArray.get(i);
 			//仓库名称
@@ -150,15 +152,15 @@ public class QueryInventory extends QueryBase{
 			//商品描述
 //			String description = lstObject.getString("description");
 			
-			GoodsSkuAttr parseGoodsSku = goodsSkuAttrService.parseGoodsSku(productCode);
 			String skuid = "";
 			String specid = "";
+			GoodsSkuAttr parseGoodsSku = goodsSkuAttrService.parseGoodsSku(productCode);
 			if(parseGoodsSku.getErrorCode() > 102) {
 				skuid = parseGoodsSku.getSkuid();
 				specid = parseGoodsSku.getSpecid();
 			}
 			
-			System.out.println(eName);
+//			System.out.println(eName);
 			OverseasWarehouseStock stock = OverseasWarehouseStock.builder()
 												.code(productCode).goodsName(eName)
 												.goodsPid(productId)
@@ -167,7 +169,7 @@ public class QueryInventory extends QueryBase{
 												.skuid(skuid)
 												.specid(specid)
 												.build();
-			
+//			System.out.println(stock.toString());
 			owsService.syncStock(stock );
 			
 		}

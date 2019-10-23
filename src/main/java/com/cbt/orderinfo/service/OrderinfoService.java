@@ -453,8 +453,10 @@ public class OrderinfoService implements IOrderinfoService {
 				adminid=Integer.valueOf(admin);
 			}
 			if ("1".equals(checked)) {
+				//验货
 				resultList=orderinfoMapper.getOrderDataOne(shipno);
 			}else{
+				//入库
 				resultList=orderinfoMapper.getOrderData(shipno,adminid);
 			}
 			Set set=new HashSet();

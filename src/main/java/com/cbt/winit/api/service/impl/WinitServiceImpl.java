@@ -29,7 +29,7 @@ public class WinitServiceImpl implements WinitService {
 			queryInventory.toDo();
 			loopSize = queryInventory.getPageTotal();
 		}
-		return 0;
+		return loopSize;
 	}
 
 

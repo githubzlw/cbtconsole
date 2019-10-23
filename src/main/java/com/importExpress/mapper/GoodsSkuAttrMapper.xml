@@ -23,5 +23,8 @@
   <select id="countGoodsSku"  resultMap="goodsSkuAttrMap" >
     select id,pid,specid,skuid,skuattr,type from goods_sku_attr where pid=#{pid} and skuattr=#{skuattr} limit 1;
   </select>
+  
+  <insert id="addGoodsSkuErrorlog" parameterType="com.importExpress.pojo.GoodsSkuAttr" > 
+  insert into goods_sku_attr_log (pid,code,create_time) values(#{pid},#{errorCode},now())</insert>
  
 </mapper>
