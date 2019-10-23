@@ -2995,12 +2995,16 @@ public class WarehouseCtrl {
 			fs.close();
 			stream.close();
 			File video=new File(filePath);
+			String VidoPath=iWarehouseService.getRepathByPid(goods_pid);
+			String Vpath=VidoPath.split("/")[4];
+			
 			if (video.exists()) {
-				boolean flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/insp_video/", filename+"_"+file.getOriginalFilename(), filePath);
+				boolean flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/"+Vpath+"/"+goods_pid+"/", filename+"_"+file.getOriginalFilename(), filePath);
 				if(flag){
 					map.put("msg","1");
 					map.put("goods_pid",goods_pid);
-					String path="https://img.import-express.com/importcsvimg/insp_video/"+(filename+"_"+file.getOriginalFilename())+"";
+//					String path="https://img.import-express.com/importcsvimg/insp_video/"+(filename+"_"+file.getOriginalFilename())+"";
+					String path = "https://img.import-express.com/importcsvimg/"+Vpath+"/"+goods_pid+"/" + (filename + "_" + file.getOriginalFilename()) + "";
 					map.put("path",path);
 					GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(goods_pid,path);
 					iWarehouseService.updateCustomVideoUrl(map);
@@ -9179,13 +9183,13 @@ public class WarehouseCtrl {
 				fs.close();
 				stream.close();
 				File video = new File(filePath);
-				if (video.exists()) {
+				if (video.exists()) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
 //					UploadByOkHttp.uploadFile(video,filePath);
-					boolean flag = NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/"+Vpath+pid+"/", filename + "_" + file.getOriginalFilename(), filePath);
+					boolean flag = NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/"+Vpath+"/"+pid+"/", filename + "_" + file.getOriginalFilename(), filePath);
 					if (flag) {
 						map.put("msg", "1");
 						map.put("goods_pid", pid);
-						String path = "https://img.import-express.com/importcsvimg/"+Vpath+pid+"/" + (filename + "_" + file.getOriginalFilename()) + "";
+						String path = "https://img.import-express.com/importcsvimg/"+Vpath+"/"+pid+"/" + (filename + "_" + file.getOriginalFilename()) + "";
 						map.put("path", path);
 						GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(pid, path);
 						iWarehouseService.updateCustomVideoUrl(map);
