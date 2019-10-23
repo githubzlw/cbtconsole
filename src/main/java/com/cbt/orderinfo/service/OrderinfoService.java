@@ -321,13 +321,17 @@ public class OrderinfoService implements IOrderinfoService {
 				int tbId=0;
 				if(StringUtil.isNotBlank(typeName) && typeName.contains("&gt;")){
 					String [] types=typeName.split("&gt;");
-					String sku1=types[0];
-					String sku2=types[1];
-					tbId=UtilAll.getTbId(tList,sku1,sku2);
+					if(types.length >= 2){
+						String sku1=types[0];
+						String sku2=types[1];
+						tbId=UtilAll.getTbId(tList,sku1,sku2);
+					}
 				}else if(StringUtil.isNotBlank(typeName)){
 					tbId=UtilAll.getTbId(tList,typeName,"");
 				}
 				map.put("tbId",String.valueOf(tbId));
+
+				// map.put("tbId",map.get("taobaoId"));
 				//更新订单详情表状态为已经到仓库
 				orderinfoMapper.updateState(map);
 				if("0".equals(map.get("repState"))){
@@ -592,6 +596,10 @@ public class OrderinfoService implements IOrderinfoService {
 					searchresultinfo.setSpecId(map.get("specid")!=null?map.get("specid") : "");
 					searchresultinfo.setSkuID(map.get("skuid")!=null?map.get("skuid") : "");
 				}
+				if(org.apache.commons.lang3.StringUtils.isNotBlank(map.get("taobao_id"))){
+					searchresultinfo.setTaobaoId(Integer.parseInt(map.get("taobao_id")));
+				}
+
 				info.add(searchresultinfo);
 			}
 			//一个1688包裹对应的采购订单数量

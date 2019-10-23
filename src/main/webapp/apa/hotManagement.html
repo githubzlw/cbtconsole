@@ -73,6 +73,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            loadHotClass();
             loadWebSize();
             closeDialog();
             setDatagrid();
@@ -82,7 +83,6 @@
         function loadWebSize() {
             $.ajax({
                 type: 'POST',
-                dataType: 'text',
                 url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
                 data: {},
                 success: function (data) {
@@ -101,6 +101,36 @@
                     }
                 },
                 error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
+
+        function loadHotClass() {
+            $.ajax({
+                type: 'POST',
+                url: '/cbtconsole/hotManage/queryClassInfoList',
+                data: {
+                    "className": "",
+                    "jsonName": ""
+                },
+                success: function (data) {
+                    if (data.ok) {
+
+                        var data = data.data;
+                        var content = '<option value="0" selected="selected">全部</option>';
+                        for(var i = 0;i<data.length;i++){
+                            content += '<option value="'+data[i].id+'">'+data[i].className+'</option>'
+                        }
+                        $("#query_hot_type").empty();
+                        $("#query_hot_type").append(content);
+                        $("#hot_type").empty();
+                        $("#hot_type").append(content);
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function (data) {
                     $.messager.alert("提醒", "执行失败,请联系管理员", "info");
                 }
             });
@@ -212,6 +242,10 @@
                 content = 'kids海外仓专区';
             }else if (val == 26) {
                 content = 'pets海外仓专区';
+            }else if (val == 27) {
+                content = '热卖区(pets)';
+            }else if (val == 28) {
+                content = '热卖区(kids)';
             }
             return content;
         }
@@ -245,6 +279,7 @@
                 getCategory(id);
                 $("#add_title").text("编辑热卖类别");
             } else {
+                $("#category_id").val(0);
                 $("#form_enter")[0].reset();
                 $("#add_title").text("新增热卖类别");
             }
@@ -413,45 +448,58 @@
 
         function refreshOnlineGoodsJson(){
         var webType = $("#web_size_type").val();
-		$("#gen_show_notice").show();
-		$(".refresh_color").css("background","#aaa");
-		$(".refresh_color").attr("disabled",true);
-		var url = "https://www.import-express.com/popProducts/refreshHotJson?webType="+webType;
-		if(webType == 2){
-		    url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?webType="+webType;
+        var hotType = $("#query_hot_type").val();
+		// $("#gen_show_notice").show();
+		//$(".refresh_color").css("background","#aaa");
+		//$(".refresh_color").attr("disabled",true);
+		var url = "http://52.34.56.133:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
+		if(webType == 1){
+		    url = "http://52.34.56.133:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
+        } else if(webType == 2){
+		    url = "http://52.34.56.133:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         } else if(webType == 3){
-		    url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?webType="+webType;
+		    url = "http://52.34.56.133:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         }else if(webType == 4){
-		    url = "https://www.restaurantkitchenequipments.com/popProducts/refreshHotJson?webType="+webType;
+		    url = "http://52.34.56.133:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         }else{
 		    $("#gen_show_notice").text("选择分组失败，不刷新！");
 		    return;
         }
         if(window.location.href.indexOf("127.0.0.1") > -1){
-		    url =  "http://127.0.0.1:8087/popProducts/refreshHotJson?webType="+webType;
+		    url =  "http://127.0.0.1:8383/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         }
-		$.ajax({
-			type : "POST",
+        if(hotType > 0){
+            url += "&hotClassId="+hotType;
+        }
+        var param = "height=400,width=600,top=140,left=500,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        window.open(url, "windows", param);
+		/*$.ajax({
+			type : "GET",
 			url : url,
 			data : {},
 			success : function(data) {
 				$(".refresh_color").attr("disabled",false);
 				$(".refresh_color").css("background","#44a823");
-				if(data.code==200){
+				if(data){
+				    // data.code==200
 					$("#gen_show_notice").text("刷新成功！");
 				}else{
 					$("#gen_show_notice").text("刷新失败，"+ data.message);
 				}
 			}
-		});
+		});*/
 	}
+
+
         function refreshOnlineGoodsHtml(){
     		$("#gen_show_notice").show();
     		var webType = $("#web_size_type").val();
     		$(".refresh_color").css("background","#aaa");
     		$(".refresh_color").attr("disabled",true);
             var url = "https://www.import-express.com/popProducts/refreshHotJson?html=1&webType="+webType;
-            if(webType == 2){
+            if(webType == 1){
+                url = "https://www.import-express.com/popProducts/refreshHotJson?html=1&webType="+webType;
+            }else if(webType == 2){
                 url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?html=1&webType="+webType;
             }else if(webType == 3){
                 url = "https://www.lovelypetsupply.com/popProducts/refreshHotJson?html=1&webType="+webType;
@@ -462,7 +510,7 @@
                 return;
             }
     		$.ajax({
-    			type : "POST",
+    			type : "GET",
     			url : url,
     			data : {},
     			success : function(data) {
@@ -482,10 +530,10 @@
 
 <div id="hot_toolbar" style="padding: 5px; height: auto">
     <form id="hot_query_form" action="#" onsubmit="return false;">
-
+        <a href="./hotClassInfo.html" target="_blank">热卖分组管理</a>
 			<span>热卖类别: <select id="query_hot_type"
                                 style="font-size: 16px; height: 24px; width: 140px;">
-					<option value="0" selected="selected">全部</option>
+					<!--<option value="0" selected="selected">全部</option>
                     <option value="1">热卖区(原始)</option>
                     <option value="2">今日折扣</option>
                     <option value="3">新品</option>
@@ -512,6 +560,8 @@
                     <option value="24">限制首页分组</option>
                     <option value="25">kids海外仓专区</option>
                     <option value="26">pets海外仓专区</option>
+                    <option value="27">热卖区(kids)</option>
+                    <option value="28">热卖区(pets)</option>-->
 			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>是否启用: <select
             id="query_is_on"
             style="font-size: 16px; height: 24px; width: 120px;">
@@ -545,7 +595,8 @@
                 data-options="field:'showImg',align:'center',width:'120px',formatter:formatImg">显示图片
         </th>
 
-        <th data-options="field:'hotType',align:'center',width:'100px',formatter:formatHotType">所属类别</th>
+        <!--<th data-options="field:'hotType',align:'center',width:'100px',formatter:formatHotType">所属类别</th>-->
+        <th data-options="field:'hotTypeName',align:'center',width:'100px'">所属类别</th>
         <th
                 data-options="field:'isOn',align:'center',width:'100px',formatter:formatIsOn">启用状态
         </th>
@@ -598,7 +649,7 @@
             <tr>
                 <td>所属类别：</td>
                 <td><select id="hot_type" style="width: 190px;height: 28px;">
-                    <option value="1">热卖区(原始)</option>
+                    <!--<option value="1">热卖区(原始)</option>
                     <option value="2">今日折扣</option>
                     <option value="3">新品</option>
                     <option value="4">热卖区(Panda)</option>
@@ -624,6 +675,8 @@
                     <option value="24">限制首页分组</option>
                     <option value="25">kids海外仓专区</option>
                     <option value="26">pets海外仓专区</option>
+                    <option value="27">热卖区(kids)</option>
+                    <option value="28">热卖区(pets)</option>-->
                 </select></td>
             </tr>
             <tr>

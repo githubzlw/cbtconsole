@@ -8,8 +8,11 @@ import com.cbt.bean.FileMeta;
 import com.cbt.processes.service.SendEmail;
 import com.cbt.service.IComplainChatService;
 import com.cbt.service.IComplainService;
+import com.cbt.util.DateFormatUtil;
+import com.cbt.util.RandomUtil;
 import com.cbt.util.Util;
 import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import org.apache.commons.collections.map.HashedMap;
@@ -33,6 +36,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,7 +70,7 @@ public class ComplainChatController {
 					cf.setComplainChatid(complainChatid);
 					cf.setComplainid(t.getComplainid());
 					cf.setFlag(1);
-					cf.setImgUrl("https://img.import-express.com/importcsvimg/stock_picture/2018-20/"+urls);
+					cf.setImgUrl(urls);
 					complainChatService.add(cf);
 				}
 				StringBuffer sb = new StringBuffer(t.getChatText());
@@ -113,12 +117,9 @@ public class ComplainChatController {
 	 * @return
 	 */
 	private String getNewFileName(MultipartFile file) {
-		SimpleDateFormat order=new SimpleDateFormat("yyyyMMddHHmmss");
-		Date data=new Date();
-		String fileName2=order.format(data);
-//		String fileName = file.getOriginalFilename();
-//		String fileName2 = fileName.split(",")[0];
-		return fileName2;
+		String fileName = file.getOriginalFilename();
+        String fileName2 = fileName.split(",")[0];
+        return "" + System.currentTimeMillis() + RandomUtil.getRandom4() + fileName2.substring(fileName2.lastIndexOf("."));
 	}
 	
 	@RequestMapping("/uploads")
@@ -134,16 +135,23 @@ public class ComplainChatController {
 			map.put("data", "无文件上传");
 			return map;
 		}
-		String filePath=request.getSession().getServletContext().getRealPath("/");
-		File headPath = new File(getRootPath(multipartRequest)+"/upimg");//获取文件夹路径
-//		//System.out.println(getRootPath(multipartRequest));
-        if(!headPath.exists()){//判断文件夹是否创建，没有创建则创建新文件夹
-        	headPath.mkdirs();
-        }
+
 		//获取上传的所有文件名
 		Iterator<String> itr = multipartRequest.getFileNames();
 		MultipartFile mpf = null;
 		String newFileName ="";
+
+		String yearAndMonth = DateFormatUtil.formatDateToYearAndMonthString(LocalDateTime.now()).replace("-","");
+        String preFilePath = getRootPath(multipartRequest) + "/upimg/"+ yearAndMonth + "/" + System.currentTimeMillis() + "/";
+
+        String middleStr = "/importcsvimg/servicerequest/" + yearAndMonth + "/";
+        String remotePath = UploadByOkHttp.SERVICE_LOCAL_IMPORT_PATH + middleStr;
+
+        File preFile = new File(preFilePath);
+        if(!preFile.exists()){
+        	preFile.mkdirs();
+        }
+        String rsNames = "";
 		while (itr.hasNext()) {
 			//取出文件
 			mpf = multipartRequest.getFile(itr.next());
@@ -170,10 +178,17 @@ public class ComplainChatController {
 				Matcher mat = pat.matcher(newFileName);
 				newFileName=mat.replaceAll("");
 				//输出(保存)文件
-//				FileCopyUtils.copy(("\r\n--"+mpf+"--\r\n").getBytes(), new FileOutputStream(getRootPath(multipartRequest)+"/upimg/" +newFileName));
-				FileCopyUtils.copy((mpf).getBytes(), new FileOutputStream(getRootPath(multipartRequest)+"/upimg/" +newFileName));
+				FileCopyUtils.copy((mpf).getBytes(), new FileOutputStream(preFilePath +newFileName));
 				//获取后缀名
 				map.put("success", true);
+
+				boolean isSu = UploadByOkHttp.uploadFile(new File(preFilePath + newFileName), remotePath, 0);
+                if (!isSu) {
+                    map.put("success", false);
+                    map.put("message", "File upload occured problem.");
+                }else{
+                	rsNames +=  "," + middleStr + newFileName ;
+				}
 				
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -182,12 +197,14 @@ public class ComplainChatController {
 			}
 			//压入栈顶
 			files.add(fileMeta);
-			ContinueFTP2 f1 = new ContinueFTP2(Util.PIC_IP, Util.PIC_USER, Util.PIC_PASS, "21", "/stock_picture/2018-20/"+newFileName+"", headPath+"/"+newFileName);
+			/*ContinueFTP2 f1 = new ContinueFTP2(Util.PIC_IP, Util.PIC_USER, Util.PIC_PASS, "21",
+					"/stock_picture/2018-20/"+newFileName+"", preFilePath+"/"+newFileName);
 			//远程上传到图片服务器
-			f1.start();
+			f1.start();*/
 		}
-		map.put("names", newFileName);
-		map.put("saveLoaction", saveFileUrl);
+		map.put("names", rsNames.substring(1));
+		// map.put("saveLoaction", saveFileUrl);
+		map.put("saveLoaction", middleStr);
 		return map;
 	}
 	

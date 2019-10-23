@@ -47,6 +47,11 @@ public class SendMQ {
     private static long totalDisConnect = 0;
 
     public final static HashMap<String,String> config = new HashMap(10);
+    /**
+     * 客户授权MQ
+     */
+    private final static String QUEUE_USER_AUTH_NAME = "usersauth";
+    private final static String EXCHANGE_USER_AUTH_NAME = "usersauth";
 
     private Connection connection;
     private Channel channel;
@@ -204,6 +209,20 @@ public class SendMQ {
         System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
     }
 
+    /**
+     * 授权的，仅限import
+     * @param json
+     * @throws Exception
+     */
+    private void sendAuthorizationFlagStr(String json) throws Exception{
+        channel.exchangeDeclare(EXCHANGE_USER_AUTH_NAME,"fanout",true);
+        channel.basicPublish(EXCHANGE_USER_AUTH_NAME, "", null, json.getBytes("UTF-8"));
+
+        // channel.queueDeclare(QUEUE_USER_AUTH_NAME, false, false, false, null);
+        // channel.basicPublish("", QUEUE_USER_AUTH_NAME, null, json.getBytes("UTF-8"));
+        System.err.println(" [x] Sent '" + json + "'");
+    }
+
 
     public static void sendMqSql(RunBatchSqlModel model) {
         SendMQ sendMQ = null;
@@ -222,6 +241,45 @@ public class SendMQ {
         }
     }
 
+    /**
+     * 授权使用MQ
+     * @param userId
+     * @param flag
+     */
+    public static void sendAuthorizationFlagMqSql(int userId, int flag) {
+        SendMQ sendMQ = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("userid",String.valueOf(userId));
+            // 1是添加，2是删除
+            json.put("type",flag > 0 ? "1" : "2");
+            sendMQ = new SendMQ();
+            sendMQ.sendAuthorizationFlagStr(json.toString());
+        } catch (Exception e){
+            e.printStackTrace();
+            // throw new RuntimeException("sendMQ exception!");
+        } finally {
+            if (null != sendMQ){
+                try {
+                    sendMQ.closeConn();
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
+
+    public static void main(String[] argv) throws Exception {
+        SendMQ sendMQ = new SendMQ();
+        /*// 直接执行sql示例
+        String sql = "INSERT INTO shipping_package (shipmentno,orderid,remarks,createtime) VALUES('0001','O4051803889279563','O4051803889279563',now())" +
+                "on duplicate key update shipmentno ='0001',createtime =now(),remarks ='O4051803889279563'";
+
+        sendMQ.sendMsg(new RunSqlModel(sql));*/
+        // sendMQ.sendMsg(new RunSqlModel(sql1));
+        //执行sql并保存记录，对应可以注入
+//    	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
+//    	sendMQ.runSqlOnline("543232153010", sql);
+    }
 
     private void sendMessageStr(String json, int website) throws Exception{
         if (website == 0) {

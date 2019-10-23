@@ -89,8 +89,8 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 		String sql="insert into tb_complain_file(complainid,imgUrl,delState,complainChatid,flag) values(?,?,0,?,?)";
 //		conn = DBHelper.getInstance().getConnection2();
 		try {
-			stmt=conn.prepareStatement(sql);
-			stmt.executeUpdate();
+//			stmt=conn.prepareStatement(sql);
+//			stmt.executeUpdate();
 
 			List<String> lstValues = new ArrayList<String>();
 			lstValues.add(String.valueOf(t.getComplainid()));

@@ -1448,4 +1448,8 @@
         from custom_pid_describe_log a,admuser b where a.pid = #{pid} and  a.admin_id = b.id
         order by a.create_time limit 1
     </select>
+
+    <select id="queryDescribeLogList" resultType="string">
+        select pid from custom_pid_describe_log
+    </select>
 </mapper>
