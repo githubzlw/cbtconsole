@@ -849,9 +849,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 				+ map.get("goodsid")
 				+ "' AND od.orderid='"
 				+ map.get("orderid") + "' and li.is_use=1";
-		SendMQ sendMQ = null;
+
 		try {
-			sendMQ = new SendMQ();
+
 			stmt = conn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			if (rs.next()) {
@@ -1043,9 +1043,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 		String goods_pid="";
 		Date date=new Date();
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:MM:ss");
-		SendMQ sendMQ = null;
+
 		try {
-			sendMQ = new SendMQ();
+
 			// 修改库存数量
 			String sql = "SELECT i.goods_pid,i.remaining,i.new_remaining,i.remark,i.id,i.goods_p_price,li.od_id odid FROM inventory i INNER JOIN lock_inventory li ON i.id=li.in_id WHERE li.od_id='"
 					+ map.get("od_id") + "' and is_delete=0";
@@ -1259,7 +1259,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 				+ "' AND od.orderid='"
 				+ map.get("orderid") + "' and li.is_use=1";
 		try {
-			SendMQ sendMQ=new SendMQ();
+
 			stmt = conn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			if (rs.next()) {
@@ -1810,7 +1810,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 		PreparedStatement stmt = null;
 		String sql="";
 		try{
-			SendMQ sendMQ=new SendMQ();
+
 			sql="update inspection_picture set isdelete=1 where orderid=? and goods_id=? and pic_path=?";
 			stmt=conn27.prepareStatement(sql);
 			stmt.setString(1,map.get("orderid"));
@@ -1874,7 +1874,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 		ResultSet rs = null;
 		String sql = "";
 		try {
-			SendMQ sendMQ=new SendMQ();
+
 			sql = "select ftpPicPath,localImgPath from orderinfo where order_no=?";
 			stmt = conn1.prepareStatement(sql);
 			stmt.setString(1, orderid);
@@ -1962,7 +1962,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 		ResultSet rs = null;
 		String sql = "";
 		try {
-			SendMQ sendMQ=new SendMQ();
+
 			sql = "select ftpPicPath,localImgPath from orderinfo where order_no=?";
 			stmt = conn1.prepareStatement(sql);
 			stmt.setString(1, orderid);

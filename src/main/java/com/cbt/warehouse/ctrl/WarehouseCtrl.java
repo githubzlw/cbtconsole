@@ -343,7 +343,7 @@ public class WarehouseCtrl {
 			map.put("type",type);
 			row=iWarehouseService.updateCatePrice(map);
 			if(row>0){
-				SendMQ sendMQ=new SendMQ();
+
 				String sql="";
 				sql="update priority_category set minPrice="+minPrice+" where id="+id+"";
 				SendMQ.sendMsg(new RunSqlModel(sql));
@@ -411,7 +411,7 @@ public class WarehouseCtrl {
 				map.put("goodsid",bp.getGoodsid());
 				row=iWarehouseService.saveCommentContent(map);
 				if(row>0){
-					SendMQ sendMQ=new SendMQ();
+
 					SendMQ.sendMsg(new RunSqlModel("insert into goods_comments_real(oid,car_type,order_no,user_id,user_name,country_id,goods_pid,comments_content," +
 							"comments_time,admin_id,goodsid,picPath) VALUES" +
 							"('"+map.get("od_id")+"','"+map.get("car_type")+"','"+map.get("orderid")+"','"+map.get("uid")+"','"+map.get("email")+"','"+map.get("countryid")+"'" +
@@ -5087,9 +5087,9 @@ public class WarehouseCtrl {
 		List<OrderDetailsBean> od_list=new ArrayList<OrderDetailsBean>();
 		Map<String,String> map_sku=new HashMap<String, String>();
 		Map<String,String> map_count=new HashMap<String, String>();
-		SendMQ sendMQ=null;
+
 		try{
-			sendMQ=new SendMQ();
+
 			String sku_str[]=sku_list.split("&");
 			for (String s : sku_str) {
 				StringBuilder sb=new StringBuilder();
@@ -5223,7 +5223,7 @@ public class WarehouseCtrl {
 		Map<String,String> pidMap=new HashMap<String, String>();
 		Map<String,String> map_count=new HashMap<String, String>();
 		try{
-			SendMQ sendMQ=new SendMQ();
+
 			String remarks_val=request.getParameter("remarks_val");
 			Map<String,String> remarkMap=new HashMap<String,String>();
 			String remark_str []=remarks_val.split("&");
@@ -8603,7 +8603,7 @@ public class WarehouseCtrl {
 					updateMap.put("orderno", dropShipOrder.getParentOrderNo());
 					updateMap.put("userid", userId);
 					try {
-					    SendMQ sendMQ=new SendMQ();
+
 					    StringBuilder sql=new StringBuilder();
                         sql.append("update orderinfo set product_cost = round(product_cost-"+updateMap.get("productcost")+",2),foreign_freight = round(foreign_freight-"+updateMap.get("foreignfreight")+",2)," +
                                 "pay_price = round(pay_price-"+updateMap.get("productcost")+"-"+updateMap.get("foreignfreight")+",2),pay_price_tow = round(pay_price_tow-"+updateMap.get("foreignfreight")+",2)," +
@@ -8855,7 +8855,7 @@ public class WarehouseCtrl {
 					row=iWarehouseService.updateQuestPicPath(gbookid,Util.PIC_URL+localFilePath+"");
 					if(row>0){
 						json.setOk(true);
-						SendMQ sendMQ=new SendMQ();
+
 						SendMQ.sendMsg(new RunSqlModel("update guestbook set picPath='"+Util.PIC_URL+localFilePath+"' where id="+gbookid+""));
 
 					}

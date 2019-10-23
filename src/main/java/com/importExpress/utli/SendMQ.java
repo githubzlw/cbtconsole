@@ -56,10 +56,7 @@ public class SendMQ {
         config.put("password", SysParamUtil.getParam("rabbitmq.password"));
     }
 
-    /**
-     * @deprecated
-     */
-    public SendMQ() {
+    private SendMQ() {
     }
 
     /**
@@ -129,19 +126,12 @@ public class SendMQ {
     }
 
     public static void sendMqSql(RunBatchSqlModel model) {
-        SendMQ sendMQ = null;
+
         try {
-            sendMQ = new SendMQ();
-            sendMQ.sendMsg(model);
+
+            SendMQ.sendMsg(model);
         } catch (Exception e) {
             throw new RuntimeException("sendMQ exception!");
-        } finally {
-            if (null != sendMQ) {
-                try {
-                    sendMQ.closeConn();
-                } catch (Exception e) {
-                }
-            }
         }
     }
 
@@ -152,7 +142,7 @@ public class SendMQ {
      *              {"type":"3","sqls":["insert into test values(1);","insert into test values(2);"]}
      * @throws Exception
      */
-    public void sendMsg(RunBatchSqlModel model) throws Exception {
+    public static void sendMsg(RunBatchSqlModel model) throws Exception {
         Channel channel = getChannel();
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
         JSONObject jsonObject = JSONObject.fromObject(model);
@@ -161,13 +151,6 @@ public class SendMQ {
         channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
         System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
         closeChannel(channel);
-    }
-
-    /**
-     * @deprecated
-     */
-    public void closeConn() {
-
     }
 
     /**
@@ -229,12 +212,12 @@ public class SendMQ {
      * @param model type=2是，输入userid为数组，如：[11,222,333]
      * @throws Exception
      */
-    public void sendMsg(RedisModel model, int website) throws Exception {
+    public static void sendMsg(RedisModel model, int website) throws Exception {
         JSONObject jsonObject = JSONObject.fromObject(model);
         sendMessageStr(jsonObject.toString(), website);
     }
 
-    private void sendMessageStr(String json, int website) throws Exception {
+    private static void sendMessageStr(String json, int website) throws Exception {
         Channel channel = getChannel();
         if (website == 0) {
             channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
@@ -290,7 +273,7 @@ public class SendMQ {
      * @param model type=4
      * @throws Exception
      */
-    public void sendMsg(JSONObject model, int website) throws Exception {
+    public static void sendMsg(JSONObject model, int website) throws Exception {
         sendMessageStr(model.toString(), website);
     }
 
