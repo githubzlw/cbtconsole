@@ -29,8 +29,6 @@ public class SendMQ {
     /** 直接执行的sql带返回值*/
     public final static String QUEUE_NAME_RPC = "updateTbl_rpc";
 
-
-
     /** 优惠卷json数据*/
     private final static String COUPON_NAME = "coupon"; //发送优惠卷到线上 （mq 连接27更新线上，连接98更新153）
 //    private final static String COUPON_NAME = "coupon2"; //发送优惠卷信息到镜像服 mq 连接27
@@ -43,18 +41,12 @@ public class SendMQ {
     private final static String QUEUE_REDIS_NAME = "redis";
     private final static String QUEUE_REDIS_NAME_KIDS = "redis_kids";
     private final static String QUEUE_REDIS_NAME_PETS = "redis_pets";
-    private static long totalConnect = 0;
-    private static long totalDisConnect = 0;
 
     public final static HashMap<String,String> config = new HashMap(10);
     /**
      * 客户授权MQ
      */
-    private final static String QUEUE_USER_AUTH_NAME = "usersauth";
     private final static String EXCHANGE_USER_AUTH_NAME = "usersauth";
-
-    private Connection connection;
-    private Channel channel;
 
     static{
         log.info("host:" + SysParamUtil.getParam("rabbitmq.host"));
@@ -65,41 +57,18 @@ public class SendMQ {
         config.put("password",SysParamUtil.getParam("rabbitmq.password"));
     }
 
+    /**
+     * @deprecated
+     *
+     */
     public SendMQ()  {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(config.get("host"));
-        factory.setPort(Integer.parseInt(config.get("port")));
-        factory.setUsername(config.get("username"));
-        factory.setPassword(config.get("password"));
-        try {
-            connection= factory.newConnection();
-            channel = connection.createChannel();
-            ++totalConnect;
-        } catch (Exception e) {
-           log.error("SendMQ",e);
-        }
-
-        log.info("取得MQ 返回总数/获取总数：" + totalDisConnect + "/" + totalConnect);
     }
 
+    /**
+     * @deprecated
+     */
     public void closeConn() {
-        if(channel!=null) {
-            try {
-                channel.close();
-            } catch (IOException e) {
-                log.error("closeConn",e);
-            } catch (TimeoutException e) {
-                log.error("closeConn",e);
-            }
-        }
-        if(connection!=null){
-            try {
-                connection.close();
-                --totalDisConnect;
-            } catch (IOException e) {
-                log.error("closeConn",e);
-            }
-        }
+
     }
 
     /**
@@ -138,6 +107,7 @@ public class SendMQ {
      * @throws Exception
      */
     public void sendCouponMsg(String couponJson, int website) throws Exception {
+        Channel channel=getChannel();
         if (website == 3) {
             channel.queueDeclare(COUPON_NAME_PETS, false, false, false, null);
             channel.basicPublish("", COUPON_NAME_PETS, null, couponJson.getBytes("UTF-8"));
@@ -153,20 +123,43 @@ public class SendMQ {
             sendCouponMsg(couponJson, 3);
         }
         log.info("Site=" + website + " [x] Sent '" + couponJson + "'");
+
+        closeChannel(channel);
     }
 
-//    /**
-//     * 通过消息将新购物车推荐商品数据传到线上
-//     * @param recommendJson
-//     * @throws Exception
-//     */
-//    public void sendRecommend(String recommendJson) throws Exception {
-//        channel.exchangeDeclare(RECOMMEND_NAME, BuiltinExchangeType.FANOUT);
-//        channel.basicPublish(RECOMMEND_NAME,"",null,recommendJson.getBytes("UTF-8"));
-////        channel.queueDeclare(RECOMMEND_NAME, false, false, false, null);
-////        channel.basicPublish("", RECOMMEND_NAME, null, recommendJson.getBytes("UTF-8"));
-//        log.info(" [x] Sent '" + recommendJson + "'");
-//    }
+    private Channel getChannel(){
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(config.get("host"));
+        factory.setPort(Integer.parseInt(config.get("port")));
+        factory.setUsername(config.get("username"));
+        factory.setPassword(config.get("password"));
+        try {
+            Channel channel = factory.newConnection().createChannel();
+            return channel;
+        } catch (Exception e) {
+            log.error("getChannel",e);
+            return null;
+        }
+    }
+
+    public void closeChannel(Channel channel) {
+        if(channel!=null) {
+            try {
+                channel.close();
+            } catch (IOException e) {
+                log.error("closeChannel",e);
+            } catch (TimeoutException e) {
+                log.error("closeChannel",e);
+            }
+        }
+        if(channel.getConnection()!=null){
+            try {
+                channel.getConnection().close();
+            } catch (IOException e) {
+                log.error("closeChannel",e);
+            }
+        }
+    }
 
     public static String repCha(String str){
     	if (StringUtils.isBlank(str)) {
@@ -201,12 +194,14 @@ public class SendMQ {
      * @throws Exception
      */
     public void sendMsg(RunBatchSqlModel model) throws Exception {
+        Channel channel=getChannel();
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
         JSONObject jsonObject = JSONObject.fromObject(model);
         System.out.println(jsonObject.toString().getBytes("UTF-8"));
 
         channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
         System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
+        closeChannel(channel);
     }
 
     /**
@@ -215,12 +210,14 @@ public class SendMQ {
      * @throws Exception
      */
     private void sendAuthorizationFlagStr(String json) throws Exception{
+        Channel channel=getChannel();
         channel.exchangeDeclare(EXCHANGE_USER_AUTH_NAME,"fanout",true);
         channel.basicPublish(EXCHANGE_USER_AUTH_NAME, "", null, json.getBytes("UTF-8"));
 
         // channel.queueDeclare(QUEUE_USER_AUTH_NAME, false, false, false, null);
         // channel.basicPublish("", QUEUE_USER_AUTH_NAME, null, json.getBytes("UTF-8"));
         System.err.println(" [x] Sent '" + json + "'");
+        closeChannel(channel);
     }
 
 
@@ -282,6 +279,7 @@ public class SendMQ {
     }
 
     private void sendMessageStr(String json, int website) throws Exception{
+        Channel channel=getChannel();
         if (website == 0) {
             channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
             channel.basicPublish("", QUEUE_REDIS_NAME, null, json.getBytes("UTF-8"));
@@ -293,6 +291,7 @@ public class SendMQ {
             channel.basicPublish("", QUEUE_REDIS_NAME_PETS, null, json.getBytes("UTF-8"));
         }
         log.info(" [x] Sent '" + json + "'");
+        closeChannel(channel);
     }
 
     /**
