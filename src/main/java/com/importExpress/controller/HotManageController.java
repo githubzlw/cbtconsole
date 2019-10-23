@@ -1213,12 +1213,12 @@ public class HotManageController {
                         break;
                     }
                 }
+                list.clear();
                 if(classInfoRs == null){
                     json.setOk(false);
                     json.setMessage("获取信息失败");
                     return json;
                 }
-                list.clear();
             } else {
                 json.setOk(false);
                 json.setMessage("获取结果失败");
