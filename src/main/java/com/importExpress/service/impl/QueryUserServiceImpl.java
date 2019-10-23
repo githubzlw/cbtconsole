@@ -829,17 +829,13 @@ public class QueryUserServiceImpl implements QueryUserService {
             queryUserMapper.updateUserCheckout(userid, type);
             // 更新线上
             String sql = "INSERT INTO user_checkout (id, flag) VALUES (" + userid + ", " + type + ") ON DUPLICATE KEY UPDATE flag = " + type + ";";
-            SendMQ sendMQ = null;
+
             try {
-                sendMQ = new SendMQ();
+
                 SendMQ.sendMsg(new RunSqlModel(sql));
 
             } catch (Exception e) {
                 throw new RuntimeException("updateUserCheckout mq error");
-            } finally {
-                if (sendMQ != null) {
-
-                }
             }
             result.put("state", "true");
         }

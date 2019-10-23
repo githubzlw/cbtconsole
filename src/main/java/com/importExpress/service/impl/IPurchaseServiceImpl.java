@@ -176,7 +176,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		i++;
 		String goods_p_url = "";
 		try{
-			SendMQ sendMQ=new SendMQ();
+
 			res=pruchaseMapper.getOpsCount(orderNo,od_id);
 			if (res == 0) {
 				Map<String,String> odMap=pruchaseMapper.getOrderDtails(od_id);
@@ -207,7 +207,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				//更新货源信息
 				pruchaseMapper.updateSourceInfo(admid,goodid,orderNo,od_id);
 			}
-			sendMQ.sendMsg(new RunSqlModel("update order_details set purchase_state=1 where orderid='"+orderNo+"' and id='"+od_id+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update order_details set purchase_state=1 where orderid='"+orderNo+"' and id='"+od_id+"'"));
 			//确认采购LOG日志记录
 			List<String> idList=pruchaseMapper.getIdList(orderNo,String.valueOf(od_id));
 			if(idList.size()>0){
@@ -215,7 +215,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			}else{
 				pruchaseMapper.insertLog(admid,orderNo,String.valueOf(od_id),"确认采购");
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -245,7 +245,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		}
 		map.put("itemid",itemid);
 		try{
-			SendMQ sendMQ=new SendMQ();
+
 			if (resource.contains("1688.com")) {
 				resource = resource.substring(0, resource.indexOf(".html") + 5);
 			} else if (resource.contains("taobao")) {
@@ -325,7 +325,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			}
 			if("客户已同意替换".equals(map.get("issuree"))){
 				pruchaseMapper.updateDetails(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set car_url = '"+map.get("resource")+"' where orderid='"+map.get("orderNo")+"' and id = '"+map.get("od_id")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set car_url = '"+map.get("resource")+"' where orderid='"+map.get("orderNo")+"' and id = '"+map.get("od_id")+"'"));
 			}
 			//查询goods_source是否有该货源记录
 			Map<String,String> gMap=pruchaseMapper.queryGoodsSource(map);
@@ -374,7 +374,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					}
 				}
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {
@@ -431,7 +431,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		Map<String,String> map=new HashMap<String,String>();
 		map.put("orderid",orderid);
 		try{
-			SendMQ sendMQ=new SendMQ();
+
 			int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
 			int isSendEmail=pruchaseMapper.getIsSendEmail(orderid);
 			//查询可以确认采购的商品信息
@@ -446,7 +446,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					pruchaseMapper.insertLog(adminid,orderid,odid,"确认采购");
 				}
 				pruchaseMapper.updateCgSourceState(orderid,odid,adminid);
-				sendMQ.sendMsg(new RunSqlModel(" UPDATE order_details  SET purchase_state=3,purchase_time=now() WHERE id='"+odid+"' and orderid='"+orderid+"'"));
+				SendMQ.sendMsg(new RunSqlModel(" UPDATE order_details  SET purchase_state=3,purchase_time=now() WHERE id='"+odid+"' and orderid='"+orderid+"'"));
 				bf.append(orderid).append(";").append(odid).append(";").append(sdf.format(date)).append("&");
 			}
 
@@ -455,7 +455,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				if(StringUtil.isNotBlank(dropshipid)){
 					pruchaseMapper.updateDpOrderState(dropshipid);
 
-					sendMQ.sendMsg(new RunSqlModel(" update dropshiporder set state= (SELECT IF ((select count(*) from ( select * from order_details " +
+					SendMQ.sendMsg(new RunSqlModel(" update dropshiporder set state= (SELECT IF ((select count(*) from ( select * from order_details " +
 							"where dropshipid='"+dropshipid+"' and state!=2 AND purchase_state=3) a)>0,'1','5')) where child_order_no='"+dropshipid+"'"));
 				}
 			}
@@ -463,7 +463,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			Map<String,Object> orderInfo = pruchaseMapper.queryUserIdAndStateByOrderNo(orderid);
 
 			pruchaseMapper.updateOrderInfoState(orderid);
-			sendMQ.sendMsg(new RunSqlModel("update orderinfo set state= (SELECT IF ((select count(*) from ( select * from order_details where orderid='"+orderid+"' " +
+			SendMQ.sendMsg(new RunSqlModel("update orderinfo set state= (SELECT IF ((select count(*) from ( select * from order_details where orderid='"+orderid+"' " +
 					" and state!=2 AND purchase_state=3) a)>0,'1','5')) where order_no='"+orderid+"'"));
 
 			if(orderInfo != null && orderInfo.size() == 3){
@@ -477,7 +477,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 
 			datas = bf.toString().length() > 0 ? bf.toString().substring(0,bf.toString().length() - 1) : "";
 			map.clear();
-			sendMQ.closeConn();
+
 			if(isSendEmail<=0){
 				//发送邮件给客户告知已经发货
 				IGuestBookService ibs = new GuestBookServiceImpl();
@@ -713,7 +713,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		Map<String,String> map=new HashMap<String,String>();
 		map.put("orderid",orderid);
 		try{
-			SendMQ sendMQ=new SendMQ();
+
 			int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
 			//查询可以取消采购的商品
 			List<String> odidList=pruchaseMapper.getAllGoodsisList(orderid,adminid);
@@ -727,7 +727,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					pruchaseMapper.insertLog(adminid,orderid,String.valueOf(odid),"取消采购");
 				}
 				pruchaseMapper.updateQxSourceState(orderid,odid);
-				sendMQ.sendMsg(new RunSqlModel(" UPDATE order_details  SET purchase_state=1,purchase_time=null WHERE id='"+odid+"' and orderid='"+orderid+"'"));
+				SendMQ.sendMsg(new RunSqlModel(" UPDATE order_details  SET purchase_state=1,purchase_time=null WHERE id='"+odid+"' and orderid='"+orderid+"'"));
 				bf.append(orderid).append(";").append(odid).append("&");
 			}
 
@@ -735,7 +735,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				String dropshipid=pruchaseMapper.getDpOrderInfo(orderid);
 				if(StringUtil.isNotBlank(dropshipid)){
 					pruchaseMapper.updateDpOrderState(dropshipid);
-					sendMQ.sendMsg(new RunSqlModel(" update dropshiporder set state= (SELECT IF ((select count(*) from ( select * from order_details " +
+					SendMQ.sendMsg(new RunSqlModel(" update dropshiporder set state= (SELECT IF ((select count(*) from ( select * from order_details " +
 							"where dropshipid='"+dropshipid+"' and state!=2 AND purchase_state=3) a)>0,'1','5')) where child_order_no='"+dropshipid+"'"));
 				}
 			}
@@ -743,7 +743,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			Map<String,Object> orderInfo = pruchaseMapper.queryUserIdAndStateByOrderNo(orderid);
 
 			pruchaseMapper.updateOrderInfoState(orderid);
-			sendMQ.sendMsg(new RunSqlModel(" update orderinfo set state= (SELECT IF ((select count(*) from ( select * from order_details where orderid='"+orderid+"' " +
+			SendMQ.sendMsg(new RunSqlModel(" update orderinfo set state= (SELECT IF ((select count(*) from ( select * from order_details where orderid='"+orderid+"' " +
 					" and state!=2 AND purchase_state=3) a)>0,'1','5')) where order_no='"+orderid+"'"));
 
 			if(orderInfo != null && orderInfo.size() == 3){
@@ -755,7 +755,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			}
 			orderInfo.clear();
 
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -767,7 +767,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	public int useInventory(Map<String, String> map) {
 		int row = 0;
 		try{
-//			SendMQ sendMQ=new SendMQ();
+//
 			if("1".equals(map.get("isUse"))){
 				//使用库存
 				pruchaseMapper.updateLockInventory(map);
@@ -779,12 +779,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					//更新本地产品表为无库存标识
 					map.put("goods_pid",goods_pid);
 					pruchaseMapper.updateCustomSstockFlag(map);
-//					sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'"));
+//					SendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'"));
 					GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
 				}
 				pruchaseMapper.updateDetailsRemark(map);
 			}
-//			sendMQ.closeConn();
+//
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -796,7 +796,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		String datas = "";
 		StringBuffer bf = new StringBuffer();
 		try{
-			SendMQ sendMQ=new SendMQ();
+
 			List<String> goodsids=pruchaseMapper.getGoodsisList(orderid,adminid);
 			for(String odid:goodsids){
 				//货源确认LOG日志记录
@@ -810,11 +810,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				pruchaseMapper.updateOrderProSource(orderid,odid);
 				//更新order_details状态
 				pruchaseMapper.updateDetailsState(orderid,odid);
-				sendMQ.sendMsg(new RunSqlModel("UPDATE order_details  SET purchase_state=0 WHERE id='"+odid+"' and orderid='"+orderid+"'"));
+				SendMQ.sendMsg(new RunSqlModel("UPDATE order_details  SET purchase_state=0 WHERE id='"+odid+"' and orderid='"+orderid+"'"));
 				bf.append(orderid).append(";").append(odid).append("&");
 			}
 			datas = bf.toString().length() > 0 ? bf.toString().substring(0,bf.toString().length() - 1) : "";
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -1310,12 +1310,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 //			Map<Object,Object> map =new HashMap<Object,Object>();
 			List<StraightHairPojo> list_stra= pruchaseMapper.straightHairList();
 			try{
-				SendMQ sendMQ = new SendMQ();
-				updateDetailsState(list_stra, sendMQ);
-				sendMQ.closeConn();
+
+				updateDetailsState(list_stra);
+
 			}catch (Exception e){
 				System.out.println("MQ错误。。。。。。。。。。。");
-			}finally {
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -1739,22 +1738,22 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		return es_price;
 	}
 
-	private void updateDetailsState(List<StraightHairPojo> list_stra, SendMQ sendMQ) throws Exception {
+	private void updateDetailsState(List<StraightHairPojo> list_stra) throws Exception {
 		for (StraightHairPojo s : list_stra) {
 			if(StringUtil.isNotBlank(s.getStates()) && Integer.valueOf(s.getStates())>0){
 				s.setStates("<span style='color:green'>已签收</span>");
 //				map.put("orderid",s.getOrderid());
 //				map.put("goodsid",s.getGoodsid());
 				pruchaseMapper.updateState(s.getOrderid(),s.getGoodsid());
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1,checked=1 where orderid='"+s.getOrderid()+"' and goodsid='"+s.getGoodsid()+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1,checked=1 where orderid='"+s.getOrderid()+"' and goodsid='"+s.getGoodsid()+"'"));
 				Map<String,Integer> qMap=pruchaseMapper.queryState(s.getOrderid());
 				if(qMap != null && qMap.get("states")>0 && qMap.get("states").equals(qMap.get("counts"))){
 					pruchaseMapper.updateOrderInfo(s.getOrderid());
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set  state=2 where order_no='"+s.getOrderid()+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set  state=2 where order_no='"+s.getOrderid()+"'"));
 					//发送消息给客户,订单状态
 					NotifyToCustomerUtil.updateOrderState(Integer.valueOf(s.getUserid()),s.getOrderid(),1,2);
 				}
-				sendMQ.closeConn();
+
 			}
 		}
 	}
