@@ -22,14 +22,15 @@ public class WinitServiceImpl implements WinitService {
 	@Override
 	public int queryInventory(WarehouseWrap warehouse) {
 		queryInventory.setWarehouse(warehouse);
-		
+		int totalStock = 0;
 		int loopSize = 1;
 		for(int i=0;i<loopSize;i++) {
 			queryInventory.setPageNum(i+1);
 			queryInventory.toDo();
+			totalStock += queryInventory.getStock();
 			loopSize = queryInventory.getPageTotal();
 		}
-		return loopSize;
+		return totalStock;
 	}
 
 

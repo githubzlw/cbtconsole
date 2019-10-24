@@ -139,9 +139,11 @@ public class OverseasWarehouseStockController {
 				@Override
 				public void run() {
 					List<WarehouseWrap> queryWarehouse = winitService.queryWarehouse();
+					int syncCount = 0;
 					for(WarehouseWrap w : queryWarehouse) {
-						winitService.queryInventory(w);
+						syncCount += winitService.queryInventory(w);
 					}
+					stockService.addSyncStockTime(syncCount);
 				}
 			}).start();
 			result.put("status", 200);

@@ -37,7 +37,7 @@
 <!-- 订单完结或者取消减少订单占用库存，可用库存增加 -->
   <update id="reduceOrderStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
     update overseas_warehouse_stock set order_stock=order_stock-#{orderStock},
-    available_stock=available_stock+#{availableStock} where code=#{code}
+    available_stock=available_stock+#{orderStock} where code=#{code}
   </update>
 <!-- 日志记录  -->
   <insert id="addLog" parameterType="com.importExpress.pojo.OverseasWarehouseStockLog" >
@@ -45,6 +45,12 @@
     values ((select id from overseas_warehouse_stock where code=#{code} limit 1), #{changeStock}, #{odid},
       #{orderno}, #{changeType}, #{remark},#{code},now())
   </insert>
+  
+  <select id="getLogByOrderno" resultMap="StockLogResultMap">
+  select id,ows_id, change_stock,od_id,orderno,change_type,remark,code,create_time 
+  from  overseas_warehouse_stock_log where orderno=#{orderno} order by change_type asc
+  </select>
+  
 <!-- 最近一次同步时间  -->
 	<select id="getLastSyncStock" resultType="String">
 	select create_time from overseas_warehouse_stock_synchronization order by id desc limit 1
@@ -93,12 +99,13 @@
 	<insert id="addStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
 	insert into overseas_warehouse_stock(ow_stock,order_stock,available_stock,goods_pid,goods_name,
 	code,sku,skuid,specid,create_time,update_time,remark) 
-	values(#{owStock},#{orderStock},#{availableStock},#{goodsPid},#{goodsName},#{code},#{sku},#{skuid},#{specid},now(),now(),#{remark})
+	values(#{owStock},0,#{owStock},#{goodsPid},#{goodsName},#{code},#{sku},#{skuid},#{specid},now(),now(),#{remark})
 	</insert>
 	
 	<update id="updateStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
-	update overseas_warehouse_stock set ow_stock=#{owStock},available_stock=#{availableStock},update_time=now() where code=#{code}
+	update overseas_warehouse_stock set ow_stock=#{owStock},available_stock=#{owStock}-order_stock,update_time=now() where code=#{code}
 	</update>
+	<insert id="addSyncStockTime">insert into overseas_warehouse_stock_synchronization(create_time,sync_count) values(now(),#{syncCount})</insert>
 	
 	
 </mapper>

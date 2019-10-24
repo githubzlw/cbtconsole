@@ -3,6 +3,7 @@ package com.importExpress.service;
 import java.util.List;
 
 import com.importExpress.pojo.OverseasWarehouseStock;
+import com.importExpress.pojo.OverseasWarehouseStockLog;
 import com.importExpress.pojo.OverseasWarehouseStockParamter;
 import com.importExpress.pojo.OverseasWarehouseStockWrap;
 
@@ -13,6 +14,12 @@ public interface OverseasWarehouseStockService {
      * @return
      */
     int reduceOrderStock(OverseasWarehouseStock stock,String orderno,int odid,String remark);
+    
+    /**获取订单占用日志
+     * @param orderno
+     * @return
+     */
+    List<OverseasWarehouseStockLog> getLogByOrderno(String orderno);
 
    /* *//**海外仓库存变更记录日志
      * @param log
@@ -51,4 +58,8 @@ public interface OverseasWarehouseStockService {
      * @return
      */
     int syncStock(OverseasWarehouseStock stock);
+    /**同步时间
+     * @return
+     */
+    int addSyncStockTime(int syncCount);
 }

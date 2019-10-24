@@ -31,6 +31,12 @@ public interface OverseasWarehouseStockMapper {
      * @return
      */
     int addLog(OverseasWarehouseStockLog log);
+    
+    /**获取订单占用日志
+     * @param orderno
+     * @return
+     */
+    List<OverseasWarehouseStockLog> getLogByOrderno(String orderno);
     /**库存列表
      * @param param
      * @return
@@ -46,6 +52,11 @@ public interface OverseasWarehouseStockMapper {
      * @return
      */
     String getLastSyncStock();
+    
+    /**同步时间
+     * @return
+     */
+    int addSyncStockTime(int syncCount);
     /**库存日志列表
      * @param param
      * @return

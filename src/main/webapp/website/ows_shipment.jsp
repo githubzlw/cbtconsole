@@ -18,7 +18,7 @@
 .report .form-control {display: inline-block;width: 70%;}
 .report {font-size: 16px;color: #333;}
 .report .mt20 {margin-top: 20px;margin-right: 18px;margin-left: 18px;}
-.check-in{height:34px;width:405px;}
+.check-in{height:34px;width:398px;}
 .row-1{margin-left: 1px;}
 .ingo-border{border: 1px solid #ddd; height: 500px;}
 .row-info{border: 1px solid #ddd;height: 38px;width: 98%;margin-top: 1px;margin-left: 2px;}
@@ -58,7 +58,7 @@
 			<c:forEach items="${ows}" var="stock">
 			<tr>
 			<td class="datagrid-userid">${stock['user_id']}</td>
-			<td class="datagrid-orderno">${stock['order_no']}</td>
+			<td class="datagrid-orderno"><a  name="${stock['order_no']}" onclick="clickStock(this)">${stock['order_no']}</a></td>
 			</tr>
 			</c:forEach>
 			</tbody>
@@ -120,7 +120,7 @@
 				
 			<div class="row row-l-30">
 			<label>尾程运单追踪号:</label>
-			<input type="text" value="" class="in-shipno" id="in-shipno">
+			<input type="text" value="${owsDetail.shipmentno }" class="in-shipno" id="in-shipno">
 			<button class="btn btn-info btn-shipno">确认</button>
 			</div>	
 				

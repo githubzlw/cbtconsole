@@ -767,7 +767,7 @@ public interface OrderinfoMapper {
 	 * 海外仓订单列表
 	 * @return
 	 */
-	List<Map<String,Object>> getOverseasWarehouseStockOrder(String ordernoOrUserid);
+	List<Map<String,Object>> getOverseasWarehouseStockOrder(@Param("ordernoOrUserid")String ordernoOrUserid);
 	
 	/**
 	 * 订单信息

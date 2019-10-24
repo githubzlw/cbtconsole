@@ -24,6 +24,7 @@ public class QueryInventory extends QueryBase{
 	private int pageNum = 1;
 	
 	private int pageTotal = 1;
+	private int stock;
 	
 	public void toDo() {
 		doAction();
@@ -83,6 +84,7 @@ public class QueryInventory extends QueryBase{
 		if(latArray == null) {
 			return ;
 		}
+		int totalStock = 0;
 		for(int i=0,size=latArray.size();i<size;i++) {
 			JSONObject lstObject = (JSONObject)latArray.get(i);
 			//仓库名称
@@ -118,6 +120,7 @@ public class QueryInventory extends QueryBase{
 			
 			//可用库存
 			String qtyAvailable = lstObject.getString("qtyAvailable");
+			totalStock += Integer.parseInt(qtyAvailable);
 			//待出库
 //			String qtyReserved = lstObject.getString("qtyReserved");
 			//在途库存
@@ -164,7 +167,7 @@ public class QueryInventory extends QueryBase{
 			OverseasWarehouseStock stock = OverseasWarehouseStock.builder()
 												.code(productCode).goodsName(eName)
 												.goodsPid(productId)
-												.orderStock(Integer.parseInt(qtyAvailable))
+												.owStock(Integer.parseInt(qtyAvailable))
 												.sku(specification)
 												.skuid(skuid)
 												.specid(specid)
@@ -174,6 +177,7 @@ public class QueryInventory extends QueryBase{
 			
 		}
 		
+		setStock(totalStock);
 	}
 
 	public void setWarehouse(WarehouseWrap warehouse) {
@@ -187,4 +191,13 @@ public class QueryInventory extends QueryBase{
 	public void setPageNum(int pageNum) {
 		this.pageNum = pageNum > 1 ? pageNum : 1;
 	}
+
+	public int getStock() {
+		return stock;
+	}
+
+	private void setStock(int stock) {
+		this.stock = stock;
+	}
+	
 }
