@@ -2980,7 +2980,8 @@ public class WarehouseCtrl {
 			}
 			// 检查配置文件信息是否正常读取
 			String imgUploadPath = ftpConfig.getLocalDiskPath();
-			filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
+			filePath = imgUploadPath  + file.getOriginalFilename();
+//			filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
 			FileOutputStream fs=new FileOutputStream(filePath);
 			int i=1/0;
 			byte[] buffer =new byte[1024*1024];
@@ -3015,6 +3016,7 @@ public class WarehouseCtrl {
 
 		} catch (Exception e) {
 			map.put("msg","0");
+			LOG.error("视频上传错误",e);
 		}
 		return map;
 	}
@@ -9212,6 +9214,7 @@ public class WarehouseCtrl {
 			}
 		} catch (Exception e) {
 			list.add("0");
+			LOG.error("视频批量上传错误",e);
 			return list;
 		}
 		return list;
