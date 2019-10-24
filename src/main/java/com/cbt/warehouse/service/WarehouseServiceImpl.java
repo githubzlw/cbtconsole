@@ -255,7 +255,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int insertEvaluation(Map<String, String> map) {
         int row=0;
         try{
-            SendMQ sendMQ=new SendMQ();
+
             String id=warehouseMapper.queryQevId(map);
             if(StringUtil.isBlank(id)){
                 row=warehouseMapper.insertEvaluation(map);
@@ -1732,7 +1732,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int addKeyword(Map<String, String> map) {
         int row=0;
         try{
-            SendMQ sendMQ=new SendMQ();
+
             row=warehouseMapper.addKeyword(map);
             if(row>0){
                 SendMQ.sendMsg(new RunSqlModel("insert into priority_category(keyword,category) values('"+map.get("keyword")+"','"+map.get("cateId")+"')"));
@@ -1748,7 +1748,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int editKeyword(Map<String, String> map) {
         int row=0;
         try{
-            SendMQ sendMQ=new SendMQ();
+
             row=warehouseMapper.editKeyword(map);
             if(row>0){
                 SendMQ.sendMsg(new RunSqlModel("update priority_category set category="+map.get("cid")+" where id="+map.get("id")+""));
@@ -1764,7 +1764,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int updateStateCategory(Map<String, String> map) {
         int row=0;
         try{
-            SendMQ sendMQ=new SendMQ();
+
             row=warehouseMapper.updateStateCategory(map);
             if(row>0){
                 SendMQ.sendMsg(new RunSqlModel("update priority_category set status="+map.get("state")+" where id="+map.get("id")+""));

@@ -26,7 +26,7 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 		ResultSet rs = null;
 		int row=0;
 		String sql = "insert into tb_complain_chat (complainid,chatText,chatTime,chatAdmin,chatAdminid,flag) values(?,?,now(),?,?,1)";
-		String sql1= "select max(id) as maxId from tb_complain_chat ";
+		String sql1= "select max(id) as maxId from tb_complain_chat where  complainid = ?";
 		conn = DBHelper.getInstance().getConnection2();
 		try {
 //			stmt=conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
@@ -52,12 +52,11 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 //            }
 
 			stmt = conn.prepareStatement(sql1);
+			stmt.setInt(1, t.getComplainid());
 			rs = stmt.executeQuery();
 			while (rs.next()) {
-				int id = rs.getInt("maxId");
-                row =id + 1;
+				row = rs.getInt("maxId");
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -89,8 +88,8 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 		String sql="insert into tb_complain_file(complainid,imgUrl,delState,complainChatid,flag) values(?,?,0,?,?)";
 //		conn = DBHelper.getInstance().getConnection2();
 		try {
-//			stmt=conn.prepareStatement(sql);
-//			stmt.executeUpdate();
+			// stmt=conn.prepareStatement(sql);
+			// stmt.executeUpdate();
 
 			List<String> lstValues = new ArrayList<String>();
 			lstValues.add(String.valueOf(t.getComplainid()));
@@ -99,7 +98,7 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 			lstValues.add(String.valueOf(t.getFlag()));
 
 			String runSql = DBHelper.covertToSQL(sql,lstValues);
-			SendMQ.sendMsg(new RunSqlModel(runSql));
+			SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
 
 
 

@@ -154,14 +154,14 @@ public class CustomerRelationshipManagementController {
         //2.清空redis数据
         //使用MQ清空购物车数据
         //redis示例
-        SendMQ sendMQ = null;
+
         String userIdStr = String.valueOf(userId);
-        sendMQ = new SendMQ();
+
         RedisModel redisModel= new RedisModel();
         redisModel.setType("3");
         redisModel.setUserid(new String[]{userIdStr});
-        sendMQ.sendMsg(redisModel, MultiSiteUtil.getSiteTypeNum(orderNo) - 1);
-        sendMQ.closeConn();
+        SendMQ.sendMsg(redisModel, MultiSiteUtil.getSiteTypeNum(orderNo) - 1);
+
         return message;
     }
     @RequestMapping(value = "/reorder")

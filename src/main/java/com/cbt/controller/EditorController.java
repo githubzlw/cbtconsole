@@ -2836,7 +2836,7 @@ public class EditorController {
 
         try {
             CustomGoodsBean goods = hotGoodsService.queryFor1688Goods(goodsPid);
-            SendMQ sendMQ = new SendMQ();
+
             // 校检存在的goodsPid数据
             boolean isExists = hotGoodsService.checkExistsGoods(categoryId, goodsPid);
             if (isExists) {
@@ -2869,7 +2869,7 @@ public class EditorController {
                 if (showName.contains("\"")) {
                     showName = showName.replace("\"", "\\\"");
                 }
-                sendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
+                SendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
                         "goods_url,goods_img,goods_price,is_on,profit_margin,selling_price,wholesale_price_1,wholesale_price_2," +
                         "wholesale_price_3,wholesale_price_4,wholesale_price_5,create_admid,amazon_price,asin_code) values(" + hsGoods.getHotSellingId() + "," + hsGoods.getGoodsPid() + "," +
                         "'" + showName + "'," +
@@ -2878,7 +2878,7 @@ public class EditorController {
                         "'" + hsGoods.getWholesalePrice_3() + "','" + hsGoods.getWholesalePrice_4() + "','" + hsGoods.getWholesalePrice_5() + "'," +
                         "'" + hsGoods.getCreateAdmid() + "','" + hsGoods.getAmazonPrice() + "','" + hsGoods.getAsinCode() + "')"));
 
-                sendMQ.closeConn();
+
             }
 
         } catch (Exception e) {

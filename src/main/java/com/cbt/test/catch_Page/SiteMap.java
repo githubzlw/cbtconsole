@@ -72,13 +72,14 @@ public class SiteMap {
         return xmlurl;
     }
 
-    // 童鞋产品数据
+    // 产品数据
     public static List<String> getProductInfo() {
         Connection conn = DBHelper.getInstance().getConnection();
         PreparedStatement stmt = null;
         ResultSet rs=null;
         List<String> list=new ArrayList<String>();
-        String sql="select substring_index(REPLACE(REPLACE(enname,'\\'','-'),' ','-'),'-',10) as ennameNew,substring_index(REPLACE(path_catid,',','-'),'-',2) as pathcatidNew,CONCAT('1',pid) as pidNew from custom_benchmark_ready where valid=1 and  path_catid like '1038378,125386001,%'";
+//        String sql="select substring_index(REPLACE(REPLACE(enname,'\\'','-'),' ','-'),'-',10) as ennameNew,substring_index(REPLACE(path_catid,',','-'),'-',2) as pathcatidNew,CONCAT('1',pid) as pidNew from custom_benchmark_ready where valid=1 and  path_catid like '1038378,125386001,%'";
+        String sql="select substring_index(REPLACE(REPLACE(enname,'\\'','-'),' ','-'),'-',10) as ennameNew,substring_index(REPLACE(path_catid,',','-'),'-',2) as pathcatidNew,CONCAT('1',pid) as pidNew from custom_benchmark_ready where valid=1 and   (path_catid like '%,1037002' or path_catid like '%,122110001' or path_catid like '%,123184002' or path_catid like '%,125296002' or path_catid like '%,125386001,%' or path_catid like '%,126128002,%' or path_catid like '%,1752,%' or path_catid like '%1501,%' or path_catid like '%1813,%' or path_catid like '%311,%') ";
         try {
             stmt = conn.prepareStatement(sql.toString());
             rs = stmt.executeQuery();
