@@ -2507,7 +2507,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		} finally {
 			if (stmtQr != null) {
 				try {
-					stmt.close();
+					stmtQr.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
