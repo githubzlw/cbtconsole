@@ -22,6 +22,7 @@ public class HotCategory implements Serializable {
     private int isOn;// 状态: 0:关闭 1:启用
     private int sorting;// 排序号
     private int hotType;// 热卖类别，1热卖区、2今日折扣、3新品
+    private String hotTypeName;
     private String remark;// 备注
     private int adminId;// 创建人id
     private String adminName;//创建人
@@ -179,6 +180,14 @@ public class HotCategory implements Serializable {
 
     public void setLimitNum(int limitNum) {
         this.limitNum = limitNum;
+    }
+
+    public String getHotTypeName() {
+        return hotTypeName;
+    }
+
+    public void setHotTypeName(String hotTypeName) {
+        this.hotTypeName = hotTypeName;
     }
 
     @Override

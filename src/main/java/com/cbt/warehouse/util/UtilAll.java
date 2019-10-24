@@ -429,12 +429,17 @@ public class UtilAll {
 			String sku=t.getSku();
 			if(StringUtil.isNotBlank(sku) && sku.contains(" ") && StringUtil.isNotBlank(skuTwo)){
 				String []skus=sku.split(" ");
-				if(skus[0].split("：")[1].equals(skuOne) && skus[1].split("：")[1].equals(skuTwo)){
-					return t.getId();
+				if(skus.length >= 2){
+					if(skus[0].split("：")[1].equals(skuOne) && skus[1].split("：")[1].equals(skuTwo)){
+						return t.getId();
+					}
 				}
 			}else if(StringUtil.isNotBlank(sku) && StringUtil.isBlank(skuTwo)){
-				if(sku.split("：")[1].equals(skuOne)){
-					return t.getId();
+				String []skus=sku.split("：");
+				if(skus.length >= 2){
+					if(skus[1].equals(skuOne)){
+						return t.getId();
+					}
 				}
 			}
 		}

@@ -129,18 +129,7 @@ public class GetConfigureInfo {
 	 * @return
 	 */
 	public static boolean openJob() {
-		boolean is = false;
-		try {
-			if (cbtProperties == null) {
-				initCbt();
-			}
-			is = Boolean.valueOf(cbtProperties.getProperty("openJob"));
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("get openJob error : " + e.getMessage());
-			LOG.error("get openJob error : ", e);
-		}
-		return is;
+		return false;
 	}
 
 	/**

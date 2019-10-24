@@ -1,6 +1,7 @@
 package com.importExpress.service;
 
 import com.cbt.warehouse.pojo.HotCategory;
+import com.cbt.warehouse.pojo.HotClassInfo;
 import com.cbt.warehouse.pojo.HotDiscount;
 import com.cbt.warehouse.pojo.HotEvaluation;
 import com.importExpress.pojo.HotSellGoods;
@@ -93,13 +94,6 @@ public interface HotManageService {
     int checkEvaluationIsExists(String goodsPid, String skuId);
 
     /**
-     * 根据ID查询商品评价信息
-     * @param id
-     * @return
-     */
-    HotEvaluation queryHotEvaluationById(int id);
-
-    /**
      * 插入商品评价信息
      * @param hotEvaluation
      * @return
@@ -135,5 +129,25 @@ public interface HotManageService {
 	 * @return
 	 */
 	List<HotCategory> queryCategoryList(HotCategory hotCategory);
+
+    /**
+     * 获取所有的热卖分组
+     * @return
+     */
+	List<HotClassInfo> getClassInfoList(HotClassInfo classInfo);
+
+    /**
+     * 插入热卖分组
+     * @param hotClassInfo
+     * @return
+     */
+	int insertIntoHotClassInfo(HotClassInfo hotClassInfo);
+
+	/**
+     * 更新热卖分组
+     * @param hotClassInfo
+     * @return
+     */
+	int updateIntoHotClassInfo(HotClassInfo hotClassInfo);
 
 }
