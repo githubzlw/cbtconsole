@@ -2983,7 +2983,6 @@ public class WarehouseCtrl {
 			filePath = imgUploadPath  + file.getOriginalFilename();
 //			filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
 			FileOutputStream fs=new FileOutputStream(filePath);
-			int i=1/0;
 			byte[] buffer =new byte[1024*1024];
 			int bytesum = 0;
 			int byteread = 0;
@@ -9200,6 +9199,7 @@ public class WarehouseCtrl {
 					list.add(pid);
 				}
 			} catch (Exception e) {
+				LOG.error("视频批量上传错误"+pid,e);
 					list.add(pid);
 			}
 
@@ -9256,11 +9256,11 @@ public class WarehouseCtrl {
 				File video = new File(filePath);
 				if (video.exists()) {
 //					UploadByOkHttp.uploadFile(video,filePath);
-					boolean flag = NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/" + Vpath + pid + "/", filename + "_" + file.getOriginalFilename(), filePath);
+					boolean flag = NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/" + Vpath +"/"+ pid + "/", filename + "_" + file.getOriginalFilename(), filePath);
 					if (flag) {
 						map.put("msg", "1");
 						map.put("goods_pid", pid);
-						String path = "https://img.import-express.com/importcsvimg/" + Vpath + pid + "/" + (filename + "_" + file.getOriginalFilename()) + "";
+						String path = "https://img.import-express.com/importcsvimg/" + Vpath +"/"+ pid + "/" + (filename + "_" + file.getOriginalFilename()) + "";
 						map.put("path", path);
 						GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(pid, path);
 						iWarehouseService.updateCustomVideoUrl(map);
