@@ -266,9 +266,9 @@ function search(){
 	var temp = $("#query_temp").val();
 	var requestHost = "https://www.import-express.com";
 	if(temp == '2'){
-		requestHost = "https://www.kidsproductwholesale.com/";
+		requestHost = "https://www.kidsproductwholesale.com";
 	}else if(temp == '4'){
-		requestHost = "https://www.lovelypetsupply.com/";
+		requestHost = "https://www.petstoreinc.com";
 	}
 	productArray = [];
 	//本地已经生成的目录商品优先展示
@@ -368,35 +368,39 @@ function searchFromRemote(temp,requestHost){
 			}
 			var categoryHtml = "";
 			var rootTree = data.rootTree
-			for(var i=0;i<rootTree.length;i++){
-				categoryHtml = categoryHtml +'<div class="category-lev1';
-				if(qcatid==rootTree[i].cid){
-					categoryHtml = categoryHtml +' category-lev1-select';
-				}
-				categoryHtml = categoryHtml+'"><span name="'+rootTree[i].cid+'" onclick="categorysearch(this)">'+rootTree[i].category+'</span>';
-				var childens = rootTree[i].childens;
-				for(var j=0;j<childens.length;j++){
-					categoryHtml = categoryHtml +'<div class="category-lev2';
-					if(qcatid==childens[j].cid){
-						categoryHtml = categoryHtml +' category-lev2-select';
+			if(rootTree){
+				for(var i=0;i<rootTree.length;i++){
+					categoryHtml = categoryHtml +'<div class="category-lev1';
+					if(qcatid==rootTree[i].cid){
+						categoryHtml = categoryHtml +' category-lev1-select';
 					}
-					categoryHtml = categoryHtml +'"><span name="'+childens[j].cid+'" onclick="categorysearch(this)">'+childens[j].category+'</span>';
-					var childens_c = childens[j].childens;
-					for(var k=0;k<childens_c.length;k++){
-						categoryHtml = categoryHtml +'<div class="category-lev3'
-						if(qcatid==childens_c[k].cid){
-							categoryHtml = categoryHtml +' category-lev3-select';
+					categoryHtml = categoryHtml+'"><span name="'+rootTree[i].cid+'" onclick="categorysearch(this)">'+rootTree[i].category+'</span>';
+					var childens = rootTree[i].childens;
+					for(var j=0;j<childens.length;j++){
+						categoryHtml = categoryHtml +'<div class="category-lev2';
+						if(qcatid==childens[j].cid){
+							categoryHtml = categoryHtml +' category-lev2-select';
 						}
-						categoryHtml = categoryHtml +'"><span name="'+childens_c[k].cid+'" onclick="categorysearch(this)">'+childens_c[k].category+'</span>'+'</div>';
+						categoryHtml = categoryHtml +'"><span name="'+childens[j].cid+'" onclick="categorysearch(this)">'+childens[j].category+'</span>';
+						var childens_c = childens[j].childens;
+						for(var k=0;k<childens_c.length;k++){
+							categoryHtml = categoryHtml +'<div class="category-lev3'
+							if(qcatid==childens_c[k].cid){
+								categoryHtml = categoryHtml +' category-lev3-select';
+							}
+							categoryHtml = categoryHtml +'"><span name="'+childens_c[k].cid+'" onclick="categorysearch(this)">'+childens_c[k].category+'</span>'+'</div>';
+						}
+						categoryHtml = categoryHtml +'</div>';
 					}
 					categoryHtml = categoryHtml +'</div>';
 				}
-				categoryHtml = categoryHtml +'</div>';
 			}
 			$(".category-list").html(categoryHtml);
 			$(".product-list").html(productHtml);
 			$("#record-count").html(data.recordCount);
-			$(".product-page").show();
+			if(data.recordCount > 0){
+				$(".product-page").show();
+			}
 			totalpage = parseInt(paramv.amountPage);
 		},
 		error:function(e){

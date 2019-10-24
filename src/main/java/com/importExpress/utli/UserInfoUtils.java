@@ -21,7 +21,7 @@ public class UserInfoUtils {
      * @return
      */
     public static Admuser getUserInfo(HttpServletRequest request) {
-        String sessionId = "1";//request.getSession().getId();
+        String sessionId = request.getSession().getId();
         String userJson = Redis.hget(sessionId, "admuser");
         Admuser admuser = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
         return admuser;
