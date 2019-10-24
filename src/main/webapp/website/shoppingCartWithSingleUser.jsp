@@ -61,6 +61,7 @@
         $(document).ready(function () {
             closeDialog('simple_email_div', 'simple_form_enter');
             closeDialog('shop_cart_div', 'hop_cart_form');
+            closeDialog('simple_coupon_div', 'simple_coupon_enter');
             imgLazyLoad();
             var website = '${param.website}';
             if (!website) {
@@ -276,14 +277,19 @@
 
         function  openSendEmail(userId, website) {
             var type = $("#send_type").val();
-            var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId="
-                + userId + "&type=" + type + "&website=" + website;
-            var iWidth = 1680; //弹出窗口的宽度;
-            var iHeight = 880; //弹出窗口的高度;
-            var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
-            var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置;
-            var param = "height=" + iHeight + ",width=" + iWidth + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no";
-            window.open(url, 'windows', param);
+            if(type == 2){
+                // 动态展示折扣券
+                getCouponCode(userId, website);
+            }else{
+                var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId="
+                    + userId + "&type=" + type + "&website=" + website;
+                var iWidth = 1680; //弹出窗口的宽度;
+                var iHeight = 880; //弹出窗口的高度;
+                var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
+                var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置;
+                var param = "height=" + iHeight + ",width=" + iWidth + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no";
+                window.open(url, 'windows', param);
+            }
         }
 
         function showMessage(message) {
@@ -309,6 +315,118 @@
                 return false;
             }
         }
+
+        function getCouponCode(userId, website) {
+            $.ajax({
+                type: "GET",
+                url: "/cbtconsole/coupon/querycouponcode.do",
+                dataType: "text",
+                success: function (msg) {
+                    $("#coupon_code").val(msg);
+                    $("#coupon_web_site").val(website);
+                    $("#coupon_user_id").val(userId);
+
+                    $("#simple_coupon_div").dialog('open');
+                    $('#simple_coupon_div').window('center');
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
+
+        function addCoupon(obj) {
+            var couponWebsiteType = $("#coupon_web_site").val();// 网站
+            var couponCode = $("#coupon_code").val();// 卷码
+            var typeCodeMo = $("#coupon_type").val();//卷类别
+            var valueLeft = $("#coupon_min_amount").val();//最低消费金额
+            var valueRight = $("#coupon_deduction").val();// 该卷抵扣金额
+            var describe =  $("#coupon_desc").val();// 描述
+            var count = 1;
+            var fromTime = $("#coupon_begin_time").val();
+            var toTime = $("#coupon_end_time").val();
+            var websiteType = couponWebsiteType;
+            var userids = $("#coupon_user_id").val();
+            var isSu = true;
+            if(couponWebsiteType < 1){
+                $.messager.alert("提醒", "获取网站类别失败", "info");
+                isSu = false;
+                return isSu;
+            }
+            if(couponCode ==  null || couponCode == ""){
+                $.messager.alert("提醒", "获取卷码失败", "info");
+                isSu = false;
+                return isSu;
+            }
+            if(typeCodeMo < 1){
+                $.messager.alert("提醒", "获取卷类别失败", "info");
+                isSu = false;
+                return isSu;
+            }
+            if(valueLeft < 0){
+                $.messager.alert("提醒", "获取最低消费金额失败", "info");
+                isSu = false;
+                return isSu;
+            }
+            if(valueRight < 0){
+                $.messager.alert("提醒", "获取该卷抵扣金额失败", "info");
+                isSu = false;
+                return isSu;
+            }
+            if(describe ==  null || describe == ""){
+                $.messager.alert("提醒", "获取该卷描述失败", "info");
+                isSu = false;
+                return isSu;
+            }
+            if(fromTime ==  null || fromTime == ""){
+                $.messager.alert("提醒", "获取开始时间失败", "info");
+                isSu = false;
+                return isSu;
+            }
+            if(toTime ==  null || toTime == ""){
+                $.messager.alert("提醒", "获取到期时间失败", "info");
+                isSu = false;
+                return isSu;
+            }
+            if(userids < 0){
+                $.messager.alert("提醒", "获取客户ID失败", "info");
+                isSu = false;
+                return isSu;
+            }
+            if(isSu){
+                $(obj).prop("disabled", true);
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/coupon/addcoupon.do",
+                    data: {
+                        couponWebsiteType:couponWebsiteType,
+                        couponCode:couponCode,
+                        typeCodeMo:typeCodeMo,
+                        valueLeft:valueLeft,
+                        valueRight:valueRight,
+                        describe:describe,
+                        count:count,
+                        fromTime:fromTime,
+                        toTime:toTime,
+                        websiteType:websiteType,
+                        userids:userids
+                    },
+                    dataType: "json",
+                    success: function (msg) {
+                        $(obj).prop("disabled", false);
+                        if (msg.state == 'true') {
+                            closeDialog('simple_coupon_div', 'simple_coupon_enter');
+                        } else {
+                            $.messager.alert("提醒", msg.message, "info");
+                        }
+                    },
+                    error: function () {
+                        $(obj).prop("disabled", false);
+                        $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                    }
+                });
+            }
+        }
     </script>
 </head>
 <body>
@@ -317,6 +435,55 @@
     <h1 align="center">${message}</h1>
 </c:if>
 <c:if test="${success > 0}">
+
+    <div id="simple_coupon_div" class="easyui-dialog" title="创建购物车营销优惠券"
+         data-options="modal:true" style="width: 750px; height: 463px;">
+        <form id="simple_coupon_enter" action="#" onsubmit="return false">
+
+            <table cellspacing="1" border="1">
+
+                <tr>
+                    <td style="display: none;">
+                        <input id="coupon_web_site" type="hidden" value="0"/>
+                        <input id="coupon_user_id" type="hidden" value="0"/>
+                    </td>
+                    <td>卷码(自动生成):</td>
+                    <td><input id="coupon_code" readonly="readonly"/></td>
+                </tr>
+                <tr>
+                    <td>卷类别:</td>
+                    <td>
+                        <select id="coupon_type">
+                            <option value="1">1-满减券</option>
+                        </select>
+                        <span>最低消费金额*<input id="coupon_min_amount" type="number" step="0.01"/></span>
+                        <span>抵扣金额*<input id="coupon_deduction" type="number" step="0.01"/></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>描述(自动生成):</td>
+                    <td><input id="coupon_desc" /></td>
+                </tr>
+                <tr>
+                    <td>截止时间:</td>
+                    <td><input id="coupon_begin_time" class="Wdate"
+                           style="width: 168px; height: 24px" type="text" value=""
+                           onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+                    <input id="coupon_end_time" class="Wdate"
+                           style="width: 168px; height: 24px" type="text" value=""
+                           onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></td>
+                </tr>
+
+                <tr>
+                    <td><button onclick="addCoupon(this)">创建</button></td>
+                    <td><button onclick="closeDialog('simple_coupon_div', 'simple_coupon_enter')">关闭</button></td>
+                </tr>
+            </table>
+
+        </form>
+    </div>
+
+
 
     <div id="simple_email_div" class="easyui-dialog" title="发送邮件(简单跟进)"
          data-options="modal:true" style="width: 750px; height: 463px;">
@@ -395,7 +562,8 @@
                        <span>邮件类型:
                             <select id="send_type" style="height: 28px;width: 180px;">
                             <option value="1" selected="selected">不做变动,直接发送</option>
-                            <option value="2">给单个产品价格改价</option>
+                            <%--<option value="2">给单个产品价格改价</option>--%>
+                            <option value="2">给折扣券</option>
                             <%--<option value="3">操作运费</option>--%>
                             <option value="4">为客户选择最佳运输方式</option>
                             </select>
@@ -407,9 +575,9 @@
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="查看客户信息" onclick="openUserInfo(${userId}, ${param.website})"/>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="查看EDM跟踪" onclick="openUserFollow(${userId}, ${param.website})"/>
+                        <%--<input class="btn_sty" type="button" value="查看EDM跟踪" onclick="openUserFollow(${userId}, ${param.website})"/>--%>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" style="display: none;" type="button" value="恢复线上数据" onclick="recoverOnlineData(${userId}, ${param.website})"/>
+                        <%--<input class="btn_sty" style="display: none;" type="button" value="恢复线上数据" onclick="recoverOnlineData(${userId}, ${param.website})"/>--%>
                     </div>
                 </td>
             </tr>
@@ -433,8 +601,8 @@
                 <td style="width: 180px;">对标商品信息</td>
                 <td style="width: 80px;">数量</td>
                 <td style="width: 80px;">原价</td>
-                <td style="width: 80px;">改价</td>
-                <td style="width: 140px;">操作</td>
+               <%-- <td style="width: 80px;">改价</td>--%>
+                <%--<td style="width: 140px;">操作</td>--%>
             </tr>
             </thead>
             <tbody>
@@ -484,7 +652,7 @@
                             ${good.cartGoodsPrice}
                         </c:if>
                     </td>
-                    <td style="text-align: center">
+                    <%--<td style="text-align: center">
                         <c:if test="${good.cartOldPrice > 0}">
                             ${good.cartGoodsPrice}
                         </c:if>
@@ -499,7 +667,7 @@
                             <br><input class="btn_sty" type="button" value="修改价格"
                                        onclick="updateGoodsPrice('${good.pid}',${good.id},${userId},${good.cartGoodsPrice},this)"/>
                         </c:if>
-                    </td>
+                    </td>--%>
                 </tr>
             </c:forEach>
 

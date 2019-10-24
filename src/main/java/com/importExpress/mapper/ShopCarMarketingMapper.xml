@@ -1669,12 +1669,12 @@
 
     <select id="queryForList" parameterType="com.importExpress.pojo.ShopCarUserStatistic"
             resultMap="shopCarUserStatisticResultMap">
-        select gcf.userid,us.email,scm.total_catid,DATE_FORMAT(gcf.updateTime,'%Y-%m-%d %H:%i:%s') as last_add_cart_time,
+        select gcf.userid,us.email,scm.total_catid,DATE_FORMAT(gcf.time_updated,'%Y-%m-%d %H:%i:%s') as last_add_cart_time,
         convert(scm.total_price,decimal(10,2)) as total_price,convert(scm.average_price,decimal(10,2)) as average_price,
         us.countryId,zone.country,us.currency,au.adminid,au.admName,us.site,
         '' as last_login_time,ifnull(adm.id,0) as follow_admin_id,ifnull(adm.admName,'') as follow_admin_name,
         DATE_FORMAT(gcf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time
-        from goods_carconfig gcf
+        from shop_cart_data gcf
         inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
         (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
         inner join shop_car_distribution sb on sa.userid = sb.user_id
@@ -1717,7 +1717,7 @@
         <if test="countryId > 0">
             and us.countryId = #{countryId}
         </if>
-        order by gcf.updateTime desc
+        order by gcf.time_updated desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
         </if>
@@ -1726,7 +1726,7 @@
     <select id="queryForListCount" parameterType="com.importExpress.pojo.ShopCarUserStatistic"
             resultType="java.lang.Integer">
         select count(1)
-        from goods_carconfig gcf
+        from shop_cart_data gcf
         inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
         (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
         inner join shop_car_distribution sb on sa.userid = sb.user_id
@@ -1889,7 +1889,7 @@
     </select>
 
     <insert id="insertIntoPriceLog" parameterType="com.importExpress.pojo.ShopCarMarketing">
-        insert into shop_car_marketing_price_log(shop_mark_id,user_id,pid,goods_price,goods_price_new,admin_id)
+        insert into shop_car_marketing_price_log_1024(shop_mark_id,user_id,pid,goods_price,goods_price_new,admin_id)
         values(#{id}, #{userid} , #{itemid} , #{googsPrice} , #{priceNew} , #{adminId} )
     </insert>
 
