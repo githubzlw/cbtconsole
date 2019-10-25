@@ -238,6 +238,7 @@
     </if>
     <if test="goodscatid ==-1"> and isku.goodscatid='0'</if>
     
+    <if test="odid != 0">and isku.od_id=#{odid}</if>
     <if test="isline == 1">and c.valid=1</if>
     <if test="isline == 2">and c.valid!=1</if>
     order by isku.createtime desc
@@ -257,6 +258,7 @@
 	    </if>
     </if>
     <if test="goodscatid ==-1">and isku.goodscatid='0'</if>
+    <if test="odid != 0">and isku.od_id=#{odid}</if>
     <if test="isline == 1">and c.valid=1</if>
     <if test="isline == 2">and c.valid!=1</if>
        
