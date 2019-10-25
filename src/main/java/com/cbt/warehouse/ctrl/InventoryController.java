@@ -486,6 +486,10 @@ public class InventoryController {
 		strisline = StrUtils.isMatch(strisline, "\\d+") ? strisline : "0";
 		map.put("isline",Integer.valueOf(strisline));
 		
+		String odid = request.getParameter("odid");
+		odid = StrUtils.isMatch(odid, "\\d+") ? odid : "0";
+		map.put("odid",Integer.valueOf(odid));
+		
 		String goodscatid = request.getParameter("goodscatid");
 		goodscatid = goodscatid == null ? "0" : goodscatid;
 		map.put("goodscatid", goodscatid);

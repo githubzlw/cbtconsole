@@ -351,7 +351,7 @@ $(".datagrid-cell-c2-remarkContext").each(function(){
 		
 	});
 })	
-	
+$('.img-lazy').lazyload({effect: "fadeIn"});	
 })
 function vMoreLi(t){
 	$(t).parent().find(".li_more_s").show();
@@ -475,8 +475,8 @@ function getProduct(){
 	    			 }
 	    		 }else{
 	    			 trHtml = trHtml+"<tr><td ><span class='lu_sku'>as picture</span><br>";
-    				 trHtml = trHtml+"<span class='lu_specid'>"+skuM.goods_pid+"</span><br>";
-    				 trHtml = trHtml+"<span class='lu_skuid'>"+skuM.goods_pid+"</span></td>";
+    				 trHtml = trHtml+"<span class='lu_specid'>"+goods_pid+"</span><br>";
+    				 trHtml = trHtml+"<span class='lu_skuid'>"+goods_pid+"</span></td>";
     				 trHtml = trHtml+"<td><input type='text' class='form-control lu_count'  value='0'></td>";
     				 trHtml = trHtml+'<td class="lu_barcode"><input type="text" placeholder="请输入库位条形码" class="lu_barcode_a"></td>';
 //    				 trHtml = trHtml+'<td class="lu_barcode"><a onclick="getbarcode(this,\''+skuM.goods_pid+'\');" class="lu_barcode_a" >获取库位</a></td>';
@@ -549,12 +549,13 @@ function doQuery(page,flag) {
 	var page = $("#current_page").val();
 	var goods_name = $('#query_goods_name').val();
 	var goods_pid = $('#query_goods_pid').val();
+	var odid = $('#query_odid').val();
 	var minintentory = $('#query_minintentory').val();
 	var maxintentory = $('#query_maxintentory').val();
 	var queryLine = $('#query_line').val();
 	if(flag == 0){
 		var goodscatid = $('#query_goodscatid-in').val();
-		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine, "_self");
+		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&odid="+odid, "_self");
 	}else{
 		var goodscatid = $('#query_goodscatid').val();
 		var check_id = $("#check_id").val();
