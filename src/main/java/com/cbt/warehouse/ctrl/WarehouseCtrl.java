@@ -450,7 +450,7 @@ public class WarehouseCtrl {
 			map.put("type",type);
 			row=iWarehouseService.updateCatePrice(map);
 			if(row>0){
-				SendMQ sendMQ=new SendMQ();
+
 				String sql="";
 				sql="update priority_category set minPrice="+minPrice+" where id="+id+"";
 				SendMQ.sendMsg(new RunSqlModel(sql));
@@ -518,12 +518,10 @@ public class WarehouseCtrl {
 				map.put("goodsid",bp.getGoodsid());
 				row=iWarehouseService.saveCommentContent(map);
 				if(row>0){
-					SendMQ sendMQ=new SendMQ();
-					sendMQ.sendMsg(new RunSqlModel("insert into goods_comments_real(oid,car_type,order_no,user_id,user_name,country_id,goods_pid,comments_content," +
+					SendMQ.sendMsg(new RunSqlModel("insert into goods_comments_real(oid,car_type,order_no,user_id,user_name,country_id,goods_pid,comments_content," +
 							"comments_time,admin_id,goodsid,picPath) VALUES" +
 							"('"+map.get("od_id")+"','"+map.get("car_type")+"','"+map.get("orderid")+"','"+map.get("uid")+"','"+map.get("email")+"','"+map.get("countryid")+"'" +
 							",'"+map.get("goods_pid")+"','"+map.get("commentsContent")+"',now(),'"+map.get("admuserid")+"','"+map.get("goodsid")+"','"+map.get("picPath")+"')"));
-					sendMQ.closeConn();
 					flag=true;
 				}
 			}
@@ -763,10 +761,8 @@ public class WarehouseCtrl {
 			map.put("path",path);
 			map.put("i_id",i_id);
 			iWarehouseService.delInPic(map);
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("update order_details set picturepath='' where orderid='"+map.get("orderid")+"' and goodsid='"+map.get("goods_pid")+"'"));
-			sendMQ.sendMsg(new RunSqlModel("update inspection_picture set isdelete=1 where pic_path='"+map.get("path")+"'"));
-			sendMQ.closeConn();
+			SendMQ.sendMsg(new RunSqlModel("update order_details set picturepath='' where orderid='"+map.get("orderid")+"' and goodsid='"+map.get("goods_pid")+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update inspection_picture set isdelete=1 where pic_path='"+map.get("path")+"'"));
 			row=1;
 		}catch (Exception e){
 			e.printStackTrace();
@@ -3087,9 +3083,9 @@ public class WarehouseCtrl {
 			}
 			// 检查配置文件信息是否正常读取
 			String imgUploadPath = ftpConfig.getLocalDiskPath();
-			filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
+			filePath = imgUploadPath  + file.getOriginalFilename();
+//			filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
 			FileOutputStream fs=new FileOutputStream(filePath);
-			int i=1/0;
 			byte[] buffer =new byte[1024*1024];
 			int bytesum = 0;
 			int byteread = 0;
@@ -3102,12 +3098,16 @@ public class WarehouseCtrl {
 			fs.close();
 			stream.close();
 			File video=new File(filePath);
+			String VidoPath=iWarehouseService.getRepathByPid(goods_pid);
+			String Vpath=VidoPath.split("/")[4];
+			
 			if (video.exists()) {
-				boolean flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/insp_video/", filename+"_"+file.getOriginalFilename(), filePath);
+				boolean flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/"+Vpath+"/"+goods_pid+"/", filename+"_"+file.getOriginalFilename(), filePath);
 				if(flag){
 					map.put("msg","1");
 					map.put("goods_pid",goods_pid);
-					String path="https://img.import-express.com/importcsvimg/insp_video/"+(filename+"_"+file.getOriginalFilename())+"";
+//					String path="https://img.import-express.com/importcsvimg/insp_video/"+(filename+"_"+file.getOriginalFilename())+"";
+					String path = "https://img.import-express.com/importcsvimg/"+Vpath+"/"+goods_pid+"/" + (filename + "_" + file.getOriginalFilename()) + "";
 					map.put("path",path);
 					GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(goods_pid,path);
 					iWarehouseService.updateCustomVideoUrl(map);
@@ -3118,6 +3118,7 @@ public class WarehouseCtrl {
 
 		} catch (Exception e) {
 			map.put("msg","0");
+			LOG.error("视频上传错误",e);
 		}
 		return map;
 	}
@@ -5194,9 +5195,9 @@ public class WarehouseCtrl {
 		List<OrderDetailsBean> od_list=new ArrayList<OrderDetailsBean>();
 		Map<String,String> map_sku=new HashMap<String, String>();
 		Map<String,String> map_count=new HashMap<String, String>();
-		SendMQ sendMQ=null;
+
 		try{
-			sendMQ=new SendMQ();
+
 			String sku_str[]=sku_list.split("&");
 			for (String s : sku_str) {
 				StringBuilder sb=new StringBuilder();
@@ -5330,7 +5331,7 @@ public class WarehouseCtrl {
 		Map<String,String> pidMap=new HashMap<String, String>();
 		Map<String,String> map_count=new HashMap<String, String>();
 		try{
-			SendMQ sendMQ=new SendMQ();
+
 			String remarks_val=request.getParameter("remarks_val");
 			Map<String,String> remarkMap=new HashMap<String,String>();
 			String remark_str []=remarks_val.split("&");
@@ -8710,7 +8711,7 @@ public class WarehouseCtrl {
 					updateMap.put("orderno", dropShipOrder.getParentOrderNo());
 					updateMap.put("userid", userId);
 					try {
-					    SendMQ sendMQ=new SendMQ();
+
 					    StringBuilder sql=new StringBuilder();
                         sql.append("update orderinfo set product_cost = round(product_cost-"+updateMap.get("productcost")+",2),foreign_freight = round(foreign_freight-"+updateMap.get("foreignfreight")+",2)," +
                                 "pay_price = round(pay_price-"+updateMap.get("productcost")+"-"+updateMap.get("foreignfreight")+",2),pay_price_tow = round(pay_price_tow-"+updateMap.get("foreignfreight")+",2)," +
@@ -8962,7 +8963,7 @@ public class WarehouseCtrl {
 					row=iWarehouseService.updateQuestPicPath(gbookid,Util.PIC_URL+localFilePath+"");
 					if(row>0){
 						json.setOk(true);
-						SendMQ sendMQ=new SendMQ();
+
 						SendMQ.sendMsg(new RunSqlModel("update guestbook set picPath='"+Util.PIC_URL+localFilePath+"' where id="+gbookid+""));
 
 					}
@@ -9288,11 +9289,11 @@ public class WarehouseCtrl {
 				File video = new File(filePath);
 				if (video.exists()) {
 //					UploadByOkHttp.uploadFile(video,filePath);
-					boolean flag = NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/"+Vpath+pid+"/", filename + "_" + file.getOriginalFilename(), filePath);
+					boolean flag = NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/"+Vpath+"/"+pid+"/", filename + "_" + file.getOriginalFilename(), filePath);
 					if (flag) {
 						map.put("msg", "1");
 						map.put("goods_pid", pid);
-						String path = "https://img.import-express.com/importcsvimg/"+Vpath+pid+"/" + (filename + "_" + file.getOriginalFilename()) + "";
+						String path = "https://img.import-express.com/importcsvimg/"+Vpath+"/"+pid+"/" + (filename + "_" + file.getOriginalFilename()) + "";
 						map.put("path", path);
 						GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(pid, path);
 						iWarehouseService.updateCustomVideoUrl(map);
@@ -9301,6 +9302,7 @@ public class WarehouseCtrl {
 					list.add(pid);
 				}
 			} catch (Exception e) {
+				LOG.error("视频批量上传错误"+pid,e);
 					list.add(pid);
 			}
 
@@ -9315,6 +9317,7 @@ public class WarehouseCtrl {
 			}
 		} catch (Exception e) {
 			list.add("0");
+			LOG.error("视频批量上传错误",e);
 			return list;
 		}
 		return list;
@@ -9356,11 +9359,11 @@ public class WarehouseCtrl {
 				File video = new File(filePath);
 				if (video.exists()) {
 //					UploadByOkHttp.uploadFile(video,filePath);
-					boolean flag = NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/" + Vpath + pid + "/", filename + "_" + file.getOriginalFilename(), filePath);
+					boolean flag = NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/" + Vpath +"/"+ pid + "/", filename + "_" + file.getOriginalFilename(), filePath);
 					if (flag) {
 						map.put("msg", "1");
 						map.put("goods_pid", pid);
-						String path = "https://img.import-express.com/importcsvimg/" + Vpath + pid + "/" + (filename + "_" + file.getOriginalFilename()) + "";
+						String path = "https://img.import-express.com/importcsvimg/" + Vpath +"/"+ pid + "/" + (filename + "_" + file.getOriginalFilename()) + "";
 						map.put("path", path);
 						GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(pid, path);
 						iWarehouseService.updateCustomVideoUrl(map);

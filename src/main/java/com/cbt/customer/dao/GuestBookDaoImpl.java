@@ -199,9 +199,10 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 				}
 		        sql+=",g.create_time,g.reply_content,"
 				+ "g.reply_time,g.status,ifnull(u.email,'') useremail ,ifnull(u.businessName,'') as bname ,"
-				+ "ifnull(ad.admName ,'')  admName ,ifnull(er.id,'0')eid,g.online_url from guestbook  g left join user  u  on  g.user_id=u.id "
+//				+ "ifnull(ad.admName ,'')  admName ,ifnull(er.id,'0')eid,g.online_url from guestbook  g left join user  u  on  g.user_id=u.id "
+						+ "ifnull(au.admName ,'')  admName ,ifnull(er.id,'0')eid,g.online_url from guestbook  g left join user  u  on  g.user_id=u.id "
 				+ "left join admin_r_user  au ON  u.id=au.userid "
-				+ "LEFT JOIN admuser ad ON au.adminid=ad.id "
+//				+ "LEFT JOIN admuser ad ON au.adminid=ad.id "
 				+ " left join email_receive er  on er.question_id=g.id)m "
 				+ "left join (select question_id,max(id) eid from email_receive order by question_id)n on m.id=n.question_id where 1=1";
 

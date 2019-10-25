@@ -4310,9 +4310,9 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 //			stmt1 = conn1.prepareStatement(sql2);
 //			stmt1.setString(1, orderNo);
 //			res = stmt1.executeUpdate();
-			SendMQ sendMQ=new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("update orderinfo set packag_style = 2 where order_no ='"+orderNo+"' "));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel("update orderinfo set packag_style = 2 where order_no ='"+orderNo+"' "));
+
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -4400,9 +4400,9 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 //			stmt0 = conn1.prepareStatement(sqlDel);
 //			stmt0.setString(1, orderNo);
 //			res = stmt0.executeUpdate();
-			SendMQ sendMQ=new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("delete from changegooddata where orderno='"+orderNo+"'"));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel("delete from changegooddata where orderno='"+orderNo+"'"));
+
 
 //			for(int i=0; i<gsfList.size(); i++){
 //				stmt1 = conn1.prepareStatement(sql1);
@@ -5378,9 +5378,9 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 //				stmt4 = conn1.prepareStatement(sqlChangeOnLine);
 //				stmt4.setString(1, orderNo);
 //				res = stmt4.executeUpdate();
-				SendMQ sendMQ=new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set packag_style = 1 where order_no ='"+orderNo+"' "));
-				sendMQ.closeConn();
+
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set packag_style = 1 where order_no ='"+orderNo+"' "));
+
 
 				//更新货源表替换产品标识
 				String sqlGoods = "update goods_source set change_flag = 1 where goods_url = ? and goods_purl=? ";

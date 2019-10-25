@@ -577,7 +577,7 @@
     <!-- 更新阿盘点数据 -->
     <update id="updateInventoryCheckRecord">
     update inventory_sku_check_record_temp set 
-    check_remaining=#{checkRemaining},after_barcode=#{afterBarcode},create_time=now() where id=#{id}
+    check_remaining=#{checkRemaining},after_barcode=#{afterBarcode},create_time=now()
     where id=#{id}
     </update>
     <!-- 插入本次盘点数据 -->

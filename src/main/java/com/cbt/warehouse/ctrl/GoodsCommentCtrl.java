@@ -52,7 +52,7 @@ public class GoodsCommentCtrl {
 	public Map<String,Object> saveComment(HttpServletRequest request , HttpServletResponse response){
 				Map<String,Object> map = new HashMap<String, Object>();
 				try {
-					SendMQ sendMQ=new SendMQ();
+
 					DataSourceSelector.set("dataSource127hop");
 					GoodsCommentsBean commentsBean = new GoodsCommentsBean();
 					String userName = request.getParameter("userName");

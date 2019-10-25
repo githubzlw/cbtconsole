@@ -27,11 +27,12 @@
   
   
   <select id="findByQuery"  resultMap="BaseResultMap">
-	SELECT  IFNULL(ad.admName,'') AS admName,q.questionid,q.userid,q.pid,q.pname,q.purl,q.question_content,q.create_time,q.reply_status,
+	/*SELECT  IFNULL(ad.admName,'') AS admName,q.questionid,q.userid,q.pid,q.pname,q.purl,q.question_content,q.create_time,q.reply_status,*/
+      SELECT  IFNULL(a.admName,'') AS admName,q.questionid,q.userid,q.pid,q.pname,q.purl,q.question_content,q.create_time,q.reply_status,
 	q.reply_content,q.reply_time,IFNULL(b.admName,'') AS reply_name,q.isShow,IFNULL(c.shop_id,'') as c_shop_id,q.shop_id
 	FROM question_answer q LEFT JOIN custom_benchmark_ready c ON q.pid=c.pid LEFT JOIN admuser b ON q.reply_name=b.id
     left join admin_r_user a on q.userid=a.userid
-      left join admuser ad on a.adminid=ad.id
+      /*left join admuser ad on a.adminid=ad.id*/
 	WHERE q.is_delete=0
     <if test="replyStatus != 0 ">
         and q.reply_status=#{replyStatus}

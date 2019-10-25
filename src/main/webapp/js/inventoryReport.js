@@ -723,7 +723,7 @@ function addcheck(){
  var before_barcode = $("#index_check_barcode_b").val();
  var after_barcode = $("#index_check_barcode").val();
  var goods_price = $("#index_check_goods_price").val();
- var record_id = $("#index_check_record_id").val();
+ var record_id = $("#index_check_q_record_id").val();
  var index_c = $("#index_check_index").val();
  var goods_name = $("#index_check_igoodsname").text().trim();
  if(index_iremaining != index_icanremaining){
@@ -822,6 +822,10 @@ function saveInventory(){
 			reasonType = $(this).val();
 		 }
 	})
+	if(lu_pid==''||lu_name=='产品名称产品名称产品名称产品名称'){
+		alert("请输入产品ID后按enter键,页面正确显示产品名称后录入");
+		return ;
+	}
 	var remark = $("#lu_remark").val();
 	jQuery.ajax({
 	       url:"/cbtconsole/inventory/input",
