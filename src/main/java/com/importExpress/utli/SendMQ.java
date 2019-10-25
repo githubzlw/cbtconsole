@@ -159,13 +159,13 @@ public class SendMQ {
      * @param userId
      * @param flag
      */
-    public static void sendAuthorizationFlagMqSql(int userId, int flag) {
+    public static void sendAuthorizationFlagMqSql(Channel channel,int userId, int flag) {
         try {
             JSONObject json = new JSONObject();
             json.put("userid", String.valueOf(userId));
             // 1是添加，2是删除
             json.put("type", flag > 0 ? "1" : "2");
-            SendMQ.sendAuthorizationFlagStr(json.toString());
+            SendMQ.sendAuthorizationFlagStr(channel,json.toString());
         } catch (Exception e) {
             log.error("sendMsgByRPC", e);
         }
@@ -177,11 +177,9 @@ public class SendMQ {
      * @param json
      * @throws Exception
      */
-    private static void sendAuthorizationFlagStr(String json) throws Exception {
-        Channel channel = getChannel();
+    private static void sendAuthorizationFlagStr(Channel channel,String json) throws Exception {
         channel.exchangeDeclare(EXCHANGE_USER_AUTH_NAME, "fanout", true);
         channel.basicPublish(EXCHANGE_USER_AUTH_NAME, "", null, json.getBytes("UTF-8"));
-        closeChannel(channel);
     }
 
 
@@ -233,7 +231,7 @@ public class SendMQ {
         closeChannel(channel);
     }
 
-    private static Channel getChannel() {
+    public static Channel getChannel() {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(config.get("host"));
         factory.setPort(Integer.parseInt(config.get("port")));
@@ -248,7 +246,7 @@ public class SendMQ {
         }
     }
 
-    private static void closeChannel(Channel channel) {
+    public static void closeChannel(Channel channel) {
         if (channel != null) {
             try {
                 channel.close();
