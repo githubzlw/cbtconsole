@@ -3,6 +3,7 @@ package com.importExpress.mapper;
 import com.importExpress.pojo.GoodsCarconfig;
 import com.importExpress.pojo.GoodsCarconfigExample;
 import com.importExpress.pojo.GoodsCarconfigWithBLOBs;
+import com.importExpress.pojo.ShopCarNewBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -39,4 +40,10 @@ public interface GoodsCarconfigMapper {
     List<GoodsCarconfigWithBLOBs> queryByIsNew(@Param("userId") int userId);
 
     int updateByIdAndUserId(@Param("id") int id, @Param("userId") int userId);
+
+    /**
+     * 新购物车Bean获取
+     * @return
+     */
+     ShopCarNewBean queryShopCarNewBeanByUserId(int userId);
 }

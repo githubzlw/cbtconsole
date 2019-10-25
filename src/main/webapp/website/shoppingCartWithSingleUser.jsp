@@ -401,7 +401,7 @@
                     data: {
                         couponWebsiteType:couponWebsiteType,
                         couponCode:couponCode,
-                        typeCodeMo:typeCodeMo,
+                        type:typeCodeMo,
                         valueLeft:valueLeft,
                         valueRight:valueRight,
                         describe:describe,
@@ -415,6 +415,14 @@
                     success: function (msg) {
                         $(obj).prop("disabled", false);
                         if (msg.state == 'true') {
+                            var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId="
+                                + userids + "&type=" + 2 + "&website=" + websiteType + "&couponCode=" + couponCode;
+                            var iWidth = 1680; //弹出窗口的宽度;
+                            var iHeight = 880; //弹出窗口的高度;
+                            var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
+                            var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置;
+                            var param = "height=" + iHeight + ",width=" + iWidth + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no";
+                            window.open(url, 'windows', param);
                             closeDialog('simple_coupon_div', 'simple_coupon_enter');
                         } else {
                             $.messager.alert("提醒", msg.message, "info");
@@ -427,6 +435,12 @@
                 });
             }
         }
+
+        function changeDescribe(price) {
+            if(price && price > 0){
+                $("#coupon_desc").val('If order over  $' + price);
+            }
+        }
     </script>
 </head>
 <body>
@@ -437,10 +451,10 @@
 <c:if test="${success > 0}">
 
     <div id="simple_coupon_div" class="easyui-dialog" title="创建购物车营销优惠券"
-         data-options="modal:true" style="width: 750px; height: 463px;">
-        <form id="simple_coupon_enter" action="#" onsubmit="return false">
+         data-options="modal:true" style="width: 500px; height: 250px;">
+        <form id="simple_coupon_enter" style="text-align: center" action="#" onsubmit="return false">
 
-            <table cellspacing="1" border="1">
+            <table cellspacing="1" >
 
                 <tr>
                     <td style="display: none;">
@@ -456,13 +470,19 @@
                         <select id="coupon_type">
                             <option value="1">1-满减券</option>
                         </select>
-                        <span>最低消费金额*<input id="coupon_min_amount" type="number" step="0.01"/></span>
-                        <span>抵扣金额*<input id="coupon_deduction" type="number" step="0.01"/></span>
                     </td>
                 </tr>
                 <tr>
+                    <td>最低消费金额</td>
+                    <td><input id="coupon_min_amount" type="number" step="0.01" onchange="changeDescribe(this.value)"/>(<b style="color: red">*根据总产品金额给</b>)</td>
+                </tr>
+                <tr>
+                    <td>抵扣金额</td>
+                    <td><input id="coupon_deduction" type="number" step="0.01"/>(<b style="color: red">*按照优惠券逻辑设置</b>)</td>
+                </tr>
+                <tr>
                     <td>描述(自动生成):</td>
-                    <td><input id="coupon_desc" /></td>
+                    <td><input id="coupon_desc" readonly="readonly"/></td>
                 </tr>
                 <tr>
                     <td>截止时间:</td>
@@ -475,8 +495,8 @@
                 </tr>
 
                 <tr>
-                    <td><button onclick="addCoupon(this)">创建</button></td>
-                    <td><button onclick="closeDialog('simple_coupon_div', 'simple_coupon_enter')">关闭</button></td>
+                    <td colspan="2" style="text-align: center;"><button onclick="addCoupon(this)">创建</button>
+                    &nbsp;&nbsp;<button onclick="closeDialog('simple_coupon_div', 'simple_coupon_enter')">关闭</button></td>
                 </tr>
             </table>
 

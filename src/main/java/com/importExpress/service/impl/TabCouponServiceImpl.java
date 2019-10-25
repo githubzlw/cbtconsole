@@ -78,8 +78,12 @@ public class TabCouponServiceImpl implements TabCouponService {
                 result.put("message", "创建折扣卷成功, 但未找到被关联的用户信息, 未进行关联!");
                 return result;
             }
-            insertCouponUsersAndSendMail(tabCouponNew, userList);
-            result.put("message", "创建折扣卷成功, 且关联用户id成功, 正在发送邮件通知客户。");
+            if(couponRedis.getIsShopCar() == 0){
+                insertCouponUsersAndSendMail(tabCouponNew, userList);
+                result.put("message", "创建折扣卷成功, 且关联用户id成功, 正在发送邮件通知客户。");
+            }else{
+                result.put("message", "创建折扣卷成功, 且关联用户id成功!");
+            }
         }
         return result;
     }
