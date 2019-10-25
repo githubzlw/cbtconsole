@@ -82,6 +82,8 @@ public class TabCouponServiceImpl implements TabCouponService {
                 insertCouponUsersAndSendMail(tabCouponNew, userList);
                 result.put("message", "创建折扣卷成功, 且关联用户id成功, 正在发送邮件通知客户。");
             }else{
+                tabCouponNew.setIsShopFlag(1);
+                insertCouponUsersAndSendMail(tabCouponNew, userList);
                 result.put("message", "创建折扣卷成功, 且关联用户id成功!");
             }
         }
@@ -192,9 +194,11 @@ public class TabCouponServiceImpl implements TabCouponService {
                 String json = JSONObject.fromObject(bean).toString();
                 SendMQ.sendCouponMsg(json, tabCouponNew.getWebsiteType());
             }
-            //异步发送邮件
-            Runnable task=new sendCouponMailTask(userList, tabCouponNew);
-            new Thread(task).start();
+            if(tabCouponNew.getIsShopFlag() == 0){
+                //异步发送邮件
+                Runnable task=new sendCouponMailTask(userList, tabCouponNew);
+                new Thread(task).start();
+            }
         } catch (Exception e) {
             throw new RuntimeException("mq发送失败");
         }

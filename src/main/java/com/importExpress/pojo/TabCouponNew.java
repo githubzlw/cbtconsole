@@ -57,6 +57,7 @@ public class TabCouponNew {
     private Integer site;//优惠卷所在网站
 
     private String siteStr;//优惠卷所在网站 中文
+	private int isShopFlag; // 是否是购物车营销优惠券标识
 
     public void setSite(Integer site) {
         this.site = site;

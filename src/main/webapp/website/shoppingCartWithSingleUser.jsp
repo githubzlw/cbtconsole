@@ -409,7 +409,8 @@
                         fromTime:fromTime,
                         toTime:toTime,
                         websiteType:websiteType,
-                        userids:userids
+                        userids:userids,
+                        isShopCar:1
                     },
                     dataType: "json",
                     success: function (msg) {
