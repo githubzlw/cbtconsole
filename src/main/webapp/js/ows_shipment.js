@@ -23,11 +23,11 @@ $(function(){
 				if(data.status == 200){
 					
 				}else{
-					alert(data.message);
+					$.MsgBox.Alert("提示", "添加运单号错误:"+data.message);
 				}
 			},
 			error:function(e){
-				alert("失败");
+				$.MsgBox.Alert("提示", "添加运单号失败");
 			}
 		})
 		
@@ -48,11 +48,11 @@ $(function(){
 				if(data.status == 200){
 					
 				}else{
-					alert(data.message);
+					$.MsgBox.Alert("提示", "出运错误:"+data.message);
 				}
 			},
 			error:function(e){
-				alert("失败");
+				$.MsgBox.Alert("提示", "出运失败");
 			}
 		})
 		
@@ -105,11 +105,11 @@ function clickCheck(){
 	    			  $(".btn-shipno").hide();
 	    		  }
 	    	  }else{
-	    		  alert(data.message);
+	    		  $.MsgBox.Alert("提示", "获取订单信息错误:"+data.message);
 	    	  }
 	       },
 	   	error:function(e){
-	   		alert("失败");
+	   		$.MsgBox.Alert("提示", "获取订单信息失败");
 	   	}
 	   })
 }

@@ -685,7 +685,7 @@ function saveInventory(){
 		 }
 	})
 	if(lu_pid==''||lu_name=='产品名称产品名称产品名称产品名称'){
-		alert("请输入产品ID后按enter键,页面正确显示产品名称后录入");
+		$.MsgBox.Alert("提示", "请输入产品ID后按enter键,页面正确显示产品名称后录入");
 		return ;
 	}
 	var remark = $("#lu_remark").val();
@@ -744,6 +744,10 @@ function saveTbInventory(){
 			reasonType = $(this).val();
 		}
 	})
+	if(varray==''){
+		$.MsgBox.Alert("提示", "请输入产品ID后按enter键,页面正确显示产品名称后录入");
+		return ;
+	}
 	var remark = $("#lu_tb_remark").val();
 	jQuery.ajax({
 		url:"/cbtconsole/inventory/input",
