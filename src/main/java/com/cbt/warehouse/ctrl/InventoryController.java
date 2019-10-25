@@ -1271,48 +1271,54 @@ public class InventoryController {
 			result.put("reason", "数据错误,未匹配库存或者未启动盘点");
 			return result;
 		}
-		
-		String strRecordId = request.getParameter("record_id");
-		strRecordId = StrUtils.isNum(strRecordId) ? strRecordId : "0";
-		
-		int recordId = Integer.parseInt(strRecordId);
-		
-		String strInventoryRemaining = request.getParameter("inventory_remaining");
-		strInventoryRemaining = StringUtil.isNotBlank(strInventoryRemaining) ? strInventoryRemaining.trim() : "0";
-		strInventoryRemaining = StrUtils.isNum(strInventoryRemaining) ? strInventoryRemaining.trim() : "0";
-		
-		String strCheckRemaining = request.getParameter("check_remaining");
-		strCheckRemaining = StringUtil.isNotBlank(strCheckRemaining) ? strCheckRemaining.trim() : "0";
-		strCheckRemaining = StrUtils.isNum(strCheckRemaining) ? strCheckRemaining : "0";
-		InventoryCheckRecord record = new InventoryCheckRecord();
-		record.setId(recordId);
-		String goodsPid = request.getParameter("goods_pid");
-		String goodsSku = request.getParameter("goods_sku");
-		String goodsSpecid = request.getParameter("goods_specid");
-		String goodsSkuid = request.getParameter("goods_skuid");
-		String goodsPrice = request.getParameter("goods_price");
-		String beforeBarcode = request.getParameter("before_barcode");
-		String afterBarcode = request.getParameter("after_barcode");
-		String goodsName = request.getParameter("goods_name");
-		record.setAfterBarcode(afterBarcode);
-		record.setBeforeBarcode(beforeBarcode);
-		record.setCheckRemaining(Integer.parseInt(strCheckRemaining));
-		record.setGoodsPid(goodsPid);
-		record.setGoodsPrice(goodsPrice);
-		record.setGoodsSku(goodsSku);
-		record.setGoodsSkuid(goodsSkuid);
-		record.setGoodsSpecid(goodsSpecid);
-		record.setInventorySkuId(Integer.parseInt(strInventoryId));
-		record.setInventoryCheckId(Integer.parseInt(strCheckId));
-		record.setInventoryRemaining(Integer.parseInt(strInventoryRemaining));
-		record.setGoodsName(goodsName);
-		if(recordId > 0) {
-			inventoryService.updateInventoryCheckRecord(record );
-		}else {
-			recordId = inventoryService.insertInventoryCheckRecord(record);
+		try {
+			String strRecordId = request.getParameter("record_id");
+			strRecordId = StrUtils.isNum(strRecordId) ? strRecordId : "0";
+			
+			int recordId = Integer.parseInt(strRecordId);
+			
+			String strInventoryRemaining = request.getParameter("inventory_remaining");
+			strInventoryRemaining = StringUtil.isNotBlank(strInventoryRemaining) ? strInventoryRemaining.trim() : "0";
+			strInventoryRemaining = StrUtils.isNum(strInventoryRemaining) ? strInventoryRemaining.trim() : "0";
+			
+			String strCheckRemaining = request.getParameter("check_remaining");
+			strCheckRemaining = StringUtil.isNotBlank(strCheckRemaining) ? strCheckRemaining.trim() : "0";
+			strCheckRemaining = StrUtils.isNum(strCheckRemaining) ? strCheckRemaining : "0";
+			InventoryCheckRecord record = new InventoryCheckRecord();
+			record.setId(recordId);
+			String goodsPid = request.getParameter("goods_pid");
+			String goodsSku = request.getParameter("goods_sku");
+			String goodsSpecid = request.getParameter("goods_specid");
+			String goodsSkuid = request.getParameter("goods_skuid");
+			String goodsPrice = request.getParameter("goods_price");
+			String beforeBarcode = request.getParameter("before_barcode");
+			String afterBarcode = request.getParameter("after_barcode");
+			String goodsName = request.getParameter("goods_name");
+			record.setAfterBarcode(afterBarcode);
+			record.setBeforeBarcode(beforeBarcode);
+			record.setCheckRemaining(Integer.parseInt(strCheckRemaining));
+			record.setGoodsPid(goodsPid);
+			record.setGoodsPrice(goodsPrice);
+			record.setGoodsSku(goodsSku);
+			record.setGoodsSkuid(goodsSkuid);
+			record.setGoodsSpecid(goodsSpecid);
+			record.setInventorySkuId(Integer.parseInt(strInventoryId));
+			record.setInventoryCheckId(Integer.parseInt(strCheckId));
+			record.setInventoryRemaining(Integer.parseInt(strInventoryRemaining));
+			record.setGoodsName(goodsName);
+			if(recordId > 0) {
+				inventoryService.updateInventoryCheckRecord(record );
+			}else {
+				recordId = inventoryService.insertInventoryCheckRecord(record);
+			}
+			result.put("recordId", recordId);
+			result.put("status", 200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("reson", "发生错误");
+			result.put("status", 103);
 		}
-		result.put("recordId", recordId);
-		result.put("status", 200);
+		
 		return result;
 	}
 	

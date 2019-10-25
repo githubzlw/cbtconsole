@@ -723,7 +723,7 @@ function addcheck(){
  var before_barcode = $("#index_check_barcode_b").val();
  var after_barcode = $("#index_check_barcode").val();
  var goods_price = $("#index_check_goods_price").val();
- var record_id = $("#index_check_record_id").val();
+ var record_id = $("#index_check_q_record_id").val();
  var index_c = $("#index_check_index").val();
  var goods_name = $("#index_check_igoodsname").text().trim();
  if(index_iremaining != index_icanremaining){
