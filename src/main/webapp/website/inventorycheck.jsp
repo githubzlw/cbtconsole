@@ -274,7 +274,7 @@ em,i{font-style: normal;}
 						 <em class="barcode_code">${tory.barcode}</em>
 						<em class="datagrid-cell-c2-canRemaining" style="display:none;">${tory.canRemaining}</em>
 						<input value="${tory.barcode}" class="q_in_barcode_h" type="hidden">
-						<input value="0" class="q_record_id" type="hidden">
+						<input value="${tory.checkId}" class="q_record_id" type="hidden">
 						<input value="${tory.inventorySkuId}" class="q_inventory_id" type="hidden">
 						<input value="${tory.barcode}" class="q_in_barcode" readonly="readonly" type="hidden" onchange="updateCheckRecord(${index.index})"></td>
 						<td>
