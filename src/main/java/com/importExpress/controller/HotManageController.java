@@ -202,9 +202,10 @@ public class HotManageController {
 
         String show_img = request.getParameter("show_img");
         if (StringUtils.isBlank(show_img)) {
-            json.setOk(false);
+            show_img = "";
+            /*json.setOk(false);
             json.setMessage("获取显示图片链接失败");
-            return json;
+            return json;*/
         }
 
         String view_more_url = request.getParameter("view_more_url");
@@ -315,9 +316,10 @@ public class HotManageController {
 
         String show_img = request.getParameter("show_img");
         if (StringUtils.isBlank(show_img)) {
-            json.setOk(false);
+            show_img = "";
+            /*json.setOk(false);
             json.setMessage("获取显示图片链接失败");
-            return json;
+            return json;*/
         }
 
 
