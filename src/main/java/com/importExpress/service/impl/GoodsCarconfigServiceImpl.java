@@ -6,6 +6,7 @@ import com.importExpress.mapper.GoodsCarconfigMapper;
 import com.importExpress.pojo.GoodsCarconfig;
 import com.importExpress.pojo.GoodsCarconfigExample;
 import com.importExpress.pojo.GoodsCarconfigWithBLOBs;
+import com.importExpress.pojo.ShopCarNewBean;
 import com.importExpress.service.GoodsCarconfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -121,6 +122,11 @@ public class GoodsCarconfigServiceImpl implements GoodsCarconfigService {
     public boolean updateGoodsCarConfig(GoodsCarconfigWithBLOBs record) {
         //更新线上
         return carConfigDao.updateGoodsCarConfig(record);
+    }
+
+    @Override
+    public ShopCarNewBean queryShopCarNewBeanByUserId(int userId) {
+        return goodsCarconfigMapper.queryShopCarNewBeanByUserId(userId);
     }
 
 
