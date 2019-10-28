@@ -96,8 +96,14 @@ public class LevelPageController {
 	 */
 	@RequestMapping(value="/refresh",method = {RequestMethod.POST,RequestMethod.GET})
 	@ResponseBody
-	public String refresh(){
+	public String refresh(HttpServletRequest req, HttpServletResponse resp){
+		String site = req.getParameter("site");
 		String url  = "https://www.import-express.com/app/rlevel";
+		if("kids".equals(site)) {
+			url  = "https://www.kidsproductwholesale.com/app/rlevel";
+		}else if("pets".equals(site)) {
+			url  = "https://www.lovelypetsupply.com/app/rlevel";
+		}
 		DownloadMain.getContentClient(url, null);
 		return "刷新成功";
 	}

@@ -3,6 +3,8 @@ package com.cbt.util;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.Syncdatainfo;
 import com.cbt.warehouse.service.SyncdatainfoService;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,7 +42,6 @@ public class SqlErrorUtil {
 			//本地链接
 			Connection conn = DBHelper.getInstance().getConnection();
 			//远程链接
-			Connection conn1 = DBHelper.getInstance().getConnection2();
 			PreparedStatement stmt = null;
 			PreparedStatement stmt1 = null;
 			int result = 0;
@@ -69,8 +70,7 @@ public class SqlErrorUtil {
 				}
 				//重试远程
 				if (flag == 2) {
-					stmt1=conn1.prepareStatement(sql);
-					result=stmt1.executeUpdate();
+					result= Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(sql)));
 					loopNum -= 1;
 					//sql重试结果小于0和循环次数大于0的情况下继续重试
 					if (result > 0) {
@@ -102,7 +102,6 @@ public class SqlErrorUtil {
 				DBHelper.getInstance().closePreparedStatement(stmt);
 				DBHelper.getInstance().closePreparedStatement(stmt1);
 				DBHelper.getInstance().closeConnection(conn);
-				DBHelper.getInstance().closeConnection(conn1);
 			}
 		}
 		return 0;

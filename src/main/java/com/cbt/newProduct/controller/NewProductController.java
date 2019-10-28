@@ -48,7 +48,7 @@ public class NewProductController {
 	    purl = purl.contains("?")?purl.substring(0, purl.indexOf("?")):purl;
 	    int ret = 2;
 	    try{
-		    SendMQ sendMQ = new SendMQ();
+
 			//判断是否重复插入
 			if(newProductService.checkUrl(purl)==0){
 				NewProduct bean  = new NewProduct();
@@ -64,7 +64,7 @@ public class NewProductController {
 				DataSourceSelector.set("dataSource127hop");
 				if(newProductService.checkUrl(purl)==0){
 					if(bean!=null){
-						sendMQ.sendMsg(new RunSqlModel("insert  into new_product_data (cid,category,goods_pid,goods_name,goods_price,goods_img,goods_url,goods_sold,goods_morder   " +
+						SendMQ.sendMsg(new RunSqlModel("insert  into new_product_data (cid,category,goods_pid,goods_name,goods_price,goods_img,goods_url,goods_sold,goods_morder   " +
 								",goods_free,goods_price_unit,goods_unit,createtime) values('"+bean.getCid()+"','"+bean.getCategory()+"','"+bean.getGoods_pid()+"','"+bean.getGoods_name()+"' " +
 								",'"+bean.getGoods_price()+"' ,'"+bean.getGoods_img()+"' ,'"+bean.getGoods_url()+"' ,'"+bean.getGoods_sold()+"' ,'"+bean.getGoods_morder()+"'   " +
 								" ,'"+bean.getGoods_free()+"' ,'"+bean.getGoods_price_unit()+"' ,'"+bean.getGoods_unit()+"' ,'"+bean.getCreatetime()+"')"));
@@ -72,7 +72,7 @@ public class NewProductController {
 					}
 				}
 			}
-		    sendMQ.closeConn();
+
 		}catch (Exception e){
 	    	e.printStackTrace();
 		}finally {
@@ -128,7 +128,7 @@ public class NewProductController {
         List<NewProduct>  list = new ArrayList<NewProduct>();
 		int ret = 0;
         try{
-	        SendMQ sendMQ = new SendMQ();
+
 			for(String  purl:urls){
 				purl = purl.contains("?")?purl.substring(0, purl.indexOf("?")):purl;
 				//判断是否重复插入
@@ -152,14 +152,14 @@ public class NewProductController {
 			DataSourceSelector.set("dataSource127hop");
 			for(NewProduct bean:list){
 				if(newProductService.checkUrl(bean.getGoods_url())==0){
-					sendMQ.sendMsg(new RunSqlModel("insert  into new_product_data (cid,category,goods_pid,goods_name,goods_price,goods_img,goods_url,goods_sold,goods_morder   " +
+					SendMQ.sendMsg(new RunSqlModel("insert  into new_product_data (cid,category,goods_pid,goods_name,goods_price,goods_img,goods_url,goods_sold,goods_morder   " +
 							",goods_free,goods_price_unit,goods_unit,createtime) values('"+bean.getCid()+"','"+bean.getCategory()+"','"+bean.getGoods_pid()+"','"+bean.getGoods_name()+"' " +
 							",'"+bean.getGoods_price()+"' ,'"+bean.getGoods_img()+"' ,'"+bean.getGoods_url()+"' ,'"+bean.getGoods_sold()+"' ,'"+bean.getGoods_morder()+"'   " +
 							" ,'"+bean.getGoods_free()+"' ,'"+bean.getGoods_price_unit()+"' ,'"+bean.getGoods_unit()+"' ,'"+bean.getCreatetime()+"')"));
 					ret+=1;
 				}
 			}
-	        sendMQ.closeConn();
+
 		}catch (Exception e){
         	e.printStackTrace();
 		}finally {
@@ -199,11 +199,11 @@ public class NewProductController {
 	public  String  down(HttpServletRequest request, HttpServletResponse response){
 		int ret=0;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			String pid = request.getParameter("pid");
 			ret = newProductService.down(pid);
-			sendMQ.sendMsg(new RunSqlModel("update  new_product_data  set  goods_flag = 2  where  goods_pid = '"+pid+"'"));
-			sendMQ.closeConn();
+			SendMQ.sendMsg(new RunSqlModel("update  new_product_data  set  goods_flag = 2  where  goods_pid = '"+pid+"'"));
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}

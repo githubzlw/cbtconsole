@@ -2271,11 +2271,11 @@ public class EditorController {
             int index = customGoodsService.updateReviewRemark(paramMap);
             if (index > 0) {
                 //插入数据到线上
-                SendMQ sendMQ = new SendMQ();
+
 //                String sql = "update goods_review set review_remark='" + edit_remark + "',country='" + editcountry + "',review_score='" + edit_score + "',review_flag='" + update_flag + "',updatetime=now() where goods_pid='" + goods_pid + "' and createtime='" + oldCreateTime + "'";
                 String sql = "update goods_review set review_remark='" + edit_remark + "',country='" + editcountry + "',review_score='" + edit_score + "',review_flag='" + update_flag + "',updatetime=now() where id='" + id + "';";
-                sendMQ.sendMsg(new RunSqlModel(sql));
-                sendMQ.closeConn();
+                SendMQ.sendMsg(new RunSqlModel(sql));
+
             }
             json.setOk(index > 0 ? true : false);
             json.setMessage(index > 0 ? "修改成功" : "修改失败");
@@ -2321,10 +2321,10 @@ public class EditorController {
             int index = customGoodsService.addReviewRemark(paramMap);
             if (index > 0) {
                 //插入数据到线上
-                SendMQ sendMQ = new SendMQ();
+
                 String sql = "insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('" + goods_pid + "','" + country + "','" + adm.getAdmName() + "','" + createTime + "','" + SendMQ.repCha(review_remark) + "','" + review_score + "')";
-                sendMQ.sendMsg(new RunSqlModel(sql));
-                sendMQ.closeConn();
+                SendMQ.sendMsg(new RunSqlModel(sql));
+
             }
             json.setOk(index > 0 ? true : false);
             json.setMessage("线上产品单页对应评论数据已增加, 后台对应新增评论10分钟后会显示. ");
@@ -2836,7 +2836,7 @@ public class EditorController {
 
         try {
             CustomGoodsBean goods = hotGoodsService.queryFor1688Goods(goodsPid);
-            SendMQ sendMQ = new SendMQ();
+
             // 校检存在的goodsPid数据
             boolean isExists = hotGoodsService.checkExistsGoods(categoryId, goodsPid);
             if (isExists) {
@@ -2869,7 +2869,7 @@ public class EditorController {
                 if (showName.contains("\"")) {
                     showName = showName.replace("\"", "\\\"");
                 }
-                sendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
+                SendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
                         "goods_url,goods_img,goods_price,is_on,profit_margin,selling_price,wholesale_price_1,wholesale_price_2," +
                         "wholesale_price_3,wholesale_price_4,wholesale_price_5,create_admid,amazon_price,asin_code) values(" + hsGoods.getHotSellingId() + "," + hsGoods.getGoodsPid() + "," +
                         "'" + showName + "'," +
@@ -2878,7 +2878,7 @@ public class EditorController {
                         "'" + hsGoods.getWholesalePrice_3() + "','" + hsGoods.getWholesalePrice_4() + "','" + hsGoods.getWholesalePrice_5() + "'," +
                         "'" + hsGoods.getCreateAdmid() + "','" + hsGoods.getAmazonPrice() + "','" + hsGoods.getAsinCode() + "')"));
 
-                sendMQ.closeConn();
+
             }
 
         } catch (Exception e) {

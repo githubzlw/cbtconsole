@@ -3,6 +3,8 @@ package com.cbt.customer.dao;
 import com.cbt.bean.GuestBookBean;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -197,9 +199,10 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 				}
 		        sql+=",g.create_time,g.reply_content,"
 				+ "g.reply_time,g.status,ifnull(u.email,'') useremail ,ifnull(u.businessName,'') as bname ,"
-				+ "ifnull(ad.admName ,'')  admName ,ifnull(er.id,'0')eid,g.online_url from guestbook  g left join user  u  on  g.user_id=u.id "
+//				+ "ifnull(ad.admName ,'')  admName ,ifnull(er.id,'0')eid,g.online_url from guestbook  g left join user  u  on  g.user_id=u.id "
+						+ "ifnull(au.admName ,'')  admName ,ifnull(er.id,'0')eid,g.online_url from guestbook  g left join user  u  on  g.user_id=u.id "
 				+ "left join admin_r_user  au ON  u.id=au.userid "
-				+ "LEFT JOIN admuser ad ON au.adminid=ad.id "
+//				+ "LEFT JOIN admuser ad ON au.adminid=ad.id "
 				+ " left join email_receive er  on er.question_id=g.id)m "
 				+ "left join (select question_id,max(id) eid from email_receive order by question_id)n on m.id=n.question_id where 1=1";
 
@@ -349,7 +352,6 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 		PreparedStatement stmt = null;
 		int result = 0;
 		conn = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		ResultSet rs=null;
 		try {
 			sql="select reply_content from guestbook where id=?";
@@ -369,12 +371,17 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 			result = stmt.executeUpdate();
 			//将评论更新到aws库中以便回复在产品单页展示  王宏杰 2018-04-27
 			sql = "update guestbook set reply_content=?,reply_time=?,status=? where status=0 and id=? ";
-			stmt = conn2.prepareStatement(sql);
-			stmt.setString(1, replyContent);
-			stmt.setString(2, date);
-			stmt.setInt(3, 1);// 状态改为已回复
-			stmt.setInt(4, id);
-			stmt.executeUpdate();
+
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(replyContent);
+			lstValues.add(date);
+			lstValues.add("1");
+			lstValues.add(String.valueOf(id));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -386,7 +393,6 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 		return result;
 	}

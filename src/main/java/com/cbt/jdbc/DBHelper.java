@@ -8,12 +8,16 @@ package com.cbt.jdbc;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,7 +30,6 @@ public class DBHelper {
     private static ComboPooledDataSource dataSource = null;
     private static ComboPooledDataSource dataSource2 = null;
     private static ComboPooledDataSource dataSource3 = null;
-    private static ComboPooledDataSource dataSource4 = null;
     /***
      *dataSource28alidata
      */
@@ -47,7 +50,6 @@ public class DBHelper {
     private static AtomicInteger totalConnect1  = new AtomicInteger();
     private static AtomicInteger totalConnect2  = new AtomicInteger();
     private static AtomicInteger totalConnect3  = new AtomicInteger();
-    private static AtomicInteger totalConnect4 = new AtomicInteger();
     private static AtomicInteger totalConnect5 = new AtomicInteger();
     private static AtomicInteger totalConnect6 = new AtomicInteger();
     private static AtomicInteger totalConnect7 = new AtomicInteger();
@@ -83,8 +85,6 @@ public class DBHelper {
                 initDataSource2(p);
 
                 initDataSource3(p);
-
-                initDataSource4(p);
 
                 initDataSource5(p);
 
@@ -176,25 +176,6 @@ public class DBHelper {
         logger.info("初始化数据库3完成");
     }
 
-    /**
-     * connection_28_alidata
-     * @param p
-     * @throws PropertyVetoException
-     */
-    private void initDataSource4(Properties p) throws PropertyVetoException {
-        dataSource4 = new ComboPooledDataSource();
-        dataSource4.setUser(p.getProperty("jdbc.userName28hop"));
-        dataSource4.setPassword(p.getProperty("jdbc.userPass28hop"));
-        dataSource4.setJdbcUrl(p.getProperty("jdbc.url28hop"));
-        dataSource4.setDriverClass(p.getProperty("driver"));
-        dataSource4.setInitialPoolSize(20);
-        dataSource4.setMinPoolSize(10);
-        dataSource4.setMaxPoolSize(100);
-        dataSource4.setMaxStatements(50);
-        dataSource4.setMaxIdleTime(60);
-
-        logger.info("初始化数据库4完成");
-    }
 
     private void initDataSource5(Properties p) throws PropertyVetoException {
         dataSource5 = new ComboPooledDataSource();
@@ -327,21 +308,6 @@ public class DBHelper {
         return conn;
     }
 
-    /**
-     * connection 28_alidata
-     * @return
-     */
-    public synchronized final Connection getConnection4() {
-        Connection conn;
-        try {
-            conn = dataSource4.getConnection();
-            logger.info("取得数据库连接+1 (#4),连接数：" + totalConnect4.incrementAndGet() + ",返回总数/获取总数：" + totalDisConnectNum + "/" + totalConnectNum.incrementAndGet());
-        } catch (SQLException e) {
-            logger.error("getConnection4",e);
-            throw new RuntimeException("getConnection4 ERROR");
-        }
-        return conn;
-    }
 
     /**
      * connection 28_alidata
@@ -458,6 +424,30 @@ public class DBHelper {
         } catch (SQLException e) {
             logger.error("closeStatement",e);
         }
+    }
+
+    public static String covertToSQL(String prepareSQL, List<String> lstValues){
+        if(StringUtils.isNotBlank(prepareSQL) && lstValues != null){
+            String replaceSQL = prepareSQL.replace("?", "'%s'");
+            return String.format(replaceSQL, lstValues.toArray(new String[lstValues.size()]));
+        }else{
+            throw new IllegalArgumentException("input parameters is invalid");
+        }
+    }
+
+    public static void  main(String[] args){
+        System.out.println(String.format("Hi,%s", "王力"));
+        String replaceSQL = "abc %s,%s";
+        List<String> lstValues = new ArrayList<>();
+        lstValues.add("1");
+        lstValues.add("2");
+        String[] lst = new String[2];
+        lst[0] = "11";
+        lst[1] = "22";
+        String result = String.format(replaceSQL, lst);
+        System.out.println(result);
+        Object[] x = lstValues.toArray();
+        System.out.println(x);
     }
 
 }

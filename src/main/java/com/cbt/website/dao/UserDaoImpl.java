@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.cbt.jdbc.DBHelper;
@@ -711,7 +714,7 @@ public class UserDaoImpl implements UserDao {
                 + "FROM DUAL WHERE NOT EXISTS (SELECT * FROM admin_r_user WHERE userid="+(userid == 0 ? "ifnull((select id from user where email='"+email+"'),0)" : userid)+" and useremail='"+email+"' and adminid="+adminid+")";
         Connection conn = DBHelper.getInstance().getConnection();
         // 分配销售 同时更改线上
-        Connection conn2 = DBHelper.getInstance().getConnection2();
+        // Connection conn2 = DBHelper.getInstance().getConnection2();
         int res = 0;
         int res2 = 0;
         PreparedStatement stmt = null;
@@ -733,9 +736,10 @@ public class UserDaoImpl implements UserDao {
                     oneSql = "delete from admin_r_user where userid=" + userid;
                     SaveSyncTable.InsertOnlineDataInfo(userid, "", "分配销售", "admin_r_user", oneSql);
                 } else{
-                    pst1 = conn2.prepareStatement(Dsql);
+                    /*pst1 = conn2.prepareStatement(Dsql);
                     pst1.setInt(1, userid);
-                    pst1.execute();
+                    pst1.execute();*/
+                    SendMQ.sendMsg(new RunSqlModel(Dsql));
                 }
             } else if (email != null && !email.equals("")) {
                 Dsql = "delete from admin_r_user where useremail=?";
@@ -749,9 +753,10 @@ public class UserDaoImpl implements UserDao {
                     oneSql = "delete from admin_r_user where useremail='" + email + "'";
                     SaveSyncTable.InsertOnlineDataInfo(userid, "", "分配销售", "admin_r_user", oneSql);
                 } else{
-                    pst1 = conn2.prepareStatement(Dsql);
+                    /*pst1 = conn2.prepareStatement(Dsql);
                     pst1.setString(1, email);
-                    pst1.execute();
+                    pst1.execute();*/
+                    SendMQ.sendMsg(new RunSqlModel(Dsql));
                 }
             }
             // stmt = conn.prepareStatement(Dsql);
@@ -759,20 +764,26 @@ public class UserDaoImpl implements UserDao {
             // stmt.setInt(2, userid);
             // stmt.execute();
             stmt = conn.prepareStatement(Isql);
-            pst = conn2.prepareStatement(Isql);
+            // pst = conn2.prepareStatement(Isql);
 
             String secondSql = "";
 
+            List<String> listValues = new ArrayList<>();
             if (userid == 0) {
                 stmt.setString(1, email);
-                pst.setString(1, email);
+                // pst.setString(1, email);
+
+                listValues.add(String.valueOf(email));
+
                 secondSql = "insert into admin_r_user(userid,username,useremail,adminid,createdate,admName) "
                         + "select ifnull((select id from user where email='" + email + "'),0),'" + userName + "','"
                         + email + "'," + adminid + ",now()" + ",'" + admName + "' "
                         + "FROM DUAL WHERE NOT EXISTS (SELECT * FROM admin_r_user WHERE userid=ifnull((select id from user where email='" + email + "'),0) and useremail='"+email+"' and adminid="+adminid+")";
             } else {
                 stmt.setInt(1, userid);
-                pst.setInt(1, userid);
+                // pst.setInt(1, userid);
+                listValues.add(String.valueOf(userid));
+
                 secondSql = "insert into admin_r_user(userid,username,useremail,adminid,createdate,admName) "
                         + "select " + userid + ",'" + userName + "','" + email + "'," + adminid + ",now()" + ",'"
                         + admName + "' "
@@ -786,16 +797,28 @@ public class UserDaoImpl implements UserDao {
             stmt.executeUpdate();
             res = 1;
 
-            pst.setString(2, userName);
+            /*pst.setString(2, userName);
             pst.setString(3, email);
             pst.setInt(4, adminid);
-            pst.setString(5, admName);
+            pst.setString(5, admName);*/
+
+            listValues.add(String.valueOf(userName));
+            listValues.add(String.valueOf(email));
+            listValues.add(String.valueOf(adminid));
+            listValues.add(String.valueOf(admName));
             
             // 判断是否开启线下同步线上配置
             if (GetConfigureInfo.openSync()) {
                 SaveSyncTable.InsertOnlineDataInfo(userid, "", "分配销售", "admin_r_user", secondSql);
             } else{
-                res2 = pst.executeUpdate();
+                // res2 = pst.executeUpdate();
+                String runSql = DBHelper.covertToSQL(Isql, listValues);
+				String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+				int countRs = 0;
+				if(StringUtils.isBlank(rsStr)){
+					countRs = Integer.valueOf(rsStr);
+				}
+				res2 =countRs;
             }
 
         } catch (Exception e) {
@@ -830,7 +853,7 @@ public class UserDaoImpl implements UserDao {
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
-            DBHelper.getInstance().closeConnection(conn2);
+            // DBHelper.getInstance().closeConnection(conn2);
         }
 
         return res;
@@ -841,7 +864,7 @@ public class UserDaoImpl implements UserDao {
             String admName) {
         String sql = "insert into admin_r_user_log(id,userid,username,useremail,adminid,createdate,updatedate,updateadmin,admName) (select admin_r_user.id,userid,username,useremail,adminid,createdate,now(),?,admName from admin_r_user where  (useremail!='' and  useremail=?)  or ( userid=?  and userid<>0))";
         Connection conn = DBHelper.getInstance().getConnection();
-        Connection conn2 = DBHelper.getInstance().getConnection2();
+        // Connection conn2 = DBHelper.getInstance().getConnection2();
         PreparedStatement stmt = null;
         PreparedStatement ps = null;
         try {
@@ -851,11 +874,19 @@ public class UserDaoImpl implements UserDao {
             stmt.setInt(3, userid);
             stmt.executeUpdate();
 
-            ps = conn2.prepareStatement(sql);
+           /* ps = conn2.prepareStatement(sql);
             ps.setString(1, users);
             ps.setString(2, email);
             ps.setInt(3, userid);
-            ps.executeUpdate();
+            ps.executeUpdate();*/
+
+            List<String> listValues = new ArrayList<>();
+            listValues.add(String.valueOf(users));
+            listValues.add(String.valueOf(email));
+            listValues.add(String.valueOf(userid));
+            String runSql = DBHelper.covertToSQL(sql, listValues);
+            SendMQ.sendMsg(new RunSqlModel(runSql));
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -874,7 +905,7 @@ public class UserDaoImpl implements UserDao {
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
-            DBHelper.getInstance().closeConnection(conn2);
+            // DBHelper.getInstance().closeConnection(conn2);
         }
     }
 
@@ -924,7 +955,7 @@ public class UserDaoImpl implements UserDao {
                 
                 
             } else{
-                stmt = conn.prepareStatement(sql);
+                /*stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, userid);
                 stmt.setFloat(2, available);
                 stmt.setInt(3, type);
@@ -937,13 +968,48 @@ public class UserDaoImpl implements UserDao {
                 stmt.setString(6, modifyuser);
                 stmt.setInt(7, usersign);
                 stmt.setDouble(8, available_m);
-                res = stmt.executeUpdate();
+                res = stmt.executeUpdate();*/
+
+                List<String> listValues = new ArrayList<>();
+				listValues.add(String.valueOf(userid));
+				listValues.add(String.valueOf(available));
+				listValues.add(String.valueOf(type));
+				if (usersign == 0) {
+				    listValues.add(String.valueOf("add:" + remark));
+                } else {
+				    listValues.add(String.valueOf("deduction:" + remark));
+                }
+                listValues.add(String.valueOf(remarkId));
+				listValues.add(String.valueOf(modifyuser));
+				listValues.add(String.valueOf(usersign));
+				listValues.add(String.valueOf(available_m));
+
+				String runSql = DBHelper.covertToSQL(sql, listValues);
+				String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+				int countRs = 0;
+				if(StringUtils.isNotBlank(rsStr)){
+					countRs = Integer.parseInt(rsStr);
+				}
+				res = countRs;
                 
-                stmt1 = conn.prepareStatement(sql1);
+                /*stmt1 = conn.prepareStatement(sql1);
                 stmt1.setFloat(1, available);
                 stmt1.setFloat(2, order_ac);
                 stmt1.setInt(3, userid);
-                res1 = stmt1.executeUpdate();
+                res1 = stmt1.executeUpdate();*/
+
+                listValues.clear();
+                listValues.add(String.valueOf(available));
+				listValues.add(String.valueOf(order_ac));
+				listValues.add(String.valueOf(userid));
+
+				runSql = DBHelper.covertToSQL(sql1, listValues);
+				rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+				countRs = 0;
+				if(StringUtils.isNotBlank(rsStr)){
+					countRs = Integer.parseInt(rsStr);
+				}
+				res1 = countRs;
             }    
             
         } catch (Exception e) {

@@ -66,9 +66,9 @@ function mhide(){
 	$("#catid").val('0');
 	$(".main1").hide();
 }
-function fnre(){
+function fnre(site){
 	 $.post("/cbtconsole/level/refresh",
-				{},
+				{'site':site},
 				function(res){
 					alert(msg);
 				});
@@ -226,7 +226,9 @@ color: #fff;
 <body>
 <div class="main" align="center"><div class="tabletitle">关键词二级页面管理</div></div>
 <input type="button" value="新增" onclick="fnrefresh(0,0)" class="mailibtn"  style="margin-left: -961px;">
-<input type="button" id="bt-query" class="mailibtn"  value="刷新" onclick="fnre()">
+<input type="button" id="bt-query" class="mailibtn"  value="刷新Import" onclick="fnre('import')">
+<input type="button" id="bt-query" class="mailibtn"  value="刷新Kids" onclick="fnre('kids')">
+<input type="button" id="bt-query" class="mailibtn"  value="刷新Pets" onclick="fnre('pets')">
 	   
 	<div class="main" align="center">
 		<table class="table table-bordered  table-hover definewidth m10" style="table-layout: fixed;word-wrap:break-word;">

@@ -430,7 +430,7 @@ public class UserController {
     public String upPhone(HttpServletRequest request, String oldPhone, String newPhone, int userid) throws ParseException {
         int res = 0;
         try{
-            SendMQ sendMQ = new SendMQ();
+
             DataSourceSelector.set("dataSource127hop");
             String admJson = Redis.hget(request.getSession().getId(), "admuser");
             if (admJson == null) {
@@ -440,12 +440,12 @@ public class UserController {
             int admuserid = user.getId();
             String exitEmail = userInfoService.exitPhone(oldPhone, userid);
             if (exitEmail == null) {
-                sendMQ.sendMsg(new RunSqlModel("insert into user_ex (userid,otherphone) values('"+userid+"','"+newPhone+"')"));
+                SendMQ.sendMsg(new RunSqlModel("insert into user_ex (userid,otherphone) values('"+userid+"','"+newPhone+"')"));
             } else {
-                sendMQ.sendMsg(new RunSqlModel("update user_ex set otherphone='"+newPhone+"' where userid='"+userid+"'"));
+                SendMQ.sendMsg(new RunSqlModel("update user_ex set otherphone='"+newPhone+"' where userid='"+userid+"'"));
             }
             res=1;
-            sendMQ.closeConn();
+
         }catch (Exception e){
             e.printStackTrace();
         }finally {

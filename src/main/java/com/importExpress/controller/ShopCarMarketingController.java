@@ -416,9 +416,9 @@ public class ShopCarMarketingController {
 
                         if(activeList.size() > 0){
                             jsonObject.put("json",com.alibaba.fastjson.JSON.toJSONString(activeList));
-                            SendMQ sendMQ = new SendMQ();
-                            sendMQ.sendMsg(jsonObject, Integer.valueOf(websiteType) - 1);
-                            sendMQ.closeConn();
+
+                            SendMQ.sendMsg(jsonObject, Integer.valueOf(websiteType) - 1);
+
                         }
 
                     }catch (Exception e){
@@ -433,11 +433,11 @@ public class ShopCarMarketingController {
                     if (isSuccess) {
                         // 2.清空redis数据 使用MQ清空购物车数据 redis示例
                         try {
-                            SendMQ sendMQ = new SendMQ();
+
                             RedisModel redisModel = new RedisModel(new String[]{userIdStr});
                             redisModel.setType("3");
-                            sendMQ.sendMsg(redisModel);
-                            sendMQ.closeConn();
+                            SendMQ.sendMsg(redisModel);
+
                         } catch (Exception e) {
                             logger.error(" SendMQ error:{}",e);
                             e.printStackTrace();
@@ -673,15 +673,15 @@ public class ShopCarMarketingController {
                 dateTime = dateTime.minusHours(8);
                 String deadline = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-                SendMQ sendMQ = new SendMQ();
+
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("type", "5");
                 jsonObject.put("userid", userId);
                 jsonObject.put("uuid", followCode);
                 // 失效时间3周
                 jsonObject.put("timeout", 3 * 7 * 24 * 60 * 60);
-                sendMQ.sendMsg(jsonObject, websiteType -1);
-                sendMQ.closeConn();
+                SendMQ.sendMsg(jsonObject, websiteType -1);
+
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.error("userId:" + userId + ",更新redis的跟踪码信息 SendMQ error:", e);
@@ -1790,9 +1790,9 @@ public class ShopCarMarketingController {
 
                     if (activeList.size() > 0) {
                         jsonObject.put("json", com.alibaba.fastjson.JSON.toJSONString(activeList));
-                        SendMQ sendMQ = new SendMQ();
-                        sendMQ.sendMsg(jsonObject, "2".equals(websiteType) ? 1 : 0);
-                        sendMQ.closeConn();
+
+                        SendMQ.sendMsg(jsonObject, "2".equals(websiteType) ? 1 : 0);
+
                     }
                     json.setOk(true);
                     json.setMessage("更新成功");

@@ -30,10 +30,10 @@ public class SendMQServiceImpl implements SendMQService {
 		// 在27上面保存通过mq更新线上数据的记录
         String insertSqlLog = "INSERT INTO `alidata`.`mq_update_log` (`pid`, `message`, `createtime`) VALUES (?, ?, NOW())";
 		PreparedStatement stmt = null;
-		SendMQ sendMQ = null;
+
 		try {
 			//创建mq工具 用于同步线上数据
-			sendMQ = new SendMQ();
+
 			RunSqlModel model= new RunSqlModel(sql);
 			//保存记录
 			stmt = conn.prepareStatement(insertSqlLog);
@@ -41,7 +41,7 @@ public class SendMQServiceImpl implements SendMQService {
             stmt.setString(2, JSONObject.fromObject(model).toString());
             stmt.executeUpdate();
             //发送mq消息
-            sendMQ.sendMsg(model);	
+            SendMQ.sendMsg(model);
             return 1;
 		} catch (Exception e) {
 			e.getStackTrace();
@@ -54,15 +54,7 @@ public class SendMQServiceImpl implements SendMQService {
 					e.printStackTrace();
 				}
 			}
-			if (sendMQ != null) {
-				try {
-					sendMQ.closeConn();
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println("GoodsSoldUnsellableReasonJob error:" + e.getMessage());
-					LOG.error("GoodsSoldUnsellableReasonJob error:", e);
-				}
-			}
+
 			DBHelper.getInstance().closeConnection(conn);
 		}
 		return 0;

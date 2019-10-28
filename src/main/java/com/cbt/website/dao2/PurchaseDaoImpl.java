@@ -31,6 +31,7 @@ import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.thread.PurchaseThred;
+import com.google.common.collect.Lists;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -102,11 +103,11 @@ public class PurchaseDaoImpl implements PurchaseDao {
 	public String getAliPid(String goods_pid) {
 		StringBuilder sb=new StringBuilder();
 		String sql = "select goods_pid,shop_id from ali_info_data where 1688_pid='"+goods_pid+"' limit 1";
-		Connection conn = DBHelper.getInstance().getConnection4();
+		Connection connection5 = DBHelper.getInstance().getConnection5();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
+			stmt = connection5.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			while (rs.next()) {
 				sb.append(rs.getString("goods_pid")).append("&").append(rs.getString("shop_id"));
@@ -124,7 +125,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 			}catch(Exception e){
 				e.printStackTrace();
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeConnection(connection5);
 		}
 		return sb.toString();
 	}
@@ -1194,13 +1195,19 @@ public class PurchaseDaoImpl implements PurchaseDao {
 							if (GetConfigureInfo.openSync()) {
 								SaveSyncTable.InsertOnlineDataInfo(userid,orderNo, "替换", "order_details","update order_details set car_url ='"+ resource+ "'  where	 orderid='"+ orderNo + "' and goodsid = "+ goodid);
 							} else {
-								Connection conn2 = DBHelper.getInstance().getConnection2();
+								List<String> lstValues = Lists.newArrayList();
+								lstValues.add(resource);
+								lstValues.add(orderNo);
+								lstValues.add(String.valueOf(goodid));
+								String runSql = DBHelper.covertToSQL(sqls, lstValues);
+								SendMQ.sendMsg(new RunSqlModel(runSql));
+								/*Connection conn2 = DBHelper.getInstance().getConnection2();
 								stms = conn2.prepareStatement(sqls);
 								stms.setString(1, resource);
 								stms.setString(2, orderNo);
 								stms.setInt(3, goodid);
 								stms.executeUpdate();
-								DBHelper.getInstance().closeConnection(conn2);
+								DBHelper.getInstance().closeConnection(conn2);*/
 							}
 							stms2 = conn.prepareStatement(sqls);
 							stms2.setString(1, resource);
@@ -1348,13 +1355,13 @@ public class PurchaseDaoImpl implements PurchaseDao {
 							if (GetConfigureInfo.openSync()) {
 								SaveSyncTable.InsertOnlineDataInfo(userid,orderNo, "替换", "order_details","update order_details set car_url ='"+ resource+ "' where	orderid='" + orderNo+ "' and goodsid = " + goodid);
 							} else {
-								Connection conn2 = DBHelper.getInstance().getConnection2();
-								stms = conn2.prepareStatement(sqls);
-								stms.setString(1, resource);
-								stms.setString(2, orderNo);
-								stms.setInt(3, goodid);
-								stms.executeUpdate();
-								DBHelper.getInstance().closeConnection(conn2);
+								List<String> lstValues = Lists.newArrayList();
+								lstValues.add(resource);
+								lstValues.add(orderNo);
+								lstValues.add(String.valueOf(goodid));
+								String runSql = DBHelper.covertToSQL(sqls, lstValues);
+								SendMQ.sendMsg(new RunSqlModel(runSql));
+								
 							}
 							stms2 = conn.prepareStatement(sqls);
 							stms2.setString(1, resource);
@@ -2011,7 +2018,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 
 		String orderNew = orderno;
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null, stmtf = null, stmtf2 = null, stmtfee = null, mergeStmt, gxzt, stmtid = null;
 		ResultSet rs = null;
 		try {
@@ -2037,8 +2043,8 @@ public class PurchaseDaoImpl implements PurchaseDao {
 						"update orderinfo set state='3' where order_no in ("
 								+ orderNew + ")");
 			} else {
-				PreparedStatement stmt2 = conn2.prepareStatement(sqlorderinfo);
-				stmt2.executeUpdate();
+
+				SendMQ.sendMsgByRPC(new RunSqlModel(sqlorderinfo));
 			}
 			// new Thread(new Runnable() {
 			// @Override
@@ -2092,29 +2098,37 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				stmtf.executeUpdate();
 
 				// 线上一份
-				stmtf2 = conn2.prepareStatement(sqlforwarder);
-				stmtf2.setString(1, strTemp);
-				stmtf2.setString(7, userid);
+				List<String> lstValues = Lists.newArrayList();
+//				stmtf2 = conn2.prepareStatement(sqlforwarder);
+				lstValues.add( strTemp);
 				if (transport.equals("yyffhh")) { // 原飞航出货
-					stmtf2.setString(2, wuliuNumber); // 以后快递单号放一起
-					stmtf2.setString(3, "原飞航");
-					stmtf2.setString(5, "");
-					stmtf2.setString(6, "原飞航");
+					lstValues.add(wuliuNumber); // 以后快递单号放一起
+					lstValues.add("原飞航");
+					lstValues.add("1");
+					lstValues.add( "");
+					lstValues.add( "原飞航");
 					in = 1;
 				} else {
-					stmtf2.setString(2, wuliuNumber);
-					stmtf2.setString(3, transport);// 4PX 与 其他方式出货
-					stmtf2.setString(5, "");
-					stmtf2.setString(6, "");
+					lstValues.add( wuliuNumber);
+					lstValues.add(transport);// 4PX 与 其他方式出货
+					lstValues.add("0");
+					lstValues.add("");
+					lstValues.add("");
 					in = 0;
 				}
-				stmtf2.setInt(4, in);
-				stmtf2.executeUpdate();
+				lstValues.add(userid);
+//				stmtf2.executeUpdate();
+				String runSql = DBHelper.covertToSQL(sqlforwarder, lstValues);
+				SendMQ.sendMsg(new RunSqlModel(runSql));
 
 				String gxztSql = "update order_details set state='0' where orderid=? ";
-				gxzt = conn2.prepareStatement(gxztSql);
+				/*gxzt = conn2.prepareStatement(gxztSql);
 				gxzt.setString(1, strTemp);
-				gxzt.executeUpdate();
+				gxzt.executeUpdate();*/
+				lstValues = Lists.newArrayList();
+				lstValues.add(strTemp);
+				runSql = DBHelper.covertToSQL(gxztSql, lstValues);
+				SendMQ.sendMsg(new RunSqlModel(runSql));
 
 			}
 
@@ -2156,7 +2170,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 	}
 
@@ -2207,7 +2220,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		String sqltwo = "update order_details set purchase_state=0,purchase_time=null,purchase_confirmation=null where orderid=? and goodsid=?";
 		String sqlthree = "update orderinfo  set state='5',purchase_number=purchase_number-1 where order_no=?";
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null, stmttwo = null, stmtinfo = null, stmttwo2 = null, stmtinfo2 = null;
 		try {
 			stmt = conn.prepareStatement(sql);
@@ -2225,14 +2237,23 @@ public class PurchaseDaoImpl implements PurchaseDao {
 			stmtinfo.executeUpdate();
 			i++;
 			// 线上一份
-			stmttwo2 = conn2.prepareStatement(sqltwo);
+			/*stmttwo2 = conn2.prepareStatement(sqltwo);
 			stmttwo2.setString(1, orderNo);
 			stmttwo2.setInt(2, goodsid);
-			stmttwo2.executeUpdate();
+			stmttwo2.executeUpdate();*/
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(orderNo);
+			lstValues.add(String.valueOf(goodsid));
+			String runSql = DBHelper.covertToSQL(sqltwo, lstValues);
+			SendMQ.sendMsg(new RunSqlModel(runSql));
 
-			stmtinfo2 = conn2.prepareStatement(sqlthree);
+			/*stmtinfo2 = conn2.prepareStatement(sqlthree);
 			stmtinfo2.setString(1, orderNo);
-			stmtinfo2.executeUpdate();
+			stmtinfo2.executeUpdate();*/
+			lstValues = Lists.newArrayList();
+			lstValues.add(orderNo);
+			runSql = DBHelper.covertToSQL(sqlthree, lstValues);
+			SendMQ.sendMsg(new RunSqlModel(runSql));
 
 			// this.order_state(conn, orderNo);
 			// this.order_state(conn2, orderNo);
@@ -2275,7 +2296,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 		return i;
 	}
@@ -2340,11 +2360,18 @@ public class PurchaseDaoImpl implements PurchaseDao {
 			stmttwo.setString(2, orderNo);
 			stmttwo.setInt(3, goodid);
 			// order_details 跟新2份
-			stmttwo2 = conn2.prepareStatement(sqltwo);
+			/*stmttwo2 = conn2.prepareStatement(sqltwo);
 			stmttwo2.setString(1, this.getUserbyID(admid + ""));
 			stmttwo2.setString(2, orderNo);
 			stmttwo2.setInt(3, goodid);
-			stmttwo2.executeUpdate();
+			stmttwo2.executeUpdate();*/
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(this.getUserbyID(admid + ""));
+			lstValues.add(orderNo);
+			lstValues.add(String.valueOf(goodid));
+			String runSql = DBHelper.covertToSQL(sqltwo, lstValues);
+			SendMQ.sendMsg(new RunSqlModel(runSql));
+
 
 			rs = stmt.executeQuery();
 			stmttwo.executeUpdate();
@@ -2463,9 +2490,14 @@ public class PurchaseDaoImpl implements PurchaseDao {
 			stmtinfo.setString(1, orderNo);
 			stmtinfo.executeUpdate();
 			// 更改订单状态2份
-			stmtinfo2 = conn2.prepareStatement(sqlthree);
+			/*stmtinfo2 = conn2.prepareStatement(sqlthree);
 			stmtinfo2.setString(1, orderNo);
-			stmtinfo2.executeUpdate();
+			stmtinfo2.executeUpdate();*/
+			lstValues = Lists.newArrayList();
+			lstValues.add(orderNo);
+			runSql = DBHelper.covertToSQL(sqlthree, lstValues);
+			SendMQ.sendMsg(new RunSqlModel(runSql));
+			
 			i++;
 			this.order_state(conn, orderNo);
 			this.order_state(conn2, orderNo);
@@ -2975,11 +3007,11 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		PreparedStatement stmt = null;
 		ResultSet rs=null;
 		try{
-			SendMQ sendMQ = new SendMQ();
+
 			String sql="update order_details set state=1,checked=1 where orderid='"+orderid+"' and goodsid='"+goodsid+"'";
 			stmt=conn.prepareStatement(sql);
 			stmt.executeUpdate();
-			sendMQ.sendMsg(new RunSqlModel(sql));
+			SendMQ.sendMsg(new RunSqlModel(sql));
 			sql="SELECT IFNULL(SUM(od.state),0) AS states,COUNT(od.id) AS counts FROM orderinfo oi " +
 					"INNER JOIN order_details od ON oi.order_no=od.orderid AND oi.state=1 AND od.state<2 AND od.orderid='"+orderid+"'";
 			stmt=conn.prepareStatement(sql);
@@ -2988,9 +3020,9 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				sql="update orderinfo set  state=2 where order_no='"+orderid+"'";
 				stmt=conn.prepareStatement(sql);
 				stmt.executeUpdate();
-				sendMQ.sendMsg(new RunSqlModel(sql));
+				SendMQ.sendMsg(new RunSqlModel(sql));
 			}
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {
@@ -3462,7 +3494,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		String sql = "update order_product_source set purchase_state=4 where goods_url=? and orderid=? and goodsid=?";
 		String sqlorder = "update order_details set state=1 where orderid=? and goodsid=?";
 		String sqlorderinfo = "select state from order_details where orderid=?";
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		Connection conn = DBHelper.getInstance().getConnection();
 
 		PreparedStatement stmt = null;
@@ -3483,10 +3514,15 @@ public class PurchaseDaoImpl implements PurchaseDao {
 			stmtorder.setInt(2, goodid);
 			stmtorder.executeUpdate();
 
-			stmtorder2 = conn2.prepareStatement(sqlorder);
+			/*stmtorder2 = conn2.prepareStatement(sqlorder);
 			stmtorder2.setString(1, orderno);
 			stmtorder2.setInt(2, goodid);
-			stmtorder2.executeUpdate();
+			stmtorder2.executeUpdate();*/
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(orderno);
+			lstValues.add(String.valueOf(goodid));
+			String runSql = DBHelper.covertToSQL(sqlorder, lstValues);
+			SendMQ.sendMsg(new RunSqlModel(runSql));
 
 			stmtorderinfo = conn.prepareStatement(sqlorderinfo);
 			stmtorderinfo.setString(1, orderno);
@@ -3504,9 +3540,13 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				stmtoi.executeUpdate();
 
 				// 更改订单2份
-				stmtoi2 = conn2.prepareStatement(sqloi);
+				/*stmtoi2 = conn2.prepareStatement(sqloi);
 				stmtoi2.setString(1, orderno);
-				stmtoi2.executeUpdate();
+				stmtoi2.executeUpdate();*/
+				lstValues = Lists.newArrayList();
+				lstValues.add(orderno);
+				runSql = DBHelper.covertToSQL(sqloi, lstValues);
+				SendMQ.sendMsg(new RunSqlModel(runSql));
 
 			}
 		} catch (Exception e) {
@@ -3555,7 +3595,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 		return rk;
 	}
@@ -4206,8 +4245,9 @@ public class PurchaseDaoImpl implements PurchaseDao {
 										+ dropshipid
 										+ "' and state!=2 AND purchase_state=3) a)>0,'1','5')) where child_order_no='"
 										+ dropshipid + "'";
-								stmt = conn2.prepareStatement(sql);
-								stmt.executeUpdate();
+								/*stmt = conn2.prepareStatement(sql);
+								stmt.executeUpdate();*/
+								SendMQ.sendMsg(new RunSqlModel(sql));
 							}
 							sql = "SELECT IF ((select count(*) from ( select * from order_details where orderid='"
 									+ orderNo
@@ -4422,8 +4462,9 @@ public class PurchaseDaoImpl implements PurchaseDao {
 									+ goodsid
 									+ "' and orderid='"
 									+ orderNo + "'";
-							stmt = conn2.prepareStatement(sql);
-							stmt.executeUpdate();
+							/*stmt = conn2.prepareStatement(sql);
+							stmt.executeUpdate();*/
+							SendMQ.sendMsg(new RunSqlModel(sql));
 							if (isDropshipOrder.equals("1")) {
 								sql = "SELECT dropshipid FROM order_details WHERE orderid='"
 										+ orderNo + "'";
@@ -4598,7 +4639,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 			datas = bf.toString().length() > 0 ? bf.toString().substring(0,bf.toString().length() - 1) : "";
 			new Thread(){
 				public void run() {
-					Connection conn2 = DBHelper.getInstance().getConnection2();
 					PreparedStatement stmt = null;
 					try{
 						for(int i=0;i<list1.size();i++){
@@ -4608,8 +4648,9 @@ public class PurchaseDaoImpl implements PurchaseDao {
 									+ "' and orderid='"
 									+ orderNo
 									+ "'";
-							stmt = conn2.prepareStatement(sql);
-							stmt.executeUpdate();
+							/*stmt = conn2.prepareStatement(sql);
+							stmt.executeUpdate();*/
+							SendMQ.sendMsg(new RunSqlModel(sql));
 						}
 					}catch(Exception e){
 						e.printStackTrace();
@@ -4621,7 +4662,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 								e.printStackTrace();
 							}
 						}
-						DBHelper.getInstance().closeConnection(conn2);
 					}
 				};
 			}.start();
@@ -4913,7 +4953,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		int i = 0;
 		String sql = "update order_product_source set confirm_userid=null,confirm_time=null,purchase_state=0 where orderid=? and od_id=? and del=0";
 		Connection conn = DBHelper.getInstance().getConnection();
-		// Connection conn2 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(sql);
@@ -5073,22 +5112,12 @@ public class PurchaseDaoImpl implements PurchaseDao {
 
 	public int deleteFromSql127(String sql) {
 		int i = 0;
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
-			i = stmt.executeUpdate();
+			/*stmt = conn.prepareStatement(sql);
+			i = stmt.executeUpdate();*/
+			SendMQ.sendMsg(new RunSqlModel(sql));
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
 		}
 		return i;
 	}
@@ -5123,26 +5152,21 @@ public class PurchaseDaoImpl implements PurchaseDao {
 	public int updateOrderPs127(String orderNo, String goodsid, String itemid) {
 		int i = 0;
 		String sql = "update order_product_source set tb_1688_itemid=? where orderid=? and goodsid=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
 		try {
-			stmt = conn.prepareStatement(sql);
+			/*stmt = conn.prepareStatement(sql);
 			stmt.setString(1, itemid);
 			stmt.setString(2, orderNo);
 			stmt.setString(3, goodsid);
-			stmt.executeUpdate();
+			stmt.executeUpdate();*/
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(itemid);
+			lstValues.add(orderNo);
+			lstValues.add(goodsid);
+			String runSql = DBHelper.covertToSQL(sql, lstValues);
+			SendMQ.sendMsg(new RunSqlModel(runSql));
 			i++;
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
 		}
 		return i;
 	}
@@ -5255,16 +5279,18 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		// purchase_state=0,
 		String sql = "update orderinfo set state=1 where order_no=?";
 		Connection conn = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null, stmt2 = null;
+		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, orderNo);
 			stmt.executeUpdate();
 
-			stmt2 = conn2.prepareStatement(sql);
-			stmt2.setString(1, orderNo);
-			stmt2.executeUpdate();
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(orderNo);
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 			i++;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -5289,26 +5315,22 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				+ price
 				+ ", goods_p_url=?,tb_1688_itemid=? where orderid=? and goods_url='"
 				+ goods_url + "'";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
+
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, goodspurl);
-			stmt.setString(2, itemid);
-			stmt.setString(3, orderNo);
-			stmt.executeUpdate();
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(goodspurl);
+			lstValues.add(itemid);
+			lstValues.add(orderNo);
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 			i++;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+
 		}
 		return i;
 	}
@@ -5326,7 +5348,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rse = null;
 		PreparedStatement stmtfind = null;
-		PreparedStatement stmttt = null;
 		try {
 			i++;
 			int res = 0;
@@ -5341,24 +5362,29 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				String sqlll = "insert into order_product_source(adminid,userid,addtime,orderid,confirm_userid,confirm_time,"
 						+ "goodsid,goodsdataid,goods_url,goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,"
 						+ "usecount,buycount,purchase_state,od_id,tb_1688_itemid,tborderid) values(?,?,now(),?,?,now(),?,?,?,?,?,?,?,?,?,?,1,?,?,'重复10') ";
-				stmttt = conn.prepareStatement(sqlll);
-				stmttt.setDouble(1, admid);
-				stmttt.setInt(2, userid);
-				stmttt.setString(3, orderNo);
-				stmttt.setInt(4, userid);
-				stmttt.setInt(5, goodid);
-				stmttt.setInt(6, goodsdataid);
-				stmttt.setString(7, goodsurl);
-				stmttt.setString(8, newValue);
-				stmttt.setString(9, googsimg);
-				stmttt.setString(10, goodsprice);
-				stmttt.setString(11, oldValue);
-				stmttt.setString(12, goodstitle);
-				stmttt.setInt(13, googsnumber);
-				stmttt.setInt(14, purchaseCount);
-				stmttt.setInt(15, od_id);
-				stmttt.setString(16, itemid);
-				stmttt.executeUpdate();
+
+				List<String> lstValues = new ArrayList<>();
+				lstValues.add(String.valueOf(admid));
+				lstValues.add(String.valueOf(userid));
+				lstValues.add(String.valueOf(orderNo));
+				lstValues.add(String.valueOf(userid));
+				lstValues.add(String.valueOf(goodid));
+				lstValues.add(String.valueOf(goodsdataid));
+				lstValues.add(String.valueOf(goodsurl));
+				lstValues.add(String.valueOf(newValue));
+				lstValues.add(String.valueOf(googsimg));
+				lstValues.add(String.valueOf(goodsprice));
+				lstValues.add(String.valueOf(oldValue));
+				lstValues.add(String.valueOf(goodstitle));
+				lstValues.add(String.valueOf(googsnumber));
+				lstValues.add(String.valueOf(googsnumber));
+				lstValues.add(String.valueOf(purchaseCount));
+				lstValues.add(String.valueOf(od_id));
+				lstValues.add(String.valueOf(itemid));
+
+				String runSql = DBHelper.covertToSQL(sqlll,lstValues);
+				Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 				i++;
 			} else {
 				String sqlll = "update order_product_source set confirm_userid="
@@ -5368,8 +5394,8 @@ public class PurchaseDaoImpl implements PurchaseDao {
 						+ orderNo
 						+ "' and goodsid="
 						+ goodid + " and del=0";
-				stmttt = conn.prepareStatement(sqlll);
-				stmttt.executeUpdate();
+
+				SendMQ.sendMsgByRPC(new RunSqlModel(sqlll));
 				i++;
 			}
 
@@ -5391,13 +5417,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				}
 			}
 
-			if (stmttt != null) {
-				try {
-					stmttt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+
 
 			DBHelper.getInstance().closeConnection(conn);
 		}
@@ -5802,6 +5822,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 			// stmtt.executeUpdate();
 			String sqlll = "";
 			String sqlc = "";
+			List<String> lstValues = Lists.newArrayList();
 			if (iia == 0) { // order_product_source表//
 				if (reason.contains("无货源")) {
 					tempSql = "delete from order_product_source where orderid='"
@@ -5810,24 +5831,40 @@ public class PurchaseDaoImpl implements PurchaseDao {
 					sqlll = "insert into order_product_source(adminid,userid,orderid,goodsid,goodsdataid,goods_url,"
 							+ "goods_img_url,goods_price,goods_name,usecount,buycount,currency,goods_p_name,remark,"
 							+ "purchase_state,od_id,tb_1688_itemid,tborderid) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,5,?,?,'重复12') ";
-					stmttt = conn.prepareStatement(sqlll);
-					stmttt.setDouble(1, admid);
-					stmttt.setInt(2, userid);
-					stmttt.setString(3, orderNo);
-					stmttt.setInt(4, goodid);
-					stmttt.setInt(5, goodsdataid);
-					stmttt.setString(6, goods_url);
-					stmttt.setString(7, googs_img);
-					stmttt.setDouble(8, goodsprice);
-					stmttt.setString(9, goods_title);
-					stmttt.setInt(10, googsnumber);
-					stmttt.setInt(11, buycount);
-					stmttt.setString(12, currency);
-					stmttt.setString(13, pname);
-					stmttt.setString(14, reason);
-					stmttt.setInt(15, od_id);
-					stmttt.setString(16, itemid);
+//					stmttt = conn.prepareStatement(sqlll);
+					lstValues.add(String.valueOf(admid));
+					lstValues.add(String.valueOf(userid));
+					lstValues.add(orderNo);
+					lstValues.add(String.valueOf(goodid));
+					lstValues.add(String.valueOf(goodsdataid));
+					lstValues.add(goods_url);
+					lstValues.add(googs_img);
+					lstValues.add(String.valueOf(goodsprice));
+					lstValues.add(goods_title);
+					lstValues.add(String.valueOf(googsnumber));
+					lstValues.add(String.valueOf(buycount));
+					lstValues.add(currency);
+					lstValues.add(pname);
+					lstValues.add(reason);
+					lstValues.add(String.valueOf(od_id));
+					lstValues.add(itemid);
+					String runSql = DBHelper.covertToSQL(sqlll, lstValues);
+					SendMQ.sendMsg(new RunSqlModel(runSql));
 				} else {
+					lstValues.add(String.valueOf(admid));
+					lstValues.add(String.valueOf(userid));
+					lstValues.add(orderNo);
+					lstValues.add(String.valueOf(goodid));
+					lstValues.add(String.valueOf(goodsdataid));
+					lstValues.add(goods_url);
+					lstValues.add(resource);
+					lstValues.add(googs_img);
+					lstValues.add(String.valueOf(goodsprice));
+					lstValues.add(String.valueOf(price));
+					lstValues.add(goods_title);
+					lstValues.add(String.valueOf(googsnumber));
+					lstValues.add(String.valueOf(buycount));
+					
 					if (reason.equals("") || reason == null) {
 						tempSql = "delete from order_product_source where orderid='"
 								+ orderNo + "' and goodsid='" + goodid + "'";
@@ -5835,11 +5872,17 @@ public class PurchaseDaoImpl implements PurchaseDao {
 						sqlll = "insert into order_product_source(adminid,userid,addtime,orderid,goodsid,goodsdataid,goods_url,goods_p_url,"
 								+ "goods_img_url,goods_price,goods_p_price,goods_name,usecount,buycount,currency,goods_p_name,od_id,tb_1688_itemid,tborderid) "
 								+ "values(?,?,now(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'重复13') ";
-						stmttt = conn.prepareStatement(sqlll);
-						stmttt.setString(14, currency);
-						stmttt.setString(15, pname);
-						stmttt.setInt(16, od_id);
-						stmttt.setString(17, itemid);
+//						stmttt = conn.prepareStatement(sqlll);
+//						stmttt.setString(14, currency);
+//						stmttt.setString(15, pname);
+//						stmttt.setInt(16, od_id);
+//						stmttt.setString(17, itemid);
+						lstValues.add(currency);
+						lstValues.add(pname);
+						lstValues.add(String.valueOf(od_id));
+						lstValues.add(itemid);
+						String runSql = DBHelper.covertToSQL(sqlll, lstValues);
+						SendMQ.sendMsg(new RunSqlModel(runSql));
 					} else {
 						tempSql = "delete from order_product_source where orderid='"
 								+ orderNo + "' and goodsid='" + goodid + "'";
@@ -5847,27 +5890,21 @@ public class PurchaseDaoImpl implements PurchaseDao {
 						sqlll = "insert into order_product_source(adminid,userid,addtime,orderid,goodsid,goodsdataid,goods_url,goods_p_url,"
 								+ "goods_img_url,goods_price,goods_p_price,goods_name,usecount,buycount,remark,purchase_state,"
 								+ "currency,goods_p_name,od_id,tb_1688_itemid,tborderid) values(?,?,now(),?,?,?,?,?,?,?,?,?,?,?,?,5,?,?,?,?,'重复14') ";
-						stmttt = conn.prepareStatement(sqlll);
+						/*stmttt = conn.prepareStatement(sqlll);
 						stmttt.setString(14, reason);
 						stmttt.setString(15, currency);
 						stmttt.setString(16, pname);
 						stmttt.setInt(17, od_id);
-						stmttt.setString(18, itemid);
-
+						stmttt.setString(18, itemid);*/
+						lstValues.add(reason);
+						lstValues.add(currency);
+						lstValues.add(pname);
+						lstValues.add(String.valueOf(od_id));
+						lstValues.add(itemid);
+						String runSql = DBHelper.covertToSQL(sqlll, lstValues);
+						SendMQ.sendMsg(new RunSqlModel(runSql));
 					}
-					stmttt.setDouble(1, admid);
-					stmttt.setInt(2, userid);
-					stmttt.setString(3, orderNo);
-					stmttt.setInt(4, goodid);
-					stmttt.setInt(5, goodsdataid);
-					stmttt.setString(6, goods_url);
-					stmttt.setString(7, resource);
-					stmttt.setString(8, googs_img);
-					stmttt.setDouble(9, goodsprice);
-					stmttt.setDouble(10, price);
-					stmttt.setString(11, goods_title);
-					stmttt.setInt(12, googsnumber);
-					stmttt.setInt(13, buycount);
+					
 				}
 			} else {
 				if (reason.contains("无货源")) {
@@ -5876,20 +5913,35 @@ public class PurchaseDaoImpl implements PurchaseDao {
 							+ " ,adminid=?,userid=?,addtime=null,confirm_userid=null,confirm_time=null,"
 							+ "purchase_state=5,remark=?,goods_img_url=?,goods_price=?,usecount=?,buycount=?,goods_p_url=null,"
 							+ "goods_p_price=null,goods_p_name=?,od_id=? where goods_url=? and orderid=? and goodsid=? ";
-					stmttt = conn.prepareStatement(sqlll);
-					stmttt.setDouble(1, admid);
-					stmttt.setInt(2, userid);
-					stmttt.setString(3, reason);
-					stmttt.setString(4, googs_img);
-					stmttt.setDouble(5, goodsprice);
-					stmttt.setInt(6, googsnumber);
-					stmttt.setInt(7, buycount);
-					stmttt.setString(8, pname);
-					stmttt.setInt(9, od_id);
-					stmttt.setString(10, goods_url);
-					stmttt.setString(11, orderNo);
-					stmttt.setInt(12, goodid);
+//					stmttt = conn.prepareStatement(sqlll);
+//					stmttt.setString(10, goods_url);
+//					stmttt.setString(11, orderNo);
+//					stmttt.setInt(12, goodid);
+					lstValues.add(String.valueOf(admid));
+					lstValues.add(String.valueOf(userid));
+					lstValues.add(reason);
+					lstValues.add(googs_img);
+					lstValues.add(String.valueOf(goodsprice));
+					lstValues.add(String.valueOf(googsnumber));
+					lstValues.add(String.valueOf(buycount));
+					lstValues.add(pname);
+					lstValues.add(String.valueOf(od_id));
+					lstValues.add(goods_url);
+					lstValues.add(orderNo);
+					lstValues.add(String.valueOf(goodid));
+					String runSql = DBHelper.covertToSQL(sqlll, lstValues);
+					SendMQ.sendMsg(new RunSqlModel(runSql));
 				} else {
+					lstValues.add(String.valueOf(admid));
+					lstValues.add(String.valueOf(userid));
+					lstValues.add(String.valueOf(goodid));
+					lstValues.add(resource);
+					lstValues.add(googs_img);
+					lstValues.add(String.valueOf(goodsprice));
+					lstValues.add(String.valueOf(price));
+					lstValues.add(String.valueOf(googsnumber));
+					lstValues.add(String.valueOf(buycount));
+					
 					if (reason.equals("") || reason == null) {
 						// purchase_state=0,
 						sqlll = "update order_product_source set tb_1688_itemid="
@@ -5899,15 +5951,29 @@ public class PurchaseDaoImpl implements PurchaseDao {
 								+ "usecount=?,buycount=?,goods_p_name=?,od_id=? where goods_url=? and orderid=? and goodsid=? ";
 						sqlc = "update order_details set state=0 where goodsid=? and orderid=?;";
 						LOG.info("线上操作的不用的");
-						stmttt = conn.prepareStatement(sqlll);
-						stmc = conn.prepareStatement(sqlc);
-						stmttt.setString(10, pname);
-						stmttt.setInt(11, od_id);
-						stmttt.setString(12, goods_url);
-						stmttt.setString(13, orderNo);
-						stmttt.setInt(14, goodid);
-						stmc.setString(2, orderNo);
-						stmc.setInt(1, goodid);
+//						stmttt = conn.prepareStatement(sqlll);
+						lstValues.add(pname);
+						lstValues.add(String.valueOf(od_id));
+						lstValues.add(goods_url);
+						lstValues.add(orderNo);
+						lstValues.add(String.valueOf(goodid));
+//						stmttt.setString(10, pname);
+//						stmttt.setInt(11, od_id);
+//						stmttt.setString(12, goods_url);
+//						stmttt.setString(13, orderNo);
+//						stmttt.setInt(14, goodid);
+						String runSql = DBHelper.covertToSQL(sqlll, lstValues);
+						SendMQ.sendMsg(new RunSqlModel(runSql));
+						
+//						stmc = conn.prepareStatement(sqlc);
+//						stmc.setString(2, orderNo);
+//						stmc.setInt(1, goodid);
+						lstValues = Lists.newArrayList();
+						lstValues.add(String.valueOf(goodid));
+						lstValues.add(orderNo);
+						runSql = DBHelper.covertToSQL(sqlll, lstValues);
+						SendMQ.sendMsg(new RunSqlModel(runSql));
+						
 					} else {
 						// 线上的库
 						sqlll = "update order_product_source set tb_1688_itemid="
@@ -5915,58 +5981,73 @@ public class PurchaseDaoImpl implements PurchaseDao {
 								+ " , adminid=?,userid=?,addtime=now(),goodsid=?,goods_p_url=?,"
 								+ "goods_img_url=?,goods_price=?,goods_p_price=?,usecount=?,buycount=?,remark=?,"
 								+ "purchase_state=5,goods_p_name=?,od_id=? where goods_url=? and orderid=? and goodsid=? ";
-						stmttt = conn.prepareStatement(sqlll);
+						/*stmttt = conn.prepareStatement(sqlll);
 						stmttt.setString(10, reason);
 						stmttt.setString(11, pname);
 						stmttt.setInt(12, od_id);
 						stmttt.setString(13, goods_url);
 						stmttt.setString(14, orderNo);
-						stmttt.setInt(15, goodid);
+						stmttt.setInt(15, goodid);*/
+						lstValues.add(reason);
+						lstValues.add(pname);
+						lstValues.add(String.valueOf(od_id));
+						lstValues.add(goods_url);
+						lstValues.add(orderNo);
+						lstValues.add(String.valueOf(goodid));
+						
+						String runSql = DBHelper.covertToSQL(sqlll, lstValues);
+						SendMQ.sendMsg(new RunSqlModel(runSql));
 					}
-					stmttt.setDouble(1, admid);
-					stmttt.setInt(2, userid);
-					stmttt.setInt(3, goodid);
-					stmttt.setString(4, resource);
-					stmttt.setString(5, googs_img);
-					stmttt.setDouble(6, goodsprice);
-					stmttt.setDouble(7, price);
-					stmttt.setInt(8, googsnumber);
-					stmttt.setInt(9, buycount);
+					
 				}
 			}
-			stmttt.executeUpdate();
-			if (stmc != null) {
+//			stmttt.executeUpdate();
+			/*if (stmc != null) {
 				stmc.executeUpdate();
 			} else {
 
-			}
+			}*/
+			lstValues = Lists.newArrayList();
 			String sqllll = "";
 			if (iib == 0) {// goods_source表//
 				sqllll = "insert into goods_source(goodsdataid,goods_url,goods_purl,goods_img_url,"
 						+ "goods_price,goods_name,moq,goodssourcetype,buycount,del,updatetime) "
 						+ "values(?,?,?,?,?,?,1,1,?,0,now())";
-				stmtttt = conn.prepareStatement(sqllll);
+				/*stmtttt = conn.prepareStatement(sqllll);
 				stmtttt.setInt(1, goodsdataid);
 				stmtttt.setString(2, goods_url);
 				stmtttt.setString(3, resource);
 				stmtttt.setString(4, googs_img);
 				stmtttt.setDouble(5, price);
 				stmtttt.setString(6, pname);
-				stmtttt.setInt(7, buycount);
+				stmtttt.setInt(7, buycount);*/
+				lstValues.add(String.valueOf(goodsdataid));
+				lstValues.add(goods_url);
+				lstValues.add(resource);
+				lstValues.add(googs_img);
+				lstValues.add(String.valueOf(price));
+				lstValues.add(pname);
+				lstValues.add(String.valueOf(buycount));
 			} else {
 				// and goods_purl=?
 				sqllll = "update goods_source set goods_purl='" + resource
 						+ "',goods_img_url=?,goods_price=?,buycount=?,"
 						+ "updatetime=now() where goods_url=? ";
-				stmtttt = conn.prepareStatement(sqllll);
+				/*stmtttt = conn.prepareStatement(sqllll);
 				stmtttt.setString(1, googs_img);
 				stmtttt.setDouble(2, price);
 				stmtttt.setInt(3, buycount);
-				stmtttt.setString(4, goods_url);
+				stmtttt.setString(4, goods_url);*/
+				lstValues.add(googs_img);
+				lstValues.add(String.valueOf(price));
+				lstValues.add(String.valueOf(buycount));
+				lstValues.add(goods_url);
 				// stmtttt.setString(5, resource);
 			}
 			if (!reason.contains("无货源")) {
-				stmtttt.executeUpdate();
+				String runSql = DBHelper.covertToSQL(sqlll, lstValues);
+				SendMQ.sendMsg(new RunSqlModel(runSql));
+//				stmtttt.executeUpdate();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -6089,16 +6170,18 @@ public class PurchaseDaoImpl implements PurchaseDao {
 
 			sqlorderinfo = "update orderinfo set state='3' where order_no in ("
 					+ orderNew + ")";
-			stmt = conn.prepareStatement(sqlorderinfo);
-			// stmt.setString(1,orderNew);
-			stmt.executeUpdate();
+//			stmt = conn.prepareStatement(sqlorderinfo);
+//			// stmt.setString(1,orderNew);
+//			stmt.executeUpdate();
+			SendMQ.sendMsg(new RunSqlModel(sqlorderinfo));
 
 			// 修改库存已出货
 			sqlorderinfo = "update id_relationtable set state='1' where  is_delete != 1 and  orderid in ("
 					+ orderNew + ")";
-			stmtid = conn.prepareStatement(sqlorderinfo);
-			stmtid.executeUpdate();
-
+//			stmtid = conn.prepareStatement(sqlorderinfo);
+//			stmtid.executeUpdate();
+			SendMQ.sendMsg(new RunSqlModel(sqlorderinfo));
+			
 			sql = "select orderno from order_fee  where mergeOrders= '"
 					+ orderno + "' and state='1' ";
 			mergeStmt = conn.prepareStatement(sql);
@@ -6107,33 +6190,48 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				String strTemp = rs.getString("orderno");
 				String sqlforwarder = "insert into forwarder(order_no,express_no,logistics_name,createtime,isneed,yfhorder,ship_name,userid) values(?,?,?,now(),?,?,?,?) ";// 更改forwarder表;
 
-				stmtf = conn.prepareStatement(sqlforwarder);
-				stmtf.setString(1, strTemp);
-				stmtf.setString(7, userid);
+//				stmtf = conn.prepareStatement(sqlforwarder);
+				List<String> lstValues = Lists.newArrayList();
+				lstValues.add(strTemp);
 				int in;
 				if (transport.equals("yyffhh")) { // 原飞航出货
-					stmtf.setString(2, wuliuNumber); // 以后快递单号放一起
-					stmtf.setString(3, "");
-					stmtf.setString(5, "");
-					stmtf.setString(6, "原飞航");
+//					stmtf.setString(2, wuliuNumber); // 以后快递单号放一起
+//					stmtf.setString(3, "");
+//					stmtf.setString(5, "");
+//					stmtf.setString(6, "原飞航");
+					lstValues.add(wuliuNumber);
+					lstValues.add("");
+					lstValues.add("1");
+					lstValues.add("");
+					lstValues.add("原飞航");
 					in = 1;
 				} else {
-					stmtf.setString(2, wuliuNumber);
-					stmtf.setString(3, transport);// 4PX 与 其他方式出货
-					stmtf.setString(5, "");
-					stmtf.setString(6, "");
+//					stmtf.setString(2, wuliuNumber);
+//					stmtf.setString(3, transport);// 4PX 与 其他方式出货
+//					stmtf.setString(5, "");
+//					stmtf.setString(6, "");
+					lstValues.add(wuliuNumber);
+					lstValues.add(transport);
+					lstValues.add("0");
+					lstValues.add("");
+					lstValues.add("");
 					in = 0;
 				}
-				stmtf.setInt(4, in);
-				stmtf.executeUpdate();
+				lstValues.add(String.valueOf(userid));
+//				stmtf.setInt(4, in);
+//				stmtf.executeUpdate();
+				
+				String runSql = DBHelper.covertToSQL(sqlforwarder, lstValues);
+				SendMQ.sendMsg(new RunSqlModel(runSql));
 
 			}
 
 			sqlorder_fee = "update order_fee set state=2 where orderno in ("
 					+ orderNew + ")";// 更改order_fee表;
-			stmtfee = conn.prepareStatement(sqlorder_fee);
+//			stmtfee = conn.prepareStatement(sqlorder_fee);
 			// stmtfee.setString(1,orderNew );
-			stmtfee.executeUpdate();
+//			stmtfee.executeUpdate();
+			SendMQ.sendMsg(new RunSqlModel(sqlorder_fee));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -6250,7 +6348,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				PreparedStatement stmt = null;
 				ResultSet rs = null;
 				String sql = "";
-
 				public void run() {
 					try {
 						sql = "select goods_pid,car_urlMD5,goodsname from order_details where orderid=? and goodsid=?";
@@ -6282,7 +6379,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 							if (rs.next()) {
 								int pg_id = rs.getInt("id");
 								sql = "insert into preferential_goods_price (pgid,goods_p_itemid,begin,end,price,is_manual) values(?,?,?,?,?,1)";
-								stmt = conn2.prepareStatement(sql);
+								/*stmt = conn2.prepareStatement(sql);
 								stmt.setInt(1, pg_id);
 								stmt.setString(2, goods_p_itemid);
 								stmt.setInt(3, Integer.valueOf(map.get(
@@ -6291,10 +6388,29 @@ public class PurchaseDaoImpl implements PurchaseDao {
 										"add_end").toString()));
 								stmt.setDouble(5, Double.valueOf(map.get(
 										"add_price").toString()));
-								stmt.executeUpdate();
+								stmt.executeUpdate();*/
+								List<String> lstValues = Lists.newArrayList();
+								lstValues.add(String.valueOf(pg_id));
+								lstValues.add(goods_p_itemid);
+								lstValues.add(map.get(
+										"add_begin").toString());
+								lstValues.add(map.get(
+										"add_end").toString());
+								lstValues.add(map.get(
+										"add_price").toString());
+								String runSql = DBHelper.covertToSQL(sql, lstValues);
+								SendMQ.sendMsg(new RunSqlModel(runSql));
 							} else {
+								sql = "select id from preferential_goods order by id desc limit 1";
+								stmt = conn2.prepareStatement(sql);
+								rs = stmt.executeQuery();
+								int id = 0;
+								if(rs.next()) {
+									id = rs.getInt("id");
+								}
+								
 								sql = "insert into preferential_goods (goods_pid,goods_url,goods_p_url,goods_p_itemid,createtime,price,uuid,is_manual) values(?,?,?,?,now(),?,?,1)";
-								stmt = conn2.prepareStatement(sql,
+								/*stmt = conn2.prepareStatement(sql,
 										Statement.RETURN_GENERATED_KEYS);
 								stmt.setString(1, goods_pid);
 								stmt.setString(2, goods_url);
@@ -6305,11 +6421,23 @@ public class PurchaseDaoImpl implements PurchaseDao {
 										.toString());
 								stmt.setString(6, uuid);
 								stmt.executeUpdate();
-								rs = stmt.getGeneratedKeys();
-								if (rs.next()) {
-									int id = rs.getInt(1);
+								rs = stmt.getGeneratedKeys();*/
+								List<String> lstValues = Lists.newArrayList();
+								lstValues.add(goods_pid);
+								lstValues.add(goods_url);
+								lstValues.add(map.get("goods_p_url")
+										.toString());
+								lstValues.add(goods_p_itemid);
+								lstValues.add(map.get("goods_p_price")
+										.toString());
+								lstValues.add(uuid);
+								String runSql = DBHelper.covertToSQL(sql, lstValues);
+								int r = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+								if (r > 0) {
+									id = id+1;
+//									int id = rs.getInt(1);
 									sql = "insert into preferential_goods_price (pgid,goods_p_itemid,begin,end,price,is_manual) values(?,?,?,?,?,1)";
-									stmt = conn2.prepareStatement(sql);
+									/*stmt = conn2.prepareStatement(sql);
 									stmt.setInt(1, id);
 									stmt.setString(2, goods_p_itemid);
 									stmt.setInt(3, Integer.valueOf(map.get(
@@ -6318,7 +6446,18 @@ public class PurchaseDaoImpl implements PurchaseDao {
 											"add_end").toString()));
 									stmt.setDouble(5, Double.valueOf(map.get(
 											"add_price").toString()));
-									stmt.executeUpdate();
+									stmt.executeUpdate();*/
+									lstValues = Lists.newArrayList();
+									lstValues.add(String.valueOf(id));
+									lstValues.add(goods_p_itemid);
+									lstValues.add(map.get(
+											"add_begin").toString());
+									lstValues.add(map.get(
+											"add_end").toString());
+									lstValues.add(map.get(
+											"add_price").toString());
+									runSql = DBHelper.covertToSQL(sql, lstValues);
+									SendMQ.sendMsg(new RunSqlModel(runSql));
 								}
 							}
 						}
@@ -6454,7 +6593,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				row = stmt.executeUpdate();
 			}
 			new Thread() {
-				Connection conn2 = DBHelper.getInstance().getConnection2();
 				PreparedStatement stmt = null;
 
 				public void run() {
@@ -6462,30 +6600,41 @@ public class PurchaseDaoImpl implements PurchaseDao {
 						String sql = "";
 						if ("1".equals(map.get("type"))) {
 							sql = "update preferential_goods_price set begin=?,end=?,price=? where begin=? and end=? and goods_p_itemid=?";
-							stmt = conn2.prepareStatement(sql);
-							stmt.setInt(1, Integer.valueOf(map.get("new_begin")
-									.toString()));
-							stmt.setInt(2, Integer.valueOf(map.get("new_end")
-									.toString()));
-							stmt.setDouble(3, Double.valueOf(map.get(
-									"new_price").toString()));
-							stmt.setInt(4, Integer.valueOf(map.get("old_begin")
-									.toString()));
-							stmt.setInt(5, Integer.valueOf(map.get("old_end")
-									.toString()));
-							stmt.setString(6, map.get("goods_p_itemid")
+//							stmt = conn2.prepareStatement(sql);
+							List<String> lstValues = Lists.newArrayList();
+							lstValues.add(map.get("new_begin").toString());
+							lstValues.add(map.get("new_end")
 									.toString());
-							stmt.executeUpdate();
+							lstValues.add(map.get(
+									"new_price").toString());
+							lstValues.add(map.get("old_begin")
+									.toString());
+							lstValues.add(map.get("old_end")
+									.toString());
+							lstValues.add(map.get("goods_p_itemid")
+									.toString());
+							String runSql = DBHelper.covertToSQL(sql, lstValues);
+							SendMQ.sendMsg(new RunSqlModel(runSql));
+//							stmt.executeUpdate();
 						} else if ("2".equals(map.get("type"))) {
 							sql = "update preferential_goods_price set is_delete=1 where begin=? and end=? and goods_p_itemid=?";
-							stmt = conn2.prepareStatement(sql);
+							/*stmt = conn2.prepareStatement(sql);
 							stmt.setInt(1, Integer.valueOf(map.get("old_begin")
 									.toString()));
 							stmt.setInt(2, Integer.valueOf(map.get("old_end")
 									.toString()));
 							stmt.setString(3, map.get("goods_p_itemid")
 									.toString());
-							stmt.executeUpdate();
+							stmt.executeUpdate();*/
+							List<String> lstValues = Lists.newArrayList();
+							lstValues.add(map.get("old_begin")
+									.toString());
+							lstValues.add(map.get("old_end")
+									.toString());
+							lstValues.add(map.get("goods_p_itemid")
+									.toString());
+							String runSql = DBHelper.covertToSQL(sql, lstValues);
+							SendMQ.sendMsg(new RunSqlModel(runSql));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -6497,7 +6646,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 								e.printStackTrace();
 							}
 						}
-						DBHelper.getInstance().closeConnection(conn2);
+//						DBHelper.getInstance().closeConnection(conn2);
 					}
 				};
 			}.start();
@@ -6524,26 +6673,44 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		String sqltwo = "update order_details set purchase_state=0,purchase_time=null,purchase_confirmation=null where orderid=? and goodsid=?";
 		String sqlthree = "update orderinfo set purchase_number=purchase_number-1 where order_no=?";
 		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null, stmttwo = null, stmtinfo = null;
+//		PreparedStatement stmt = null, stmttwo = null, stmtinfo = null;
 		try {
-			stmt = conn.prepareStatement(sql);
+			/*stmt = conn.prepareStatement(sql);
 			stmt.setString(1, orderNo);
 			stmt.setInt(2, goodsid);
-			stmttwo = conn.prepareStatement(sqltwo);
+			stmt.executeUpdate();*/
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(orderNo);
+			lstValues.add(String.valueOf(goodsid));
+			String runSql = DBHelper.covertToSQL(sql, lstValues);
+			SendMQ.sendMsg(new RunSqlModel(runSql));
+			
+			/*stmttwo = conn.prepareStatement(sqltwo);
 			stmttwo.setString(1, orderNo);
 			stmttwo.setInt(2, goodsid);
-			stmt.executeUpdate();
+			stmttwo.executeUpdate();*/
+//			lstValues = Lists.newArrayList();
+//			lstValues.add(orderNo);
+//			lstValues.add(String.valueOf(goodsid));
 			i++;
-			stmttwo.executeUpdate();
-			stmtinfo = conn.prepareStatement(sqlthree);
+			
+			runSql = DBHelper.covertToSQL(sqltwo, lstValues);
+			SendMQ.sendMsg(new RunSqlModel(runSql));
+			i++;
+			
+			lstValues = Lists.newArrayList();
+			lstValues.add(orderNo);
+			runSql = DBHelper.covertToSQL(sqlthree, lstValues);
+			SendMQ.sendMsg(new RunSqlModel(runSql));
+			/*stmtinfo = conn.prepareStatement(sqlthree);
 			stmtinfo.setString(1, orderNo);
-			stmtinfo.executeUpdate();
+			stmtinfo.executeUpdate();*/
 			i++;
 			this.order_state(conn, orderNo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
+			/*if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
@@ -6563,7 +6730,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
-			}
+			}*/
 			DBHelper.getInstance().closeConnection(conn);
 		}
 		return i;
@@ -6829,11 +6996,11 @@ public class PurchaseDaoImpl implements PurchaseDao {
 			try {
 				// 同步更新线上数据
 				LOG.info("异步线程更新线上的order_details purchase_state状态为1");
-				conn2 = DBHelper.getInstance().getConnection2();
-				stmc2 = conn2.prepareStatement(sqlc);
-				stmc2.setInt(2, goodid);
-				stmc2.setString(1, orderNo);
-				stmc2.executeUpdate();
+				List<String> lstValues = Lists.newArrayList();
+				lstValues.add(orderNo);
+				lstValues.add(String.valueOf(goodid));
+				String runSql = DBHelper.covertToSQL(sqlc, lstValues);
+				SendMQ.sendMsg(new RunSqlModel(runSql));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -7036,11 +7203,6 @@ public class PurchaseDaoImpl implements PurchaseDao {
 					stmt.executeUpdate();
 					DBHelper.getInstance().closeConnection(conn28);
 					//线上表
-//					Connection conn2 = DBHelper.getInstance().getConnection2();
-//					sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-//					stmt = conn2.prepareStatement(sql);
-//					stmt.executeUpdate();
-//					DBHelper.getInstance().closeConnection(conn2);
 					GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
 				}
 				sql="update order_details set inventory_remark='此次不使用库存' where id="+map.get("od_id")+"";

@@ -501,13 +501,14 @@ public class OrderInfoController{
 			map.put("itemid", request.getParameter("itemid"));
 			map.put("repState", request.getParameter("repState"));
 			map.put("warehouseRemark", warehouseRemark);
+			map.put("taobaoId", request.getParameter("taobaoId"));
 			// 验货有误时的验货数量
 			int count = Integer.valueOf(request.getParameter("count"));
-			map.put("count",String.valueOf(count));
+			map.put("count", String.valueOf(count));
 			res = iOrderinfoService.updateGoodStatus(map);
-			String goods_pid=request.getParameter("goods_pid");//统计质量差的商品
-			if (!("1".equals(goods_pid)||"".equals(goods_pid)||goods_pid==null)){
-				Boolean b=this.iOrderinfoService.UpdateGoodsState(goods_pid);
+			String goods_pid = request.getParameter("goods_pid");//统计质量差的商品
+			if (!("1".equals(goods_pid) || "".equals(goods_pid) || goods_pid == null)) {
+				Boolean b = this.iOrderinfoService.UpdateGoodsState(goods_pid);
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -693,10 +694,10 @@ public class OrderInfoController{
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE_PET);
 			}
 //			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
-			SendMQ sendMQ=new SendMQ();
+
 			iOrderinfoService.updateOrderinfoUpdateState(orderNo);
-			sendMQ.sendMsg(new RunSqlModel("update orderinfo set server_update=1 where order_no='"+orderNo+"'"));
-			sendMQ.closeConn();
+			SendMQ.sendMsg(new RunSqlModel("update orderinfo set server_update=1 where order_no='"+orderNo+"'"));
+
 			row=1;
 		}
 		out.print(row);

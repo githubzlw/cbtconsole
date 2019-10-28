@@ -62,16 +62,12 @@ public class TabCouponServiceImpl implements TabCouponService {
 		//保存记录到本地
 		tabCouponMapper.addCoupon(tabCouponNew);
         //发送mq {"count":"100","describe":"-3$","from":"1545580800","id":"001-20181228-100","leftCount":"100","to":"1545926400","type":"1","valid":"1","value":"10-3"}
-        SendMQ sendMQ = null;
+
         try {
-            sendMQ = new SendMQ();
-            sendMQ.sendCouponMsg(json, tabCouponNew.getSite());
+
+            SendMQ.sendCouponMsg(json, tabCouponNew.getSite());
         } catch (Exception e) {
             throw new RuntimeException("mq发送失败");
-        } finally {
-            if (sendMQ != null){
-                sendMQ.closeConn();
-            }
         }
         result.put("state", "true");
         result.put("message", "创建折扣卷成功!");
@@ -184,23 +180,19 @@ public class TabCouponServiceImpl implements TabCouponService {
         //保存记录到本地
         tabCouponMapper.insertCouponUsers(tabCouponNew, userList);
         //发送mq 到线上 {"id":"001-20181228-100","to":"1546185600","type":"2","userid":"1000"}
-        SendMQ sendMQ = null;
+
         try {
-            sendMQ = new SendMQ();
+
             for (UserBean userBean : userList) {
                 CouponUserRedisBean bean = new CouponUserRedisBean(tabCouponNew.getId(), new Long(tabCouponNew.getTo().getTime()).toString(), String.valueOf(userBean.getId()));
                 String json = JSONObject.fromObject(bean).toString();
-                sendMQ.sendCouponMsg(json, tabCouponNew.getWebsiteType());
+                SendMQ.sendCouponMsg(json, tabCouponNew.getWebsiteType());
             }
             //异步发送邮件
             Runnable task=new sendCouponMailTask(userList, tabCouponNew);
             new Thread(task).start();
         } catch (Exception e) {
             throw new RuntimeException("mq发送失败");
-        } finally {
-            if (sendMQ != null){
-                sendMQ.closeConn();
-            }
         }
     }
 
@@ -264,11 +256,11 @@ public class TabCouponServiceImpl implements TabCouponService {
         jsonMap.put("key", "coupon:" + couponCode);
         jsonMap.put("type", "3");
         String json = JSONObject.fromObject(jsonMap).toString();
-        SendMQ sendMQ = null;
+
         try {
-            sendMQ = new SendMQ();
+
             //发送mq删除线上  {"key":"coupon:001-20180929-1000","type":"3"}
-            sendMQ.sendCouponMsg(json, tabCouponNew.getSite());
+            SendMQ.sendCouponMsg(json, tabCouponNew.getSite());
             //本地数据删除（打标记）
             tabCouponMapper.updateCouponValid(couponCode, 0);
             result.put("state", "true");
@@ -276,10 +268,6 @@ public class TabCouponServiceImpl implements TabCouponService {
         } catch (Exception e) {
             result.put("state", "true");
             result.put("message", "删除折扣卷成功");
-        } finally {
-            if (sendMQ != null){
-                sendMQ.closeConn();
-            }
         }
 //        String res = HttpUtil.postCoupon("/coupon/deleteCoupon", "pass", "huisj123lo", "type", "1", "couponcode", couponCode);
 //        if (StringUtils.isNotBlank(res) && Long.valueOf(res) >= 0){

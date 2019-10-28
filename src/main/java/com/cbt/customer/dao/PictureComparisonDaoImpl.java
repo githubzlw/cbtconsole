@@ -9,7 +9,7 @@ import com.cbt.parse.service.TypeUtils;
 import com.cbt.util.StrUtils;
 import com.cbt.util.Util;
 import com.cbt.warehouse.util.StringUtil;
-
+import com.google.common.collect.Lists;
 import com.importExpress.utli.RunBatchSqlModel;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -4301,7 +4301,6 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 
 
 		Connection conn = DBHelper.getInstance().getConnection();
-//		Connection conn1 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null,stmt1 = null;
 		int res = 0;
 		try {
@@ -4311,9 +4310,9 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 //			stmt1 = conn1.prepareStatement(sql2);
 //			stmt1.setString(1, orderNo);
 //			res = stmt1.executeUpdate();
-			SendMQ sendMQ=new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("update orderinfo set packag_style = 2 where order_no ='"+orderNo+"' "));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel("update orderinfo set packag_style = 2 where order_no ='"+orderNo+"' "));
+
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -4395,16 +4394,15 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		
 		String sql1 = "insert into changegooddata (orderno,goodscarid,goodid,aliname,aliimg,aliurl,aliprice,chagoodname,chagoodimg,chagoodurl,chagoodprice,delflag,changeflag,goodstype,emailsendflag) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
 		String sqlDel ="delete from changegooddata where orderno=? ";
-//		Connection conn1 = DBHelper.getInstance().getConnection2();
 //		PreparedStatement stmt0=null,stmt1 = null;
 		int res = 0;
 		try {
 //			stmt0 = conn1.prepareStatement(sqlDel);
 //			stmt0.setString(1, orderNo);
 //			res = stmt0.executeUpdate();
-			SendMQ sendMQ=new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("delete from changegooddata where orderno='"+orderNo+"'"));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel("delete from changegooddata where orderno='"+orderNo+"'"));
+
 
 //			for(int i=0; i<gsfList.size(); i++){
 //				stmt1 = conn1.prepareStatement(sql1);
@@ -5309,7 +5307,6 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		
 
 		Connection conn = DBHelper.getInstance().getConnection();
-//		Connection conn1 = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
 		PreparedStatement stmt0 = null,stmt = null,stmt1 = null,stmt2 = null,stmt3 = null;
 		GoodsCheckBean goodsCheckBean = null;
@@ -5381,9 +5378,9 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 //				stmt4 = conn1.prepareStatement(sqlChangeOnLine);
 //				stmt4.setString(1, orderNo);
 //				res = stmt4.executeUpdate();
-				SendMQ sendMQ=new SendMQ();
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set packag_style = 1 where order_no ='"+orderNo+"' "));
-				sendMQ.closeConn();
+
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set packag_style = 1 where order_no ='"+orderNo+"' "));
+
 
 				//更新货源表替换产品标识
 				String sqlGoods = "update goods_source set change_flag = 1 where goods_url = ? and goods_purl=? ";
@@ -5949,24 +5946,14 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			sql = "update custom_benchmark_ready set rebid_flag=4 where pid=? ";
 		}
 
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
 		int res = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, tbGoodBean.getSourceYlpid());
-			res = stmt.executeUpdate();
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(tbGoodBean.getSourceYlpid());
+			String runSql = DBHelper.covertToSQL(sql, lstValues );
+			res = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
 		}
 	 return res;
 	}

@@ -1,6 +1,7 @@
 package com.importExpress.service.impl;
 
 import com.cbt.warehouse.pojo.HotCategory;
+import com.cbt.warehouse.pojo.HotClassInfo;
 import com.cbt.warehouse.pojo.HotDiscount;
 import com.cbt.warehouse.pojo.HotEvaluation;
 import com.importExpress.mapper.HotManageMapper;
@@ -72,11 +73,6 @@ public class HotManageServiceImpl implements HotManageService {
     @Override
     public int checkEvaluationIsExists(String goodsPid, String skuId) {
         return hotManageMapper.checkEvaluationIsExists(goodsPid, skuId);
-    }
-
-    @Override
-    public HotEvaluation queryHotEvaluationById(int id) {
-        return hotManageMapper.queryHotEvaluationById(id);
     }
 
     @Override
@@ -185,6 +181,26 @@ public class HotManageServiceImpl implements HotManageService {
 	public List<HotCategory> queryCategoryList(HotCategory hotCategory) {
 		return hotManageMapper.queryCategoryList(hotCategory);
 	}
+
+    @Override
+    public List<HotClassInfo> getClassInfoList(HotClassInfo classInfo) {
+        return hotManageMapper.getClassInfoList(classInfo);
+    }
+
+    @Override
+    public int insertIntoHotClassInfo(HotClassInfo hotClassInfo) {
+        return hotManageMapper.insertIntoHotClassInfo(hotClassInfo);
+    }
+
+    @Override
+    public int updateIntoHotClassInfo(HotClassInfo hotClassInfo) {
+        return hotManageMapper.updateIntoHotClassInfo(hotClassInfo);
+    }
+
+    @Override
+    public int deleteHotClassInfo(int id) {
+        return hotManageMapper.deleteHotClassInfo(id);
+    }
 
 
 }

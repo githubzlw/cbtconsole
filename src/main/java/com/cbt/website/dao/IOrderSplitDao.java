@@ -23,6 +23,7 @@ public interface IOrderSplitDao {
 	 * @param gId_last拆出来的购物车ID
 	 * @param splitGoodsId前台输入数量拆出来的购物车ID
 	 */
+	@Deprecated
 	public int splitOrder(OrderBean orderBean, OrderBean orderBean2, String odId_last, String selSplitArr, Payment pay,
                           int state, double order_ac, double balance_pay, String gId_last, String adminUserName, String pay_time,
                           List<OrderDetailsBean> updateOrderDetaildList, List<OrderDetailsBean> insertOrderDetaildList,

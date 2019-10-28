@@ -1,6 +1,7 @@
 package com.importExpress.mapper;
 
 import com.cbt.warehouse.pojo.HotCategory;
+import com.cbt.warehouse.pojo.HotClassInfo;
 import com.cbt.warehouse.pojo.HotDiscount;
 import com.cbt.warehouse.pojo.HotEvaluation;
 import com.importExpress.pojo.HotSellGoods;
@@ -34,8 +35,6 @@ public interface HotManageMapper {
 
     int checkEvaluationIsExists(@Param("goodsPid") String goodsPid, @Param("skuId") String skuId);
 
-    HotEvaluation queryHotEvaluationById(@Param("id") int id);
-
     int insertIntoHotEvaluation(HotEvaluation hotEvaluation);
 
     int updateHotEvaluation(HotEvaluation hotEvaluation);
@@ -50,4 +49,31 @@ public interface HotManageMapper {
     List<HotSellGoods> queryGoodsByHotType(@Param("hotType") int hotType);
 
 	List<HotCategory> queryCategoryList(HotCategory hotCategory);
+
+	/**
+     * 获取所有的热卖分组
+     * @return
+     */
+	List<HotClassInfo> getClassInfoList(HotClassInfo classInfo);
+
+    /**
+     * 插入热卖分组
+     * @param hotClassInfo
+     * @return
+     */
+	int insertIntoHotClassInfo(HotClassInfo hotClassInfo);
+
+	/**
+     * 更新热卖分组
+     * @param hotClassInfo
+     * @return
+     */
+	int updateIntoHotClassInfo(HotClassInfo hotClassInfo);
+
+	/**
+     * 删除热卖分组
+     * @param id
+     * @return
+     */
+	int deleteHotClassInfo(int id);
 }

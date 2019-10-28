@@ -111,17 +111,19 @@ public class InventoryServiceImpl implements  InventoryService{
 			}
 			String car_img=t.getCarImg();
 			if(StringUtil.isNotBlank(car_img)) {
+				car_img = car_img.replace(".60x60.jpg", ".400x400.jpg");
+//				String imgs[]=car_img.split("kf");
+//				if(imgs.length > 1) {
+//					String one=imgs[0];
+//					String two=imgs[1].replace(".jpg_50x50","");
+//					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
+//				}
+//				
+//				t.setCarImg("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
+//						+ "<img   class=\"img-responsive\" src='"+ (car_img.indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":car_img) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ car_img + "')\" height='100' width='100'></a>");
 				
-				String imgs[]=car_img.split("kf");
-				if(imgs.length > 1) {
-					String one=imgs[0];
-					String two=imgs[1].replace(".jpg_50x50","");
-					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
-				}
 				
-				t.setCarImg("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
-						+ "<img   class=\"img-responsive\" src='"+ (car_img.indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":car_img) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ car_img + "')\" height='100' width='100'></a>");
-				
+				t.setCarImg(car_img);
 			}
 			t.setGoodsUrl(StringUtil.isBlank(t.getGoodsUrl())?"":t.getGoodsUrl());
 			t.setCarUrlMD5(StringUtil.isBlank(t.getCarUrlMD5())?"":t.getCarUrlMD5());
@@ -901,7 +903,7 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public int inputInventory(Map<String, String> param) {
-		String goodsUrl = "https://www.import-express.com/goodsinfo/aa-0-0-"+param.get("goods_pid")+".html";
+		String goodsUrl = "https://www.import-express.com/goodsinfo/aa-0-0-1"+param.get("goods_pid")+".html";
 		InventorySku iSku = new InventorySku();
 		iSku.setBarcode(param.get("barcode"));
 		iSku.setCarImg(param.get("img"));
@@ -1106,7 +1108,6 @@ public class InventoryServiceImpl implements  InventoryService{
 			item.setCanRemaining(i.getCheckRemaining());
 			item.setInventoryCheckId(checkId);
 			item.setCheckRemaining(i.getCheckRemaining());
-			item.setCanRemaining(i.getCheckRemaining());
 			item.setBarcode(i.getAfterBarcode());
 			inventoryMapper.updateInventoryCheckFlag(item );
 			
@@ -1192,7 +1193,7 @@ public class InventoryServiceImpl implements  InventoryService{
 	 */
 	private void updateOrderState(Map<String,String> map){
 		try {
-			SendMQ sendMQ = new SendMQ();
+
 			//订单产品要入库， 状态要验货无误
 //			order_details.state=1 order_details.checked=1 
 			orderinfoMapper.updateChecked(map);
@@ -1203,24 +1204,24 @@ public class InventoryServiceImpl implements  InventoryService{
 			Map<String,Object> orderinfoMap = pruchaseMapper.queryUserIdAndStateByOrderNo(map.get("orderid"));
 			
 			orderinfoMapper.updateOrderDetails(map);
-			sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+			SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 			
 			int counts=orderinfoMapper.getDtailsState(map);
 			
 			if (isDropshipOrder == 1) {
 //				orderinfoMapper.updateOrderDetails(map);
-//				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+//				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 //				int counts=orderinfoMapper.getDtailsState(map);
 				if(counts == 0){
 					orderinfoMapper.updateDropshiporder(map);
-					sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+map.get("orderid")+"' " +
+					SendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+map.get("orderid")+"' " +
 							"and id='"+map.get("odid")+"')"));
 				}
 				//判断主单下所有的子单是否到库
 				counts=orderinfoMapper.getAllChildOrderState(map);
 				/*if(counts == 0){
 					orderinfoMapper.updateOrderInfoState(map);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 					//判断订单状态是否一致
 					if(!orderinfoMap.get("old_state").toString().equals("2")){
 						//发送消息给客户
@@ -1231,12 +1232,12 @@ public class InventoryServiceImpl implements  InventoryService{
 			}else{
 				// 非dropshi订单
 //				orderinfoMapper.updateOrderDetails(map);
-//				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
+//				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 				//判断订单是否全部到库
 //				int counts=orderinfoMapper.getDetailsState(map);
 				/*if(counts == 0){
 					orderinfoMapper.updateOrderInfoState(map);
-					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 					//判断订单状态是否一致
 					if(!orderinfoMap.get("old_state").toString().equals("2")){
 						//发送消息给客户
@@ -1247,7 +1248,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			}
 			if(counts == 0){
 				orderinfoMapper.updateOrderInfoState(map);
-				sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+				SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 				//判断订单状态是否一致
 				if(!orderinfoMap.get("old_state").toString().equals("2")){
 					//发送消息给客户
@@ -1262,7 +1263,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			map.put("remark", "有库存商品，采购自动匹配入库 inventory_sku_id:"+map.get("inventory_sku_id")+"/orderid:"+map.get("orderid")+"/od_id:"+map.get("od_id"));
 			orderinfoMapper.insertGoodsInventory(map);
 			LOG.info("--------------------结束记录商品入库--------------------");
-			sendMQ.closeConn();
+
 			
 			//insertOrderProductSource
 			pruchaseMapper.insertOrderProductSource(map);
@@ -1579,6 +1580,8 @@ public class InventoryServiceImpl implements  InventoryService{
 	public List<LossInventoryWrap> inventoryLossList(Map<String, Object> map) {
 		List<LossInventoryWrap> inventoryLossList = inventoryMapper.inventoryLossList(map);
 		for(LossInventoryWrap l : inventoryLossList) {
+			String img = l.getImg() == null ? "" : l.getImg();
+			l.setImg(img.replace(".60x60.jpg", ".400x400.jpg"));
 			//0  损坏 1 遗失  3 添加 4 补货  5 漏发 7 其他原因
 			String changeContext = "";
 			switch (l.getChangeType()) {
