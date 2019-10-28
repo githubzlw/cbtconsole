@@ -187,7 +187,7 @@ function topCenter(msg){
 				<th data-options="field:'goodsPid',width:50,align:'center'" >产品ID</th>
 				<th data-options="field:'skuContext',width:100,align:'center'">产品SKU</th>
 				<th data-options="field:'goodsImg',width:80,align:'center'">商品图片</th>
-				<th data-options="field:'goodsNumber',width:50,align:'center'">数量</th>
+				<th data-options="field:'goodsNumber',width:50,align:'center'">库存变化数量</th>
 				<th data-options="field:'orderContext',width:50,align:'center'">订单信息</th>
 				<th data-options="field:'typeContext',width:50,align:'center'">类型</th>
 				<th data-options="field:'remark',width:50,align:'center'">备注说明</th>

@@ -322,6 +322,11 @@ public class NewOrderSplitCtr {
 
             // 查询订单和订单详情
             OrderBean orderBean = splitDao.getOrders(orderNo);
+            if(orderBean == null || StringUtils.isBlank(orderBean.getOrderNo())){
+                json.setOk(false);
+                json.setMessage("获取订单，请重试");
+                return json;
+            }
             // 获取新的订单号
             nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0);
             // 需要取消的商品order_details的id

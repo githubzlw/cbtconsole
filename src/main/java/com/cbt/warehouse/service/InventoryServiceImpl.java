@@ -111,17 +111,19 @@ public class InventoryServiceImpl implements  InventoryService{
 			}
 			String car_img=t.getCarImg();
 			if(StringUtil.isNotBlank(car_img)) {
+				car_img = car_img.replace(".60x60.jpg", ".400x400.jpg");
+//				String imgs[]=car_img.split("kf");
+//				if(imgs.length > 1) {
+//					String one=imgs[0];
+//					String two=imgs[1].replace(".jpg_50x50","");
+//					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
+//				}
+//				
+//				t.setCarImg("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
+//						+ "<img   class=\"img-responsive\" src='"+ (car_img.indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":car_img) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ car_img + "')\" height='100' width='100'></a>");
 				
-				String imgs[]=car_img.split("kf");
-				if(imgs.length > 1) {
-					String one=imgs[0];
-					String two=imgs[1].replace(".jpg_50x50","");
-					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
-				}
 				
-				t.setCarImg("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
-						+ "<img   class=\"img-responsive\" src='"+ (car_img.indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":car_img) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ car_img + "')\" height='100' width='100'></a>");
-				
+				t.setCarImg(car_img);
 			}
 			t.setGoodsUrl(StringUtil.isBlank(t.getGoodsUrl())?"":t.getGoodsUrl());
 			t.setCarUrlMD5(StringUtil.isBlank(t.getCarUrlMD5())?"":t.getCarUrlMD5());
@@ -901,7 +903,7 @@ public class InventoryServiceImpl implements  InventoryService{
 	}
 	@Override
 	public int inputInventory(Map<String, String> param) {
-		String goodsUrl = "https://www.import-express.com/goodsinfo/aa-0-0-"+param.get("goods_pid")+".html";
+		String goodsUrl = "https://www.import-express.com/goodsinfo/aa-0-0-1"+param.get("goods_pid")+".html";
 		InventorySku iSku = new InventorySku();
 		iSku.setBarcode(param.get("barcode"));
 		iSku.setCarImg(param.get("img"));
@@ -1106,7 +1108,6 @@ public class InventoryServiceImpl implements  InventoryService{
 			item.setCanRemaining(i.getCheckRemaining());
 			item.setInventoryCheckId(checkId);
 			item.setCheckRemaining(i.getCheckRemaining());
-			item.setCanRemaining(i.getCheckRemaining());
 			item.setBarcode(i.getAfterBarcode());
 			inventoryMapper.updateInventoryCheckFlag(item );
 			
@@ -1579,6 +1580,8 @@ public class InventoryServiceImpl implements  InventoryService{
 	public List<LossInventoryWrap> inventoryLossList(Map<String, Object> map) {
 		List<LossInventoryWrap> inventoryLossList = inventoryMapper.inventoryLossList(map);
 		for(LossInventoryWrap l : inventoryLossList) {
+			String img = l.getImg() == null ? "" : l.getImg();
+			l.setImg(img.replace(".60x60.jpg", ".400x400.jpg"));
 			//0  损坏 1 遗失  3 添加 4 补货  5 漏发 7 其他原因
 			String changeContext = "";
 			switch (l.getChangeType()) {

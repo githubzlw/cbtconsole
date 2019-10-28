@@ -987,8 +987,8 @@ public class UserDaoImpl implements UserDao {
 				String runSql = DBHelper.covertToSQL(sql, listValues);
 				String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
 				int countRs = 0;
-				if(StringUtils.isBlank(rsStr)){
-					countRs = Integer.valueOf(rsStr);
+				if(StringUtils.isNotBlank(rsStr)){
+					countRs = Integer.parseInt(rsStr);
 				}
 				res = countRs;
                 
@@ -1003,11 +1003,11 @@ public class UserDaoImpl implements UserDao {
 				listValues.add(String.valueOf(order_ac));
 				listValues.add(String.valueOf(userid));
 
-				runSql = DBHelper.covertToSQL(sql, listValues);
+				runSql = DBHelper.covertToSQL(sql1, listValues);
 				rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
 				countRs = 0;
-				if(StringUtils.isBlank(rsStr)){
-					countRs = Integer.valueOf(rsStr);
+				if(StringUtils.isNotBlank(rsStr)){
+					countRs = Integer.parseInt(rsStr);
 				}
 				res1 = countRs;
             }    
