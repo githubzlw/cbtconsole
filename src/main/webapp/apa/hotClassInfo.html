@@ -42,7 +42,16 @@
 
         .but_color {
             background: #44a823;
-            width: 90px;
+            width: 80px;
+            height: 28px;
+            border: 1px #aaa solid;
+            color: #fff;
+            margin-right: 18px;
+        }
+
+        .del_color {
+            background: red;
+            width: 80px;
             height: 28px;
             border: 1px #aaa solid;
             color: #fff;
@@ -119,7 +128,9 @@
         }
 
         function formatOperation(val, row, index) {
-            return '<button class="but_color" onclick="updateAndInsertClassIfo(' + row.id + ',1)">编辑</button>';
+            var content = '<button class="but_color" onclick="updateAndInsertClassIfo(' + row.id + ',1)">编辑</button>';
+            content += '<button class="del_color" onclick="deleteClassIfo(' + row.id + ')">删除</button>';
+            return content;
         }
 
         function updateAndInsertClassIfo(id, type) {
@@ -179,13 +190,38 @@
                         closeDialog();
                         doQuery();
                     } else {
-                        $.messager.alert("提醒", '查询失败:' + data.message, "info");
+                        $.messager.alert("提醒", '设置失败:' + data.message, "info");
                     }
                 },
                 error: function (res) {
                     $.messager.alert("提醒", '执行错误，请联系管理员', "error");
                 }
             });
+        }
+
+        function deleteClassIfo(id) {
+            $.messager.confirm('提示', '是否删除?删除后数据将无法恢复', function (rs) {
+                if (rs) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/cbtconsole/hotManage/deleteClassIfo",
+                        data: {
+                            id: id
+                        },
+                        success: function (data) {
+                            if (data.ok) {
+                                doQuery();
+                            } else {
+                                $.messager.alert("提醒", '执行失败:' + data.message, "info");
+                            }
+                        },
+                        error: function (res) {
+                            $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                        }
+                    });
+                }
+            });
+
         }
     </script>
 </head>

@@ -1286,6 +1286,36 @@ public class HotManageController {
         return json;
     }
 
+    @RequestMapping("/deleteClassIfo")
+    @ResponseBody
+    public JsonResult deleteClassIfo(HttpServletRequest request,
+                                   @RequestParam(value = "id", required = true) Integer id) {
+
+        JsonResult json = new JsonResult();
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null || admuser.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后重试");
+            return json;
+        }
+        if (id == null || id < 1) {
+            json.setOk(false);
+            json.setMessage("获取分组名称失败");
+            return json;
+        }
+        try {
+            deleteHotClassInfoOnline(id);
+            hotManageService.deleteHotClassInfo(id);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("deleteClassIfo失败，原因 :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("deleteClassIfo失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
 	/**
 	 * 热卖json信息写入
 	 * @param resultList
@@ -1525,6 +1555,11 @@ public class HotManageController {
                 + " where id = " + hotClassInfo.getId();
         System.err.println(sql);
         NotifyToCustomerUtil.sendSqlByMq(sql);
+    }
+
+    private void deleteHotClassInfoOnline(int id){
+	    String sql = "delete from hot_class_info where id = " + id;
+	    NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
 }
