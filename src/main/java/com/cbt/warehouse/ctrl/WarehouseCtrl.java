@@ -9548,7 +9548,10 @@ public class WarehouseCtrl {
 				OverseasWarehouseStock stock;
 				int reduce = 0;
 				for(OverseasWarehouseStockLog l : logByOrderno) {
-					String remark = "订单"+orderno+"/"+l.getOdid()+"已出运"+shipno+",释放其占用的库存"+l.getChangeStock();
+					if(l.getChangeStock() == 0) {
+						continue;
+					}
+					String remark = "订单"+orderno+"/"+l.getOdid()+"已出运-"+shipno+",释放其占用的库存"+l.getChangeStock();
 					stock = OverseasWarehouseStock.builder().orderStock(l.getChangeStock()).code(l.getCode()).build();
 					reduce += owsService.reduceOrderStock(stock, orderno, l.getOdid(), remark);
 				}
