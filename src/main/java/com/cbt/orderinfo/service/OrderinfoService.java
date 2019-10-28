@@ -1420,7 +1420,6 @@ public class OrderinfoService implements IOrderinfoService {
 							"        values " +
 							"            ('"+sob.getUserId()+"','"+sob.getOrderNo()+"','"+sob.getPid()+"','"+sob.getImgUrl()+"','"+sob.getSkuId()+"','"+sob.getEnType()+"','"+sob.getIsChoose()+"')";
 					SendMQ.sendMsg(new RunSqlModel(sql));
-					System.out.println(sql);
 				}
 
 
@@ -1529,7 +1528,7 @@ public class OrderinfoService implements IOrderinfoService {
 				//添加订单详细信息
 
 				SendMQ.sendMsg(new RunSqlModel(sql));
-				System.out.println(sql);
+
 			}
 			// 插入地址信息
 			SendMQ.sendMsg(new RunSqlModel("insert into order_address(AddressID,orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,street,recipients)" +
