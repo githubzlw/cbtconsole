@@ -57,7 +57,7 @@
 	width: 200px;
 }
 .report .w350 {
-	width: 350px;
+	width: 250px;
 }
 .report .w160 {
 	width: 160px;
@@ -65,7 +65,7 @@
 /* .report th, .report td {
 	text-align: center;
 } */
-.datagrid-cell-c2-goodsName{width:300px;}
+.datagrid-cell-c2-goodsName{width:250px;}
 .datagrid-cell-c2-goodsSku{width: 350px;}
 .mt5 {
 	margin-top: 5px;
@@ -143,7 +143,7 @@ em,i{font-style: normal;}
 .tc3 .wrap8{text-align: center;}
 .tc3 .wrap8 button{border:1px solid #999;padding:0 80px; line-height:28px;border-radius: 4px;}
 
-.datagrid-cell-c2-remarkContext{width:400px;}
+.datagrid-cell-c2-remarkContext{width:350px;}
 .li_more_s{display: none;}
 .report .btn_page_in{width:100px;}
 .btn-check-list{display: none;}
@@ -188,6 +188,10 @@ em,i{font-style: normal;}
 				</c:if>
 				</select>
 				</label>
+				<label>
+						<input type="checkbox" id="szero">零库存
+						<input type="hidden" value="${queryParam.isShowZero}" id="q_szero">
+					</label>
 				<label><button class="btn btn-info"  id="query_button">查询</button></label>
 				<label><a href="/cbtconsole/inventory/check/list"><button class="btn btn-success">库存盘点</button></a></label>
 				<label><a href="/cbtconsole/inventory/loss/list"><button class="btn btn-success button_loss"  id="query_button_loss">库存损益</button></a></label>

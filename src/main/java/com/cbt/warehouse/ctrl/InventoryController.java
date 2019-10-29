@@ -499,6 +499,10 @@ public class InventoryController {
 			map.put("check_id", Integer.valueOf(check_id));
 		}
 		
+		String isShowZero = request.getParameter("szero");
+		
+		
+		map.put("isShowZero", "1".equals(isShowZero)? 1 : 0);
 		return map;
 	}
 

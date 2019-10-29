@@ -228,6 +228,10 @@ em,i{font-style: normal;}
 				</c:if>
 				</select>
 				</label>
+				<label>
+						<input type="checkbox" id="szero">零库存
+						<input type="hidden" value="${queryParam.isShowZero}" id="q_szero">
+					</label>
 				<button class="btn btn-info bt_ready"  id="query_button_check">查询</button>
 				
 			</div>

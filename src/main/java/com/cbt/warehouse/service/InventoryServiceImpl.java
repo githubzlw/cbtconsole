@@ -685,7 +685,9 @@ public class InventoryServiceImpl implements  InventoryService{
 		
 		int after_remaining = before_remaining - inventory_count;
 		can_remaining = isReduce ? can_remaining : can_remaining - inventory_count;
-		
+		if(after_remaining < 0) {
+			return 0;
+		}
 		//1.库存减少
 		iSku.setId(inventoryMap.getId());
 		iSku.setRemaining(after_remaining);
