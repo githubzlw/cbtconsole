@@ -148,4 +148,14 @@ public static void main(String[] args) {
         return mapper.insertIntoUserRecommendEmail(userRecommendEmail);
     }
 
+	@Override
+	public List<UserInfo> queryBusinessMembershipAuthorization(UserInfo userInfo) {
+		return mapper.queryBusinessMembershipAuthorization(userInfo);
+	}
+
+	@Override
+	public int queryBusinessMembershipAuthorizationCount(UserInfo userInfo) {
+		return mapper.queryBusinessMembershipAuthorizationCount(userInfo);
+	}
+
 }

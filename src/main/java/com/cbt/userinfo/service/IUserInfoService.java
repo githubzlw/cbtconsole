@@ -92,4 +92,13 @@ public interface IUserInfoService {
      * @return
      */
 	int insertIntoUserRecommendEmail(UserRecommendEmail userRecommendEmail);
+
+	/**
+     * 分页查询商业会员授权
+     * @param userInfo
+     * @return
+     */
+	List<UserInfo> queryBusinessMembershipAuthorization(UserInfo userInfo);
+
+	int queryBusinessMembershipAuthorizationCount(UserInfo userInfo);
 }

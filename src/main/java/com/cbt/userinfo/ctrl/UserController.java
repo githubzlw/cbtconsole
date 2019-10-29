@@ -1,9 +1,6 @@
 package com.cbt.userinfo.ctrl;
 
-import com.cbt.bean.Address;
-import com.cbt.bean.BalanceBean;
-import com.cbt.bean.OrderBean;
-import com.cbt.bean.OrderPaymentBean;
+import com.cbt.bean.*;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.dao.RefundDaoPlus;
 import com.cbt.dao.impl.RefundDaoImpl;
@@ -675,6 +672,51 @@ public class UserController {
             json.setOk(false);
             json.setMessage("获取失败");
             e.printStackTrace();
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/queryMemAuthList", method = RequestMethod.POST)
+    @ResponseBody
+    public EasyUiJsonResult queryBusinessMembershipAuthorization(HttpServletRequest request,
+                               Integer page , Integer rows, Integer userId, String email, Integer countryId, Integer authFlag) {
+        EasyUiJsonResult json = new EasyUiJsonResult();
+
+
+        UserInfo userInfo = new UserInfo();
+        if(page == null || page == 0){
+            page = 1;
+        }
+        if(rows != null && rows > 0){
+            userInfo.setLimitNum(rows);
+            userInfo.setStartNum((page -1) * rows);
+        }
+        if(userId != null &&  userId > 0){
+            userInfo.setUserid(userId);
+        }
+
+        if(StringUtils.isNotBlank(email)){
+            userInfo.setEmail(email);
+        }
+        userInfo.setCountryId(countryId);
+        userInfo.setAuthFlag(authFlag);
+
+        try {
+
+
+            List<UserInfo> list= userInfoService.queryBusinessMembershipAuthorization(userInfo);
+
+            int count = userInfoService.queryBusinessMembershipAuthorizationCount(userInfo);
+            json.setRows(list);
+            json.setTotal(count);
+            json.setSuccess(true);
+        } catch (Exception e) {
+            json.setSuccess(false);
+            json.setMessage("获取失败");
+            e.printStackTrace();
+            LOG.error("queryMemAuthList error:",e);
+
         }
         return json;
     }
