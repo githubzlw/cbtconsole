@@ -313,6 +313,7 @@ function catalogProduct(id,requestHost){
 					productArray.push(product.pid);
 				}
 			}
+			$("#catalog_name").val(data.catalogName);
 			$(".product-list").html(productHtml);
 //			console.log(productArray);
 		},
