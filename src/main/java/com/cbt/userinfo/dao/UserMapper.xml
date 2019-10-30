@@ -19,12 +19,7 @@
     <result column="ac_there" property="acThere" jdbcType="INTEGER" />
     <result column="currency" property="currency" jdbcType="VARCHAR" />
     <result column="adminname" property="adminname" jdbcType="VARCHAR" />
-    <result column="businessinfo" property="businessinfo" jdbcType="VARCHAR" />
-      <result column="productone" property="productone" jdbcType="VARCHAR" />
-      <result column="businessName" property="businessname" jdbcType="VARCHAR" />
-      <result column="businessName" property="businessname" jdbcType="VARCHAR" />
-      <result column="businessName" property="businessname" jdbcType="VARCHAR" />
-      <result column="businessName" property="businessname" jdbcType="VARCHAR" />
+    <result column="businessName" property="businessname" jdbcType="VARCHAR" />
   </resultMap>
   
   <resultMap id="UserExResultMap" type="com.cbt.pojo.UserEx" >
