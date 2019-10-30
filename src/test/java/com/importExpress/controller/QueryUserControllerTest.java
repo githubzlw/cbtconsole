@@ -2,6 +2,7 @@ package com.importExpress.controller;
 
 import com.importExpress.service.QueryUserService;
 import com.importExpress.utli.SendMQ;
+import com.rabbitmq.client.Channel;
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,9 +11,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author: JiangXW
@@ -31,11 +34,12 @@ public class QueryUserControllerTest {
 
 
     @Test
-    public void testGo() {
+    public void testGo() throws IOException, TimeoutException {
 
         // Executor theadPool = Executors.newCachedThreadPool();
         Map<String, String> map = new HashMap<>();
         int isFlag = 1;
+        Channel channel =null ;
         try {
             List<Integer> list = queryUserService.queryAllCheckout(isFlag);
             int count = 0;
@@ -53,7 +57,8 @@ public class QueryUserControllerTest {
                         SendMQ.sendAuthorizationFlagMqSql(userid, isFlag);
                         queryUserService.updateUserCheckout(userid, isFlag);
                     });*/
-                    SendMQ.sendAuthorizationFlagMqSql(userid, isFlag);
+                    channel = SendMQ.getChannel();
+                    SendMQ.sendAuthorizationFlagMqSql(channel ,userid, isFlag);
                     queryUserService.updateUserCheckout(userid, isFlag);
                 }
             }
@@ -64,6 +69,10 @@ public class QueryUserControllerTest {
             e.printStackTrace();
             map.put("success", "false");
             map.put("message", e.getMessage());
+        }finally {
+            if(channel != null){
+                channel.close();
+            }
         }
         System.err.println(map);
 
@@ -85,7 +94,7 @@ public class QueryUserControllerTest {
                         SendMQ.sendAuthorizationFlagMqSql(userid, zoneFlag);
                         queryUserService.updateUserCheckout(userid, zoneFlag);
                     });*/
-                    SendMQ.sendAuthorizationFlagMqSql(userid, zoneFlag);
+                    SendMQ.sendAuthorizationFlagMqSql(channel, userid, zoneFlag);
                     queryUserService.updateUserCheckout(userid, zoneFlag);
                 }
             }
