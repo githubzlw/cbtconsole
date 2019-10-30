@@ -143,7 +143,8 @@ em,i{font-style: normal;}
 <body>
 <div class="container-fluid report">
 <div class=""></div>
-		<h1 class="text-center">推荐目录列表</h1>
+		<h1 class="text-center">推荐目录列表</h1><span style="color: red;">注意:因线上与后台数据同步原因,新增或编辑目录后需等待3分钟刷新列表!!!</span>
+		
 		<div class="row mt20 row2">
 			<div class="col-xs-2">
 				<button class="btn btn-success catalog-new" >新增推荐</button>
@@ -181,8 +182,8 @@ em,i{font-style: normal;}
 						<td class="catalog-template">
 						
 						<c:if test="${catalog.template==1}">IMPORT</c:if>
-						<c:if test="${catalog.template==2}">IMPORT</c:if>
-						<c:if test="${catalog.template==4}">IMPORT</c:if>
+						<c:if test="${catalog.template==2}">KIDS</c:if>
+						<c:if test="${catalog.template==4}">PETS</c:if>
 						
 						</td>
 						<td align="left" class="catalog-create-admin">${catalog.createAdmin}</td>

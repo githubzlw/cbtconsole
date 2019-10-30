@@ -118,6 +118,7 @@ public class RecommendCatalogController {
 		List<CatalogProductWrap> redisWrap = new ArrayList<>();
 		String redisCatalog = "";
 		String catalogName = "";
+		int template = 1;
 		if("true".equals(isManag)) {
 			String id = request.getParameter("id");
 			//仅预览
@@ -140,6 +141,7 @@ public class RecommendCatalogController {
 				return result;
 			}
 			catalogName = catalogById.getCatalogName();
+			template = catalogById.getTemplate();
 			redisWrap = SerializeUtil.JsonToListT(redisCatalog, CatalogProductWrap.class);
 			result.put("productSize", redisWrap.size());
 			Redis.hset(redisKey, saveKey, redisCatalog,2*60*60);
@@ -153,6 +155,7 @@ public class RecommendCatalogController {
 		result.put("productSize", redisWrap.size());
 		result.put("product", redisCatalog);
 		result.put("catalogName", catalogName);
+		result.put("template", template);
 		
 		return result;
 		
