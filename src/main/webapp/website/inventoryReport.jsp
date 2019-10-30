@@ -508,6 +508,7 @@ em,i{font-style: normal;}
 </div>
 </body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/msg-confirm.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/inventoryReport.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.min.js"></script>
 </html>

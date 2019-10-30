@@ -648,11 +648,11 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
                     //End：
 
                     // 如果订单总金额<= 0,不能进行退款操作
-                    if (actualPay <= 0) {
-                        $('#closeOrder').removeAttr("disabled");
-                        $("#closeOrder").show();
-                        showMessage('余额小于等于0，不能取消');
-                    } else {
+                    // if (actualPay <= 0) {
+                    //     $('#closeOrder').removeAttr("disabled");
+                    //     $("#closeOrder").show();
+                    //     showMessage('余额小于等于0，不能取消');
+                    // } else {
                         var params = {
                             "orderNo" : orderno,
                             "userId" : userId,
@@ -693,7 +693,7 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
                                 $("#closeOrder").show();
                             }
                         });
-                    }
+                    // }
                 }
         },
         cancel : function() {

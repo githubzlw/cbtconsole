@@ -1,9 +1,11 @@
 package com.importExpress.mapper;
 
-import com.cbt.bean.Category1688Bean;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.cbt.bean.Category1688Bean;
 
 public interface CategoryMapper {
 	 /**
@@ -28,5 +30,16 @@ public interface CategoryMapper {
      * @return
      */
     int updateCategoryname(@Param("id") int id, @Param("categoryname") String categoryname);
+    
+    /**获取类别列表
+     * @return
+     */
+    List<Map<String,String>> geCategoryList();
+    
+    /**获取类别名称
+     * @param catid
+     * @return
+     */
+    String getCategoryByCatid(String catid);
 
 }
