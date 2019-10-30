@@ -685,9 +685,10 @@ public class InventoryServiceImpl implements  InventoryService{
 		
 		int after_remaining = before_remaining - inventory_count;
 		can_remaining = isReduce ? can_remaining : can_remaining - inventory_count;
-		if(after_remaining < 0) {
+		if(before_remaining ==0) {
 			return 0;
 		}
+		after_remaining = after_remaining < 0 ? 0 : after_remaining;
 		//1.库存减少
 		iSku.setId(inventoryMap.getId());
 		iSku.setRemaining(after_remaining);
@@ -1446,6 +1447,13 @@ public class InventoryServiceImpl implements  InventoryService{
 			}else if(i.getIbState() == 5) {
 				i.setStateContext("仓库取消了入库请求");
 			}
+			String iskSCarImg = i.getIskSCarImg();
+			iskSCarImg = iskSCarImg == null ? iskSCarImg : iskSCarImg.replace(".60x60.jpg", ".400x400.jpg");
+			String odCarImg = i.getOdCarImg();
+			odCarImg = odCarImg == null ? odCarImg : odCarImg.replace(".60x60.jpg", ".400x400.jpg");
+			
+			i.setIskSCarImg(iskSCarImg);
+			i.setOdCarImg(odCarImg);
 		}
 		return inventoryBarcodeList;
 	}

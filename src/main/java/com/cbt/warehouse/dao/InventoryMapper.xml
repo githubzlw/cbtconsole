@@ -822,7 +822,7 @@
     select  goods_pid,good_skuid,goods_specid,orderno,od_id,goods_number,
     inventory_id,goods_p_skuid,goods_p_specid
     
-    from inventory_details_sku where od_id=#{odid} and type=0 order by id desc limit 1 
+    from inventory_details_sku where od_id=#{odid} and type=5 order by id desc limit 1 
     </select>
     <select id="getUnDoneInventoryBarcode" resultType="Integer">
     select count(*) from  inventory_barcode_record where state=0 or state=1
