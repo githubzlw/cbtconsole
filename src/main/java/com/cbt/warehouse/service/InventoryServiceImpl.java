@@ -840,7 +840,9 @@ public class InventoryServiceImpl implements  InventoryService{
 		for(InventoryDetails i : inventoryDetails) {
 			wrap = new InventoryDetailsWrap();
 			wrap.setCreatetime(i.getCreatetime());
-			wrap.setGoodsImg("<img class='img_class' src='"+i.getGoodsImg()+"'>");
+			String goodsImg = i.getGoodsImg();
+			goodsImg = StringUtil.isBlank(goodsImg) ? goodsImg : goodsImg.replace(".60x60.jpg", ".400x400.jpg");
+			wrap.setGoodsImg("<img class='img_class' src='"+goodsImg+"'>");
 			wrap.setGoodsNumber(i.getGoodsNumber());
 			wrap.setGoodsPid(i.getGoodsPid());
 			wrap.setInventoryId(i.getInventoryId());
