@@ -4,6 +4,8 @@ import com.cbt.bean.*;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.dao.RefundDaoPlus;
 import com.cbt.dao.impl.RefundDaoImpl;
+import com.cbt.fee.service.IZoneServer;
+import com.cbt.fee.service.ZoneServer;
 import com.cbt.pay.service.IOrderServer;
 import com.cbt.pojo.AddBalanceInfo;
 import com.cbt.pojo.RechangeRecord;
@@ -719,5 +721,19 @@ public class UserController {
 
         }
         return json;
+    }
+
+    @RequestMapping(value = "/getZoneList")
+    @ResponseBody
+    public List<ZoneBean> getZoneList() {
+        List<ZoneBean> list = new ArrayList<>();
+        try {
+            IZoneServer os = new ZoneServer();
+            list = os.getAllZone();
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("getZoneList error:", e);
+        }
+        return list;
     }
 }

@@ -145,10 +145,10 @@
         function getAllZone() {
             $.ajax({
                 type: "GET",
-                url: "/cbtconsole/warehouse/getAllZone",
+                url: "/cbtconsole/userinfo/getZoneList",
                 dataType: "json",
                 success: function (msg) {
-                    var content = '';
+                    var content = '<option value="0">全部</option>';
                     $(msg).each(function (index, item) {
                         content += '<option value="' + item.id + '">' + item.country + '</option>';
                     });
