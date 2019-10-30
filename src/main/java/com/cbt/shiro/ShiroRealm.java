@@ -2,7 +2,6 @@ package com.cbt.shiro;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.shiro.authc.AuthenticationException;
@@ -16,7 +15,6 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.springframework.data.redis.connection.StringRedisConnection.StringTuple;
 
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
@@ -27,8 +25,6 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.userAuth.impl.AdmUserDaoImpl;
 import com.cbt.website.userAuth.impl.UserAuthDaoImpl;
-
-import net.sf.json.JSONArray;
 
 public class ShiroRealm extends AuthorizingRealm{
 	private  AdmUserDao admuserDao = new AdmUserDaoImpl();

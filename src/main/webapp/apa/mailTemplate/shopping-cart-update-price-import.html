@@ -243,9 +243,9 @@
                             <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Import Express.</p>
                             <p>Recently you have added some items to your shopping  cart. We greatly value your trust
                               and confidence. To express our sincere appreciation for your loyalty to our business,
-                              <b>we have reduced some unit prices in your shopping cart:</b> </p>
+                              <b>we send a coupon in your shopping cart:</b> </p>
                           </div>
-                          <p class="estima_time">Item Name & Details:</p>
+                          <!--<p class="estima_time">Item Name & Details:</p>
                           <ul class="clearfix">
                             <li class="order_li" th:each="carInfo:${updateList}">
 
@@ -261,9 +261,9 @@
                                <p class="order_pr"><em th:text="${carInfo.googsNumber}">1</em>&nbsp;&nbsp;<i th:text="${carInfo.goodsunit}">pc</i></p>
                               <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong> <span><em>USD</em> <em th:text="${carInfo.price1}">6.58</em></span></p>
                              </li>
-                           </ul>
+                           </ul>-->
                           <div class="xian"></div>
-                          <p class="estima_time">Other Items in your shopping Cart:</p>
+                          <p class="estima_time">Items in your shopping Cart:</p>
                           <ul class="clearfix">
                             <li class="order_li" th:each="carInfo:${sourceList}">
 
@@ -276,15 +276,15 @@
                                 </div>
                               </div>
 
-                              <p class="order_pr"><em th:text="${carInfo.googsNumber}">1</em>&nbsp;&nbsp;<i th:text="${carInfo.goodsunit}">pc</i></p>
-                              <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong></p>
+                              <!--<p class="order_pr"><em th:text="${carInfo.googsNumber}">1</em>&nbsp;&nbsp;<i th:text="${carInfo.goodsunit}">pc</i></p>
+                              <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong></p>-->
                             </li>
                           </ul>
                           <p class="order_click"><a target="_blank" th:href="${carUrl}" href="https://www.import-express.com/Goods/getShopCar">Click here</a> to see the rest items</p>
                           <div class="order_usd order_usd_due">
-                            <p class="order_off"><strong>Products Cart Final Total:
-                              <em>USD</em><em th:text="${totalActualCost}"> 15.00</em></strong><i><strong><em>USD</em><em th:text="${totalProductCost}"> 18.80</em></strong></i></p>
-                            <p class="estima_time estima_time_color">You have saved :USD <span th:text="${offCost}">7.2</span>
+                            <!--<p class="order_off"><strong>Products Cart Final Total:
+                              <em>USD</em><em th:text="${totalActualCost}"> 15.00</em></strong><i><strong><em>USD</em><em th:text="${totalProductCost}"> 18.80</em></strong></i></p>-->
+                            <p class="estima_time estima_time_color">You have coupon :<span th:text="${couponValue}">0-0</span>
                               <a th:href="${carUrl}" href="https://www.import-express.com/Goods/getShopCar" target="_blank">Buy now</a></p>
                           </div>
                           <p class="order_rem_p">We'll keep this deal valid <b>for the next 48 hours</b></p>

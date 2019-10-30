@@ -603,6 +603,7 @@ em,i{font-style: normal;}
 <input type="hidden" value="${isBarcodeDone}" id="isBarcodeDone">
 </body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/msg-confirm.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/inventoryReport.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.min.js"></script>
 </html>
