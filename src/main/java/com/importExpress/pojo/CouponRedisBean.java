@@ -22,6 +22,7 @@ public class CouponRedisBean {
 	private String type; //优惠卷类型 1-满减卷
 	
 	private String valid = "1";//是否有效 1-有效
+	private int isShopCar;// 是否是购物车营销优惠券
 
 	public CouponRedisBean() {
 		super();

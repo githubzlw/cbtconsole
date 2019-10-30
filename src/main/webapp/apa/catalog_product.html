@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>目录</title>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
+<style type="text/css">
+.main{width: 80%;background:#dff0d8;}
+.main-body .form-control{display: inline-block;width: 70%;}
+.product-name{padding: 0 3px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;width:200px;}
+ .product-img{height:200px;z-index: 100;margin:0 auto;}
+ .info-product{padding: 5px;}
+ .product-sold{height:20px;}
+ .product-price{height:20px;}
+ .is_boutique_check {
+    z-index: 200;
+    width: 20px;
+    height: 20px;
+}
+.product-page{display:none;margin-left: 1px;margin-top: 5px;}
+.category-lev1{margin-top: 5px;}
+.category-lev2{margin-left: 20px;}
+.category-lev3{margin-left: 40px;}
+.lev1-hide-view{margin-left: 130px;}
+.lev2-hide-view{margin-left: 150px;}
+.lev3-hide-view{margin-left: 170px;}
+.category-lev1-hide{display: none;}
+.category-lev2-hide{display: none;}
+.category-lev3-hide{display: none;}
+.category-lev1-select{color: #ee8907;}
+.category-lev2-select{color: #ee8907;}
+.category-lev3-select{color: #ee8907;}
+.category-more{display:none;}
+.co-category{overflow-y: auto;border: 1px solid #e3e3e3;height:900px;}
+.category-list{width: 96%;margin-left: 12px;}
+
+.tc, .trnasparent {
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, .5);
+	position: fixed;
+	z-index: 800;
+	display: none;
+	text-align: center;
+}
+
+.tc {
+	background-color: rgba(0, 0, 0, 0);
+	top: 0;
+	left: 0;
+}
+/* 产品弹窗 tc1 */
+.tc1{
+    position: absolute;
+    z-index: 888;
+    display: none;
+    top: 100px;
+    left: 50%;
+    margin-left: -600px;
+    background-color: #fff;
+    padding: 20px;
+    max-height: 800px;
+    border-radius: 12px;
+    overflow-y: auto;
+}
+.tc,.tc *{font-size:16px;}
+.tc1 .form-horizontal .control-label{text-align: left;}
+.tc1 th{font-weight: normal;}
+.tc1 th,.tc1 td{text-align: center;}
+.tc1 label{font-weight: normal;}
+.tc1 .remark label{margin-right:32px;}
+.tc1 button{width: 300px;}
+.tc1 .container{margin-top:50px;}
+.tc1 table td:last-child{text-align: center;}
+.tc1 table input[type="radio"]{width:20px;height:20px;}
+
+.tc1_table,.tc2_table{max-height:500px;height:auto;overflow-y:auto;}
+
+.window-bd{width: 90%;}
+.catalog_img{height:200px;margin: 0 auto;}
+.category-row-product{margin-left:150px; }
+input[type=checkbox], input[type=radio]{position: absolute;top: 0;right: 20px;}
+.product_in{border:1px solid #999; padding-top: 10px;}
+.product{margin-bottom:20px;}
+.h3-c{text-align: left;}
+.close-x{
+    position: absolute;
+    top: 0;
+    right: 3px;
+    z-index: 999;
+}
+#catalog_name{border-radius: 6px;width:333px;height:50px;}
+.boutique_goods_cancel{width:90px;}
+.container-row{width:600px;}
+/* 产品弹窗 tc2 */
+.tc2{
+    position: absolute;
+    z-index:888;
+    display: none;
+    top: 100px;
+    left: 37%;
+    background-color: #fff;
+    padding: 20px;
+    max-height: 800px;
+    border-radius: 12px;
+    width: 600px;
+}
+.row-button{margin-top: 10px;}
+.title-contro{margin-bottom: 9px;}
+.form-control-q{
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+.btn-div-tc{margin-left: 2px;width: 90%;text-align: right;}
+.h-tc{width: 100%;font-size: 23px;font-weight: bolder;}
+.col-xs-3-product{height:200px;}
+.roe-h{width: 100%;}
+.catalog_img{max-height: 200px;}
+</style>
+</head>
+<body>
+<div class="container-fluid main">
+<h1 class="text-center">推荐目录</h1>
+<div class="row co-search-param">
+<div class="col-xs-10 title-contro">
+
+<label class="w200">模板: <select class="form-control-q" id="query_temp" >
+						<option value="1" selected="selected">IMPORT</option>
+						<option value="2" >KIDS</option>
+						<option value="4">PETS</option>
+				</select>
+				</label>
+<label>关键词:<input class="form-control-q" name="" id="query-keyword" value=""></label>
+<label><button class="btn btn-info"  id="query_button">搜索</button></label>
+<label><button class="btn btn-info"  id="catalog_preview">预览</button></label>
+<label><button class="btn btn-info"  id="catalog_create">生成目录</button></label>
+</div>
+</div>
+<div class="row main-body">
+
+<div class="col-xs-2 co-category">
+<div class="category-list">
+
+</div>
+</div>
+
+<div class="col-xs-10 co-product">
+
+<div class="row product-list">
+
+</div>
+<div class="row product-page">
+总共:<span id="current-page-h"></span>/<span id="total-page"></span>页,<span id="record-count"></span>个产品
+<input type="text" value="1" id="current-page" class="form-control-i">
+<button class="btn btn-info"  id="catalog-jump-page">跳转</button>
+<button class="btn btn-info"  id="catalog-pre-page">上一页</button>
+<button class="btn btn-info"  id="catalog-next-page">下一页</button>
+</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="tc">
+	<div class="trnasparent"></div>
+	<div class="container tc1">
+		<div class="row ">
+		<div class="row roe-h">
+        <h3 class="text-center h-tc">推荐商品类目页预览</h3>
+		</div>
+        <div class="row btn-div-tc">
+        <label>
+        <input class="btn btn-info boutique_goods_create" type="button" value="生成目录页">
+        </label>
+        <label>
+        <input class="btn btn-info boutique_goods_clear" type="button" value="清空所有勾选的商品">
+        </label>
+        </div>
+        </div>
+        <br>
+        
+        <div class="row window-bd">
+                <div class="row ain-list">
+                    <div class="pre-row">
+                        
+                </div>
+            </div>
+    </div>
+		
+</div>
+	<div class="container tc2">
+		<div class="row container-row">
+		<div class="row"><h3>提示</h3></div>
+       <div class="row">
+       <label>目录名称:<input type="text" value="" id="catalog_name" class="" placeholder="请输入目录名称"></label>
+       </div>
+       <div class="row row-button">
+       <label><input class="btn btn-info boutique_goods_ok" type="button" value="确认生成"  style="margin-right: 20px;"></label>
+       <label><input class="btn boutique_goods_cancel" type="button" value="返回"  style="margin-right: 20px;"></label>
+       </div>
+        </div>
+        <br>
+</div>
+</div>
+<input value="" id="list-product-edit" type="hidden">
+<input id="param-catid" value="0" type="hidden">
+<input id="pre-save-key" value="" type="hidden">
+</body>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script src='/cbtconsole/js/jquery.lazyload.js'></script>
+<script type="text/javascript" src="/cbtconsole/js/msg-confirm.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/catalog-product.js"></script>
+</html>

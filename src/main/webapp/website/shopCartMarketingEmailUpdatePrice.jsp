@@ -55,7 +55,7 @@
 </c:if>
 <c:if test="${success > 0}">
     <div>
-        <h2 style="text-align: center">产品改价邮件预览</h2>
+        <h2 style="text-align: center">产品发送优惠券邮件预览</h2>
         <img style="cursor: pointer"
                  src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
         <span>网站名:
@@ -65,8 +65,10 @@
             </select>
         </span>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"
-               value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}',${type})"/>
+               value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}',${type},'${couponCode}')"/>
         <span id="show_notice" style="display: none;color: red;">*正在执行，请等待...</span>
+        <br>
+        <span>优惠券码:${couponCode}</span>
     </div>
     <div style="height: auto;font-size:20px;" id="email_content">
         <div style="font-family: Times New Roman;">
@@ -83,7 +85,7 @@
             <span>we have reduced some unit prices in your shopping cart: </span>
             </p>
 
-            <table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_update_table" border="1"
+            <%--<table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_update_table" border="1"
                    cellpadding="1" cellspacing="0">
                 <caption style="float: left;font-weight: bold;font-size: 18px;padding:6px;">Price reduced items
                 </caption>
@@ -93,11 +95,11 @@
                 </tr>
                 <tr style="font-weight: bold;">
                     <td align="center" width="350px">Item Name &amp; Details</td>
-                    <td align="center" width="140px">Item Price</td>
+                    &lt;%&ndash;<td align="center" width="140px">Item Price</td>&ndash;%&gt;
                     <td align="center" width="140px">Quantity</td>
-                    <td align="center" width="140px">New Price</td>
+                    &lt;%&ndash;<td align="center" width="140px">New Price</td>
                     <td align="center" width="140px">Total Price</td>
-                    <td align="center" width="160px">Remark</td>
+                    <td align="center" width="160px">Remark</td>&ndash;%&gt;
                 </tr>
                 <c:forEach items="${updateList}" var="carInfo" varStatus="status">
                     <tr>
@@ -113,17 +115,17 @@
                                 </c:forEach>
                             </div>
                         </td>
-                        <td align="center" width="140px">USD <span>${carInfo.price1}</span></td>
+                        &lt;%&ndash;<td align="center" width="140px">USD <span>${carInfo.price1}</span></td>&ndash;%&gt;
                         <td align="center" width="140px">${carInfo.googsNumber}&nbsp;${carInfo.goodsunit}&nbsp;</td>
-                        <td align="center" width="140px">USD <span>${carInfo.googsPrice}</span></td>
+                        &lt;%&ndash;<td align="center" width="140px">USD <span>${carInfo.googsPrice}</span></td>
                         <td align="center" width="140px">USD <span>${carInfo.totalPrice}</span></td>
-                        <td width="160px">${carInfo.remark}</td>
+                        <td width="160px">${carInfo.remark}</td>&ndash;%&gt;
                     </tr>
                 </c:forEach>
                 </tbody>
-            </table>
+            </table>--%>
 
-            <table style="width: 820px;font-size: 18px;text-align: right">
+            <%--<table style="width: 820px;font-size: 18px;text-align: right">
                 <tbody>
                 <tr>
                     <td>Products Cart Total:</td>
@@ -134,14 +136,13 @@
                     <td style="width: 150px">USD&nbsp;&nbsp;${actualCost}</td>
                 </tr>
                 </tbody>
-            </table>
+            </table>--%>
 
             <c:if test="${fn:length(sourceList) > 0}">
                 <br>
                 <table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_old_table" border="1"
                        cellpadding="1" cellspacing="0">
-                    <caption style="float: left;font-weight: bold;font-size: 18px;padding:6px;">Others Items in your
-                        shopping Cart
+                    <caption style="float: left;font-weight: bold;font-size: 18px;padding:6px;">Items in your shopping Cart
                     </caption>
                     <tbody>
                     <tr>
@@ -149,10 +150,10 @@
                     </tr>
                     <tr style="font-weight: bold;font-size: 12px;">
                         <td align="center" width="350px">Item Name &amp; Details</td>
-                        <td align="center" width="140px">Item Price</td>
+                        <%--<td align="center" width="140px">Item Price</td>--%>
                         <td align="center" width="140px">Quantity</td>
-                        <td align="center" width="140px">Total Price</td>
-                        <td align="center" width="160px">Remark</td>
+                        <%--<td align="center" width="140px">Total Price</td>
+                        <td align="center" width="160px">Remark</td>--%>
                     </tr>
                     <c:forEach items="${sourceList}" var="carInfo" varStatus="status">
                         <tr>
@@ -169,10 +170,10 @@
                                     </c:forEach>
                                 </div>
                             </td>
-                            <td align="center" width="140px">USD <span>${carInfo.googsPrice}</span></td>
+                            <%--<td align="center" width="140px">USD <span>${carInfo.googsPrice}</span></td>--%>
                             <td align="center" width="140px">${carInfo.googsNumber}&nbsp;${carInfo.goodsunit}&nbsp;</td>
-                            <td align="center" width="140px">USD <span>${carInfo.totalPrice}</span></td>
-                            <td width="160px">${carInfo.remark}</td>
+                            <%--<td align="center" width="140px">USD <span>${carInfo.totalPrice}</span></td>
+                            <td width="160px">${carInfo.remark}</td>--%>
                         </tr>
                     </c:forEach>
                     </tbody>
@@ -190,21 +191,20 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Shop Cart Total:</td>
-                    <td style="width: 150px">USD&nbsp;&nbsp;${totalProductCost}</td>
+                    <td>Shop Cart Total: USD&nbsp;&nbsp;${totalProductCost}(<b style="color: red;">总价为buniess价格,和客户购物车价格不一定一致</b>)</td>
                 </tr>
-                <tr>
+                <%--<tr>
                     <td>Shop Cart Final Due:</td>
                     <td style="width: 150px">USD&nbsp;&nbsp;${totalActualCost}</td>
-                </tr>
+                </tr>--%>
                 </tbody>
             </table>
 
-            <div style="width:500px;position:relative;top:-30px;">
+            <%--<div style="width:500px;position:relative;top:-30px;">
                 <span style="font-weight: bold;font-size: 20px;margin-right:8px;">You have saved :USD&nbsp;${offCost}</span>
                 <span><a href="https://www.import-express.com" target="_blank"
                          style="font-size: 16px;border-radius: 4px;color: #fff;background-color: #3e9eea;padding:4px 8px;text-decoration: none;">BUY NOW</a></span>
-            </div>
+            </div>--%>
         </div>
         <div style="font-family: Times New Roman;">
             <div>
@@ -252,7 +252,7 @@
 </c:if>
 </body>
 <script>
-    function confirmAndSendEmail(userId, userEmail,type) {
+    function confirmAndSendEmail(userId, userEmail, type, couponCode) {
         var r = confirm("是否确认发送邮件?");
         if (r) {
             var websiteType = $("#website_type").val();
@@ -296,7 +296,8 @@
                         "whatsApp": whatsApp,
                         "type":type,
                         "emailTitle":"Limited Time Offer JUST for you!",
-                        "websiteType": websiteType
+                        "websiteType": websiteType,
+                        "couponCode":couponCode
                         //"emailContent": emailContent,
                         //"model": model,
                     },
