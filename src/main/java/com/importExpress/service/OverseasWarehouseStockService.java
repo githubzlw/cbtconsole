@@ -67,11 +67,11 @@ public interface OverseasWarehouseStockService {
 	 * @param map
 	 * @return
 	 */
-	int addOverseasWarehouseStockOrder(Map<String,Object> map);
+	int addOwsOrderShipno(Map<String,Object> map);
 	
 	/**MQ更新海外仓订单出货
 	 * @param map
 	 * @return
 	 */
-	int shipoutOverseasWarehouseStockOrder(Map<String,Object> map);
+	int shipoutOwsOrder(Map<String,Object> map);
 }

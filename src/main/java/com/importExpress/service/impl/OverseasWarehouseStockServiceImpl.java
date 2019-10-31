@@ -3,10 +3,12 @@ package com.importExpress.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.bouncycastle.crypto.agreement.srp.SRP6Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cbt.jdbc.DBHelper;
+import com.cbt.parse.service.StrUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.mapper.OverseasWarehouseStockMapper;
@@ -145,21 +147,24 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
 		return logs;
 	}
 	@Override
-	public int addOverseasWarehouseStockOrder(Map<String, Object> map) {
-		String sql = "insert into overseas_warehouse_ship_package(orderid,ship_no,state) values(?,?,?,now())";
+	public int addOwsOrderShipno(Map<String, Object> map) {
+		String sql = "insert into overseas_warehouse_ship_package(orderid,ship_no,state,create_time) values(?,?,?,now())";
 		List<String> lstValues = Lists.newArrayList();
+		lstValues.add(String.valueOf(map.get("orderno")));
+		lstValues.add(String.valueOf(map.get("shipno")));
+		lstValues.add("0");
 		String runSql = DBHelper.covertToSQL(sql, lstValues);
-		return 0;
+		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+		return StrUtils.isNum(sendMsgByRPC) ? Integer.parseInt(sendMsgByRPC) : 0;
 	}
 
-
-
 	@Override
-	public int shipoutOverseasWarehouseStockOrder(Map<String, Object> map) {
-		
-		
-		
-		
-		return 0;
+	public int shipoutOwsOrder(Map<String, Object> map) {
+		String sql = "update overseas_warehouse_ship_package set ship_out_time=now,state=1 where orderid=?";
+		List<String> lstValues = Lists.newArrayList();
+		lstValues.add(String.valueOf(map.get("orderno")));
+		String runSql = DBHelper.covertToSQL(sql, lstValues);
+		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+		return StrUtils.isNum(sendMsgByRPC) ? Integer.parseInt(sendMsgByRPC) : 0;
 	}
 }
