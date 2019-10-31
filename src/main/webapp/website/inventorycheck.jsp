@@ -19,7 +19,14 @@
 	display: inline-block;
 	width: 70%;
 }
-
+.report .form-control-i {
+	display: inline-block;
+	width: 30%;
+}
+.report .form-control-i200 {
+	display: inline-block;
+	width: 50%;
+}
 .report select.form-control {
 	width: 48%;
 }
@@ -48,7 +55,12 @@
 .report .w200 {
 	width: 200px;
 }
-
+.report .w350 {
+	width: 350px;
+}
+.report .w160 {
+	width: 160px;
+}
 /* .report th, .report td {
 	text-align: center;
 } */
@@ -153,7 +165,7 @@ em,i{font-style: normal;}
 .tc4 .wrap8{text-align: center;}
 .tc4 .wrap8 button{border:1px solid #999;padding:0 80px; line-height:28px;border-radius: 4px;}
 
-
+.img-responsive{max-width: 137px;max-height: 135px;}
 .report .btn_page_in{width:100px;}
 .w350{width: 350px;}
 .datagrid-cell-c2-goodsName{width:300px;}
@@ -188,6 +200,7 @@ em,i{font-style: normal;}
 			</div>
 			<div class="col-xs-11">
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
+				<label class="w200">ODID：<input type="text" class="form-control form-control-i200" id="query_odid" value="${queryParam.odid }"></label>
 				<label>产品ID：<input type="text" class="form-control p_q_r" id="query_goods_pid" value="${queryParam.goods_pid }"></label>
 				<label>产品分类：
 				<select class="form-control p_q_r" id="query_goodscatid" >
@@ -195,8 +208,8 @@ em,i{font-style: normal;}
 				</select>
 				<input type="hidden" class="form-control p_q_r" id="query_goodscatid_q" value="${queryParam.goodscatid }">
 				</label>
-				<label>库存量大于：<input type="text" class="form-control p_q_r" id="query_minintentory" value="${queryParam.qminintentory }"></label>
-				<label>库存量小于：<input type="text" class="form-control p_q_r" id="query_maxintentory" value="${queryParam.qmaxintentory }"></label>
+				<label class="w160">库存量大于：<input type="text" class="form-control p_q_r form-control-i" id="query_minintentory" value="${queryParam.qminintentory }"></label>
+				<label class="w160">库存量小于：<input type="text" class="form-control p_q_r form-control-i" id="query_maxintentory" value="${queryParam.qmaxintentory }"></label>
 				<label class="w200">是否上架： <select class="form-control  p_qs_r" id="query_line" >
 				<c:if test="${queryParam.isline==0 }">
 						<option value="0" selected="selected">全部</option>
@@ -261,7 +274,13 @@ em,i{font-style: normal;}
 						<br>
 						<em>Specid:</em><em class="emspecid">${tory.goodsSpecid}</em></td>
 						
-						<td class="datagrid-cell-c2-carImg">${tory.goodsImg }</td>
+						<td class="datagrid-cell-c2-carImg">
+						<img class="img-responsive img-lazy"   src="/cbtconsole/img/beforeLoad.gif" data-original="${tory.goodsImg }" >
+						<%-- <a href="${ tory.goodsUrl}" title='跳转到网站链接' target='_blank'>
+						 onmouseout="closeBigImg();" onmouseover="BigImg('${ tory.carImg}')"
+						
+						</a> --%>
+						</td>
 						<td class="datagrid-cell-c2-last-remaining">${tory.lastCheckRemaining}</td>
 						<td class="datagrid-cell-c2-change-remaining">${tory.changeRemaining}</td>
 						<td class="datagrid-cell-c2-remaining">${tory.remaining}
@@ -274,7 +293,7 @@ em,i{font-style: normal;}
 						 <em class="barcode_code">${tory.barcode}</em>
 						<em class="datagrid-cell-c2-canRemaining" style="display:none;">${tory.canRemaining}</em>
 						<input value="${tory.barcode}" class="q_in_barcode_h" type="hidden">
-						<input value="0" class="q_record_id" type="hidden">
+						<input value="${tory.checkId}" class="q_record_id" type="hidden">
 						<input value="${tory.inventorySkuId}" class="q_inventory_id" type="hidden">
 						<input value="${tory.barcode}" class="q_in_barcode" readonly="readonly" type="hidden" onchange="updateCheckRecord(${index.index})"></td>
 						<td>
@@ -305,7 +324,7 @@ em,i{font-style: normal;}
 					<div class="form-group">
 						<label class="col-xs-2 control-label text-left">产品ID:</label>
 						<div class="col-xs-10">
-							<input type="text" class="form-control" id="lu_pid" onchange="getProduct()">
+							<input type="text" class="form-control" id="lu_pid" onchange="getProduct()" placeholder="输入产品ID后点击键盘Enter键">
 							<input type="hidden"  id="lu_catid" value="">
 							<input type="hidden"  id="lu_price" value="">
 						</div>
@@ -384,7 +403,7 @@ em,i{font-style: normal;}
 				<div class="form-group row">
 					<label class="control-label col-xs-2">淘宝订单/运单号</label>
 					<div class="col-xs-5">
-						<input type="text" class="form-control" id="tb_order_shipno" onchange="getTbOrder()">
+						<input type="text" class="form-control" id="tb_order_shipno" onchange="getTbOrder()" placeholder="输入淘宝订单号或者运单号后点击键盘Enter键">
 						<input type="hidden"  id="tb_h_order" value="">
 						<input type="hidden"  id="tb_h_shipno"  value="">
 					</div>
@@ -586,10 +605,7 @@ em,i{font-style: normal;}
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/msg-confirm.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/inventoryReport.js"></script>
-<script type="text/javascript"
-	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
-<script type="text/javascript"
-	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.min.js"></script>
 </html>
 
 

@@ -328,10 +328,10 @@
                 $.messager.alert("提醒", '请输入显示名称', "info");
                 return false;
             }
-            if (show_img == "" || show_img == null) {
+            /*if (show_img == "" || show_img == null) {
                 $.messager.alert("提醒", '请输入显示图片链接', "info");
                 return false;
-            }
+            }*/
             if (view_more_url == "" || view_more_url == null) {
                 view_more_url = "";
             }
@@ -471,6 +471,8 @@
         if(hotType > 0){
             url += "&hotClassId="+hotType;
         }
+        url += "&freeFlag=1";
+
         var param = "height=400,width=600,top=140,left=500,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open(url, "windows", param);
 		/*$.ajax({

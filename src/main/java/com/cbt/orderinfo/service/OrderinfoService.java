@@ -1962,6 +1962,8 @@ public class OrderinfoService implements IOrderinfoService {
 				} else if (odb.getCar_urlMD5().startsWith("A")) {
 					odb.setMatch_url("http://www.aliexpress.com/item/a/" + odb.getGoods_pid() + ".html");
 				}
+			}else {
+				odb.setMatch_url("https://detail.1688.com/offer/" + odb.getGoods_pid() + ".html");
 			}
 			//获取产品单位
 			getSeilUnit(odb);

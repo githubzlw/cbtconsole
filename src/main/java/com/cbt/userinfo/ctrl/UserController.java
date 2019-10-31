@@ -1,12 +1,11 @@
 package com.cbt.userinfo.ctrl;
 
-import com.cbt.bean.Address;
-import com.cbt.bean.BalanceBean;
-import com.cbt.bean.OrderBean;
-import com.cbt.bean.OrderPaymentBean;
+import com.cbt.bean.*;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.dao.RefundDaoPlus;
 import com.cbt.dao.impl.RefundDaoImpl;
+import com.cbt.fee.service.IZoneServer;
+import com.cbt.fee.service.ZoneServer;
 import com.cbt.pay.service.IOrderServer;
 import com.cbt.pojo.AddBalanceInfo;
 import com.cbt.pojo.RechangeRecord;
@@ -23,13 +22,19 @@ import com.cbt.util.SerializeUtil;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.CustomerFinancialBean;
+import com.cbt.website.bean.UserInfo;
 import com.cbt.website.dao.IOrderwsDao;
 import com.cbt.website.dao.OrderwsDao;
 import com.cbt.website.dao.PaymentDao;
 import com.cbt.website.dao.PaymentDaoImp;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.JsonResult;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.UserRecommendEmail;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -55,6 +60,8 @@ import java.util.Map;
 public class UserController {
 
 
+    @Autowired
+    private SendMailFactory sendMailFactory;
 
     @Autowired
     private RefundSSService refundSSService;
@@ -551,4 +558,182 @@ public class UserController {
         return orderList;
     }
 
+
+    @RequestMapping(value = "/getUserAllInfoById", method = RequestMethod.POST)
+    @ResponseBody
+    public JsonResult getUserAllInfoById(HttpServletRequest request, Integer userId) {
+        JsonResult json = new JsonResult();
+        if(userId == null || userId < 0){
+            json.setOk(false);
+            json.setMessage("获取用户ID失败");
+            return json;
+        }
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        try {
+            UserInfo useInfo = userInfoService.queryAllInfoById(userId);
+            useInfo.setAdmuser(admuser.getEmail());
+
+            List<UserRecommendEmail>  list =  userInfoService.queryRecommendEmailInfo(userId);
+
+            json.setOk(true);
+            json.setData(useInfo);
+            json.setAllData(list);
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("获取失败");
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    @RequestMapping(value = "/sendRecommendEmail", method = RequestMethod.POST)
+    @ResponseBody
+    public JsonResult sendRecommendEmail(HttpServletRequest request, Integer userId, String userEmail,String createTime
+    ,String buniessInfo,String goodsNeed,String sendUrl,String sellEmail,String goodsRequire ,Integer webSite) {
+        JsonResult json = new JsonResult();
+
+        if (userId == null || userId < 0) {
+            json.setOk(false);
+            json.setMessage("获取客户ID失败");
+            return json;
+        }
+        if (webSite == null || webSite < 0) {
+            json.setOk(false);
+            json.setMessage("获取网站类别失败");
+            return json;
+        }
+        if (StringUtils.isBlank(userEmail)) {
+            json.setOk(false);
+            json.setMessage("获取客户邮箱失败");
+            return json;
+        }
+        if (StringUtils.isBlank(createTime)) {
+            json.setOk(false);
+            json.setMessage("获取客户创建时间失败");
+            return json;
+        }
+        if (StringUtils.isBlank(buniessInfo)) {
+            buniessInfo = "";
+        }
+        if (StringUtils.isBlank(goodsNeed)) {
+            goodsNeed = "";
+        }
+        if (StringUtils.isBlank(goodsRequire)) {
+            goodsRequire = "";
+        }
+        if (StringUtils.isBlank(sendUrl)) {
+            json.setOk(false);
+            json.setMessage("获取目录地址失败");
+            return json;
+        }
+        if (StringUtils.isBlank(sellEmail)) {
+            json.setOk(false);
+            json.setMessage("获取销售邮箱失败");
+            return json;
+        }
+
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        try {
+            Map<String,Object> sendMap = new HashMap<>();
+            sendMap.put("userId",String.valueOf(userId));
+            sendMap.put("createTime",createTime);
+            sendMap.put("buniessInfo",buniessInfo);
+            sendMap.put("goodsNeed",goodsNeed);
+            sendMap.put("goodsRequire",goodsRequire);
+            sendMap.put("sendUrl",sendUrl);
+            sendMap.put("webSite",webSite);
+
+            String title = "Our Recommendation";
+            sendMap.put("title",title);
+
+            TemplateType emailHtml = TemplateType.OUR_RECOMMENDATION;
+            sendMailFactory.sendMail(userEmail, sellEmail, title, sendMap, emailHtml);
+
+
+            UserRecommendEmail userRecommendEmail = new UserRecommendEmail();
+            userRecommendEmail.setAdminId(admuser.getId());
+            userRecommendEmail.setCreateTime(createTime);
+            userRecommendEmail.setSendUrl(sendUrl);
+            userRecommendEmail.setEmailContent(sendMap.toString());
+            userRecommendEmail.setUserId(userId);
+
+            userInfoService.insertIntoUserRecommendEmail(userRecommendEmail);
+
+            json.setOk(true);
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("获取失败");
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/queryMemAuthList", method = RequestMethod.POST)
+    @ResponseBody
+    public EasyUiJsonResult queryBusinessMembershipAuthorization(HttpServletRequest request,
+                               Integer page , Integer rows, Integer userId, String email, Integer countryId, Integer authFlag) {
+        EasyUiJsonResult json = new EasyUiJsonResult();
+
+
+        UserInfo userInfo = new UserInfo();
+        if(page == null || page == 0){
+            page = 1;
+        }
+        if(rows != null && rows > 0){
+            userInfo.setLimitNum(rows);
+            userInfo.setStartNum((page -1) * rows);
+        }
+        if(userId != null &&  userId > 0){
+            userInfo.setUserid(userId);
+        }
+
+        if(StringUtils.isNotBlank(email)){
+            userInfo.setEmail(email);
+        }
+        userInfo.setCountryId(countryId);
+        userInfo.setAuthFlag(authFlag);
+
+        try {
+
+
+            List<UserInfo> list= userInfoService.queryBusinessMembershipAuthorization(userInfo);
+
+            int count = userInfoService.queryBusinessMembershipAuthorizationCount(userInfo);
+            json.setRows(list);
+            json.setTotal(count);
+            json.setSuccess(true);
+        } catch (Exception e) {
+            json.setSuccess(false);
+            json.setMessage("获取失败");
+            e.printStackTrace();
+            LOG.error("queryMemAuthList error:",e);
+
+        }
+        return json;
+    }
+
+    @RequestMapping(value = "/getZoneList")
+    @ResponseBody
+    public List<ZoneBean> getZoneList() {
+        List<ZoneBean> list = new ArrayList<>();
+        try {
+            IZoneServer os = new ZoneServer();
+            list = os.getAllZone();
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("getZoneList error:", e);
+        }
+        return list;
+    }
 }

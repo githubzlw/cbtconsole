@@ -150,4 +150,11 @@ public interface HotManageService {
      */
 	int updateIntoHotClassInfo(HotClassInfo hotClassInfo);
 
+    /**
+     * 删除热卖分组
+     * @param id
+     * @return
+     */
+	int deleteHotClassInfo(int id);
+
 }

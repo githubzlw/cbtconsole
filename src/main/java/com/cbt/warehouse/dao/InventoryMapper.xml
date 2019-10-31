@@ -238,6 +238,7 @@
     </if>
     <if test="goodscatid ==-1"> and isku.goodscatid='0'</if>
     
+    <if test="odid != 0">and isku.od_id=#{odid}</if>
     <if test="isline == 1">and c.valid=1</if>
     <if test="isline == 2">and c.valid!=1</if>
     order by isku.createtime desc
@@ -257,6 +258,7 @@
 	    </if>
     </if>
     <if test="goodscatid ==-1">and isku.goodscatid='0'</if>
+    <if test="odid != 0">and isku.od_id=#{odid}</if>
     <if test="isline == 1">and c.valid=1</if>
     <if test="isline == 2">and c.valid!=1</if>
        
@@ -577,7 +579,7 @@
     <!-- 更新阿盘点数据 -->
     <update id="updateInventoryCheckRecord">
     update inventory_sku_check_record_temp set 
-    check_remaining=#{checkRemaining},after_barcode=#{afterBarcode},create_time=now() where id=#{id}
+    check_remaining=#{checkRemaining},after_barcode=#{afterBarcode},create_time=now()
     where id=#{id}
     </update>
     <!-- 插入本次盘点数据 -->

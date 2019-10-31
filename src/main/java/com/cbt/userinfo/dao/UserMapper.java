@@ -1,6 +1,8 @@
 package com.cbt.userinfo.dao;
 
 import com.cbt.pojo.UserEx;
+import com.cbt.website.bean.UserInfo;
+import com.importExpress.pojo.UserRecommendEmail;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -69,4 +71,35 @@ public interface UserMapper {
     int checkFollowMeCode(@Param("followCode") String followCode);
 
     int updateUserFollowCode(@Param("followCode") String followCode,@Param("userId") int userId);
+
+	/**
+	 * 查询用户所有信息
+	 * @param userId
+	 * @return
+	 */
+	UserInfo queryAllInfoById(int userId);
+
+	/**
+	 * 根据客户ID查询所有的推荐邮箱
+	 * @param userId
+	 * @return
+	 */
+	List<UserRecommendEmail> queryRecommendEmailInfo(int userId);
+
+	/**
+     * 插入发送消息
+     * @param userRecommendEmail
+     * @return
+     */
+	int insertIntoUserRecommendEmail(UserRecommendEmail userRecommendEmail);
+
+    /**
+     * 分页查询商业会员授权
+     * @param userInfo
+     * @return
+     */
+	List<UserInfo> queryBusinessMembershipAuthorization(UserInfo userInfo);
+
+	int queryBusinessMembershipAuthorizationCount(UserInfo userInfo);
+
 }

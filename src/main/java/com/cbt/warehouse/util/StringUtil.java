@@ -365,7 +365,7 @@ public class StringUtil {
 
     public static String getNewUrl(String url,String goods_pid,String car_urlMD5){
         if(!url.contains("import-express") && !url.contains("aliexpress")  && !url.contains("1688")){
-            url="https://www.import-express.com/"+url;
+            url="https://www.import-express.com"+(StringUtils.startsWith(url, "/")? "" : "/")+url;
         }
 //        url="https://www.import-express.com/goodsinfo/ornament-handcraft-paillette-collar-double-layers-gold-plating-chain-necklace-1525681076507.html";
         if(StringUtil.isNotBlank(url) && StringUtil.isNotBlank(car_urlMD5) && car_urlMD5.startsWith("A")){
