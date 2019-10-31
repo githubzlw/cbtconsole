@@ -6595,7 +6595,7 @@ public class WarehouseCtrl {
 				}
 				if (MultiSiteUtil.getSiteTypeNum(orderid)==3){
 					modelM.put("websiteType",3);
-					modelM.put("toHref","https://www.lovelypetsupply.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+					modelM.put("toHref","https://www.petstoreinc.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
 					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK_PET);
 				}
 
@@ -7363,7 +7363,7 @@ public class WarehouseCtrl {
                         } else if (websiteType == 2) {
                             modelM.put("toHref", "https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         } else if (websiteType == 3) {
-                            modelM.put("toHref", "https://www.lovelypetsupply.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                            modelM.put("toHref", "https://www.petstoreinc.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         }
                         sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
 						//插入发送邮件记录

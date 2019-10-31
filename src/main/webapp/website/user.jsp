@@ -627,7 +627,7 @@ tr .td_class{width:230px;}
             <span>kidsproductwholesale</span>
             <br /><br />
             <input type='radio' name='site' value='3'/>
-            <span>lovelypetsupply</span>
+            <span>petstoreinc</span>
             <br /><br />
         </div>
         <div style="margin-left: 260px;">

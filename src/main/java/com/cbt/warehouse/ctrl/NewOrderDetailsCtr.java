@@ -2008,7 +2008,7 @@ public class NewOrderDetailsCtr {
 							webType = TemplateType.CANCEL_ORDER_KID;
 							break;
 						case 3:
-							webSiteTitle = "LovelyPetSupply";
+							webSiteTitle = "PetStoreInc";
 							webType = TemplateType.CANCEL_ORDER_PET;
 							break;
 						case 4:
