@@ -2974,7 +2974,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                    list.addAll(inventories);
                 }
                 for (int i=0;i<list.size();i++){
-                    list.get(i).setSkuList(this.getSkulistSd(list.get(i).getSku(),list.get(i).getFinal_weight()));
+                    list.get(i).setSkuList(this.getSkulistSd(list.get(i).getNew_barcode(),list.get(i).getFinal_weight()));
                 }
             }else {
                list = this.warehouseMapper.FindAllGoods(page * pagesize, pagesize, pid);

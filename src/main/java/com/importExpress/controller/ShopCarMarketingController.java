@@ -17,6 +17,7 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.*;
 import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.ShopCarMarketingService;
+import com.importExpress.service.TabCouponService;
 import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -77,6 +78,9 @@ public class ShopCarMarketingController {
 
     private shoppingCartDao shopCarDao = new shoppingCartDaoImpl();
 
+    @Autowired
+	private TabCouponService tabCouponService;
+
 
     @RequestMapping("/queryCarInfoByUserId")
     public ModelAndView queryCarInfoByUserId(HttpServletRequest request, HttpServletResponse response) {
@@ -100,7 +104,7 @@ public class ShopCarMarketingController {
             //查询当前客户存在的购物车数据
             ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
             ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
-            marketingCriteria.andUseridEqualTo(Integer.valueOf(userIdStr));
+            marketingCriteria.andUseridEqualTo(Integer.parseInt(userIdStr));
             List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
             //格式化处理规格数据
             for (ShopCarMarketing shopCar : shopCarMarketingList) {
@@ -176,8 +180,8 @@ public class ShopCarMarketingController {
         try {
             int count = 0;
             ShopCarMarketing shopCarMarketing = new ShopCarMarketing();
-            shopCarMarketing.setId(Integer.valueOf(goodsIdStr));
-            shopCarMarketing.setUserid(Integer.valueOf(userIdStr));
+            shopCarMarketing.setId(Integer.parseInt(goodsIdStr));
+            shopCarMarketing.setUserid(Integer.parseInt(userIdStr));
             shopCarMarketing.setGoogsPrice(goodsPriceStr);
             shopCarMarketing.setPriceNew(newPriceStr);
             shopCarMarketing.setAdminId(user.getId());
@@ -225,7 +229,7 @@ public class ShopCarMarketingController {
             4.【为客户选择最佳运输天数】
          */
         String type = request.getParameter("type");
-        if (StringUtils.isBlank(type) || Integer.valueOf(type) <= 0) {
+        if (StringUtils.isBlank(type) || Integer.parseInt(type) <= 0) {
             json.setOk(false);
             json.setMessage("获取发送类别失败");
             return json;
@@ -330,21 +334,31 @@ public class ShopCarMarketingController {
             json.setMessage("获取whatsApp失败");
             return json;
         }
-        /*String emailContent = request.getParameter("emailContent");
-        if (StringUtils.isBlank(emailContent)) {
-            json.setOk(false);
-            json.setMessage("获取邮件内容失败");
-            return json;
-        }*/
-
-
+        String couponCode = request.getParameter("couponCode");
+        String couponValue = "";
+        if("2".equals(type)){
+            if (StringUtils.isBlank(couponCode)) {
+                json.setOk(false);
+                json.setMessage("获取优惠券码失败");
+                return json;
+            }else{
+                TabCouponNew tabCouponNew =  tabCouponService.queryTabCouponOne(couponCode);
+                if(tabCouponNew == null || StringUtils.isBlank(tabCouponNew.getValue()) ){
+                    json.setOk(false);
+                    json.setMessage("无此优惠券或者设置失败，请确认");
+                    return json;
+                }else{
+                    couponValue = tabCouponNew.getValue();
+                }
+            }
+        }
 
 
         String userName;
         String userEmail = request.getParameter("userEmail");
         if (StringUtils.isBlank(userEmail)) {
             //查询客户信息
-            Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
+            Map<String, Object> listu = userInfoService.getUserCount(Integer.parseInt(userIdStr));
             userEmail = listu.get("email").toString();
             listu.clear();
             if(listu.containsValue("name") && StringUtils.isNotBlank(listu.get("name").toString())){
@@ -354,20 +368,21 @@ public class ShopCarMarketingController {
             }
         }
         //try {
-            int userId = Integer.valueOf(userIdStr);
+            int userId = Integer.parseInt(userIdStr);
             if ("1".equals(type) || "2".equals(type)) {
                 //1.重新生成goods_carconfig数据，并进行保存
 
                 //获取原来的重新生成goods_carconfig数据
-                GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
+                // GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
+                ShopCarNewBean carNewBean = goodsCarconfigService.queryShopCarNewBeanByUserId(userId);
                 if ("1".equals(websiteType)) {
-                    if (StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10) {
+                    if (StringUtils.isBlank(carNewBean.getImportData()) || carNewBean.getImportData().length() < 10) {
                         json.setOk(false);
                         json.setMessage("客户购物车信息为空");
                         return json;
                     }
                 } else if ("2".equals(websiteType) || "3".equals(websiteType) || "4".equals(websiteType)) {
-                    if (StringUtils.isBlank(carconfigWithBLOBs.getKidscarconfig()) || carconfigWithBLOBs.getKidscarconfig().length() < 10) {
+                    if (StringUtils.isBlank(carNewBean.getOtherData()) || carNewBean.getOtherData().length() < 10) {
                         json.setOk(false);
                         json.setMessage("客户购物车信息为空");
                         return json;
@@ -378,7 +393,7 @@ public class ShopCarMarketingController {
                     return json;
                 }
 
-                List<GoodsCarActiveSimplBean> listActive = new ArrayList<>();
+                /*List<GoodsCarActiveSimplBean> listActive = new ArrayList<>();
 
                 if ("2".equals(websiteType) || "3".equals(websiteType) || "4".equals(websiteType)) {
                     listActive =(List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getKidscarconfig()), GoodsCarActiveSimplBean.class);
@@ -389,7 +404,7 @@ public class ShopCarMarketingController {
                 List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
                 List<GoodsCarActiveSimplBean> activeList = new ArrayList<>();
                 System.err.println("shopMarketing userId:" + userId + ",websiteType:" + websiteType);
-                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(websiteType) -1);
+                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.parseInt(websiteType));
                 int isUpdatePrice = 0;
                 for (ShopCarMarketing shopCar : shopCarMarketingList) {
                     for (GoodsCarActiveSimplBean simplBean : listActive) {
@@ -417,7 +432,7 @@ public class ShopCarMarketingController {
                         if(activeList.size() > 0){
                             jsonObject.put("json",com.alibaba.fastjson.JSON.toJSONString(activeList));
 
-                            SendMQ.sendMsg(jsonObject, Integer.valueOf(websiteType) - 1);
+                            SendMQ.sendMsg(jsonObject, Integer.parseInt(websiteType) - 1);
 
                         }
 
@@ -427,8 +442,8 @@ public class ShopCarMarketingController {
                     }
 
 
-                    /*--jxw05-27弃用弃用，改成更新redis数据
-                    boolean isSuccess = updateGoodsCarConfig(listActive, Integer.valueOf(userIdStr));
+                    *//*--jxw05-27弃用弃用，改成更新redis数据
+                    boolean isSuccess = updateGoodsCarConfig(listActive, Integer.parseInt(userIdStr));
                     //更新成功后，发布邮件的时候全部更新线上
                     if (isSuccess) {
                         // 2.清空redis数据 使用MQ清空购物车数据 redis示例
@@ -446,11 +461,11 @@ public class ShopCarMarketingController {
                         json.setOk(false);
                         json.setMessage("更新失败,请重试");
                         return json;
-                    }*/
-                }
-                listActive.clear();
+                    }*//*
+                }*/
+                /*listActive.clear();
                 showList.clear();
-                activeList.clear();
+                activeList.clear();*/
             }
 
 
@@ -463,6 +478,8 @@ public class ShopCarMarketingController {
             paramMap.put("whatsApp", whatsApp);
             paramMap.put("type", type);
             paramMap.put("websiteType", websiteType);
+            paramMap.put("couponCode", couponCode);
+            paramMap.put("couponValue", couponValue);
             if (genHtmlEamil(userId, paramMap)) {
                 //4.更新跟进信息
                 shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), paramMap.toString());
@@ -486,7 +503,7 @@ public class ShopCarMarketingController {
 
     private boolean genHtmlEamil(int userId,Map<String,String> paramMap) {
         boolean isSuccess = false;
-        int websiteType = Integer.valueOf(paramMap.get("websiteType"));
+        int websiteType = Integer.parseInt(paramMap.get("websiteType"));
         try {
             Map<String, Object> modelM = new HashMap<String, Object>();
 
@@ -516,7 +533,7 @@ public class ShopCarMarketingController {
 
             if ("1".equals(paramMap.get("type")) || "2".equals(paramMap.get("type"))) {
                 //查询当前客户存在的购物车数据
-                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(paramMap.get("websiteType")) -1);
+                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.parseInt(paramMap.get("websiteType")));
 
                 //格式化处理规格数据
                 double productCost = 0;
@@ -590,6 +607,7 @@ public class ShopCarMarketingController {
                 }
                 modelM.put("updateList", resultList);
                 modelM.put("sourceList", sourceList);
+                modelM.put("couponValue", paramMap.get("couponValue"));
             }
 
 
@@ -890,12 +908,12 @@ public class ShopCarMarketingController {
         int limitNum = 30;
         String rowsStr = request.getParameter("rows");
         if (StringUtils.isNotBlank(rowsStr)) {
-            limitNum = Integer.valueOf(rowsStr);
+            limitNum = Integer.parseInt(rowsStr);
         }
 
         String pageStr = request.getParameter("page");
         if (StringUtils.isNotBlank(pageStr)) {
-            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+            startNum = (Integer.parseInt(pageStr) - 1) * limitNum;
         }
 
         String followIdStr = request.getParameter("followId");
@@ -991,7 +1009,7 @@ public class ShopCarMarketingController {
         } else {
             mv.addObject("userId", userIdStr);
         }
-        int userId = Integer.valueOf(userIdStr);
+        int userId = Integer.parseInt(userIdStr);
         if(!"0".equals(user.getRoletype()) && !shopCarMarketingService.checkIsDistribution(userId,user.getId())){
             mv.addObject("message", "非当前分配销售");
             mv.addObject("success", 0);
@@ -1001,7 +1019,7 @@ public class ShopCarMarketingController {
         String websiteStr = request.getParameter("website");
         int checkWebsite = 0;
         if(StringUtils.isNotBlank(websiteStr)){
-            checkWebsite = Integer.valueOf(websiteStr);
+            checkWebsite = Integer.parseInt(websiteStr);
         }
         try {
 
@@ -1015,8 +1033,8 @@ public class ShopCarMarketingController {
             mv.addObject("website", checkWebsite);
             mv.addObject("success", 1);
             for (Integer website : resultMap.keySet()) {
-                if (checkWebsite == website + 1) {
-                    dealShopCarGoodsByType(resultMap.get(website), carUserStatistic, userId, mv, website + 1);
+                if (checkWebsite == website) {
+                    dealShopCarGoodsByType(resultMap.get(website), carUserStatistic, userId, mv, website);
                     break;
                 }
             }
@@ -1040,10 +1058,12 @@ public class ShopCarMarketingController {
         double estimateProfit = 0;
 
         String onlineUrl = null;
+        double totalPriceNew = 0;
         for (ShopCarInfo carInfo : shopCarInfoList) {
             if (StringUtils.isBlank(carInfo.getWholesalePrice())) {
                 continue;
             }
+            totalPriceNew += carInfo.getCartGoodsPrice() * carInfo.getCartGoodsNum();
             //设置显示图片
             carInfo.setShowImg(carInfo.getRemotePath() + carInfo.getMainImg());
             carInfo.setCartGoodsImg(carInfo.getCartGoodsImg().replace("60x60.", "400x400."));
@@ -1122,6 +1142,7 @@ public class ShopCarMarketingController {
                 carUserStatistic.setTotalWhosePrice(BigDecimalUtil.truncateDouble(totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE, 2));
             }
         }
+        carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPriceNew, 2));
         mv.addObject("website", website);
         mv.addObject("success", 1);
         mv.addObject("userInfo", carUserStatistic);
@@ -1189,7 +1210,7 @@ public class ShopCarMarketingController {
             //查询当前客户存在的购物车数据
             ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
             ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
-            marketingCriteria.andUseridEqualTo(Integer.valueOf(userIdStr));
+            marketingCriteria.andUseridEqualTo(Integer.parseInt(userIdStr));
             List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
             //格式化处理规格数据
             double productCost = 0;
@@ -1266,7 +1287,7 @@ public class ShopCarMarketingController {
             mv.addObject("userId", userIdStr);
         }
         try {
-            int userId = Integer.valueOf(userIdStr);
+            int userId = Integer.parseInt(userIdStr);
             //查询客户信息
             Map<String, Object> listu = userInfoService.getUserCount(userId);
             mv.addObject("userEmail", listu.get("email"));
@@ -1365,12 +1386,12 @@ public class ShopCarMarketingController {
         int limitNum = 30;
         String rowsStr = request.getParameter("rows");
         if (StringUtils.isNotBlank(rowsStr)) {
-            limitNum = Integer.valueOf(rowsStr);
+            limitNum = Integer.parseInt(rowsStr);
         }
 
         String pageStr = request.getParameter("page");
         if (StringUtils.isNotBlank(pageStr)) {
-            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+            startNum = (Integer.parseInt(pageStr) - 1) * limitNum;
         }
 
         String userIdStr = request.getParameter("userId");
@@ -1556,16 +1577,27 @@ public class ShopCarMarketingController {
         }
 
         String typeStr = request.getParameter("type");
-        if (StringUtils.isBlank(typeStr) || Integer.valueOf(typeStr) <= 0) {
+        if (StringUtils.isBlank(typeStr) || Integer.parseInt(typeStr) <= 0) {
             mv.addObject("message", "获取发送类型失败");
             mv.addObject("success", 0);
             return mv;
         } else {
             mv.addObject("type", typeStr);
         }
+        String couponCode = "";
+        if("2".equals(typeStr)){
+            couponCode = request.getParameter("couponCode");
+            if(StringUtils.isBlank(couponCode) || couponCode.length() < 5){
+                mv.addObject("message", "获取优惠券码失败");
+                mv.addObject("success", 0);
+                return mv;
+            }else{
+                mv.addObject("couponCode", couponCode);
+            }
+        }
 
         String websiteStr = request.getParameter("website");
-        if (StringUtils.isBlank(websiteStr) || Integer.valueOf(websiteStr) <= 0) {
+        if (StringUtils.isBlank(websiteStr) || Integer.parseInt(websiteStr) <= 0) {
             mv.addObject("message", "获取网站类型失败");
             mv.addObject("success", 0);
             return mv;
@@ -1586,17 +1618,23 @@ public class ShopCarMarketingController {
         }
 
         try {
+            int userId = Integer.parseInt(userIdStr);
             //查询客户信息
-            Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
+            Map<String, Object> listu = userInfoService.getUserCount(userId);
             mv.addObject("userEmail", listu.get("email"));
             listu.clear();
 
             //获取原来的重新生成goods_carconfig数据
-            GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(Integer.valueOf(userIdStr));
+            /*GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(Integer.parseInt(userIdStr));
             boolean isImport = StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig())
                     || carconfigWithBLOBs.getBuyformecarconfig().length() < 10;
             boolean isKids = StringUtils.isBlank(carconfigWithBLOBs.getKidscarconfig())
-                    || carconfigWithBLOBs.getKidscarconfig().length() < 10;
+                    || carconfigWithBLOBs.getKidscarconfig().length() < 10;*/
+            ShopCarNewBean carNewBean = goodsCarconfigService.queryShopCarNewBeanByUserId(userId);
+            boolean isImport = StringUtils.isBlank(carNewBean.getImportData())
+                    || carNewBean.getImportData().length() < 10;
+            boolean isKids = StringUtils.isBlank(carNewBean.getOtherData())
+                    || carNewBean.getOtherData().length() < 10;
             if(isImport && isKids){
                 mv.addObject("message", "客户购物车信息为空");
                 mv.addObject("success", 0);
@@ -1604,7 +1642,7 @@ public class ShopCarMarketingController {
             }
 
             //查询当前客户存在的购物车数据
-            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(Integer.valueOf(userIdStr),Integer.valueOf(websiteStr)-1 );
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId,Integer.parseInt(websiteStr));
             //格式化处理规格数据
             double productCost = 0;
             double actualCost = 0;
@@ -1682,13 +1720,13 @@ public class ShopCarMarketingController {
         int limitNum = 30;
         String rowsStr = request.getParameter("rows");
         if (StringUtils.isNotBlank(rowsStr)) {
-            limitNum = Integer.valueOf(rowsStr);
+            limitNum = Integer.parseInt(rowsStr);
             logBean.setLimitNum(limitNum);
         }
 
         String pageStr = request.getParameter("page");
         if (StringUtils.isNotBlank(pageStr)) {
-            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+            startNum = (Integer.parseInt(pageStr) - 1) * limitNum;
         }
         logBean.setStartNum(startNum);
 
@@ -1735,12 +1773,12 @@ public class ShopCarMarketingController {
     public JsonResult recoverOnlineDataSingle(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
         String userIdStr = request.getParameter("userId");
-        int userId = Integer.valueOf(userIdStr);
+        int userId = Integer.parseInt(userIdStr);
         String websiteType = request.getParameter("website");
         if (StringUtils.isBlank(websiteType)) {
             websiteType = "1";
         }
-        json = dealDataAndUpload(Integer.valueOf(userId), websiteType);
+        json = dealDataAndUpload(Integer.parseInt(userIdStr), websiteType);
         return json;
     }
 
@@ -1769,7 +1807,7 @@ public class ShopCarMarketingController {
             }
             List<GoodsCarActiveSimplBean> activeList = new ArrayList<>();
             System.err.println("shopMarketing userId:" + userId + ",websiteType:" + websiteType);
-            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(websiteType) - 1);
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.parseInt(websiteType));
             for (ShopCarMarketing shopCar : shopCarMarketingList) {
                 for (GoodsCarActiveSimplBean simplBean : listActive) {
                     if (shopCar.getItemid().equals(simplBean.getItemId()) && shopCar.getGoodsType().equals(simplBean.getTypes())) {

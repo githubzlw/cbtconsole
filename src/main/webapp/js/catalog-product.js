@@ -263,26 +263,20 @@ function search(){
 	$(".product-page").hide();
 	var editid = $("#list-product-edit").val();
 	
-	var temp = $("#query_temp").val();
-	var requestHost = "https://www.import-express.com";
-	if(temp == '2'){
-		requestHost = "https://www.kidsproductwholesale.com";
-	}else if(temp == '4'){
-		requestHost = "https://www.petstoreinc.com";
-	}
 	productArray = [];
 	//本地已经生成的目录商品优先展示
 	if(editid != ''){
-		catalogProduct(editid,requestHost);
+		catalogProduct(editid);
+	}else{
+		//获取线上商品
+		searchFromRemote();
 	}
-	//获取线上商品
-	searchFromRemote(temp,requestHost);
 }
 /**已经生成的目录商品优先展示
  * @param id
  * @returns
  */
-function catalogProduct(id,requestHost){
+function catalogProduct(id){
 	$.ajax({
 		url:'/cbtconsole/catalog/product',
 		data:{
@@ -296,6 +290,13 @@ function catalogProduct(id,requestHost){
 				$(".product-list").html("");
 				return ;
 			}
+			var requestHost = "https://www.import-express.com";
+			if(data.template == 2){
+				requestHost = "https://www.kidsproductwholesale.com";
+			}else if(data.template == 4){
+				requestHost = "https://www.petstoreinc.com";
+			}
+			
 			var goodslist = eval(data.product);
 			var productHtml = '';
 			for(var i=0;i<size;i++){
@@ -313,9 +314,14 @@ function catalogProduct(id,requestHost){
 					productArray.push(product.pid);
 				}
 			}
+			$("#catalog_name").val(data.catalogName);
+			
+			 $("#query_temp").val(data.template);
+			
 			$(".product-list").html(productHtml);
 			$('.img-lazy').lazyload({effect: "fadeIn"});
 //			console.log(productArray);
+			searchFromRemote();
 		},
 		error:function(e){
 //			$.MsgBox.Alert("提示", "搜索请求错误");
@@ -327,7 +333,14 @@ function catalogProduct(id,requestHost){
 /**获取线上商品
  * @returns
  */
-function searchFromRemote(temp,requestHost){
+function searchFromRemote(){
+	var temp = $("#query_temp").val();
+	var requestHost = "https://www.import-express.com";
+	if(temp == 2){
+		requestHost = "https://www.kidsproductwholesale.com";
+	}else if(temp == 4){
+		requestHost = "https://www.petstoreinc.com";
+	}
 	var catid = $("#param-catid").val();
 	var keyword = $("#query-keyword").val();
 	var page = $("#current-page").val();
@@ -341,7 +354,7 @@ function searchFromRemote(temp,requestHost){
 		},
 		type:"post",
 		success:function(data){
-			var size = parseInt(data.goodsSize);
+			var size = data.goodsList.length;//parseInt(data.goodsSize);
 			if(size < 1){
 				$(".product-list").html("");
 				return ;

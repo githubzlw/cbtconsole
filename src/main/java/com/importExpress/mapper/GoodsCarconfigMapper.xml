@@ -546,4 +546,11 @@
   set is_new = 0,updateTime = now()
   where id = #{id,jdbcType=INTEGER} and userid = #{userId,jdbcType=INTEGER}
   </update>
+
+    <select id="queryShopCarNewBeanByUserId" resultType="com.importExpress.pojo.ShopCarNewBean">
+        select a.id,a.userid as userId,a.shop_car_data_import as importData,
+        a.shop_car_data_other as otherData,a.is_new as isNew, b.is_test as isTest, b.site
+        from shop_cart_data a, user b where  a.userid = b.id and a.userid = #{userId}
+    </select>
+
 </mapper>

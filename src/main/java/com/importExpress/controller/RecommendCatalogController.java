@@ -117,6 +117,8 @@ public class RecommendCatalogController {
 		String isManag = request.getParameter("isManag");
 		List<CatalogProductWrap> redisWrap = new ArrayList<>();
 		String redisCatalog = "";
+		String catalogName = "";
+		int template = 1;
 		if("true".equals(isManag)) {
 			String id = request.getParameter("id");
 			//仅预览
@@ -138,6 +140,8 @@ public class RecommendCatalogController {
 				result.put("message", "无产品可预览！！！");
 				return result;
 			}
+			catalogName = catalogById.getCatalogName();
+			template = catalogById.getTemplate();
 			redisWrap = SerializeUtil.JsonToListT(redisCatalog, CatalogProductWrap.class);
 			result.put("productSize", redisWrap.size());
 			Redis.hset(redisKey, saveKey, redisCatalog,2*60*60);
@@ -150,6 +154,9 @@ public class RecommendCatalogController {
 		result.put("status", 200);
 		result.put("productSize", redisWrap.size());
 		result.put("product", redisCatalog);
+		result.put("catalogName", catalogName);
+		result.put("template", template);
+		
 		return result;
 		
 	}
@@ -162,49 +169,55 @@ public class RecommendCatalogController {
 	@ResponseBody
 	public Map<String,Object> catalogCreate(HttpServletRequest request, HttpServletResponse response) {
 		Map<String,Object> result = new HashMap<>();
-		//仅预览
-		Subject currentUser = SecurityUtils.getSubject();
-		Admuser admuser = (Admuser)currentUser.getPrincipal();
-//		com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
-		String redisKey  = "catalog"+admuser.getId();
+		try {
+			//仅预览
+			Subject currentUser = SecurityUtils.getSubject();
+			Admuser admuser = (Admuser)currentUser.getPrincipal();
+//			com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+			String redisKey  = "catalog"+admuser.getId();
+			
+			String redisCatalog = Redis.hget(redisKey, saveKey);
+			List<CatalogProductWrap> redisWrap = new ArrayList<>();
+			if(StringUtils.isNotBlank(redisCatalog)) {
+				redisWrap = SerializeUtil.JsonToListT(redisCatalog, CatalogProductWrap.class);
+			}else {
+				result.put("status", 101);
+				result.put("message", "请先挑选产品！！！");
+				return result;
+			}
+			String tem = request.getParameter("tem");
+			int template = Integer.parseInt(tem);
+			String id = request.getParameter("id");
+			String catalogName = request.getParameter("catalogname");
+			//生成目录
+			int addCatelog = 0;
+			RecommendCatalog catalog = new RecommendCatalog();
+			catalog.setCatalogName(catalogName);
+			catalog.setCreateAdmin(admuser.getAdmName());
+			int productCount = redisWrap.stream().mapToInt(CatalogProductWrap::getProductCount).sum();
+			catalog.setProductCount(productCount);
+			catalog.setProductList(redisCatalog);
+			catalog.setStatus(1);
+			catalog.setTemplate(template);
+			if(StrUtils.isNum(id) && Integer.parseInt(id) > 0) {
+				catalog.setId(Integer.parseInt(id));
+				addCatelog = recommendCatalogService.updateCatalog(catalog);
+			}else {
+				addCatelog = recommendCatalogService.addCatelog(catalog);
+			}
+			Redis.hdel(redisKey);
+			if(addCatelog < 1) {
+				result.put("status", 102);
+				result.put("message", "生成目录失败！！！");
+				return result;
+			}
+			result.put("status", 200);
+			result.put("addCatelog", addCatelog);
+		} catch (Exception e) {
+			result.put("status", 105);
+			result.put("message", "生成目录失败:"+e.getMessage());
+		}
 		
-		String redisCatalog = Redis.hget(redisKey, saveKey);
-		List<CatalogProductWrap> redisWrap = new ArrayList<>();
-		if(StringUtils.isNotBlank(redisCatalog)) {
-			redisWrap = SerializeUtil.JsonToListT(redisCatalog, CatalogProductWrap.class);
-		}else {
-			result.put("status", 101);
-			result.put("message", "请先挑选产品！！！");
-			return result;
-		}
-		String tem = request.getParameter("tem");
-		int template = Integer.parseInt(tem);
-		String id = request.getParameter("id");
-		String catalogName = request.getParameter("catalogname");
-		//生成目录
-		int addCatelog = 0;
-		RecommendCatalog catalog = new RecommendCatalog();
-		catalog.setCatalogName(catalogName);
-		catalog.setCreateAdmin(admuser.getAdmName());
-		int productCount = redisWrap.stream().mapToInt(CatalogProductWrap::getProductCount).sum();
-		catalog.setProductCount(productCount);
-		catalog.setProductList(redisCatalog);
-		catalog.setStatus(1);
-		catalog.setTemplate(template);
-		if(StrUtils.isNum(id) && Integer.parseInt(id) > 0) {
-			catalog.setId(Integer.parseInt(id));
-			addCatelog = recommendCatalogService.updateCatalog(catalog);
-		}else {
-			addCatelog = recommendCatalogService.addCatelog(catalog);
-		}
-		if(addCatelog < 1) {
-			result.put("status", 102);
-			result.put("message", "生成目录失败！！！");
-			return result;
-		}
-		result.put("status", 200);
-		result.put("addCatelog", addCatelog);
-		Redis.hdel(redisKey);
 		return result;
 	}
 	/**预览时清空产品

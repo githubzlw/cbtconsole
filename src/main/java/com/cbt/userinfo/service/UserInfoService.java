@@ -131,4 +131,9 @@ public static void main(String[] args) {
 		return mapper.updateUserFollowCode(followCode, userId);
 	}
 
+	@Override
+	public Map<String, String> getUserInfoById(int id) {
+		return mapper.getUserInfoById(id);
+	}
+
 }

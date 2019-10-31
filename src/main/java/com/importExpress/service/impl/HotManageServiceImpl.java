@@ -197,5 +197,10 @@ public class HotManageServiceImpl implements HotManageService {
         return hotManageMapper.updateIntoHotClassInfo(hotClassInfo);
     }
 
+    @Override
+    public int deleteHotClassInfo(int id) {
+        return hotManageMapper.deleteHotClassInfo(id);
+    }
+
 
 }

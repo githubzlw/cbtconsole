@@ -69,4 +69,6 @@ public interface UserMapper {
     int checkFollowMeCode(@Param("followCode") String followCode);
 
     int updateUserFollowCode(@Param("followCode") String followCode,@Param("userId") int userId);
+
+    Map<String,String> getUserInfoById(@Param("id") int id);
 }

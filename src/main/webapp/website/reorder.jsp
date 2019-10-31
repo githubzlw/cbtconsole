@@ -74,8 +74,12 @@
                     userId:userId
                 },
                 success:function(result){
-                    if(result != null){
-                        var content = '<div></div><span style="color: orange">'+result+'</span><br>';
+                    if(result){
+                        var message = "执行成功";
+                        if(!result.ok){
+                            message = result.message;
+                        }
+                        var content = '<div></div><span style="color: orange">'+message+'</span><br>';
                         $.dialog({
                             title : '添加订单商品到指定用户结果!',
                             content : content,

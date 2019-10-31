@@ -119,5 +119,9 @@
     </update>
 
 
+    <select id="getUserInfoById" resultType="hashmap">
+        select * from user where id = #{id}
+    </select>
+
 
 </mapper>
