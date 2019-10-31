@@ -1225,16 +1225,5 @@ public interface IWarehouseService {
 	 */
 	List<Map<String,Object>> getOverseasWarehouseStockOrder(String ordernoOrUserid);
 	
-	/**MQ更新海外仓订单添加运单号
-	 * @param map
-	 * @return
-	 */
-	int addOverseasWarehouseStockOrder(Map<String,Object> map);
-	
-	/**MQ更新海外仓订单出货
-	 * @param map
-	 * @return
-	 */
-	int shipoutOverseasWarehouseStockOrder(Map<String,Object> map);
 }
  

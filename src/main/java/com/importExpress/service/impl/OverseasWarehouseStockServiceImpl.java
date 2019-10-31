@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cbt.jdbc.DBHelper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.mapper.OverseasWarehouseStockMapper;
 import com.importExpress.pojo.OverseasWarehouseStock;
@@ -14,6 +15,7 @@ import com.importExpress.pojo.OverseasWarehouseStockLog;
 import com.importExpress.pojo.OverseasWarehouseStockParamter;
 import com.importExpress.pojo.OverseasWarehouseStockWrap;
 import com.importExpress.service.OverseasWarehouseStockService;
+import com.importExpress.utli.RunBatchSqlModel;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 @Service
@@ -142,5 +144,22 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
 		});
 		return logs;
 	}
-	
+	@Override
+	public int addOverseasWarehouseStockOrder(Map<String, Object> map) {
+		String sql = "insert into overseas_warehouse_ship_package(orderid,ship_no,state) values(?,?,?,now())";
+		List<String> lstValues = Lists.newArrayList();
+		String runSql = DBHelper.covertToSQL(sql, lstValues);
+		return 0;
+	}
+
+
+
+	@Override
+	public int shipoutOverseasWarehouseStockOrder(Map<String, Object> map) {
+		
+		
+		
+		
+		return 0;
+	}
 }

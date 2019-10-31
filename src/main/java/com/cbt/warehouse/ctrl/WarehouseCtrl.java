@@ -9513,7 +9513,7 @@ public class WarehouseCtrl {
 		Map<String, Object> map = Maps.newHashMap();
 		map.put("orderno", orderno);
 		map.put("shipno", shipno);
-		int owsAdd = iWarehouseService.addOverseasWarehouseStockOrder(map );
+		int owsAdd = owsService.addOverseasWarehouseStockOrder(map );
 		if(owsAdd > 0) {
 			result.put("status", 200);
 		}else {
@@ -9539,7 +9539,7 @@ public class WarehouseCtrl {
 		map.put("shipno", shipno);
 		List<OverseasWarehouseStockLog> logByOrderno = owsService.getLogByOrderno(orderno);
 		if(logByOrderno == null || logByOrderno.isEmpty()) {
-			int owsAdd = iWarehouseService.shipoutOverseasWarehouseStockOrder(map );
+			int owsAdd = owsService.shipoutOverseasWarehouseStockOrder(map );
 			if(owsAdd > 0) {
 				//释放占用
 				OverseasWarehouseStock stock;

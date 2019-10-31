@@ -3061,26 +3061,4 @@ public class WarehouseServiceImpl implements IWarehouseService {
 		return orderinfoMapper.getOverseasWarehouseStockOrder(ordernoOrUserid);
 	}
 
-
-
-	@Override
-	public int addOverseasWarehouseStockOrder(Map<String, Object> map) {
-		
-		SendMQ.sendMqSql(new RunBatchSqlModel());
-		
-		return 0;
-	}
-
-
-
-	@Override
-	public int shipoutOverseasWarehouseStockOrder(Map<String, Object> map) {
-		
-		
-		
-		
-		return 0;
-	}
-
-
 }
