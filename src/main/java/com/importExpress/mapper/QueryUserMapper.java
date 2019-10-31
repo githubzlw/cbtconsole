@@ -162,4 +162,6 @@ public interface QueryUserMapper {
     TimingWarningInfo queryQuotaData(@Param("id") Integer id);
 
     void udpateQuotaData(@Param("bean") TimingWarningInfo bean);
+
+    List<Integer> queryAllCheckout(int flag);
 }

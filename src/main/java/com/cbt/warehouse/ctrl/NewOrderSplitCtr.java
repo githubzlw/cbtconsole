@@ -322,6 +322,11 @@ public class NewOrderSplitCtr {
 
             // 查询订单和订单详情
             OrderBean orderBean = splitDao.getOrders(orderNo);
+            if(orderBean == null || StringUtils.isBlank(orderBean.getOrderNo())){
+                json.setOk(false);
+                json.setMessage("获取订单，请重试");
+                return json;
+            }
             // 获取新的订单号
             nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0, isOverSea);
             // 需要取消的商品order_details的id
@@ -567,6 +572,11 @@ public class NewOrderSplitCtr {
             // 判断是否是Drop Ship订单，根据订单号获取订单信息
             IOrderSplitDao splitDao = new OrderSplitDaoImpl();
             OrderBean orderBean = splitDao.getOrders(orderNo);
+            if(orderBean == null || StringUtils.isBlank(orderBean.getOrderNo())){
+                json.setOk(false);
+                json.setMessage("获取订单信息失败!");
+                return json;
+            }
             if (orderBean.getIsDropshipOrder() == 1) {
                 // Drop Ship 拆单，不可数量拆单
                 json.setOk(false);

@@ -255,19 +255,19 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int insertEvaluation(Map<String, String> map) {
         int row=0;
         try{
-            SendMQ sendMQ=new SendMQ();
+
             String id=warehouseMapper.queryQevId(map);
             if(StringUtil.isBlank(id)){
                 row=warehouseMapper.insertEvaluation(map);
-                sendMQ.sendMsg(new RunSqlModel("insert into goods_evaluation (goods_pid,evaluation,createtime) values('"+map.get("goods_pid")+"','"+map.get("evaluation")+"',now())"));
+                SendMQ.sendMsg(new RunSqlModel("insert into goods_evaluation (goods_pid,evaluation,createtime) values('"+map.get("goods_pid")+"','"+map.get("evaluation")+"',now())"));
                 id=warehouseMapper.queryQevId(map);
             }else{
                 row=warehouseMapper.updateEvaluation(map);
-                sendMQ.sendMsg(new RunSqlModel("update goods_evaluation set evaluation='"+map.get("evaluation")+"' where goods_pid='"+map.get("goods_pid")+"'"));
+                SendMQ.sendMsg(new RunSqlModel("update goods_evaluation set evaluation='"+map.get("evaluation")+"' where goods_pid='"+map.get("goods_pid")+"'"));
             }
             map.put("ge_id",id);
             warehouseMapper.insertEvaluationLog(map);
-            sendMQ.closeConn();
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -285,9 +285,9 @@ public class WarehouseServiceImpl implements IWarehouseService {
 			    checked=0;
 		    }
 		    if(checked>0){
-			    SendMQ sendMQ = new SendMQ();
-			    sendMQ.sendMsg(new RunSqlModel(" insert into inspection_picture(pid,orderid,pic_path,createtime,odid) values('"+map.get("goodsPid")+"','"+map.get("orderid")+"','"+map.get("picPath")+"',now(),'"+map.get("odid")+"')"));
-			    sendMQ.closeConn();
+
+			    SendMQ.sendMsg(new RunSqlModel(" insert into inspection_picture(pid,orderid,pic_path,createtime,odid) values('"+map.get("goodsPid")+"','"+map.get("orderid")+"','"+map.get("picPath")+"',now(),'"+map.get("odid")+"')"));
+
 		    }
 	    }catch (Exception e){
     		e.printStackTrace();
@@ -1732,12 +1732,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int addKeyword(Map<String, String> map) {
         int row=0;
         try{
-            SendMQ sendMQ=new SendMQ();
+
             row=warehouseMapper.addKeyword(map);
             if(row>0){
-                sendMQ.sendMsg(new RunSqlModel("insert into priority_category(keyword,category) values('"+map.get("keyword")+"','"+map.get("cateId")+"')"));
+                SendMQ.sendMsg(new RunSqlModel("insert into priority_category(keyword,category) values('"+map.get("keyword")+"','"+map.get("cateId")+"')"));
             }
-            sendMQ.closeConn();
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -1748,12 +1748,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int editKeyword(Map<String, String> map) {
         int row=0;
         try{
-            SendMQ sendMQ=new SendMQ();
+
             row=warehouseMapper.editKeyword(map);
             if(row>0){
-                sendMQ.sendMsg(new RunSqlModel("update priority_category set category="+map.get("cid")+" where id="+map.get("id")+""));
+                SendMQ.sendMsg(new RunSqlModel("update priority_category set category="+map.get("cid")+" where id="+map.get("id")+""));
             }
-            sendMQ.closeConn();
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -1764,12 +1764,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int updateStateCategory(Map<String, String> map) {
         int row=0;
         try{
-            SendMQ sendMQ=new SendMQ();
+
             row=warehouseMapper.updateStateCategory(map);
             if(row>0){
-                sendMQ.sendMsg(new RunSqlModel("update priority_category set status="+map.get("state")+" where id="+map.get("id")+""));
+                SendMQ.sendMsg(new RunSqlModel("update priority_category set status="+map.get("state")+" where id="+map.get("id")+""));
             }
-            sendMQ.closeConn();
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -2974,7 +2974,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                    list.addAll(inventories);
                 }
                 for (int i=0;i<list.size();i++){
-                    list.get(i).setSkuList(this.getSkulistSd(list.get(i).getSku(),list.get(i).getFinal_weight()));
+                    list.get(i).setSkuList(this.getSkulistSd(list.get(i).getNew_barcode(),list.get(i).getFinal_weight()));
                 }
             }else {
                list = this.warehouseMapper.FindAllGoods(page * pagesize, pagesize, pid);

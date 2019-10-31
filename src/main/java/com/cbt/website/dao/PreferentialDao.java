@@ -6,6 +6,9 @@ import com.cbt.bean.Preferential;
 import com.cbt.bean.PreferentialWeb;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.Utility;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -385,7 +388,7 @@ public static void main(String[] args) {
 	public int savePai(List<Object[]> list,String uid,int userid,String sessionid) {
 			String sql = "insert into pa_interacted(paid,gid,price,type,createtime) values(?,?,?,0,now())";
 			Connection conn = DBHelper.getInstance().getConnection();
-			Connection conn2 = DBHelper.getInstance().getConnection2();
+			// Connection conn2 = DBHelper.getInstance().getConnection2();
 			PreparedStatement stmt = null;
 			PreparedStatement stmt2 = null;
 			PreparedStatement ps1 = null;
@@ -394,24 +397,36 @@ public static void main(String[] args) {
 			int result = 0;
 			try {
 				stmt = conn.prepareStatement(sql,  PreparedStatement.RETURN_GENERATED_KEYS);
-				ps1 = conn2.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+				// ps1 = conn2.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 				for (int i = 0; i < list.size(); i++) {
 					stmt.setInt(1, Integer.parseInt(list.get(i)[0].toString()));
 					stmt.setInt(2, Integer.parseInt(list.get(i)[1].toString()));
 					stmt.setDouble(3, Double.parseDouble(list.get(i)[2].toString()));
 					stmt.addBatch();
 					
-					ps1.setInt(1, Integer.parseInt(list.get(i)[0].toString()));
+					/*ps1.setInt(1, Integer.parseInt(list.get(i)[0].toString()));
 					ps1.setInt(2, Integer.parseInt(list.get(i)[1].toString()));
 					ps1.setDouble(3, Double.parseDouble(list.get(i)[2].toString()));
-					ps1.addBatch();
+					ps1.addBatch();*/
+
+					List<String> listValues = new ArrayList<>();
+					listValues.add(String.valueOf(list.get(i)[0].toString()));
+					listValues.add(String.valueOf(list.get(i)[1].toString()));
+					listValues.add(String.valueOf(list.get(i)[2].toString()));
+					String runSql = DBHelper.covertToSQL(sql, listValues);
+					String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+					int countRs = 0;
+					if(StringUtils.isBlank(rsStr)){
+						countRs = Integer.valueOf(rsStr);
+					}
+					result += countRs;
 				}
 				int[] results = stmt.executeBatch();
 				ps1.executeBatch();
 				
 				String sql1 = "insert into paprestrain(pid,uid,suserid,sessionid,createtime) values(?,?,?,?,now())";
 				stmt2 = conn.prepareStatement(sql1,PreparedStatement.RETURN_GENERATED_KEYS);
-				ps2 = conn2.prepareStatement(sql1, PreparedStatement.RETURN_GENERATED_KEYS);
+				// ps2 = conn2.prepareStatement(sql1, PreparedStatement.RETURN_GENERATED_KEYS);
 				for (int i = 0; i < list.size(); i++) {
 					stmt2.setInt(1, Integer.parseInt(list.get(i)[0].toString()));
 					stmt2.setString(2, uid);
@@ -419,14 +434,27 @@ public static void main(String[] args) {
 					stmt2.setString(4, sessionid);
 					stmt2.addBatch();
 					
-					ps2.setInt(1, Integer.parseInt(list.get(i)[0].toString()));
+					/*ps2.setInt(1, Integer.parseInt(list.get(i)[0].toString()));
 					ps2.setString(2, uid);
 					ps2.setInt(3, userid);
 					ps2.setString(4, sessionid);
-					ps2.addBatch();
+					ps2.addBatch();*/
+
+					List<String> listValues = new ArrayList<>();
+					listValues.add(String.valueOf(list.get(i)[0].toString()));
+					listValues.add(String.valueOf(uid));
+					listValues.add(String.valueOf(userid));
+					listValues.add(String.valueOf(sessionid));
+					String runSql = DBHelper.covertToSQL(sql1, listValues);
+					String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+					int countRs = 0;
+					if(StringUtils.isBlank(rsStr)){
+						countRs = Integer.valueOf(rsStr);
+					}
+					result += countRs;
 				}
 				stmt2.executeBatch();
-				ps2.executeBatch();
+				// ps2.executeBatch();
 				
 				result = results.length;
 			} catch (Exception e) {
@@ -461,7 +489,7 @@ public static void main(String[] args) {
 					}
 				}
 				DBHelper.getInstance().closeConnection(conn);
-				DBHelper.getInstance().closeConnection(conn2);
+				// DBHelper.getInstance().closeConnection(conn2);
 			}
 			return result;
 		}
@@ -469,14 +497,25 @@ public static void main(String[] args) {
 	@Override
 	public int savePaprestrain(String uid, int userid) {
 		String sql = "insert paprestrain(uid,suserid,createtime) values(?,?,now())";
-		Connection conn = DBHelper.getInstance().getConnection2();
+		// Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
 		int res = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
+			/*stmt = conn.prepareStatement(sql);
 			stmt.setInt(2, userid);
 			stmt.setString(1, uid);
-			res = stmt.executeUpdate();
+			res = stmt.executeUpdate();*/
+
+			List<String> listValues = new ArrayList<>();
+			listValues.add(String.valueOf(uid));
+			listValues.add(String.valueOf(userid));
+			String runSql = DBHelper.covertToSQL(sql, listValues);
+			String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+			int countRs = 0;
+			if (StringUtils.isBlank(rsStr)) {
+				countRs = Integer.valueOf(rsStr);
+			}
+			res = countRs;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -487,22 +526,33 @@ public static void main(String[] args) {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
-	}
+			// DBHelper.getInstance().closeConnection(conn);
+		}
 		return res;
 	}
 
 	@Override
 	public int delPaprestrain(int pid,String cancel_reason) {
 		String sql = "update preferential_application set state=2 ,cancel_reason=?,cancel_obj=2 where id=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
+		// Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
 		int res = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
+			/*stmt = conn.prepareStatement(sql);
 			stmt.setInt(2, pid);
 			stmt.setString(1, cancel_reason);
-			res = stmt.executeUpdate();
+			res = stmt.executeUpdate();*/
+
+			List<String> listValues = new ArrayList<>();
+			listValues.add(String.valueOf(cancel_reason));
+			listValues.add(String.valueOf(pid));
+			String runSql = DBHelper.covertToSQL(sql, listValues);
+			String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+			int countRs = 0;
+			if (StringUtils.isBlank(rsStr)) {
+				countRs = Integer.valueOf(rsStr);
+			}
+			res = countRs;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -513,7 +563,7 @@ public static void main(String[] args) {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			// DBHelper.getInstance().closeConnection(conn);
 	}
 		return res;
 	}
@@ -521,7 +571,7 @@ public static void main(String[] args) {
 	@Override
 	public int upPaconfirm(String[] uid) {
 		String sql = "update preferential_application set confirm = 1 where  ";
-		Connection conn = DBHelper.getInstance().getConnection2();
+		// Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
 		int res = 0;
 		try {
@@ -529,11 +579,21 @@ public static void main(String[] args) {
 			for (int i = 1; i < uid.length; i++) {
 				sql += " or id=? ";
 			}
-			stmt = conn.prepareStatement(sql);
+			// stmt = conn.prepareStatement(sql);
+			List<String> listValues = new ArrayList<>();
 			for (int i = 0; i < uid.length; i++) {
-				stmt.setInt(i+1, Integer.parseInt(uid[i]));
+				// stmt.setInt(i+1, Integer.parseInt(uid[i]));
+				listValues.add(String.valueOf(uid[i]));
 			}
-			res = stmt.executeUpdate();
+			// res = stmt.executeUpdate();
+
+			String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(sql));
+			int countRs = 0;
+			if (StringUtils.isBlank(rsStr)) {
+				countRs = Integer.valueOf(rsStr);
+			}
+			res = countRs;
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -544,7 +604,7 @@ public static void main(String[] args) {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			// DBHelper.getInstance().closeConnection(conn);
 	}
 		return res;
 	}
@@ -552,13 +612,23 @@ public static void main(String[] args) {
 	@Override
 	public int uptimePainteracted(int pid, String time) {
 		String sql = "update preferential_application set syseffectivetime = DATE_ADD(NOW(),INTERVAL 1 MONTH) where  id = ?";
-		Connection conn = DBHelper.getInstance().getConnection2();
+		// Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
 		int res = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
+			/*stmt = conn.prepareStatement(sql);
 				stmt.setInt(1, pid);
-			res = stmt.executeUpdate();
+			res = stmt.executeUpdate();*/
+
+			List<String> listValues = new ArrayList<>();
+			listValues.add(String.valueOf(pid));
+			String runSql = DBHelper.covertToSQL(sql, listValues);
+			String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+			int countRs = 0;
+			if (StringUtils.isBlank(rsStr)) {
+				countRs = Integer.valueOf(rsStr);
+			}
+			res = countRs;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -569,8 +639,8 @@ public static void main(String[] args) {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
-	}
+			//DBHelper.getInstance().closeConnection(conn);
+		}
 		return res;
 	}
 
@@ -658,26 +728,22 @@ public static void main(String[] args) {
 	@Override
 	public int upPostageD(int id, int type, String handleman) {
 		String sql = "update postage_discounts set handleman=?,handletime=now(),state=? where id=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement stmt = null;
 		int res = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, handleman);
-			stmt.setInt(2, type);
-			stmt.setInt(3, id);
-			res = stmt.executeUpdate();
+
+
+			List<String> lstValues = new ArrayList<>();
+			lstValues.add(handleman);
+			lstValues.add(String.valueOf(type));
+			lstValues.add(String.valueOf(id));
+
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+			res=Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			DBHelper.getInstance().closeConnection(conn);
+
 	}
 		return res;
 	}
@@ -739,7 +805,7 @@ public static void main(String[] args) {
 //		String sql = "update preferential_application set discountedunitprice=?,state=1 where id=?";
 		String sql = "update preferential_application set discountedunitprice=?,totalprice=(quantity*?)  where id=?";
 		Connection con = DBHelper.getInstance().getConnection();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		// Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement ps1=null,ps2=null;
 		int i =0;
 		try {
@@ -748,12 +814,24 @@ public static void main(String[] args) {
 			ps1.setDouble(2, price);
 			ps1.setInt(3, id);
 			
-			ps2 = conn.prepareStatement(sql);
+			/*ps2 = conn.prepareStatement(sql);
 			ps2.setDouble(1, price);
 			ps2.setDouble(2, price);
-			ps2.setInt(3, id);
+			ps2.setInt(3, id);*/
 			i = ps1.executeUpdate();
-			i+= ps2.executeUpdate();
+			// i+= ps2.executeUpdate();
+
+			List<String> listValues = new ArrayList<>();
+			listValues.add(String.valueOf(price));
+			listValues.add(String.valueOf(price));
+			listValues.add(String.valueOf(id));
+			String runSql = DBHelper.covertToSQL(sql, listValues);
+			String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+			int countRs = 0;
+			if(StringUtils.isBlank(rsStr)){
+				countRs = Integer.valueOf(rsStr);
+			}
+			i+=countRs;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -772,40 +850,51 @@ public static void main(String[] args) {
 				}
 			}
 		}
-		DBHelper.getInstance().closeConnection(conn);
+		// DBHelper.getInstance().closeConnection(conn);
 		DBHelper.getInstance().closeConnection(con);
 		return i;
 	}
 	
 	@Override
-	public int updateGoodsCarPrice(double price, String itemId){
+	public int updateGoodsCarPrice(double price, String itemId) {
 		//4.10 修改价格
 		String sql = "update goods_car set googs_price=?  where preferential=?";
 		Connection con = DBHelper.getInstance().getConnection();
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement ps1=null,ps2=null;
-		int i =0;
+		// Connection conn = DBHelper.getInstance().getConnection2();
+		PreparedStatement ps1 = null, ps2 = null;
+		int i = 0;
 		try {
 			ps1 = con.prepareStatement(sql);
 			ps1.setDouble(1, price);
 			ps1.setString(2, itemId);
 			
-			ps2 = conn.prepareStatement(sql);
+			/*ps2 = conn.prepareStatement(sql);
 			ps2.setDouble(1, price);
 			ps2.setString(2, itemId);
 			i = ps1.executeUpdate();
-			i+= ps2.executeUpdate();
+			i+= ps2.executeUpdate();*/
+
+			List<String> listValues = new ArrayList<>();
+			listValues.add(String.valueOf(price));
+			listValues.add(String.valueOf(itemId));
+			String runSql = DBHelper.covertToSQL(sql, listValues);
+			String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+			int countRs = 0;
+			if (StringUtils.isBlank(rsStr)) {
+				countRs = Integer.valueOf(rsStr);
+			}
+			i += countRs;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			if(ps1!=null){
+			if (ps1 != null) {
 				try {
 					ps1.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			if(ps2!=null){
+			if (ps2 != null) {
 				try {
 					ps2.close();
 				} catch (SQLException e) {
@@ -813,7 +902,7 @@ public static void main(String[] args) {
 				}
 			}
 		}
-		DBHelper.getInstance().closeConnection(conn);
+		//DBHelper.getInstance().closeConnection(conn);
 		DBHelper.getInstance().closeConnection(con);
 		return i;
 	}
@@ -824,20 +913,23 @@ public static void main(String[] args) {
 //		String sql = "update preferential_application set discountedunitprice=?,state=1 where id=?";
 		String sql = "update preferential_application set pay_price=?  where itemId=?";
 		Connection con = DBHelper.getInstance().getConnection();
-		Connection conn = DBHelper.getInstance().getConnection2();
-		PreparedStatement ps1=null,ps2=null;
+		PreparedStatement ps1=null;
 		int i =0;
 		try {
 			ps1 = con.prepareStatement(sql);
 			ps1.setDouble(1, payPrice);
 			ps1.setString(2, itemId);
-			
-			ps2 = conn.prepareStatement(sql);
-			ps2.setDouble(1, payPrice);
-			ps2.setString(2, itemId);
-			
+
+			List<String> lstValues = new ArrayList<>(2);
+			lstValues.add( String.valueOf(payPrice));
+			lstValues.add( itemId);
+			String runSql = DBHelper.covertToSQL(sql,lstValues);
+
+			SendMQ.sendMsg(new RunSqlModel(runSql));
+
+
 			i = ps1.executeUpdate();
-			i+= ps2.executeUpdate();
+			++i;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -848,15 +940,7 @@ public static void main(String[] args) {
 					e.printStackTrace();
 				}
 			}
-			if(ps2!=null){
-				try {
-					ps2.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
 		}
-		DBHelper.getInstance().closeConnection(conn);
 		DBHelper.getInstance().closeConnection(con);
 		return i;
 	}

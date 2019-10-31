@@ -2,6 +2,8 @@ package com.cbt.parse.service;
 
 import com.cbt.util.AppConfig;
 import com.cbt.util.Md5Util;
+import com.cbt.util.SearchConfig;
+
 import org.apache.commons.lang.StringUtils;
 
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,11 @@ public class TypeUtils {
 	public static final String home = "http://www.import-express.com/";
 	public static final String myhome = "http://192.168.1.58:8080/";
 	public static final String path = "/usr/local/apache2/htdocs";
+	/**
+	 * 产品单页静态化文件中的名字，
+	 */
+	private static final String[] goodsNameWords={"hotsale","aliexpress","free-shipping","new","shipping","HOT","fashion","Hot sale","Hot Worldwide"};
+	
 	
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(TypeUtils.class);
 	private static final String[] url_items = new String[]{ 
@@ -659,6 +666,108 @@ public class TypeUtils {
 	public static String itemIDToUrl(String itemId,String type){
 		return UUidToUrl(itemIDToUUID(itemId, type), itemId);
 	}
+	 /**
+     * 
+     * @Title uUidToStaticUrl_cart 
+     * @Description 生成产品页面伪静态链接（qiqing  优化上面那个接口，不要再for循环中读配置文件）
+     * @param uuid
+     * @param itemID
+     * @param pname
+     * @param urlHead
+     * @return
+     * @return String
+     */
+    public static String uUidToStaticUrl_cart(String uuid,String itemID,String pname,String urlHead,String catid1,String catid2) {
+    	String type = StringUtils.length(uuid) > 0 ? uuid.substring(0, 1) : "D";
+		return pseudoStaticUrl(itemID, type , pname, catid1, catid2);
+    }
+    
+	 /**伪静态化产品链接
+     * @param itemid 产品id
+     * @param type 类型 
+     * @param name 产品名称
+     * @param catid1 类别1
+     * @param catid2 类别2
+     * @return
+     */
+    public static String pseudoStaticUrl(String itemid,String type,String name,String catid1,String catid2) {
+    	String dataType = "1";
+    	switch (type) {
+		case SearchConfig.UPLOAD_PRODUCT:
+			dataType = "1";
+			break;
+		case SearchConfig.ALIEXPRESS_PRODUCT:
+			dataType = "2";
+			break;
+		case SearchConfig.NEWCLOUD_PRODUCT:
+			dataType = "3";
+			break;
+		case SearchConfig.AMAZON_PRODUCT:
+			dataType = "4";
+			break;
+		case SearchConfig.IMAGE_SEARCH_PRODUCT:
+			dataType = "5";
+			break;
+		case SearchConfig.CHANGE_PRODUCT:
+			dataType = "6";
+			break;
+		case SearchConfig.IMPORT_EXPRESS_PRODUCT:
+			dataType = "7";
+			break;
+		default:
+			dataType = "1";
+			break;
+		}
+    	name = name.toLowerCase().replaceAll("[^a-zA-Z0-9]"," ").trim();
+		//去除静态页名字中一些不需要的词
+    	name=removeGoodsNameWords(name);
+		String[] nameArr = name.split("\\s+");
+		StringBuffer goodnameNew=new StringBuffer();
+		if(nameArr.length>10){
+			for (int i = 0; i < 10; i++) {
+				if(StringUtils.isNotBlank(nameArr[i])){
+					goodnameNew.append(nameArr[i]+"-");
+				}
+			} 
+		}else{
+			goodnameNew.append(name.replaceAll("(\\s+)", "-"));
+		}
+		String url  = "";
+		if(StringUtils.isNotBlank(goodnameNew.toString())){
+			if(StringUtils.isBlank(catid1) || StringUtils.isBlank(catid2)) {
+				url = "/goodsinfo/"+goodnameNew.deleteCharAt(goodnameNew.length()-1)+"-"+dataType+ itemid + ".html";
+			}else {
+				url = "/goodsinfo/"+goodnameNew.deleteCharAt(goodnameNew.length()-1) +"-"+catid1+"-"+catid2+"-"+dataType+ itemid + ".html";
+			}
+		} else {
+			url = "/spider/getSpider?item="+itemid+"&source="+itemIDToUUID(itemid, type);
+		}
+    	
+		return url;
+    }
 	
-	
+    /**
+	 * 移除产品单页名字中一些乱七八糟的词
+	 * @param goodsName
+	 * @return
+	 */
+	public static String removeGoodsNameWords(String goodsName){
+		
+		if(goodsName!=null&&!"".equals(goodsName)){
+			for (String name : goodsNameWords) {
+//				goodsName=goodsName.replace(name.trim(), "");
+				//替换忽略大小写
+				String newName="(?i)"+name;
+				goodsName=goodsName.replaceAll(newName, "");
+			}
+			
+//			int nowYear = Integer.parseInt(new SimpleDateFormat("yyyy").format(new Date()));
+			/*delete by lhao 2018.06.29
+			for(int year=1949;year<=9999;year++){
+				goodsName = goodsName.replace(String.valueOf(year), "");
+			}*/
+		 return goodsName;
+		} 
+		return goodsName;
+	}
 }

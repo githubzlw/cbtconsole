@@ -17,6 +17,7 @@
         <result column="update_time" property="updateTime"/>
         <result column="web_site" property="webSite"/>
         <result column="view_more_url" property="viewMoreUrl"/>
+        <result column="hot_type_name" property="hotTypeName"/>
     </resultMap>
 
 
@@ -85,8 +86,8 @@
             parameterType="com.cbt.warehouse.pojo.HotCategory">
         select a.id,a.category_name,a.show_name,a.show_img,a.is_on,a.sorting,a.hot_type,
         a.admin_id,b.admName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.update_admin_id,
-        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.web_site
-        from hot_category a left join admuser b on a.admin_id =b.id
+        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.web_site,c.class_name as hot_type_name
+        from hot_category a left join admuser b on a.admin_id =b.id inner join hot_class_info c on a.hot_type = c.id
         where 1=1
         <if test="isOn > -1">
             and is_on = #{isOn}
@@ -126,7 +127,7 @@
             parameterType="com.cbt.warehouse.pojo.HotCategory">
         select count(0)
         from hot_category
-        where 1=1 and hot_type = #{hotType} and (show_img = #{showImg} or show_name = #{showName})
+        where 1=1 and hot_type = #{hotType} and show_name = #{showName}
         <if test="id > 0">
             and id != #{id}
         </if>
@@ -249,4 +250,36 @@
 		</if>
 	</select>
 
+    <select id="getClassInfoList" resultType="com.cbt.warehouse.pojo.HotClassInfo" parameterType="com.cbt.warehouse.pojo.HotClassInfo">
+        select a.id,a.class_name as className,a.json_name as jsonName,
+        a.admin_id as adminId,b.admName as adminName,a.update_admin_id as updateAdminId,c.admName as updateAdminName,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,
+        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as updateTime
+        from hot_class_info a left join admuser b on a.admin_id = b.id
+        left join admuser c on a.update_admin_id = c.id
+        where 1=1
+        <if test="id > 0">
+            and a.id = #{id}
+        </if>
+        <if test="className != null">
+            and a.class_name = CONCAT('%',#{className},'%')
+        </if>
+        <if test="jsonName != null">
+            and a.json_name = CONCAT('%',#{jsonName},'%')
+        </if>
+    </select>
+
+    <insert id="insertIntoHotClassInfo" parameterType="com.cbt.warehouse.pojo.HotClassInfo">
+        insert into hot_class_info(class_name,json_name,admin_id)
+        values(#{className},#{jsonName},#{adminId})
+    </insert>
+
+    <update id="updateIntoHotClassInfo" parameterType="com.cbt.warehouse.pojo.HotClassInfo">
+        update hot_class_info set class_name = #{className},json_name = #{jsonName},update_admin_id = #{updateAdminId}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteHotClassInfo">
+        delete from hot_class_info where id = #{id}
+    </delete>
 </mapper>

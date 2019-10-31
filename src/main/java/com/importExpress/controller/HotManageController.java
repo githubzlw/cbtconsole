@@ -20,11 +20,11 @@ import com.importExpress.service.HotManageService;
 import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -35,7 +35,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/hotManage")
@@ -199,9 +202,10 @@ public class HotManageController {
 
         String show_img = request.getParameter("show_img");
         if (StringUtils.isBlank(show_img)) {
-            json.setOk(false);
+            show_img = "";
+            /*json.setOk(false);
             json.setMessage("获取显示图片链接失败");
-            return json;
+            return json;*/
         }
 
         String view_more_url = request.getParameter("view_more_url");
@@ -312,9 +316,10 @@ public class HotManageController {
 
         String show_img = request.getParameter("show_img");
         if (StringUtils.isBlank(show_img)) {
-            json.setOk(false);
+            show_img = "";
+            /*json.setOk(false);
             json.setMessage("获取显示图片链接失败");
-            return json;
+            return json;*/
         }
 
 
@@ -1132,6 +1137,191 @@ public class HotManageController {
         return json;
     }
 
+    @RequestMapping("/getClassInfoList")
+    @ResponseBody
+    public JsonResult getClassInfoList(@RequestParam(value = "jsonName", required = false) String jsonName,
+                                       @RequestParam(value = "className", required = false) String className, int rows, int page) {
+        JsonResult json = new JsonResult();
+        HotClassInfo classInfo = new HotClassInfo();
+
+        if(StringUtils.isNotBlank(jsonName)){
+            classInfo.setJsonName(jsonName);
+        }
+        if(StringUtils.isNotBlank(className)){
+            classInfo.setClassName(className);
+        }
+        if (rows > 0 && page > 0) {
+            classInfo.setStartNum((page - 1) * rows);
+            classInfo.setLimitNum(rows);
+        }
+        try {
+            List<HotClassInfo> list = hotManageService.getClassInfoList(classInfo);
+            int length = 0;
+            if (list == null) {
+                list = new ArrayList<>();
+            } else {
+                length = list.size();
+                if (rows > 1) {
+                    // 分页
+                    list = list.stream().skip(classInfo.getStartNum()).limit(classInfo.getLimitNum()).collect(Collectors.toList());
+                }
+            }
+            json.setOk(true);
+            json.setRows(list);
+            json.setTotal((long) length);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("查询失败，原因 :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+    @RequestMapping("/queryClassInfoList")
+    @ResponseBody
+    public JsonResult queryClassInfoList(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        HotClassInfo classInfo = new HotClassInfo();
+        try {
+            List<HotClassInfo> list = hotManageService.getClassInfoList(classInfo);
+            int length = list.size();
+            json.setOk(true);
+            json.setData(list);
+            json.setTotal((long) length);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("查询失败，原因 :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+    @RequestMapping("/getClassInfoById")
+    @ResponseBody
+    public JsonResult getClassInfoById(@RequestParam(value = "id", required = false) Integer id) {
+
+        JsonResult json = new JsonResult();
+
+        HotClassInfo classInfo = new HotClassInfo();
+        if (id == null || id < 0) {
+            json.setOk(false);
+            json.setMessage("获取参数失败");
+            return json;
+        }
+        try {
+            List<HotClassInfo> list = hotManageService.getClassInfoList(classInfo);
+            HotClassInfo classInfoRs = null;
+            if (list != null && list.size() > 0) {
+                for(HotClassInfo info : list){
+                    if(info.getId() == id){
+                        classInfoRs = info;
+                        break;
+                    }
+                }
+                list.clear();
+                if(classInfoRs == null){
+                    json.setOk(false);
+                    json.setMessage("获取信息失败");
+                    return json;
+                }
+            } else {
+                json.setOk(false);
+                json.setMessage("获取结果失败");
+                return json;
+            }
+            json.setOk(true);
+            json.setRows(classInfoRs);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("getClassInfoById查询失败，原因 :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("getClassInfoById查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+    @RequestMapping("/setClassInfo")
+    @ResponseBody
+    public JsonResult setClassInfo(HttpServletRequest request,
+                                   @RequestParam(value = "id", required = false) Integer id,
+                                   @RequestParam(value = "className", required = true) String className,
+                                   @RequestParam(value = "jsonName", required = true) String jsonName) {
+
+        JsonResult json = new JsonResult();
+
+        HotClassInfo classInfo = new HotClassInfo();
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null || admuser.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后重试");
+            return json;
+        }
+        if (StringUtils.isBlank(className)) {
+            json.setOk(false);
+            json.setMessage("获取分组名称失败");
+            return json;
+        }
+        if (StringUtils.isBlank(jsonName)) {
+            json.setOk(false);
+            json.setMessage("获取json名称失败");
+            return json;
+        }else if(!jsonName.endsWith(".json")){
+            jsonName += ".json";
+        }
+        try {
+            classInfo.setClassName(className);
+            classInfo.setJsonName(jsonName);
+            if (id == null || id < 1) {
+                classInfo.setAdminId(admuser.getId());
+                insertHotClassInfoOnline(classInfo);
+                hotManageService.insertIntoHotClassInfo(classInfo);
+            } else {
+                classInfo.setId(id);
+                classInfo.setUpdateAdminId(admuser.getId());
+                updateHotClassInfoOnline(classInfo);
+                hotManageService.updateIntoHotClassInfo(classInfo);
+            }
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("setClassInfo失败，原因 :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("setClassInfo失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+    @RequestMapping("/deleteClassIfo")
+    @ResponseBody
+    public JsonResult deleteClassIfo(HttpServletRequest request,
+                                   @RequestParam(value = "id", required = true) Integer id) {
+
+        JsonResult json = new JsonResult();
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null || admuser.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后重试");
+            return json;
+        }
+        if (id == null || id < 1) {
+            json.setOk(false);
+            json.setMessage("获取分组名称失败");
+            return json;
+        }
+        try {
+            deleteHotClassInfoOnline(id);
+            hotManageService.deleteHotClassInfo(id);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("deleteClassIfo失败，原因 :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("deleteClassIfo失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
 
 	/**
 	 * 热卖json信息写入
@@ -1355,5 +1545,28 @@ public class HotManageController {
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
+
+    private void insertHotClassInfoOnline(HotClassInfo hotClassInfo) {
+
+        String sql = "insert into hot_class_info(class_name,json_name,admin_id) values(";
+        sql += "'" + hotClassInfo.getClassName() + "','" + hotClassInfo.getJsonName()
+                + "'," + hotClassInfo.getAdminId() + ")";
+        NotifyToCustomerUtil.sendSqlByMq(sql);
+    }
+
+
+    private void updateHotClassInfoOnline(HotClassInfo hotClassInfo) {
+
+        String sql = "update hot_class_info set class_name = '" + hotClassInfo.getClassName()
+                + "', json_name = '" + hotClassInfo.getJsonName() + "',update_admin_id = " + hotClassInfo.getUpdateTime()
+                + " where id = " + hotClassInfo.getId();
+        System.err.println(sql);
+        NotifyToCustomerUtil.sendSqlByMq(sql);
+    }
+
+    private void deleteHotClassInfoOnline(int id){
+	    String sql = "delete from hot_class_info where id = " + id;
+	    NotifyToCustomerUtil.sendSqlByMq(sql);
+    }
 
 }

@@ -137,7 +137,7 @@ public class TabCouponController {
                                          String couponCode, //卷码
                                          @RequestParam(value = "userids", defaultValue = "", required = false) String userids, //满减卷关联用户的id
                                          Integer type, //卷类别
-                                         Integer shareFlag, //是否用于社交分享
+                                         @RequestParam(value = "shareFlag", defaultValue = "0", required = false) Integer shareFlag, //是否用于社交分享
                                          @RequestParam(value = "valueLeft", defaultValue = "0", required = false) Integer valueLeft, //慢减卷最低消费金额
                                          @RequestParam(value = "valueRight", defaultValue = "0", required = false) Integer valueRight, //满减卷优惠金额
                                          String describe, //卷描述
@@ -188,6 +188,7 @@ public class TabCouponController {
         	resultMap.put("code", "2");
         	return resultMap;
 		}
+        String isShopCar = request.getParameter("isShopCar");
         String value = valueLeft + "-" + valueRight;
     	String shareid = "";
     	if (shareFlag == 1){
@@ -213,6 +214,9 @@ public class TabCouponController {
         CouponRedisBean couponRedis = new CouponRedisBean(couponCode, count.toString(), count.toString(),
         		describe, value, new Long(fromDate.getTime()).toString(), new Long(toDate.getTime()).toString(),
         		type.toString(), "1");
+        if(StringUtils.isNotBlank(isShopCar)){
+            couponRedis.setIsShopCar(1);
+        }
         //String id, Integer count, Integer leftCount, String describe, String value, Date from, Date to, int type, int valid, Integer userid
         TabCouponNew tabCouponNew = new TabCouponNew(couponCode, count, count, describe,
         		value, fromDate, toDate, type, 1, userId, shareFlag, websiteType, couponWebsiteType);

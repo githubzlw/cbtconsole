@@ -9,6 +9,8 @@ import com.cbt.pojo.AddBalanceInfo;
 import com.cbt.pojo.RechangeRecord;
 import com.cbt.refund.bean.RefundBean;
 import com.cbt.website.bean.*;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -964,7 +966,7 @@ public class PaymentDao implements PaymentDaoImp {
             rs = stmt0.executeQuery();
             if (rs.next()) {
                 if (rs.getInt("count(*)") > 0) {
-                    stmt = conn.prepareStatement(sql2);
+                    /*stmt = conn.prepareStatement(sql2);
                     stmt.setInt(1, payment.getUserid());
                     stmt.setString(2, payment.getPaymentid());
                     stmt.setString(3, payment.getPayment_amount());
@@ -978,9 +980,31 @@ public class PaymentDao implements PaymentDaoImp {
                     stmt.setString(11, payment.getPayment_other());
                     stmt.setString(12, payment.getUsername());
                     stmt.setString(13, payment.getOrderid());
-                    result = stmt.executeUpdate();
+                    result = stmt.executeUpdate();*/
+
+                    List<String> listValues = new ArrayList<>();
+                    listValues.add(String.valueOf(payment.getUserid()));
+                    listValues.add(String.valueOf(payment.getPaymentid()));
+                    listValues.add(String.valueOf(payment.getPayment_amount()));
+                    listValues.add(String.valueOf(payment.getPayment_cc()));
+                    listValues.add(String.valueOf(payment.getOrderdesc()));
+                    listValues.add(String.valueOf(payment.getPaystatus()));
+                    listValues.add(String.valueOf(payment.getCreatetime()));
+                    listValues.add(String.valueOf(payment.getPaySID()));
+                    listValues.add(String.valueOf(payment.getPayflag()));
+                    listValues.add(String.valueOf(payment.getPaytype()));
+                    listValues.add(String.valueOf(payment.getPayment_other()));
+                    listValues.add(String.valueOf(payment.getUsername()));
+                    listValues.add(String.valueOf(payment.getOrderid()));
+                    String runSql = DBHelper.covertToSQL(sql2, listValues);
+                    String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+                    int countRs = 0;
+                    if(StringUtils.isBlank(rsStr)){
+                        countRs = Integer.valueOf(rsStr);
+                    }
+                    result = countRs;
                 } else {
-                    stmt = conn.prepareStatement(sql);
+                    /*stmt = conn.prepareStatement(sql);
                     stmt.setInt(1, payment.getUserid());
                     stmt.setString(2, payment.getOrderid());
                     stmt.setString(3, payment.getPaymentid());
@@ -994,7 +1018,29 @@ public class PaymentDao implements PaymentDaoImp {
                     stmt.setString(11, payment.getPaytype());
                     stmt.setString(12, payment.getPayment_other());
                     stmt.setString(13, payment.getUsername());
-                    result = stmt.executeUpdate();
+                    result = stmt.executeUpdate();*/
+
+                    List<String> listValues = new ArrayList<>();
+                    listValues.add(String.valueOf(payment.getUserid()));
+                    listValues.add(String.valueOf(payment.getOrderid()));
+                    listValues.add(String.valueOf(payment.getPaymentid()));
+                    listValues.add(String.valueOf(payment.getPayment_amount()));
+                    listValues.add(String.valueOf(payment.getPayment_cc()));
+                    listValues.add(String.valueOf(payment.getOrderdesc()));
+                    listValues.add(String.valueOf(payment.getPaystatus()));
+                    listValues.add(String.valueOf(payment.getCreatetime()));
+                    listValues.add(String.valueOf(payment.getPaySID()));
+                    listValues.add(String.valueOf(payment.getPayflag()));
+                    listValues.add(String.valueOf(payment.getPaytype()));
+                    listValues.add(String.valueOf(payment.getPayment_other()));
+                    listValues.add(String.valueOf(payment.getUsername()));
+                    String runSql = DBHelper.covertToSQL(sql, listValues);
+                    String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+                    int countRs = 0;
+                    if(StringUtils.isBlank(rsStr)){
+                        countRs = Integer.valueOf(rsStr);
+                    }
+                    result = countRs;
                 }
 
             }
@@ -1360,14 +1406,24 @@ public class PaymentDao implements PaymentDaoImp {
     public int cancelPayment(String pid) {
         String sql = "update payment set paystatus=0  where id=?";
         Connection conn1 = DBHelper.getInstance().getConnection();
-        Connection conn2 = DBHelper.getInstance().getConnection2();
+        // Connection conn2 = DBHelper.getInstance().getConnection2();
         PreparedStatement stmt1 = null;
         PreparedStatement stmt2 = null;
         int res = 0;
         try {
-            stmt2 = conn2.prepareStatement(sql);
+            /*stmt2 = conn2.prepareStatement(sql);
             stmt2.setInt(1, Integer.valueOf(pid));
-            res = stmt2.executeUpdate();
+            res = stmt2.executeUpdate();*/
+
+            List<String> listValues = new ArrayList<>();
+            listValues.add(String.valueOf(pid));
+            String runSql = DBHelper.covertToSQL(sql, listValues);
+            String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+            int countRs = 0;
+            if(StringUtils.isBlank(rsStr)){
+                countRs = Integer.valueOf(rsStr);
+            }
+            res = countRs;
 
             stmt1 = conn1.prepareStatement(sql);
             stmt1.setInt(1, Integer.valueOf(pid));
@@ -1390,7 +1446,7 @@ public class PaymentDao implements PaymentDaoImp {
                     e.printStackTrace();
                 }
             }
-            DBHelper.getInstance().closeConnection(conn2);
+            // DBHelper.getInstance().closeConnection(conn2);
             DBHelper.getInstance().closeConnection(conn1);
         }
         return res;

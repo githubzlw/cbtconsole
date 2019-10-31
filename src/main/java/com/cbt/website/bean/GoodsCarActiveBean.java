@@ -110,6 +110,8 @@ public class GoodsCarActiveBean implements Serializable{
      * step v1. @author: cjc @date：  16:45:46  TODO 产品表【promotion_flag=1】 是促销商品，不参加购物车降价。
      */
     private String promotionFlag;
+    private String types;//商品规格
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

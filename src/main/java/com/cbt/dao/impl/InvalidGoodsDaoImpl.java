@@ -4,6 +4,8 @@ import com.cbt.bean.IntensveBean;
 import com.cbt.bean.InvalidUrlBean;
 import com.cbt.dao.InvalidGoodsDao;
 import com.cbt.jdbc.DBHelper;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +25,7 @@ public class InvalidGoodsDaoImpl implements InvalidGoodsDao {
 		ResultSet rs = null;
 		int result = 0;
 		PreparedStatement stmt = null;
-		PreparedStatement stmt2 = null;
+//		PreparedStatement stmt2 = null;
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, goodsPid);
@@ -33,10 +35,18 @@ public class InvalidGoodsDaoImpl implements InvalidGoodsDao {
 			}
 			
 			if(result == 0){
-				stmt2 = conn.prepareStatement(sql2);
-				stmt2.setString(1, goodsUuid);
-				stmt2.setString(2, goodsPid);
-				result = stmt2.executeUpdate();
+//				stmt2 = conn.prepareStatement(sql2);
+//				stmt2.setString(1, goodsUuid);
+//				stmt2.setString(2, goodsPid);
+//				result = stmt2.executeUpdate();
+
+				List<String> lstValues = new ArrayList<String>();
+				lstValues.add(goodsUuid);
+				lstValues.add(goodsPid);
+
+				String runSql = DBHelper.covertToSQL(sql2,lstValues);
+				result = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 			}else{
 				result = -2;
 			}
@@ -50,13 +60,13 @@ public class InvalidGoodsDaoImpl implements InvalidGoodsDao {
 					e.printStackTrace();
 				}
 			}
-			if (stmt2 != null) {
-				try {
-					stmt2.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+//			if (stmt2 != null) {
+//				try {
+//					stmt2.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
 			if (rs != null) {
 				try {
 					rs.close();
@@ -78,7 +88,7 @@ public class InvalidGoodsDaoImpl implements InvalidGoodsDao {
 		ResultSet rs = null;
 		int result = 0;
 		PreparedStatement stmt = null;
-		PreparedStatement stmt2 = null;
+//		PreparedStatement stmt2 = null;
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, storeUrl);
@@ -88,10 +98,18 @@ public class InvalidGoodsDaoImpl implements InvalidGoodsDao {
 			}
 			
 			if(result == 0){
-				stmt2 = conn.prepareStatement(sql2);
-				stmt2.setString(1, storeUrl);
-				stmt2.setString(2, storeId);
-				result = stmt2.executeUpdate();
+//				stmt2 = conn.prepareStatement(sql2);
+//				stmt2.setString(1, storeUrl);
+//				stmt2.setString(2, storeId);
+//				result = stmt2.executeUpdate();
+
+				List<String> lstValues = new ArrayList<String>();
+				lstValues.add(storeUrl);
+				lstValues.add(storeId);
+
+				String runSql = DBHelper.covertToSQL(sql2,lstValues);
+				result = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 			}else{
 				result = -2;
 			}
@@ -105,13 +123,13 @@ public class InvalidGoodsDaoImpl implements InvalidGoodsDao {
 					e.printStackTrace();
 				}
 			}
-			if (stmt2 != null) {
-				try {
-					stmt2.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+//			if (stmt2 != null) {
+//				try {
+//					stmt2.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
 			if (rs != null) {
 				try {
 					rs.close();
@@ -126,7 +144,7 @@ public class InvalidGoodsDaoImpl implements InvalidGoodsDao {
 
 	@Override
 	public int updateGoodsUrl(String goodsUuid,String goodsPid) {
-		
+		//线上表不存在不需要改
 		String sql0 = "update custom_benchmark_ready set valid=3 where pid=?";
 		String sql1 = "update off_shelf_list set shelf_flag=3 where goods_pid=?";
 //		String sql = "update goods_data_new set goods_valid=6 where goods_pid=?";

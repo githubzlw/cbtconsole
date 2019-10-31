@@ -133,24 +133,16 @@ public class NotifyToCustomerUtil {
 
     public static boolean sendSqlByMq(String sql) {
         boolean isSuccess;
-        SendMQ sendMQ = null;
+
         try {
             System.err.println("MQ:[" + sql + "]");
-            sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel(sql));
+
+            SendMQ.sendMsg(new RunSqlModel(sql));
             isSuccess = true;
         } catch (Exception e) {
             isSuccess = false;
             e.printStackTrace();
             LOG.error("sendSqlByMq[" + sql + "],error:" + e.getMessage());
-        } finally {
-            if (null != sendMQ) {
-                try {
-                    sendMQ.closeConn();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return isSuccess;
     }

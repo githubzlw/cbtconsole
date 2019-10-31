@@ -2323,9 +2323,9 @@ public class StatisticalReportController {
         map.put("id", request.getParameter("id"));
         map.put("showFlag", request.getParameter("showFlag"));
         row = taoBaoOrderService.setDisplay(map);
-        SendMQ sendMQ = new SendMQ();
-        sendMQ.sendMsg(new RunSqlModel("update goods_comments_real set show_flag='" + map.get("showFlag") + "' where id='" + map.get("id") + "'"));
-        sendMQ.closeConn();
+
+        SendMQ.sendMsg(new RunSqlModel("update goods_comments_real set show_flag='" + map.get("showFlag") + "' where id='" + map.get("id") + "'"));
+
         out.print(row);
         out.close();
     }

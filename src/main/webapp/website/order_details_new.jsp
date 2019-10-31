@@ -653,7 +653,7 @@
                             +运费<span>(${order.extra_freight})</span>
                         </c:if>
                         <c:if test="${order.actual_freight_c>0}">
-                            +$50国际费用<span>（${order.actual_freight_c}） </span>
+                            +EUB handling fee<span>（${order.actual_freight_c}） </span>
                         </c:if>
                         <c:if test="${order.order_ac != 0}">
                             - 批量优惠金额<span>（${preferential_price}） </span>

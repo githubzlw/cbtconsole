@@ -8,7 +8,10 @@ import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.parse.service.TypeUtils;
 import com.cbt.util.Utility;
+import com.google.common.collect.Lists;
 import com.importExpress.service.impl.SendMQServiceImpl;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 import org.slf4j.LoggerFactory;
 
@@ -108,42 +111,39 @@ public class OrderDao implements IOrderDao{
 		String sql = "insert order_details(goodsid,orderid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,"
 				+ "yourorder,userid,goodsname,goodsprice,goodsfreight,goodsdata_id,remark,goods_class,extra_freight,car_url,"
 				+ "car_img,car_type,freight_free,od_bulk_volume,od_total_weight) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-		Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
 		int re = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
 			for(int i=0;i<orderdetails.size();i++){
-				stmt.setInt(1,orderdetails.get(i).getGoodsid());
-				stmt.setString(2,orderdetails.get(i).getOrderid());
-				stmt.setString(3,orderdetails.get(i).getDelivery_time());
-				stmt.setInt(4,orderdetails.get(i).getCheckprice_fee());
-				stmt.setInt(5,orderdetails.get(i).getCheckproduct_fee());
-				stmt.setInt(6,orderdetails.get(i).getState());
-				stmt.setString(7,orderdetails.get(i).getFileupload());
-				stmt.setInt(8, orderdetails.get(i).getYourorder());
-				stmt.setInt(9, orderdetails.get(i).getUserid());
-				stmt.setString(10, orderdetails.get(i).getGoodsname());
-				stmt.setString(11, orderdetails.get(i).getGoodsprice());
-				stmt.setString(12, orderdetails.get(i).getFreight());
-				stmt.setInt(13, orderdetails.get(i).getGoodsdata_id());
-				stmt.setString(14, orderdetails.get(i).getRemark());
-				stmt.setInt(15, orderdetails.get(i).getGoods_class());
-				stmt.setDouble(16, orderdetails.get(i).getExtra_freight());
-				stmt.setString(17, orderdetails.get(i).getGoods_url());
-				stmt.setString(18, orderdetails.get(i).getGoods_img());
-				stmt.setString(19, orderdetails.get(i).getGoods_type());
+				List<String> lstValues = Lists.newArrayList();
+				
+				lstValues.add(String.valueOf(orderdetails.get(i).getGoodsid()));
+				lstValues.add(orderdetails.get(i).getOrderid());
+				lstValues.add(orderdetails.get(i).getDelivery_time());
+				lstValues.add(String.valueOf(orderdetails.get(i).getCheckprice_fee()));
+				lstValues.add(String.valueOf(orderdetails.get(i).getCheckproduct_fee()));
+				lstValues.add(String.valueOf(orderdetails.get(i).getState()));
+				lstValues.add(orderdetails.get(i).getFileupload());
+				lstValues.add(String.valueOf(orderdetails.get(i).getYourorder()));
+				lstValues.add(String.valueOf(orderdetails.get(i).getUserid()));
+				lstValues.add(orderdetails.get(i).getGoodsname());
+				lstValues.add(orderdetails.get(i).getGoodsprice());
+				lstValues.add(orderdetails.get(i).getFreight());
+				lstValues.add(String.valueOf(orderdetails.get(i).getGoodsdata_id()));
+				lstValues.add(orderdetails.get(i).getRemark());
+				lstValues.add(String.valueOf(orderdetails.get(i).getGoods_class()));
+				lstValues.add(String.valueOf(orderdetails.get(i).getExtra_freight()));
+				lstValues.add(orderdetails.get(i).getGoods_url());
+				lstValues.add(orderdetails.get(i).getGoods_img());
+				lstValues.add(orderdetails.get(i).getGoods_type());
 				int freight_free = orderdetails.get(i).getFreight_free();
-				stmt.setInt(20, freight_free);
-				stmt.setString(21, orderdetails.get(i).getOd_bulk_volume());
-				stmt.setDouble(22, orderdetails.get(i).getOd_total_weight());
-				stmt.addBatch();
+				lstValues.add(String.valueOf(freight_free));
+				lstValues.add(orderdetails.get(i).getOd_bulk_volume());
+				lstValues.add(String.valueOf(orderdetails.get(i).getOd_total_weight()));
+				String runSql = DBHelper.covertToSQL(sql, lstValues);
+				re = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+				
 			}
-			int[] result = stmt.executeBatch();
-//			if (result.length > 0) {
-//				stmt.getGeneratedKeys();
-//			}
-			re = result[0];
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -154,7 +154,6 @@ public class OrderDao implements IOrderDao{
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
 		}
 		return re;
 	}
@@ -407,43 +406,39 @@ public class OrderDao implements IOrderDao{
 				+ "pay_price_tow,currency,actual_ffreight,discount_amount,order_ac,actual_lwh,actual_weight,"
 				+ "actual_weight_estimate,extra_freight,packag_number,orderRemark,cashback,exchange_rate) "
 				+ "values(?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?,?,?,?,?,?,?,?,?,1,?,0,?)";
-		Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
 		int rs = 0;
 		try {
-			stmt = conn.prepareStatement(sql);
 			for(int i=0;i<OrderBean.size();i++){
-				stmt.setString(1,OrderBean.get(i).getOrderNo());
-				stmt.setInt(2,OrderBean.get(i).getUserid());
-				stmt.setString(3,OrderBean.get(i).getProduct_cost());
-				stmt.setInt(4,OrderBean.get(i).getState());
-				stmt.setInt(5, addressid);
-				stmt.setInt(6, OrderBean.get(i).getDeliveryTime());
-				stmt.setString(7, OrderBean.get(i).getService_fee());
-				stmt.setString(8, OrderBean.get(i).getIp());
-				stmt.setString(9, OrderBean.get(i).getMode_transport());
-				stmt.setInt(10, OrderBean.get(i).getDetails_number());
-				stmt.setString(11, OrderBean.get(i).getPay_price_three());
-				stmt.setString(12, OrderBean.get(i).getForeign_freight());
-				stmt.setString(13, OrderBean.get(i).getPay_price()+"");
-				stmt.setString(14, OrderBean.get(i).getPay_price_tow()+"");
-				stmt.setString(15, OrderBean.get(i).getCurrency());
-				stmt.setString(16, OrderBean.get(i).getActual_ffreight());
-				stmt.setDouble(17, OrderBean.get(i).getDiscount_amount());
-				stmt.setDouble(18, OrderBean.get(i).getOrder_ac());
-				stmt.setString(19, OrderBean.get(i).getActual_lwh());
-				stmt.setString(20, OrderBean.get(i).getActual_weight());
-				stmt.setDouble(21, OrderBean.get(i).getActual_weight_estimate());
-				stmt.setDouble(22, OrderBean.get(i).getExtra_freight());
-				stmt.setString(23, OrderBean.get(i).getOrderRemark());
-				stmt.setString(24, OrderBean.get(i).getExchange_rate());
-				stmt.addBatch();
+				List<String> lstValues = Lists.newArrayList();
+				
+				lstValues.add(OrderBean.get(i).getOrderNo());
+				lstValues.add(String.valueOf(OrderBean.get(i).getUserid()));
+				lstValues.add(OrderBean.get(i).getProduct_cost());
+				lstValues.add(String.valueOf(OrderBean.get(i).getState()));
+				lstValues.add(String.valueOf(addressid));
+				lstValues.add(String.valueOf(OrderBean.get(i).getDeliveryTime()));
+				lstValues.add(OrderBean.get(i).getService_fee());
+				lstValues.add(OrderBean.get(i).getIp());
+				lstValues.add(OrderBean.get(i).getMode_transport());
+				lstValues.add(String.valueOf(OrderBean.get(i).getDetails_number()));
+				lstValues.add(OrderBean.get(i).getPay_price_three());
+				lstValues.add(OrderBean.get(i).getForeign_freight());
+				lstValues.add(OrderBean.get(i).getPay_price()+"");
+				lstValues.add(OrderBean.get(i).getPay_price_tow()+"");
+				lstValues.add(OrderBean.get(i).getCurrency());
+				lstValues.add(OrderBean.get(i).getActual_ffreight());
+				lstValues.add(String.valueOf(OrderBean.get(i).getDiscount_amount()));
+				lstValues.add(String.valueOf(OrderBean.get(i).getOrder_ac()));
+				lstValues.add(OrderBean.get(i).getActual_lwh());
+				lstValues.add(OrderBean.get(i).getActual_weight());
+				lstValues.add(String.valueOf(OrderBean.get(i).getActual_weight_estimate()));
+				lstValues.add(String.valueOf(OrderBean.get(i).getExtra_freight()));
+				lstValues.add(OrderBean.get(i).getOrderRemark());
+				lstValues.add(OrderBean.get(i).getExchange_rate());
+				String runSql = DBHelper.covertToSQL(sql, lstValues);
+				rs = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 			}
-			int[] result = stmt.executeBatch();
-//			if (result.length > 0) {
-//				stmt.getGeneratedKeys();
-//			}
-			rs = result[0];
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -454,7 +449,6 @@ public class OrderDao implements IOrderDao{
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs;
 	}
@@ -1301,9 +1295,17 @@ public class OrderDao implements IOrderDao{
 				+ "phoneNumber,zipcode,Adstatus,street,recipients) values(?,?,?,?,?,?,?,?,?,?,?)";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
+		ResultSet rs = null;
 		int keys=-1;
 		try {
-			stmt = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+			String querySql = "select id from order_address order by id desc limit 1";
+			stmt = conn.prepareStatement(querySql);
+			rs = stmt.executeQuery();
+			int id = 0;
+			if(rs.next()) {
+				id = rs.getInt("id");
+			}
+			List<String> lstValues = Lists.newArrayList();
 			int addressid=Utility.getInt(map.get("addressid").toString());
 			String orderno=Utility.formatObject(map.get("orderno"));
 			String country=Utility.formatObject(map.get("country"));
@@ -1314,22 +1316,22 @@ public class OrderDao implements IOrderDao{
 			String zipcode=Utility.formatObject(map.get("zipcode"));
 			String street=Utility.formatObject(map.get("street"));
 			String recipients=Utility.formatObject(map.get("recipients"));
-			stmt.setInt(1, addressid);
-			stmt.setString(2, orderno);
-			stmt.setString(3, country);
-			stmt.setString(4, statename);
-			stmt.setString(5, address);
-			stmt.setString(6, address2);
-			stmt.setString(7, phoneNumber);
-			stmt.setString(8, zipcode);
-			stmt.setString(9, "0");
-			stmt.setString(10, street);
-			stmt.setString(11, recipients);
-			int result = stmt.executeUpdate();
+			lstValues.add(String.valueOf(addressid));
+			lstValues.add(orderno);
+			lstValues.add(country);
+			lstValues.add(statename);
+			lstValues.add(address);
+			lstValues.add(address2);
+			lstValues.add(phoneNumber);
+			lstValues.add(zipcode);
+			lstValues.add("0");
+			lstValues.add(street);
+			lstValues.add(recipients);
+			
+			String runSql = DBHelper.covertToSQL(sql, lstValues);
+			int result = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 			if (result == 1) {
-				ResultSet rs=stmt.getGeneratedKeys();
-				rs.next();
-				keys=rs.getInt(1);
+				keys=id+1;
 			}
 
 		} catch (Exception e) {
@@ -1338,6 +1340,13 @@ public class OrderDao implements IOrderDao{
 			if (stmt != null) {
 				try {
 					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (rs != null) {
+				try {
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -1911,14 +1920,13 @@ public class OrderDao implements IOrderDao{
 	public int cancelOrder(String orderid) {
 		String sql = "update orderinfo set state=-1 where order_no=?";
 		Connection conn1 = DBHelper.getInstance().getConnection();
-		Connection conn2 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt1 = null;
-		PreparedStatement stmt2 = null;
 		int res = 0;
 		try {
-			stmt2 = conn2.prepareStatement(sql);
-			stmt2.setString(1, orderid);
-			res = stmt2.executeUpdate();
+			List<String> lstValues = Lists.newArrayList();
+			lstValues.add(orderid);
+			String runSql = DBHelper.covertToSQL(sql, lstValues);
+			res = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 
 			stmt1 = conn1.prepareStatement(sql);
 			stmt1.setString(1, orderid);
@@ -1933,15 +1941,7 @@ public class OrderDao implements IOrderDao{
 					e.printStackTrace();
 				}
 			}
-			if (stmt2 != null) {
-				try {
-					stmt2.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
 			DBHelper.getInstance().closeConnection(conn1);
-			DBHelper.getInstance().closeConnection(conn2);
 		}
 		return res;
 	}

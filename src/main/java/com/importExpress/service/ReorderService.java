@@ -1,5 +1,8 @@
 package com.importExpress.service;
 
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.website.util.JsonResult;
+
 import java.util.List;
 import java.util.Map;
 
@@ -17,4 +20,13 @@ public interface ReorderService {
 
     String reorder(String orderNo, String userId);
     String returnGoodsCarByUserId(String userId);
+
+    /**
+     * 新版reorder
+     * @param orderNo
+     * @param userId
+     * @param odbs
+     * @return
+     */
+    JsonResult reOrderNew(String orderNo, String userId,List<OrderDetailsBean> odbs);
 }

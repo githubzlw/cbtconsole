@@ -2,6 +2,7 @@ package com.importExpress.controller;
 
 
 import com.cbt.admuser.service.AdmuserService;
+import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Orderinfo;
 import com.cbt.bean.TabTransitFreightinfoUniteNew;
 import com.cbt.orderinfo.service.IOrderinfoService;
@@ -17,6 +18,7 @@ import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.RedisModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,21 +150,38 @@ public class CustomerRelationshipManagementController {
     }
     @RequestMapping(value = "/reorderTrue")
     @ResponseBody
-    public String reorderTrue(String orderNo,String  userId) throws Exception {
-        String message = reorderService.reorder(orderNo, userId);
+    public JsonResult reorderTrue(String orderNo,String  userId) throws Exception {
+        // String message = reorderService.reorder(orderNo, userId);
+
+        JsonResult json = new JsonResult();
+        if(StringUtils.isBlank(orderNo) || StringUtils.isBlank(userId)){
+            json.setOk(false);
+            json.setMessage("获取订单号或者客户ID失败");
+            return  json;
+        }
+        String message = "success!";
+        List<OrderDetailsBean> odbs=iOrderinfoService.getOrdersDetails(orderNo);
+        if(odbs == null || odbs.isEmpty()){
+            message = "获取订单详情失败";
+            json.setOk(false);
+            json.setMessage(message);
+        } else {
+            json = reorderService.reOrderNew(orderNo, userId, odbs);
+        }
         //清除redis 里面数据
         //2.清空redis数据
         //使用MQ清空购物车数据
         //redis示例
-        SendMQ sendMQ = null;
-        String userIdStr = String.valueOf(userId);
-        sendMQ = new SendMQ();
-        RedisModel redisModel= new RedisModel();
-        redisModel.setType("3");
-        redisModel.setUserid(new String[]{userIdStr});
-        sendMQ.sendMsg(redisModel, MultiSiteUtil.getSiteTypeNum(orderNo) - 1);
-        sendMQ.closeConn();
-        return message;
+
+        if(json.isOk()){
+            String userIdStr = String.valueOf(userId);
+
+            RedisModel redisModel= new RedisModel();
+            redisModel.setType("3");
+            redisModel.setUserid(new String[]{userIdStr});
+            SendMQ.sendMsg(redisModel, MultiSiteUtil.getSiteTypeNum(orderNo) - 1);
+        }
+        return json;
     }
     @RequestMapping(value = "/reorder")
     public String reorder(String orderNo,HttpServletRequest request) throws Exception {

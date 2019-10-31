@@ -4,6 +4,9 @@ import com.cbt.bean.Goods;
 import com.cbt.bean.SpiderBean;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.Util;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -361,7 +364,7 @@ public class GoodsDaoImpl implements IGoodsDao {
 	public int updateVolumeOrWeight(String f, int id, String vw, String total) {
 		int i =0;
 		Connection con  = DBHelper.getInstance().getConnection();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		// Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement ps1 = null;
 		PreparedStatement ps2 = null;
 		String sql = "";
@@ -373,13 +376,26 @@ public class GoodsDaoImpl implements IGoodsDao {
 				ps1.setString(2, total);
 				ps1.setInt(3, id);
 				
-				ps2 = conn.prepareStatement(sql);
+				/*ps2 = conn.prepareStatement(sql);
 				ps2.setString(1, vw);
 				ps2.setString(2, total);
-				ps2.setInt(3, id);
+				ps2.setInt(3, id);*/
+
+				List<String> listValues = new ArrayList<>();
+				listValues.add(String.valueOf(vw));
+				listValues.add(String.valueOf(total));
+				listValues.add(String.valueOf(id));
+				String runSql = DBHelper.covertToSQL(sql, listValues);
+				String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+				int countRs = 0;
+				if(StringUtils.isBlank(rsStr)){
+					countRs = Integer.valueOf(rsStr);
+				}
 				
 				i = ps1.executeUpdate();
-				i+=ps2.executeUpdate();
+
+				// i+=ps2.executeUpdate();
+				i+= countRs;
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
@@ -408,14 +424,27 @@ public class GoodsDaoImpl implements IGoodsDao {
 				ps1.setString(3, total);
 				ps1.setInt(4, id);
 				
-				ps2 = conn.prepareStatement(sql);
+				/*ps2 = conn.prepareStatement(sql);
 				ps2.setString(1, vw);
 				ps2.setString(2, vw);
 				ps2.setString(3, total);
-				ps2.setInt(4, id);
+				ps2.setInt(4, id);*/
+
+				List<String> listValues = new ArrayList<>();
+				listValues.add(String.valueOf(vw));
+				listValues.add(String.valueOf(vw));
+				listValues.add(String.valueOf(total));
+				listValues.add(String.valueOf(id));
+				String runSql = DBHelper.covertToSQL(sql, listValues);
+				String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+				int countRs = 0;
+				if(StringUtils.isBlank(rsStr)){
+					countRs = Integer.valueOf(rsStr);
+				}
 				
 				i = ps1.executeUpdate();
-				i+=ps2.executeUpdate();
+				// i+=ps2.executeUpdate();
+				i+= countRs;
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
@@ -436,7 +465,7 @@ public class GoodsDaoImpl implements IGoodsDao {
 			}
 		}
 		DBHelper.getInstance().closeConnection(con);
-		DBHelper.getInstance().closeConnection(conn);
+		// DBHelper.getInstance().closeConnection(conn);
 		return i;
 	}
 	 

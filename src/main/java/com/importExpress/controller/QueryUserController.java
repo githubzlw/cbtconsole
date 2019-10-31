@@ -13,10 +13,8 @@ import com.importExpress.pojo.OrderShare;
 import com.importExpress.pojo.TimingWarningInfo;
 import com.importExpress.pojo.UserBean;
 import com.importExpress.service.QueryUserService;
-import com.importExpress.utli.DESUtils;
-import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
-import com.importExpress.utli.MultiSiteUtil;
-import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.*;
+import com.rabbitmq.client.Channel;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -30,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.tagext.TryCatchFinally;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -812,9 +811,49 @@ public class QueryUserController {
     @RequestMapping(value = "/updateUserCheckout")
     @ResponseBody
     public Map<String, Object> updateUserCheckout(Integer userid, Integer type){
+        //放入MQ
+        Channel channel =null ;
+        try{
+            channel = SendMQ.getChannel();
+            SendMQ.sendAuthorizationFlagMqSql(channel,userid, type);
+        }finally {
+            SendMQ.closeChannel(channel);
+        }
         return queryUserService.updateUserCheckout(userid, type);
     }
 
+
+    @RequestMapping(value = "/refreshCheckout")
+    @ResponseBody
+    public Map<String, String> refreshCheckout(@RequestParam(value = "flag",required = true, defaultValue = "-1") Integer flag) {
+        //放入MQ
+        Map<String, String> map = new HashMap<>();
+        if (flag == null || flag < 0) {
+            map.put("success", "false");
+            map.put("message", "获取flag失败");
+            return map;
+        }
+        try {
+            List<Integer> list = queryUserService.queryAllCheckout(flag);
+            Channel channel = SendMQ.getChannel();
+            if (CollectionUtils.isNotEmpty(list)) {
+                for (Integer userid : list) {
+                    SendMQ.sendAuthorizationFlagMqSql(channel,userid, flag);
+                    queryUserService.updateUserCheckout(userid, flag);
+                }
+            }
+            SendMQ.closeChannel(channel);
+            map.put("success", "true");
+            map.put("message", "执行成功，size:" + list.size());
+            list.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("success", "false");
+            map.put("message", e.getMessage());
+            return map;
+        }
+        return map;
+    }
 
     /**
      * 给出公司的各种爬虫列表，并监控运行状态 监控

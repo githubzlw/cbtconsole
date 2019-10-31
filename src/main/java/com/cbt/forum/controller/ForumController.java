@@ -88,10 +88,10 @@ public class ForumController {
 			int State=forumService.EditForum_State(id,type,state);
 			if(State>0){
 				//更新线上帖子状态
-				/*SendMQ sendMQ=new SendMQ();
+				/*
 				String sql="";
-				sendMQ.sendMsg(new RunSqlModel(sql));
-				sendMQ.closeConn();*/
+				SendMQ.sendMsg(new RunSqlModel(sql));
+				*/
 
 				jsonResult.setOk(true);
 			}
@@ -130,10 +130,10 @@ public class ForumController {
 			int State=forumService.EditForum_details_State(id);
 			if(State>0){
 				//更新线上帖子状态
-				/*SendMQ sendMQ=new SendMQ();
+				/*
 				String sql="";
-				sendMQ.sendMsg(new RunSqlModel(sql));
-				sendMQ.closeConn();*/
+				SendMQ.sendMsg(new RunSqlModel(sql));
+				*/
 
 				json.setOk(true);
 			}

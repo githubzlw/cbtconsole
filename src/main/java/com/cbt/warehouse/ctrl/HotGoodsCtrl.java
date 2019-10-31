@@ -128,7 +128,7 @@ public class HotGoodsCtrl {
             new Thread() {
                 public void run() {
                     try {
-                        SendMQ sendMQ = new SendMQ();
+
                         StringBuilder sql = new StringBuilder();
                         sql.append("update hot_selling_category set ");
                         if (StringUtil.isNotBlank(nwCategory.getShowName())) {
@@ -149,8 +149,8 @@ public class HotGoodsCtrl {
                         }
                         sql.append("update_admid = " + nwCategory.getUpdateAdmid() + ",update_time =SYSDATE()");
                         sql.append(" where id = " + category.getId());
-                        sendMQ.sendMsg(new RunSqlModel(sql.toString()));
-                        sendMQ.closeConn();
+                        SendMQ.sendMsg(new RunSqlModel(sql.toString()));
+
                     } catch (Exception e) {
                         LOG.error("修改线上热卖区类别失败，原因：" + e.getMessage());
                     }
@@ -321,7 +321,7 @@ public class HotGoodsCtrl {
             new Thread() {
                 public void run() {
                     try {
-                        SendMQ sendMQ = new SendMQ();
+
                         StringBuilder sql = new StringBuilder();
                         sql.append("update hot_selling_goods set ");
                         if (StringUtil.isNotBlank(nwHsGoods.getIsOn())) {
@@ -342,8 +342,8 @@ public class HotGoodsCtrl {
 
 
                         System.err.println(sql.toString());
-                        sendMQ.sendMsg(new RunSqlModel(sql.toString()));
-                        sendMQ.closeConn();
+                        SendMQ.sendMsg(new RunSqlModel(sql.toString()));
+
                     } catch (Exception e) {
                         LOG.error("修改类别商品失败，原因：" + e.getMessage());
                     }
@@ -451,7 +451,7 @@ public class HotGoodsCtrl {
         }
 
         try {
-            SendMQ sendMQ = new SendMQ();
+
             // 校检存在的goodsPid数据
             boolean isExists = hotGoodsService.checkExistsGoods(Integer.valueOf(categoryIdStr), goodsPid);
             if (isExists) {
@@ -496,7 +496,7 @@ public class HotGoodsCtrl {
             if (showName.contains("\"")) {
                 showName = showName.replace("\"", "\\\"");
             }
-            sendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
+            SendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
                     "goods_url,goods_img,goods_price,is_on,profit_margin,selling_price,wholesale_price_1,wholesale_price_2," +
                     "wholesale_price_3,wholesale_price_4,wholesale_price_5,create_admid,amazon_price,asin_code) values(" + hsGoods.getHotSellingId() + "," + hsGoods.getGoodsPid() + "," +
                     "'" + showName + "'," +
@@ -506,7 +506,7 @@ public class HotGoodsCtrl {
                     "'" + hsGoods.getCreateAdmid() + "','" + hsGoods.getAmazonPrice() + "','" + hsGoods.getAsinCode() + "')"));
             json.setOk(true);
             json.setMessage("保存线上类别商品成功，请等待数据拉取");
-            sendMQ.closeConn();
+
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
@@ -558,9 +558,9 @@ public class HotGoodsCtrl {
 
             // 删除本地goodsPid
             hotGoodsService.deleteGoodsByPid(Integer.valueOf(categoryIdStr), goodsPid);
-            SendMQ sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel("delete from hot_selling_goods where hot_selling_id = " + categoryIdStr + " and goods_pid = '" + goodsPid + "'"));
-            sendMQ.closeConn();
+
+            SendMQ.sendMsg(new RunSqlModel("delete from hot_selling_goods where hot_selling_id = " + categoryIdStr + " and goods_pid = '" + goodsPid + "'"));
+
             final String newGoodsPid = goodsPid;
             new Thread() {
                 @Override
@@ -667,7 +667,7 @@ public class HotGoodsCtrl {
 
     private void insertIntoOnline(List<HotSellingGoods> gdLst) throws Exception {
         try {
-            SendMQ sendMQ = new SendMQ();
+
             List<HotSellingCategory> ctLst = hotGoodsService.queryInsertCategory();
             if (ctLst != null && ctLst.size() > 0) {
                 for (HotSellingCategory ctgy : ctLst) {
@@ -677,7 +677,7 @@ public class HotGoodsCtrl {
                     }
                 }
                 for (HotSellingCategory h : ctLst) {
-                    sendMQ.sendMsg(new RunSqlModel("insert into hot_selling_category (category_id,category_name,show_name,is_on,sorting) values " +
+                    SendMQ.sendMsg(new RunSqlModel("insert into hot_selling_category (category_id,category_name,show_name,is_on,sorting) values " +
                             "('" + h.getCategoryId() + "','" + h.getCategoryName() + "','" + h.getShowName() + "','" + h.getIsOn() + "','" + h.getSorting() + "')"));
                 }
             }
@@ -690,7 +690,7 @@ public class HotGoodsCtrl {
                     if (count % 10 == 0) {
                         if (nwGdLst.size() > 0) {
                             for (HotSellingGoods g : nwGdLst) {
-                                sendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,goods_name,show_name,goods_url," +
+                                SendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,goods_name,show_name,goods_url," +
                                         "goods_img,goods_price,profit_margin,selling_price,goods_path) values ('" + g.getHotSellingId() + "','" + g.getGoodsPid() + "','" + g.getGoodsName() + "','" + g.getShowName() + "'," +
                                         "'" + g.getGoodsUrl() + "','" + g.getGoodsImg() + "','" + g.getGoodsPrice() + "'," +
                                         "'" + g.getProfitMargin() + "','" + g.getSellingPrice() + "','')"));
@@ -702,9 +702,9 @@ public class HotGoodsCtrl {
             }
             // 更新线上关联关系
 //			hotGoodsService.updateRelationship();
-            sendMQ.sendMsg(new RunSqlModel("update hot_selling_goods,hot_selling_category set hot_selling_goods.hot_selling_id = hot_selling_category.id " +
+            SendMQ.sendMsg(new RunSqlModel("update hot_selling_goods,hot_selling_category set hot_selling_goods.hot_selling_id = hot_selling_category.id " +
                     "where find_in_set(hot_selling_category.category_id,hot_selling_goods.goods_path)>0 and hot_selling_goods.hot_selling_id=0;"));
-            sendMQ.closeConn();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -817,15 +817,12 @@ public class HotGoodsCtrl {
             }
             if (pidsMap.size() > 0) {
                 hotGoodsService.useHotGoodsByState(pidsMap,Integer.valueOf(categoryId),user.getId());
-                SendMQ sendMQ = new SendMQ();
                 for (String key : pidsMap.keySet()) {
                     String value = pidsMap.get(key);
                     String sql = "update hot_selling_goods set is_on = " + value + " where goods_pid = '" + key
                             + "' and hot_selling_id ="+categoryId;
-                    System.err.println(sql);
-                    sendMQ.sendMsg(new RunSqlModel(sql));
+                    SendMQ.sendMsg(new RunSqlModel(sql));
                 }
-                sendMQ.closeConn();
                 json.setOk(true);
 
                 final String[] newPids = pidList;

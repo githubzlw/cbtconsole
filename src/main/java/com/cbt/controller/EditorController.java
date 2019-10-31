@@ -673,7 +673,76 @@ public class EditorController {
         return json;
     }
 
+    /**
+     * 处理阿里详情数据
+     *
+     * @param content
+     * @return
+     * @author jxw
+     * @date 2017-11-10
+     */
+    private String dealAliInfoData(String content) {
 
+        Document nwDoc = Jsoup.parseBodyFragment(content);
+        // 移除所有的页面效果 kse标签,实际div
+        Elements divLst = nwDoc.getElementsByTag("div");
+        for (Element dEl : divLst) {
+            if (!(dEl.attr("name") == null || "".equals(dEl.attr("name").trim()))) {
+                if ("productItem".equalsIgnoreCase(dEl.attr("name").trim())) {
+                    dEl.remove();
+                    continue;
+                }
+            }
+            // 移除所有div下面包含a标签的数据
+            Elements aLst = dEl.getElementsByTag("a");
+            if (aLst.size() > 0) {
+                dEl.remove();
+            }
+        }
+        // 移除所有的 a标签
+        Elements aLst = nwDoc.getElementsByTag("a");
+        for (Element ael : aLst) {
+            ael.remove();
+        }
+
+        // 移除所有的 包裹列表div主体
+        nwDoc.select(".pnl-packaging-main").remove();
+        // 移除所有的 买家交易信息div主体
+        nwDoc.select(".transaction-feedback-main").remove();
+        // 移除所有的 更多产品，相关产品
+        nwDoc.select(".related-products-main").remove();
+        // 移除所有的 相关产品搜索
+        nwDoc.select("#j-related-searches").remove();
+
+        // 移除所有的 img属性含有以下字符的图片
+        Elements imgLst = nwDoc.getElementsByTag("img");
+        for (Element imel : imgLst) {
+            if (imel.hasAttr("alt")) {
+                String attrVal = imel.attr("alt");
+                if ("Shipping".equalsIgnoreCase(attrVal)) {
+                    imel.remove();
+                } else if ("Payment".equalsIgnoreCase(attrVal)) {
+                    imel.remove();
+                } else if ("Feedback".equalsIgnoreCase(attrVal)) {
+                    imel.remove();
+                } else if ("Contact us".equalsIgnoreCase(attrVal)) {
+                    imel.remove();
+                } else if ("Return".equalsIgnoreCase(attrVal)) {
+                    imel.remove();
+                }
+            }
+        }
+        Elements ckImgLst = nwDoc.getElementsByTag("img");
+        if (ckImgLst.size() == 0) {
+            nwDoc = Jsoup.parseBodyFragment(content);
+            // 移除所有的 a标签
+            Elements nwALst = nwDoc.getElementsByTag("a");
+            for (Element nael : nwALst) {
+                nael.remove();
+            }
+        }
+        return nwDoc.html();
+    }
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/saveEditDetalis")
@@ -1958,11 +2027,11 @@ public class EditorController {
             int index = customGoodsService.updateReviewRemark(paramMap);
             if (index > 0) {
                 //插入数据到线上
-                SendMQ sendMQ = new SendMQ();
+
 //                String sql = "update goods_review set review_remark='" + edit_remark + "',country='" + editcountry + "',review_score='" + edit_score + "',review_flag='" + update_flag + "',updatetime=now() where goods_pid='" + goods_pid + "' and createtime='" + oldCreateTime + "'";
                 String sql = "update goods_review set review_remark='" + edit_remark + "',country='" + editcountry + "',review_score='" + edit_score + "',review_flag='" + update_flag + "',updatetime=now() where id='" + id + "';";
-                sendMQ.sendMsg(new RunSqlModel(sql));
-                sendMQ.closeConn();
+                SendMQ.sendMsg(new RunSqlModel(sql));
+
             }
             json.setOk(index > 0 ? true : false);
             json.setMessage(index > 0 ? "修改成功" : "修改失败");
@@ -2008,10 +2077,10 @@ public class EditorController {
             int index = customGoodsService.addReviewRemark(paramMap);
             if (index > 0) {
                 //插入数据到线上
-                SendMQ sendMQ = new SendMQ();
+
                 String sql = "insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('" + goods_pid + "','" + country + "','" + adm.getAdmName() + "','" + createTime + "','" + SendMQ.repCha(review_remark) + "','" + review_score + "')";
-                sendMQ.sendMsg(new RunSqlModel(sql));
-                sendMQ.closeConn();
+                SendMQ.sendMsg(new RunSqlModel(sql));
+
             }
             json.setOk(index > 0 ? true : false);
             json.setMessage("线上产品单页对应评论数据已增加, 后台对应新增评论10分钟后会显示. ");
@@ -2524,6 +2593,7 @@ public class EditorController {
         try {
             CustomGoodsBean goods = hotGoodsService.queryFor1688Goods(goodsPid);
             // SendMQ sendMQ = new SendMQ();
+
             // 校检存在的goodsPid数据
             boolean isExists = hotGoodsService.checkExistsGoods(categoryId, goodsPid);
             if (isExists) {
@@ -2562,6 +2632,7 @@ public class EditorController {
                     showName = showName.replace("\"", "\\\"");
                 }
                 String sql = "insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
+                SendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
                         "goods_url,goods_img,goods_price,is_on,profit_margin,selling_price,wholesale_price_1,wholesale_price_2," +
                         "wholesale_price_3,wholesale_price_4,wholesale_price_5,create_admid,amazon_price,asin_code) values(" + hsGoods.getHotSellingId() + "," + hsGoods.getGoodsPid() + "," +
                         "'" + showName + "'," +
@@ -2767,6 +2838,16 @@ public class EditorController {
     }
 
 
+    /**
+     * @param filename 文件的原始名称
+     * @return uuid+"_"+文件的原始名称
+     * @Method: makeFileName
+     * @Description: 生成上传文件的文件名，文件名以：uuid+"_"+文件的原始名称
+     */
+    public static String makeFileName(String filename) { // 2.jpg
+        // 为防止文件覆盖的现象发生，要为上传文件产生一个唯一的文件名
+        return UUID.randomUUID().toString() + "_" + filename;
+    }
 
 
     @RequestMapping(value = "/goodsEditLog")
@@ -3031,7 +3112,7 @@ public class EditorController {
                 }
                 if (pidMapOlds.containsKey(gdEd.getPid())) {
                     if (StringUtils.isNotBlank(gdEd.getOld_title())) {
-                        if (GoodsInfoUtils.checkListContains(pidMapOlds.get(gdEd.getPid()), gdEd.getOld_title())) {
+                        if (checkListContains(pidMapOlds.get(gdEd.getPid()), gdEd.getOld_title())) {
                             gdEd.setOld_title("");
                         } else {
                             pidMapOlds.get(gdEd.getPid()).add(gdEd.getOld_title());
@@ -3044,7 +3125,7 @@ public class EditorController {
                 }
                 if (pidMapNews.containsKey(gdEd.getPid())) {
                     if (StringUtils.isNotBlank(gdEd.getNew_title())) {
-                        if (GoodsInfoUtils.checkListContains(pidMapNews.get(gdEd.getPid()), gdEd.getNew_title())) {
+                        if (checkListContains(pidMapNews.get(gdEd.getPid()), gdEd.getNew_title())) {
                             gdEd.setNew_title("");
                         } else {
                             pidMapNews.get(gdEd.getPid()).add(gdEd.getNew_title());
@@ -3501,7 +3582,7 @@ public class EditorController {
                     // 本地生成新的文件
                     Random random = new Random();
                     String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
-                    String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
+                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
                     String changeLocalFilePath = prePath + saveFilename + fileSuffix;
 
                     BASE64Decoder decoder = new BASE64Decoder();
@@ -3587,144 +3668,6 @@ public class EditorController {
         return json;
     }
 
-
-    @RequestMapping(value = "/setGoodsOverSea")
-    @ResponseBody
-    public JsonResult setGoodsOverSea(HttpServletRequest request, HttpServletResponse response) {
-        JsonResult json = new JsonResult();
-        com.cbt.pojo.Admuser admuser =UserInfoUtils.getUserInfo(request);
-        if(admuser == null || admuser.getId() == 0){
-            json.setOk(false);
-            json.setMessage("请登录后操作");
-            return  json;
-        }
-        String pid = request.getParameter("pid");
-        if(StringUtils.isBlank(pid)){
-            json.setOk(false);
-            json.setMessage("获取PID失败");
-            return  json;
-        }
-        String countryId = request.getParameter("countryId");
-        if(StringUtils.isBlank(countryId)){
-            json.setOk(false);
-            json.setMessage("获取countryId失败");
-            return  json;
-        }
-        String isSupport = request.getParameter("isSupport");
-        if(StringUtils.isBlank(isSupport)){
-            json.setOk(false);
-            json.setMessage("获取是否支持失败");
-            return  json;
-        }
-        String categoryIdStr = request.getParameter("categoryId");
-        int categoryId = 0;
-        if(StringUtils.isBlank(categoryIdStr)){
-            json.setOk(false);
-            json.setMessage("获取热卖区分类失败");
-            return  json;
-        }
-
-        try {
-            categoryId = Integer.parseInt(categoryIdStr);
-            int isUpdate = 0;
-            List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
-            if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
-                for(GoodsOverSea goods: goodsOverSeaList){
-                    if(goods.getCountryId() == Integer.parseInt(countryId)){
-                        isUpdate = 1;
-                        break;
-                    }
-                }
-            }
-            if(isUpdate > 0) {
-                json.setOk(false);
-                json.setMessage("此国家已经被设置");
-                return json;
-            }
-            int supportFlag = Integer.parseInt(isSupport);
-            GoodsOverSea overSea = new GoodsOverSea();
-            overSea.setAdminId(admuser.getId());
-            overSea.setPid(pid);
-            overSea.setCountryId(Integer.parseInt(countryId));
-            overSea.setIsSupport(supportFlag);
-
-            customGoodsService.insertIntoGoodsOverSeaInfo(overSea);
-            String sql = "insert into custom_goods_oversea(pid,country_id,admin_id,is_support)" +
-                    " values('" + pid + "'," + countryId + "," + admuser.getId() + "," + isSupport + ")";
-            NotifyToCustomerUtil.sendSqlByMq(sql);
-
-            // 加入到热卖区
-            if(supportFlag > 0){
-                // 添加
-                saveHotGoods(pid, categoryId, admuser.getId());
-            }else {
-                // 删除
-                hotGoodsService.deleteGoodsByPid(categoryId, pid);
-                String sqlDel = "delete from hot_selling_goods where hot_selling_id = " + categoryId + " and goods_pid = '" + pid + "'";
-                NotifyToCustomerUtil.sendSqlByMq(sqlDel);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            json.setOk(false);
-            json.setMessage("执行错误，原因：" + e.getMessage());
-        }
-        return json;
-    }
-
-    @RequestMapping(value = "/getAllZone")
-    @ResponseBody
-    public JsonResult getAllZone(HttpServletRequest request, HttpServletResponse response) {
-        JsonResult json = new JsonResult();
-        String isUsd = request.getParameter("isUsd");
-        try {
-            IZoneServer os = new ZoneServer();
-            List<ZoneBean> zoneBeanList = os.getAllZone();
-            if (StringUtils.isNotBlank(isUsd) && Integer.parseInt(isUsd) > 0) {
-                List<ZoneBean> listNew = zoneBeanList.stream().filter(e -> {
-                    return "USA".equalsIgnoreCase(e.getCountry());
-                }).collect(Collectors.toList());
-
-                json.setData(listNew);
-                zoneBeanList.clear();
-            } else {
-                json.setData(zoneBeanList);
-            }
-
-            json.setOk(true);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            json.setOk(false);
-            json.setMessage("执行错误，原因：" + e.getMessage());
-        }
-        return json;
-    }
-
-
-    @RequestMapping(value = "/getGoodsOverSeaList")
-    @ResponseBody
-    public JsonResult getGoodsOverSeaList(HttpServletRequest request, String pid) {
-        JsonResult json = new JsonResult();
-        if (StringUtils.isBlank(pid)) {
-            json.setOk(false);
-            json.setMessage("获取PID失败");
-            return json;
-        }
-        try {
-            List<GoodsOverSea> list = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
-            json.setData(list);
-            json.setOk(true);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            json.setOk(false);
-            json.setMessage("执行错误，原因：" + e.getMessage());
-        }
-        return json;
-    }
-
-
     private void praseEninfoAndUpdate(GoodsParseBean gd) {
         try {
             // 获取配置文件信息
@@ -3767,7 +3710,7 @@ public class EditorController {
                                 // 文件的后缀取出来
                                 String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
                                 // 生成唯一文件名称
-                                String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
+                                String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
                                 // 本地服务器磁盘全路径
                                 String localFilePath = "checkImg/" + gd.getPid() + "/desc/" + saveFilename + fileSuffix;
                                 // 下载网络图片到本地
@@ -3849,8 +3792,7 @@ public class EditorController {
         }
     }
 
-
-     private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
+    private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
         try {
 
             Document nwDoc = Jsoup.parseBodyFragment(gd.getEninfo());
@@ -3872,6 +3814,43 @@ public class EditorController {
         }
     }
 
+
+    private boolean deleteImgByUrl(String pid) {
+        /*boolean isSu = false;
+        CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+        if (checkIsKidsCatid(goods.getCatid1()) && goods.getValid() == 0) {
+            // 接口调用
+            isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
+                    *//*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
+                    boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                    if (!isSu) {
+                        isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                    }
+                    if (!isSu) {
+                        LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
+                    }*//*
+
+        } else {
+            isSu = true;
+        }*/
+        return OKHttpUtils.optionGoodsInterface(pid, 0, 6, 2);
+    }
+
+    private boolean checkListContains(List<String> list, String str) {
+        boolean isOk = false;
+        if (list == null || list.isEmpty() || StringUtils.isBlank(str)) {
+            return isOk;
+        } else {
+            for (String tempStr : list) {
+                if (str.equals(tempStr)) {
+                    isOk = true;
+                    break;
+                }
+            }
+        }
+        return isOk;
+    }
+
     private boolean checkIsKidsCatid(String catid) {
         boolean isCheck = false;
         if (kidsCatidList == null || kidsCatidList.size() == 0) {
@@ -3885,5 +3864,4 @@ public class EditorController {
         }
         return isCheck;
     }
-
 }

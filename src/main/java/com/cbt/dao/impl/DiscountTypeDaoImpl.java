@@ -5,6 +5,8 @@ package com.cbt.dao.impl;
 
 import com.cbt.dao.IDiscountTypeDao;
 import com.cbt.jdbc.DBHelper;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -111,10 +113,17 @@ public class DiscountTypeDaoImpl implements IDiscountTypeDao {
 				}
 			}
 			if(rows>0){//大于0就说明数据存在则更新
-				stmt2 = conn.prepareStatement(sql2);
-				stmt2.setDouble(1, maxDiscount);
-				stmt2.setString(2, cid);
-				rs1 = stmt2.executeUpdate();
+//				stmt2 = conn.prepareStatement(sql2);
+//				stmt2.setDouble(1, maxDiscount);
+//				stmt2.setString(2, cid);
+//				rs1 = stmt2.executeUpdate();
+
+				List<String> lstValues = new ArrayList<String>();
+				lstValues.add(String.valueOf(maxDiscount));
+				lstValues.add(String.valueOf(cid));
+				String runSql = DBHelper.covertToSQL(sql2,lstValues);
+				rs1 = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 				//同时 修改本地
 				ps2 = con.prepareStatement(sql2);
 				ps2.setDouble(1, maxDiscount);
@@ -122,10 +131,17 @@ public class DiscountTypeDaoImpl implements IDiscountTypeDao {
 				ps2.executeUpdate();
 			}else{//否则插入数据
 				stmt1 = conn.prepareStatement(sql1);
-				stmt1.setString(1, cid);
-				stmt1.setString(2, category);
-				stmt1.setDouble(3, maxDiscount);
-				rs1 = stmt1.executeUpdate();
+//				stmt1.setString(1, cid);
+//				stmt1.setString(2, category);
+//				stmt1.setDouble(3, maxDiscount);
+//				rs1 = stmt1.executeUpdate();
+				List<String> lstValues = new ArrayList<String>();
+				lstValues.add(String.valueOf(cid));
+				lstValues.add(String.valueOf(category));
+				lstValues.add(String.valueOf(maxDiscount));
+				String runSql = DBHelper.covertToSQL(sql1,lstValues);
+				rs1 = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+
 				//同时修改本地
 				ps1 = con.prepareStatement(sql1);
 				ps1.setString(1, cid);

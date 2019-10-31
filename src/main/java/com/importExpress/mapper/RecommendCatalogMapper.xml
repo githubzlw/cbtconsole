@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.RecommendCatalogMapper" >
+
+	  <resultMap id="recommendCatalogResultMap" type="com.importExpress.pojo.RecommendCatalog" >
+	    <id column="id" property="id" />
+	    <result column="catalog_name" property="catalogName" />
+	    <result column="template" property="template" />
+	    <result column="create_admin" property="createAdmin" />
+	    <result column="create_time" property="createTime" />
+	    <result column="product_count" property="productCount" />
+	    <result column="product_list" property="productList" />
+	    <result column="catalog_file" property="catalogFile" />
+	    <result column="status" property="status" />
+
+	  </resultMap>
+
+    <!--更新目录-->
+	<update id="updateCatalog" parameterType="com.importExpress.pojo.RecommendCatalog">
+		update recommend_catalog set product_count=#{productCount},product_list=#{productList},template=#{template},catalog_name=#{catalogName} where id=#{id}
+	</update>
+    <!--更新目录-->
+	<update id="deleteCatalog">
+		update recommend_catalog set status=0 where id=#{id}
+	</update>
+
+	<!-- 保存 -->
+	<insert id="insertCatalog" parameterType="com.importExpress.pojo.RecommendCatalog" keyProperty="id" useGeneratedKeys="true">
+	  insert into recommend_catalog (catalog_name,template,create_admin,create_time,product_count,product_list,catalog_file,status)
+	  values(#{catalogName},#{template},#{createAdmin},now(),#{productCount},
+	  #{productList},#{catalogFile},#{status})
+	</insert>
+	
+	<!-- 目录列表 -->
+	<select id="catalogList" resultMap="recommendCatalogResultMap">
+	select  id,catalog_name,template,create_admin,create_time,product_count,product_list,catalog_file,status
+	from recommend_catalog where status=1 
+	<if test="template !=0"> and template=#{template}</if>
+	<if test="catalogName !=null"> and catalog_name=#{catalogName}</if>
+	limit #{page},40
+	</select>
+	
+	<!-- 目录 -->
+	<select id="catalogById" resultMap="recommendCatalogResultMap">
+	select  id,catalog_name,template,create_admin,create_time,product_count,product_list,catalog_file,status
+	from recommend_catalog where status=1 and id=#{id}
+	limit 1
+	</select>
+	
+	<!-- 目录数量 -->
+	<select id="catalogCount" resultType="Integer">
+	select  count(*) from recommend_catalog where status=1 
+	<if test="template !=0"> and template=#{template}</if>
+	<if test="catalogName !=null"> and catalog_name=#{catalogName}</if>
+	</select>
+
+</mapper>

@@ -198,9 +198,9 @@ public class EventGoodsCtrl extends UtilAll {
 			map.put("title", title);
 			map.put("category", map.get("category").toString().replaceAll("'", "&apos;"));
 			map.put("title", map.get("title").toString().replaceAll("'", "&apos;"));
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("insert into eventgoods (cid,category,title,createtime) values('"+map.get("cid")+"','"+map.get("category")+"','"+map.get("title")+"',now())"));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel("insert into eventgoods (cid,category,title,createtime) values('"+map.get("cid")+"','"+map.get("category")+"','"+map.get("title")+"',now())"));
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -244,9 +244,9 @@ public class EventGoodsCtrl extends UtilAll {
 		id= StringUtil.isBlank(id)?"00000":id;
 		int ret=1;
 		try{
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("delete from eventgoodsdetails where id='"+id+"'"));
-			sendMQ.closeConn();
+
+			SendMQ.sendMsg(new RunSqlModel("delete from eventgoodsdetails where id='"+id+"'"));
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -315,11 +315,11 @@ public class EventGoodsCtrl extends UtilAll {
 				return "1001";
 			}
 			goodsname=goodsname.toString().replaceAll("'", "&apos;");
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("insert into eventgoodsdetails (flag,type,weight,goodssampleid,goodsid,goodsname,goodsurl,goodsimg,avilibleStock,sold," +
+
+			SendMQ.sendMsg(new RunSqlModel("insert into eventgoodsdetails (flag,type,weight,goodssampleid,goodsid,goodsname,goodsurl,goodsimg,avilibleStock,sold," +
 					"goodsprice,originalprice,discount) values('"+flag+"','"+type+"','"+weight+"','"+goodssampleid+"','"+goodsid+"','"+goodsname+"','"+goodsurl+"'," +
 					"'"+goodsimg+"','"+avilibleStock+"','"+sold+"','"+goodsprice+"','"+originalprice+"','"+discount+""));
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -353,11 +353,11 @@ public class EventGoodsCtrl extends UtilAll {
 			if (isStringNull(id)) {
 				return "1001";
 			}
-			SendMQ sendMQ = new SendMQ();
-			sendMQ.sendMsg(new RunSqlModel("update eventgoodsdetails set flag='"+flag+"',originalprice='"+originalprice+"',type='"+type+"',weight='"+weight+"'," +
+
+			SendMQ.sendMsg(new RunSqlModel("update eventgoodsdetails set flag='"+flag+"',originalprice='"+originalprice+"',type='"+type+"',weight='"+weight+"'," +
 					"goodsid='"+goodsid+"',goodsname='"+goodsname+"',goodsurl='"+goodsurl+"',goodsimg='"+goodsimg+"'," +
 					"goodsprice='"+goodsprice+"',discount='"+discount+"',avilibleStock='"+avilibleStock+"',sold='"+sold+"'where id='"+id+"'"));
-			sendMQ.closeConn();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
