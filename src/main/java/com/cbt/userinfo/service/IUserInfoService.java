@@ -1,6 +1,7 @@
 package com.cbt.userinfo.service;
 
 import com.cbt.pojo.UserEx;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -69,4 +70,6 @@ public interface IUserInfoService {
     int checkFollowMeCode(String followCode);
 
     int updateUserFollowCode(String followCode,int userId);
+
+    Map<String,String> getUserInfoById(@Param("id") int id);
 }

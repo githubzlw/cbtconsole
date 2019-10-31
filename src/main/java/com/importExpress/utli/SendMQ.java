@@ -195,6 +195,7 @@ public class SendMQ {
 
             JSONObject jsonObject = JSONObject.fromObject(model);
             log.info(" [x] Sent [{}]", jsonObject);
+            System.err.println("[x] Sent" + jsonObject);
             String response = rpcClient.call(jsonObject.toString());
             log.info(" [x] response [{}]", response);
             return response;
