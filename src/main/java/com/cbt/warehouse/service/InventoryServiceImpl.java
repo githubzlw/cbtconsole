@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ import com.cbt.website.bean.LossInventoryWrap;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
 import com.cbt.website.dao.IExpressTrackDao;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -1435,6 +1438,18 @@ public class InventoryServiceImpl implements  InventoryService{
 		if(inventoryBarcodeList == null || inventoryBarcodeList.isEmpty()) {
 			return null;
 		}
+		List<String> lstSkuid = Lists.newArrayList();
+		for(InventoryWrap i : inventoryBarcodeList) {
+			if(StringUtil.isBlank(i.getIskSkuid())) {
+				continue;
+			}
+			lstSkuid.add(i.getIskSkuid());
+		}
+		List<Map<String,Object>> returnGoods = inventoryMapper.returnGoods(lstSkuid);
+		Map<String,Integer> setM = Maps.newHashMap();
+		for(Map<String,Object> r : returnGoods) {
+			setM.put(r.get("skuID").toString(), Integer.parseInt(r.get("count").toString()));
+		}
 		for(InventoryWrap i : inventoryBarcodeList) {
 			if(i.getIbState() == 0) {
 				i.setStateContext("采购使用库存,等待仓库移出库存");
@@ -1456,6 +1471,11 @@ public class InventoryServiceImpl implements  InventoryService{
 			
 			i.setIskSCarImg(iskSCarImg);
 			i.setOdCarImg(odCarImg);
+			
+			Integer returnCount = setM.get(i.getIskSkuid());
+			returnCount = returnCount == null ? 0 : returnCount;
+			i.setReturnOrderNum(returnCount);
+			
 		}
 		return inventoryBarcodeList;
 	}

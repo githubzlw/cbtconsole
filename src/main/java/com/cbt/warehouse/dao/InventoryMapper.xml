@@ -845,4 +845,13 @@
      show tables like #{table_name}; 
     </select>
     
+    <select id="returnGoods" resultType="java.util.Map">
+    
+    select b.skuID,count(a.tb_id) as count  from 
+	return_display a 
+	left join taobao_1688_order_history b on a.tb_id=b.id where b.skuID in
+	<foreach collection="list" close=")" open="(" index="index" item="item" separator=",">#{item}</foreach>
+    group by b.skuID;
+</select>
+    
 </mapper>
