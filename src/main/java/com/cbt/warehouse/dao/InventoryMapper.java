@@ -440,4 +440,6 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	List<InventoryData> invetoryCheck();
+	
+	List<Map<String,Object>> returnGoods(List<String> list);
 }
