@@ -2602,9 +2602,9 @@ public class EditorController {
                 HotSellingGoods hsGoods = new HotSellingGoods();
                 hsGoods.setHotSellingId(categoryId);
 
-                if(StringUtils.isNotBlank(goods.getName())){
+                if (StringUtils.isNotBlank(goods.getName())) {
                     hsGoods.setGoodsName(goods.getName());
-                }else {
+                } else {
                     hsGoods.setGoodsName("");
                 }
 
@@ -2631,7 +2631,6 @@ public class EditorController {
                 if (showName.contains("\"")) {
                     showName = showName.replace("\"", "\\\"");
                 }
-                String sql = "insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
                 SendMQ.sendMsg(new RunSqlModel("insert into hot_selling_goods (hot_selling_id,goods_pid,show_name," +
                         "goods_url,goods_img,goods_price,is_on,profit_margin,selling_price,wholesale_price_1,wholesale_price_2," +
                         "wholesale_price_3,wholesale_price_4,wholesale_price_5,create_admid,amazon_price,asin_code) values(" + hsGoods.getHotSellingId() + "," + hsGoods.getGoodsPid() + "," +
@@ -2639,11 +2638,7 @@ public class EditorController {
                         "'" + hsGoods.getGoodsUrl() + "','" + hsGoods.getGoodsImg() + "','" + hsGoods.getGoodsPrice() + "','" + hsGoods.getIsOn() + "'," +
                         "'" + hsGoods.getProfitMargin() + "','" + hsGoods.getSellingPrice() + "','" + hsGoods.getWholesalePrice_1() + "','" + hsGoods.getWholesalePrice_2() + "'," +
                         "'" + hsGoods.getWholesalePrice_3() + "','" + hsGoods.getWholesalePrice_4() + "','" + hsGoods.getWholesalePrice_5() + "'," +
-                        "'" + hsGoods.getCreateAdmid() + "','" + hsGoods.getAmazonPrice() + "','" + hsGoods.getAsinCode() + "')";
-
-                // sendMQ.sendMsg(new RunSqlModel(sql));
-                //sendMQ.closeConn();
-                NotifyToCustomerUtil.sendSqlByMq(sql);
+                        "'" + hsGoods.getCreateAdmid() + "','" + hsGoods.getAmazonPrice() + "','" + hsGoods.getAsinCode() + "')"));
             }
 
         } catch (Exception e) {
