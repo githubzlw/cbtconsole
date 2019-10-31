@@ -216,7 +216,7 @@ public class SendMQ {
         sendMessageStr(jsonObject.toString(), website);
     }
 
-    private static void sendMessageStr(String json, int website) throws Exception {
+    public static void sendMessageStr(String json, int website) throws Exception {
         Channel channel = getChannel();
         if (website == 0) {
             channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
@@ -228,6 +228,7 @@ public class SendMQ {
             channel.queueDeclare(QUEUE_REDIS_NAME_PETS, false, false, false, null);
             channel.basicPublish("", QUEUE_REDIS_NAME_PETS, null, json.getBytes("UTF-8"));
         }
+        System.err.println(" [x] Sent '" + json + "'");
         log.info(" [x] Sent '" + json + "'");
         closeChannel(channel);
     }
