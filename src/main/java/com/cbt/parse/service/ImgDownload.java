@@ -57,7 +57,7 @@ public class ImgDownload {
 			fileOutputStream.write(output.toByteArray());
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			System.err.println("execute download[ " + imgUrl + "] error:" + e.getMessage());
 			return false;
 		} finally {
@@ -110,7 +110,7 @@ public class ImgDownload {
 				return false;
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			System.err.println("execute download[ " + fileName + "] error:" + e.getMessage());
 			return false;
 		}

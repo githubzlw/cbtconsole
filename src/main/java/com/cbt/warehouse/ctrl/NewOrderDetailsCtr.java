@@ -812,7 +812,7 @@ public class NewOrderDetailsCtr {
 			json.setOk(true);
 			json.setData(list);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("查询运费失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询运费失败,原因：" + e.getMessage());
@@ -843,7 +843,7 @@ public class NewOrderDetailsCtr {
 			json.setOk(true);
 			json.setData(list_uid);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("查询相似账号失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询相似账号失败,原因：" + e.getMessage());
@@ -879,7 +879,7 @@ public class NewOrderDetailsCtr {
 			server.changeBuyer(Integer.valueOf(odid), Integer.valueOf(admuserid));
 			json.setOk(true);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("调整采购人员失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("调整采购人员失败,原因：" + e.getMessage());
@@ -912,7 +912,7 @@ public class NewOrderDetailsCtr {
 			this.iPurchaseService.changeAllBuyer(orderNo, Integer.valueOf(admuserid));
 			json.setOk(true);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("调整采购人员失败，原因：" + e.getMessage());
 			json.setOk(false);
 			json.setMessage("调整采购人员失败,原因：" + e.getMessage());
@@ -951,7 +951,7 @@ public class NewOrderDetailsCtr {
 			this.iPurchaseService.changeBuyerByPid(odid,admid,orderNo);
 			json.setOk(true);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("调整采购人员失败，原因：" + e.getMessage());
 			json.setOk(false);
 			json.setMessage("调整采购人员失败,原因：" + e.getMessage());
@@ -987,7 +987,7 @@ public class NewOrderDetailsCtr {
 			server.changeOrderBuyer(orderid, Integer.valueOf(admuserid),odids);
 			json.setOk(true);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("调整整个订单的采购人员失败，原因：" + e.getMessage());
 			json.setOk(false);
 			json.setMessage("调整整个订单的采购人员失败,原因：" + e.getMessage());
@@ -1018,7 +1018,7 @@ public class NewOrderDetailsCtr {
 			json.setOk(true);
 			json.setData(list);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("通过oid查找商品采购员失败，原因：" + e.getMessage());
 			json.setOk(false);
 			json.setMessage("通过oid查找商品采购员失败,原因：" + e.getMessage());
@@ -1055,7 +1055,7 @@ public class NewOrderDetailsCtr {
 				json.setMessage("暂无历史价格!");
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("获取历史价格失败，原因：" + e.getMessage());
 			json.setOk(false);
 			json.setMessage("获取历史价格失败,原因：" + e.getMessage());
@@ -1129,7 +1129,7 @@ public class NewOrderDetailsCtr {
 				json.setMessage("新增补货订单成功");
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("新增补货订单失败，原因：" + e.getMessage());
 			json.setOk(false);
 			json.setMessage("新增补货订单失败,原因：" + e.getMessage());
@@ -2098,7 +2098,7 @@ public class NewOrderDetailsCtr {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			if (orderinfo != null) {
 				LOG.error("订单[" + orderinfo.getOrderNo() + "]更改失败，修改状态为：" + operationType);
 			} else {
@@ -2192,7 +2192,7 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("userId", userId);
 			request.setAttribute("flag", orderNo.length()==18);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error(e.getMessage());
 		}
 
@@ -2369,7 +2369,7 @@ public class NewOrderDetailsCtr {
 			json.setOk(true);
 			json.setData(res);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error(e.getMessage());
 			json.setOk(false);
 			json.setMessage("sendCutomers error:" + e.getMessage());
@@ -2486,7 +2486,7 @@ public class NewOrderDetailsCtr {
 			json.setOk(true);
 			json.setData(res);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error(e.getMessage());
 			json.setOk(false);
 			json.setMessage("sendEmailFright error:" + e.getMessage());

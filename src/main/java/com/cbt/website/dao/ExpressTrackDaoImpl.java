@@ -4346,7 +4346,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			if (orderinfo != null) {
 				LOG.error("订单[订单号：" + orderinfo.getOrderNo()
 						+ "]更改，插入更改数据失败，修改状态为：" + operationType);

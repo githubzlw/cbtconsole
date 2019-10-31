@@ -44,7 +44,7 @@ public class SendMQServiceImpl implements SendMQService {
             sendMQ.sendMsg(model);	
             return 1;
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("SendMQServiceImpl异常，原因： ", e);
 		} finally {
 			if (stmt != null) {

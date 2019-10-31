@@ -1450,6 +1450,7 @@
 
 
         function openOverSeaDialog() {
+            queryHotCategory();
             $.ajax({
                 type: 'POST',
                 sync: true,
@@ -1521,7 +1522,7 @@
                 sync: true,
                 dataType: 'json',
                 url: '/cbtconsole/hotManage/getHotTypeList',
-                data: {},
+                data: {"hotType": 24},
                 success: function (data) {
                     if (data.success) {
                         var content = "";
@@ -1537,7 +1538,7 @@
                     }
                 },
                 error: function (XMLResponse) {
-                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                    $.messager.alert("提醒", "获取数据，请联系管理员", "error");
                 }
             });
         }
@@ -1571,27 +1572,61 @@
         function saveOverSeaInfo(pid) {
             var countryId = $("#query_country_id").val();
             var isSupport = $("#query_is_support").val();
+            var categoryId= $("#sea_category_id").val();
+            if(!categoryId || categoryId <= 0){
+                showMessage("请选择类别数据");
+                return;
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/cbtconsole/editc/setGoodsOverSea',
+                    data: {
+                        pid: pid,
+                        countryId: countryId,
+                        isSupport: isSupport,
+                        categoryId: categoryId
+                    },
+                    success: function (data) {
+                        if (data.ok) {
+                            showMessage("执行成功");
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 500);
+                        } else {
+                            $.messager.alert("提醒", data.message, "error");
+                        }
+                    },
+                    error: function (XMLResponse) {
+                        $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                    }
+                });
+            }
+        }
+        
+        function queryHotCategory() {
+            var hotType = $("#sea_hot_class_id").val();
             $.ajax({
                 type: 'POST',
+                sync: true,
                 dataType: 'json',
-                url: '/cbtconsole/editc/setGoodsOverSea',
-                data: {
-                    pid: pid,
-                    countryId: countryId,
-                    isSupport: isSupport
-                },
+                url: '/cbtconsole/hotManage/getHotTypeList',
+                data: {"hotType": hotType},
                 success: function (data) {
-                    if (data.ok) {
-                        showMessage("执行成功");
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 500);
+                    if (data.success) {
+                        var content = "";
+                        var jsonData = data.rows;
+                        for (var i=0;i< jsonData.length;i++) {
+                            content += '<option value="' + jsonData[i].id + '">' + jsonData[i].showName + '</option>';
+                        }
+                        $("#sea_category_id").empty();
+                        $("#sea_category_id").append(content);
                     } else {
                         $.messager.alert("提醒", data.message, "error");
                     }
                 },
                 error: function (XMLResponse) {
-                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                    $.messager.alert("提醒", "获取数据，请联系管理员", "error");
                 }
             });
         }
@@ -1619,15 +1654,37 @@
 
     <div id="set_over_sea_div" class="easyui-dialog" title="设置海外仓"
          data-options="modal:true"
-         style="width: 330px; height: 180px; padding: 10px;">
+         style="width: 335px; height: 240px; padding: 10px;">
         <form style="margin-left: 44px;" id="set_over_sea_form" method="post" enctype="multipart/form-data">
-            <span>国&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;家:</span><select id="query_country_id" style="height: 26px;width: 200px;">
-        </select>
-            <br>
-            <span>是否支持:</span><select id="query_is_support" style="height: 26px;width: 200px;">
-            <option value="0">不支持</option>
-            <option value="1">支持</option>
-        </select>
+            <table>
+                <tr>
+                    <td>热卖分组:</td>
+                    <td>
+                        <select id="sea_hot_class_id" onchange="queryHotCategory()" style="height: 26px;width: 150px;">
+                            <option value="25">kids海外仓专区</option>
+                            <option value="26">pets海外仓专区</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>分类:</td>
+                    <td>
+                        <select id="sea_category_id" style="height: 26px;width: 150px;">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>国家:</td>
+                    <td><select id="query_country_id" style="height: 26px;width: 150px;"></select></td>
+                </tr>
+                <tr>
+                    <td>是否支持</td>
+                    <td><select id="query_is_support" style="height: 26px;width: 150px;">
+                        <option value="0">不支持</option>
+                        <option value="1">支持</option>
+                    </select></td>
+                </tr>
+            </table>
         </form>
         <br>
         <div style="text-align: center; padding: 5px 0">

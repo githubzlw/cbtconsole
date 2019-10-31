@@ -39,7 +39,7 @@ public class HotGoodsCtrl {
     @Autowired
     private HotGoodsService hotGoodsService;
 
-    /**
+    /**d
      * 查询所有热卖类别
      *
      * @param request
@@ -57,7 +57,7 @@ public class HotGoodsCtrl {
             json.setOk(true);
             json.setData(categoryLst);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("获取热卖区类别失败，原因：" + e.getMessage());
             LOG.error("获取热卖区类别失败，原因：" + e.getMessage());
@@ -159,7 +159,7 @@ public class HotGoodsCtrl {
 
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("修改热卖区类别失败，原因：" + e.getMessage());
             LOG.error("修改热卖区类别失败，原因：" + e.getMessage());
@@ -225,7 +225,7 @@ public class HotGoodsCtrl {
             json.setOk(true);
             json.setData(goodsList);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("获取类别商品失败，原因：" + e.getMessage());
             LOG.error("获取类别商品失败，原因：" + e.getMessage());
@@ -367,7 +367,7 @@ public class HotGoodsCtrl {
 
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("修改类别商品失败，原因：" + e.getMessage());
             LOG.error("修改类别商品失败，原因：" + e.getMessage());
@@ -508,7 +508,7 @@ public class HotGoodsCtrl {
             json.setMessage("保存线上类别商品成功，请等待数据拉取");
             sendMQ.closeConn();
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("保存类别商品失败，原因：" + e.getMessage());
             LOG.error("保存类别商品失败，原因：" + e.getMessage());
@@ -573,7 +573,7 @@ public class HotGoodsCtrl {
             json.setOk(true);
             json.setMessage("删除成功");
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("删除成功，原因：" + e.getMessage());
             LOG.error("删除成功，原因：" + e.getMessage());
@@ -657,7 +657,7 @@ public class HotGoodsCtrl {
             json.setOk(true);
             json.setMessage("本次获取有效商品数:" + (goodsLst.size() - nwGoodsLst.size() - deleteNum) + ",请等待数据拉取");
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("自动获取热卖类别和热卖商品失败，原因：" + e.getMessage());
             LOG.error("自动获取热卖类别和热卖商品失败，原因：" + e.getMessage());
@@ -767,7 +767,7 @@ public class HotGoodsCtrl {
                 json.setData(goods);
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("获取1688商品信息失败，原因：" + e.getMessage());
             LOG.error("获取1688商品信息失败，原因：" + e.getMessage());
@@ -848,7 +848,7 @@ public class HotGoodsCtrl {
                 json.setMessage("获取参数失败，请重试");
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("更新热卖商品是否启用失败，原因：" + e.getMessage());
             LOG.error("更新热卖商品是否启用失败，原因：" + e.getMessage());

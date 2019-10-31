@@ -4638,7 +4638,7 @@ public class StatisticalReportController {
             json.setData(rsList);
             return json;
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("查询失败,原因:" + e.getMessage());
             return json;

@@ -47,7 +47,7 @@ public class OnlineOrderUpdateThread implements Runnable {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("OnlineOrderUpdateThread error: " + e.getMessage());
 		}
 
@@ -73,7 +73,7 @@ public class OnlineOrderUpdateThread implements Runnable {
 				ChangeRecordsDao cRecordsDao = new ChangeRecordsDao();
 				cRecordsDao.insertOrderChange(orderinfo, adminId, operationType);
 			} catch (Exception e) {
-				e.getStackTrace();
+				e.printStackTrace();
 				LOG.error("updateOrderState error: " + e.getMessage());
 			}
 

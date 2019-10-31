@@ -679,7 +679,7 @@ public class NewCloudEditorController {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("保存错误，原因：" + e.getMessage());
 			e.printStackTrace();
@@ -787,7 +787,7 @@ public class NewCloudEditorController {
 			json.setMessage("执行成功");
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("pid : " + pidStr + " 执行错误，原因：" + e.getMessage());
 			LOG.error("pid : " + pidStr + " 执行错误，原因：" + e.getMessage());
@@ -821,7 +821,7 @@ public class NewCloudEditorController {
 			json.setMessage("执行成功");
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("pid : " + pidStr + " 执行错误，原因：" + e.getMessage());
 			LOG.error("pid : " + pidStr + " 执行错误，原因：" + e.getMessage());
@@ -1466,7 +1466,7 @@ public class NewCloudEditorController {
 				}
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("执行错误：" + e.getMessage());
 			LOG.error("执行错误：" + e.getMessage());
@@ -1553,7 +1553,7 @@ public class NewCloudEditorController {
 				}
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("mainPid:" + mainPid + " addSimilarGoods 执行错误：" + e.getMessage());
 			LOG.error("mainPid:" + mainPid + " addSimilarGoods 执行错误：" + e.getMessage());
@@ -1594,7 +1594,7 @@ public class NewCloudEditorController {
 			json.setOk(true);
 			json.setData(goodsList);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("mainPid:" + mainPid + " querySimilarGoodsByMainPid 执行错误：" + e.getMessage());
 			LOG.error("mainPid:" + mainPid + " querySimilarGoodsByMainPid 执行错误：" + e.getMessage());

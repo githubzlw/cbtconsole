@@ -38,7 +38,7 @@ public class ImageCompression {
 				}
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 		}
 		return is;
 	}
@@ -180,7 +180,7 @@ public class ImageCompression {
 			result[0] = src.getWidth(null); // 得到源图宽
 			result[1] = src.getHeight(null); // 得到源图高
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			System.out.print(e.getMessage());
 		} finally {
 			if (is != null) {

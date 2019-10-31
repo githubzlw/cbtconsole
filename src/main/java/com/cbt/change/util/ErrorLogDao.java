@@ -28,7 +28,7 @@ public class ErrorLogDao {
 			stm.executeUpdate();
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("插入update_table_error_log失败，原因： " + e.getMessage());
 		} finally {
 			if (stm != null) {

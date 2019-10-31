@@ -8035,7 +8035,7 @@ public class WarehouseCtrl {
 				NotifyToCustomerUtil.updateOrderState(userId,orderNo,2,3);
 //				DataSourceSelector.restore();
 			} catch (Exception e) {
-				e.getStackTrace();
+				e.printStackTrace();
 				LOG.error("更新线上orderinfo订单信息失败," + "订单号:" + orderNo, e);
 				// jxw 2017-4-17 插入失败，插入信息放入失败记录表中
 				String sqlStr = "update orderinfo set state ='3' where order_no = '"
@@ -8102,7 +8102,7 @@ public class WarehouseCtrl {
 				sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state = '3'  where child_order_no = '"+map.get("orders")+"'"));
 				sendMQ.closeConn();
 			} catch (Exception e) {
-				e.getStackTrace();
+				e.printStackTrace();
 				LOG.error("更新线上dropshipOrder订单失败，订单号：" + mainOrder, e);
 				// jxw 2017-4-17 插入失败，插入信息放入失败记录表中
 				String sqlStr = "update orderinfo set state ='3' where order_no = '"
@@ -8132,7 +8132,7 @@ public class WarehouseCtrl {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			if (orderinfo != null) {
 				LOG.error("订单[" + orderinfo.getOrderNo() + "]更改失败，修改状态为："
 						+ operationType);
@@ -8258,7 +8258,7 @@ public class WarehouseCtrl {
 				}
 				//DataSourceSelector.restore();
 			} catch (Exception e) {
-				e.getStackTrace();
+				e.printStackTrace();
 				LOG.error("更新线上orderinfo state状态失败 ,订单号:" + map.get("orderid"),
 						e);
 				// jxw 2017-4-16 插入失败，插入信息放入失败记录表中
@@ -8292,7 +8292,7 @@ public class WarehouseCtrl {
 						"and state!=2 AND purchase_state=3) a)>0,'1','5')) where child_order_no='"+map.get("child_order_no")+"'"));
 				sendMQ.closeConn();
 			} catch (Exception e) {
-				e.getStackTrace();
+				e.printStackTrace();
 				LOG.error(
 						"更新线上dropshiporder state状态失败,订单号:"
 								+ map.get("child_order_no"), e);

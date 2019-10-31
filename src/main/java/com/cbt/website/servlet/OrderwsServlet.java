@@ -2410,7 +2410,7 @@ public class OrderwsServlet extends HttpServlet {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			if (orderinfo != null) {
 				LOG.error("订单[" + orderinfo.getOrderNo() + "]更改失败，修改状态为：" + operationType);
 			} else {

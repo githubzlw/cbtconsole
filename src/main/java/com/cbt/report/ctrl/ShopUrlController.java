@@ -1078,7 +1078,7 @@ public class ShopUrlController {
             json.setOk(true);
             json.setMessage("执行成功");
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("保存失败，原因：" + e.getMessage());
             System.err.println("saveAndUpdateInfos error:" + e.getMessage());
@@ -1111,7 +1111,7 @@ public class ShopUrlController {
             json.setOk(true);
             json.setMessage("执行成功");
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             System.err.println("doGoodsClear error:" + e.getMessage());
@@ -1294,7 +1294,7 @@ public class ShopUrlController {
             shopUrlService.deleteShopReadyGoods(shopId, pids);
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             System.err.println("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
@@ -1339,7 +1339,7 @@ public class ShopUrlController {
             shopUrlService.setShopGoodsNoSold(shopId, pids);
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             System.err.println("shopId:" + shopId + ",pids:" + pids + ",setShopGoodsNoSold error:" + e.getMessage());
@@ -1385,7 +1385,7 @@ public class ShopUrlController {
             shopUrlService.deleteShopOfferGoods(shopId, pids);
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             System.err.println("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
@@ -1980,7 +1980,7 @@ public class ShopUrlController {
             }
 
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("保存失败，原因：" + e.getMessage());
             System.err.println("shopId:" + shopId + ",deleteGoodsImgs error:" + e.getMessage());
@@ -2819,7 +2819,7 @@ public class ShopUrlController {
             }
 
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",pid:" + pidStr + ",保存错误，原因：" + e.getMessage());
             LOG.error("shopId:" + shopId + ",pid:" + pidStr + ",保存错误，原因：", e);
@@ -2918,7 +2918,7 @@ public class ShopUrlController {
             thread.start();
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
             LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
@@ -2968,7 +2968,7 @@ public class ShopUrlController {
 
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
             LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
@@ -3015,7 +3015,7 @@ public class ShopUrlController {
             shopUrlService.updateShopState(shopId, 4);
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
             LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
@@ -3234,7 +3234,7 @@ public class ShopUrlController {
 
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
             LOG.error("shopId:" + shopId + ",发布错误，原因：", e);
@@ -3666,7 +3666,7 @@ public class ShopUrlController {
             shopUrlService.saveReadyDeleteShop(shopId, Integer.valueOf(type), remark);
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新问题店铺标识失败，原因：" + e.getMessage());
             LOG.error("shopId:" + shopId + "，更新问题店铺标识失败，原因：", e);
@@ -3719,7 +3719,7 @@ public class ShopUrlController {
             }
 
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新店铺类型失败，原因：" + e.getMessage());
             LOG.error("shopId:" + shopId + "，更新店铺类型失败，原因：", e);
@@ -3761,7 +3761,7 @@ public class ShopUrlController {
             LOG.info("shopId:" + shopId + "，更新店铺已授权,操作人：" + user.getId() + "@" + user.getAdmName());
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新店铺已授权失败，原因：" + e.getMessage());
             LOG.error("shopId:" + shopId + "，更新店铺已授权失败，原因：", e);
@@ -3796,7 +3796,7 @@ public class ShopUrlController {
             shopUrlService.setShopTranslate(shopId);
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，更新标识失败，原因：" + e.getMessage());
             LOG.error("shopId:" + shopId + "，更新标识失败，原因：", e);
@@ -3830,7 +3830,7 @@ public class ShopUrlController {
             shopUrlService.reDownShopGoods(shopId, user);
             json.setOk(true);
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("shopId:" + shopId + "，设置重新下载失败，原因：" + e.getMessage());
             LOG.error("shopId:" + shopId + "，设置重新下载失败，原因：", e);
