@@ -5417,7 +5417,10 @@ public class OrderwsDao implements IOrderwsDao {
 
                 String runSql = DBHelper.covertToSQL(sql,lstValues);
 
-                SendMQ.sendMsg(new RunSqlModel(runSql));
+                String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+                if(org.apache.commons.lang3.StringUtils.isNotBlank(rsStr)){
+                    row += Integer.parseInt(rsStr);
+                }
 
 //                row = stmt.executeUpdate();
                 sql = "select id,goodsdata_id,goodscatid,car_url from order_details where orderid='" + newOrderid

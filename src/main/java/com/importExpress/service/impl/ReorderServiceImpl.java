@@ -3,18 +3,18 @@ package com.importExpress.service.impl;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.parse.service.ParseGoodsUrl;
 import com.cbt.parse.service.TypeUtils;
+import com.cbt.userinfo.dao.UserMapper;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.StrUtils;
 import com.cbt.warehouse.dao.SpiderMapper;
 import com.cbt.website.bean.GoodsCarActiveBean;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.GoodsCarconfigMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.OrderSplitService;
-import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
-import com.importExpress.utli.RedisModel;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.*;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -48,6 +48,9 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
     private static final Logger logger = LogManager.getLogger(ReorderServiceImpl.class);
     @Autowired
     private SpiderMapper spiderMapper;
+
+    @Autowired
+    private UserMapper userMapper;
     /**
      * @Title: getGoodsInfoByOrderNo
      * @Author: cjc
@@ -59,14 +62,17 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
     @Override
     public List<Map<String, Object>> getGoodsInfoByOrderNo(String orderNo, String goodsId) {
         List<Map<String, Object>> listGoods =new ArrayList<Map<String, Object>>();
-        if(goodsId!=null){
-            String[] goodsIdArr = goodsId.split("#");
-            listGoods = spiderMapper.getGoodsInfoByOrderNo(orderNo,goodsIdArr);
-            return listGoods;
-        }else{
-            listGoods = spiderMapper.getGoodsInfoByOrderNo(orderNo,null);
-            return listGoods;
+        try{
+            if(goodsId!=null){
+                String[] goodsIdArr = goodsId.split("#");
+                listGoods = spiderMapper.getGoodsInfoByOrderNo(orderNo,goodsIdArr);
+            }else{
+                listGoods = spiderMapper.getGoodsInfoByOrderNo(orderNo,null);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+        return listGoods;
     }
     @Override
     public List<Map<String, Object>> getGoodsInfoByUserId(String userid) {
@@ -279,6 +285,7 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                             int number1 = goodsActiveInfo.getNumber();
                             goodsActiveInfo.setFreight(freight);
                             //添加购物车
+                            goodsActiveInfo.setTypes((String)goodMap.get("goods_type"));
                             goodsActiveInfo.setFirstnumber(number1);
                             goodsActiveInfo.setFreeprice((double)goodMap.get("freeprice"));
                             goodsActiveInfo.setNotfreeprice(notFreePrice1);
@@ -310,23 +317,30 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                    // String sql = "update goods_carconfig set shopCarShowinfo = '"+SerializeUtil.ListToJson(list_show).replaceAll("'","") +"', shopCarinfo='"+SerializeUtil.ListToJson(list_active)+"' where userid="+userId;
                     //Added <V1.0.1> Start： cjc 2019/3/22 17:41:01 Description :使用新的数据结构
                     //step v1. @author: cjc @date：2019/3/22 17:44:19   Description : 合并
-                    List<GoodsCarActiveSimplBean> list_goods = activeShowBeanToSimpleBeanAdapter(list_active,list_show);
+
+
+                    // 老版购物车数据
+                    /*List<GoodsCarActiveSimplBean> list_goods = activeShowBeanToSimpleBeanAdapter(list_active,list_show);
                     String GoodsCarActiveSimplBeanJson = SerializeUtil.ListToJson(list_goods);
-                    String sql = "update goods_carconfig set buyForMeCarConfig = '"+GoodsCarActiveSimplBeanJson.replaceAll("'","") +"' where userid="+userId;
+                    String sql = "update goods_carconfig set buyForMeCarConfig = '"
+                            +GoodsCarActiveSimplBeanJson.replaceAll("'","") +"' where userid="+userId;*/
 
                     //End：
 
+                    // 新版 singleBean
+                    List<SimpleCarDataBean> list = changeToSimpleBeanList(list_active);
+
                     try {
 
-                        SendMQ.sendMsg(new RunSqlModel(sql));
+                        // SendMQ.sendMsg(new RunSqlModel(sql));
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    if(listActive_new_1.size()>0){
-                        /**
+                    /*if(listActive_new_1.size()>0){
+                        *//**
                          * 向goods_car表异步插入购物车数据
-                         * */
+                         * *//*
                         List<SpiderNewBean> spidersDB = new ArrayList<SpiderNewBean>();
                         for (int i = 0; i < listActive_new_1.size(); i++) {
                             SpiderNewBean spiderBean = new SpiderNewBean();
@@ -346,7 +360,7 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                         if(i>0 ){
                             message = "success!";
                         }
-                    }
+                    }*/
                 }
             }
         }
@@ -538,6 +552,29 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
         count = goodsCarconfigMapper.updateByExampleSelective(record, example);
         return count;
     }
+
+    private static List<SimpleCarDataBean> changeToSimpleBeanList(List<GoodsCarActiveBean> list_active){
+
+        List<SimpleCarDataBean> list = new ArrayList<>();
+        for(GoodsCarActiveBean  carActiveBean: list_active){
+            SimpleCarDataBean simpleBean = new SimpleCarDataBean();
+            simpleBean.setId(carActiveBean.getItemId());
+            simpleBean.setNum(carActiveBean.getNumber());
+            simpleBean.setRm("");
+            simpleBean.setSct(1);
+            simpleBean.setSt(1);
+            String typeStr = carActiveBean.getTypes();
+            if(StringUtils.isNotBlank(typeStr)){
+                simpleBean.setTp(typeStr);
+            }else{
+                simpleBean.setTp("");
+            }
+
+        }
+        return list;
+    }
+
+
     public static List<GoodsCarActiveSimplBean> activeShowBeanToSimpleBeanAdapter(List<GoodsCarActiveBean> list_active,List<GoodsCarShowBean> list_show){
         List<GoodsCarActiveSimplBean> redisGoodsList = new ArrayList<GoodsCarActiveSimplBean>();
         if(list_active==null||list_show==null) {
@@ -870,5 +907,101 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                 }
             }
             return message;
+    }
+
+    @Override
+    public JsonResult reOrderNew(String orderNo, String userId,List<com.cbt.bean.OrderDetailsBean> odbs) {
+        JsonResult json = new JsonResult();
+        // 验证订单号是否和客户ID一致
+        Map<String, String> userInfo = userMapper.getUserInfoById(Integer.parseInt(userId));
+        if (userInfo == null || userInfo.size() == 0) {
+            json.setOk(false);
+            json.setMessage("获取客户信息失败");
+            return json;
+        }
+        int website = MultiSiteUtil.getSiteTypeNum(orderNo);
+        String userSite = String.valueOf(userInfo.get("site"));
+        if (website == 1 && ("0".equals(userSite) || "1".equals(userSite) || "3".equals(userSite))) {
+            // import的
+        } else if (website == 2 && ("2".equals(userSite) || "3".equals(userSite))) {
+            // kids的
+        } else if (website == 3 && ("4".equals(userSite))) {
+            // pets的
+        } else {
+            json.setOk(false);
+            json.setMessage("订单号网站和客户注册网站不匹配");
+            return json;
+        }
+
+        if (odbs == null || odbs.isEmpty()) {
+            json.setOk(false);
+            json.setMessage("获取订单详情失败");
+            return json;
+        } else {
+            try {
+                List<SimpleCarDataBean> list = new ArrayList<>();
+                for (com.cbt.bean.OrderDetailsBean odBean : odbs) {
+                    SimpleCarDataBean simpleBean = new SimpleCarDataBean();
+                    simpleBean.setId(odBean.getGoods_pid());
+                    simpleBean.setNum(odBean.getYourorder());
+                    simpleBean.setRm("");
+                    simpleBean.setSct(1);
+                    simpleBean.setSt(2);
+                    String typeStr = odBean.getCar_type();
+                    if (StringUtils.isNotBlank(typeStr)) {
+                        // Color:White@32161,Spec:120cm(47 inch | age 6-8T)@324514
+                        StringBuffer sb = new StringBuffer();
+                        String[] arrs = typeStr.split(",");
+                        for (String childStr : arrs) {
+                            if (StringUtils.isNotBlank(childStr)) {
+                                String[] childArr = childStr.split("@");
+                                if (childArr.length == 2) {
+                                    sb.append("@" + childArr[1]);
+                                }
+                            }
+                        }
+
+                        simpleBean.setTp(sb.toString().substring(1));
+                    } else {
+                        simpleBean.setTp("");
+                    }
+                    list.add(simpleBean);
+                }
+
+                String sql;
+                String updateData = list.toString();
+                if (website > 1) {
+                    sql = "update shop_cart_data set shop_car_data_other = '" + updateData + "' where userid = " + userId;
+                } else {
+                    sql = "update shop_cart_data set shop_car_data_import = '" + updateData + "' where userid = " + userId;
+                }
+
+                String intStr = SendMQ.sendMsgByRPC(new RunSqlModel(sql));
+                if (StringUtils.isBlank(intStr)) {
+                    json.setOk(false);
+                    json.setMessage("更新失败");
+                } else {
+                    json.setOk(true);
+                }
+
+                /*JSONObject jsonObject = new JSONObject();
+                jsonObject.put("type", "4");
+                jsonObject.put("userid", userId);
+                System.err.println("activeList:[" + list.size() + "]");
+
+                if (list.size() > 0) {
+                    jsonObject.put("json", com.alibaba.fastjson.JSON.toJSONString(list));
+                    SendMQ.sendMsg(jsonObject, website - 1);
+                } else {
+                    json.setOk(false);
+                    json.setMessage("生成数据失败");
+                }*/
+            } catch (Exception e) {
+                e.printStackTrace();
+                json.setOk(false);
+                json.setMessage("更新失败");
+            }
+        }
+        return json;
     }
 }
