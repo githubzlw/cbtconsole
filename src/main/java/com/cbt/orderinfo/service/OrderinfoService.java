@@ -2095,13 +2095,15 @@ public class OrderinfoService implements IOrderinfoService {
 		result.add(cywMap);
 		// 支付失败的订单
 		List<String> orderNoList = orderinfoMapper.getOrderIds(admuserid);
-        List<Map<String, String>> list = orderinfoMapper.getorderPending(orderNoList);
-        orderNoList.clear();
-        for (Map<String, Integer> bean : result) {
-            if ("order_pending".equals(bean.get("state"))) {
-                bean.put("counts", list==null?0:list.size());
-            }
-        }
+       	if(orderNoList.size() > 0){
+			List<Map<String, String>> list = orderinfoMapper.getorderPending(orderNoList);
+			orderNoList.clear();
+			for (Map<String, Integer> bean : result) {
+				if ("order_pending".equals(bean.get("state"))) {
+					bean.put("counts", list==null?0:list.size());
+				}
+			}
+		}
 		return result;
 	}
 	
