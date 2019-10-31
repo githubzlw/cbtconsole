@@ -145,7 +145,7 @@ public class MultiSiteUtil {
             case 2:
                 return "https://www.kidsproductwholesale.com";
             case 3:
-                return "https://www.lovelypetsupply.com";
+                return "https://www.petstoreinc.com";
             default:
                 return "";
         }
