@@ -3066,7 +3066,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
 	@Override
 	public int addOverseasWarehouseStockOrder(Map<String, Object> map) {
 		
-//		SendMQ.sendMqSql(new RunBatchSqlModel());
+		SendMQ.sendMqSql(new RunBatchSqlModel());
 		
 		return 0;
 	}
@@ -3075,6 +3075,9 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
 	@Override
 	public int shipoutOverseasWarehouseStockOrder(Map<String, Object> map) {
+		
+		
+		
 		
 		return 0;
 	}

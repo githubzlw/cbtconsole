@@ -12,7 +12,9 @@ $(function(){
 		if(!shipno || shipno==''){
 			return ;
 		}
-		$.ajax({
+		$("#in-shipno").attr("disabled","disabled");
+		$(".btn-shipno").hide();
+		/*$.ajax({
 			url:"/cbtconsole/warehouse/shipno.do",
 			data:{
 				"shipno" : shipno,
@@ -29,13 +31,15 @@ $(function(){
 			error:function(e){
 				$.MsgBox.Alert("提示", "添加运单号失败");
 			}
-		})
+		})*/
 		
 	})
 	//出运
 	$(".btn-shipout").click(function(){
 		var shipno = $("#in-shipno").val();
 		if(!shipno || shipno==''){
+			$("#in-shipno").removeAttr("disabled");
+			$(".btn-shipno").show();
 			return ;
 		}
 		$.ajax({
@@ -85,7 +89,7 @@ function clickCheck(){
 	    			  var stock = ows[i];
 	    			  tbhtml += '<tr>';
 	    			  tbhtml += ' <td class="datagrid-userid">'+stock['user_id']+'</td>';
-	    			  tbhtml += '<td class="datagrid-orderno"><a name="${stock.order_no}" onclick="clickStock(this)">'+stock['order_no']+'</a></td>';
+	    			  tbhtml += '<td class="datagrid-orderno"><a name="'+stock['order_no']+'" onclick="clickStock(this)">'+stock['order_no']+'</a></td>';
 	    			  tbhtml += '</tr>';
 	    		  }
 	    		  $(".clear-all-table").html(tbhtml);
@@ -101,7 +105,7 @@ function clickCheck(){
 	    		  $('.info-address-phone').text(owsorder.phoneNumber);
 	    		  $('.info-address-a').text(owsorder.address+owsorder.street);
 	    		  $('.in-shipno').val(owsorder.shipmentno);
-	    		  if(owsorder.shipmentno !=''){
+	    		  if(owsorder.shipmentno && owsorder.shipmentno !=''){
 	    			  $(".btn-shipno").hide();
 	    		  }
 	    	  }else{

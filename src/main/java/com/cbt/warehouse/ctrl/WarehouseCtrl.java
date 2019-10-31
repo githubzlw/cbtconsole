@@ -8431,9 +8431,8 @@ public class WarehouseCtrl {
 								+ map.get("orderid").toString()
 								+ "','"
 								+ map.get("remarks").toString()
-								+ "','"
-								+ map.get("createtime").toString()
-								+ "','"
+								+ "',now()"
+								+ ",'"
 								+ map.get("weight").toString()
 								+ "','"
 								+ map.get("svolume").toString()
@@ -8456,7 +8455,7 @@ public class WarehouseCtrl {
 					sql.append("insert into shipping_package(orderid,remarks,createtime,sweight,svolume,volumeweight ,sflag ,transportcompany ,expressno, estimatefreight  ,flag) values ");
 					for(int i=0;i<bgList.size();i++){
 						Map<String, Object> map=bgList.get(i);
-						sql.append("('"+map.get("orderid")+"','"+map.get("remarks")+"','"+map.get("createtime")+"','"+map.get("weight")+"','"+map.get("svolume")+"','"+map.get("volumeweight")+"',3,'"+map.get("transport")+"','"+map.get("expressno")+"','"+map.get("estimatefreight")+"',1),");
+						sql.append("('"+map.get("orderid")+"','"+map.get("remarks")+"',now()"+",'"+map.get("weight")+"','"+map.get("svolume")+"','"+map.get("volumeweight")+"',3,'"+map.get("transport")+"','"+map.get("expressno")+"','"+map.get("estimatefreight")+"',1),");
 					}
 					SendMQ.sendMsg(new RunSqlModel(sql.toString().substring(0,sql.toString().length()-1)));
 
@@ -9469,7 +9468,7 @@ public class WarehouseCtrl {
 	 */
 	@RequestMapping(value = "/owsorder",method=RequestMethod.POST)
 	@ResponseBody
-	public Map<String,Object> OverseaWarehouseStockOrder(HttpServletRequest request,HttpServletResponse response) {
+	public Map<String,Object> owsOrder(HttpServletRequest request,HttpServletResponse response) {
 		Map<String,Object> result = Maps.newHashMap();
 		try {
 			String useridOrOrderno = request.getParameter("useridOrOrderno");
@@ -9507,7 +9506,7 @@ public class WarehouseCtrl {
 	 */
 	@RequestMapping(value = "shipno.do", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String,Object> OverseaWarehouseStockOrderShipno(HttpServletRequest request,HttpServletResponse response) {
+	public Map<String,Object> owsOrderShipno(HttpServletRequest request,HttpServletResponse response) {
 		Map<String,Object> result = Maps.newHashMap();
 		String orderno = request.getParameter("orderno");
 		String shipno = request.getParameter("shipno");
@@ -9517,11 +9516,9 @@ public class WarehouseCtrl {
 		int owsAdd = iWarehouseService.addOverseasWarehouseStockOrder(map );
 		if(owsAdd > 0) {
 			result.put("status", 200);
-			
 		}else {
 			result.put("status", 101);
 			result.put("message", "添加运单号出现错误");
-			
 		}
 		return result;
 	}
