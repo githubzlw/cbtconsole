@@ -433,22 +433,26 @@ public class InventoryController {
 	protected ModelAndView inventoryInfo(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
 		ModelAndView mv = new ModelAndView("inventoryReport");
-		Map<Object, Object> map = getObjectByInventory(request,false);
-		int toryListCount = inventoryService.getIinOutInventoryCount(map);
-		if(toryListCount > 0) {
-			InventoryCheck lastInventoryCheck = inventoryService.getLastInventoryCheck();
-			if(lastInventoryCheck != null) {
-				mv.addObject("lastCheckTime", lastInventoryCheck.getCheckTime());
+		try {
+			Map<Object, Object> map = getObjectByInventory(request,false);
+			int toryListCount = inventoryService.getIinOutInventoryCount(map);
+			if(toryListCount > 0) {
+				InventoryCheck lastInventoryCheck = inventoryService.getLastInventoryCheck();
+				if(lastInventoryCheck != null) {
+					mv.addObject("lastCheckTime", lastInventoryCheck.getCheckTime());
+				}
+				List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
+				mv.addObject("toryList", toryList);
 			}
-			List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
-			mv.addObject("toryList", toryList);
+			mv.addObject("toryListCount", toryListCount);
+			
+			int toryListPage = toryListCount % 20 == 0 ? toryListCount / 20 : toryListCount / 20 + 1;
+			mv.addObject("toryListPage", toryListPage);
+			mv.addObject("page", map.get("current_page"));
+			mv.addObject("queryParam",map);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		mv.addObject("toryListCount", toryListCount);
-		
-		int toryListPage = toryListCount % 20 == 0 ? toryListCount / 20 : toryListCount / 20 + 1;
-		mv.addObject("toryListPage", toryListPage);
-		mv.addObject("page", map.get("current_page"));
-		mv.addObject("queryParam",map);
 //		//是否有待操作的移库请求，只有处理完才可以盘点
 //		int unDoneInventoryBarcode = inventoryService.getUnDoneInventoryBarcode();
 //		mv.addObject("isBarcodeDone",unDoneInventoryBarcode);
@@ -1196,29 +1200,33 @@ public class InventoryController {
 			return mv;
 		}
 		ModelAndView mv = new ModelAndView("inventorycheck");
-		Map<Object, Object> map = getObjectByInventory(request,true);
-		int checkListCount = inventoryService.getIinOutInventoryCount(map);
-		if(checkListCount == 0) {
-			return mv;
-		}
-		List<InventoryCheckWrap> invetoryCheckList = inventoryService.invetoryCheckList(map);
-		
-		mv.addObject("checkList", invetoryCheckList);
-		mv.addObject("checkListCount", checkListCount);
-		int toryListPage = checkListCount % 20 == 0 ? checkListCount / 20 : checkListCount / 20 + 1;
-		mv.addObject("toryListPage", toryListPage);
-		
-		if(Integer.parseInt(StrUtils.object2NumStr(map.get("check_id"))) == 0) {
-			List<InventoryCheck> unDoneInventoryCheck = inventoryService.getUnDoneInventoryCheck();
-			map.put("check_id", 
-					unDoneInventoryCheck==null || unDoneInventoryCheck.isEmpty() ? 0 : unDoneInventoryCheck.get(0).getId());
+		try {
+			Map<Object, Object> map = getObjectByInventory(request,true);
+			int checkListCount = inventoryService.getIinOutInventoryCount(map);
+			if(checkListCount == 0) {
+				return mv;
+			}
+			List<InventoryCheckWrap> invetoryCheckList = inventoryService.invetoryCheckList(map);
 			
+			mv.addObject("checkList", invetoryCheckList);
+			mv.addObject("checkListCount", checkListCount);
+			int toryListPage = checkListCount % 20 == 0 ? checkListCount / 20 : checkListCount / 20 + 1;
+			mv.addObject("toryListPage", toryListPage);
+			
+			if(Integer.parseInt(StrUtils.object2NumStr(map.get("check_id"))) == 0) {
+				List<InventoryCheck> unDoneInventoryCheck = inventoryService.getUnDoneInventoryCheck();
+				map.put("check_id", 
+						unDoneInventoryCheck==null || unDoneInventoryCheck.isEmpty() ? 0 : unDoneInventoryCheck.get(0).getId());
+				
+			}
+			mv.addObject("queryParam",map);
+			
+			//是否有待操作的移库请求，只有处理完才可以盘点
+			int unDoneInventoryBarcode = inventoryService.getUnDoneInventoryBarcode();
+			mv.addObject("isBarcodeDone",unDoneInventoryBarcode);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		mv.addObject("queryParam",map);
-		
-		//是否有待操作的移库请求，只有处理完才可以盘点
-		int unDoneInventoryBarcode = inventoryService.getUnDoneInventoryBarcode();
-		mv.addObject("isBarcodeDone",unDoneInventoryBarcode);
 		
 		return mv;
 		
@@ -1472,31 +1480,36 @@ public class InventoryController {
 	@RequestMapping("/check/info")
 	public ModelAndView checkInfo(HttpServletRequest request, HttpServletResponse response) {
 		ModelAndView mv = new ModelAndView("inventorycheckinfo");
-		String strInid = request.getParameter("inid");
-		strInid = StrUtils.isNum(strInid) ? strInid : "0";
-		
-		String strPage = request.getParameter("page");
-		strPage = StrUtils.isNum(strPage) ? strPage : "1";
-		
-		int page = (Integer.parseInt(strPage) - 1) * 50;
-		String goods_pid = request.getParameter("goods_pid");
-		goods_pid = StringUtil.isBlank(goods_pid) ? null : goods_pid;
-		
-		int inid = Integer.valueOf(strInid);
-		int icrHistoryCount = 0,totalPage = 0;
-		if(inid > 0) {
-			icrHistoryCount = inventoryService.getICRHistoryCount(inid,goods_pid);
-			if(icrHistoryCount > 0) {
-				List<InventoryCheckRecord> icrHistory = inventoryService.getICRHistory(inid,page,goods_pid);
-				mv.addObject("icrHistory", icrHistory);
-				totalPage = icrHistoryCount % 50 == 0 ? icrHistoryCount / 50 : icrHistoryCount / 50 + 1;
+		try {
+			String strInid = request.getParameter("inid");
+			strInid = StrUtils.isNum(strInid) ? strInid : "0";
+			
+			String strPage = request.getParameter("page");
+			strPage = StrUtils.isNum(strPage) ? strPage : "1";
+			
+			int page = (Integer.parseInt(strPage) - 1) * 50;
+			String goods_pid = request.getParameter("goods_pid");
+			goods_pid = StringUtil.isBlank(goods_pid) ? null : goods_pid;
+			
+			int inid = Integer.valueOf(strInid);
+			int icrHistoryCount = 0,totalPage = 0;
+			if(inid > 0) {
+				icrHistoryCount = inventoryService.getICRHistoryCount(inid,goods_pid);
+				if(icrHistoryCount > 0) {
+					List<InventoryCheckRecord> icrHistory = inventoryService.getICRHistory(inid,page,goods_pid);
+					mv.addObject("icrHistory", icrHistory);
+					totalPage = icrHistoryCount % 50 == 0 ? icrHistoryCount / 50 : icrHistoryCount / 50 + 1;
+				}
 			}
+			mv.addObject("currentPage", Integer.parseInt(strPage));
+			
+			mv.addObject("inid", inid);
+			mv.addObject("totalPage", totalPage);
+			mv.addObject("totalCount", icrHistoryCount);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		mv.addObject("currentPage", Integer.parseInt(strPage));
-		
-		mv.addObject("inid", inid);
-		mv.addObject("totalPage", totalPage);
-		mv.addObject("totalCount", icrHistoryCount);
 		return mv;
 	}
 	

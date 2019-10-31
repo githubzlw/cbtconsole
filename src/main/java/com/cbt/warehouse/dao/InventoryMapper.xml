@@ -603,7 +603,7 @@
     <!-- 获取盘点历史数据 -->
     <select id="getICRHistory" resultMap="InventoryCheckRecordMap">
     select iscr.id,iscr.inventory_check_id,iscr.inventory_sku_id,iscr.goods_pid,iscr.goods_sku,
-    iscr.goods_specid,iscr.goods_skuid,iscr.goods_price,iscr.inventory_remaining,iscr.goods_name
+    iscr.goods_specid,iscr.goods_skuid,iscr.goods_price,iscr.inventory_remaining,iscr.goods_name,
     iscr.check_remaining,iscr.create_time,iscr.before_barcode,iscr.after_barcode,isk.car_img as goods_img
     
     from inventory_sku_check_record iscr
