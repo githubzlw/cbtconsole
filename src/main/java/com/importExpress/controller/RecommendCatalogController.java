@@ -205,6 +205,7 @@ public class RecommendCatalogController {
 			}else {
 				addCatelog = recommendCatalogService.addCatelog(catalog);
 			}
+			Redis.hdel(redisKey);
 			if(addCatelog < 1) {
 				result.put("status", 102);
 				result.put("message", "生成目录失败！！！");
@@ -212,7 +213,6 @@ public class RecommendCatalogController {
 			}
 			result.put("status", 200);
 			result.put("addCatelog", addCatelog);
-			Redis.hdel(redisKey);
 		} catch (Exception e) {
 			result.put("status", 105);
 			result.put("message", "生成目录失败:"+e.getMessage());
