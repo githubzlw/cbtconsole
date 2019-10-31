@@ -4,19 +4,11 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 import com.cbt.warehouse.pojo.OrderDetailsBeans;
 import com.cbt.warehouse.pojo.SampleOrderBean;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -2094,14 +2086,16 @@ public class OrderinfoService implements IOrderinfoService {
 		cywMap.put("counts", waring0);
 		result.add(cywMap);
 		// 支付失败的订单
-		List<String> orderNoList = orderinfoMapper.getOrderIds(admuserid);
-        List<Map<String, String>> list = orderinfoMapper.getorderPending(orderNoList);
-        orderNoList.clear();
-        for (Map<String, Integer> bean : result) {
-            if ("order_pending".equals(bean.get("state"))) {
-                bean.put("counts", list==null?0:list.size());
-            }
-        }
+		List<String> orderNoList = orderinfoMapper.getOrderIds(18);
+       	if(CollectionUtils.isNotEmpty(orderNoList)){
+			List<Map<String, String>> list = orderinfoMapper.getorderPending(orderNoList);
+			orderNoList.clear();
+			for (Map<String, Integer> bean : result) {
+				if ("order_pending".equals(bean.get("state"))) {
+					bean.put("counts", list==null?0:list.size());
+				}
+			}
+		}
 		return result;
 	}
 	
