@@ -1546,7 +1546,7 @@
     <select id="getOverseasWarehouseStockOrder" resultType="java.util.Map">
     select user_id,order_no from orderinfo  where 1=1
     <if test="ordernoOrUserid!=null">and (order_no=#{ordernoOrUserid} or user_id=#{ordernoOrUserid})</if>
-    and order_no like '%_H%
+    and order_no like '%_H%'
     and state=2
     </select>
     <select id="getOverseasWarehouseStockOrderDetail" resultType="java.util.Map">

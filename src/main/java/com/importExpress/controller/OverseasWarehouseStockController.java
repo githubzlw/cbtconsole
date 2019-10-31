@@ -70,6 +70,7 @@ public class OverseasWarehouseStockController {
 			mv.addObject("stockListCount", stockListCount);
 			int stockListPage = stockListCount % 20 == 0 ? stockListCount / 20 : stockListCount / 20 + 1;
 			mv.addObject("stockListPage", stockListPage);
+			mv.addObject("currentpage", page);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -117,6 +118,7 @@ public class OverseasWarehouseStockController {
 			mv.addObject("stockLogListCount", stockLogListCount);
 			int stockLogListPage = stockLogListCount % 20 == 0 ? stockLogListCount / 20 : stockLogListCount / 20 + 1;
 			mv.addObject("stockLogListPage", stockLogListPage);
+			mv.addObject("currentpage", page);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -83,8 +83,8 @@
 				</tbody>
 			</table>
 				<div>
-				<span>当前页 :${stockParamter.page } / ${stockListPage},总共 ${stockListCount }条数据,跳转</span>
-				<input type="text" class="form-control btn_page_in" id="current_page" value="${stockParamter.page }">
+				<span>当前页 :${currentpage } / ${stockListPage},总共 ${stockListCount }条数据,跳转</span>
+				<input type="text" class="form-control btn_page_in" id="current_page" value="${currentpage}">
 				<button class="btn btn-info btn_page_qu">查询</button>
 				<button class="btn btn-info btn_page_up">上一页</button>
 				<button class="btn btn-info btn_page_down">下一页</button>
