@@ -1453,6 +1453,11 @@
         select pid from custom_pid_describe_log
     </select>
 
+    <select id="getGoodsByPid" resultType="java.util.HashMap">
+
+    select  pid,sku,entype from custom_benchmark_ready where pid=#{pid} limit 1
+    </select>
+
     <insert id="insertIntoGoodsOverSeaInfo" parameterType="com.importExpress.pojo.GoodsOverSea">
         insert into custom_goods_oversea(pid,country_id,admin_id,is_support)
         values(#{pid},#{countryId},#{adminId},#{isSupport})

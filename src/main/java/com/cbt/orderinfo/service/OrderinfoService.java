@@ -447,8 +447,10 @@ public class OrderinfoService implements IOrderinfoService {
 				adminid=Integer.valueOf(admin);
 			}
 			if ("1".equals(checked)) {
+				//验货
 				resultList=orderinfoMapper.getOrderDataOne(shipno);
 			}else{
+				//入库
 				resultList=orderinfoMapper.getOrderData(shipno,adminid);
 			}
 			Set set=new HashSet();
@@ -2232,6 +2234,15 @@ public class OrderinfoService implements IOrderinfoService {
 			}
 		}
 		return result;
+	}
+
+
+
+
+	@Override
+	public Map<String, Object> getOverseasWarehouseStockOrderDetail(String orderno, int userid) {
+		
+		return orderinfoMapper.getOverseasWarehouseStockOrderDetail(orderno, userid);
 	}
 }
 

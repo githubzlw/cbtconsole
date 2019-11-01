@@ -118,10 +118,73 @@
         update user set follow_code = #{followCode} where id = #{userId}
     </update>
 
+    <select id="queryAllInfoById" resultType="com.cbt.website.bean.UserInfo">
+        select a.id,a.email,DATE_FORMAT(a.createtime,'%Y-%m-%d %H:%i:%S') as creattime,b.businessinfo,
+        b.productone,b.producttwo,b.requirementone,b.requirementtwo
+        from user a left join user_regist_info b on a.id  = b.userid where a.id = #{userId} limit 1
+    </select>
+
+    <select id="queryRecommendEmailInfo" resultType="com.importExpress.pojo.UserRecommendEmail">
+        select a.id,a.user_id as userId,a.email_content as emailContent,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,a.send_url as sendUrl,
+        a.admin_id as adminId,b.admName as adminName
+        from user_recommend_email a,admuser b where a.admin_id = b.id and a.user_id = #{userId}
+    </select>
+
+    <insert id="insertIntoUserRecommendEmail" parameterType="com.importExpress.pojo.UserRecommendEmail">
+        insert into user_recommend_email(user_id,email_content,send_url,admin_id)
+        values(#{userId},#{emailContent},#{sendUrl},#{adminId})
+    </insert>
 
     <select id="getUserInfoById" resultType="hashmap">
         select * from user where id = #{id}
     </select>
 
+    <select id="queryBusinessMembershipAuthorization" parameterType="com.cbt.website.bean.UserInfo"
+            resultType="com.cbt.website.bean.UserInfo">
+        select a.id as userid,a.email,DATE_FORMAT(a.createtime,'%Y-%m-%d %H:%i:%S') as creattime,b.businessinfo, d.country as zone,
+        b.productone,b.producttwo,b.requirementone,b.requirementtwo, ifnull(c.flag,0) as authFlag,a.site,
+        CAST(ifnull((select sum(googs_price * googs_number) from shop_car_marketing where userid =  a.id ),0) AS DECIMAL(11, 2)) as shopCarAmount,
+        CAST((select ifnull(sum(pay_price),0) from orderinfo where user_id = a.id and state in(1,2,3,4,5)) AS DECIMAL(11, 2)) as historyAmount,
+        DATE_FORMAT(b.application_time,'%Y-%m-%d %H:%i:%S') as applicationTime
+        from user a inner join user_regist_info b on a.id  = b.userid left join user_checkout c on a.id = c.id
+        left join zone d on a.countryId = d.id
+        where 1=1
+        <if test="userid > 0">
+            and a.id = #{userid}
+        </if>
+        <if test="email != null">
+            and a.email = #{email}
+        </if>
+        <if test="countryId != null and countryId > 0">
+            and a.countryId = #{countryId}
+        </if>
+        <if test="authFlag != null and authFlag > -1">
+            and c.flag = #{authFlag}
+        </if>
+        order by b.application_time desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryBusinessMembershipAuthorizationCount" parameterType="com.cbt.website.bean.UserInfo" resultType="int">
+        select count(0) from user a inner join user_regist_info b on a.id  = b.userid
+        left join user_checkout c on a.id = c.id
+        left join zone d on a.countryId = d.id
+        where 1=1
+        <if test="userid > 0">
+            and a.id = #{userid}
+        </if>
+        <if test="email != null">
+            and a.email = #{email}
+        </if>
+        <if test="countryId != null and countryId > 0">
+            and a.countryId = #{countryId}
+        </if>
+        <if test="authFlag != null and authFlag > -1">
+            and c.flag = #{authFlag}
+        </if>
+    </select>
 
 </mapper>
