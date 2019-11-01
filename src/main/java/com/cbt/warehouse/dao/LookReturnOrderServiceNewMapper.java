@@ -15,10 +15,10 @@ import com.cbt.warehouse.pojo.returndisplay;
 public interface LookReturnOrderServiceNewMapper {
 
 	int selectCount(@Param("nameString")String nameString, @Param("state")String state,
-			@Param("a1688Shipno")String a1688Shipno, @Param("optTimeStart")String optTimeStart, @Param("optTimeEnd")String optTimeEnd,@Param("page")int page,@Param("userOther")String userOther,@Param("user")String user,@Param("a1688order")String a1688order);
+			@Param("a1688Shipno")String a1688Shipno, @Param("optTimeStart")String optTimeStart, @Param("optTimeEnd")String optTimeEnd,@Param("page")int page,@Param("userOther")String userOther,@Param("user")String user,@Param("a1688order")String a1688order,@Param("pid")String pid);
 
 	List<returndisplay> FindReturndisplay(@Param("nameString")String nameString, @Param("state")String state,
-			@Param("a1688Shipno")String a1688Shipno, @Param("optTimeStart")String optTimeStart, @Param("optTimeEnd")String optTimeEnd,@Param("page")int page,@Param("userOther")String userOther,@Param("user")String user,@Param("a1688order")String a1688order);
+			@Param("a1688Shipno")String a1688Shipno, @Param("optTimeStart")String optTimeStart, @Param("optTimeEnd")String optTimeEnd,@Param("page")int page,@Param("userOther")String userOther,@Param("user")String user,@Param("a1688order")String a1688order,@Param("pid")String pid);
 
 	@Update("UPDATE return_display SET State=0,returntime=NOW(),actual_money=#{money} WHERE id=#{ship} ")
 	Boolean UpdaeReturnOrder(@Param("ship")String ship,@Param("money") double money);
