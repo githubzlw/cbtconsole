@@ -181,7 +181,8 @@
                 "userId": userId,
                 "email": email,
                 "countryId": countryId,
-                "authFlag": authFlag
+                "authFlag": authFlag,
+                "site": 1
             };
             if (flag > 0) {
                 $("#user_easyui-datagrid").datagrid("load", param);
@@ -196,6 +197,14 @@
             content += '<br><span>邮箱:' + row.email + '</span>';
             content += '<br><span>国家:' + row.zone + '</span>';
             content += '<br><span>注册时间:' + row.creattime + '</span>';
+            if(row.site == 0 || row.site == 1){
+                content += '<br><span>网站:Import</span>';
+            }else if(row.site == 2 || row.site == 3){
+                content += '<br><span>网站:KIDS</span>';
+            }else if(row.site == 4){
+                content += '<br><span>网站:PETS</span>';
+            }
+            content += '<br><span>销售:' + row.admuser + '</span>';
             return content;
         }
 
