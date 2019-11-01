@@ -251,7 +251,7 @@ public class InsertMessageNotification {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("insertTreasuryNoteFor error :", e);
 		}
 		return row;
@@ -307,7 +307,7 @@ public class InsertMessageNotification {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("insertTreasuryNote error:", e);
 		}
 

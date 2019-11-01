@@ -1452,9 +1452,21 @@
     <select id="queryDescribeLogList" resultType="string">
         select pid from custom_pid_describe_log
     </select>
-     <select id="getGoodsByPid" resultType="java.util.HashMap">
-    
+
+    <select id="getGoodsByPid" resultType="java.util.HashMap">
+
     select  pid,sku,entype from custom_benchmark_ready where pid=#{pid} limit 1
     </select>
-    
+
+    <insert id="insertIntoGoodsOverSeaInfo" parameterType="com.importExpress.pojo.GoodsOverSea">
+        insert into custom_goods_oversea(pid,country_id,admin_id,is_support)
+        values(#{pid},#{countryId},#{adminId},#{isSupport})
+    </insert>
+
+    <select id="queryGoodsOverSeaInfoByPid" resultType="com.importExpress.pojo.GoodsOverSea">
+        select a.id,a.pid,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,a.is_support as isSupport,
+        a.pid ,b.admName as adminName,a.country_id as countryId,c.country as countryName
+        from custom_goods_oversea a left join admuser b on a.admin_id = b.id  left join zone c on c.id = a.country_id
+        where a.pid = #{pid}
+    </select>
 </mapper>

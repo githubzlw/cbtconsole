@@ -120,7 +120,7 @@ public class UpdateOrderStateServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             LOG.error("更新线上orderinfo订单信息失败," + "订单号:" + orderid, e);
             // jxw 2017-4-24 插入失败，插入信息放入失败记录表中
             String sqlStr = "update orderinfo set state ='" + state + "' where order_no = '" + orderid + "';";

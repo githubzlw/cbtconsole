@@ -265,7 +265,7 @@ public class GroupBuyManageCtrl {
                 json.setData(goods);
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("获取1688商品信息失败，原因：" + e.getMessage());
             LOG.error("获取1688商品信息失败，原因：" + e.getMessage());

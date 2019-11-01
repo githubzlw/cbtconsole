@@ -35,7 +35,7 @@ public class UniqueIdUtil {
 				uniqueId = rs.getInt(1);
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("获取数据失败,原因:", e);
 		} finally {
 			DBHelper.getInstance().closeConnection(conn);
@@ -74,7 +74,7 @@ public class UniqueIdUtil {
 				uniqueId = rs.getInt(1);
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("获取数据失败,原因:", e);
 		} finally {
 			DBHelper.getInstance().closeConnection(conn);

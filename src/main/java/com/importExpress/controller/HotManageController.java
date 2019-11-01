@@ -1096,7 +1096,7 @@ public class HotManageController {
             json.setOk(true);
             json.setMessage("执行成功");
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("更新热卖商品热销标识失败，原因：" + e.getMessage());
             LOG.error("更新热卖商品热销标识失败，原因：" + e.getMessage());
@@ -1107,14 +1107,19 @@ public class HotManageController {
 
     @RequestMapping("/getHotTypeList")
     @ResponseBody
-    public EasyUiJsonResult getHotTypeList(HttpServletRequest request, HttpServletResponse response) {
+    public EasyUiJsonResult getHotTypeList(Integer hotType) {
 
         EasyUiJsonResult json = new EasyUiJsonResult();
+        if(hotType == null || hotType< 0){
+            json.setSuccess(false);
+            json.setMessage("获取类别失败");
+            return json;
+        }
 
         HotCategory param = new HotCategory();
         try {
 
-            param.setHotType(24);
+            param.setHotType(hotType);
             param.setIsOn(-1);
 
             List<HotCategory> res = hotManageService.queryForList(param);

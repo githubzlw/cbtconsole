@@ -130,6 +130,9 @@ function fn(va) {
         if(paytype == 4){
             showImg += "<span class='spiconbl'>支付pending</span>";
         }
+        if(json[i].order_no.indexOf("_H") > -1){
+        	showImg += "<span class='spiconbl'>海外仓订单</span>";
+		}
 		//Added <V1.0.1> Start： cjc 2018/10/13 15:41 TODO 如果有申诉确保可以连接到申诉页面
 		////cbtconsole/complain/searchComplainByParam?userid=24940&creatTime=&complainState=-1&username=&toPage=1&currentPage=1
 		//End：
@@ -202,7 +205,12 @@ function fn(va) {
 		if(json[i].mode_transport != null){
 			delaytime = json[i].mode_transport.split('@')[1];
 		}
-		$("#table tr:eq(" + row + ") td:eq(7)").after("<td style='text-align:center;vertical-align:middle;'>"+ (json[i].delivery_time == null || json[i].delivery_time == ''?"-":json[i].delivery_time) + "</td>");//国内准备时间
+		if(json[i].order_no.indexOf("_H") > -1){
+			$("#table tr:eq(" + row + ") td:eq(7)").after("<td style='text-align:center;vertical-align:middle;'>0</td>");//国内准备时间
+		}else{
+			$("#table tr:eq(" + row + ") td:eq(7)").after("<td style='text-align:center;vertical-align:middle;'>"+ (json[i].delivery_time == null || json[i].delivery_time == ''?"-":json[i].delivery_time) + "</td>");//国内准备时间
+		}
+
 		$("#table tr:eq(" + row + ") td:eq(8)").after("<td style='text-align:center;vertical-align:middle;'>"+ (delaytime == null || delaytime == ''?"-":delaytime) + "</td>");
 		//产品金额
 		$("#table tr:eq(" + row + ") td:eq(9)").after("<td>" + (json[i].product_cost == null || json[i].product_cost ==''?"0":json[i].product_cost)+ "&nbsp;" + json[i].currency+ "</td>");

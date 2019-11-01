@@ -640,7 +640,7 @@ public class ProductEditorController {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("保存错误，原因：" + e.getMessage());
 			LOG.error("保存错误，原因：" + e.getMessage());
@@ -1151,7 +1151,7 @@ public class ProductEditorController {
 				}
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("执行错误：" + e.getMessage());
 			LOG.error("执行错误：" + e.getMessage());
@@ -1218,7 +1218,7 @@ public class ProductEditorController {
 				}	
 			}			
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("执行错误：" + e.getMessage());
 			LOG.error("执行错误：" + e.getMessage());

@@ -128,7 +128,7 @@ public class NewOrderSplitCtr {
                 } else {
                     // 正常拆单流程
                     // json = splitCommonOrder(orderno, odids, state);
-                    json = newSplitCommonOrder(admuser, orderno, odids, state);
+                    json = newSplitCommonOrder(admuser, orderno, odids, state, 0);
                 }
 
             }
@@ -240,7 +240,7 @@ public class NewOrderSplitCtr {
                 if (nwOrderDetails.size() > 0) {
                     // 生成另一个采购中订单
                     // 修改已有货源订单详情的订单号
-                    nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0);
+                    nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0, 0);
 
                     // 开始执行拆单
                     boolean isOk = true;
@@ -306,7 +306,7 @@ public class NewOrderSplitCtr {
     }
 
     @SuppressWarnings("finally")
-    private JsonResult newSplitCommonOrder(Admuser admuser, String orderNo, String odids, String state) {
+    private JsonResult newSplitCommonOrder(Admuser admuser, String orderNo, String odids, String state, int isOverSea) {
 
         // 1.订单拆单前，做数据保存信息
         // 2.复制订单信息充当临时订单
@@ -328,7 +328,7 @@ public class NewOrderSplitCtr {
                 return json;
             }
             // 获取新的订单号
-            nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0);
+            nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0, isOverSea);
             // 需要取消的商品order_details的id
             String[] odidLst = odids.split("@");
             // 1.拆单之前保存订单原始信息 log
@@ -646,7 +646,7 @@ public class NewOrderSplitCtr {
             // 2.新的订单数据
             // 复制订单信息充当临时订单
             OrderBean orderBeanTemp = (OrderBean) orderBean.clone();
-            String newOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 1);
+            String newOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 1, 0);
             OrderBean newOrderBean = OrderInfoUtil.genNewOrderInfo(orderBean, orderBeanTemp, splitRatio, newOrderNo,
                     oldTotalGoodsCost, nwOrderDetails);
 
@@ -677,6 +677,50 @@ public class NewOrderSplitCtr {
         }
         return json;
     }
+
+
+    @RequestMapping(value = "/splitGoodsByOverSea")
+    @ResponseBody
+    public JsonResult splitGoodsByOverSea(HttpServletRequest request) {
+        JsonResult json = new JsonResult();
+        String orderNo = request.getParameter("orderNo");
+        String odIds = request.getParameter("odIds");
+        try {
+
+            if (StringUtils.isBlank(orderNo) || StringUtils.isBlank(odIds)) {
+                json.setOk(false);
+                json.setMessage("获取拆单数据失败");
+                return json;
+            }
+
+            Admuser admuser = UserInfoUtils.getUserInfo(request);
+            if (admuser == null || admuser.getId() == 0) {
+                json.setOk(false);
+                json.setMessage("请登录后操作");
+                return json;
+            }
+
+            // 判断是否是Drop Ship订单，根据订单号获取订单信息
+            IOrderSplitDao splitDao = new OrderSplitDaoImpl();
+            OrderBean orderBean = splitDao.getOrders(orderNo);
+            if (orderBean.getIsDropshipOrder() == 1) {
+                // Drop Ship 拆单，不可数量拆单
+                json.setOk(false);
+                json.setMessage("DropShip订单，不能数量拆单");
+                return json;
+            }
+
+            json = newSplitCommonOrder(admuser, orderNo,  odIds, "1", 1);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("splitGoodsByNum error:", e);
+            json.setOk(false);
+            json.setMessage("orderNo:" + orderNo + ",splitGoodsByNum error:" + e.getMessage());
+        }
+        return json;
+    }
+
 
 
     /**

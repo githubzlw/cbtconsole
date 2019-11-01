@@ -297,7 +297,7 @@ public class OrderSplitServer implements IOrderSplitServer{
 		//生成另一个采购中订单
 		//修改已有货源订单详情的订单号
 		String orderNew = null ;
-		orderNew = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0);
+		orderNew = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0, 0);
 
 		int isPurchase = 0;
 		//拆完后原订单数量和入库数量相等，则将原订单信息改为入库，

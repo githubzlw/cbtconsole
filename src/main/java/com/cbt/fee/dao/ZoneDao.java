@@ -29,7 +29,7 @@ public class ZoneDao implements IZoneDao {
 	@Override
 	public List<ZoneBean> getAllZone() {
 		// TODO Auto-generated method stub
-		String sql = "select * from zone where id not in(43,42)  order by country asc";
+		String sql = "select * from zone where id not in(43,42) and del != 1 order by country asc";
 		Connection conn = DBHelper.getInstance().getConnection();
 		ResultSet rs  = null;
 		PreparedStatement stmt = null;
