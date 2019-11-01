@@ -15,7 +15,7 @@ public enum WebSiteEnum {
     /**
      * PETS网站
      */
-    PETS(3,"https://www.lovelypetsupply.com"),
+    PETS(3,"https://www.petstoreinc.com"),
     /**
      * RESTAURANT网站
      */

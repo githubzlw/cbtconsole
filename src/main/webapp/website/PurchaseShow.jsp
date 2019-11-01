@@ -3005,7 +3005,7 @@
                             <select name="websiteType" style="height: 28px;width: 160px;display: none;">
                                 <option value="1" <c:if test="${websiteType == 1}">selected="selected"</c:if>>import-express</option>
                                 <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidsproductwholesale</option>
-                                <option value="3" <c:if test="${websiteType == 3}">selected="selected"</c:if>>lovelypetsupply</option>
+                                <option value="3" <c:if test="${websiteType == 3}">selected="selected"</c:if>>petstoreinc</option>
                             </select>
                             操作/状态
 							<br><input type="button" id="allQr1" style="color: green;" onclick="allQr('${pb.orderNo}')" value="一键确认货源" /><input type="button" id="allcgQr1" style="color: green;" onclick="allcgQr('${pb.orderNo}', this)" value="一键确认采购" /><br/><br/><input type="button" id="allQr2" style="color: red;" onclick="allQxQr('${pb.orderNo}')" value="一键取消货源" /><input type="button" id="allcgQr2" style="color: red;" onclick="allQxcgQr('${pb.orderNo}')" value="一键取消采购" /></td>
@@ -3400,7 +3400,7 @@
                                 <select name="websiteType" style="height: 28px;width: 160px;display: none;">
                                     <option value="1" <c:if test="${websiteType == 1}">selected="selected"</c:if>>import-express</option>
                                     <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidsproductwholesale</option>
-                                    <option value="3" <c:if test="${websiteType == 3}">selected="selected"</c:if>>lovelypetsupply</option>
+                                    <option value="3" <c:if test="${websiteType == 3}">selected="selected"</c:if>>petstoreinc</option>
                                 </select>
                             </div>
 							<div id="clickdiv_${pb.orderNo}" onclick="FnComfirm('${pb.userid}','${pb.orderNo}','${pb.od_id}','${pb.goodsid}','${pb.goodsdata_id}','${pb.goods_url}','','${pb.goods_price}','${pb.googs_number}','${pb.purchaseCount}','${pb.child_order_no}','${pb.isDropshipOrder}', this);" style="width: 100%;">
