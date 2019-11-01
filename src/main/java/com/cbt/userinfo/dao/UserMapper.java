@@ -72,6 +72,8 @@ public interface UserMapper {
 
     int updateUserFollowCode(@Param("followCode") String followCode,@Param("userId") int userId);
 
+    Map<String,String> getUserInfoById(@Param("id") int id);
+
 	/**
 	 * 查询用户所有信息
 	 * @param userId

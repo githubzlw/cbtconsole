@@ -1,20 +1,59 @@
 package com.cbt.warehouse.service;
 
-import com.cbt.bean.*;
-import com.cbt.bean.OrderBean;
-import com.cbt.bean.ZoneBean;
-import com.cbt.pojo.*;
-import com.cbt.warehouse.pojo.*;
-import com.cbt.warehouse.pojo.AdmuserPojo;
-import com.cbt.warehouse.pojo.ClassDiscount;
-import com.cbt.website.bean.*;
-import com.cbt.website.util.JsonResult;
-import org.apache.ibatis.annotations.Param;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.cbt.bean.BlackList;
+import com.cbt.bean.CustomGoodsBean;
+import com.cbt.bean.Forwarder;
+import com.cbt.bean.LocationManagementInfo;
+import com.cbt.bean.LocationTracking;
+import com.cbt.bean.Logisticsinfo;
+import com.cbt.bean.OrderAddress;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.bean.OrderInfoPrint;
+import com.cbt.bean.Orderinfo;
+import com.cbt.bean.StorageInspectionLogPojo;
+import com.cbt.bean.StorageLocationBean;
+import com.cbt.bean.ZoneBean;
+import com.cbt.bean.badGoods;
+import com.cbt.pojo.BuyerCommentPojo;
+import com.cbt.pojo.CustomsRegulationsPojo;
+import com.cbt.pojo.Inventory;
+import com.cbt.pojo.RedManProductBean;
+import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.warehouse.pojo.AdmuserPojo;
+import com.cbt.warehouse.pojo.AllProblemPojo;
+import com.cbt.warehouse.pojo.ClassDiscount;
+import com.cbt.warehouse.pojo.DisplayBuyInfo;
+import com.cbt.warehouse.pojo.GoodsInventory;
+import com.cbt.warehouse.pojo.JcexPrintInfo;
+import com.cbt.warehouse.pojo.OrderFeePojo;
+import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.OrderInfoPojo;
+import com.cbt.warehouse.pojo.OrderProductSurcePojo;
+import com.cbt.warehouse.pojo.OrderReplenishmentPojo;
+import com.cbt.warehouse.pojo.RefundSamplePojo;
+import com.cbt.warehouse.pojo.SampleOrderBean;
+import com.cbt.warehouse.pojo.SbxxPojo;
+import com.cbt.warehouse.pojo.ShippingPackage;
+import com.cbt.warehouse.pojo.Tb1688Account;
+import com.cbt.warehouse.pojo.Tb1688Pojo;
+import com.cbt.warehouse.pojo.returndisplay;
+import com.cbt.website.bean.PurchaseBean;
+import com.cbt.website.bean.PurchaseDetailsBean;
+import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
+import com.cbt.website.bean.SampleGoodsBean;
+import com.cbt.website.bean.SearchResultInfo;
+import com.cbt.website.bean.ShopManagerPojo;
+import com.cbt.website.bean.UserInfo;
+import com.cbt.website.bean.outIdBean;
 
 public interface IWarehouseService {
 	public outIdBean findOutId(Integer uid);
@@ -1179,5 +1218,12 @@ public interface IWarehouseService {
 	 * @return
 	 */
 	int insertMqLog(String sqlStr, String shopNo, String orderNo,  String paramStr);
+	
+	/**
+	 * 海外仓订单列表
+	 * @return
+	 */
+	List<Map<String,Object>> getOverseasWarehouseStockOrder(String ordernoOrUserid);
+	
 }
  

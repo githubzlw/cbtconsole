@@ -517,4 +517,6 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<String> queryDescribeLogList();
+    
+    Map<String,String>  getGoodsByPid(@Param("pid") String pid);
 }

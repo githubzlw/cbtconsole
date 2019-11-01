@@ -1,6 +1,7 @@
 package com.cbt.userinfo.service;
 
 import com.cbt.pojo.UserEx;
+import org.apache.ibatis.annotations.Param;
 import com.cbt.website.bean.UserInfo;
 import com.importExpress.pojo.UserRecommendEmail;
 
@@ -71,6 +72,8 @@ public interface IUserInfoService {
     int checkFollowMeCode(String followCode);
 
     int updateUserFollowCode(String followCode,int userId);
+
+    Map<String,String> getUserInfoById(@Param("id") int id);
 
     /**
 	 * 查询用户所有信息

@@ -134,6 +134,11 @@ public static void main(String[] args) {
 	}
 
 	@Override
+	public Map<String, String> getUserInfoById(int id) {
+		return mapper.getUserInfoById(id);
+	}
+
+	@Override
 	public UserInfo queryAllInfoById(int userId) {
 		return mapper.queryAllInfoById(userId);
 	}

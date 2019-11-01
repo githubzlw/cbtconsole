@@ -1,81 +1,52 @@
 package com.cbt.warehouse.ctrl;
 
-import com.alibaba.fastjson.JSON;
-import com.cbt.FreightFee.service.FreightFeeSerive;
-import com.cbt.FtpUtil.ContinueFTP2;
-import com.cbt.Specification.util.DateFormatUtil;
-import com.cbt.bean.*;
-import com.cbt.bean.OrderBean;
-import com.cbt.bean.TypeBean;
-import com.cbt.bean.ZoneBean;
-import com.cbt.change.util.ChangeRecordsDao;
-import com.cbt.change.util.CheckCanUpdateUtil;
-import com.cbt.change.util.ErrorLogDao;
-import com.cbt.change.util.OnlineOrderInfoDao;
-import com.cbt.common.StringUtils;
-import com.cbt.common.dynamics.DataSourceSelector;
-import com.cbt.customer.service.GuestBookServiceImpl;
-import com.cbt.customer.service.IGuestBookService;
-import com.cbt.fee.service.IZoneServer;
-import com.cbt.fee.service.ZoneServer;
-import com.cbt.jcys.bean.*;
-import com.cbt.jcys.util.HttpUtil;
-import com.cbt.jcys.util.JcgjSoapHttpPost;
-import com.cbt.jcys.util.Md5Helper;
-import com.cbt.jdbc.DBHelper;
-import com.cbt.jdbc.MiniConnectionPoolManager.TimeoutException;
-import com.cbt.messages.service.MessagesService;
-import com.cbt.method.service.OrderDetailsServiceImpl;
-import com.cbt.onlinesql.ctr.SaveSyncTable;
-import com.cbt.orderinfo.service.IOrderinfoService;
-import com.cbt.orderinfo.service.OrderinfoService;
-import com.cbt.parse.service.ImgDownload;
-import com.cbt.parse.service.StrUtils;
-import com.cbt.pojo.*;
-import com.cbt.processes.service.SendEmail;
-import com.cbt.processes.servlet.Currency;
-import com.cbt.report.service.GeneralReportService;
-import com.cbt.util.*;
-import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.pojo.AdmuserPojo;
-import com.cbt.warehouse.pojo.*;
-import com.cbt.warehouse.service.IWarehouseService;
-import com.cbt.warehouse.service.MabangshipmentService;
-import com.cbt.warehouse.service.SkuinfoService;
-import com.cbt.warehouse.service.ZoneShippingService;
-import com.cbt.warehouse.thread.warehouseThread;
-import com.cbt.warehouse.util.*;
-import com.cbt.warehouse.util.Utility;
-import com.cbt.website.bean.*;
-import com.cbt.website.dao.ExpressTrackDaoImpl;
-import com.cbt.website.dao.IExpressTrackDao;
-import com.cbt.website.dao2.*;
-import com.cbt.website.server.PurchaseServer;
-import com.cbt.website.server.PurchaseServerImpl;
-import com.cbt.website.service.IOrderwsServer;
-import com.cbt.website.service.OrderwsServer;
-import com.cbt.website.servlet.Purchase;
-import com.cbt.website.thread.AddInventoryThread;
-import com.cbt.website.util.ContentConfig;
-import com.cbt.website.util.*;
-import com.cbt.website.util.EasyUiJsonResult;
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.google.common.collect.Lists;
-import com.importExpress.mail.SendMailFactory;
-import com.importExpress.mail.TemplateType;
-import com.importExpress.mapper.IPurchaseMapper;
-import com.importExpress.service.IPurchaseService;
-import com.importExpress.service.TabCouponService;
-import com.importExpress.utli.*;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.imageio.ImageIO;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
@@ -96,36 +67,170 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import sun.misc.BASE64Encoder;
+import org.springframework.web.servlet.ModelAndView;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.imageio.ImageIO;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.alibaba.fastjson.JSON;
+import com.cbt.FreightFee.service.FreightFeeSerive;
+import com.cbt.FtpUtil.ContinueFTP2;
+import com.cbt.Specification.util.DateFormatUtil;
+import com.cbt.bean.AliInfoDataBean;
+import com.cbt.bean.BlackList;
+import com.cbt.bean.CustomGoodsBean;
+import com.cbt.bean.Forwarder;
+import com.cbt.bean.GuestBookBean;
+import com.cbt.bean.LocationManagementInfo;
+import com.cbt.bean.LocationTracking;
+import com.cbt.bean.Logisticsinfo;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.bean.OrderInfoPrint;
+import com.cbt.bean.Orderinfo;
+import com.cbt.bean.RechargeRecord;
+import com.cbt.bean.ShippingBean;
+import com.cbt.bean.StorageInspectionLogPojo;
+import com.cbt.bean.StorageLocationBean;
+import com.cbt.bean.TrackBean;
+import com.cbt.bean.TypeBean;
+import com.cbt.bean.ZoneBean;
+import com.cbt.change.util.ChangeRecordsDao;
+import com.cbt.change.util.CheckCanUpdateUtil;
+import com.cbt.change.util.ErrorLogDao;
+import com.cbt.change.util.OnlineOrderInfoDao;
+import com.cbt.common.StringUtils;
+import com.cbt.common.dynamics.DataSourceSelector;
+import com.cbt.customer.service.GuestBookServiceImpl;
+import com.cbt.customer.service.IGuestBookService;
+import com.cbt.fee.service.IZoneServer;
+import com.cbt.fee.service.ZoneServer;
+import com.cbt.jcys.bean.DataInfo;
+import com.cbt.jcys.bean.GoodsPojo;
+import com.cbt.jcys.bean.PriceData;
+import com.cbt.jcys.bean.PriceReturnJsonNew;
+import com.cbt.jcys.bean.RecList;
+import com.cbt.jcys.util.HttpUtil;
+import com.cbt.jcys.util.JcgjSoapHttpPost;
+import com.cbt.jcys.util.Md5Helper;
+import com.cbt.jdbc.DBHelper;
+import com.cbt.jdbc.MiniConnectionPoolManager.TimeoutException;
+import com.cbt.messages.service.MessagesService;
+import com.cbt.method.service.OrderDetailsServiceImpl;
+import com.cbt.onlinesql.ctr.SaveSyncTable;
+import com.cbt.orderinfo.service.IOrderinfoService;
+import com.cbt.orderinfo.service.OrderinfoService;
+import com.cbt.parse.service.ImgDownload;
+import com.cbt.parse.service.StrUtils;
+import com.cbt.pojo.Admuser;
+import com.cbt.pojo.BuyerCommentPojo;
+import com.cbt.pojo.CustomsRegulationsPojo;
+import com.cbt.pojo.RedManProductBean;
+import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.processes.service.SendEmail;
+import com.cbt.processes.servlet.Currency;
+import com.cbt.report.service.GeneralReportService;
+import com.cbt.util.FtpConfig;
+import com.cbt.util.GetConfigureInfo;
+import com.cbt.util.Md5Util;
+import com.cbt.util.NewFtpUtil;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
+import com.cbt.util.SpringContextUtil;
+import com.cbt.util.SysParamUtil;
+import com.cbt.util.Util;
+import com.cbt.warehouse.dao.WarehouseMapper;
+import com.cbt.warehouse.pojo.AdmuserPojo;
+import com.cbt.warehouse.pojo.AllProblemPojo;
+import com.cbt.warehouse.pojo.DisplayBuyInfo;
+import com.cbt.warehouse.pojo.Dropshiporder;
+import com.cbt.warehouse.pojo.GoodsInventory;
+import com.cbt.warehouse.pojo.JcexPrintInfo;
+import com.cbt.warehouse.pojo.Mabangshipment;
+import com.cbt.warehouse.pojo.OrderFeePojo;
+import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.OrderInfoPojo;
+import com.cbt.warehouse.pojo.OrderProductSurcePojo;
+import com.cbt.warehouse.pojo.OrderReplenishmentPojo;
+import com.cbt.warehouse.pojo.RefundSamplePojo;
+import com.cbt.warehouse.pojo.SbxxPojo;
+import com.cbt.warehouse.pojo.ShippingPackage;
+import com.cbt.warehouse.pojo.Skuinfo;
+import com.cbt.warehouse.pojo.Tb1688Account;
+import com.cbt.warehouse.pojo.Tb1688Pojo;
+import com.cbt.warehouse.pojo.returndisplay;
+import com.cbt.warehouse.service.IWarehouseService;
+import com.cbt.warehouse.service.MabangshipmentService;
+import com.cbt.warehouse.service.SkuinfoService;
+import com.cbt.warehouse.service.ZoneShippingService;
+import com.cbt.warehouse.thread.warehouseThread;
+import com.cbt.warehouse.util.ExcelUtil;
+import com.cbt.warehouse.util.OrderInfoPage;
+import com.cbt.warehouse.util.OrderPrintInfoUtil;
+import com.cbt.warehouse.util.StringUtil;
+import com.cbt.warehouse.util.UtilAll;
+import com.cbt.warehouse.util.Utility;
+import com.cbt.website.bean.ProductBean;
+import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
+import com.cbt.website.bean.SampleGoodsBean;
+import com.cbt.website.bean.SearchResultInfo;
+import com.cbt.website.bean.ShopManagerPojo;
+import com.cbt.website.bean.UserInfo;
+import com.cbt.website.bean.UserOrderDetails;
+import com.cbt.website.dao.ExpressTrackDaoImpl;
+import com.cbt.website.dao.IExpressTrackDao;
+import com.cbt.website.dao2.ChargeCalculateSample;
+import com.cbt.website.dao2.CreateAndPreAlertOrderSample;
+import com.cbt.website.dao2.FindOrderSample;
+import com.cbt.website.dao2.RemoveOrderSample;
+import com.cbt.website.dao2.feeCount;
+import com.cbt.website.server.PurchaseServer;
+import com.cbt.website.server.PurchaseServerImpl;
+import com.cbt.website.service.IOrderwsServer;
+import com.cbt.website.service.OrderwsServer;
+import com.cbt.website.servlet.Purchase;
+import com.cbt.website.thread.AddInventoryThread;
+import com.cbt.website.util.ContentConfig;
+import com.cbt.website.util.DownloadMain;
+import com.cbt.website.util.EasyUiJsonResult;
+import com.cbt.website.util.FileTool;
+import com.cbt.website.util.GetCompanyName;
+import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.UploadByOkHttp;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
+import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.pojo.OverseasWarehouseStock;
+import com.importExpress.pojo.OverseasWarehouseStockLog;
+import com.importExpress.service.IPurchaseService;
+import com.importExpress.service.OverseasWarehouseStockService;
+import com.importExpress.service.TabCouponService;
+import com.importExpress.utli.DESUtils;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.MultiSiteUtil;
+import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SearchFileUtils;
+import com.importExpress.utli.SendMQ;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import sun.misc.BASE64Encoder;
 
 @SuppressWarnings("deprecation")
 @Controller
@@ -177,6 +282,8 @@ public class WarehouseCtrl {
 	private FreightFeeSerive freightFeeSerive;
 	@Autowired
 	private TabCouponService tabCouponService;
+	@Autowired
+	private OverseasWarehouseStockService owsService;
 	/**
 	 *
 	 * @Title getAllBuyer
@@ -411,12 +518,10 @@ public class WarehouseCtrl {
 				map.put("goodsid",bp.getGoodsid());
 				row=iWarehouseService.saveCommentContent(map);
 				if(row>0){
-
 					SendMQ.sendMsg(new RunSqlModel("insert into goods_comments_real(oid,car_type,order_no,user_id,user_name,country_id,goods_pid,comments_content," +
 							"comments_time,admin_id,goodsid,picPath) VALUES" +
 							"('"+map.get("od_id")+"','"+map.get("car_type")+"','"+map.get("orderid")+"','"+map.get("uid")+"','"+map.get("email")+"','"+map.get("countryid")+"'" +
 							",'"+map.get("goods_pid")+"','"+map.get("commentsContent")+"',now(),'"+map.get("admuserid")+"','"+map.get("goodsid")+"','"+map.get("picPath")+"')"));
-
 					flag=true;
 				}
 			}
@@ -656,10 +761,8 @@ public class WarehouseCtrl {
 			map.put("path",path);
 			map.put("i_id",i_id);
 			iWarehouseService.delInPic(map);
-
 			SendMQ.sendMsg(new RunSqlModel("update order_details set picturepath='' where orderid='"+map.get("orderid")+"' and goodsid='"+map.get("goods_pid")+"'"));
 			SendMQ.sendMsg(new RunSqlModel("update inspection_picture set isdelete=1 where pic_path='"+map.get("path")+"'"));
-
 			row=1;
 		}catch (Exception e){
 			e.printStackTrace();
@@ -8328,9 +8431,8 @@ public class WarehouseCtrl {
 								+ map.get("orderid").toString()
 								+ "','"
 								+ map.get("remarks").toString()
-								+ "','"
-								+ map.get("createtime").toString()
-								+ "','"
+								+ "',now()"
+								+ ",'"
 								+ map.get("weight").toString()
 								+ "','"
 								+ map.get("svolume").toString()
@@ -8353,7 +8455,7 @@ public class WarehouseCtrl {
 					sql.append("insert into shipping_package(orderid,remarks,createtime,sweight,svolume,volumeweight ,sflag ,transportcompany ,expressno, estimatefreight  ,flag) values ");
 					for(int i=0;i<bgList.size();i++){
 						Map<String, Object> map=bgList.get(i);
-						sql.append("('"+map.get("orderid")+"','"+map.get("remarks")+"','"+map.get("createtime")+"','"+map.get("weight")+"','"+map.get("svolume")+"','"+map.get("volumeweight")+"',3,'"+map.get("transport")+"','"+map.get("expressno")+"','"+map.get("estimatefreight")+"',1),");
+						sql.append("('"+map.get("orderid")+"','"+map.get("remarks")+"',now()"+",'"+map.get("weight")+"','"+map.get("svolume")+"','"+map.get("volumeweight")+"',3,'"+map.get("transport")+"','"+map.get("expressno")+"','"+map.get("estimatefreight")+"',1),");
 					}
 					SendMQ.sendMsg(new RunSqlModel(sql.toString().substring(0,sql.toString().length()-1)));
 
@@ -9330,4 +9432,143 @@ public class WarehouseCtrl {
 		return list;
 	}
 
+	/**
+	 *
+	 * @Description 海外仓正式出库列表
+	 * @param request
+	 * @param model
+	 * @return 返回Jsp页面名称
+	 * @return ModelAndView 返回值类型
+	 */
+	@RequestMapping(value = "/ows.do", method = RequestMethod.GET)
+	public ModelAndView overseaWarehouseStock(HttpServletRequest request,HttpServletResponse response) {
+		ModelAndView mv = new ModelAndView("ows_shipment");
+		try {
+			List<Map<String, Object>> ows = iWarehouseService.getOverseasWarehouseStockOrder(null);
+			mv.addObject("ows", ows);
+			if(ows != null && !ows.isEmpty()) {
+				Map<String, Object> firstOrder = ows.get(0);
+				int userid = (Integer)firstOrder.get("user_id");
+				String orderno = (String)firstOrder.get("order_no");
+				Map<String, Object> owsDetail = orderinfoService.getOverseasWarehouseStockOrderDetail(orderno, userid);
+				mv.addObject("owsDetail", owsDetail);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return mv;
+	}
+	
+	/**
+	 *
+	 * @Description 海外仓正式出库列表
+	 * @param request
+	 * @return Map<String,Object> 返回值类型
+	 */
+	@RequestMapping(value = "/owsorder",method=RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> owsOrder(HttpServletRequest request,HttpServletResponse response) {
+		Map<String,Object> result = Maps.newHashMap();
+		try {
+			String useridOrOrderno = request.getParameter("useridOrOrderno");
+			List<Map<String, Object>> ows = iWarehouseService.getOverseasWarehouseStockOrder(useridOrOrderno);
+			if(ows != null && !ows.isEmpty()) {
+				Map<String, Object> firstOrder = ows.get(0);
+				int userid = (Integer)firstOrder.get("user_id");
+				String orderno = (String)firstOrder.get("order_no");
+				Map<String, Object> owsDetail = orderinfoService.getOverseasWarehouseStockOrderDetail(orderno, userid);
+				result.put("status", 200);
+				if(owsDetail == null || owsDetail.isEmpty()) {
+					result.put("status", 100);
+					result.put("message", "获取订单错误");
+				}else {
+					result.put("owsorder",owsDetail);
+				}
+				result.put("ows", SerializeUtil.ListToJson(ows));
+			}else {
+				result.put("status", 101);
+				result.put("message", "获取订单错误");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("status", 102);
+			result.put("message", "错误");
+		}
+		return result;
+	}
+	/**
+	 *
+	 * @Description 海外仓尾程运单追踪号
+	 * @param request
+	 * @return Map<String,Object> 返回值类型
+	 */
+	@RequestMapping(value = "shipno.do", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String,Object> owsOrderShipno(HttpServletRequest request,HttpServletResponse response) {
+		Map<String,Object> result = Maps.newHashMap();
+		String orderno = request.getParameter("orderno");
+		String shipno = request.getParameter("shipno");
+		Map<String, Object> map = Maps.newHashMap();
+		map.put("orderno", orderno);
+		map.put("shipno", shipno);
+		int owsAdd = owsService.addOwsOrderShipno(map );
+		if(owsAdd > 0) {
+			result.put("status", 200);
+		}else {
+			result.put("status", 101);
+			result.put("message", "添加运单号出现错误");
+		}
+		return result;
+	}
+	/**
+	 *
+	 * @Description 海外仓出货
+	 * @param request
+	 * @return Map<String,Object> 返回值类型
+	 */
+	@RequestMapping(value = "shipout.do", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String,Object> owsOrderShipOut(HttpServletRequest request,HttpServletResponse response) {
+		Map<String,Object> result = Maps.newHashMap();
+		String orderno = request.getParameter("orderno");
+		String shipno = request.getParameter("shipno");
+		Map<String, Object> map = Maps.newHashMap();
+		map.put("orderno", orderno);
+		map.put("shipno", shipno);
+		List<OverseasWarehouseStockLog> logByOrderno = owsService.getLogByOrderno(orderno);
+		if(logByOrderno == null || logByOrderno.isEmpty()) {
+			int owsAdd = owsService.shipoutOwsOrder(map );
+			if(owsAdd > 0) {
+				//释放占用
+				OverseasWarehouseStock stock;
+				int reduce = 0;
+				for(OverseasWarehouseStockLog l : logByOrderno) {
+					if(l.getChangeStock() == 0) {
+						continue;
+					}
+					String remark = "订单"+orderno+"/"+l.getOdid()+"已出运-"+shipno+",释放其占用的库存"+l.getChangeStock();
+					stock = OverseasWarehouseStock.builder().orderStock(l.getChangeStock()).code(l.getCode()).build();
+					reduce += owsService.reduceOrderStock(stock, orderno, l.getOdid(), remark);
+				}
+				if(logByOrderno.size()==reduce) {
+					result.put("status", 200);
+				}else {
+					result.put("status", 103);
+					result.put("message", "添加运单号成功，但部分产品释放占用库存失败");
+				}
+			}else {
+				result.put("status", 101);
+				result.put("message", "添加运单号出现错误");
+			}
+		}else {
+			result.put("status", 102);
+			result.put("message", "没有找到对应订单的库存占用记录");
+		}
+		return result;
+	}
+	
+	
+	
 }

@@ -3057,4 +3057,10 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
 
+
+	@Override
+	public List<Map<String, Object>> getOverseasWarehouseStockOrder(String ordernoOrUserid) {
+		return orderinfoMapper.getOverseasWarehouseStockOrder(ordernoOrUserid);
+	}
+
 }

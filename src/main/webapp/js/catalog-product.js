@@ -263,26 +263,20 @@ function search(){
 	$(".product-page").hide();
 	var editid = $("#list-product-edit").val();
 	
-	var temp = $("#query_temp").val();
-	var requestHost = "https://www.import-express.com";
-	if(temp == '2'){
-		requestHost = "https://www.kidsproductwholesale.com";
-	}else if(temp == '4'){
-		requestHost = "https://www.petstoreinc.com";
-	}
 	productArray = [];
 	//本地已经生成的目录商品优先展示
 	if(editid != ''){
-		catalogProduct(editid,requestHost);
+		catalogProduct(editid);
+	}else{
+		//获取线上商品
+		searchFromRemote();
 	}
-	//获取线上商品
-	searchFromRemote(temp,requestHost);
 }
 /**已经生成的目录商品优先展示
  * @param id
  * @returns
  */
-function catalogProduct(id,requestHost){
+function catalogProduct(id){
 	$.ajax({
 		url:'/cbtconsole/catalog/product',
 		data:{
@@ -296,6 +290,13 @@ function catalogProduct(id,requestHost){
 				$(".product-list").html("");
 				return ;
 			}
+			var requestHost = "https://www.import-express.com";
+			if(data.template == 2){
+				requestHost = "https://www.kidsproductwholesale.com";
+			}else if(data.template == 4){
+				requestHost = "https://www.petstoreinc.com";
+			}
+			
 			var goodslist = eval(data.product);
 			var productHtml = '';
 			for(var i=0;i<size;i++){
@@ -303,7 +304,7 @@ function catalogProduct(id,requestHost){
 				for(var j=0;j<item.length;j++){
 					var product = item[j];
 					productHtml = productHtml +'<div class="col-xs-2 product"><div class="product_in">';//src="https://www.import-express.com/newindex/img/dot.gif" data-
-					productHtml = productHtml +'<a href="'+requestHost+product.url+'"><img src="'+product.img+'" class="product-img img-lazy img-responsive"></a>';
+					productHtml = productHtml +'<a href="'+requestHost+product.url+'"><img src="/cbtconsole/img/beforeLoad.gif" data-original="'+product.img+'" class="product-img img-lazy img-responsive"></a>';
 					productHtml = productHtml +'<input type="checkbox" class="is_boutique_check" name="is_selected" value="'+product.pid+'" onclick="checkClick(this)" checked="checked">';
 					productHtml = productHtml +'<div class="info-product">';
 					productHtml = productHtml +'<div class="product-name">'+product.name+'</div>';
@@ -313,8 +314,14 @@ function catalogProduct(id,requestHost){
 					productArray.push(product.pid);
 				}
 			}
+			$("#catalog_name").val(data.catalogName);
+			
+			 $("#query_temp").val(data.template);
+			
 			$(".product-list").html(productHtml);
+			$('.img-lazy').lazyload({effect: "fadeIn"});
 //			console.log(productArray);
+			searchFromRemote();
 		},
 		error:function(e){
 //			$.MsgBox.Alert("提示", "搜索请求错误");
@@ -326,7 +333,14 @@ function catalogProduct(id,requestHost){
 /**获取线上商品
  * @returns
  */
-function searchFromRemote(temp,requestHost){
+function searchFromRemote(){
+	var temp = $("#query_temp").val();
+	var requestHost = "https://www.import-express.com";
+	if(temp == 2){
+		requestHost = "https://www.kidsproductwholesale.com";
+	}else if(temp == 4){
+		requestHost = "https://www.petstoreinc.com";
+	}
 	var catid = $("#param-catid").val();
 	var keyword = $("#query-keyword").val();
 	var page = $("#current-page").val();
@@ -340,7 +354,7 @@ function searchFromRemote(temp,requestHost){
 		},
 		type:"post",
 		success:function(data){
-			var size = parseInt(data.goodsSize);
+			var size = data.goodsList.length;//parseInt(data.goodsSize);
 			if(size < 1){
 				$(".product-list").html("");
 				return ;
@@ -358,7 +372,7 @@ function searchFromRemote(temp,requestHost){
 					continue;
 				}
 				productHtml = productHtml +'<div class="col-xs-2 product"><div class="product_in">';//src="https://www.import-express.com/newindex/img/dot.gif" data-
-				productHtml = productHtml +'<a href="'+requestHost+goodslist[i].goods_url+'"><img src="'+goodslist[i].goods_image+'" class="product-img img-lazy img-responsive"></a>';
+				productHtml = productHtml +'<a href="'+requestHost+goodslist[i].goods_url+'"><img src="/cbtconsole/img/beforeLoad.gif" data-original="'+goodslist[i].goods_image+'" class="product-img img-lazy img-responsive"></a>';
 				productHtml = productHtml +'<input type="checkbox" class="is_boutique_check" name="is_selected" value="'+goodslist[i].goods_pid+'" onclick="checkClick(this)">';
 				productHtml = productHtml +'<div class="info-product">';
 				productHtml = productHtml +'<div class="product-name">'+goodslist[i].goods_name+'</div>';
@@ -402,6 +416,7 @@ function searchFromRemote(temp,requestHost){
 				$(".product-page").show();
 			}
 			totalpage = parseInt(paramv.amountPage);
+			$('.img-lazy').lazyload({effect: "fadeIn"});
 		},
 		error:function(e){
 			$.MsgBox.Alert("提示", "搜索请求错误");

@@ -2200,7 +2200,7 @@
 		values
 		<foreach collection="list" item="item" index="index"
 				 separator=",">
-			(${item.orderid},${item.remarks},${item.createtime},${item.weight},${item.svolume},${item.volumeweight},3,${item.transport}
+			(${item.orderid},${item.remarks},now(),${item.weight},${item.svolume},${item.volumeweight},3,${item.transport}
 			,${item.expressno},${item.estimatefreight},1)
 		</foreach>
 	</insert>

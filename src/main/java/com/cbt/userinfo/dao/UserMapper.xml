@@ -136,6 +136,10 @@
         values(#{userId},#{emailContent},#{sendUrl},#{adminId})
     </insert>
 
+    <select id="getUserInfoById" resultType="hashmap">
+        select * from user where id = #{id}
+    </select>
+
     <select id="queryBusinessMembershipAuthorization" parameterType="com.cbt.website.bean.UserInfo"
             resultType="com.cbt.website.bean.UserInfo">
         select a.id as userid,a.email,DATE_FORMAT(a.createtime,'%Y-%m-%d %H:%i:%S') as creattime,b.businessinfo, d.country as zone,

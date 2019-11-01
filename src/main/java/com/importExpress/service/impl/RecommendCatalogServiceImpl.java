@@ -42,13 +42,13 @@ public class RecommendCatalogServiceImpl implements RecommendCatalogService {
 	@Override
 	public int addCatelog(RecommendCatalog catalog) {
 		String sql  ="insert into recommend_catalog (catalog_name,template,create_admin,"
-				+ "create_time,product_count,product_list,status)values(?,?,?,now(),?,?,?)";
+				+ "create_time,product_count,product_list,status) values(?,?,?,now(),?,?,?)";
 		List<String> lstValues = Lists.newArrayList();
-		lstValues.add(catalog.getCatalogName());
+		lstValues.add(catalog.getCatalogName().replace("'", "\\'"));
 		lstValues.add(String.valueOf(catalog.getTemplate()));
 		lstValues.add(catalog.getCreateAdmin());
 		lstValues.add(String.valueOf(catalog.getProductCount()));
-		lstValues.add(catalog.getProductList());
+		lstValues.add(catalog.getProductList().replace("'", "\\'"));
 		lstValues.add("1");
 		
 		String runSql = DBHelper.covertToSQL(sql, lstValues );
@@ -284,9 +284,9 @@ public class RecommendCatalogServiceImpl implements RecommendCatalogService {
 		String sql = "update recommend_catalog set product_count=?,product_list=?,template=?,catalog_name=? where id=?";
 		List<String> lstValues = Lists.newArrayList();
 		lstValues.add(String.valueOf(cataLog.getProductCount()));
-		lstValues.add(cataLog.getProductList());
+		lstValues.add(cataLog.getProductList().replace("'", "\\'"));
 		lstValues.add(String.valueOf(cataLog.getTemplate()));
-		lstValues.add(cataLog.getCatalogName());
+		lstValues.add(cataLog.getCatalogName().replace("'", "\\'"));
 		lstValues.add(String.valueOf(cataLog.getId()));
 		
 		String runSql = DBHelper.covertToSQL(sql, lstValues );

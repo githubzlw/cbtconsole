@@ -859,5 +859,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryDescribeLogList();
     }
 
+    @Override
+	public Map<String, String> getGoodsByPid(String pid) {
+		// TODO Auto-generated method stub
+		return customGoodsMapper.getGoodsByPid(pid);
+	}
 
 }
