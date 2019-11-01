@@ -873,6 +873,8 @@ public interface CustomGoodsService {
      */
     List<String> queryDescribeLogList();
 
+    Map<String,String>  getGoodsByPid(String pid);
+
     /**
      * 插入海外仓数据
      * @param goodsOverSea
