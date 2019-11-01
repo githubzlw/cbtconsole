@@ -762,4 +762,19 @@ public interface OrderinfoMapper {
 	int updateOrderSplitNumGoodsCommunicationInfoData(@Param("orderNo") String orderNo);
     @Select("SELECT car_urlMd5 from order_details WHERE orderid='2190927K687' LIMIT 1")
     String getUrlMd5ByOrder(@Param("orderNo") String orderNo);
+    
+    /**
+	 * 海外仓订单列表
+	 * @return
+	 */
+	List<Map<String,Object>> getOverseasWarehouseStockOrder(@Param("ordernoOrUserid")String ordernoOrUserid);
+	
+	/**
+	 * 订单信息
+	 * @param orderno
+	 * @param userid
+	 * @return
+	 */
+	Map<String,Object> getOverseasWarehouseStockOrderDetail(@Param("orderno")String orderno,@Param("userid")int userid);
+	
 }

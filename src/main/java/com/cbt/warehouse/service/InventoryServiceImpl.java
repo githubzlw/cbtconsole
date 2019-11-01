@@ -1444,6 +1444,13 @@ public class InventoryServiceImpl implements  InventoryService{
 			}else if(i.getIbState() == 5) {
 				i.setStateContext("仓库取消了入库请求");
 			}
+			String iskSCarImg = i.getIskSCarImg();
+			iskSCarImg = iskSCarImg == null ? iskSCarImg : iskSCarImg.replace(".60x60.jpg", ".400x400.jpg");
+			String odCarImg = i.getOdCarImg();
+			odCarImg = odCarImg == null ? odCarImg : odCarImg.replace(".60x60.jpg", ".400x400.jpg");
+			
+			i.setIskSCarImg(iskSCarImg);
+			i.setOdCarImg(odCarImg);
 		}
 		return inventoryBarcodeList;
 	}

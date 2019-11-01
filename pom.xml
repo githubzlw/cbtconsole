@@ -22,7 +22,7 @@
         <poi-ooxml.version>3.15-beta2</poi-ooxml.version>
         <json-lib.version>2.4</json-lib.version>
         <org.json.version>chargebee-1.0</org.json.version>
-        <fastjson.version>1.2.13</fastjson.version>
+        <fastjson.version>1.2.29</fastjson.version>
         <lire.version>1.0b2</lire.version>
         <lucene-core.version>6.0.0</lucene-core.version>
         <lucene-queryparser.version>6.0.0</lucene-queryparser.version>
@@ -429,6 +429,11 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.1</version>
         </dependency>
         <dependency>
             <groupId>org.tuckey</groupId>

@@ -57,7 +57,8 @@ public enum TemplateType {
 
     GUESTBOOK_REPLY("GUESTBOOK-REPLY"),
     REPLACEGOODS("REPLACE-GOODS"),
-    COUPON("COUPON");
+    COUPON("COUPON"),
+    OUR_RECOMMENDATION("OUR-RECOMMENDATION");
 
     private String name;
 
