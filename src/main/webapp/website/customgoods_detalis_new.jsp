@@ -1474,7 +1474,7 @@
                     }
                 },
                 error: function (XMLResponse) {
-                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                    $.messager.alert("提醒", "获取数据错误", "error");
                 }
             });
         }

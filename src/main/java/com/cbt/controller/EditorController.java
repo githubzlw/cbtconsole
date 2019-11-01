@@ -3663,6 +3663,119 @@ public class EditorController {
         return json;
     }
 
+    @RequestMapping(value = "/setGoodsOverSea")
+    @ResponseBody
+    public JsonResult setGoodsOverSea(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        com.cbt.pojo.Admuser admuser =UserInfoUtils.getUserInfo(request);
+        if(admuser == null || admuser.getId() == 0){
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return  json;
+        }
+        String pid = request.getParameter("pid");
+        if(StringUtils.isBlank(pid)){
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return  json;
+        }
+        String countryId = request.getParameter("countryId");
+        if(StringUtils.isBlank(countryId)){
+            json.setOk(false);
+            json.setMessage("获取countryId失败");
+            return  json;
+        }
+        String isSupport = request.getParameter("isSupport");
+        if(StringUtils.isBlank(isSupport)){
+            json.setOk(false);
+            json.setMessage("获取是否支持失败");
+            return  json;
+        }
+        String categoryIdStr = request.getParameter("categoryId");
+        int categoryId = 0;
+        if(StringUtils.isBlank(categoryIdStr)){
+            json.setOk(false);
+            json.setMessage("获取热卖区分类失败");
+            return  json;
+        }
+
+        try {
+            categoryId = Integer.parseInt(categoryIdStr);
+            int isUpdate = 0;
+            List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
+            if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
+                for(GoodsOverSea goods: goodsOverSeaList){
+                    if(goods.getCountryId() == Integer.parseInt(countryId)){
+                        isUpdate = 1;
+                        break;
+                    }
+                }
+            }
+            if(isUpdate > 0) {
+                json.setOk(false);
+                json.setMessage("此国家已经被设置");
+                return json;
+            }
+            int supportFlag = Integer.parseInt(isSupport);
+            GoodsOverSea overSea = new GoodsOverSea();
+            overSea.setAdminId(admuser.getId());
+            overSea.setPid(pid);
+            overSea.setCountryId(Integer.parseInt(countryId));
+            overSea.setIsSupport(supportFlag);
+
+            customGoodsService.insertIntoGoodsOverSeaInfo(overSea);
+            String sql = "insert into custom_goods_oversea(pid,country_id,admin_id,is_support)" +
+                    " values('" + pid + "'," + countryId + "," + admuser.getId() + "," + isSupport + ")";
+            NotifyToCustomerUtil.sendSqlByMq(sql);
+
+            // 加入到热卖区
+            if(supportFlag > 0){
+                // 添加
+                saveHotGoods(pid, categoryId, admuser.getId());
+            }else {
+                // 删除
+                hotGoodsService.deleteGoodsByPid(categoryId, pid);
+                String sqlDel = "delete from hot_selling_goods where hot_selling_id = " + categoryId + " and goods_pid = '" + pid + "'";
+                NotifyToCustomerUtil.sendSqlByMq(sqlDel);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+    @RequestMapping(value = "/getAllZone")
+    @ResponseBody
+    public JsonResult getAllZone(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String isUsd = request.getParameter("isUsd");
+        try {
+            IZoneServer os = new ZoneServer();
+            List<ZoneBean> zoneBeanList = os.getAllZone();
+            if (StringUtils.isNotBlank(isUsd) && Integer.parseInt(isUsd) > 0) {
+                List<ZoneBean> listNew = zoneBeanList.stream().filter(e -> {
+                    return "USA".equalsIgnoreCase(e.getCountry());
+                }).collect(Collectors.toList());
+
+                json.setData(listNew);
+                zoneBeanList.clear();
+            } else {
+                json.setData(zoneBeanList);
+            }
+
+            json.setOk(true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
     private void praseEninfoAndUpdate(GoodsParseBean gd) {
         try {
             // 获取配置文件信息
