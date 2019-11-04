@@ -48,4 +48,8 @@ public class OverseasWarehouseStockLog {
      * 商品号
      */
     private String code;
+    /**
+     * 商品号
+     */
+    private String coden;
 }
