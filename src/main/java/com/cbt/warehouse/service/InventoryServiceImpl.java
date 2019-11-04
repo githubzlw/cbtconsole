@@ -2,14 +2,12 @@ package com.cbt.warehouse.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.StringRedisConnection.StringTuple;
 import org.springframework.stereotype.Service;
 
 import com.cbt.Specification.bean.AliCategory;
@@ -38,11 +36,12 @@ import com.cbt.website.bean.LossInventoryWrap;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
 import com.cbt.website.dao.IExpressTrackDao;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import com.mysql.fabric.xmlrpc.base.Data;
 @Service
 public class InventoryServiceImpl implements  InventoryService{
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
@@ -685,7 +684,10 @@ public class InventoryServiceImpl implements  InventoryService{
 		
 		int after_remaining = before_remaining - inventory_count;
 		can_remaining = isReduce ? can_remaining : can_remaining - inventory_count;
-		
+		if(before_remaining ==0) {
+			return 0;
+		}
+		after_remaining = after_remaining < 0 ? 0 : after_remaining;
 		//1.库存减少
 		iSku.setId(inventoryMap.getId());
 		iSku.setRemaining(after_remaining);
@@ -837,7 +839,9 @@ public class InventoryServiceImpl implements  InventoryService{
 		for(InventoryDetails i : inventoryDetails) {
 			wrap = new InventoryDetailsWrap();
 			wrap.setCreatetime(i.getCreatetime());
-			wrap.setGoodsImg("<img class='img_class' src='"+i.getGoodsImg()+"'>");
+			String goodsImg = i.getGoodsImg();
+			goodsImg = StringUtil.isBlank(goodsImg) ? goodsImg : goodsImg.replace(".60x60.jpg", ".400x400.jpg");
+			wrap.setGoodsImg("<img class='img_class' src='"+goodsImg+"'>");
 			wrap.setGoodsNumber(i.getGoodsNumber());
 			wrap.setGoodsPid(i.getGoodsPid());
 			wrap.setInventoryId(i.getInventoryId());
@@ -1430,6 +1434,18 @@ public class InventoryServiceImpl implements  InventoryService{
 		if(inventoryBarcodeList == null || inventoryBarcodeList.isEmpty()) {
 			return null;
 		}
+		List<String> lstSkuid = Lists.newArrayList();
+		for(InventoryWrap i : inventoryBarcodeList) {
+			if(StringUtil.isBlank(i.getIskSkuid())) {
+				continue;
+			}
+			lstSkuid.add(i.getIskSkuid());
+		}
+		List<Map<String,Object>> returnGoods = inventoryMapper.returnGoods(lstSkuid);
+		Map<String,Integer> setM = Maps.newHashMap();
+		for(Map<String,Object> r : returnGoods) {
+			setM.put(r.get("skuID").toString(), Integer.parseInt(r.get("count").toString()));
+		}
 		for(InventoryWrap i : inventoryBarcodeList) {
 			if(i.getIbState() == 0) {
 				i.setStateContext("采购使用库存,等待仓库移出库存");
@@ -1451,6 +1467,11 @@ public class InventoryServiceImpl implements  InventoryService{
 			
 			i.setIskSCarImg(iskSCarImg);
 			i.setOdCarImg(odCarImg);
+			
+			Integer returnCount = setM.get(i.getIskSkuid());
+			returnCount = returnCount == null ? 0 : returnCount;
+			i.setReturnOrderNum(returnCount);
+			
 		}
 		return inventoryBarcodeList;
 	}

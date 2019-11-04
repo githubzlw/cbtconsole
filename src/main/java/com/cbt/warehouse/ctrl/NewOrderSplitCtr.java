@@ -757,7 +757,7 @@ public class NewOrderSplitCtr {
                     webType = TemplateType.DISMANTLING_KID;
                     break;
                 case 3:
-                    webSiteTitle = "Lovely Pet Supply";
+                    webSiteTitle = "Pet Store Inc";
                     webType = TemplateType.DISMANTLING_PET;
                     break;
                 case 4:

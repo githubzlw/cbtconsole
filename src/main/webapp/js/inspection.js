@@ -52,17 +52,18 @@ function updatecancelChecktatus(isok, orderid, odid, isDropshipOrder, goodid, in
     var specid = $(".specid_"+orderid+"_"+odid).html();
     var skuid=$(".skuID_"+orderid+"_"+odid).html();
     var tbspecid = '';
-    var tbskuid = '';
+    var tbskuid = ''; 
+    var skucount = 0;
     if((specid && specid!='' )||( skuid && skuid!='')){
     	//采购货源产品规格id
     	tbspecid= specid !=''? $(".specId_"+specid).html():'';
     	tbskuid=skuid!=''?$(".skuID_"+skuid).html():'';
     	if((tbspecid!=''&&specid == tbspecid || tbskuid!=''&&skuid == tbskuid)){
-    		var skucount = $(".itemqty_"+specid+"_"+skuid).html();
-    		if(Number(skucount) > 0){
+    		skucount = $(".itemqty_"+specid+"_"+skuid).html();
+    		/*if(Number(skucount) > 0){
     			count = skucount;
     			$("#" + orderid + "count_" + odid + "").val(count);
-    		}
+    		}*/
     	}
     }
     var _count = document.getElementById("" + orderid + "_count" + odid + "").value;//销售数量
@@ -72,10 +73,15 @@ function updatecancelChecktatus(isok, orderid, odid, isDropshipOrder, goodid, in
         return;
     }
     var weight = $("#" + orderid + "weight" + odid + "").val();
-    var cance_inventory_count = Number(count) + Number(record_)
-        - (Number(_count) * Number(seiUnit));//库存数量
+    
     if (isDropshipOrder == 3) {
         cance_inventory_count = count;
+    }
+    //库存数量
+    var cance_inventory_count = Number(count);
+    var acinventory = Number(record_) - (Number(_count) * Number(seiUnit));//库存数量
+    if(cance_inventory_count > acinventory){
+    	cance_inventory_count = acinventory;
     }
   
     if (confirm("您确定要取消验货吗?")) {

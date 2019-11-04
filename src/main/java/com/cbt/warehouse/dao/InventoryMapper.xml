@@ -237,6 +237,7 @@
 	    </if>
     </if>
     <if test="goodscatid ==-1"> and isku.goodscatid='0'</if>
+    <if test="isShowZero !=1"> and remaining > 0</if>
     
     <if test="odid != 0">and isku.od_id=#{odid}</if>
     <if test="isline == 1">and c.valid=1</if>
@@ -258,6 +259,7 @@
 	    </if>
     </if>
     <if test="goodscatid ==-1">and isku.goodscatid='0'</if>
+     <if test="isShowZero !=1"> and remaining > 0</if>
     <if test="odid != 0">and isku.od_id=#{odid}</if>
     <if test="isline == 1">and c.valid=1</if>
     <if test="isline == 2">and c.valid!=1</if>
@@ -601,7 +603,7 @@
     <!-- 获取盘点历史数据 -->
     <select id="getICRHistory" resultMap="InventoryCheckRecordMap">
     select iscr.id,iscr.inventory_check_id,iscr.inventory_sku_id,iscr.goods_pid,iscr.goods_sku,
-    iscr.goods_specid,iscr.goods_skuid,iscr.goods_price,iscr.inventory_remaining,iscr.goods_name
+    iscr.goods_specid,iscr.goods_skuid,iscr.goods_price,iscr.inventory_remaining,iscr.goods_name,
     iscr.check_remaining,iscr.create_time,iscr.before_barcode,iscr.after_barcode,isk.car_img as goods_img
     
     from inventory_sku_check_record iscr
@@ -820,7 +822,7 @@
     select  goods_pid,good_skuid,goods_specid,orderno,od_id,goods_number,
     inventory_id,goods_p_skuid,goods_p_specid
     
-    from inventory_details_sku where od_id=#{odid} and type=0 order by id desc limit 1 
+    from inventory_details_sku where od_id=#{odid} and type=5 order by id desc limit 1 
     </select>
     <select id="getUnDoneInventoryBarcode" resultType="Integer">
     select count(*) from  inventory_barcode_record where state=0 or state=1
@@ -842,5 +844,14 @@
     <select id="showCheckTable" resultType="String">
      show tables like #{table_name}; 
     </select>
+    
+    <select id="returnGoods" resultType="java.util.Map">
+    
+    select b.skuID,count(a.tb_id) as count  from 
+	return_display a 
+	left join taobao_1688_order_history b on a.tb_id=b.id where b.skuID in
+	<foreach collection="list" close=")" open="(" index="index" item="item" separator=",">#{item}</foreach>
+    group by b.skuID;
+</select>
     
 </mapper>

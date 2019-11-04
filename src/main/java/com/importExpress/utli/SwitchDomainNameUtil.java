@@ -27,10 +27,10 @@ public class SwitchDomainNameUtil {
     private static final String KIDS_DOMAIN_NAME_2 = "KidsProductWholesale";
     private static final String KIDS_DOMAIN_NAME_3 = "Kids Product Wholesale";
 
-    // https://www.lovelypetsupply.com/
-    private static final String PETS_DOMAIN_NAME_1 = "lovelypetsupply";
-    private static final String PETS_DOMAIN_NAME_2 = "LovelyPetSupply";
-    private static final String PETS_DOMAIN_NAME_3 = "Lovely Pet Supply";
+    // https://www.petstoreinc.com/
+    private static final String PETS_DOMAIN_NAME_1 = "petstoreinc";
+    private static final String PETS_DOMAIN_NAME_2 = "PetStoreInc";
+    private static final String PETS_DOMAIN_NAME_3 = "Pet Store Inc";
 
     // www.restaurantkitchenequipments.com
     private static final String RESTAURANT_DOMAIN_NAME_1 = "restaurantkitchenequipments";

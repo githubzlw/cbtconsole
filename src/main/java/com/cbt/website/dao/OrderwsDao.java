@@ -24,6 +24,7 @@ import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.bean.UserBehavior;
 import com.importExpress.pojo.GoodsCarActiveSimplBean;
 import com.importExpress.service.impl.SendMQServiceImpl;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -5396,7 +5397,13 @@ public class OrderwsDao implements IOrderwsDao {
                 lstValues.add( rs.getString("fileupload"));
                 lstValues.add( count);
                 lstValues.add( rs.getString("userid"));
-                lstValues.add( rs.getString("goodsname"));
+                String goodsName = rs.getString("goodsname");
+                if(StringUtil.isNotBlank(goodsName)){
+                    lstValues.add(GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(goodsName));
+                }else{
+                    lstValues.add("");
+                }
+
                 lstValues.add( rs.getString("goodsprice"));
                 lstValues.add( rs.getString("goodsfreight"));
                 lstValues.add( rs.getString("goodsdata_id"));
@@ -5405,7 +5412,13 @@ public class OrderwsDao implements IOrderwsDao {
                 lstValues.add( rs.getString("extra_freight"));
                 lstValues.add( rs.getString("car_url"));
                 lstValues.add( rs.getString("car_img"));
-                lstValues.add( rs.getString("car_type"));
+
+                String car_type = rs.getString("car_type");
+                if(StringUtil.isNotBlank(car_type)){
+                    lstValues.add(GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(car_type));
+                }else{
+                    lstValues.add("");
+                }
                 lstValues.add( rs.getString("freight_free"));
                 lstValues.add( rs.getString("od_bulk_volume"));
                 lstValues.add( rs.getString("od_total_weight"));

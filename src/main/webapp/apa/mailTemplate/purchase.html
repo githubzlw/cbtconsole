@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width" />
   <title th:if="${websiteType} eq 1">ImportExpress Mail Complaint</title>
   <title th:if="${websiteType} eq 2">kidsProductWholesale Mail Complaint</title>
-  <title th:if="${websiteType} eq 3">lovelypetsupply Mail Complaint</title>
+  <title th:if="${websiteType} eq 3">petstoreinc Mail Complaint</title>
   <style type="text/css">
 
   *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -192,7 +192,7 @@
         <td class="header container" align="center">
           <div class="content">
             <span class="brand">
-              <a href="https://www.lovelypetsupply.com/">
+              <a href="https://www.petstoreinc.com/">
                 <img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/wh89/pet/pet_logo.png">
               </a>
             </span>
@@ -232,12 +232,12 @@
                         <p class="order_batck">You can track the package through:
                             <a th:if="${websiteType} eq 1" target="_blank" href="https://www.import-express.com" th:href="${toHref}">https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo=<i th:text="${orderid}"></i></a>
                             <a th:if="${websiteType} eq 2" target="_blank" href="https://www.kidsproductwholesale.com" th:href="${toHref}">https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo=<i th:text="${orderid}"></i></a>
-                            <a th:if="${websiteType} eq 3" target="_blank" href="https://www.lovelypetsupply.com" th:href="${toHref}">https://www.lovelypetsupply.com/apa/tracking.html?loginflag=false&orderNo=<i th:text="${orderid}"></i></a>
+                            <a th:if="${websiteType} eq 3" target="_blank" href="https://www.petstoreinc.com" th:href="${toHref}">https://www.petstoreinc.com/apa/tracking.html?loginflag=false&orderNo=<i th:text="${orderid}"></i></a>
                         </p>
                         <p class="order_batck">Any more questions please fill our online Customer Contact Form:
                             <a th:if="${websiteType} eq 1" target="_blank" href="https://www.import-express.com/cbt/servicerequest.jsp">Customer Service.</a>
                             <a th:if="${websiteType} eq 2" target="_blank" href="https://www.kidsproductwholesale.com/cbt/servicerequest.jsp">Customer Service.</a>
-                            <a th:if="${websiteType} eq 3" target="_blank" href="https://www.lovelypetsupply.com/cbt/servicerequest.jsp">Customer Service.</a>
+                            <a th:if="${websiteType} eq 3" target="_blank" href="https://www.petstoreinc.com/cbt/servicerequest.jsp">Customer Service.</a>
                         </p>
                         <p class="order_batck"> Thanks for your confirmation and have a nice day!</p>
                         <table class="body-signature-block">
@@ -246,7 +246,7 @@
                               <p class="thanks_so">Warm Regards,</p>
                               <p th:if="${websiteType} eq 1">ImportExpress</p>
                               <p th:if="${websiteType} eq 2">kidsProductWholesale</p>
-                              <p th:if="${websiteType} eq 3">lovelypetsupply</p>
+                              <p th:if="${websiteType} eq 3">petstoreinc</p>
                             </td>
                           </tr>
                         </table>

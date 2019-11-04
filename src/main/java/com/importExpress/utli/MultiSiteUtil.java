@@ -57,7 +57,7 @@ public class MultiSiteUtil {
             return 2;
         }
         if (StringUtils.isNotBlank(url)
-                && StringUtils.containsIgnoreCase(url, "www.lovelypetsupply.com")) {
+                && StringUtils.containsIgnoreCase(url, "www.petstoreinc.com")) {
             return 3;
         }
         return 1;
@@ -158,7 +158,7 @@ public class MultiSiteUtil {
             case 2:
                 return "https://img.kidsproductwholesale.com";
             case 3:
-                return "https://img.lovelypetsupply.com";
+                return "https://img.petstoreinc.com";
             default:
                 return "";
         }
@@ -167,7 +167,7 @@ public class MultiSiteUtil {
     public static Map<String, String> webSiteMap = new HashMap<String, String>(){{
         put("ImportExpress", "https://www.import-express.com");
         put("KidsProductWholesale", "https://www.kidsproductwholesale.com");
-        put("LovelyPetSupply", "https://www.lovelypetsupply.com");
+        put("PetStoreInc", "https://www.petstoreinc.com");
     }};
 
 

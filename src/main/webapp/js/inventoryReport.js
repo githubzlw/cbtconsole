@@ -1,4 +1,7 @@
 $(function(){
+	if($("#q_szero").val()=='1'){
+		$("#szero").attr("checked",'checked');
+	}
 	var query_goodscatid_q = $("#query_goodscatid_q").val();
 	//获取类别
 	jQuery.ajax({
@@ -181,6 +184,7 @@ $(function(){
 		$("#lu_img").attr("src","https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg");
 		 $("#lu_name").html("产品名称产品名称产品名称产品名称"); 
 		 $("#lu_catid").val(""); 
+		 $("#lu_pid").val(""); 
 		 var trHtml=''
 		 trHtml = trHtml+"<tr><td ><span class='lu_sku'>as picture</span><br>";
 		 trHtml = trHtml+"<span class='lu_specid'></span><br>";
@@ -193,6 +197,30 @@ $(function(){
 		
 	});
 	$('#tc2').click(function(){
+		$("#tb_order_shipno").val("");
+		 var trHtml=''
+			 trHtml = trHtml+"<tr>";
+			 trHtml = trHtml+"<td class='lu_tb_index'>1</td>";
+			 trHtml = trHtml+"<td class='lu_tb_name'>产品名称产品名称产品名称产品名称</td>";
+			 trHtml = trHtml+"<td><img src='https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg' alt='' class='img-responsive'></td>";
+			 trHtml = trHtml+"<td class='lu_tb_skuc'>";
+			 trHtml = trHtml+"Sku:<span  class='lu_tb_sku'>xxxxx</span><br>";
+			 trHtml = trHtml+"Skuid:<span  class='lu_tb_skuid'>1111111111111</span><br>";
+			 trHtml = trHtml+"Specid:<span  class='lu_tb_specidc'>2222222222222</span>";
+			 trHtml = trHtml+"</td>";
+			 trHtml = trHtml+"<td class='lu_tb_count'>10</td>";
+			 trHtml = trHtml+"<td><input type='text' class='form-control lu_tb_a_count' value='10'></td>";
+			 trHtml = trHtml+"<td class='lu_tb_bar'>";
+			 trHtml = trHtml+"<input type='text' placeholder='请输入库位条形码' class='lu_tb_barcode'>";
+			/*<!-- <a class="gain lu_tb_barcode" onclick="getbarcode()">获取库位</a> --></td>";
+*/			trHtml = trHtml+"<td><input type='checkbox' class='lu_tb_checkbox'>";
+			trHtml = trHtml+"<input type='hidden' class='lu_tb_pid' value=''>";
+			trHtml = trHtml+"<input type='hidden' class='lu_tb_img' value=''>";
+			trHtml = trHtml+"<input type='hidden' class='lu_tb_url' value=''>";
+			trHtml = trHtml+"</td>";
+			trHtml = trHtml+"</tr>";
+		 $("#lu_tb_tr").html(trHtml);
+		 
 		$('.tc,.trnasparent,.tc2').show();
 		
 	});
@@ -415,13 +443,21 @@ function doQuery(page,flag) {
 	var minintentory = $('#query_minintentory').val();
 	var maxintentory = $('#query_maxintentory').val();
 	var queryLine = $('#query_line').val();
+	var szero = "0";
+	if($("#szero").is(':checked')){
+		szero = "1";
+	}
 	if(flag == 0){
 		var goodscatid = $('#query_goodscatid-in').val();
-		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&odid="+odid, "_self");
+		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid
+				+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine
+				+"&odid="+odid+"&szero="+szero, "_self");
 	}else{
 		var goodscatid = $('#query_goodscatid').val();
 		var check_id = $("#check_id").val();
-		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&check_id="+check_id, "_self");
+		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid
+				+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine
+				+"&check_id="+check_id+"&odid="+odid+"&szero="+szero, "_self");
 	}
 }
 
