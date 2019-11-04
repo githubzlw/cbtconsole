@@ -401,8 +401,8 @@ function inoutInventory(index,ibid,liid,inorout){
 		orderbarcode = $(".order_barcode_"+index).text();
 	}
 	jQuery.ajax({
-	       url:"/cbtconsole/inventory/barcode/update",
-	       data:{
+		 url:"/cbtconsole/inventory/barcode/update",
+		 data:{
 	    	   "ibid":ibid,
 	    	   "liid":liid,
 	    	   "inbarcode":inbarcode,
@@ -412,16 +412,16 @@ function inoutInventory(index,ibid,liid,inorout){
 	       },
 	       type:"post",
 	       success:function(data){
-	    	  if(data.status == 200){
-	    		 location.reload();
-	    	  }else{
-	    		  alert(data.reason);
-	    	  }
-	       },
-	   	error:function(e){
-	   		alert("获取类别列表失败");
-	   	}
-	   });
+		    	  if(data.status == 200){
+		    		 location.reload();
+		    	  }else{
+		    		  alert("获取类别列表错误:"+data.reason);
+		    	  }
+		       },
+		   	error:function(e){
+		   		alert("获取类别列表失败");
+		   	}
+	})
 }
 </script>
 </html>

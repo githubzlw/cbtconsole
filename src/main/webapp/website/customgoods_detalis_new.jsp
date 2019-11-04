@@ -53,6 +53,7 @@
             closeNewAliPidDlg('close');
             closeMultiFileDialog();
             closeGoodsDescDialog();
+            closeOverSeaDialog();
         });
 
         function relieveDisabled(obj) {
@@ -1442,6 +1443,42 @@
             $("#set_desc_form")[0].reset();
         }
 
+        function closeOverSeaDialog() {
+            $('#set_over_sea_div').dialog('close');
+            $("#set_over_sea_form")[0].reset();
+        }
+
+
+        function openOverSeaDialog() {
+            queryHotCategory();
+            $.ajax({
+                type: 'POST',
+                sync: true,
+                dataType: 'json',
+                url: '/cbtconsole/editc/getAllZone',
+                data: {
+                    "isUsd": 1
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        var content = "";
+                        var jsonData = data.data;
+                        for (var i=0;i< jsonData.length;i++) {
+                            content += '<option value="' + jsonData[i].id + '">' + jsonData[i].country + '</option>';
+                        }
+                        $("#query_country_id").empty();
+                        $("#query_country_id").append(content);
+                        $('#set_over_sea_div').dialog('open');
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (XMLResponse) {
+                    $.messager.alert("提醒", "获取数据错误", "error");
+                }
+            });
+        }
+
         function uploadMultiFile() {
             $.messager.progress({
                 title: '上传本地图片',
@@ -1485,7 +1522,7 @@
                 sync: true,
                 dataType: 'json',
                 url: '/cbtconsole/hotManage/getHotTypeList',
-                data: {},
+                data: {"hotType": 24},
                 success: function (data) {
                     if (data.success) {
                         var content = "";
@@ -1501,7 +1538,7 @@
                     }
                 },
                 error: function (XMLResponse) {
-                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                    $.messager.alert("提醒", "获取数据，请联系管理员", "error");
                 }
             });
         }
@@ -1531,6 +1568,68 @@
                 }
             });
         }
+
+        function saveOverSeaInfo(pid) {
+            var countryId = $("#query_country_id").val();
+            var isSupport = $("#query_is_support").val();
+            var categoryId= $("#sea_category_id").val();
+            if(!categoryId || categoryId <= 0){
+                showMessage("请选择类别数据");
+                return;
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/cbtconsole/editc/setGoodsOverSea',
+                    data: {
+                        pid: pid,
+                        countryId: countryId,
+                        isSupport: isSupport,
+                        categoryId: categoryId
+                    },
+                    success: function (data) {
+                        if (data.ok) {
+                            showMessage("执行成功");
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 500);
+                        } else {
+                            $.messager.alert("提醒", data.message, "error");
+                        }
+                    },
+                    error: function (XMLResponse) {
+                        $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                    }
+                });
+            }
+        }
+        
+        function queryHotCategory() {
+            var hotType = $("#sea_hot_class_id").val();
+            $.ajax({
+                type: 'POST',
+                sync: true,
+                dataType: 'json',
+                url: '/cbtconsole/hotManage/getHotTypeList',
+                data: {"hotType": hotType},
+                success: function (data) {
+                    if (data.success) {
+                        var content = "";
+                        var jsonData = data.rows;
+                        for (var i=0;i< jsonData.length;i++) {
+                            content += '<option value="' + jsonData[i].id + '">' + jsonData[i].showName + '</option>';
+                        }
+                        $("#sea_category_id").empty();
+                        $("#sea_category_id").append(content);
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (XMLResponse) {
+                    $.messager.alert("提醒", "获取数据，请联系管理员", "error");
+                }
+            });
+        }
     </script>
 </head>
 
@@ -1552,6 +1651,51 @@
 <c:if test="${uid > 0}">
 
     <div class="mask"></div>
+
+    <div id="set_over_sea_div" class="easyui-dialog" title="设置海外仓"
+         data-options="modal:true"
+         style="width: 335px; height: 240px; padding: 10px;">
+        <form style="margin-left: 44px;" id="set_over_sea_form" method="post" enctype="multipart/form-data">
+            <table>
+                <tr>
+                    <td>热卖分组:</td>
+                    <td>
+                        <select id="sea_hot_class_id" onchange="queryHotCategory()" style="height: 26px;width: 150px;">
+                            <option value="25">kids海外仓专区</option>
+                            <option value="26">pets海外仓专区</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>分类:</td>
+                    <td>
+                        <select id="sea_category_id" style="height: 26px;width: 150px;">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>国家:</td>
+                    <td><select id="query_country_id" style="height: 26px;width: 150px;"></select></td>
+                </tr>
+                <tr>
+                    <td>是否支持</td>
+                    <td><select id="query_is_support" style="height: 26px;width: 150px;">
+                        <option value="0">不支持</option>
+                        <option value="1">支持</option>
+                    </select></td>
+                </tr>
+            </table>
+        </form>
+        <br>
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="saveOverSeaInfo('${goods.pid}')" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeOverSeaDialog()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
 
     <div id="set_goods_desc_type" class="easyui-dialog" title="设置描述很精彩"
          data-options="modal:true"
@@ -1859,6 +2003,10 @@
             <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,1,0,0)">标识永不下架</span>
             <c:if test="${goods.promotionFlag == 0}">
                 <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,0,0,1)">标识促销商品</span>
+            </c:if>
+
+            <c:if test="${goods.overSeaFlag == 0}">
+                <span class="s_btn" onclick="openOverSeaDialog()">设置海外仓</span>
             </c:if>
 
 
@@ -2223,6 +2371,41 @@
                     <c:if test="${not empty describeGoodFlagStr}">
                         <b style="font-size: 16px;color: red;">描述很精彩:(${describeGoodFlagStr})</b>
                     </c:if>
+                </c:if><c:if test="${goods.overSeaFlag >0}">
+                    <br>
+                    <div style="font-size: 20px;background-color: #a2f387" >
+                        <table border="1">
+                            <caption>海外仓设置</caption>
+                            <thead>
+                            <tr>
+                                <td>国家</td>
+                                <td>是否支持</td>
+                                <td>设置人</td>
+                                <td>设置时间</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <c:forEach items="${goodsOverSeaList}" var="overSea">
+                                <tr>
+                                    <td>
+                                            ${overSea.countryName}
+                                    </td>
+                                    <td>
+                                        <c:if test="${overSea.isSupport > 0}">
+                                            <b style="color: #2f5aff">支持</b>
+                                        </c:if>
+                                        <c:if test="${overSea.isSupport == 0}">
+                                            <b style="color: red">不支持</b>
+                                        </c:if>
+                                    </td>
+                                    <td>${overSea.adminName}</td>
+                                    <td>${overSea.createTime}</td>
+                                </tr>
+                            </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
                 </c:if><c:if test="${goods.isBenchmark >0}">
                     <br>
                     <b style="font-size: 16px;">货源对标情况:${goods.isBenchmark ==1 ? '精确对标':'近似对标'}</b>

@@ -2,6 +2,8 @@ package com.cbt.userinfo.service;
 
 import com.cbt.pojo.UserEx;
 import org.apache.ibatis.annotations.Param;
+import com.cbt.website.bean.UserInfo;
+import com.importExpress.pojo.UserRecommendEmail;
 
 import java.util.List;
 import java.util.Map;
@@ -72,4 +74,34 @@ public interface IUserInfoService {
     int updateUserFollowCode(String followCode,int userId);
 
     Map<String,String> getUserInfoById(@Param("id") int id);
+
+    /**
+	 * 查询用户所有信息
+	 * @param userId
+	 * @return
+	 */
+	UserInfo queryAllInfoById(int userId);
+
+	/**
+	 * 根据客户ID查询所有的推荐邮箱
+	 * @param userId
+	 * @return
+	 */
+	List<UserRecommendEmail> queryRecommendEmailInfo(int userId);
+
+    /**
+     * 插入发送消息
+     * @param userRecommendEmail
+     * @return
+     */
+	int insertIntoUserRecommendEmail(UserRecommendEmail userRecommendEmail);
+
+	/**
+     * 分页查询商业会员授权
+     * @param userInfo
+     * @return
+     */
+	List<UserInfo> queryBusinessMembershipAuthorization(UserInfo userInfo);
+
+	int queryBusinessMembershipAuthorizationCount(UserInfo userInfo);
 }

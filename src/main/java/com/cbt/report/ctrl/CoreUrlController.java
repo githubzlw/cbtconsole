@@ -868,7 +868,7 @@ public class CoreUrlController {
 			json.setOk(true);
 			json.setMessage("执行成功");
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("保存失败，原因：" + e.getMessage());
 			System.err.println("saveAndUpdateInfos error:" + e.getMessage());
@@ -902,7 +902,7 @@ public class CoreUrlController {
 			json.setOk(true);
 			json.setMessage("执行成功");
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("执行失败，原因：" + e.getMessage());
 			System.err.println("doGoodsClear error:" + e.getMessage());
@@ -1073,7 +1073,7 @@ public class CoreUrlController {
 			shopUrlService.deleteShopReadyGoods(shopId, pids);
 			json.setOk(true);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("执行失败，原因：" + e.getMessage());
 			System.err.println("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
@@ -1120,7 +1120,7 @@ public class CoreUrlController {
 			shopUrlService.deleteShopOfferGoods(shopId, pids);
 			json.setOk(true);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("执行失败，原因：" + e.getMessage());
 			System.err.println("shopId:" + shopId + ",pids:" + pids + ",deleteShopGoods error:" + e.getMessage());
@@ -1474,7 +1474,7 @@ public class CoreUrlController {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("保存失败，原因：" + e.getMessage());
 			System.err.println("shopId:" + shopId + ",deleteGoodsImgs error:" + e.getMessage());
@@ -2064,7 +2064,7 @@ public class CoreUrlController {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("shopId:" + shopId + ",pid:" + pidStr + ",保存错误，原因：" + e.getMessage());
 			LOG.error("shopId:" + shopId + ",pid:" + pidStr + ",保存错误，原因：" + e.getMessage());
@@ -2087,7 +2087,7 @@ public class CoreUrlController {
 			thread.start();
 			json.setOk(true);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("tbl:" + sourceTbl + ",发布错误，原因：" + e.getMessage());
 			LOG.error("tbl:" + sourceTbl + ",发布错误，原因：" + e.getMessage());
@@ -2138,7 +2138,7 @@ public class CoreUrlController {
 
 			json.setOk(true);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
 			LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
@@ -2185,7 +2185,7 @@ public class CoreUrlController {
 			shopUrlService.updateShopState(shopId, 4);
 			json.setOk(true);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
 			LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
@@ -2404,7 +2404,7 @@ public class CoreUrlController {
 
 			json.setOk(true);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());
 			LOG.error("shopId:" + shopId + ",发布错误，原因：" + e.getMessage());

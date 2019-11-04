@@ -2,15 +2,12 @@ package com.cbt.warehouse.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.StringRedisConnection.StringTuple;
 import org.springframework.stereotype.Service;
 
 import com.cbt.Specification.bean.AliCategory;
@@ -45,7 +42,6 @@ import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import com.mysql.fabric.xmlrpc.base.Data;
 @Service
 public class InventoryServiceImpl implements  InventoryService{
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);

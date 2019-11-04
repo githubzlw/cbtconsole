@@ -147,6 +147,15 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private String noChnageRemark;
 	private String locationNum;
 	private int downSample;//拆样数量
+	private int overSeaFlag;// 海外仓标识
+
+	public int getOverSeaFlag() {
+		return overSeaFlag;
+	}
+
+	public void setOverSeaFlag(int overSeaFlag) {
+		this.overSeaFlag = overSeaFlag;
+	}
 
 	/**
 	 * 原始拆单前商品数量

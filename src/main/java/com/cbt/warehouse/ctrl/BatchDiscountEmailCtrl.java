@@ -108,7 +108,7 @@ public class BatchDiscountEmailCtrl {
 			json.setRows(emailLst);
 			json.setTotal(total);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setSuccess(false);
 			json.setMessage("获取批量优惠邮件失败，原因：" + e.getMessage());
 			LOG.error("获取批量优惠邮件失败，原因：" + e.getMessage());
@@ -154,7 +154,7 @@ public class BatchDiscountEmailCtrl {
 			json.setOk(true);
 			json.setData(emailDetailsLst);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("获取批量优惠邮件详情失败，原因：" + e.getMessage());
 			LOG.error("获取批量优惠邮件详情失败，原因：" + e.getMessage());
@@ -231,7 +231,7 @@ public class BatchDiscountEmailCtrl {
 			json.setOk(true);
 			json.setMessage("批量更新成功");
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("批量更新失败，原因：" + e.getMessage());
 			LOG.error("获批量更新失败，原因：" + e.getMessage());
@@ -304,7 +304,7 @@ public class BatchDiscountEmailCtrl {
 				json.setMessage("发送邮件失败");
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("发送邮件执行失败，原因：" + e.getMessage());
 			LOG.error("发送邮件执行失败，原因：" + e.getMessage());
@@ -332,7 +332,7 @@ public class BatchDiscountEmailCtrl {
 			BatchDiscountEmail bdEamilInfo = bdEmailService.queryEmailByOrderNo(orderNo);
 			request.setAttribute("bdEamilInfo", bdEamilInfo);
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("跳转邮件预览失败，原因：" + e.getMessage());
 			LOG.error("跳转邮件预览失败，原因：" + e.getMessage());
@@ -378,7 +378,7 @@ public class BatchDiscountEmailCtrl {
 					checkIsBatchDiscountEamil(this.orderNo);
 				}
 			} catch (Exception e) {
-				e.getStackTrace();
+				e.printStackTrace();
 				LOG.error("生成批量价格邮件出错,原因:" + e.getMessage());
 			}
 
@@ -440,7 +440,7 @@ public class BatchDiscountEmailCtrl {
 			System.out.println("当前订单[" + orderNo + "]的含有批量价格的商品个数:" + nwEdLst.size());
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("检查商品的批量价格有效出错,原因:" + e.getMessage());
 		}
 	}

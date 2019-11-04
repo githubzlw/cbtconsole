@@ -278,6 +278,98 @@ tr .td_class{width:230px;}
         $('#user_type').window('open');
     }
 
+    function openRecommendEmail(userId, site) {
+
+		$.ajax({
+			type:'post',
+			url:'../userinfo/getUserAllInfoById',
+			data:{
+				userId:userId
+			},
+			success:function(data){
+				if(data != null){
+					if(data.ok){
+						$("#send_web_site").val(site);
+						$("#send_user_id").val(userId);
+						var json = data.data;
+						$("#send_user_email").val(json.email);
+						$("#user_create_time").val(json.creattime);
+						$("#user_buniess_info").val(json.businessinfo);
+						if(json.productone && json.productone.length > 2){
+							$("#user_goods_need").val(json.productone);
+							$("#user_goods_require").val(json.requirementone);
+						}else if(json.productone && json.producttwo.length > 2){
+							$("#user_goods_need").val(json.producttwo);
+							$("#user_goods_require").val(json.requirementtwo);
+						}
+						$("#sell_email").val(json.admuser);
+						var jsonList = data.allData;
+						if(jsonList && jsonList.length > 0){
+							var content = '';
+							for(var i = 0;i<jsonList.length;i++){
+								content += '<tr>';
+								content += '<td>时间:'+jsonList[i].createTime+'</td>';
+								content += '<td>推送人:'+jsonList[i].adminName+'</td>';
+								content += '<td><a href="'+jsonList[i].sendUrl+'">链接</a></td>';
+								content += '</tr>';
+							}
+							$("#history_id").empty();
+							$("#history_id").append(content);
+							$("#history_table").show();
+						}
+						$("#send_recommend_id").window('open');
+					}else{
+						alert("获取信息失败");
+					}
+				}else{
+					alert("网络错误");
+				}
+			}
+		});
+	}
+
+	function sendRecommendEmail() {
+		var userId = $("#send_user_id").val();
+		var userEmail = $("#send_user_email").val();
+		var createTime = $("#user_create_time").val();
+		var buniessInfo = $("#user_buniess_info").val();
+		var goodsNeed = $("#user_goods_need").val();
+		var goodsRequire = $("#user_goods_require").val();
+		var sendUrl = $("#send_url").val();
+		var sellEmail = $("#sell_email").val();
+		var webSite = $("#send_web_site").val();
+		if(userId && userEmail && createTime && sendUrl && webSite){
+			$("#notice_id").show();
+			$.ajax({
+				type:'post',
+				url:'../userinfo/sendRecommendEmail',
+				data:{
+					userId:userId,
+					userEmail:userEmail,
+					createTime:createTime,
+					buniessInfo:buniessInfo,
+					goodsNeed:goodsNeed,
+					sendUrl:sendUrl,
+					sellEmail:sellEmail,
+					goodsRequire:goodsRequire,
+					webSite:webSite
+				},
+				success:function(data){
+					$("#notice_id").hide();
+					if(data.ok){
+						$("#send_recommend_id").window('close');
+					}else{
+						alert("执行报错");
+					}
+				}
+			});
+		}else{
+			alert("请填写必要的信息");
+			return;
+		}
+
+	}
+
 	function userlogin(userid, name, currency) {
         $('#user_login_message input[name=userid]').val(userid);
         $('#user_login_message').window('open');
@@ -646,6 +738,46 @@ tr .td_class{width:230px;}
         </div>
         <div style="margin-left: 260px;">
         </div>
+    </div>
+	<div id="send_recommend_id" class="easyui-window" title="推荐目录推送"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:500px;height:400px;display: none;font-size: 16px;">
+        <table align="center">
+			<tr>
+				<td>用户邮箱:</td><td>
+				<input id="send_user_id" value="0" style="display: none"/>
+				<input id="send_web_site" value="-1" style="display: none"/>
+				<input id="send_user_email" style="width: 280px;"/></td>
+			</tr>
+			<tr>
+				<td>注册日期:</td><td><input id="user_create_time" style="width: 280px;"/></td>
+			</tr>
+			<tr>
+				<td>商务信息:</td><td><input id="user_buniess_info" style="width: 280px;"/></td>
+			</tr>
+			<tr>
+				<td>产品需求:</td><td><input id="user_goods_need" style="width: 280px;"/>
+			<br>
+			<input id="user_goods_require" style="width: 280px;"/></td>
+			</tr>
+			<tr>
+				<td>目录地址:</td><td><input id="send_url" style="width: 280px;"/><button>生成目录</button></td>
+			</tr>
+			<tr>
+				<td>推送邮箱:</td><td><input id="sell_email" style="width: 280px;"/></td>
+			</tr>
+			<tr>
+				<td colspan="2" style="text-align: center"><button onclick="sendRecommendEmail()">推送</button>
+				<span id="notice_id" style="display: none;color: red;">执行中，请等待...</span>
+				</td>
+			</tr>
+		</table>
+		<table align="center" id="history_table" style="display: none;" border="1" cellpadding="0">
+			<caption>推送历史记录</caption>
+			<tbody id="history_id">
+
+			</tbody>
+		</table>
     </div>
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div>

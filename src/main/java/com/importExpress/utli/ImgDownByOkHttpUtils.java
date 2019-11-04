@@ -37,7 +37,7 @@ public class ImgDownByOkHttpUtils {
             FileUtils.copyInputStreamToFile(inputStream, downFile);
 
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             System.err.println("execute download[ " + imgUrl + "] error:---");
             System.err.println("--- " + e.getMessage());
             return false;
@@ -98,7 +98,7 @@ public class ImgDownByOkHttpUtils {
             fileOutputStream.write(output.toByteArray());
 
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             System.err.println("execute download[ " + imgUrl + "] error:" + e.getMessage());
             return false;
         } finally {

@@ -51,7 +51,7 @@ public class NewOrderInfoCtr {
 				countryname = "USA";
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("查询国家名称失败，原因：" + e.getMessage());
 			json.setOk(false);
 			json.setMessage("查询国家名称失败,原因：" + e.getMessage());

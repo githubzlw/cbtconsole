@@ -47,7 +47,7 @@ public class SaveSyncTable {
 				break;
 			} catch (Exception e) {
 				count++;
-				//e.getStackTrace();
+				//e.printStackTrace();
 				LOG.error("InsertOnlineDataInfo,tableName:" + tableName + ",businessType :" + businessType
 						+ " error,reason:" + e.getMessage());
 			}

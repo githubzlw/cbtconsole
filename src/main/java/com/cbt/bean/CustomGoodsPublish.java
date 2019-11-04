@@ -131,6 +131,16 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private int isShowDetImgFlag;
 
+    private int overSeaFlag;
+
+    public int getOverSeaFlag() {
+        return overSeaFlag;
+    }
+
+    public void setOverSeaFlag(int overSeaFlag) {
+        this.overSeaFlag = overSeaFlag;
+    }
+
     public int getIsShowDetImgFlag() {
         return isShowDetImgFlag;
     }

@@ -120,7 +120,7 @@ public class NewFtpUtil {
 					return json;
 				}
 			} catch (Exception e) {
-				e.getStackTrace();
+				e.printStackTrace();
 				json.setOk(false);
 				json.setMessage("上传文件错误,请重试");
 				System.err.println("上传文件错误:" + e.getMessage());
@@ -171,7 +171,7 @@ public class NewFtpUtil {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			return false;
 		} finally {
 			// 断开连接
@@ -378,7 +378,7 @@ public class NewFtpUtil {
 					ftpClient.disconnect();
 				}
 			} catch (Exception e) {
-				e.getStackTrace();
+				e.printStackTrace();
 			}
 		}
 
