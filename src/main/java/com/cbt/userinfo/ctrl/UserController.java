@@ -682,9 +682,16 @@ public class UserController {
     @RequestMapping(value = "/queryMemAuthList", method = RequestMethod.POST)
     @ResponseBody
     public EasyUiJsonResult queryBusinessMembershipAuthorization(HttpServletRequest request,
-                               Integer page , Integer rows, Integer userId, String email, Integer countryId, Integer authFlag) {
+                                            Integer page , Integer rows, Integer userId, String email,
+                                            Integer countryId, Integer authFlag, Integer site) {
         EasyUiJsonResult json = new EasyUiJsonResult();
 
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if(admuser == null || admuser.getId() == 0){
+            json.setSuccess(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
 
         UserInfo userInfo = new UserInfo();
         if(page == null || page == 0){
@@ -704,8 +711,16 @@ public class UserController {
         userInfo.setCountryId(countryId);
         userInfo.setAuthFlag(authFlag);
 
+        if(site == null || site < -1){
+            site = -1;
+        }
+        userInfo.setSite(site);
+
         try {
 
+            if(admuser.getRoletype() > 0){
+                userInfo.setAdminId(admuser.getId());
+            }
 
             List<UserInfo> list= userInfoService.queryBusinessMembershipAuthorization(userInfo);
 
