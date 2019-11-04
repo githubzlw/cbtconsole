@@ -75,7 +75,7 @@ public class SearchFileUtils {
             result[1] = src.getHeight(null);  // 得到源图高
             result[0] = src.getWidth(null);  // 得到源图宽
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             System.out.print(e.getMessage());
         } finally {
             if (is != null) {
@@ -200,7 +200,7 @@ public class SearchFileUtils {
                 }
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
         }
         return boo;
     }

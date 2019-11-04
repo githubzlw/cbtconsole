@@ -147,7 +147,7 @@ public class UserLoginController {
     		
     		
     	} catch (Exception e) {
-    		e.getStackTrace();
+    		e.printStackTrace();
     		json.setOk(false);
     		json.setMessage("校检用户信息失败，原因：" + e.getMessage());
     		LOG.error("校检用户信息失败，原因：", e);
@@ -207,7 +207,7 @@ public class UserLoginController {
 
 
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("校检用户信息失败，原因：" + e.getMessage());
             LOG.error("校检用户信息失败，原因：", e);
@@ -272,7 +272,7 @@ public class UserLoginController {
             response.addCookie(usPass);
             currentUser.logout();
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             LOG.error("退出失败，原因：" + e.getMessage());
         }
 
@@ -423,7 +423,7 @@ public class UserLoginController {
             }
 
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             json.setOk(false);
             json.setMessage("校检用户信息失败，原因：" + e.getMessage());
             LOG.error("校检用户信息失败，原因：", e);

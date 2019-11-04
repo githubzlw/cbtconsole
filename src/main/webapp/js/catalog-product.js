@@ -304,7 +304,7 @@ function catalogProduct(id){
 				for(var j=0;j<item.length;j++){
 					var product = item[j];
 					productHtml = productHtml +'<div class="col-xs-2 product"><div class="product_in">';//src="https://www.import-express.com/newindex/img/dot.gif" data-
-					productHtml = productHtml +'<a href="'+requestHost+product.url+'"><img src="'+product.img+'" class="product-img img-lazy img-responsive"></a>';
+					productHtml = productHtml +'<a href="'+requestHost+product.url+'"><img src="/cbtconsole/img/beforeLoad.gif" data-original="'+product.img+'" class="product-img img-lazy img-responsive"></a>';
 					productHtml = productHtml +'<input type="checkbox" class="is_boutique_check" name="is_selected" value="'+product.pid+'" onclick="checkClick(this)" checked="checked">';
 					productHtml = productHtml +'<div class="info-product">';
 					productHtml = productHtml +'<div class="product-name">'+product.name+'</div>';
@@ -319,6 +319,7 @@ function catalogProduct(id){
 			 $("#query_temp").val(data.template);
 			
 			$(".product-list").html(productHtml);
+			$('.img-lazy').lazyload({effect: "fadeIn"});
 //			console.log(productArray);
 			searchFromRemote();
 		},
@@ -371,7 +372,7 @@ function searchFromRemote(){
 					continue;
 				}
 				productHtml = productHtml +'<div class="col-xs-2 product"><div class="product_in">';//src="https://www.import-express.com/newindex/img/dot.gif" data-
-				productHtml = productHtml +'<a href="'+requestHost+goodslist[i].goods_url+'"><img src="'+goodslist[i].goods_image+'" class="product-img img-lazy img-responsive"></a>';
+				productHtml = productHtml +'<a href="'+requestHost+goodslist[i].goods_url+'"><img src="/cbtconsole/img/beforeLoad.gif" data-original="'+goodslist[i].goods_image+'" class="product-img img-lazy img-responsive"></a>';
 				productHtml = productHtml +'<input type="checkbox" class="is_boutique_check" name="is_selected" value="'+goodslist[i].goods_pid+'" onclick="checkClick(this)">';
 				productHtml = productHtml +'<div class="info-product">';
 				productHtml = productHtml +'<div class="product-name">'+goodslist[i].goods_name+'</div>';
@@ -415,6 +416,7 @@ function searchFromRemote(){
 				$(".product-page").show();
 			}
 			totalpage = parseInt(paramv.amountPage);
+			$('.img-lazy').lazyload({effect: "fadeIn"});
 		},
 		error:function(e){
 			$.MsgBox.Alert("提示", "搜索请求错误");

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.OverseasWarehouseStockMapper" >
+  <resultMap id="StockResultMap" type="com.importExpress.pojo.OverseasWarehouseStock" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="ow_stock" property="owStock" jdbcType="INTEGER" />
+    <result column="order_stock" property="orderStock" jdbcType="INTEGER" />
+    <result column="available_stock" property="availableStock" jdbcType="INTEGER" />
+    <result column="goods_pid" property="goodsPid" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="sku" property="sku" jdbcType="VARCHAR" />
+    <result column="skuid" property="skuid" jdbcType="VARCHAR" />
+    <result column="specid" property="specid" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="StockLogResultMap" type="com.importExpress.pojo.OverseasWarehouseStockWrap" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="goods_pid" property="goodsPid" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="sku" property="sku" jdbcType="VARCHAR" />
+    <result column="skuid" property="skuid" jdbcType="VARCHAR" />
+    <result column="specid" property="specid" jdbcType="VARCHAR" />
+    <result column="stock_remark" property="stockRemark" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="ows_id" property="owsid" jdbcType="INTEGER" />
+    <result column="od_id" property="odid" jdbcType="INTEGER" />
+    <result column="orderno" property="orderno" jdbcType="INTEGER" />
+    <result column="change_stock" property="changeStock" jdbcType="INTEGER" />
+    <result column="change_type" property="changeType" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+  </resultMap>
+
+<!-- 订单完结或者取消减少订单占用库存，可用库存增加 -->
+  <update id="reduceOrderStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
+    update overseas_warehouse_stock set order_stock=order_stock-#{orderStock},
+    available_stock=available_stock+#{orderStock} where code=#{code}
+  </update>
+<!-- 日志记录  -->
+  <insert id="addLog" parameterType="com.importExpress.pojo.OverseasWarehouseStockLog" >
+    insert into overseas_warehouse_stock_log (ows_id, change_stock,od_id,orderno,change_type,remark,code,create_time)
+    values ((select id from overseas_warehouse_stock where code=#{code} limit 1), #{changeStock}, #{odid},
+      #{orderno}, #{changeType}, #{remark},#{code},now())
+  </insert>
+  
+  <select id="getLogByOrderno" resultMap="StockLogResultMap">
+  select id,ows_id, change_stock,od_id,orderno,change_type,remark,code,create_time 
+  from  overseas_warehouse_stock_log where orderno=#{orderno} order by change_type asc
+  </select>
+  
+<!-- 最近一次同步时间  -->
+	<select id="getLastSyncStock" resultType="String">
+	select create_time from overseas_warehouse_stock_synchronization order by id desc limit 1
+	</select>
+	<!-- 库存列表  -->
+	<select id="getStockList" resultMap="StockResultMap" parameterType="com.importExpress.pojo.OverseasWarehouseStockParamter">
+	select id,ow_stock,order_stock,available_stock,goods_pid,goods_name,code,sku,skuid,specid,create_time,update_time,remark
+	from overseas_warehouse_stock where 1=1
+	<if test="goodsPid != null"> and goods_pid=#{goodsPid}</if>
+	<if test="skuid != null"> and skuid=#{skuid}</if>
+	limit #{page},20
+	</select>
+	<!-- 库存列表数量 -->
+	<select id="getStockListCount" resultType="Integer" parameterType="com.importExpress.pojo.OverseasWarehouseStockParamter">
+	select count(*)
+	from overseas_warehouse_stock where 1=1
+	<if test="goodsPid != null"> and goods_pid=#{goodsPid}</if>
+	<if test="skuid != null"> and skuid=#{skuid}</if>
+	
+	</select>
+	<!-- 库存日志列表  -->
+	<select id="getStockLogList" resultMap="StockLogResultMap" parameterType="com.importExpress.pojo.OverseasWarehouseStockParamter">
+	
+	select a.id,a.ows_id,a.od_id,a.orderno,a.change_stock,a.change_type,a.create_time,a.remark,a.code,
+	b.goods_pid,b.goods_name,b.sku,b.skuid,b.specid,b.remark as stock_remark from overseas_warehouse_stock_log a
+	left join overseas_warehouse_stock b on a.ows_id=b.id where 1=1
+	
+	<if test="owsid!=0"> and a.ows_id=#{owsid}</if>
+	<if test="code != null"> and a.code=#{code}</if>
+	<if test="goodsPid != null"> and b.goods_pid=#{goodsPid}</if>
+	<if test="skuid != null"> and b.skuid=#{skuid}</if>
+	limit #{page},20
+	</select>
+	<!-- 库存日志列表数量 -->
+	<select id="getStockLogListCount" resultType="Integer" parameterType="com.importExpress.pojo.OverseasWarehouseStockParamter">
+
+	select count(a.id) from overseas_warehouse_stock_log a
+	left join overseas_warehouse_stock b on a.ows_id=b.id
+	where 1=1
+	<if test="owsid!=0"> and a.ows_id=#{owsid}</if>
+	<if test="code != null"> and a.code=#{code}</if>
+	<if test="goodsPid != null"> and b.goods_pid=#{goodsPid}</if>
+	<if test="skuid != null"> and b.skuid=#{skuid}</if>
+	
+	</select>
+	<insert id="addStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
+	insert into overseas_warehouse_stock(ow_stock,order_stock,available_stock,goods_pid,goods_name,
+	code,sku,skuid,specid,create_time,update_time,remark) 
+	values(#{owStock},0,#{owStock},#{goodsPid},#{goodsName},#{code},#{sku},#{skuid},#{specid},now(),now(),#{remark})
+	</insert>
+	
+	<update id="updateStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
+	update overseas_warehouse_stock set ow_stock=#{owStock},available_stock=#{owStock}-order_stock,update_time=now() where code=#{code}
+	</update>
+	<insert id="addSyncStockTime">insert into overseas_warehouse_stock_synchronization(create_time,sync_count) values(now(),#{syncCount})</insert>
+	
+	
+</mapper>

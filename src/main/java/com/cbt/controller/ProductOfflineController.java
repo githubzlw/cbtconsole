@@ -354,7 +354,7 @@ public class ProductOfflineController {
 			}
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("保存错误，原因：" + e.getMessage());
 			LOG.error("保存错误，原因：" + e.getMessage());
@@ -404,7 +404,7 @@ public class ProductOfflineController {
 			json.setMessage("执行成功");
 
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("保存错误，原因：" + e.getMessage());
 			LOG.error("保存错误，原因：" + e.getMessage());
@@ -511,7 +511,7 @@ public class ProductOfflineController {
 				}
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("执行失败,原因：" + e.getMessage());
 			LOG.error("执行失败，原因：" + e.getMessage());
@@ -572,7 +572,7 @@ public class ProductOfflineController {
 				json.setMessage("执行失败,请重试");
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setOk(false);
 			json.setMessage("执行失败,原因：" + e.getMessage());
 			LOG.error("执行失败，原因：" + e.getMessage());

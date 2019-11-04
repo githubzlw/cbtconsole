@@ -92,7 +92,7 @@ public class BasicReportController {
 			json.setSuccess(true);
 			return json;
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			json.setSuccess(false);
 			json.setMessage("查询失败，原因：" + e.getMessage());
 			LOG.error("查询失败，原因：" + e.getMessage());
@@ -1994,7 +1994,7 @@ public class BasicReportController {
 					json.setOk(true);
 					json.setMessage("上传文件成功，本次导入数量：" + infos.size());
 				} catch (Exception e) {
-					e.getStackTrace();
+					e.printStackTrace();
 					json.setOk(true);
 					json.setMessage("保存失败，原因：" + e.getMessage());
 					System.out.println("保存失败，原因：" + e.getMessage());
@@ -2053,7 +2053,7 @@ public class BasicReportController {
 						remoteFlies.add(realSavePath);
 					}
 				} catch (Exception e) {
-					e.getStackTrace();
+					e.printStackTrace();
 				} finally {
 					if (fops != null) {
 						try {

@@ -160,7 +160,7 @@ public class NewCloudPublishGoodsToOnlie extends Thread {
 				LOG.warn("UploadImgToOnline pid:" + pid + " is uploading!");
 			}
 		} catch (Exception e) {
-			e.getStackTrace();
+			e.printStackTrace();
 			LOG.error("UploadImgToOnline error:" + e.getMessage());
 			newCloudGoodsService.updateGoodsState(pid, 3);
 		}

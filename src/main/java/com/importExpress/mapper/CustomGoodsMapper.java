@@ -517,4 +517,20 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<String> queryDescribeLogList();
+
+    Map<String,String>  getGoodsByPid(@Param("pid") String pid);
+
+    /**
+     * 插入海外仓数据
+     * @param goodsOverSea
+     * @return
+     */
+    int insertIntoGoodsOverSeaInfo(GoodsOverSea goodsOverSea);
+
+    /**
+     * 查询海外仓数据
+     * @param pid
+     * @return
+     */
+    List<GoodsOverSea> queryGoodsOverSeaInfoByPid(String pid);
 }
