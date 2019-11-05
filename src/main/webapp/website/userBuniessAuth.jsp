@@ -386,6 +386,11 @@
 
         }
 
+        function openContent() {
+            var url = "/cbtconsole/catalog/list";
+            window.open(url);
+        }
+
     </script>
 </head>
 <body>
@@ -446,7 +451,7 @@
         <tr>
             <td>目录地址:</td>
             <td><input id="send_url" style="width: 330px;"/>
-                <button class="enter_btn">生成目录</button>
+                <button class="enter_btn" onclick="openContent()">生成目录</button>
             </td>
         </tr>
         <tr>

@@ -370,6 +370,11 @@ tr .td_class{width:230px;}
 
 	}
 
+	function openContent() {
+		var url = "/cbtconsole/catalog/list";
+		window.open(url);
+	}
+
 	function userlogin(userid, name, currency) {
         $('#user_login_message input[name=userid]').val(userid);
         $('#user_login_message').window('open');
@@ -761,7 +766,7 @@ tr .td_class{width:230px;}
 			<input id="user_goods_require" style="width: 280px;"/></td>
 			</tr>
 			<tr>
-				<td>目录地址:</td><td><input id="send_url" style="width: 280px;"/><button>生成目录</button></td>
+				<td>目录地址:</td><td><input id="send_url" style="width: 280px;"/><button onclick="openContent()">生成目录</button></td>
 			</tr>
 			<tr>
 				<td>推送邮箱:</td><td><input id="sell_email" style="width: 280px;"/></td>

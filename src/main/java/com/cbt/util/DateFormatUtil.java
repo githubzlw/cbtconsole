@@ -1,5 +1,7 @@
 package com.cbt.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -136,6 +138,20 @@ public class DateFormatUtil {
 	 }
 	public static void main(String[] args) {
 		System.err.println(formatDateToStringByYear(new Date()));
+	}
+
+	public static Date getDateByTimeStr(String dateStr) throws ParseException {
+	 	if(StringUtils.isNotBlank(dateStr)){
+	 		if(dateStr.length() > 10){
+	 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	 			return df.parse(dateStr);
+			}else{
+	 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	 			return df.parse(dateStr);
+			}
+		}else{
+	 		return null;
+		}
 	}
 
 }
