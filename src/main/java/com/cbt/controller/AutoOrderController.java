@@ -228,13 +228,13 @@ public class AutoOrderController {
 			detailBean.setOd_total_weight(0.001);
 			detailBean.setGoodsid(1400);
 			orderdetails.add(detailBean);
-			int addOrderDetail =iOrderinfoService.addOrderDetail(orderdetails );
-//			autoOrderService.addOrderDetail(orderdetails );
+//			int addOrderDetail =iOrderinfoService.addOrderDetail(orderdetails );
+			int addOrderDetail =autoOrderService.addOrderDetail(orderdetails );
 			if(addOrderDetail<1){
 				return "-3";
 			}
 			//添加order_address
-			Map<String, String> addressMap = new HashMap<String, String>();
+			Map<String, Object> addressMap = new HashMap<String, Object>();
 			addressMap.put("orderno", orderNo);
 			addressMap.put("addressid", String.valueOf(address_id));
 			addressMap.put("country", address.getCountryname());
@@ -245,8 +245,8 @@ public class AutoOrderController {
 			addressMap.put("zipcode", address.getZip_code());
 			addressMap.put("street", address.getStreet());
 			addressMap.put("recipients", address.getRecipients());
-			int addOrderAddress =iOrderinfoService.addOrderAddress(addressMap);
-//			autoOrderService.addOrderAddress(addressMap);
+//			int addOrderAddress =iOrderinfoService.addOrderAddress(addressMap);
+			int addOrderAddress =autoOrderService.addOrderAddress(addressMap);
 			writeOrderNote(userid,orderNo,dealMan,upfile);
 			return addOrderAddress>0?orderNo:"";
 		}catch (Exception e){
