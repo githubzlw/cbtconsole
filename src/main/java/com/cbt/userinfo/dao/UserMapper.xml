@@ -127,13 +127,15 @@
     <select id="queryRecommendEmailInfo" resultType="com.importExpress.pojo.UserRecommendEmail">
         select a.id,a.user_id as userId,a.email_content as emailContent,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,a.send_url as sendUrl,
-        a.admin_id as adminId,b.admName as adminName
-        from user_recommend_email a,admuser b where a.admin_id = b.id and a.user_id = #{userId}
+        a.admin_id as adminId,b.admName as adminName,a.catalog_id as catalogId,if(ifnull(c.id,0) > 0,1,0) as openFlag
+        from user_recommend_email a inner join admuser b on a.admin_id = b.id
+		left join recommend_catalog_record c on a.user_id = c.user_id and a.catalog_id = c.catalog_id
+        where  a.user_id = #{userId}
     </select>
 
     <insert id="insertIntoUserRecommendEmail" parameterType="com.importExpress.pojo.UserRecommendEmail">
-        insert into user_recommend_email(user_id,email_content,send_url,admin_id)
-        values(#{userId},#{emailContent},#{sendUrl},#{adminId})
+        insert into user_recommend_email(user_id,email_content,send_url,admin_id,catalog_id)
+        values(#{userId},#{emailContent},#{sendUrl},#{adminId},#{catalogId})
     </insert>
 
     <select id="getUserInfoById" resultType="hashmap">

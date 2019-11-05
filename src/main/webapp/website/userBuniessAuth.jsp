@@ -295,7 +295,7 @@
         }
 
         function openRecommendEmail(userId, site) {
-
+            $("#history_id").empty();
             $.ajax({
                 type: 'post',
                 url: '../userinfo/getUserAllInfoById',
@@ -326,12 +326,19 @@
                                     content += '<tr>';
                                     content += '<td>时间:' + jsonList[i].createTime + '</td>';
                                     content += '<td>推送人:' + jsonList[i].adminName + '</td>';
+                                    if(jsonList[i].openFlag > 0){
+                                        content += '<td>打开</td>';
+                                    }else {
+                                        content += '<td>未打开</td>';
+                                    }
                                     content += '<td><a href="' + jsonList[i].sendUrl + '">链接</a></td>';
                                     content += '</tr>';
                                 }
-                                $("#history_id").empty();
+
                                 $("#history_id").append(content);
                                 $("#history_table").show();
+                            }else{
+                                $("#history_table").hide();
                             }
                             $("#send_recommend_id").dialog('open');
                         } else {
@@ -375,7 +382,7 @@
                         if (data.ok) {
                             closeSend();
                         } else {
-                            alert("执行报错");
+                            alert(data.message);
                         }
                     }
                 });
@@ -428,7 +435,7 @@
      style="width:600px;height:420px;display: none;font-size: 16px;">
     <table align="center">
         <tr>
-            <td>用户邮箱:</td>
+            <td>客户邮箱:</td>
             <td>
                 <input id="send_user_id" value="0" style="display: none"/>
                 <input id="send_web_site" value="-1" style="display: none"/>
@@ -455,7 +462,7 @@
             </td>
         </tr>
         <tr>
-            <td>推送邮箱:</td>
+            <td>销售邮箱:</td>
             <td><input id="sell_email" style="width: 330px;"/></td>
         </tr>
         <tr>
