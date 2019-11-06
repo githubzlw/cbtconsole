@@ -41,7 +41,7 @@ public class QueryUserControllerTest {
         int isFlag = 1;
         Channel channel =null ;
         try {
-            List<Integer> list = queryUserService.queryAllCheckout(isFlag);
+            List<Integer> list = queryUserService.queryAllCheckout(isFlag, null);
             int count = 0;
             if (CollectionUtils.isNotEmpty(list)) {
                 for (Integer userid : list) {
@@ -78,7 +78,7 @@ public class QueryUserControllerTest {
 
         int zoneFlag = 0;
         try {
-            List<Integer> list = queryUserService.queryAllCheckout(zoneFlag);
+            List<Integer> list = queryUserService.queryAllCheckout(zoneFlag, null);
             if (CollectionUtils.isNotEmpty(list)) {
                 int count = 0;
                 for (Integer userid : list) {
