@@ -897,5 +897,5 @@ public interface CustomGoodsService {
      * @param adminId
      * @return
      */
-    //int setSearchable(String pid, int flag, int adminId);
+    int setSearchable(String pid, int flag, int adminId);
 }

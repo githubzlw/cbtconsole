@@ -3778,22 +3778,37 @@ public class EditorController {
 
     @RequestMapping(value = "/setSearchable")
     @ResponseBody
-    public JsonResult setSearchable(HttpServletRequest request, Integer flag) {
+    public JsonResult setSearchable(HttpServletRequest request, String pid, Integer flag) {
         JsonResult json = new JsonResult();
-        com.cbt.pojo.Admuser admuser =UserInfoUtils.getUserInfo(request);
-        if(admuser == null || admuser.getId() == 0){
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null || admuser.getId() == 0) {
             json.setOk(false);
             json.setMessage("请登录后操作");
-            return  json;
+            return json;
         }
-        if(flag == null || flag < 0){
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+        if (flag == null || flag < 0) {
             json.setOk(false);
             json.setMessage("获取标识失败");
-            return  json;
+            return json;
         }
         try {
-
-
+            InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+            inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+            inputData.setPid(pid);
+            inputData.setSearchable(String.valueOf(flag));
+            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            if(isSu){
+                customGoodsService.setSearchable(pid, flag, admuser.getId());
+                json.setOk(true);
+            } else{
+                json.setOk(false);
+                json.setMessage("更新mongodb失败");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
