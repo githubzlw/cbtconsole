@@ -1469,4 +1469,9 @@
         from custom_goods_oversea a left join admuser b on a.admin_id = b.id  left join zone c on c.id = a.country_id
         where a.pid = #{pid}
     </select>
+
+    <update id="updateGoodsOverSeaInfo" parameterType="com.importExpress.pojo.GoodsOverSea">
+        update custom_goods_oversea set is_support = #{isSupport} ,admin_id = #{adminId}
+        where pid = #{pid} and country_id = #{countryId}
+    </update>
 </mapper>

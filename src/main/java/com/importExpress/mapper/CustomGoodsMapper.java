@@ -533,4 +533,11 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<GoodsOverSea> queryGoodsOverSeaInfoByPid(String pid);
+
+    /**
+     * 更新海外仓数据
+     * @param goodsOverSea
+     * @return
+     */
+    int updateGoodsOverSeaInfo(GoodsOverSea goodsOverSea);
 }
