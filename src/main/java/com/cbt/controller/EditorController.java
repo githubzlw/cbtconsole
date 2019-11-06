@@ -3776,6 +3776,32 @@ public class EditorController {
         return json;
     }
 
+    @RequestMapping(value = "/setSearchable")
+    @ResponseBody
+    public JsonResult setSearchable(HttpServletRequest request, Integer flag) {
+        JsonResult json = new JsonResult();
+        com.cbt.pojo.Admuser admuser =UserInfoUtils.getUserInfo(request);
+        if(admuser == null || admuser.getId() == 0){
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return  json;
+        }
+        if(flag == null || flag < 0){
+            json.setOk(false);
+            json.setMessage("获取标识失败");
+            return  json;
+        }
+        try {
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
     private void praseEninfoAndUpdate(GoodsParseBean gd) {
         try {
             // 获取配置文件信息

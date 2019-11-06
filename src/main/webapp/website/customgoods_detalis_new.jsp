@@ -1479,6 +1479,28 @@
             });
         }
 
+        function setSearchable(flag) {
+            $.ajax({
+                type: 'POST',
+                sync: true,
+                dataType: 'json',
+                url: '/cbtconsole/editc/setSearchable',
+                data: {
+                    "flag": flag
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        $.messager.alert("提醒", "设置成功", "info");
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (XMLResponse) {
+                    $.messager.alert("提醒", "网络错误,请重试", "error");
+                }
+            });
+        }
+
         function uploadMultiFile() {
             $.messager.progress({
                 title: '上传本地图片',
@@ -2009,6 +2031,12 @@
                 <span class="s_btn" onclick="openOverSeaDialog()">设置海外仓</span>
             </c:if>
 
+            <c:if test="${goods.searchableFlag == 0}">
+                <span class="s_btn" onclick="setSearchable(1)">设置可搜索</span>
+            </c:if>
+            <c:if test="${goods.searchableFlag > 0}">
+                <span class="s_btn" onclick="setSearchable(0)">设置不可搜索</span>
+            </c:if>
 
         </div>
         <div class="all_s">
