@@ -279,7 +279,7 @@ tr .td_class{width:230px;}
     }
 
     function openRecommendEmail(userId, site) {
-
+		$("#history_id").empty();
 		$.ajax({
 			type:'post',
 			url:'../userinfo/getUserAllInfoById',
@@ -313,9 +313,10 @@ tr .td_class{width:230px;}
 								content += '<td><a href="'+jsonList[i].sendUrl+'">链接</a></td>';
 								content += '</tr>';
 							}
-							$("#history_id").empty();
 							$("#history_id").append(content);
 							$("#history_table").show();
+						}else {
+							$("#history_table").hide();
 						}
 						$("#send_recommend_id").window('open');
 					}else{
