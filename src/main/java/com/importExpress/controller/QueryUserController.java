@@ -836,6 +836,7 @@ public class QueryUserController {
         String updateTime = null;
         try {
             List<Integer> list = queryUserService.queryAllCheckout(isFlag, updateTime);
+            System.err.println("flag:" + isFlag + ",size:" + list.size());
             int count = 0;
             if (CollectionUtils.isNotEmpty(list)) {
                 channel = SendMQ.getChannel();
@@ -875,6 +876,7 @@ public class QueryUserController {
         try {
             List<Integer> list = queryUserService.queryAllCheckout(zoneFlag, updateTime);
 
+            System.err.println("flag:" + zoneFlag + ",size:" + list.size());
             if (CollectionUtils.isNotEmpty(list)) {
                 channel = SendMQ.getChannel();
                 int count = 0;
