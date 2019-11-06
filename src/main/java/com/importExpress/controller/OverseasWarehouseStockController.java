@@ -136,15 +136,17 @@ public class OverseasWarehouseStockController {
 	@ResponseBody
 	public Map<String,Object> syncStock(HttpServletRequest request, HttpServletResponse response){
 		Map<String,Object> result = Maps.newHashMap();
+		WarehouseWrap wrap = WarehouseWrap.builder().code("US0001").id("1000008").build();
 		try {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					List<WarehouseWrap> queryWarehouse = winitService.queryWarehouse();
+					/*List<WarehouseWrap> queryWarehouse = winitService.queryWarehouse();
 					int syncCount = 0;
 					for(WarehouseWrap w : queryWarehouse) {
 						syncCount += winitService.queryInventory(w);
-					}
+					}*/
+					int syncCount = winitService.queryInventory(wrap);
 					stockService.addSyncStockTime(syncCount);
 				}
 			}).start();

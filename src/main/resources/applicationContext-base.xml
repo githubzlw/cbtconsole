@@ -193,7 +193,7 @@
     </bean>
 
     <!-- 扫描包加载service实现类 -->
-    <context:component-scan base-package="com.cbt.*.service,com.importExpress.service.impl"></context:component-scan>
+    <context:component-scan base-package="com.cbt.*.service,com.importExpress.service.impl,com.cbt.winit.api.*"></context:component-scan>
     <!-- 扫描加载所有ctrl类，注意controller的路径 -->
     <context:component-scan base-package="com.cbt.**.ctrl, org.cbt.**.ctrl,com.importExpress.controller"></context:component-scan>
 

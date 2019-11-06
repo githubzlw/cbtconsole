@@ -42,18 +42,18 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
     	*/
     	String runSql = new StringBuilder("update overseas_warehouse_stock set order_stock=order_stock-")
     			.append(stock.getOrderStock()).append(",available_stock=available_stock+")
-    			.append(stock.getOrderStock()).append(" where code=").append(stock.getCode()).toString();
+    			.append(stock.getOrderStock()).append(" where code_n='").append(stock.getCoden()).append("'").toString();
     	//mq操作更新线上数据表
     	int reduceOrderStock = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
     	if(reduceOrderStock > 0) {
-    		runSql = new StringBuilder("insert into overseas_warehouse_stock_log (ows_id, change_stock,od_id,orderno,change_type,remark,code,create_time)" )
-    				.append("values ((select id from overseas_warehouse_stock where code=\"" )
-    				.append(stock.getCode()).append("\" limit 1),")
+    		runSql = new StringBuilder("insert into overseas_warehouse_stock_log (ows_id,code, change_stock,od_id,orderno,change_type,remark,code_n,create_time)" )
+    				.append("values ((select id,code, from overseas_warehouse_stock where code_n='" )
+    				.append(stock.getCoden()).append("' limit 1),")
     				.append(stock.getOrderStock()).append(", ")
-    				.append(odid).append(",\"")
-    				.append(orderno).append("\", 1,\"")
-    				.append(remark).append("\",\"")
-    				.append(stock.getCode()).append("\",now())")
+    				.append(odid).append(",'")
+    				.append(orderno).append("', 1,'")
+    				.append(remark).append("','")
+    				.append(stock.getCoden()).append("',now())")
     				.toString();
     		SendMQ.sendMsg(new RunSqlModel(runSql));
     	}
@@ -98,22 +98,24 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
 				.append(stock.getOwStock())
 				.append(",available_stock=")
 				.append(stock.getOwStock())
-				.append("-order_stock,update_time=now() where code=")
-				.append(stock.getCode())
+				.append("-order_stock,update_time=now() where code_n='")
+				.append(stock.getCoden())
+				.append("'")
 				.toString();
 		int updateStock = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 		if(updateStock == 0) {
 			runSql = new StringBuilder("insert into overseas_warehouse_stock(ow_stock,remark,available_stock,goods_pid,")
-					.append("goods_name,code,sku,skuid,specid,create_time,update_time,order_stock)values(")
-					.append(stock.getOwStock()).append(",\"")
-					.append(stock.getRemark()).append("\",")
-					.append(stock.getOwStock()).append(",\"")
-					.append(stock.getGoodsPid()).append("\",\"")
-					.append(stock.getGoodsName()).append("\",\"")
-					.append(stock.getCode()).append("\",\"")
-					.append(stock.getSku()).append("\",\"")
-					.append(stock.getSkuid()).append("\",\"")
-					.append(stock.getSpecid()).append("\",now(),now(),)")
+					.append("goods_name,code,code_n,sku,skuid,specid,create_time,update_time,order_stock)values(")
+					.append(stock.getOwStock()).append(",'")
+					.append(stock.getRemark()).append("',")
+					.append(stock.getOwStock()).append(",'")
+					.append(stock.getGoodsPid()).append("','")
+					.append(stock.getGoodsName()).append("','")
+					.append(stock.getCode()).append("','")
+					.append(stock.getCoden()).append("','")
+					.append(stock.getSku()).append("','")
+					.append(stock.getSkuid()).append("','")
+					.append(stock.getSpecid()).append("',now(),now(),0)")
 					.toString();
 			updateStock = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 		}

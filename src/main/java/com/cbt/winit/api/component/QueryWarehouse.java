@@ -2,6 +2,9 @@ package com.cbt.winit.api.component;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.winit.api.model.RequestMsg;
@@ -12,6 +15,8 @@ import com.google.common.collect.Lists;
  * @author Administrator
  *
  */
+@Component
+@Qualifier("queryWarehouse")
 public class QueryWarehouse extends QueryBase{
 	
 	private List<WarehouseWrap> warehouses;

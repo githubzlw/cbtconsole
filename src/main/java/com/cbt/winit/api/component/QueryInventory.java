@@ -1,14 +1,16 @@
 package com.cbt.winit.api.component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.cbt.parse.service.StrUtils;
 import com.cbt.winit.api.model.RequestMsg;
 import com.cbt.winit.api.model.WarehouseWrap;
 import com.google.common.collect.Lists;
@@ -18,6 +20,8 @@ import com.importExpress.pojo.OverseasWarehouseStock;
 import com.importExpress.service.GoodsSkuAttrService;
 import com.importExpress.service.OverseasWarehouseStockService;
 
+@Component
+@Qualifier("queryInventory")
 public class QueryInventory extends QueryBase{
 	@Autowired
 	private OverseasWarehouseStockService owsService;
@@ -141,6 +145,9 @@ public class QueryInventory extends QueryBase{
 			
 			//商品编码
 			String productCode = lstObject.getString("productCode");
+			if(!StrUtils.isMatch(productCode, "(\\d+(\\-\\d+)*)")) {
+				continue;
+			}
 			//商品ID
 			String productId = lstObject.getString("productId");
 			//商品英文名字
@@ -152,10 +159,11 @@ public class QueryInventory extends QueryBase{
 			//商品描述
 //			String description = lstObject.getString("description");
 			String[] productCodes = productCode.split("-");
-			
+			productId = productCodes[0];
 			String skuid = "";
 			String specid = "";
 			String coden = "";
+			
 			if(productCodes.length > 1) {
 				GoodsSkuAttr parseGoodsSku = goodsSkuAttrService.parseGoodsSku(productCode);
 				if(parseGoodsSku.getErrorCode() > 102) {
@@ -163,10 +171,11 @@ public class QueryInventory extends QueryBase{
 					specid = parseGoodsSku.getSpecid();
 				}
 				List<Long> attrList = Lists.newArrayList();
-				for(int j=1;j<productCode.length();j++) {
+				for(int j=1;j<productCodes.length;j++) {
 					attrList.add(Long.parseLong(productCodes[j]));
 				}
 				coden = productCodes[0];
+				
 				attrList.stream().sorted().collect(Collectors.toList());
 				for(Long a : attrList) {
 					coden +="-"+a;
@@ -188,7 +197,7 @@ public class QueryInventory extends QueryBase{
 												.skuid(skuid)
 												.specid(specid)
 												.build();
-//			System.out.println(stock.toString());
+			System.out.println(stock.toString());
 			owsService.syncStock(stock );
 			
 		}
