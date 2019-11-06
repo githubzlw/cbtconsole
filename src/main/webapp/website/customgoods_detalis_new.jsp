@@ -1449,7 +1449,7 @@
         }
 
 
-        function openOverSeaDialog() {
+        function openOverSeaDialog(flag) {
             queryHotCategory();
             $.ajax({
                 type: 'POST',
@@ -1469,6 +1469,7 @@
                         $("#query_country_id").empty();
                         $("#query_country_id").append(content);
                         $('#set_over_sea_div').dialog('open');
+                        $("#query_is_support").val(flag);
                     } else {
                         $.messager.alert("提醒", data.message, "error");
                     }
@@ -2006,8 +2007,9 @@
             </c:if>
 
             <c:if test="${goods.overSeaFlag == 0}">
-                <span class="s_btn" onclick="openOverSeaDialog()">设置海外仓</span>
+
             </c:if>
+            <span class="s_btn" onclick="openOverSeaDialog(${goods.overSeaFlag})">设置海外仓</span>
 
 
         </div>
@@ -2371,7 +2373,7 @@
                     <c:if test="${not empty describeGoodFlagStr}">
                         <b style="font-size: 16px;color: red;">描述很精彩:(${describeGoodFlagStr})</b>
                     </c:if>
-                </c:if><c:if test="${goods.overSeaFlag >0}">
+                </c:if><c:if test="${not empty goodsOverSeaList}">
                     <br>
                     <div style="font-size: 20px;background-color: #a2f387" >
                         <table border="1">

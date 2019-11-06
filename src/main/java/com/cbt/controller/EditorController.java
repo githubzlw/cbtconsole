@@ -479,11 +479,15 @@ public class EditorController {
 
             // 获取海外仓标识信息
             List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
+
             if(CollectionUtils.isEmpty(goodsOverSeaList)){
                 mv.addObject("goodsOverSeaList","[]");
             }else{
                 mv.addObject("goodsOverSeaList",goodsOverSeaList);
-                goods.setOverSeaFlag(1);
+                long count = goodsOverSeaList.stream().filter(e -> e.getIsSupport() > 0).count();
+                if(count > 0){
+                    goods.setOverSeaFlag(1);
+                }
             }
 
         } catch (Exception e) {
@@ -3711,11 +3715,7 @@ public class EditorController {
                     }
                 }
             }
-            if(isUpdate > 0) {
-                json.setOk(false);
-                json.setMessage("此国家已经被设置");
-                return json;
-            }
+
             int supportFlag = Integer.parseInt(isSupport);
             GoodsOverSea overSea = new GoodsOverSea();
             overSea.setAdminId(admuser.getId());
@@ -3723,10 +3723,18 @@ public class EditorController {
             overSea.setCountryId(Integer.parseInt(countryId));
             overSea.setIsSupport(supportFlag);
 
-            customGoodsService.insertIntoGoodsOverSeaInfo(overSea);
-            String sql = "insert into custom_goods_oversea(pid,country_id,admin_id,is_support)" +
-                    " values('" + pid + "'," + countryId + "," + admuser.getId() + "," + isSupport + ")";
-            NotifyToCustomerUtil.sendSqlByMq(sql);
+
+            if (isUpdate > 0) {
+                customGoodsService.updateGoodsOverSeaInfo(overSea);
+                String sql = "update custom_goods_oversea set is_support = " + isSupport + " ,admin_id = " + admuser.getId() + " " +
+                        "where pid =  " + pid + " and country_id = " + countryId;
+                NotifyToCustomerUtil.sendSqlByMq(sql);
+            } else {
+                customGoodsService.insertIntoGoodsOverSeaInfo(overSea);
+                String sql = "insert into custom_goods_oversea(pid,country_id,admin_id,is_support)" +
+                        " values('" + pid + "'," + countryId + "," + admuser.getId() + "," + isSupport + ")";
+                NotifyToCustomerUtil.sendSqlByMq(sql);
+            }
 
             // 加入到热卖区
             if(supportFlag > 0){

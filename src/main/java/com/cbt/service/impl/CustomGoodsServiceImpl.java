@@ -875,5 +875,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryGoodsOverSeaInfoByPid(pid);
     }
 
+    @Override
+    public int updateGoodsOverSeaInfo(GoodsOverSea goodsOverSea) {
+        return customGoodsMapper.updateGoodsOverSeaInfo(goodsOverSea);
+    }
+
 
 }
