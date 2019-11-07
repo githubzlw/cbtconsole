@@ -151,7 +151,7 @@ public class AutoOrderController {
 			int userId = Integer.valueOf(userid);
 			String exchange_rate =iOrderinfoService.getExchangeRate();
 			//获取用户地址
-			DataSourceSelector.set("dataSource127hop");
+//			DataSourceSelector.set("dataSource127hop");
 			List<Address> userAddr =iOrderinfoService.getUserAddr(userId);
 //			autoOrderService.getUserAddr(userId);
 			if(userAddr.size()==0){
@@ -205,8 +205,8 @@ public class AutoOrderController {
 			orderBean.setMode_transport("China Post Express@5-9@"+county_+"@0.0@all");
 			List<OrderBean> OrderBeanList = new ArrayList<OrderBean>();
 			OrderBeanList.add(orderBean);
-			int addOrderInfo = iOrderinfoService.addOrderInfo(OrderBeanList, address_id);
-//			autoOrderService.addOrderInfo(OrderBeanList, address_id, 0);
+//			int addOrderInfo = iOrderinfoService.addOrderInfo(OrderBeanList, address_id);
+			int addOrderInfo =autoOrderService.addOrderInfo(OrderBeanList, address_id, 0);
 			if(addOrderInfo<1){
 				return "-4";
 			}

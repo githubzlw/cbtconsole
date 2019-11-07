@@ -127,6 +127,7 @@
         <result column="describe_good_flag" property="describeGoodFlag"/>
         <result column="volume_weight" property="volumeWeight"/>
         <result column="path_catid" property="pathCatid"/>
+        <result column="searchable" property="searchable"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -909,7 +910,7 @@
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.volume_weight,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
         cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,cbu.weight,
-        ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,cbu.promotion_flag,cbu.fprice_str,
+        ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,cbu.promotion_flag,cbu.fprice_str,cbu.searchable,
         ifnull(cbn.ocrcontent1,'') as ocrSizeInfo1,ifnull(cbn.ocrcontent2,'') as ocrSizeInfo2,ifnull(cbn.ocrcontent3,'') as ocrSizeInfo3,
         cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
         ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,
@@ -1469,4 +1470,14 @@
         from custom_goods_oversea a left join admuser b on a.admin_id = b.id  left join zone c on c.id = a.country_id
         where a.pid = #{pid}
     </select>
+
+    <update id="setSearchable">
+        update custom_benchmark_ready set searchable = #{flag} where pid = #{pid}
+    </update>
+
+    <insert id="insertSearchableLog">
+        insert into custom_goods_searchable(pid,flag,admin_id)
+        values(#{pid},#{flag},#{adminId})
+    </insert>
+
 </mapper>

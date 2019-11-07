@@ -888,4 +888,14 @@ public interface CustomGoodsService {
      * @return
      */
     List<GoodsOverSea> queryGoodsOverSeaInfoByPid(String pid);
+
+    /**
+     * 设置可搜索
+     *
+     * @param pid
+     * @param flag
+     * @param adminId
+     * @return
+     */
+    int setSearchable(String pid, int flag, int adminId);
 }

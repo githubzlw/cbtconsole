@@ -29,11 +29,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.tagext.TryCatchFinally;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 @Controller
 @RequestMapping("/queryuser")
@@ -825,24 +827,36 @@ public class QueryUserController {
 
     @RequestMapping(value = "/refreshCheckout")
     @ResponseBody
-    public Map<String, String> refreshCheckout(@RequestParam(value = "flag",required = true, defaultValue = "-1") Integer flag) {
+    public Map<String, String> refreshCheckout() throws IOException, TimeoutException {
         //放入MQ
         Map<String, String> map = new HashMap<>();
-        if (flag == null || flag < 0) {
-            map.put("success", "false");
-            map.put("message", "获取flag失败");
-            return map;
-        }
+        int isFlag = 0;
+        Channel channel =null ;
+        // String updateTime = "2019-11-04 00:00:00";
+        String updateTime = null;
         try {
-            List<Integer> list = queryUserService.queryAllCheckout(flag);
-            Channel channel = SendMQ.getChannel();
+            List<Integer> list = queryUserService.queryAllCheckout(isFlag, updateTime);
+            int count = 0;
             if (CollectionUtils.isNotEmpty(list)) {
+                channel = SendMQ.getChannel();
                 for (Integer userid : list) {
-                    SendMQ.sendAuthorizationFlagMqSql(channel,userid, flag);
-                    queryUserService.updateUserCheckout(userid, flag);
+                    count++;
+                    if (count % 5 == 0) {
+                        try {
+                            Thread.sleep(2);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    /*theadPool.execute(() -> {
+                        SendMQ.sendAuthorizationFlagMqSql(userid, isFlag);
+                        queryUserService.updateUserCheckout(userid, isFlag);
+                    });*/
+
+                    SendMQ.sendAuthorizationFlagMqSql(channel ,userid, isFlag);
+                    queryUserService.updateUserCheckout(userid, isFlag);
                 }
             }
-            SendMQ.closeChannel(channel);
             map.put("success", "true");
             map.put("message", "执行成功，size:" + list.size());
             list.clear();
@@ -850,7 +864,48 @@ public class QueryUserController {
             e.printStackTrace();
             map.put("success", "false");
             map.put("message", e.getMessage());
-            return map;
+        }finally {
+            if(channel != null){
+                channel.close();
+            }
+        }
+        System.err.println(map);
+
+        int zoneFlag = 1;
+        try {
+            List<Integer> list = queryUserService.queryAllCheckout(zoneFlag, updateTime);
+
+            if (CollectionUtils.isNotEmpty(list)) {
+                channel = SendMQ.getChannel();
+                int count = 0;
+                for (Integer userid : list) {
+                    count++;
+                    if (count % 5 == 0) {
+                        try {
+                            Thread.sleep(2);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    /*theadPool.execute(() -> {
+                        SendMQ.sendAuthorizationFlagMqSql(userid, zoneFlag);
+                        queryUserService.updateUserCheckout(userid, zoneFlag);
+                    });*/
+                    SendMQ.sendAuthorizationFlagMqSql(channel, userid, zoneFlag);
+                    queryUserService.updateUserCheckout(userid, zoneFlag);
+                }
+            }
+            map.put("success", "true");
+            map.put("message", "执行成功，size:" + list.size());
+            list.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("success", "false");
+            map.put("message", e.getMessage());
+        }finally {
+            if(channel != null){
+                channel.close();
+            }
         }
         return map;
     }

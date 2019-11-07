@@ -101,6 +101,16 @@ public class InputData {
 
     private String volume_weight;
 
+    private String searchable;
+
+    public String getSearchable() {
+        return searchable;
+    }
+
+    public void setSearchable(String searchable) {
+        this.searchable = searchable;
+    }
+
     public String getVolume_weight() {
         return volume_weight;
     }

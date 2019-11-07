@@ -3776,6 +3776,47 @@ public class EditorController {
         return json;
     }
 
+    @RequestMapping(value = "/setSearchable")
+    @ResponseBody
+    public JsonResult setSearchable(HttpServletRequest request, String pid, Integer flag) {
+        JsonResult json = new JsonResult();
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null || admuser.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+        if (flag == null || flag < 0) {
+            json.setOk(false);
+            json.setMessage("获取标识失败");
+            return json;
+        }
+        try {
+            InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+            inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+            inputData.setPid(pid);
+            inputData.setSearchable(String.valueOf(flag));
+            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            if(isSu){
+                customGoodsService.setSearchable(pid, flag, admuser.getId());
+                json.setOk(true);
+            } else{
+                json.setOk(false);
+                json.setMessage("更新mongodb失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
     private void praseEninfoAndUpdate(GoodsParseBean gd) {
         try {
             // 获取配置文件信息

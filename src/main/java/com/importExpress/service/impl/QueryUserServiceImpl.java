@@ -843,8 +843,8 @@ public class QueryUserServiceImpl implements QueryUserService {
     }
 
     @Override
-    public List<Integer> queryAllCheckout(int flag) {
-        return queryUserMapper.queryAllCheckout(flag);
+    public List<Integer> queryAllCheckout(int flag, String updateTime) {
+        return queryUserMapper.queryAllCheckout(flag, updateTime);
     }
 
     @Override

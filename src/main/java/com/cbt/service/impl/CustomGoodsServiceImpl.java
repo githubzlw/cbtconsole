@@ -875,5 +875,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryGoodsOverSeaInfoByPid(pid);
     }
 
+    @Override
+    public int setSearchable(String pid, int flag, int adminId) {
+        customGoodsMapper.insertSearchableLog(pid, flag, adminId);
+        return customGoodsMapper.setSearchable(pid, flag);
+    }
+
 
 }
