@@ -832,8 +832,8 @@ public class QueryUserController {
         Map<String, String> map = new HashMap<>();
         int isFlag = 0;
         Channel channel =null ;
-        // String updateTime = "2019-11-04 00:00:00";
-        String updateTime = null;
+        String updateTime = "2019-11-07 00:00:00";
+        // String updateTime = null;
         try {
             List<Integer> list = queryUserService.queryAllCheckout(isFlag, updateTime);
             System.err.println("flag:" + isFlag + ",size:" + list.size());
