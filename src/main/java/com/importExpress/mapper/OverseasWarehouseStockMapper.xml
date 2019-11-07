@@ -8,6 +8,7 @@
     <result column="available_stock" property="availableStock" jdbcType="INTEGER" />
     <result column="goods_pid" property="goodsPid" jdbcType="VARCHAR" />
     <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="code_n" property="coden" jdbcType="VARCHAR" />
     <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
     <result column="sku" property="sku" jdbcType="VARCHAR" />
     <result column="skuid" property="skuid" jdbcType="VARCHAR" />
@@ -25,6 +26,7 @@
     <result column="specid" property="specid" jdbcType="VARCHAR" />
     <result column="stock_remark" property="stockRemark" jdbcType="VARCHAR" />
     <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="code_n" property="coden" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="ows_id" property="owsid" jdbcType="INTEGER" />
     <result column="od_id" property="odid" jdbcType="INTEGER" />
@@ -37,17 +39,17 @@
 <!-- 订单完结或者取消减少订单占用库存，可用库存增加 -->
   <update id="reduceOrderStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
     update overseas_warehouse_stock set order_stock=order_stock-#{orderStock},
-    available_stock=available_stock+#{orderStock} where code=#{code}
+    available_stock=ow_stock-order_stock where code=#{code}
   </update>
 <!-- 日志记录  -->
   <insert id="addLog" parameterType="com.importExpress.pojo.OverseasWarehouseStockLog" >
-    insert into overseas_warehouse_stock_log (ows_id, change_stock,od_id,orderno,change_type,remark,code,create_time)
+    insert into overseas_warehouse_stock_log (ows_id, change_stock,od_id,orderno,change_type,remark,code,code_n,create_time)
     values ((select id from overseas_warehouse_stock where code=#{code} limit 1), #{changeStock}, #{odid},
-      #{orderno}, #{changeType}, #{remark},#{code},now())
+      #{orderno}, #{changeType}, #{remark},#{code},#{coden},now())
   </insert>
   
   <select id="getLogByOrderno" resultMap="StockLogResultMap">
-  select id,ows_id, change_stock,od_id,orderno,change_type,remark,code,create_time 
+  select id,ows_id, change_stock,od_id,orderno,change_type,remark,code,code_n,create_time 
   from  overseas_warehouse_stock_log where orderno=#{orderno} order by change_type asc
   </select>
   
@@ -98,8 +100,8 @@
 	</select>
 	<insert id="addStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
 	insert into overseas_warehouse_stock(ow_stock,order_stock,available_stock,goods_pid,goods_name,
-	code,sku,skuid,specid,create_time,update_time,remark) 
-	values(#{owStock},0,#{owStock},#{goodsPid},#{goodsName},#{code},#{sku},#{skuid},#{specid},now(),now(),#{remark})
+	code,code_n,sku,skuid,specid,create_time,update_time,remark) 
+	values(#{owStock},0,#{owStock},#{goodsPid},#{goodsName},#{code},#{coden},#{sku},#{skuid},#{specid},now(),now(),#{remark})
 	</insert>
 	
 	<update id="updateStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">

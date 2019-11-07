@@ -2,6 +2,7 @@ package com.cbt.winit.api.service.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cbt.winit.api.component.QueryInventory;
@@ -10,8 +11,10 @@ import com.cbt.winit.api.model.WarehouseWrap;
 import com.cbt.winit.api.service.WinitService;
 @Service
 public class WinitServiceImpl implements WinitService {
-	private QueryInventory queryInventory = new QueryInventory();
-	private QueryWarehouse queryWarehouse = new QueryWarehouse();
+	@Autowired
+	private QueryInventory queryInventory;
+	@Autowired
+	private QueryWarehouse queryWarehouse;
 
 	@Override
 	public List<WarehouseWrap> queryWarehouse() {
@@ -32,6 +35,5 @@ public class WinitServiceImpl implements WinitService {
 		}
 		return totalStock;
 	}
-
 
 }

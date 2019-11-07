@@ -35,6 +35,10 @@ public class OverseasWarehouseStock {
      */
     private String code;
     /**
+     *海外仓商品编码(去除规格组合差异)
+     */
+    private String coden;
+    /**
      *产品名称
      */
     private String goodsName;
