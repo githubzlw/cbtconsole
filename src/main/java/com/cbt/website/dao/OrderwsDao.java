@@ -5420,7 +5420,12 @@ public class OrderwsDao implements IOrderwsDao {
                     lstValues.add("");
                 }
                 lstValues.add( rs.getString("freight_free"));
-                lstValues.add( rs.getString("od_bulk_volume"));
+                String od_bulk_volume = rs.getString("od_bulk_volume");
+                if(StringUtil.isNotBlank(od_bulk_volume)){
+                    lstValues.add(GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(od_bulk_volume));
+                }else{
+                    lstValues.add("");
+                }
                 lstValues.add( rs.getString("od_total_weight"));
                 lstValues.add( rs.getString("discount_ratio"));
                 lstValues.add( rs.getString("goodscatid"));
