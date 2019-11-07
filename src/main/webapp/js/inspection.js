@@ -441,7 +441,7 @@ function addInventory(barcode, inventory_count, orderid, odid, goodid,count, rec
                     + inventory_count + "】件");
                 put_print1(strcartype, inventory_count,
                     tbOrderId, goods_name, barcode,
-                    odid, goodurl);
+                    odid, goodurl,skuid);
             }
         }
     });
@@ -736,7 +736,7 @@ function getPhoto() {
     ctx.drawImage(video, 0, 0, 400, 400);
 }
 
-function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goodurl, id_barcode) {
+function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goodurl, id_barcode,skuid) {
     var d = new Date();
     var str = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
     document.getElementById("div_body").style.display = "none";
@@ -749,6 +749,7 @@ function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goo
     document.getElementById("div_print2").style.display = "block";
     document.getElementById('barcode').innerHTML = "-" + barcode;
     document.getElementById('goodsid').innerHTML = odid;
+    document.getElementById('skuid').innerHTML = skuid;
     document.getElementById('goods_name').innerHTML = goods_name.substr(0, goods_name.length / 4);
     document.getElementById('sku3').innerHTML = strcartype;
     document.getElementById('count2').innerHTML = count;
@@ -771,6 +772,7 @@ function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goo
     document.getElementById("div_print2").style.display = "none";
     document.getElementById('barcode').innerHTML = "";
     document.getElementById('goodsid').innerHTML = "";
+    document.getElementById('skuid').innerHTML = "";
     document.getElementById('goods_name').innerHTML = "";
     document.getElementById('sku3').innerHTML = "";
     document.getElementById('count2').innerHTML = "";

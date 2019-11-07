@@ -838,6 +838,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		String skuContext = "",orderContext="",delContext="";
 		for(InventoryDetails i : inventoryDetails) {
 			wrap = new InventoryDetailsWrap();
+			wrap.setAdm(i.getAdm());
 			wrap.setCreatetime(i.getCreatetime());
 			String goodsImg = i.getGoodsImg();
 			goodsImg = StringUtil.isBlank(goodsImg) ? goodsImg : goodsImg.replace(".60x60.jpg", ".400x400.jpg");
@@ -881,7 +882,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			result = "出库，等待移库操作";
 			break;
 		case 2:
-			result = "报损";
+			result = "报损/调整";
 			break;
 		case 4:
 			result = "盘点";
@@ -1023,7 +1024,8 @@ public class InventoryServiceImpl implements  InventoryService{
 		InventoryCheckWrap wrap = null;
 		for(InventoryData i : iinOutInventory) {
 			wrap = new InventoryCheckWrap();
-			
+			wrap.setOdid(i.getOdid());
+			wrap.setTime(i.getUpdatetime());
 			wrap.setBarcode(i.getBarcode());
 			wrap.setGoodsPid(i.getGoodsPid());
 			wrap.setGoodsImg(i.getCarImg());
@@ -1480,7 +1482,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		return inventoryMapper.inventoryBarcodeListCount(map);
 	}
 	@Override
-	public int updateBarcode(Map<String, Object> mapParam) {
+	public int moveBarcode(Map<String, Object> mapParam) {
 		String position = dao.getPosition((String)mapParam.get("orderbarcode"));
 		mapParam.put("position", position);
 		int ibid = (int)mapParam.get("ibid");
@@ -1543,7 +1545,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			inventory.put("log_remark","仓库确认采购使用库存的请求，完成移库操作,库存数量减少");
 			inventoryMapper.addInventoryLogByInventoryid(inventory);
 		}
-		return inventoryMapper.updateBarcode(mapParam);
+		return inventoryMapper.moveBarcode(mapParam);
 	}
 	@Override
 	public int updateRemark(Map<String, Object> mapParam) {
@@ -1628,6 +1630,9 @@ public class InventoryServiceImpl implements  InventoryService{
 			case 5:
 				changeContext = "漏发";
 				break;
+			case 8:
+				changeContext = "送样";
+				break;
 
 			default:
 				changeContext = "其他原因";
@@ -1681,5 +1686,28 @@ public class InventoryServiceImpl implements  InventoryService{
 		}
 		
 		return result;
+	}
+	@Override
+	public List<String> barcodeList() {
+		// TODO Auto-generated method stub
+		return inventoryMapper.barcodeList();
+	}
+	@Override
+	public int updateBarcode(Map<String, Object> map) {
+		//inventory_sku
+		int updateBarcode = inventoryMapper.updateBarcode(map);
+		
+		//inventory_sku_log
+		Map<String, String> inventory = Maps.newHashMap();
+		inventory.put("change_type", "0");
+		inventory.put("inventory_count", "0");
+		inventory.put("before_remaining", map.get("remaining").toString());
+		inventory.put("after_remaining", map.get("remaining").toString());
+		inventory.put("inventory_sku_id", map.get("inid").toString());
+		inventory.put("log_remark",  map.get("beforeBarcode").toString()+"库位修改为"+ map.get("afterBarcode").toString());
+		int addInventoryLog = inventoryMapper.addInventoryLogByInventoryid(inventory );
+		updateBarcode += addInventoryLog;
+		
+		return updateBarcode;
 	}
 }

@@ -1066,6 +1066,7 @@
 		</tr>
 		<tr>
 			<td rowspan="2"><span id="goodsid" style="font-weight: bold;"></span></td>
+			<td rowspan="2"><span id="skuid" style="font-weight: bold;"></span></td>
 			<td><span id="goods_name"></span></td>
 			<td style="text-align:center;"><span>Qty</span></td>
 		</tr>

@@ -84,6 +84,8 @@
         <result column="goods_img" property="goodsImg" jdbcType="VARCHAR" />
         <result column="orderno" property="orderno" jdbcType="VARCHAR" />
         <result column="od_id" property="odId" jdbcType="INTEGER" />
+        <result column="admid" property="admid" jdbcType="INTEGER" />
+        <result column="admName" property="adm" jdbcType="VARCHAR" />
         <result column="goods_pid" property="goodsPid" jdbcType="VARCHAR" />
         <result column="createtime" property="createtime" jdbcType="VARCHAR" />
         <result column="inventory_id" property="inventoryId" jdbcType="INTEGER" />
@@ -240,10 +242,15 @@
     <if test="isShowZero !=1"> and remaining > 0</if>
     
     <if test="odid != 0">and isku.od_id=#{odid}</if>
+    <if test="sttime != ''">and isku.updatetime>#{sttime}</if>
+    <if test="edtime  != ''">and isku.updatetime&lt;#{edtime}</if>
+    <if test="barcode != ''">and isku.barcode=#{barcode}</if>
     <if test="isline == 1">and c.valid=1</if>
     <if test="isline == 2">and c.valid!=1</if>
     order by isku.createtime desc
+    <if test="page !=-1">
      limit #{page},20
+    </if>
     </select>
     <select id="getIinOutInventoryCount" resultType="INTEGER">
        select count(isku.id) from inventory_sku  isku
@@ -261,6 +268,9 @@
     <if test="goodscatid ==-1">and isku.goodscatid='0'</if>
      <if test="isShowZero !=1"> and remaining > 0</if>
     <if test="odid != 0">and isku.od_id=#{odid}</if>
+    <if test="sttime != ''">and isku.updatetime>#{sttime}</if>
+    <if test="edtime  != ''">and isku.updatetime&lt;#{edtime}</if>
+    <if test="barcode != ''">and isku.barcode=#{barcode}</if>
     <if test="isline == 1">and c.valid=1</if>
     <if test="isline == 2">and c.valid!=1</if>
        
@@ -440,21 +450,25 @@
     </insert>
     <!-- 库存明细列表 -->
     <select id="inventoryDetails" resultMap="inventoryDetailsMap">
-    select  id,inventory_id,goods_pid,sku,good_skuid,type,goods_specid,del_remark,del_adm,
-    del_datetime,createtime,del,goods_img,goods_number,od_id,orderno,remark
-    
-    
-    from  inventory_details_sku where 1=1
+    select  a.id,a.inventory_id,a.goods_pid,a.sku,a.good_skuid,a.type,a.goods_specid,a.del_remark,a.del_adm,
+    a.del_datetime,a.createtime,a.del,a.goods_img,a.goods_number,a.od_id,a.orderno,a.remark,a.admid,b.admName
+    from  inventory_details_sku a
+		left join admuser b on a.admid=b.id
+		 where 1=1
     <if test="inventory_sku_id > 0">
-    and inventory_id=#{inventory_sku_id}
+    and a.inventory_id=#{inventory_sku_id}
     </if>
-    order by createtime desc
+    order by a.createtime desc
     limit #{page},20
     
     </select>
     <select id="inventoryDetailsCount" resultType="Integer">
      select  count(id)
-    from  inventory_details_sku where inventory_id=#{inventory_sku_id}
+    from  inventory_details_sku 
+     where 1=1
+    <if test="inventory_sku_id > 0">
+    and inventory_id=#{inventory_sku_id}
+    </if>
     </select>
     
     <!-- 库存表  -->
@@ -759,7 +773,7 @@
     </select>
     
     <!-- 更新库位 -->
-    <update id="updateBarcode">
+    <update id="moveBarcode">
     update inventory_barcode_record set updatetime=now()
     <if test="inorout==0">,state=2,order_barcode=#{orderbarcode}</if>
     <if test="inorout==1">,state=3,in_barcode=#{inbarcode}</if>
@@ -775,7 +789,7 @@
     where odid =(select od_id from lock_inventory where id=#{liid} limit 1);
     </if>
     <if test="inorout==1">
-    update inventory_sku set barcode=#{inbarcode}
+    update inventory_sku set barcode=#{inbarcode},updatetime=now() 
     where id =(select in_id from lock_inventory where id=#{liid} limit 1);
     </if>
     </update>
@@ -853,5 +867,12 @@
 	<foreach collection="list" close=")" open="(" index="index" item="item" separator=",">#{item}</foreach>
     group by b.skuID;
 </select>
-    
+    <select id="barcodeList" resultType="String">
+    select  barcode from  storage_location  order by barcode asc
+    </select>
+     <!-- 更新库位 -->
+    <update id="updateBarcode">
+    update inventory_sku set barcode=#{afterBarcode},updatetime=now()
+    where id =#{inid}
+    </update>
 </mapper>
