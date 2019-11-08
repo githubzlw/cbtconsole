@@ -415,8 +415,16 @@ function put_print(orderid, usid, odid, strcartype, count, loginName,
 
 
 function addInventory(barcode, inventory_count, orderid, odid, goodid,count, record_, unit, 
-		goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno) {
-    $.ajax({
+		goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno,pid) {
+	alert("验货数量大于销售数量,存库【"
+            + inventory_count + "】件");
+	alert("---"+skuid);
+        skuid = !skuid ? pid : skuid;
+	put_print1(strcartype, inventory_count,
+            tbOrderId, goods_name, barcode,
+            odid, goodurl,skuid);
+	
+   /* $.ajax({
         url: "/cbtconsole/inventory/add",
         data: {
             "barcode": barcode,
@@ -439,12 +447,13 @@ function addInventory(barcode, inventory_count, orderid, odid, goodid,count, rec
                 //打印库存标签
                 alert("验货数量大于销售数量,存库【"
                     + inventory_count + "】件");
+                skuid = !skuid ? pid : skuid;
                 put_print1(strcartype, inventory_count,
                     tbOrderId, goods_name, barcode,
                     odid, goodurl,skuid);
             }
         }
-    });
+    });*/
 }
 var scrollTop;
 /**
@@ -526,7 +535,7 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     	alert("未能自动匹配到商品,请输入验货数量进行手动验货");
     	return;
     }
-    $.ajax({
+   /* $.ajax({
             url: "/cbtconsole/order/updateCheckStatus",
             type: "post",
             async: true,
@@ -583,8 +592,8 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
                     		$("#print_hide").val(1);
                     		$("#checkOrderhid").val(checkOrderhid);
                     	}
-                    	/*if(sourceCount == 1){
-                    	}*/
+                    	if(sourceCount == 1){
+                    	}
                         console.log("该订单商品已全部的到货并且验货无误，提示跳转出货审核页面");
                         document.getElementById("chuku_" + orderid + "_" + odid + "").style.display = "inline-block";
                     }
@@ -593,13 +602,14 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
         });
     $(isok).css("background", "red");
     $("#status" + odid).css("color", "red");
-    $("#status" + odid).html("已验货");
+    $("#status" + odid).html("已验货");*/
     
     if (isDropshipOrder == 3) {
-        addInventory(barcode, count, orderid, odid, goodid,count, record_, unit, goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno);
+        addInventory(barcode, count, orderid, odid, goodid,count, record_, unit, goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno,itemid);
         
     } else if ((Number(count) + Number(record_)) > (Number(_count) * Number(unit)) && Number(inventory_count) > 0 && goodid != "1400") {
-        addInventory(barcode, inventory_count, orderid, odid, goodid,count, record_, unit, goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno);
+    	alert("^^^"+skuid);
+        addInventory(barcode, inventory_count, orderid, odid, goodid,count, record_, unit, goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno,itemid);
     }
     put_print(orderid, usid, odid, strcartype, count, loginName, tbOrderId,
         _count, record_, unit, goods_name, barcode, goodurl, odid, position);
@@ -736,7 +746,8 @@ function getPhoto() {
     ctx.drawImage(video, 0, 0, 400, 400);
 }
 
-function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goodurl, id_barcode,skuid) {
+function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goodurl,skuid) {
+	alert(skuid);
     var d = new Date();
     var str = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
     document.getElementById("div_body").style.display = "none";
@@ -747,7 +758,7 @@ function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goo
     document.getElementById("operating_area").style.display = "none";
     document.getElementById("divTip").style.display = "none";
     document.getElementById("div_print2").style.display = "block";
-    document.getElementById('barcode').innerHTML = "-" + barcode;
+    document.getElementById('barcode').innerHTML = barcode;
     document.getElementById('goodsid').innerHTML = odid;
     document.getElementById('skuid').innerHTML = skuid;
     document.getElementById('goods_name').innerHTML = goods_name.substr(0, goods_name.length / 4);
