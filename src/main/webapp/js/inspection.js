@@ -738,7 +738,6 @@ function getPhoto() {
 }
 
 function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goodurl,skuid) {
-	alert(skuid);
     var d = new Date();
     var str = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
     document.getElementById("div_body").style.display = "none";
