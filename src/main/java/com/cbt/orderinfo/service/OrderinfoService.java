@@ -590,9 +590,7 @@ public class OrderinfoService implements IOrderinfoService {
 					searchresultinfo.setSpecId(map.get("specid")!=null?map.get("specid") : "");
 					searchresultinfo.setSkuID(map.get("skuid")!=null?map.get("skuid") : "");
 				}
-				if(org.apache.commons.lang3.StringUtils.isNotBlank(map.get("taobao_id"))){
-					searchresultinfo.setTaobaoId(Integer.parseInt(map.get("taobao_id")));
-				}
+				searchresultinfo.setTaobaoId(0);
 
 				info.add(searchresultinfo);
 			}
