@@ -2373,7 +2373,7 @@
                     <c:if test="${not empty describeGoodFlagStr}">
                         <b style="font-size: 16px;color: red;">描述很精彩:(${describeGoodFlagStr})</b>
                     </c:if>
-                </c:if><c:if test="${not empty goodsOverSeaList}">
+                </c:if><c:if test="${not empty goodsOverSeaList && fn:length(goodsOverSeaList) > 0}">
                     <br>
                     <div style="font-size: 20px;background-color: #a2f387" >
                         <table border="1">

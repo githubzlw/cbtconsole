@@ -481,7 +481,7 @@ public class EditorController {
             List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
 
             if(CollectionUtils.isEmpty(goodsOverSeaList)){
-                mv.addObject("goodsOverSeaList","[]");
+                mv.addObject("goodsOverSeaList",null);
             }else{
                 mv.addObject("goodsOverSeaList",goodsOverSeaList);
                 long count = goodsOverSeaList.stream().filter(e -> e.getIsSupport() > 0).count();
