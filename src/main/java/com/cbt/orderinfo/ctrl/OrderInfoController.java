@@ -546,8 +546,8 @@ public class OrderInfoController{
 			map.put("status", "1");
 			map.put("repState", "1");
 			if("1".equals(type)){
-				List<Map<String,String>> allList=iOrderinfoService.allTrack(map);
-				for(Map<String,String> allMap:allList){
+				List<Map<String,Object>> allList=iOrderinfoService.allTrack(map);
+				for(Map<String,Object> allMap:allList){
 					String orderid = String.valueOf(allMap.get("orderid"));
 					String goodid =String.valueOf(allMap.get("goodsid"));
 					String goodurl = String.valueOf(allMap.get("goods_url"));
