@@ -832,11 +832,10 @@ public class QueryUserController {
         Map<String, String> map = new HashMap<>();
         int isFlag = 0;
         Channel channel =null ;
-        String updateTime = "2019-11-07 00:00:00";
-        // String updateTime = null;
+        // String updateTime = "2019-11-07 18:10:00";
+        String updateTime = null;
         try {
             List<Integer> list = queryUserService.queryAllCheckout(isFlag, updateTime);
-            System.err.println("flag:" + isFlag + ",size:" + list.size());
             int count = 0;
             if (CollectionUtils.isNotEmpty(list)) {
                 channel = SendMQ.getChannel();
@@ -876,7 +875,6 @@ public class QueryUserController {
         try {
             List<Integer> list = queryUserService.queryAllCheckout(zoneFlag, updateTime);
 
-            System.err.println("flag:" + zoneFlag + ",size:" + list.size());
             if (CollectionUtils.isNotEmpty(list)) {
                 channel = SendMQ.getChannel();
                 int count = 0;

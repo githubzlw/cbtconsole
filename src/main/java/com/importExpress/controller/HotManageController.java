@@ -1275,8 +1275,8 @@ public class HotManageController {
             classInfo.setJsonName(jsonName);
             if (id == null || id < 1) {
                 classInfo.setAdminId(admuser.getId());
-                insertHotClassInfoOnline(classInfo);
                 hotManageService.insertIntoHotClassInfo(classInfo);
+                insertHotClassInfoOnline(classInfo);
             } else {
                 classInfo.setId(id);
                 classInfo.setUpdateAdminId(admuser.getId());
@@ -1548,8 +1548,8 @@ public class HotManageController {
 
     private void insertHotClassInfoOnline(HotClassInfo hotClassInfo) {
 
-        String sql = "insert into hot_class_info(class_name,json_name,admin_id) values(";
-        sql += "'" + hotClassInfo.getClassName() + "','" + hotClassInfo.getJsonName()
+        String sql = "insert into hot_class_info(id,class_name,json_name,admin_id) values(";
+        sql += hotClassInfo.getId() + ",'" + hotClassInfo.getClassName() + "','" + hotClassInfo.getJsonName()
                 + "'," + hotClassInfo.getAdminId() + ")";
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
