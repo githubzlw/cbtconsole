@@ -167,14 +167,14 @@ public class TabCouponController {
             resultMap.put("code", "4");
             resultMap.put("state", "false");
             return resultMap;
-        }else if (valueRight >= 50){
+        }/*else if (valueRight >= 50){
             if (!"0".endsWith(user.getRoletype())){
                 resultMap.put("message", "发放50$的优惠卷需要管理员权限!");
                 resultMap.put("code", "4");
                 resultMap.put("state", "false");
                 return resultMap;
             }
-        }else if(0.07d * valueLeft  < 1.0d * valueRight){
+        }*/else if(0.07d * valueLeft  < 1.0d * valueRight){
             resultMap.put("message", "折扣金额不能超过最低消费金额的7%!");
             resultMap.put("code", "4");
             resultMap.put("state", "false");

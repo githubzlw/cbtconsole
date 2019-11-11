@@ -70,7 +70,11 @@ public class Redis {
 	            //释放redis对象
 				e.printStackTrace();
 	            logger.error("error",e);
-	        }
+	        }finally {
+	        	if(jedis != null){
+	        		jedis.close();
+				}
+			}
 	        return res;
 	    }
 	 
@@ -113,14 +117,24 @@ public class Redis {
 	 * @return
 	 */
 	public static long hdel(String key) {
-	
-	    try (Jedis jedis = getJedis()) {
-	        Long res = jedis.del(key);
+
+		Jedis jedis = null;
+		Long res =0L;
+	    try{
+	    	jedis = getJedis();
+	         res = jedis.del(key);
 	        if (res == 0L) {
 	            logger.error("hdel result is 0,key:[{}]", key);
 	        }
-	        return res;
-	    }
+	    } catch (Exception e) {
+			e.printStackTrace();
+			logger.error("hdel result is error", e);
+		} finally {
+	    	if(jedis != null){
+	    		jedis.close();
+			}
+		}
+		return res;
 	}
 
     /**

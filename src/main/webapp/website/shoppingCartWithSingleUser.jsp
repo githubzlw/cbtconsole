@@ -407,11 +407,11 @@
                 isSu = false;
                 return isSu;
             }
-            if(50 < valueRight){
+            /*if(50 < valueRight){
                 $.messager.alert("提醒", "折扣金额不能超过50", "info");
                 isSu = false;
                 return isSu;
-            }
+            }*/
             if(isSu){
                 $(obj).prop("disabled", true);
                 $.ajax({
