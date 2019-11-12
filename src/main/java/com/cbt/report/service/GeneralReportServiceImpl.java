@@ -87,7 +87,7 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	String[] excelTota23 = { "序号","支付月份","用户ID","用户邮箱","VIP等级","订单数量","实际重量（kg）","预估重量(kg)","实际支付金额(RMB)","实际采购金额(RMB)","实际运费(RMB)","客户付的运费(RMB)","用户利润(RMB)","用户利润率(%)","预计运费(RMB)","用户利润预估(RMB)","用户预估利润率(%)"};
 	String[] excelTota24 = { "序号","商品ID","产品名","skuid","specid","sku","盘点前库存","盘点后库存","差异值","库位","时间"};
 	String[] excelTota25 = { "序号","类别","商品ID","商品名称","商品sku","商品图片","上次盘点数量","库存数量","库位","盘点数量"};
-	String[] excelTota26 = { "序号","时间","odid","商品ID","商品名称","商品sku","库存数量","库位","盘点数量"};
+	String[] excelTota26 = { "序号","时间","odid","商品ID","商品名称","商品sku","库存数量","库位","价格","盘点数量"};
 
 	@Override
 	public HSSFWorkbook exportUserProfitByMonth(List<OrderSalesAmountPojo> list) {
@@ -1266,7 +1266,8 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 				row.createCell(5).setCellValue(bg.getGoodsSku()+"\n"+bg.getGoodsSpecid()+"\n"+bg.getGoodsSkuid());
 				row.createCell(6).setCellValue(bg.getRemaining());
 				row.createCell(7).setCellValue(bg.getBarcode());
-				row.createCell(8).setCellValue("");
+				row.createCell(8).setCellValue(bg.getGoodsPrice());
+				row.createCell(9).setCellValue("");
 			}
 		}catch(Exception e){
 			e.printStackTrace();

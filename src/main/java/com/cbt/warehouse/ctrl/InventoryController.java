@@ -1454,8 +1454,8 @@ public class InventoryController {
 			HSSFWorkbook wb = generalReportService.exportInventoryCheckExcel(dicRecord);
 			response.setContentType("application/vnd.ms-excel");
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String filename = "库存盘点数据导出" + sdf.format(new Date());
-			filename = StringUtils.getFileName(filename);
+			String filename = "inventory_check_数据导出" + sdf.format(new Date());
+//			filename = StringUtils.getFileName(filename);
 			response.setHeader("Content-disposition", "attachment;filename=" + filename);
 			OutputStream ouputStream = response.getOutputStream();
 			wb.write(ouputStream);
@@ -1466,7 +1466,7 @@ public class InventoryController {
 		}
 		
 	}
-	/**完成盘点
+	/**导出报表
 	 * @param request
 	 * @param response
 	 * @return
