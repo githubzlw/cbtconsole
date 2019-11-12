@@ -48,7 +48,7 @@ $(function() {
 				padding : '8 8 10 8'
 			},
 			onLoadError : function() {
-				//$.message.alert("提示信息", "获取数据信息失败","info");
+				//$.messager.alert("提示信息", "获取数据信息失败","info");
 				return;
 			}
 		});

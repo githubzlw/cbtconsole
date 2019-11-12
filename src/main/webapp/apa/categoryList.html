@@ -3,18 +3,37 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
-    <script type="text/javascript"
-            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
-    <script type="text/javascript"
-            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
     <link rel="stylesheet" type="text/css"
           href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css"
           href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
     <title>1688类别管理</title>
     <style type="text/css">
         b {
             color: red;
+        }
+
+        .panel-title {
+            text-align: center;
+            font-size: 15px;
+            height: 20px;
+            line-height: 20px;
+        }
+
+        .btn_sy{
+            background-color: #a8f7a8;
+            border-color: #a8f7a8;
+        }
+
+        .btn_pr{
+            background-color: #f1c9ba;
+            border-color: #f1c9ba;
         }
     </style>
     <script type="text/javascript">
@@ -22,21 +41,34 @@
         var oldParentNode;
         var newParentNode;
         var currentNode;
-        var currentNodeChildList = new Array();
+        var currCidOP = "0";
 
         $(function () {
+            closeDialog();
+            setDatagrid();
+            $('#btn').bind('click', function () {
+                doQuery();
+            });
             createCategoryTree("0", "");
+            var opts = $("#cid_easyui-datagrid").datagrid("options");
+            opts.url = "/cbtconsole/category/queryAllCategoryByParam";
         });
 
         function doQuery() {
-            $("#notice_id").show().text("正在查询...");
-            var categoryId = $("#query_catid").val();
-            var categoryName = $("#query_name").val();
-            var param = {categoryId: categoryId, categoryName: categoryName};
-            $("#easyui-tree-id").tree("reload", param);
+            // $("#notice_id").show().text("正在查询...");
+            var categoryId = $("#query_catid").textbox('getValue');
+            var categoryName = $("#query_name").textbox('getValue');
+
+            // var param = {categoryId: categoryId, categoryName: categoryName};
+            // $("#easyui-tree-id").tree("reload", param);
+            createCategoryTree(categoryId, categoryName, 0);
         }
 
-        function createCategoryTree(nodeId, categoryName) {
+        function createCategoryTree(nodeId, categoryName, flag) {
+            $.messager.progress({
+                title: '类别树加载中',
+                msg: '请等待...'
+            });
             $('#easyui-tree-id').tree({
                 url: "/cbtconsole/category/queryCategoryTree",
                 animate: true,
@@ -86,6 +118,7 @@
                     $('#easyui-tree-id').find('.tree-node-selected').removeClass('tree-node-selected');
                     if (data.length > 0) {
                         if (nodeId == null || nodeId == "" || nodeId == "0") {
+                            nodeId = "0";
                             var nd = $('#easyui-tree-id').tree('find', data[0].id);
                             $('#easyui-tree-id').tree('select', nd.target);
                         } else {
@@ -96,8 +129,45 @@
                         }
                     }
                     $("#easyui-tree-id").show();
-                    $("#notice_id").hide();
+                    // $("#notice_id").hide();
+                    $.messager.progress('close');
+                    currCidOP = nodeId;
+                    loadDatagrid(flag, nodeId);
+                },
+                onDblClick: function (node) {
+                    currCidOP = node.id;
+                    loadDatagrid(0, node.id);
                 }
+            });
+        }
+
+        function reloadTree(nodeId,categoryName) {
+            var param = {categoryId: nodeId, categoryName: categoryName};
+            $('#easyui-tree-id').tree("reload",param);
+        }
+
+        function setDatagrid() {
+            $('#cid_easyui-datagrid').datagrid({
+                //title: '1688类别',
+                //iconCls : 'icon-ok',
+                width: "98%",
+                height: "98%",
+                fit: true,//自动补全
+                pageSize: 40,//默认选择的分页是每页20行数据
+                pageList: [40, 60, 80],//可以选择的分页集合
+                nowrap: false,//设置为true，当数据长度超出列宽时将会自动截取
+                striped: true,//设置为true将交替显示行背景。
+    			collapsible : true,//显示可折叠按钮
+                // toolbar: "#top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: false,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                idField: 'itemid',
+                //sortName : 'xh',//当数据表格初始化时以哪一列来排序
+    // 			sortOrder : 'desc',//定义排序顺序，可以是'asc'或者'desc'（正序或者倒序）。
+                pagination: true,//分页
+                rownumbers: true
             });
         }
 
@@ -129,6 +199,8 @@
                         $.messager.progress('close');
                         if (data.ok) {
                             showMessage("更新成功");
+                            // var currCid = $("#query_catid").textbox('getValue');
+                            $("#cid_easyui-datagrid").datagrid("reload");
                         } else {
                             $.messager.alert("提示信息", data.message, "error");
                         }
@@ -157,41 +229,276 @@
             });
         }
 
-        function traverseNode(node) {
-            if ($('#easyui-tree-id').tree('isLeaf', node.target)) {
-                return;
+        function formatOperation(val, row, index) {
+            var content = '';
+            if (row.changeName != null && row.changeName != "") {
+                content += '<button class="btn_sy" onclick="openCidInfo(\'' + row.categoryId + '\',\'\',2)">设置中文名</button>';
             } else {
-                var childrenList = $('#easyui-tree-id').tree('getChildren', node.target);
-                if (childrenList != null && childrenList != undefined) {
-                    for (var i = 0; i < childrenList.length; i++) {
-                        if ($('#easyui-tree-id').tree('isLeaf', childrenList[i].target)) {
-                            currentNodeChildList.push(childrenList[i].id)
-                        } else {
-                            traverseNode(childrenList[i]);
-                        }
-                    }
-                }
+                content += '<button class="btn_sy" onclick="openCidInfo(\'' + row.categoryId + '\',\'\',2)">设置中文名</button>';
             }
+            if (row.changeEnName != null && row.changeEnName != "") {
+                content += '&nbsp;&nbsp;<button class="btn_sy" onclick="openCidInfo(\'' + row.categoryId + '\',\'\',3)">设置英文名</button>';
+            } else {
+                content += '&nbsp;&nbsp;<button class="btn_sy" onclick="openCidInfo(\'' + row.categoryId + '\',\'\',3)">设置英文名</button>';
+            }
+            if (row.changeParentId != null && row.changeParentId != "") {
+                content += '&nbsp;&nbsp;<button class="btn_pr" onclick="openCidInfo(\'' + row.categoryId + '\',\'' + row.changeParentId
+                    + '\',1)">调整父类ID</button>';
+            } else {
+                content += '&nbsp;&nbsp;<button class="btn_pr" onclick="openCidInfo(\'' + row.categoryId + '\',\'' + row.parentId
+                    + '\',1)">调整父类别</button>';
+            }
+            return content;
+        }
+
+        function openCidInfo(cid, oldCid, type) {
+            $("#form_enter")[0].reset();
+            $("#update_type").val(type);
+            $("#old_cid").val(oldCid);
+            $("#update_cid").val(cid);
+
+
+            if (type == 1) {
+                $("#new_cid_tr").show();
+                $("#new_ch_name_tr").hide();
+                $("#new_en_name_tr").hide();
+                $('#update_div_sty').dialog('open');
+            } else if (type == 2) {
+                $("#new_cid_tr").hide();
+                $("#new_ch_name_tr").show();
+                $("#new_en_name_tr").hide();
+                getCidInfo(cid);
+            } else if (type == 3) {
+                $("#new_cid_tr").hide();
+                $("#new_ch_name_tr").hide();
+                $("#new_en_name_tr").show();
+                getCidInfo(cid);
+            } else {
+                $("#new_cid_tr").hide();
+                $("#new_ch_name_tr").hide();
+                $("#new_en_name_tr").hide();
+            }
+        }
+
+        function getCidInfo(cid) {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/category/getCidInfo",
+                data: {cid:cid},
+                success: function (data) {
+                    if (data.ok) {
+                        var json = data.data;
+                        $("#new_ch_name").val(json.categoryName);
+                        $("#new_en_name").val(json.enName);
+                        $('#update_div_sty').dialog('open');
+                    } else {
+                        $.messager.alert("提示信息", data.message, "error");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提示信息", "网络连接错误", "error");
+                }
+            });
+        }
+
+        function saveInfo() {
+            var isSu = true;
+            var type = $("#update_type").val();
+            var old_cid = $("#old_cid").val();
+            var update_cid = $("#update_cid").val();
+            var new_cid = $("#new_cid").val();
+            var new_ch_name = $("#new_ch_name").val();
+            var new_en_name = $("#new_en_name").val();
+            var param = {};
+            if (update_cid == null || update_cid == "") {
+                isSu = false;
+                $.messager.alert("提示信息", "获取类别ID失败", "error");
+                return false
+            } else {
+                param["cid"] = update_cid;
+            }
+            if (type == 1) {
+
+                if (old_cid == null || old_cid == "") {
+                    isSu = false;
+                    $.messager.alert("提示信息", "获取原始类别ID失败", "error");
+                    return false
+                } else {
+                    param["oldCid"] = old_cid;
+                }
+                if (new_cid == null || new_cid == "") {
+                    isSu = false;
+                    $.messager.alert("提示信息", "获取新的类别ID失败", "error");
+                    return false
+                } else {
+                    param["parentCid"] = new_cid;
+                }
+            } else if (type == 2) {
+                if (new_ch_name == null || new_ch_name == "") {
+                    isSu = false;
+                    $.messager.alert("提示信息", "获取修改中文名称失败", "error");
+                    return false
+                } else {
+                    param["chName"] = new_ch_name;
+                }
+            } else if (type == 3) {
+                if (new_en_name == null || new_en_name == "") {
+                    isSu = false;
+                    $.messager.alert("提示信息", "获取修改中文名称失败", "error");
+                    return false
+                } else {
+                    param["enName"] = new_en_name;
+                }
+            } else {
+                isSu = false;
+                $.messager.alert("提示信息", "获取修改类别失败", "error");
+                return false
+            }
+
+            if (isSu) {
+                setCidInfo(param, type);
+            }
+        }
+
+        function setCidInfo(param, type) {
+            $.messager.progress({
+                title: '正在执行更新',
+                msg: '请等待...'
+            });
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/category/updateCategoryInfo",
+                data: param,
+                success: function (data) {
+                    // $("#notice_id").hide();
+                    $.messager.progress('close');
+                    if (data.ok) {
+                        showMessage("更新成功");
+                        closeDialog();
+                        var currCid = $("#query_catid").textbox('getValue');
+                        createCategoryTree(currCid,"",1);
+                    } else {
+                        $.messager.alert("提示信息", data.message, "error");
+                    }
+                },
+                error: function (res) {
+                    // $("#notice_id").hide();
+                    $.messager.progress('close');
+                    $.messager.alert("提示信息", "网络连接错误", "error");
+                }
+            });
+        }
+
+        function closeDialog() {
+            $('#update_div_sty').dialog('close');
+        }
+
+        function loadDatagrid(flag, cid) {
+            $("#cid_easyui-datagrid").datagrid("load", {
+                cid: cid
+            });
+            $.parser.parse('#cid_easyui-datagrid');
+
+            /*if (flag > 0) {
+                $("#cid_easyui-datagrid").datagrid("reload", {
+                    cid: cid
+                });
+                $.parser.parse('#cid_easyui-datagrid');
+            } else {
+                $("#cid_easyui-datagrid").datagrid("load", {
+                    cid: cid
+                });
+                $.parser.parse('#cid_easyui-datagrid');
+            }*/
         }
     </script>
 </head>
-<body>
+<body class="easyui-layout">
+
+
+<div id="update_div_sty" class="easyui-dialog" title="更新类别"
+     data-options="modal:true" style="width: 430px; height: 200px;">
+    <form id="form_enter" action="#" onsubmit="return false">
+        <table>
+            <tr>
+                <td>类别ID:</td>
+                <td>
+                    <input id="update_type" value="0" type="hidden"/>
+                    <input id="old_cid" value="0" type="hidden"/>
+                    <input id="update_cid" value="0" readonly="readonly" style="width: 300px; height: 28px;"/></td>
+            </tr>
+            <tr id="new_cid_tr">
+                <td>新的父类ID:</td>
+                <td><input id="new_cid" value="" style="width: 300px; height: 28px;"/></td>
+            </tr>
+            <tr id="new_ch_name_tr">
+                <td>新的中文名称:</td>
+                <td><input id="new_ch_name" value="" style="width: 300px; height: 28px;"/></td>
+            </tr>
+            <tr id="new_en_name_tr">
+                <td>新的英文名称:</td>
+                <td><input id="new_en_name" value="" style="width: 300px; height: 28px;"/></td>
+            </tr>
+        </table>
+        <div style="text-align: center;">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton" onclick=" saveInfo()" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeDialog()"
+               style="width: 80px">取消</a>
+        </div>
+
+    </form>
+</div>
 
 <!--<div id="mm" class="easyui-menu" style="width:120px;">
 	<div onclick="append()" data-options="iconCls:'icon-add'">Append</div>
 	<div onclick="remove()" data-options="iconCls:'icon-remove'">Remove</div>
 </div>-->
 
-<h1 style="text-align: center">1688类别管理</h1>
-<div style="text-align: center;">
-    <span>类别ID:<input id="query_catid"/></span><span>类别名称:<input id="query_name"/></span>
-    <button onclick="doQuery()">查询</button>
-    <span id="notice_id" style="color: red">正在查询...</span>
+<div data-options="region:'north',title:'1688类别管理(拖动替换类别,双击查询类别数据)',split:true" style="height:70px;">
+    <div style="margin-top: 5px;text-align: center;">
+        <span>类别ID:<input id="query_catid" class="easyui-textbox"/></span>
+        <span>类别名称:<input id="query_name" class="easyui-textbox"/></span>
+        <button id="btn" onclick="doQuery()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</button>
+        <span id="notice_id" style="color: red;display: none;">正在查询...</span>
+    </div>
+
+</div>
+<!--<div data-options="region:'south',title:'South Title',split:true" style="height:100px;"></div>-->
+<!--<div data-options="region:'east',title:'East',split:true" style="width:100px;"></div>-->
+<div data-options="region:'west',title:'类别树展示',split:true" style="width: 13%;">
+    <div class="easyui-panel">
+        <ul id="easyui-tree-id">
+        </ul>
+    </div>
+</div>
+<div data-options="region:'center',title:'类别表数据'" style="padding-bottom:5px;background:#eee;width: 100%;">
+
+    <table id="cid_easyui-datagrid" class="easyui-datagrid">
+        <thead>
+        <tr>
+            <th data-options="field:'categoryId',width:'100px'">类别ID</th>
+            <th data-options="field:'name',width:'160px'">原中文名称</th>
+            <th data-options="field:'enName',width:'160px'">原英文名称</th>
+            <th data-options="field:'parentId',width:'100px'">原父类ID</th>
+            <th data-options="field:'lv',align:'center',width:'55px',">原等级</th>
+
+            <th data-options="field:'changeName',width:'160px'">现中文名称</th>
+            <th data-options="field:'changeEnName',width:'160px'">现英文名称</th>
+            <th data-options="field:'changeParentId',width:'100px'">现父类ID</th>
+            <th data-options="field:'changeLv',align:'center',width:'55px',">现等级</th>
+
+            <th data-options="field:'updateAdminName',width:'80px'">最后修改人</th>
+            <th data-options="field:'changeTime',align:'center',width:'150px'">修改时间</th>
+            <th data-options="field:'opFlag',align:'center',width:'300px',formatter:formatOperation">设置/调整</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 </div>
 
-<div class="easyui-panel">
-    <ul id="easyui-tree-id">
-    </ul>
-</div>
+
 </body>
 </html>

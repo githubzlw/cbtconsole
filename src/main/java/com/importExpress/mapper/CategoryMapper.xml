@@ -23,7 +23,42 @@
 		<result column="parent_id" property="parentId"/>
 		<result column="childids" property="childids"/>
     </resultMap>
-	
+
+	<resultMap id="categoryAllMap" type="com.cbt.bean.CategoryAllBean">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="lv" jdbcType="INTEGER" property="lv" />
+    <result column="category_id" jdbcType="VARCHAR" property="categoryId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="childids" jdbcType="VARCHAR" property="childids" />
+    <result column="path" jdbcType="VARCHAR" property="path" />
+    <result column="parent_id" jdbcType="VARCHAR" property="parentId" />
+    <result column="ali_category_id" jdbcType="VARCHAR" property="aliCategoryId" />
+    <result column="newcid" jdbcType="VARCHAR" property="newcid" />
+    <result column="newpath" jdbcType="VARCHAR" property="newpath" />
+    <result column="cat" jdbcType="VARCHAR" property="cat" />
+    <result column="allnewcid" jdbcType="VARCHAR" property="allnewcid" />
+    <result column="updatechilds" jdbcType="VARCHAR" property="updatechilds" />
+    <result column="createtime" jdbcType="VARCHAR" property="createtime" />
+    <result column="en_name" jdbcType="VARCHAR" property="enName" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="flag" jdbcType="INTEGER" property="flag" />
+    <result column="new_arrivals_flag" jdbcType="INTEGER" property="newArrivalsFlag" />
+    <result column="enable" jdbcType="INTEGER" property="enable" />
+    <result column="new_arrival_date" jdbcType="VARCHAR" property="newArrivalDate" />
+    <result column="min_volume_weight" jdbcType="VARCHAR" property="minVolumeWeight" />
+    <result column="freight_flag" jdbcType="INTEGER" property="freightFlag" />
+    <result column="weight_sort_flag" jdbcType="INTEGER" property="weightSortFlag" />
+    <result column="change_parent_id" jdbcType="VARCHAR" property="changeParentId" />
+    <result column="change_path" jdbcType="VARCHAR" property="changePath" />
+    <result column="change_childids" jdbcType="VARCHAR" property="changeChildids" />
+    <result column="change_lv" jdbcType="INTEGER" property="changeLv" />
+    <result column="change_time" jdbcType="VARCHAR" property="changeTime" />
+	<result column="change_name" jdbcType="VARCHAR" property="changeName" />
+	<result column="change_en_name" jdbcType="VARCHAR" property="changeEnName" />
+	<result column="update_admin_id" jdbcType="VARCHAR" property="updateAdminId" />
+	<result column="update_admin_name" jdbcType="VARCHAR" property="updateAdminName" />
+  </resultMap>
+
 	<select id="getList" resultMap="BaseResultMap">
 	select id,name,category_id,en_name,path,parent_id,childids,lv from 1688_category where 1=1
 	
@@ -59,38 +94,38 @@
 
 	<select id="queryCategoryList" resultMap="categoryResultMap" parameterType="com.cbt.bean.CategoryBean">
 		select cat1688.*,ifnull(cbm.total,0) as total from (select category_id as cid,name as category_name,en_name,
-        path,lv from 1688_category where lv > 0) cat1688 left join
-        (select category_id,count(0) as total  from 1688_category where lv > 0
+        path,lv from change_1688_category where lv > 0) cat1688 left join
+        (select category_id,count(0) as total  from change_1688_category where lv > 0
         <if test="cid != null">
 			and find_in_set(#{cid},path)
 		</if>
 		<if test="categoryName != null">
-			and find_in_set((select category_id from 1688_category where en_name = #{categoryName} or name = #{categoryName} limit 1),path)
+			and find_in_set((select category_id from change_1688_category where en_name = #{categoryName} or name = #{categoryName} limit 1),path)
 		</if>
         group by category_id
         ) cbm on cat1688.cid=cbm.category_id order by cat1688.lv,cat1688.category_name asc
 	</select>
 
 	<select id="queryCategoryListCount" resultType="int" parameterType="com.cbt.bean.CategoryBean">
-		select count(0) from 1688_category where lv > 0
+		select count(0) from change_1688_category where lv > 0
 		<if test="cid != null">
 			and find_in_set(#{cid},path)
 		</if>
 		<if test="categoryName != null">
-			and find_in_set((select category_id from 1688_category where en_name = #{categoryName} or name = #{categoryName} limit 1),path)
+			and find_in_set((select category_id from change_1688_category where en_name = #{categoryName} or name = #{categoryName} limit 1),path)
 		</if>
 	</select>
 
 	<select id="queryCategoryById" resultMap="categoryResultMap">
 		select category_id as cid,name as category_name,en_name,
-        path,lv,parent_id,childids from 1688_category
+        path,lv,parent_id,childids from change_1688_category
         where lv > 0 and category_id = #{cid}
 	</select>
 
 
 	<select id="queryChildCategory" resultMap="categoryResultMap" parameterType="list">
 		select category_id as cid,name as category_name,en_name,
-        path,lv,parent_id,childids from 1688_category
+        path,lv,parent_id,childids from change_1688_category
         where lv > 0 and category_id in
         <foreach collection="list" item="cid" open="(" close=")" separator=",">
 			#{cid}
@@ -100,9 +135,47 @@
 	<update id="batchUpdateCategory" parameterType="list">
 		<foreach collection="list" item="bean" separator=";">
 			update 1688_category set change_parent_id = #{bean.parentId},change_path = #{bean.path},
-			change_childids = #{bean.childids},change_lv = #{bean.lv}
+			change_childids = #{bean.childids},change_lv = #{bean.lv},update_admin_id = #{bean.adminId}
 			where category_id = #{bean.cid}
 		</foreach>
 	</update>
+
+	<select id="queryAllCategoryByParam" resultMap="categoryAllMap">
+		select a.id, a.lv, a.category_id, a.`name`, a.childids, a.`path`, a.parent_id, a.ali_category_id,
+		a.newcid, a.newpath, a.cat, a.allnewcid, a.updatechilds,
+		DATE_FORMAT(a.createtime,'%Y-%m-%d %H:%i:%S') as createtime, a.en_name, a.description,
+		a.flag, a.new_arrivals_flag, a.`enable`, a.new_arrival_date, a.min_volume_weight, a.freight_flag,
+		a.weight_sort_flag, a.change_parent_id, a.change_path, a.change_childids, a.change_lv,
+		DATE_FORMAT(a.change_time,'%Y-%m-%d %H:%i:%S') as change_time,a.change_name,a.change_en_name,
+		a.update_admin_id,ifnull(b.admName,'') as update_admin_name
+		from 1688_category a left join admuser b on a.update_admin_id = b.id
+		where a.lv > 0
+		<if test="cid != null">
+			and find_in_set(#{cid},a.path)
+		</if>
+		order by a.lv,a.`name`
+		<if test="limitNum > 0">
+			limit #{startNum},#{limitNum}
+		</if>
+	</select>
+
+	<select id="queryAllCategoryByParamCount" resultType="int">
+		select count(0) from 1688_category a left join admuser b on a.update_admin_id = b.id
+		where a.lv > 0
+		<if test="cid != null">
+			and find_in_set(#{cid},a.path)
+		</if>
+	</select>
+
+    <update id="updateChangeAllBeanInfo" parameterType="com.cbt.bean.CategoryAllBean">
+        update 1688_category set update_admin_id = #{updateAdminId}
+        <if test="changeName != null">
+            ,change_name = #{changeName}
+        </if>
+        <if test="changeEnName != null">
+            ,change_en_name = #{changeEnName}
+        </if>
+        where category_id = #{categoryId}
+    </update>
 
 </mapper>

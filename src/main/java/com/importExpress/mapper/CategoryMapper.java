@@ -3,6 +3,7 @@ package com.importExpress.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.cbt.bean.CategoryAllBean;
 import com.cbt.bean.CategoryBean;
 import org.apache.ibatis.annotations.Param;
 
@@ -77,5 +78,21 @@ public interface CategoryMapper {
      * @return
      */
     int batchUpdateCategory(List<CategoryBean> list);
+
+    /**
+     * 获取全部bean数据
+     * @param cid
+     * @return
+     */
+    List<CategoryAllBean> queryAllCategoryByParam(@Param("cid") String cid, @Param("startNum") int startNum, @Param("limitNum") int limitNum);
+
+    int queryAllCategoryByParamCount(@Param("cid") String cid, @Param("startNum") int startNum, @Param("limitNum") int limitNum);
+
+    /**
+     * 更新类别名称
+     * @param categoryBean
+     * @return
+     */
+    int updateChangeAllBeanInfo(CategoryAllBean categoryBean);
 
 }

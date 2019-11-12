@@ -1,6 +1,7 @@
 package com.cbt.service.impl;
 
 import com.cbt.bean.Category1688Bean;
+import com.cbt.bean.CategoryAllBean;
 import com.cbt.bean.CategoryBean;
 import com.cbt.service.CategoryService;
 import com.importExpress.mapper.CategoryMapper;
@@ -84,5 +85,20 @@ public class CategoryServiceImpl implements CategoryService {
 	public int batchUpdateCategory(List<CategoryBean> list) {
 		return categoryMapper.batchUpdateCategory(list);
 	}
+
+    @Override
+    public List<CategoryAllBean> queryAllCategoryByParam(String cid,int startNum,int limitNum) {
+        return categoryMapper.queryAllCategoryByParam(cid,startNum,limitNum);
+    }
+
+	@Override
+	public int queryAllCategoryByParamCount(String cid, int startNum, int limitNum) {
+		return categoryMapper.queryAllCategoryByParamCount(cid, startNum, limitNum);
+	}
+
+	@Override
+    public int updateChangeAllBeanInfo(CategoryAllBean categoryBean) {
+        return categoryMapper.updateChangeAllBeanInfo(categoryBean);
+    }
 
 }

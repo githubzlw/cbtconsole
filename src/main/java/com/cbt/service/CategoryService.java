@@ -1,6 +1,7 @@
 package com.cbt.service;
 
 import com.cbt.bean.Category1688Bean;
+import com.cbt.bean.CategoryAllBean;
 import com.cbt.bean.CategoryBean;
 
 import java.util.List;
@@ -78,5 +79,21 @@ public interface CategoryService {
      * @return
      */
     int batchUpdateCategory(List<CategoryBean> list);
+
+    /**
+     * 获取全部bean数据
+     * @param cid
+     * @return
+     */
+    List<CategoryAllBean> queryAllCategoryByParam(String cid,int startNum,int limitNum);
+
+    int queryAllCategoryByParamCount(String cid,int startNum,int limitNum);
+
+    /**
+     * 更新类别名称
+     * @param categoryBean
+     * @return
+     */
+    int updateChangeAllBeanInfo(CategoryAllBean categoryBean);
     
 }
