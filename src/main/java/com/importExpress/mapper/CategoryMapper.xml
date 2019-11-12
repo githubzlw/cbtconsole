@@ -11,6 +11,18 @@
 	    <result column="name"  property="categoryCName" />
 	    <result column="lv"  property="lv" />
 	</resultMap>
+
+	<resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
+        <id column="id" property="id"/>
+        <result column="cid" property="cid"/>
+        <result column="path" property="path"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="total" property="total"/>
+        <result column="lv" property="lv"/>
+		<result column="en_name" property="enName"/>
+		<result column="parent_id" property="parentId"/>
+		<result column="childids" property="childids"/>
+    </resultMap>
 	
 	<select id="getList" resultMap="BaseResultMap">
 	select id,name,category_id,en_name,path,parent_id,childids,lv from 1688_category where 1=1
@@ -44,5 +56,53 @@
 	<select id="getCategoryByCatid" resultType="String">
 	select en_name from 1688_category where flag=0 and category_id=#{catid}
 	</select>
-	
+
+	<select id="queryCategoryList" resultMap="categoryResultMap" parameterType="com.cbt.bean.CategoryBean">
+		select cat1688.*,ifnull(cbm.total,0) as total from (select category_id as cid,name as category_name,en_name,
+        path,lv from 1688_category where lv > 0) cat1688 left join
+        (select category_id,count(0) as total  from 1688_category where lv > 0
+        <if test="cid != null">
+			and find_in_set(#{cid},path)
+		</if>
+		<if test="categoryName != null">
+			and find_in_set((select category_id from 1688_category where en_name = #{categoryName} or name = #{categoryName} limit 1),path)
+		</if>
+        group by category_id
+        ) cbm on cat1688.cid=cbm.category_id order by cat1688.lv,cat1688.category_name asc
+	</select>
+
+	<select id="queryCategoryListCount" resultType="int" parameterType="com.cbt.bean.CategoryBean">
+		select count(0) from 1688_category where lv > 0
+		<if test="cid != null">
+			and find_in_set(#{cid},path)
+		</if>
+		<if test="categoryName != null">
+			and find_in_set((select category_id from 1688_category where en_name = #{categoryName} or name = #{categoryName} limit 1),path)
+		</if>
+	</select>
+
+	<select id="queryCategoryById" resultMap="categoryResultMap">
+		select category_id as cid,name as category_name,en_name,
+        path,lv,parent_id,childids from 1688_category
+        where lv > 0 and category_id = #{cid}
+	</select>
+
+
+	<select id="queryChildCategory" resultMap="categoryResultMap" parameterType="list">
+		select category_id as cid,name as category_name,en_name,
+        path,lv,parent_id,childids from 1688_category
+        where lv > 0 and category_id in
+        <foreach collection="list" item="cid" open="(" close=")" separator=",">
+			#{cid}
+		</foreach>
+	</select>
+
+	<update id="batchUpdateCategory" parameterType="list">
+		<foreach collection="list" item="bean" separator=";">
+			update 1688_category set change_parent_id = #{bean.parentId},change_path = #{bean.path},
+			change_childids = #{bean.childids},change_lv = #{bean.lv}
+			where category_id = #{bean.cid}
+		</foreach>
+	</update>
+
 </mapper>

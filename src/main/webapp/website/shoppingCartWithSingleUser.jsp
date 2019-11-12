@@ -483,7 +483,7 @@
                 </tr>
                 <tr>
                     <td>描述(自动生成):</td>
-                    <td><input id="coupon_desc" readonly="readonly"/></td>
+                    <td><input id="coupon_desc" readonly="readonly" value="If order over  $"/></td>
                 </tr>
                 <tr>
                     <td>截止时间:</td>

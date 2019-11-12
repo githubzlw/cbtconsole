@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <title>1688类别管理</title>
+    <style type="text/css">
+        b {
+            color: red;
+        }
+    </style>
+    <script type="text/javascript">
+
+        var oldParentNode;
+        var newParentNode;
+        var currentNode;
+        var currentNodeChildList = new Array();
+
+        $(function () {
+            createCategoryTree("0", "");
+        });
+
+        function doQuery() {
+            $("#notice_id").show().text("正在查询...");
+            var categoryId = $("#query_catid").val();
+            var categoryName = $("#query_name").val();
+            var param = {categoryId: categoryId, categoryName: categoryName};
+            $("#easyui-tree-id").tree("reload", param);
+        }
+
+        function createCategoryTree(nodeId, categoryName) {
+            $('#easyui-tree-id').tree({
+                url: "/cbtconsole/category/queryCategoryTree",
+                animate: true,
+                dnd: true,
+                lines: true,
+                method: "post",
+                queryParams: {categoryId: nodeId, categoryName: categoryName},
+                /*onContextMenu: function(e, node){
+                    e.preventDefault();
+                    // select the node
+                    $('#easyui-tree-id').tree('select', node.target);
+                    // display context menu
+                    $('#mm').menu('show', {
+                        left: e.pageX,
+                        top: e.pageY
+                    });
+                },*/
+                onStartDrag: function (node) {
+                    oldParentNode = null;
+                    currentNode = null;
+                    newParentNode = null;
+                    // 当开始拖拽节点时触发
+                    // 保存当前节点，父节点和子节点的信息
+                    var parentNode = $('#easyui-tree-id').tree("getParent", node.target);
+                    if (parentNode == null || parentNode == undefined) {
+                        // $.messager.alert("提示信息", "顶级节点不能移动","info");
+                        return false;
+                    } else {
+                        oldParentNode = parentNode;
+                        currentNode = node;
+                    }
+                    return true;
+                },
+                onDrop: function (node) {
+                    // 当节点被放置时触发
+                    // var currNode = $('#easyui-tree-id').tree("getNode", node.target);
+                    newParentNode = $('#easyui-tree-id').tree("getNode", node);
+                    changeCatidData();
+                },
+                onBeforeExpand: function (node) {
+                    if (node.children.length == 0) {
+                        $.messager.alert("提示信息", "无子节点", "info");
+                        return false;
+                    }
+                },
+                onLoadSuccess: function (node, data) {
+                    $('#easyui-tree-id').find('.tree-node-selected').removeClass('tree-node-selected');
+                    if (data.length > 0) {
+                        if (nodeId == null || nodeId == "" || nodeId == "0") {
+                            var nd = $('#easyui-tree-id').tree('find', data[0].id);
+                            $('#easyui-tree-id').tree('select', nd.target);
+                        } else {
+                            var clNode = $('#easyui-tree-id').tree('find', nodeId);
+                            if (clNode) {
+                                $('#easyui-tree-id').tree('select', clNode.target);
+                            }
+                        }
+                    }
+                    $("#easyui-tree-id").show();
+                    $("#notice_id").hide();
+                }
+            });
+        }
+
+        function changeCatidData() {
+            // $("#notice_id").show().text("正在执行更新...");
+            $.messager.progress({
+                title: '正在执行更新',
+                msg: '请等待...'
+            });
+            // newParentNode = $('#easyui-tree-id').tree("getParent", currentNode.target);
+            var oidCid = oldParentNode.id;
+            var curCid = currentNode.id;
+            var newCid = newParentNode.id;
+            /*if (!$('#easyui-tree-id').tree('isLeaf', currentNode.target)) {
+                traverseNode(currentNode);
+            }*/
+            if (oidCid == null || oidCid == "" || curCid == null || curCid == "" || newCid == null || newCid == "") {
+                // $("#notice_id").hide();
+                $.messager.progress('close');
+                $.messager.alert("提示信息", "获取移动类别失败", "error");
+                return false;
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/category/changeCategoryData",
+                    data: {oidCid: oidCid, curCid: curCid, newCid: newCid},
+                    success: function (data) {
+                        // $("#notice_id").hide();
+                        $.messager.progress('close');
+                        if (data.ok) {
+                            showMessage("更新成功");
+                        } else {
+                            $.messager.alert("提示信息", data.message, "error");
+                        }
+                    },
+                    error: function (res) {
+                        // $("#notice_id").hide();
+                        $.messager.progress('close');
+                        $.messager.alert("提示信息", "网络连接错误", "error");
+                    }
+                });
+            }
+
+        }
+
+        function showMessage(msg) {
+            $.messager.show({
+                title: '提醒',
+                msg: msg,
+                timeout: 1000,
+                showType: 'slide'
+                /*style: {
+                    right: '',
+                    top: ($(window).height() * 0.15),
+                    bottom: ''
+                }*/
+            });
+        }
+
+        function traverseNode(node) {
+            if ($('#easyui-tree-id').tree('isLeaf', node.target)) {
+                return;
+            } else {
+                var childrenList = $('#easyui-tree-id').tree('getChildren', node.target);
+                if (childrenList != null && childrenList != undefined) {
+                    for (var i = 0; i < childrenList.length; i++) {
+                        if ($('#easyui-tree-id').tree('isLeaf', childrenList[i].target)) {
+                            currentNodeChildList.push(childrenList[i].id)
+                        } else {
+                            traverseNode(childrenList[i]);
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+<!--<div id="mm" class="easyui-menu" style="width:120px;">
+	<div onclick="append()" data-options="iconCls:'icon-add'">Append</div>
+	<div onclick="remove()" data-options="iconCls:'icon-remove'">Remove</div>
+</div>-->
+
+<h1 style="text-align: center">1688类别管理</h1>
+<div style="text-align: center;">
+    <span>类别ID:<input id="query_catid"/></span><span>类别名称:<input id="query_name"/></span>
+    <button onclick="doQuery()">查询</button>
+    <span id="notice_id" style="color: red">正在查询...</span>
+</div>
+
+<div class="easyui-panel">
+    <ul id="easyui-tree-id">
+    </ul>
+</div>
+</body>
+</html>
