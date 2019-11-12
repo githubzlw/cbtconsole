@@ -1559,7 +1559,7 @@
                 data: {"hotType": 24},
                 success: function (data) {
                     if (data.success) {
-                        var content = "";
+                        var content = "<option value='0'>请选择</option>";
                         var jsonData = data.rows;
                         for (var i=0;i< jsonData.length;i++) {
                             content += '<option value="' + jsonData[i].id + '">' + jsonData[i].showName + '</option>';
@@ -1572,35 +1572,39 @@
                     }
                 },
                 error: function (XMLResponse) {
-                    $.messager.alert("提醒", "获取数据，请联系管理员", "error");
+                    $.messager.alert("提醒", "网络错误，请重试", "error");
                 }
             });
         }
 
         function saveGoodsDescInfo(pid) {
             var hotTypeId = $("#hot_type_id").val();
-            $.ajax({
-                type: 'POST',
-                dataType: 'json',
-                url: '/cbtconsole/editc/saveGoodsDescInfo',
-                data: {
-                    pid: pid,
-                    hotTypeId: hotTypeId
-                },
-                success: function (data) {
-                    if (data.ok) {
-                        showMessage("执行成功");
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 500);
-                    } else {
-                        $.messager.alert("提醒", data.message, "error");
+            if(hotTypeId == null || hotTypeId== "" || hotTypeId == "0"){
+                $.messager.alert("提醒", "获取分类ID失败", "error");
+            }else{
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/cbtconsole/editc/saveGoodsDescInfo',
+                    data: {
+                        pid: pid,
+                        hotTypeId: hotTypeId
+                    },
+                    success: function (data) {
+                        if (data.ok) {
+                            showMessage("执行成功");
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 500);
+                        } else {
+                            $.messager.alert("提醒", data.message, "error");
+                        }
+                    },
+                    error: function (XMLResponse) {
+                        $.messager.alert("提醒", "保存错误，请联系管理员", "error");
                     }
-                },
-                error: function (XMLResponse) {
-                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
-                }
-            });
+                });
+            }
         }
 
         function saveOverSeaInfo(pid) {
@@ -1660,7 +1664,7 @@
                     }
                 },
                 error: function (XMLResponse) {
-                    $.messager.alert("提醒", "获取数据，请联系管理员", "error");
+                    $.messager.alert("提醒", "网络错误，请重试", "error");
                 }
             });
         }

@@ -68,6 +68,8 @@ public class EditorController {
     private DecimalFormat format = new DecimalFormat("#0.00");
     private static List<String> kidsCatidList = new ArrayList<>();
 
+    private static Map<String,String> pidMap = new HashMap<>();
+
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 
     // private static final String OCR_URL = "http://192.168.1.84:5000/photo";
@@ -2509,21 +2511,34 @@ public class EditorController {
 
         editBean.setDescribe_good_flag(1);
 
+        if(pidMap.containsKey(pid + hotTypeId)){
+            json.setOk(false);
+            json.setMessage("已经被执行过");
+            return json;
+        }else{
+            pidMap.put(pid + hotTypeId,pid);
+        }
         try {
             customGoodsService.updatePidIsEdited(editBean);
             customGoodsService.insertIntoGoodsEditBean(editBean);
             // 更新MongoDB,记录日志
-            //u表示更新；c表示创建，d表示删除
-            InputData inputData = new InputData('u');
-            inputData.setPid(pid);
-            inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
-            inputData.setDescribe_good_flag("1");
-            GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            new Thread(()->{
+                //u表示更新；c表示创建，d表示删除
+                InputData inputData = new InputData('u');
+                inputData.setPid(pid);
+                inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+                inputData.setDescribe_good_flag("1");
+                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            }).start();
+
             // 记录日志
             customGoodsService.insertIntoDescribeLog(pid, user.getId());
 
-            // 插入热卖区数据
-            saveHotGoods(pid, Integer.parseInt(hotTypeId), user.getId());
+            new Thread(()->{
+                // 插入热卖区数据
+                saveHotGoods(pid, Integer.parseInt(hotTypeId), user.getId());
+            }).start();
+
 
             json.setOk(true);
             json.setMessage("执行成功");
