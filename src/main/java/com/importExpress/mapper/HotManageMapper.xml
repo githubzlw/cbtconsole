@@ -269,7 +269,7 @@
         </if>
     </select>
 
-    <insert id="insertIntoHotClassInfo" parameterType="com.cbt.warehouse.pojo.HotClassInfo">
+    <insert id="insertIntoHotClassInfo" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.warehouse.pojo.HotClassInfo">
         insert into hot_class_info(class_name,json_name,admin_id)
         values(#{className},#{jsonName},#{adminId})
     </insert>

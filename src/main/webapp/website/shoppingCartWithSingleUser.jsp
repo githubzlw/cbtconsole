@@ -62,6 +62,8 @@
             closeDialog('simple_email_div', 'simple_form_enter');
             closeDialog('shop_cart_div', 'hop_cart_form');
             closeDialog('simple_coupon_div', 'simple_coupon_enter');
+            closeDialog('follow_info_id', null);
+
             imgLazyLoad();
             var website = '${param.website}';
             if (!website) {
@@ -157,7 +159,9 @@
 
         function closeDialog(divId, formId) {
             $('#' + divId).dialog('close');
-            $("#" + formId)[0].reset();
+            if(formId && formId != null){
+                $("#" + formId)[0].reset();
+            }
         }
 
         function enterSimpleEmail() {
@@ -247,8 +251,8 @@
             window.open(url);
         }
         
-        function openUserFollow() {
-            
+        function openFollowInfo() {
+            $("#follow_info_id").dialog('open');
         }
 
         function recoverOnlineData(userId, website) {
@@ -393,6 +397,21 @@
                 isSu = false;
                 return isSu;
             }
+            if(valueLeft * 0.07 < valueRight){
+                $.messager.alert("提醒", "折扣金额不能超过最低消费金额的7%", "info");
+                isSu = false;
+                return isSu;
+            }
+            if(valueLeft < 100){
+                $.messager.alert("提醒", "最低消费金额不能小于100", "info");
+                isSu = false;
+                return isSu;
+            }
+            /*if(50 < valueRight){
+                $.messager.alert("提醒", "折扣金额不能超过50", "info");
+                isSu = false;
+                return isSu;
+            }*/
             if(isSu){
                 $(obj).prop("disabled", true);
                 $.ajax({
@@ -475,7 +494,7 @@
                 </tr>
                 <tr>
                     <td>最低消费金额</td>
-                    <td><input id="coupon_min_amount" type="number" step="0.01" onchange="changeDescribe(this.value)"/>(<b style="color: red">*根据总产品金额给</b>)</td>
+                    <td><input id="coupon_min_amount" type="number" step="0.01" value="100" onchange="changeDescribe(this.value)"/>(<b style="color: red">*根据总产品金额给</b>)</td>
                 </tr>
                 <tr>
                     <td>抵扣金额</td>
@@ -543,6 +562,28 @@
         </form>
     </div>
 
+    <div id="follow_info_id" class="easyui-dialog" title="跟进列表" data-options="modal:true" style="width: 400px; height: 300px;">
+        <table border="1" cellpadding="1" cellspacing="0" align="center">
+            <thead>
+                <tr>
+                    <td style="width: 80px;">跟进人</td>
+                    <td style="width: 150px;">跟进时间</td>
+                </tr>
+            </thead>
+            <c:if test="${not empty followList}">
+                <c:forEach items="${followList}" var="fl">
+                    <tr>
+                        <td>${fl.adminName}</td>
+                        <td>${fl.createTime}</td>
+                    </tr>
+                </c:forEach>
+            </c:if>
+            <tr>
+                <td colspan="2" style="text-align: center;"><button onclick="closeDialog('follow_info_id', null)">关闭</button></td>
+            </tr>
+        </table>
+    </div>
+
     <div style="height: 15%;width: 100%;text-align: center">
 
         <table style="border-color: #e65510;" border="1" cellpadding="1" cellspacing="0" align="center">
@@ -595,6 +636,8 @@
                         <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId}, ${param.website})"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="查看客户信息" onclick="openUserInfo(${userId}, ${param.website})"/>
+
+                            <input class="btn_sty" type="button" value="查看跟进记录" onclick="openFollowInfo()"/>
                         &nbsp;&nbsp;
                         <%--<input class="btn_sty" type="button" value="查看EDM跟踪" onclick="openUserFollow(${userId}, ${param.website})"/>--%>
                         &nbsp;&nbsp;

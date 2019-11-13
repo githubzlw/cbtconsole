@@ -92,5 +92,11 @@ public class InventoryCheckWrap {
 	 */
 	private int checkId;
 	
+	/**
+	 * 时间
+	 */
+	private String time;
+	
+	private int odid;
 
 }

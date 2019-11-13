@@ -127,6 +127,7 @@ function doQuery(page) {
     var shipno = $("#shipno").val();
     var order = $("#order").val();
     var pid = $("#pid").val();
+    var skuid = $("#skuid").val();
      var state = $('#state option:selected') .val();
 	$("#easyui-datagrid").datagrid("load", {
 		location_type : location_type,
@@ -136,6 +137,7 @@ function doQuery(page) {
 		shipno:shipno,
         order:order,
         pid2:pid,
+        skuid:skuid,
 		state:state
 	});
 }
@@ -420,6 +422,7 @@ function rejectedok(page) {
 				<input class="easyui-textbox" name="shipno" id="shipno" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'运单号:'">
 				<input class="easyui-textbox" name="order" id="order" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'客户订单号:'">
 				<input class="easyui-textbox" name="pid" id="pid" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'pid:'">
+				<input class="easyui-textbox" name="skuid" id="skuid" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'skuid:'" value="${param.skuid }">
 				<%--<input class="easyui-textbox" value="列:2019-01-17" name="optTimeStart" id="optTimeStart" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'发起时间:'">--%>
 				<%--<input class="easyui-textbox" value="列:2019-01-17" name="optTimeEnd" id="optTimeEnd" style="width:15%;"  data-options="label:'结束时间:',events:{blur:blurs,focus:focus},">--%>
 				时间：<input id="optTimeStart" class="Wdate"

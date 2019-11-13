@@ -148,6 +148,9 @@ em,i{font-style: normal;}
 .report .btn_page_in{width:100px;}
 .btn-check-list{display: none;}
 .img-responsive{max-width: 137px;max-height: 135px;}
+.report select.form-control3 {
+    width: 38%;
+}
 </style>
 </head>
 <body>
@@ -168,24 +171,21 @@ em,i{font-style: normal;}
 				</select>
 				
 				</label>
-				<label class="w160">库存量大于：<input type="text" class="form-control form-control-i" id="query_minintentory" value="${queryParam.qminintentory }"></label>
-				<label class="w160">库存量小于：<input type="text" class="form-control form-control-i" id="query_maxintentory" value="${queryParam.qmaxintentory }"></label>
-				<label class="w200">是否上架： <select class="form-control" id="query_line" >
-						<c:if test="${queryParam.isline==0 }">
-						<option value="0" selected="selected">全部</option>
-						<option value="1" >是</option>
-						<option value="2">否</option>
-				</c:if>
-				<c:if test="${queryParam.isline==1 }">
-						<option value="0" >全部</option>
-						<option value="1" selected="selected">是</option>
-						<option value="2" >否</option>
-				</c:if>
-				<c:if test="${queryParam.isline==2 }">
-						<option value="0" >全部</option>
-						<option value="1" >是</option>
-						<option value="2" selected="selected">否</option>
-				</c:if>
+				<label>时间: <input id="query_sttime" class="Wdate form-control"
+                             style="width: 110px; height: 34px" type="text" value="${queryParam.sttime}"
+                             onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate form-control"
+                                                 style="width: 110px; height: 34px;" type="text" value="${queryParam.edtime}"
+                                                 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+			</label>
+				<label class="w200">库存量:<input type="text" class="form-control form-control-i" id="query_minintentory" value="${queryParam.qminintentory }">
+				<span>&nbsp;-&nbsp;</span><input type="text" class="form-control form-control-i" id="query_maxintentory" value="${queryParam.qmaxintentory }">
+				</label>
+				<label>库位:<input type="text" class="form-control" id="query_barcode" value="${queryParam.barcode }"></label>
+				<label class="w200">是否上架： <select class="form-control form-control3" id="query_line" >
+				<option value="0" ${queryParam.isline==0 ? 'selected="selected"':''}>全部</option>
+						<option value="1" ${queryParam.isline==1 ? 'selected="selected"':''}>是</option>
+						<option value="2" ${queryParam.isline==2 ? 'selected="selected"':''}>否</option>
 				</select>
 				</label>
 				<label>
@@ -193,19 +193,22 @@ em,i{font-style: normal;}
 						<input type="hidden" value="${queryParam.isShowZero}" id="q_szero">
 					</label>
 				<label><button class="btn btn-info"  id="query_button">查询</button></label>
-				<label><a href="/cbtconsole/inventory/check/list"><button class="btn btn-success">库存盘点</button></a></label>
-				<label><a href="/cbtconsole/inventory/loss/list"><button class="btn btn-success button_loss"  id="query_button_loss">库存损益</button></a></label>
 			</div>
 		</div>
 		<div class="row mt20 row2">
 			<div class="col-xs-1">
 				<b>库存修正</b>
 			</div>
-			<div class="col-xs-11">
+			<div class="col-xs-6">
 				<button class="btn btn-success" id="tc1">录入新产品</button>
 				<button class="btn btn-success" id="tc2">导入未匹配产品</button>
 				<!-- <button class="btn btn-success" id="tc3">增加线上产品库存</button> -->
 				<label><b>最新盘点时间：</b><span id="intentory_time">${lastCheckTime}</span></label>
+			</div>
+			<div class="col-xs-3">
+			<label><a href="/cbtconsole/inventory/check/list" target="_blank"><button class="btn btn-success">库存盘点</button></a></label>
+				<label><a href="/cbtconsole/inventory/loss/list" target="_blank"><button class="btn btn-success button_loss"  id="query_button_loss">库存损益</button></a></label>
+			<label><button class="btn btn-success button_print"  id="query_button_print">导出清单</button></label>
 			</div>
 		</div>
 		<div class="row mt20">
@@ -244,7 +247,23 @@ em,i{font-style: normal;}
 						<td class="datagrid-cell-c2-remarkContext">${tory.remarkContext}</td>
 						<td class="datagrid-cell-c2-goodsPrice">${tory.goodsPrice}</td>
 						<td class="datagrid-cell-c2-canRemaining">${tory.canRemaining}</td>
-						<td class="">${tory.barcode}</td>
+						<td class="datagrid-cell-c2-barcode">
+						<%-- <input type="text" value="${tory.barcode}" class="after-barcode" > --%>
+						<select class="after-barcode">
+						<c:forEach items="${barcodeList }" var="bar">
+						<c:if test="${bar==tory.barcode}">
+						<option value="${bar}" selected="selected">${bar}</option>
+						</c:if>
+						<c:if test="${bar!=tory.barcode}">
+						<option value="${bar}" >${bar}</option>
+						</c:if>
+						</c:forEach>
+						
+						</select>
+						<br>
+						<button class="btn btn-info mt5 btn-update-barcode" name="${tory.id}" onclick="updatebarcode(${tory.id},'${tory.barcode}','${tory.remaining}',this)">修改库位</button>
+						
+						</td>
 						<td><span class="">${tory.checkTime }</span> <br>
 						<c:if test="${tory.checkTime!=''}">
 						<a href="/cbtconsole/inventory/check/info?inid=${tory.id}"><button class="btn btn-info">盘点历史</button></a>
@@ -252,6 +271,7 @@ em,i{font-style: normal;}
 						</td>
 						<td>
 							${tory.operation}
+							
 						</td>
 					</tr>
 					</c:forEach>
@@ -464,7 +484,7 @@ em,i{font-style: normal;}
 					<i id="index_icanremaining">20</i>
 				</div>
 				<div class="wrap wrap5">
-					<span>调整库存数量</span>
+					<span class="w150">调整库存数量到</span>
 					<input type="text" id="index_ichangcount">
 				</div>
 			</div>
@@ -498,10 +518,14 @@ em,i{font-style: normal;}
 					漏发
 				</label>
 				<label>
+					<input type="radio" name="reason" value="8" class="radio_change">
+					送样
+				</label>
+				<label>
 					<input type="radio" name="reason" value="7" class="radio_change">
 					其他
 				</label>
-				<input type="text" class="other" id="index_iremark">
+				<input type="text" class="other" id="index_iremark" placeholder="如果送样,请备注送样订单号">
 			</div>
 		</div>
 		<div class="wrap wrap8">
@@ -515,6 +539,7 @@ em,i{font-style: normal;}
 <script type="text/javascript" src="/cbtconsole/js/msg-confirm.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/inventoryReport.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
 </html>
 
 

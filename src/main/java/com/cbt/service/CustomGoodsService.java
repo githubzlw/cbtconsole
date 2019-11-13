@@ -890,6 +890,16 @@ public interface CustomGoodsService {
     List<GoodsOverSea> queryGoodsOverSeaInfoByPid(String pid);
 
     /**
+     * 设置可搜索
+     *
+     * @param pid
+     * @param flag
+     * @param adminId
+     * @return
+     */
+    int setSearchable(String pid, int flag, int adminId);
+
+    /**
      * 更新海外仓数据
      * @param goodsOverSea
      * @return

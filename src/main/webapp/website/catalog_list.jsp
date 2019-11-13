@@ -178,7 +178,12 @@ em,i{font-style: normal;}
 				<c:forEach items="${catalogList }" var="catalog" varStatus="index">
 					<tr id="datagrid-row-r2-2-${index.index}">
 						<td class="catalog-id">${catalog.id}</td>
-						<td class="catalog-name">${catalog.catalogName}</td>
+						<td class="catalog-name">
+						<c:if test="${catalog.template==1}"><a href="https://www.import-express.com/apa/recatalog.html?id=${catalog.id }" target="_blank">${catalog.catalogName}</a></c:if>
+						<c:if test="${catalog.template==2}"><a href="https://www.kidsproductwholesale.com/apa/recatalog.html?id=${catalog.id }" target="_blank">${catalog.catalogName}</a></c:if>
+						<c:if test="${catalog.template==4}"><a href="https://www.petstoreinc.com/apa/recatalog.html?id=${catalog.id }" target="_blank">${catalog.catalogName}</a></c:if>
+						
+						</td>
 						<td class="catalog-template">
 						
 						<c:if test="${catalog.template==1}">IMPORT</c:if>

@@ -13,8 +13,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet" href="script/style.css" type="text/css">
 <link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
-<link rel="stylesheet" href="/cbtconsole/css/bootstrap/AdminLTE.min.css">
-<script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<link rel="stylesheet" href="/cbtconsole/css/bootstrap/AdminLTE.min.css"><script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+
 <link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
 <link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
 <link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
@@ -191,6 +191,7 @@ function topCenter(msg){
 				<th data-options="field:'orderContext',width:50,align:'center'">订单信息</th>
 				<th data-options="field:'typeContext',width:50,align:'center'">类型</th>
 				<th data-options="field:'remark',width:50,align:'center'">备注说明</th>
+				<th data-options="field:'adm',width:50,align:'center'">操作人</th>
 				<th data-options="field:'createtime',width:50,align:'center'">时间</th>
 				<th data-options="field:'delContext',width:50,align:'center'">删除</th>
 			</tr>

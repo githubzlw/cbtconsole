@@ -254,21 +254,21 @@ public interface InventoryService {
 	 * @return
 	 */
 	int cancelToInventory( String[] odidLst,int admid,String admName);
-	/**移库位
+	/**移库列表
 	 * @return
 	 */
 	List<InventoryWrap> inventoryBarcodeList(Map<String, Object> map);
-	/**移库位
+	/**移库列表数量
 	 * @return
 	 */
 	int inventoryBarcodeListCount(Map<String, Object> map);
 	
-	/**更新库位变换
+	/**移库
 	 * @param map
 	 * @return
 	 */
-	int  updateBarcode(Map<String,Object> map);
-	/**更新库位变换
+	int  moveBarcode(Map<String,Object> map);
+	/**更新备注
 	 * @param map
 	 * @return
 	 */
@@ -278,10 +278,24 @@ public interface InventoryService {
 	 * @return
 	 */
 	List<LossInventoryWrap> inventoryLossList(Map<String,Object> map);
+	/**报损列表数量
+	 * @param map
+	 * @return
+	 */
 	int inventoryLossListCount(Map<String,Object> map);
 	/**未完成移库请求数量
 	 * @return
 	 */
 	int getUnDoneInventoryBarcode();
+	
+	/**库位列表
+	 * @return
+	 */
+	List<String> barcodeList();
+	/**库存库位修改
+	 * @param map
+	 * @return
+	 */
+	int  updateBarcode(Map<String,Object> map);
 	
 }

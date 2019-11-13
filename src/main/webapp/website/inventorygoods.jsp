@@ -244,7 +244,7 @@ em,i{font-style: normal;}
 	   <button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },0)">移出库存</button></c:if>
 					<c:if test="${b.ibState== 1}">
 					<c:if test="${b.returnOrderNum>0 }">
-					<a href="/cbtconsole/website/ReturnDisplay.jsp?pid=${b.iskSGoodsPid}" target="_blank" class="warring-a">该库存可能有退货，请去退货管理页面人为确认后再继续操作</a>
+					<a href="/cbtconsole/website/ReturnDisplay.jsp?skuid=${b.iskSkuid}" target="_blank" class="warring-a">该库存可能有退货，请去退货管理页面人为确认后再继续操作</a>
 					</c:if>
 					<button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },1)">移入库存</button>
 					</c:if>
@@ -401,7 +401,7 @@ function inoutInventory(index,ibid,liid,inorout){
 		orderbarcode = $(".order_barcode_"+index).text();
 	}
 	jQuery.ajax({
-		 url:"/cbtconsole/inventory/barcode/update",
+		 url:"/cbtconsole/inventory/barcode/move",
 		 data:{
 	    	   "ibid":ibid,
 	    	   "liid":liid,

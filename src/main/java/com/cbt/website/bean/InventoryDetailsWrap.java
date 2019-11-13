@@ -24,5 +24,10 @@ public class InventoryDetailsWrap  extends InventoryDetails{
 	 * 出入库说明
 	 */
 	private String typeContext;
+	
+	/**
+	 * 操作人
+	 */
+	private String adm;
 
 }
