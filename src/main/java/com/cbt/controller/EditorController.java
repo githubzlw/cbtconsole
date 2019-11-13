@@ -129,25 +129,30 @@ public class EditorController {
                 goods.setCanEdit(0);
             }
 
-            if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
-                if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
-                    goods.setOffReason(null);
-                } else {
-                    goods.setOffReason("老数据");
-                }
-            } else if (goods.getValid() == 2) {
-                if (goods.getGoodsState() == 1) {
-                    goods.setOffReason(null);
-                } else {
-                    String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()), "");
-                    if (StringUtils.isNotBlank(rsStr)) {
-                        goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
-                    } else {
-                        goods.setUnsellAbleReasonDesc("未知下架原因");
-                    }
-                }
-            } else if (goods.getGoodsState() == 1) {
+            if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
                 goods.setOffReason(null);
+                goods.setUnsellAbleReasonDesc(null);
+            } else {
+                if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
+                    if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
+                        goods.setOffReason(null);
+                    } else {
+                        goods.setOffReason("老数据");
+                    }
+                } else if (goods.getValid() == 2) {
+                    if (goods.getGoodsState() == 1) {
+                        goods.setOffReason(null);
+                    } else {
+                        String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()), "");
+                        if (StringUtils.isNotBlank(rsStr)) {
+                            goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
+                        } else {
+                            goods.setUnsellAbleReasonDesc("未知下架原因");
+                        }
+                    }
+                } else if (goods.getGoodsState() == 1) {
+                    goods.setOffReason(null);
+                }
             }
 
             if (goods == null) {
@@ -2528,7 +2533,13 @@ public class EditorController {
                 inputData.setPid(pid);
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setDescribe_good_flag("1");
-                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+                boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+                if(!isSu){
+                    isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+                }
+                if(!isSu){
+                    LOG.error("saveGoodsDescInfo update mongodb error,pid:" + pid + ",hotTypeId:" + hotTypeId);
+                }
             }).start();
 
             // 记录日志
