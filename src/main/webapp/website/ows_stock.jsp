@@ -67,12 +67,12 @@
 						<td class="datagrid-goodsPid">${stock.goodsPid}</td>
 						<td class="datagrid-goodsName">${stock.goodsName}</td>
 						<td align="left" class="datagrid-sku">
-						${stock.sku}<br>${stock.skuid}<br>${stock.specid}
+						${stock.sku=='null'?'':stock.sku}<br>${stock.skuid}<br>${stock.specid}
 						</td>
 						<td class="datagrid-pc"></td>
 						<td class="datagrid-ow-stock">${stock.owStock}</td>
 						<td class="datagrid-available-stock">${stock.availableStock}</td>
-						<td class="datagrid-remark">${stock.remark}</td>
+						<td class="datagrid-remark">${stock.remark=='null'?'':stock.remark}</td>
 						<td>
 						<button class="btn btn-warning btn-detail" name="${stock.id}">明细</button>
 						<br>
