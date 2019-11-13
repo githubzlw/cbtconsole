@@ -129,30 +129,32 @@ public class EditorController {
                 goods.setCanEdit(0);
             }
 
-            if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
-                goods.setOffReason(null);
-                goods.setUnsellAbleReasonDesc(null);
-            } else {
-                if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
-                    if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
-                        goods.setOffReason(null);
-                    } else {
-                        goods.setOffReason("老数据");
-                    }
-                } else if (goods.getValid() == 2) {
-                    if (goods.getGoodsState() == 1) {
-                        goods.setOffReason(null);
-                    } else {
-                        String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()), "");
-                        if (StringUtils.isNotBlank(rsStr)) {
-                            goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
-                        } else {
-                            goods.setUnsellAbleReasonDesc("未知下架原因");
-                        }
-                    }
-                } else if (goods.getGoodsState() == 1) {
+            if (goods.getValid() == 0) {
+                if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
                     goods.setOffReason(null);
+                    goods.setUnsellAbleReasonDesc(null);
+                } else if (goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
+                    goods.setOffReason("老数据");
                 }
+            } else if (goods.getValid() == 2) {
+                if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
+                    goods.setOffReason(null);
+                    goods.setUnsellAbleReasonDesc(null);
+                } else {
+                    String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()), "");
+                    if (StringUtils.isNotBlank(rsStr)) {
+                        goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
+                    } else {
+                        goods.setUnsellAbleReasonDesc("未知下架原因");
+                    }
+                }
+            } else if (goods.getValid() == 1) {
+                if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3 || goods.getGoodsState() == 5) {
+                    goods.setOffReason(null);
+                    goods.setUnsellAbleReasonDesc(null);
+                }
+            } else if (goods.getGoodsState() == 1) {
+                goods.setOffReason(null);
             }
 
             if (goods == null) {
@@ -1114,7 +1116,7 @@ public class EditorController {
                     if (StringUtils.isNotBlank(updateTimeStr)) {
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         //离上次编辑小于15分钟，不能发布
-                        if (System.currentTimeMillis() - sdf.parse(updateTimeStr).getTime() < 1000 * 60 * 15) {
+                        if (System.currentTimeMillis() - sdf.parse(updateTimeStr).getTime() == 0) {
                             json.setOk(false);
                             json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
                         } else {
