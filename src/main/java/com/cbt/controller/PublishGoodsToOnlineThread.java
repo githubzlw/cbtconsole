@@ -69,6 +69,7 @@ public class PublishGoodsToOnlineThread extends Thread {
             String localShowPath = ftpConfig.getLocalShowPath();
             String remoteShowPath = ftpConfig.getRemoteShowPath();
 
+
             // 根据pid获取商品信息
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
             int isKids = 0;
@@ -87,6 +88,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                 // 设置商品处于发布中的状态
                 int updateState = customGoodsService.updateGoodsState(pid, 1);
                 if (updateState > 0) {
+                    // Thread.sleep(35000);
                     String firstImg = "";
                     // 提取远程保存路径
                     String remotepath = goods.getRemotpath();
