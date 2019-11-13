@@ -5370,17 +5370,18 @@ public class OrderwsDao implements IOrderwsDao {
         ResultSet rs = null;
         int row = 0;
         boolean flag = true;
-        Connection conn = DBHelper.getInstance().getConnection2();
+        Connection connAws = DBHelper.getInstance().getConnection2();
+        Connection con27 = DBHelper.getInstance().getConnection();
         try {
             sql = "select * from order_details where goodsid='" + goodsid + "' and orderid='" + newOrderid + "'";
-            stmt = conn.prepareStatement(sql);
+            stmt = connAws.prepareStatement(sql);
             rs = stmt.executeQuery();
             if (rs.next()) {
                 flag = false;
                 row = 1;
             }
             sql = "select * from order_details where goodsid='" + goodsid + "' and orderid='" + orderid + "'";
-            stmt = conn.prepareStatement(sql);
+            stmt = connAws.prepareStatement(sql);
             rs = stmt.executeQuery();
             if (rs.next() && flag) {
                 sql = " insert into order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder,userid,goodsname,goodsprice,goodsfreight,"
@@ -5443,7 +5444,7 @@ public class OrderwsDao implements IOrderwsDao {
 //                row = stmt.executeUpdate();
                 sql = "select id,goodsdata_id,goodscatid,car_url from order_details where orderid='" + newOrderid
                         + "' and goodsid='" + goodsid + "'";
-                stmt = conn.prepareStatement(sql);
+                stmt = connAws.prepareStatement(sql);
                 rs = stmt.executeQuery();
                 if (admuserid != 0 && rs.next()) {
                     Date date = new Date();
@@ -5470,7 +5471,8 @@ public class OrderwsDao implements IOrderwsDao {
         } finally {
             DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeResultSet(rs);
-            DBHelper.getInstance().closeConnection(conn);
+            DBHelper.getInstance().closeConnection(connAws);
+            DBHelper.getInstance().closeConnection(con27);
         }
         return row;
     }
