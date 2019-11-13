@@ -75,7 +75,7 @@ public class QueryInventory extends QueryBase{
 
 	@Override
 	protected void parseRequestResult(String result) {
-		System.out.println(result);
+//		System.out.println(result);
 		JSONObject resultObject = JSONObject.parseObject(result);
 		JSONObject dataObject = (JSONObject)resultObject.get("data");
 		JSONObject pageObject = (JSONObject)dataObject.get("page");
@@ -95,6 +95,12 @@ public class QueryInventory extends QueryBase{
 		int totalStock = 0;
 		for(int i=0,size=latArray.size();i<size;i++) {
 			JSONObject lstObject = (JSONObject)latArray.get(i);
+			//商品编码
+			String productCode = lstObject.getString("productCode");
+			if(!StrUtils.isMatch(productCode, "(\\d+(\\-\\d+)*)")) {
+				continue;
+			}
+			System.out.println(productCode);
 			//仓库名称
 //			String warehouseName = lstObject.getString("warehouseName");
 			//仓库code
@@ -143,11 +149,6 @@ public class QueryInventory extends QueryBase{
 			//是否禁止出库
 //			String isprohibitoutbound = lstObject.getString("isprohibitoutbound");
 			
-			//商品编码
-			String productCode = lstObject.getString("productCode");
-			if(!StrUtils.isMatch(productCode, "(\\d+(\\-\\d+)*)")) {
-				continue;
-			}
 			//商品ID
 			String productId = lstObject.getString("productId");
 			//商品英文名字
@@ -190,16 +191,16 @@ public class QueryInventory extends QueryBase{
 			OverseasWarehouseStock stock = OverseasWarehouseStock.builder()
 												.code(productCode)
 												.coden(coden)
-												.goodsName(eName)
+												.goodsName(eName.replace("'", "\\'"))
 												.goodsPid(productId)
 												.owStock(Integer.parseInt(qtyAvailable))
 												.sku(specification)
 												.skuid(skuid)
 												.specid(specid)
 												.build();
-			System.out.println(stock.toString());
-			owsService.syncStock(stock );
-			
+//			System.out.println(stock.toString());
+			int syncStock = owsService.syncStock(stock );
+			System.out.println(productCode+"^^^^^^"+syncStock);
 		}
 		
 		setStock(totalStock);
