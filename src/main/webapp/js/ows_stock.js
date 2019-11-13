@@ -41,7 +41,20 @@ $(function(){
 		window.open("/cbtconsole/owstock/log?owsid="+owsid,"_blank");
 	})
 	
-	
+	$(".btn-check-stock").click(function(){
+		$.ajax({
+			  url:"/cbtconsole/owstock/sync",
+		       data:{},
+		       type:"post",
+		       success:function(data){
+		    	   $.MsgBox.Alert("提示", data.message);
+		       },
+		   	error:function(e){
+		   		$.MsgBox.Alert("提示", "失败");
+		   	}
+		})
+		
+	})
 	
 	
 })

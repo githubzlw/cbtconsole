@@ -37,7 +37,7 @@
 				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid" value="${stockParamter.goodsPid }"></label>
 				<label>SKUID：<input type="text" class="form-control" id="query_goods_skuid" value="${stockParamter.skuid }"></label>
 				<label><button class="btn btn-info query_button"  id="query_button">查询</button></label>
-				<label><a href="/cbtconsole/inventory/check/list"><button class="btn btn-warning">核对库存</button></a></label>
+				<label><button class="btn btn-warning btn-check-stock">核对库存</button></label>
 			</div>
 		</div>
 		<div class="row mt20 row2">
