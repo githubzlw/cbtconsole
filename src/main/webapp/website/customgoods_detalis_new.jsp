@@ -1577,10 +1577,12 @@
             });
         }
 
-        function saveGoodsDescInfo(pid) {
+        function saveGoodsDescInfo(pid, obj) {
+            $(obj).prop("disabled", true);
             var hotTypeId = $("#hot_type_id").val();
             if(hotTypeId == null || hotTypeId== "" || hotTypeId == "0"){
                 $.messager.alert("提醒", "获取分类ID失败", "error");
+                $(obj).prop("disabled", false);
             }else{
                 $.ajax({
                     type: 'POST',
@@ -1592,6 +1594,7 @@
                     },
                     success: function (data) {
                         if (data.ok) {
+                            $(obj).prop("disabled", false);
                             showMessage("执行成功");
                             setTimeout(function () {
                                 window.location.reload();
@@ -1601,6 +1604,7 @@
                         }
                     },
                     error: function (XMLResponse) {
+                        $(obj).prop("disabled", false);
                         $.messager.alert("提醒", "保存错误，请联系管理员", "error");
                     }
                 });
@@ -1747,7 +1751,7 @@
         <div style="text-align: center; padding: 5px 0">
             <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
                class="easyui-linkbutton"
-               onclick="saveGoodsDescInfo('${goods.pid}')" style="width: 80px">保存</a>
+               onclick="saveGoodsDescInfo('${goods.pid}', this)" style="width: 80px">保存</a>
             <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
                class="easyui-linkbutton" onclick="closeGoodsDescDialog()"
                style="width: 80px">关闭</a>
