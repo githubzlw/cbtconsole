@@ -1452,6 +1452,11 @@ public class OrderinfoService implements IOrderinfoService {
 		return orderinfoMapper.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
 	}
 
+	@Override
+	public int updateOrderSplitNumGoodsDistribution(String orderNo) {
+		return orderinfoMapper.updateOrderSplitNumGoodsDistribution(orderNo);
+	}
+
 	public boolean genSampleOrderByInfoList(String orderNo, int userId, List<SampleOrderBean> sampleOrderBeanList) {
 		// 插入订单详情
 		String spOrderNo = orderNo + "_SP";
