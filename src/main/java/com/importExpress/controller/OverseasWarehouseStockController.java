@@ -136,8 +136,9 @@ public class OverseasWarehouseStockController {
 	@ResponseBody
 	public Map<String,Object> syncStock(HttpServletRequest request, HttpServletResponse response){
 		Map<String,Object> result = Maps.newHashMap();
+		WarehouseWrap wrap = WarehouseWrap.builder().code("US0001").id("1000008").build();
 		try {
-			new Thread(new Runnable() {
+			/*new Thread(new Runnable() {
 				@Override
 				public void run() {
 					List<WarehouseWrap> queryWarehouse = winitService.queryWarehouse();
@@ -145,11 +146,14 @@ public class OverseasWarehouseStockController {
 					for(WarehouseWrap w : queryWarehouse) {
 						syncCount += winitService.queryInventory(w);
 					}
+					int syncCount = winitService.queryInventory(wrap);
 					stockService.addSyncStockTime(syncCount);
 				}
-			}).start();
+			}).start();*/
+			int syncCount = winitService.queryInventory(wrap);
+			stockService.addSyncStockTime(syncCount);
 			result.put("status", 200);
-			result.put("message", "正在同步......");
+			result.put("message", "正在同步.....请稍后刷新列表.");
 			
 		} catch (Exception e) {
 			result.put("status", 100);
