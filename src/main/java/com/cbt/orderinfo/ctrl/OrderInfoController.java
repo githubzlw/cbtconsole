@@ -546,8 +546,8 @@ public class OrderInfoController{
 			map.put("status", "1");
 			map.put("repState", "1");
 			if("1".equals(type)){
-				List<Map<String,String>> allList=iOrderinfoService.allTrack(map);
-				for(Map<String,String> allMap:allList){
+				List<Map<String,Object>> allList=iOrderinfoService.allTrack(map);
+				for(Map<String,Object> allMap:allList){
 					String orderid = String.valueOf(allMap.get("orderid"));
 					String goodid =String.valueOf(allMap.get("goodsid"));
 					String goodurl = String.valueOf(allMap.get("goods_url"));
@@ -690,7 +690,7 @@ public class OrderInfoController{
 			}
 			if (MultiSiteUtil.getSiteTypeNum(orderNo)==3){
 				modelM.put("websiteType",3);
-				modelM.put("accountLink","https://www.lovelypetsupply.com/orderInfo/emailLink?orderNo="+orderNo+"");
+				modelM.put("accountLink","https://www.petstoreinc.com/orderInfo/emailLink?orderNo="+orderNo+"");
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE_PET);
 			}
 //			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);

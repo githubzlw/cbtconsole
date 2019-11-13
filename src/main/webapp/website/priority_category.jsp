@@ -292,7 +292,7 @@ function saveKeyWord(){
 		<a href="javascript:addKeyword();" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">新增</a>
 		<a href="https://www.import-express.com/app/flushCategoryList" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">刷新Import缓存优先类别数据</a>
 		<a href="https://www.kidsproductwholesale.com/app/flushCategoryList" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">刷新Kids缓存优先类别数据</a>
-		<a href="https://www.lovelypetsupply.com/app/flushCategoryList" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">刷新Pets缓存优先类别数据</a>
+		<a href="https://www.petstoreinc.com/app/flushCategoryList" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">刷新Pets缓存优先类别数据</a>
 		<a href="https://www.import-express.com/app/refreshCategoryPrice" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">刷新线上缓存最低价格数据</a>
 		<span style="color:red">[多个优先类别用,隔开;更改完数据后需要点击刷新线上数据按钮才能生效]</span>
 	</div>

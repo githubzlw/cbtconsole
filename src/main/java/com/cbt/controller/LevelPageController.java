@@ -102,7 +102,7 @@ public class LevelPageController {
 		if("kids".equals(site)) {
 			url  = "https://www.kidsproductwholesale.com/app/rlevel";
 		}else if("pets".equals(site)) {
-			url  = "https://www.lovelypetsupply.com/app/rlevel";
+			url  = "https://www.petstoreinc.com/app/rlevel";
 		}
 		DownloadMain.getContentClient(url, null);
 		return "刷新成功";

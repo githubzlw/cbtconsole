@@ -43,6 +43,8 @@ public class ReturnsManagement {
 		String optTimeEnd=request.getParameter("optTimeEnd");
 		String pid=request.getParameter("pid");
 		String pid2=request.getParameter("pid2");
+		String skuid=request.getParameter("skuid");
+		skuid = StringUtil.isBlank(skuid) ? null : skuid;
 		int mid=Integer.parseInt(request.getParameter("mid"));
 		int page = Integer.parseInt(request.getParameter("page"));
 		if (StringUtil.isNotBlank(pid2)){
@@ -51,7 +53,7 @@ public class ReturnsManagement {
 		if (page > 0) {
 			page = (page - 1) * 20;
 		}
-		json=this.lookReturnOrderServiceNew.FindReturndisplay(applyUser,State,a1688Shipno,optTimeStart,optTimeEnd,page,mid,users,a1688order,pid);
+		json=this.lookReturnOrderServiceNew.FindReturndisplay(applyUser,State,a1688Shipno,optTimeStart,optTimeEnd,page,mid,users,a1688order,pid,skuid);
 		 
 		return json;
 }

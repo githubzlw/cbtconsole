@@ -1057,16 +1057,19 @@
 <div id="div_print2" style="margin:0;padding:0;position: fixed;left:0;bottom:0;display: none;width: 283px;height:142px;" align="center">
 	<table border="1" style="width: 283px;">
 		<tr>
-			<td colspan="2"><span style="font-size: 30px;">K</span><span id="barcode"></span></td>
+			<td colspan="1"><span style="font-size: 30px;text-align: center;">K</span></td>
+			<td><span id="barcode"></span><br>Skuid:<span id="skuid"></span></td>
 			<td  style="text-align:center;vertical-align:middle;width: 20px;" rowspan="2" ><div id="qrcode3"></div></td>
 		</tr>
 		<tr>
 			<td style="text-align:center;vertical-align:middle;">Item ID</td>
 			<td style="text-align:center;vertical-align:middle;">Spec</td>
+			<!-- <td style="text-align:center;vertical-align:middle;">Skuid</td> -->
 		</tr>
 		<tr>
 			<td rowspan="2"><span id="goodsid" style="font-weight: bold;"></span></td>
 			<td><span id="goods_name"></span></td>
+			<!-- <td rowspan="2"><span id="skuid" style="font-weight: bold;"></span></td> -->
 			<td style="text-align:center;"><span>Qty</span></td>
 		</tr>
 		<tr>

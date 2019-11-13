@@ -1046,6 +1046,9 @@
 
     <select id="queryAllCheckout" resultType="int">
         select id from user_checkout where flag = #{flag}
+        <if test="updateTime != null">
+            and updatetime >= #{updateTime}
+        </if>
     </select>
 
 </mapper>

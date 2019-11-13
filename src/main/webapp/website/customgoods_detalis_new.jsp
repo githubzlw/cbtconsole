@@ -1479,6 +1479,40 @@
             });
         }
 
+        function setSearchable(pid, flag) {
+            var content = '是否确认设置不可搜索标识';
+            if(flag > 0){
+                content = '是否确认设置可搜索标识';
+            }
+            $.messager.confirm('提示', content, function (rs) {
+                if (rs) {
+                    $.ajax({
+                        type: 'POST',
+                        sync: true,
+                        dataType: 'json',
+                        url: '/cbtconsole/editc/setSearchable',
+                        data: {
+                            "pid":pid,
+                            "flag": flag
+                        },
+                        success: function (data) {
+                            if (data.ok) {
+                                showMessage("执行成功");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
+                            } else {
+                                $.messager.alert("提醒", data.message, "error");
+                            }
+                        },
+                        error: function (XMLResponse) {
+                            $.messager.alert("提醒", "网络错误,请重试", "error");
+                        }
+                    });
+                }
+            });
+        }
+
         function uploadMultiFile() {
             $.messager.progress({
                 title: '上传本地图片',
@@ -1525,7 +1559,7 @@
                 data: {"hotType": 24},
                 success: function (data) {
                     if (data.success) {
-                        var content = "";
+                        var content = "<option value='0'>请选择</option>";
                         var jsonData = data.rows;
                         for (var i=0;i< jsonData.length;i++) {
                             content += '<option value="' + jsonData[i].id + '">' + jsonData[i].showName + '</option>';
@@ -1538,35 +1572,43 @@
                     }
                 },
                 error: function (XMLResponse) {
-                    $.messager.alert("提醒", "获取数据，请联系管理员", "error");
+                    $.messager.alert("提醒", "网络错误，请重试", "error");
                 }
             });
         }
 
-        function saveGoodsDescInfo(pid) {
+        function saveGoodsDescInfo(pid, obj) {
+            $(obj).prop("disabled", true);
             var hotTypeId = $("#hot_type_id").val();
-            $.ajax({
-                type: 'POST',
-                dataType: 'json',
-                url: '/cbtconsole/editc/saveGoodsDescInfo',
-                data: {
-                    pid: pid,
-                    hotTypeId: hotTypeId
-                },
-                success: function (data) {
-                    if (data.ok) {
-                        showMessage("执行成功");
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 500);
-                    } else {
-                        $.messager.alert("提醒", data.message, "error");
+            if(hotTypeId == null || hotTypeId== "" || hotTypeId == "0"){
+                $.messager.alert("提醒", "获取分类ID失败", "error");
+                $(obj).prop("disabled", false);
+            }else{
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/cbtconsole/editc/saveGoodsDescInfo',
+                    data: {
+                        pid: pid,
+                        hotTypeId: hotTypeId
+                    },
+                    success: function (data) {
+                        if (data.ok) {
+                            $(obj).prop("disabled", false);
+                            showMessage("执行成功");
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 500);
+                        } else {
+                            $.messager.alert("提醒", data.message, "error");
+                        }
+                    },
+                    error: function (XMLResponse) {
+                        $(obj).prop("disabled", false);
+                        $.messager.alert("提醒", "保存错误，请联系管理员", "error");
                     }
-                },
-                error: function (XMLResponse) {
-                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
-                }
-            });
+                });
+            }
         }
 
         function saveOverSeaInfo(pid) {
@@ -1626,7 +1668,7 @@
                     }
                 },
                 error: function (XMLResponse) {
-                    $.messager.alert("提醒", "获取数据，请联系管理员", "error");
+                    $.messager.alert("提醒", "网络错误，请重试", "error");
                 }
             });
         }
@@ -1709,7 +1751,7 @@
         <div style="text-align: center; padding: 5px 0">
             <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
                class="easyui-linkbutton"
-               onclick="saveGoodsDescInfo('${goods.pid}')" style="width: 80px">保存</a>
+               onclick="saveGoodsDescInfo('${goods.pid}', this)" style="width: 80px">保存</a>
             <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
                class="easyui-linkbutton" onclick="closeGoodsDescDialog()"
                style="width: 80px">关闭</a>
@@ -2009,6 +2051,12 @@
                 <span class="s_btn" onclick="openOverSeaDialog()">设置海外仓</span>
             </c:if>
 
+            <c:if test="${goods.searchable == 0}">
+                <span class="s_btn" onclick="setSearchable('${goods.pid}', 1)">设置可搜索</span>
+            </c:if>
+            <c:if test="${goods.searchable > 0}">
+                <span class="s_btn" onclick="setSearchable('${goods.pid}', 0)">设置不可搜索</span>
+            </c:if>
 
         </div>
         <div class="all_s">

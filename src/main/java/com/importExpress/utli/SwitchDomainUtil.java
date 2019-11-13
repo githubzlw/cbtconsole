@@ -12,10 +12,10 @@ import java.util.Map;
 public class SwitchDomainUtil {
     private static final String IMPORT_WEBSITE = "import-express.com";
     private static final String KID_WEBSITE = "kidsproductwholesale.com";
-    private static final String PET_WEBSITE = "lovelypetsupply.com";
+    private static final String PET_WEBSITE = "petstoreinc.com";
     public static final String HTTP_IMPORT_WEBSITE = "https://www.import-express.com";
     public static final String HTTP_KID_WEBSITE = "https://www.kidsproductwholesale.com";
-    public static final String HTTP_PET_WEBSITE = "https://www.lovelypetsupply.com";
+    public static final String HTTP_PET_WEBSITE = "https://www.petstoreinc.com";
     private static final char IMPORT = 'I';
     private static final char KID = 'K';
     private static final char PET = 'P';
@@ -23,7 +23,7 @@ public class SwitchDomainUtil {
 //    private static final String IMPORT_WEBSITE_VIDEOURL_1 = "img1.import-express.com";
 //    private static final String IMPORT_WEBSITE_VIDEOURL = "img.import-express.com";
 //    private static final String KID_WEBSITE_VIDEOURL = "img1.kidsproductwholesale.com";
-//    private static final String PET_WEBSITE_VIDEOURL = "img1.lovelypetsupply.com";
+//    private static final String PET_WEBSITE_VIDEOURL = "img1.petstoreinc.com";
     public static char getIMPORT() {
         return IMPORT;
     }

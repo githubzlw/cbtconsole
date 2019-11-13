@@ -17,5 +17,7 @@ public class UserRecommendEmail {
     private String adminName;
     private String createTime;
     private String sendUrl;
+    private int openFlag;
+    private Integer catalogId;
 
 }

@@ -52,17 +52,18 @@ function updatecancelChecktatus(isok, orderid, odid, isDropshipOrder, goodid, in
     var specid = $(".specid_"+orderid+"_"+odid).html();
     var skuid=$(".skuID_"+orderid+"_"+odid).html();
     var tbspecid = '';
-    var tbskuid = '';
+    var tbskuid = ''; 
+    var skucount = 0;
     if((specid && specid!='' )||( skuid && skuid!='')){
     	//采购货源产品规格id
     	tbspecid= specid !=''? $(".specId_"+specid).html():'';
     	tbskuid=skuid!=''?$(".skuID_"+skuid).html():'';
     	if((tbspecid!=''&&specid == tbspecid || tbskuid!=''&&skuid == tbskuid)){
-    		var skucount = $(".itemqty_"+specid+"_"+skuid).html();
-    		if(Number(skucount) > 0){
+    		skucount = $(".itemqty_"+specid+"_"+skuid).html();
+    		/*if(Number(skucount) > 0){
     			count = skucount;
     			$("#" + orderid + "count_" + odid + "").val(count);
-    		}
+    		}*/
     	}
     }
     var _count = document.getElementById("" + orderid + "_count" + odid + "").value;//销售数量
@@ -72,10 +73,15 @@ function updatecancelChecktatus(isok, orderid, odid, isDropshipOrder, goodid, in
         return;
     }
     var weight = $("#" + orderid + "weight" + odid + "").val();
-    var cance_inventory_count = Number(count) + Number(record_)
-        - (Number(_count) * Number(seiUnit));//库存数量
+    
     if (isDropshipOrder == 3) {
         cance_inventory_count = count;
+    }
+    //库存数量
+    var cance_inventory_count = Number(count);
+    var acinventory = Number(record_) - (Number(_count) * Number(seiUnit));//库存数量
+    if(cance_inventory_count > acinventory){
+    	cance_inventory_count = acinventory;
     }
   
     if (confirm("您确定要取消验货吗?")) {
@@ -409,8 +415,8 @@ function put_print(orderid, usid, odid, strcartype, count, loginName,
 
 
 function addInventory(barcode, inventory_count, orderid, odid, goodid,count, record_, unit, 
-		goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno) {
-    $.ajax({
+		goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno,pid) {
+   $.ajax({
         url: "/cbtconsole/inventory/add",
         data: {
             "barcode": barcode,
@@ -433,9 +439,10 @@ function addInventory(barcode, inventory_count, orderid, odid, goodid,count, rec
                 //打印库存标签
                 alert("验货数量大于销售数量,存库【"
                     + inventory_count + "】件");
+                skuid = !skuid ? pid : skuid;
                 put_print1(strcartype, inventory_count,
                     tbOrderId, goods_name, barcode,
-                    odid, goodurl);
+                    odid, goodurl,skuid);
             }
         }
     });
@@ -520,7 +527,7 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     	alert("未能自动匹配到商品,请输入验货数量进行手动验货");
     	return;
     }
-    $.ajax({
+   $.ajax({
             url: "/cbtconsole/order/updateCheckStatus",
             type: "post",
             async: true,
@@ -577,8 +584,8 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
                     		$("#print_hide").val(1);
                     		$("#checkOrderhid").val(checkOrderhid);
                     	}
-                    	/*if(sourceCount == 1){
-                    	}*/
+                    	if(sourceCount == 1){
+                    	}
                         console.log("该订单商品已全部的到货并且验货无误，提示跳转出货审核页面");
                         document.getElementById("chuku_" + orderid + "_" + odid + "").style.display = "inline-block";
                     }
@@ -590,10 +597,10 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     $("#status" + odid).html("已验货");
     
     if (isDropshipOrder == 3) {
-        addInventory(barcode, count, orderid, odid, goodid,count, record_, unit, goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno);
+        addInventory(barcode, count, orderid, odid, goodid,count, record_, unit, goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno,itemid);
         
     } else if ((Number(count) + Number(record_)) > (Number(_count) * Number(unit)) && Number(inventory_count) > 0 && goodid != "1400") {
-        addInventory(barcode, inventory_count, orderid, odid, goodid,count, record_, unit, goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno);
+        addInventory(barcode, inventory_count, orderid, odid, goodid,count, record_, unit, goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno,itemid);
     }
     put_print(orderid, usid, odid, strcartype, count, loginName, tbOrderId,
         _count, record_, unit, goods_name, barcode, goodurl, odid, position);
@@ -730,7 +737,7 @@ function getPhoto() {
     ctx.drawImage(video, 0, 0, 400, 400);
 }
 
-function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goodurl, id_barcode) {
+function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goodurl,skuid) {
     var d = new Date();
     var str = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
     document.getElementById("div_body").style.display = "none";
@@ -741,8 +748,9 @@ function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goo
     document.getElementById("operating_area").style.display = "none";
     document.getElementById("divTip").style.display = "none";
     document.getElementById("div_print2").style.display = "block";
-    document.getElementById('barcode').innerHTML = "-" + barcode;
+    document.getElementById('barcode').innerHTML = barcode;
     document.getElementById('goodsid').innerHTML = odid;
+    document.getElementById('skuid').innerHTML = skuid;
     document.getElementById('goods_name').innerHTML = goods_name.substr(0, goods_name.length / 4);
     document.getElementById('sku3').innerHTML = strcartype;
     document.getElementById('count2').innerHTML = count;
@@ -765,6 +773,7 @@ function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goo
     document.getElementById("div_print2").style.display = "none";
     document.getElementById('barcode').innerHTML = "";
     document.getElementById('goodsid').innerHTML = "";
+    document.getElementById('skuid').innerHTML = "";
     document.getElementById('goods_name').innerHTML = "";
     document.getElementById('sku3').innerHTML = "";
     document.getElementById('count2').innerHTML = "";

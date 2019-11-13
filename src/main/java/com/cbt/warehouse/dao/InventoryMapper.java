@@ -405,7 +405,7 @@ public interface InventoryMapper {
 	 * @param map
 	 * @return
 	 */
-	int  updateBarcode(Map<String,Object> map);
+	int  moveBarcode(Map<String,Object> map);
 	/**更新库位变换
 	 * @param map
 	 * @return
@@ -440,4 +440,21 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	List<InventoryData> invetoryCheck();
+	
+	/**退货
+	 * @param list
+	 * @return
+	 */
+	List<Map<String,Object>> returnGoods(List<String> list);
+	
+	/**所有库位列表
+	 * @return
+	 */
+	List<String> barcodeList();
+	
+	/**库存库位修改
+	 * @param map
+	 * @return
+	 */
+	int  updateBarcode(Map<String,Object> map);
 }

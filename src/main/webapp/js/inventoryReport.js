@@ -1,4 +1,7 @@
 $(function(){
+	if($("#q_szero").val()=='1'){
+		$("#szero").attr("checked",'checked');
+	}
 	var query_goodscatid_q = $("#query_goodscatid_q").val();
 	//获取类别
 	jQuery.ajax({
@@ -35,20 +38,16 @@ $(function(){
 			$(".q_in_r").removeAttr("readonly");
 			$(".q_in_barcode").removeAttr("readonly");
 			$(".p_qs_r").attr("disabled", "disabled");
-//		$(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
+			$(".p_tq_r").attr("disabled", "disabled");
 			$("#query_button_check_start").attr("disabled", "disabled");
-//		$("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
 			$(".btn-check-list").removeAttr("disabled");
 			
 			$(".qbt_check").removeAttr("disabled");
-//		$(".qbt_check").attr("style", "background-color: #fff;");
 		}else{
 			$(".qbt_check").attr("disabled", "disabled");
 			$(".btn-check-list").attr("disabled", "disabled");
-//		$(".qbt_check").attr("style", "background-color: #EEEEEE;");
 			
 			$("#query_button_check_start").removeAttr("disabled");
-//		$("#query_button_check_start").attr("style", "background-color: #fff;");
 		}
 		
 		$("#query_catid_select").change(function(){
@@ -66,6 +65,31 @@ $(function(){
 				doQuery(1,1);
 			});
 	}
+	
+	
+	$("#query_button_print").click(function(){
+		var page = $("#current_page").val();
+		var goods_name = $('#query_goods_name').val();
+		var goods_pid = $('#query_goods_pid').val();
+		var odid = $('#query_odid').val();
+		var minintentory = $('#query_minintentory').val();
+		var maxintentory = $('#query_maxintentory').val();
+		var sttime = $('#query_sttime').val();
+		var edtime = $('#query_edtime').val();
+		var barcode = $('#query_barcode').val();
+		var queryLine = $('#query_line').val();
+		var szero = "0";
+		if($("#szero").is(':checked')){
+			szero = "1";
+		}
+		var goodscatid = $('#query_goodscatid-in').val();
+		if(!goodscatid){
+			goodscatid = $('#query_goodscatid').val();
+		}
+		window.location.href = "/cbtconsole/inventory/check/print?&goods_pid="+goods_pid+"&goodscatid="+goodscatid
+				+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine
+				+"&odid="+odid+"&szero="+szero+"&sttime="+sttime+"&edtime="+edtime+"&barcode="+barcode
+	})
 	//开始盘点
 	$("#query_button_check_start").click(function(){
 		var isBarcodeDone = $("#isBarcodeDone").val();
@@ -84,20 +108,17 @@ $(function(){
 		    	  if(data.status == 200){
 		    		  $("#check_id").val(data.check_id);
 		    		  $("#query_button_check_start").attr("disabled", "disabled");
-//		    		  $("#query_button_check_start").attr("style", "background-color: #EEEEEE;");
-		    			
 		    		  $(".qbt_check").removeAttr("disabled");
-//		    		 $(".qbt_check").attr("style", "background-color: #fff;");
 		    		 $(".p_q_r").attr("readonly","readonly");
 		    		 $("#query_catid_select").attr("readonly","readonly");
 		    		 $(".p_qs_r").attr("disabled", "disabled");
-//		    	     $(".p_qs_r").attr("style", "background-color: #EEEEEE;");//设为灰色，看起来更像不能操作的按钮
+		    		 $(".p_tq_r").attr("disabled", "disabled");
 		    	     $(".q_in_barcode").removeAttr("readonly");
 		    		 $(".q_in_r").removeAttr("readonly");
 		    		 $(".btn-check-list").removeAttr("disabled");
 		    		 
 		    		 //列出所有打印
-		    		 window.location.href ="/cbtconsole/inventory/check/print";
+//		    		 window.location.href ="/cbtconsole/inventory/check/print";
 		    	  }else{
 		    		  $("#check_id").val(0);
 		    		  $.MsgBox.Alert("提示", data.reason);
@@ -112,13 +133,11 @@ $(function(){
 	//取消盘点
 	$("#query_button_check_cancel").click(function(){
 		$(".qbt_check").attr("disabled", "disabled");
-//		    		  $(".qbt_check").attr("style", "background-color: #EEEEEE;");
 		$("#query_button_check_start").removeAttr("disabled", "disabled");
-//		    			$("#query_button_check_start").attr("style", "background-color: #fff;");
 		$(".p_q_r").removeAttr("readonly");
 		$("#query_catid_select").removeAttr("readonly");
 		$(".p_qs_r").removeAttr("disabled");
-//		    	        $(".p_qs_r").attr("style", "background-color: #fff");
+		$(".p_tq_r").removeAttr("disabled");
 		$(".q_in_r").attr("readonly","readonly");
 		$(".q_in_barcode").attr("readonly","readonly");
 		$(".btn-check-list").attr("disabled", "disabled");
@@ -151,6 +170,7 @@ $(function(){
 		$("#check_id").val(0);
 		$("#query_catid_select").removeAttr("readonly");
 		$(".p_q_r").removeAttr("readonly");
+		$(".p_tq_r").removeAttr("disabled");
 		$(".p_qs_r").removeAttr("disabled");
 		$(".q_in_r").attr("readonly","readonly");
 		$(".q_in_barcode").attr("readonly","readonly");
@@ -181,6 +201,7 @@ $(function(){
 		$("#lu_img").attr("src","https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg");
 		 $("#lu_name").html("产品名称产品名称产品名称产品名称"); 
 		 $("#lu_catid").val(""); 
+		 $("#lu_pid").val(""); 
 		 var trHtml=''
 		 trHtml = trHtml+"<tr><td ><span class='lu_sku'>as picture</span><br>";
 		 trHtml = trHtml+"<span class='lu_specid'></span><br>";
@@ -193,6 +214,30 @@ $(function(){
 		
 	});
 	$('#tc2').click(function(){
+		$("#tb_order_shipno").val("");
+		 var trHtml=''
+			 trHtml = trHtml+"<tr>";
+			 trHtml = trHtml+"<td class='lu_tb_index'>1</td>";
+			 trHtml = trHtml+"<td class='lu_tb_name'>产品名称产品名称产品名称产品名称</td>";
+			 trHtml = trHtml+"<td><img src='https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg' alt='' class='img-responsive'></td>";
+			 trHtml = trHtml+"<td class='lu_tb_skuc'>";
+			 trHtml = trHtml+"Sku:<span  class='lu_tb_sku'>xxxxx</span><br>";
+			 trHtml = trHtml+"Skuid:<span  class='lu_tb_skuid'>1111111111111</span><br>";
+			 trHtml = trHtml+"Specid:<span  class='lu_tb_specidc'>2222222222222</span>";
+			 trHtml = trHtml+"</td>";
+			 trHtml = trHtml+"<td class='lu_tb_count'>10</td>";
+			 trHtml = trHtml+"<td><input type='text' class='form-control lu_tb_a_count' value='10'></td>";
+			 trHtml = trHtml+"<td class='lu_tb_bar'>";
+			 trHtml = trHtml+"<input type='text' placeholder='请输入库位条形码' class='lu_tb_barcode'>";
+			/*<!-- <a class="gain lu_tb_barcode" onclick="getbarcode()">获取库位</a> --></td>";
+*/			trHtml = trHtml+"<td><input type='checkbox' class='lu_tb_checkbox'>";
+			trHtml = trHtml+"<input type='hidden' class='lu_tb_pid' value=''>";
+			trHtml = trHtml+"<input type='hidden' class='lu_tb_img' value=''>";
+			trHtml = trHtml+"<input type='hidden' class='lu_tb_url' value=''>";
+			trHtml = trHtml+"</td>";
+			trHtml = trHtml+"</tr>";
+		 $("#lu_tb_tr").html(trHtml);
+		 
 		$('.tc,.trnasparent,.tc2').show();
 		
 	});
@@ -414,14 +459,25 @@ function doQuery(page,flag) {
 	var odid = $('#query_odid').val();
 	var minintentory = $('#query_minintentory').val();
 	var maxintentory = $('#query_maxintentory').val();
+	var sttime = $('#query_sttime').val();
+	var edtime = $('#query_edtime').val();
+	var barcode = $('#query_barcode').val();
 	var queryLine = $('#query_line').val();
+	var szero = "0";
+	if($("#szero").is(':checked')){
+		szero = "1";
+	}
 	if(flag == 0){
 		var goodscatid = $('#query_goodscatid-in').val();
-		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&odid="+odid, "_self");
+		window.open("/cbtconsole/inventory/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid
+				+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine
+				+"&odid="+odid+"&szero="+szero+"&sttime="+sttime+"&edtime="+edtime+"&barcode="+barcode, "_self");
 	}else{
 		var goodscatid = $('#query_goodscatid').val();
 		var check_id = $("#check_id").val();
-		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine+"&check_id="+check_id, "_self");
+		window.open("/cbtconsole/inventory/check/list?page="+page+"&goods_pid="+goods_pid+"&goodscatid="+goodscatid
+				+"&minintentory="+minintentory+"&maxintentory="+maxintentory+"&isline="+queryLine
+				+"&check_id="+check_id+"&odid="+odid+"&szero="+szero+"&sttime="+sttime+"&edtime="+edtime+"&barcode="+barcode, "_self");
 	}
 }
 
@@ -801,4 +857,35 @@ function doNextPage(p,flag){
 		$("#current_page").val(page);
 	}
 	doQuery(p,flag);
+}
+/**更新库位
+ * @param inid
+ * @param before
+ * @returns
+ */
+function updatebarcode(inid,before,remaining,v){
+	var after = $(v).parent(".datagrid-cell-c2-barcode").find(".after-barcode").val();
+	if(before==after){
+		return ;
+	}
+	$.ajax({
+		url:"/cbtconsole/inventory/barcode/update",
+		data:{
+			"inid" : inid,
+			"before" : before,
+			"after":after,
+			"remaining":remaining
+		},
+		type:"post",
+		success:function(data){
+			if(data.status==200){
+				location.reload();
+			}else{
+				$.MsgBox.Alert("提示", "库位修改失败！！");
+			}
+		},
+		error:function(e){
+			$.MsgBox.Alert("提示", "库位修改失败！");
+		}
+	});
 }

@@ -28,7 +28,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
     private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
 	@Override
 	public EasyUiJsonResult FindReturndisplay(String applyUser, String state,
-			String a1688Shipno, String optTimeStart, String optTimeEnd, int page,int mid,String user,String a1688order,String pid) {
+			String a1688Shipno, String optTimeStart, String optTimeEnd, int page,int mid,String user,String a1688order,String pid,String skuid) {
 		EasyUiJsonResult json=new EasyUiJsonResult();
 		String nameString=null;
 		if ("".equals(applyUser)||"全部".equals(applyUser)||"-1".equals(applyUser)) {
@@ -77,13 +77,13 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		}
 		List<returndisplay> list = new ArrayList<returndisplay>();
 		
-		list=this.lookReturnOrderServiceNewMapper.FindReturndisplay(nameString,state,a1688Shipno,optTimeStart,optTimeEnd,page,userOther,user,a1688order,pid);
+		list=this.lookReturnOrderServiceNewMapper.FindReturndisplay(nameString,state,a1688Shipno,optTimeStart,optTimeEnd,page,userOther,user,a1688order,pid,skuid);
 		if (list.size()==0) {
             json.setRows(list);
             json.setTotal(0);
 		return json;	
 		}
-		int total=this.lookReturnOrderServiceNewMapper.selectCount(nameString,state,a1688Shipno,optTimeStart,optTimeEnd,page,userOther,user,a1688order,pid);
+		int total=this.lookReturnOrderServiceNewMapper.selectCount(nameString,state,a1688Shipno,optTimeStart,optTimeEnd,page,userOther,user,a1688order,pid,skuid);
 
 		for (int i = 0; i < list.size(); i++) {
 			String ship=list.get(i).getShipno();

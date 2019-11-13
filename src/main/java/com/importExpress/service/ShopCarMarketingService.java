@@ -124,4 +124,11 @@ public interface ShopCarMarketingService {
      * @return
      */
     boolean checkIsDistribution(int userId, int adminId);
+
+    /**
+     * 获取跟进信息
+     * @param userId
+     * @return
+     */
+    List<ShopCarFollow> queryFollowInfoByUserId(int userId);
 }
