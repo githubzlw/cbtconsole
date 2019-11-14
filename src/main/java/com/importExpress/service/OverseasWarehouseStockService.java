@@ -74,4 +74,11 @@ public interface OverseasWarehouseStockService {
 	 * @return
 	 */
 	int shipoutOwsOrder(Map<String,Object> map);
+	
+	/**更新订单状态
+	 * @param orderid
+	 * @return
+	 */
+	int updateOrderState(String orderno);
+	
 }

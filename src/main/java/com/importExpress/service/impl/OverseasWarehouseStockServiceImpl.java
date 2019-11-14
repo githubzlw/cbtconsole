@@ -150,21 +150,38 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
 	}
 	@Override
 	public int addOwsOrderShipno(Map<String, Object> map) {
-		String sql = "insert into overseas_warehouse_ship_package(orderid,ship_no,state,create_time) values(?,?,?,now())";
+		String sql = "update overseas_warehouse_ship_package set ship_no=? where orderid=?";
 		List<String> lstValues = Lists.newArrayList();
-		lstValues.add(String.valueOf(map.get("orderno")));
 		lstValues.add(String.valueOf(map.get("shipno")));
-		lstValues.add("0");
+		lstValues.add(String.valueOf(map.get("orderno")));
 		String runSql = DBHelper.covertToSQL(sql, lstValues);
+		runSql = DBHelper.covertToSQL(sql, lstValues);
 		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
-		return StrUtils.isNum(sendMsgByRPC) ? Integer.parseInt(sendMsgByRPC) : 0;
+		int result = StrUtils.isNum(sendMsgByRPC) ? Integer.parseInt(sendMsgByRPC) : 0;
+		if(result == 0) {
+			sql = "insert into overseas_warehouse_ship_package(ship_no,orderid,state,create_time) values(?,?,?,now())";
+			lstValues.add("0");
+			runSql = DBHelper.covertToSQL(sql, lstValues);
+			sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+			result = StrUtils.isNum(sendMsgByRPC) ? Integer.parseInt(sendMsgByRPC) : 0;
+		}
+		return result;
 	}
 
 	@Override
 	public int shipoutOwsOrder(Map<String, Object> map) {
-		String sql = "update overseas_warehouse_ship_package set ship_out_time=now,state=1 where orderid=?";
+		String sql = "update overseas_warehouse_ship_package set ship_out_time=now(),state=1 where orderid=?";
 		List<String> lstValues = Lists.newArrayList();
 		lstValues.add(String.valueOf(map.get("orderno")));
+		String runSql = DBHelper.covertToSQL(sql, lstValues);
+		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+		return StrUtils.isNum(sendMsgByRPC) ? Integer.parseInt(sendMsgByRPC) : 0;
+	}
+	@Override
+	public int updateOrderState(String orderno) {
+		String sql = "update orderinfo set state=3  where order_no=?";
+		List<String> lstValues = Lists.newArrayList();
+		lstValues.add(orderno);
 		String runSql = DBHelper.covertToSQL(sql, lstValues);
 		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
 		return StrUtils.isNum(sendMsgByRPC) ? Integer.parseInt(sendMsgByRPC) : 0;
