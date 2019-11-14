@@ -251,6 +251,14 @@
             return content;
         }
 
+        function formatLv(val, row, index) {
+            if(val && val > -1){
+                return val;
+            }else{
+                return '';
+            }
+        }
+
         function openCidInfo(cid, oldCid, type) {
             $("#form_enter")[0].reset();
             $("#update_type").val(type);
@@ -375,8 +383,12 @@
                     if (data.ok) {
                         showMessage("更新成功");
                         closeDialog();
-                        var currCid = $("#query_catid").textbox('getValue');
-                        createCategoryTree(currCid,"",1);
+                        if(type == 3){
+                            loadDatagrid(1, currCidOP);
+                        } else {
+                            var currCid = $("#query_catid").textbox('getValue');
+                            createCategoryTree(currCid,"",1);
+                        }
                     } else {
                         $.messager.alert("提示信息", data.message, "error");
                     }
@@ -394,12 +406,12 @@
         }
 
         function loadDatagrid(flag, cid) {
-            $("#cid_easyui-datagrid").datagrid("load", {
+            /*$("#cid_easyui-datagrid").datagrid("load", {
                 cid: cid
             });
-            $.parser.parse('#cid_easyui-datagrid');
+            $.parser.parse('#cid_easyui-datagrid');*/
 
-            /*if (flag > 0) {
+            if (flag > 0) {
                 $("#cid_easyui-datagrid").datagrid("reload", {
                     cid: cid
                 });
@@ -409,7 +421,7 @@
                     cid: cid
                 });
                 $.parser.parse('#cid_easyui-datagrid');
-            }*/
+            }
         }
     </script>
 </head>
@@ -487,7 +499,7 @@
             <th data-options="field:'changeName',width:'160px'">现中文名称</th>
             <th data-options="field:'changeEnName',width:'160px'">现英文名称</th>
             <th data-options="field:'changeParentId',width:'100px'">现父类ID</th>
-            <th data-options="field:'changeLv',align:'center',width:'55px',">现等级</th>
+            <th data-options="field:'changeLv',align:'center',width:'55px',formatter:formatLv">现等级</th>
 
             <th data-options="field:'updateAdminName',width:'80px'">最后修改人</th>
             <th data-options="field:'changeTime',align:'center',width:'150px'">修改时间</th>

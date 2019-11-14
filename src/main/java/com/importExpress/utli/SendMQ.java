@@ -73,6 +73,7 @@ public class SendMQ {
     public static void sendMsg(String data) {
 
         try (RPCClient rpcClient = new RPCClient()) {
+            System.err.println(data);
             log.info(" [x] Sent [{}]", data);
             rpcClient.callNoReturn(data);
             log.info(" [x] Sent [{}] is OK", data);

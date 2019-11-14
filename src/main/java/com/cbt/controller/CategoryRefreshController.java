@@ -11,10 +11,7 @@ import com.cbt.service.CategoryService;
 import com.cbt.util.AppConfig;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
-import com.importExpress.utli.EasyUiTreeUtils;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
-import com.importExpress.utli.UserInfoUtils;
+import com.importExpress.utli.*;
 import org.apache.commons.lang.StringUtils;
 
 import org.slf4j.LoggerFactory;
@@ -227,18 +224,37 @@ public class CategoryRefreshController {
         }
         try {
 
-            if (StringUtils.isNotBlank(parentCid) && StringUtils.isNotBlank(oldCid)) {
-                updateCategoryDataByCid(oldCid, cid, parentCid, admuser.getId());
-            } else if (StringUtils.isNotBlank(chName) || StringUtils.isNotBlank(enName)) {
-                CategoryAllBean categoryBean = new CategoryAllBean();
-                categoryBean.setCategoryId(cid);
-                categoryBean.setChangeName(chName);
-                categoryBean.setChangeEnName(enName);
-                categoryBean.setUpdateAdminId(admuser.getId());
-                categoryService.updateChangeAllBeanInfo(categoryBean);
-            }
-            json.setOk(true);
-        } catch (Exception e) {
+			if (StringUtils.isNotBlank(parentCid) && StringUtils.isNotBlank(oldCid)) {
+				return updateCategoryDataByCid(oldCid, cid, parentCid, admuser.getId());
+			} else if (StringUtils.isNotBlank(chName) || StringUtils.isNotBlank(enName)) {
+				CategoryAllBean categoryBean = new CategoryAllBean();
+				categoryBean.setCategoryId(cid);
+				categoryBean.setChangeName(chName);
+				categoryBean.setChangeEnName(enName);
+				categoryBean.setUpdateAdminId(admuser.getId());
+				// MQ更新线上
+				String sql = "update 1688_category set update_admin_id =" + categoryBean.getUpdateAdminId();
+				if (StringUtils.isNotBlank(categoryBean.getChangeName())) {
+					sql += ",change_name ='" + GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(categoryBean.getChangeName()) + "'";
+				}
+				if (StringUtils.isNotBlank(categoryBean.getChangeEnName())) {
+					sql += ",change_en_name ='" + GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(categoryBean.getChangeEnName()) + "'";
+				}
+				sql += " where category_id ='" + categoryBean.getCategoryId() + "'";
+				/*String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(sql));
+				if (StringUtils.isNotBlank(rsStr) && Integer.parseInt(rsStr) > 0) {
+					categoryService.updateChangeAllBeanInfo(categoryBean);
+					json.setOk(true);
+				} else {
+					json.setOk(true);
+					json.setMessage("更新线上失败，请重试");
+				}*/
+
+				SendMQ.sendMsg(new RunSqlModel(sql));
+				categoryService.updateChangeAllBeanInfo(categoryBean);
+			}
+
+		} catch (Exception e) {
             e.printStackTrace();
             LOG.error("updateCategoryInfo", e);
             json.setOk(false);
@@ -294,57 +310,75 @@ public class CategoryRefreshController {
 
 
     private JsonResult updateCategoryDataByCid(String oidCid, String curCid, String newCid, int adminId) {
-        JsonResult json = new JsonResult();
-        CategoryBean oldParentBean = categoryService.queryCategoryById(oidCid);
-        CategoryBean newParentBean = categoryService.queryCategoryById(newCid);
-        CategoryBean curBean = categoryService.queryCategoryById(curCid);
-        Assert.notNull(oldParentBean, "获取原始父类别bean失败");
-        Assert.notNull(newParentBean, "获取原始父类别bean失败");
-        Assert.notNull(curBean, "获取原始父类别bean失败");
-        if (oldParentBean == null || newParentBean == null || curBean == null) {
-            json.setOk(false);
-            json.setMessage("获取类别bean失败");
-            return json;
-        }
+		JsonResult json = new JsonResult();
+		CategoryBean oldParentBean = categoryService.queryCategoryById(oidCid);
+		CategoryBean newParentBean = categoryService.queryCategoryById(newCid);
+		CategoryBean curBean = categoryService.queryCategoryById(curCid);
+		Assert.notNull(oldParentBean, "获取原始父类别bean失败");
+		Assert.notNull(newParentBean, "获取原始父类别bean失败");
+		Assert.notNull(curBean, "获取原始父类别bean失败");
+		if (oldParentBean == null || newParentBean == null || curBean == null) {
+			json.setOk(false);
+			json.setMessage("获取类别bean失败");
+			return json;
+		}
 
-        // 1.原父类 宠物 116 1   移除 childids中当前类
-        if (StringUtils.isNotBlank(oldParentBean.getChildids())) {
-            String rs = ("," + oldParentBean.getChildids() + ",").replace(("," + curCid + ","), "");
-            if (rs.length() > 2) {
-                oldParentBean.setChildids(rs.substring(1, rs.length() - 1));
-            } else {
-                oldParentBean.setChildids("");
-            }
-        }
-        // 2.现父类 宠物保健品 125278008 2    新增 childids中当前类，获取path数据，lv数据
-        if (StringUtils.isNotBlank(newParentBean.getChildids())) {
-            if (!("," + newParentBean.getChildids() + ",").contains("," + curCid + ",")) {
-                newParentBean.setChildids(newParentBean.getChildids() + "," + curCid);
-            }
-        } else {
-            newParentBean.setChildids(curCid);
-        }
-        // 3.当前类 宠物医药 125270017 2  更新parent_id，更新path 为 path+现父类id,更新 lv 为 现父类lv数据+1
-        // curBean.setParentId(newCid);
-        // curBean.setPath(newParentBean.getPath() + "," + newCid);
-        // curBean.setLv(newParentBean.getLv() + 1);
+		// 1.原父类 宠物 116 1   移除 childids中当前类
+		if (StringUtils.isNotBlank(oldParentBean.getChildids())) {
+			String rs = ("," + oldParentBean.getChildids() + ",").replace(("," + curCid + ","), "");
+			if (rs.length() > 2) {
+				oldParentBean.setChildids(rs.substring(1, rs.length() - 1));
+			} else {
+				oldParentBean.setChildids("");
+			}
+		}
+		// 2.现父类 宠物保健品 125278008 2    新增 childids中当前类，获取path数据，lv数据
+		if (StringUtils.isNotBlank(newParentBean.getChildids())) {
+			if (!("," + newParentBean.getChildids() + ",").contains("," + curCid + ",")) {
+				newParentBean.setChildids(newParentBean.getChildids() + "," + curCid);
+			}
+		} else {
+			newParentBean.setChildids(curCid);
+		}
+		// 3.当前类 宠物医药 125270017 2  更新parent_id，更新path 为 path+现父类id,更新 lv 为 现父类lv数据+1
+		// curBean.setParentId(newCid);
+		// curBean.setPath(newParentBean.getPath() + "," + newCid);
+		// curBean.setLv(newParentBean.getLv() + 1);
 
-        // 4.当前子类 ... 更新path 为更新path 当前类path+当前类id,更新 lv 为 当前类lv数据+1
-        // 递归更新所有子类
+		// 4.当前子类 ... 更新path 为更新path 当前类path+当前类id,更新 lv 为 当前类lv数据+1
+		// 递归更新所有子类
 
-        List<CategoryBean> resultList = new ArrayList<>();
+		List<CategoryBean> resultList = new ArrayList<>();
 
-        resultList.add(oldParentBean);
-        resultList.add(newParentBean);
+		resultList.add(oldParentBean);
+		resultList.add(newParentBean);
 
-        changeChildData(curBean, newParentBean, resultList);
-        resultList.stream().forEach(e -> e.setAdminId(adminId));
-        categoryService.batchUpdateCategory(resultList);
+		changeChildData(curBean, newParentBean, resultList);
 
-        resultList.clear();
-        json.setOk(true);
-        return json;
-    }
+		resultList.stream().forEach(e -> {
+			StringBuffer mqSql = new StringBuffer();
+			e.setAdminId(adminId);
+			mqSql.append("update 1688_category set change_parent_id ='" + e.getParentId() + "'");
+			mqSql.append(",change_path ='" + e.getPath() + "'");
+			mqSql.append(",change_childids ='" + e.getChildids() + "'");
+			mqSql.append(",change_lv =" + e.getLv() + "");
+			mqSql.append(",update_admin_id =" + adminId + "");
+			mqSql.append(" where category_id ='" + e.getCid() + "'");
+			SendMQ.sendMsg(new RunSqlModel(mqSql.toString()));
+		});
+
+		/*String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(mqSql.toString()));
+		if (StringUtils.isNotBlank(rsStr) && Integer.parseInt(rsStr) > 0) {
+			categoryService.batchUpdateCategory(resultList);
+		}*/
+
+
+		categoryService.batchUpdateCategory(resultList);
+
+		resultList.clear();
+		json.setOk(true);
+		return json;
+	}
 
 	/**
 	 * 递归调用更新类别数据
