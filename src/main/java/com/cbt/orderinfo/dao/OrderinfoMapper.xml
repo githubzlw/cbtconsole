@@ -1561,4 +1561,10 @@
     <if test="userid!=0"> and oi.user_id=#{userid}</if>
     limit 1
     </select>
+
+    <update id="updateOrderNoToNewNo">
+        update orderinfo set order_no = #{newOrderNo} where order_no = #{oldOrderNo};
+		update order_details set orderid = #{newOrderNo} where orderid = #{oldOrderNo};
+		update payment set orderid = #{newOrderNo} where orderid = #{oldOrderNo};
+    </update>
 </mapper>
