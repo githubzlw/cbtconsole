@@ -85,25 +85,30 @@ public class QueAnsController {
 		/*if(!"ling".equals(user.getAdmName().toLowerCase())){
 			adminId = StrUtils.isNum(steAdm) ? Integer.valueOf(steAdm) : 0;
 		}*/
-		
-		List<QueAns> list = questionAndAnswerService.findByQuery(goodsPid, goodsName, adminId, replyFlag,replyStatus,startdate,enddate, (page-1) * PAGESIZE);
-		int total = questionAndAnswerService.getCountByQuery(goodsPid, goodsName, adminId, replyFlag,replyStatus,startdate,enddate);
-		
-		request.setAttribute("total", total);
-		request.setAttribute("resultList", list);
-		int totalPage = total % PAGESIZE == 0 ? total / PAGESIZE : total / PAGESIZE + 1 ;
-		request.setAttribute("resultList", list);
-		request.setAttribute("page", page);
-		request.setAttribute("totalPage", totalPage);
-		request.setAttribute("replyStatus", replyStatus);
-		request.setAttribute("adminId", adminId);
-		request.setAttribute("replyFlag", replyFlag);
-		request.setAttribute("startdate", request.getParameter("startdate"));
-		request.setAttribute("enddate", request.getParameter("enddate"));
-		//回复人信息
-		UserDao dao = new UserDaoImpl();
-		List<ConfirmUserInfo> all = dao.getAll();
-		request.setAttribute("admList", all);
+
+		try{
+			List<QueAns> list = questionAndAnswerService.findByQuery(goodsPid, goodsName, adminId, replyFlag,replyStatus,startdate,enddate, (page-1) * PAGESIZE);
+			int total = questionAndAnswerService.getCountByQuery(goodsPid, goodsName, adminId, replyFlag,replyStatus,startdate,enddate);
+
+			request.setAttribute("total", total);
+			request.setAttribute("resultList", list);
+			int totalPage = total % PAGESIZE == 0 ? total / PAGESIZE : total / PAGESIZE + 1 ;
+			request.setAttribute("resultList", list);
+			request.setAttribute("page", page);
+			request.setAttribute("totalPage", totalPage);
+			request.setAttribute("replyStatus", replyStatus);
+			request.setAttribute("adminId", adminId);
+			request.setAttribute("replyFlag", replyFlag);
+			request.setAttribute("startdate", request.getParameter("startdate"));
+			request.setAttribute("enddate", request.getParameter("enddate"));
+			//回复人信息
+			UserDao dao = new UserDaoImpl();
+			List<ConfirmUserInfo> all = dao.getAll();
+			request.setAttribute("admList", all);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+
 		return "question";
     }
 	

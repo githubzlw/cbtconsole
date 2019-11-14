@@ -660,6 +660,7 @@ public class NewOrderSplitCtr {
             boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails,
                     OrderInfoConstantUtil.REVIEW,  1);
             if (isOk) {
+                splitDao.checkAndUpdateOrderState(orderNo, newOrderNo);
                 json.setOk(true);
             } else {
                 json.setOk(false);
