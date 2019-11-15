@@ -819,7 +819,7 @@
                 </td>
                 <td>
                     <input type="button"
-                           style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;"
+                           style="position: fixed; bottom: 388px; right: 50px; width: 150px; height: 30px;"
                            onclick="openOverSeaSplit('${order.orderNo}')" value="海外仓拆单">
                 </td>
                 <td>分配采购（整单）： <select id="Abuyer" onchange="changeAllBuyer('${order.orderNo}',this.value)">

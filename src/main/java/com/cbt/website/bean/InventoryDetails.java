@@ -29,15 +29,45 @@ public class InventoryDetails {
 	 * 线上SKUID 无匹配留空
 	 */
 	private String goodsSkuid;
+	/**
+	 * 产品货源是亏的
+	 */
 	private String goodsPSkuid;
+	/**
+	 * 产品货源价格
+	 */
 	private String goodsPPrice;
+	/**
+	 * 产品价格
+	 */
 	private String goodsPrice;
+	/**
+	 * 淘宝订单号
+	 */
 	private String tbOrderid;
+	/**
+	 * 套播啊运单号
+	 */
 	private String tbShipno;
+	/**
+	 * 货源产品链接
+	 */
 	private String goodsPUrl;
+	/**
+	 * 产品链接
+	 */
 	private String goodsUrl;
+	/**
+	 * 产品名称
+	 */
 	private String goodsName;
+	/**
+	 * 货源产品图片
+	 */
 	private String goodsPImg;
+	/**
+	 *操作人
+	 */
 	private int admid;
 	/**
 	 * '0 入库  1 出库 2 报损',
@@ -62,7 +92,7 @@ public class InventoryDetails {
 	 */
 	private String delDatetime;
 	/**
-	 * 
+	 * 创建时间
 	 */
 	private String createtime;
 	/**
@@ -89,5 +119,9 @@ public class InventoryDetails {
 	 * 备注
 	 */
 	private String remark;
+	/**
+	 * 操作人
+	 */
+	private String adm;
 
 }

@@ -1038,6 +1038,8 @@ public class ShopCarMarketingController {
                     break;
                 }
             }
+            List<ShopCarFollow> followList= shopCarMarketingService.queryFollowInfoByUserId(userId);
+            mv.addObject("followList", followList);
             shopCarInfoList.clear();
             resultMap.clear();
         } catch (Exception e) {

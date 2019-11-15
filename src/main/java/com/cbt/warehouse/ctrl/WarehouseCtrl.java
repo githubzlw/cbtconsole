@@ -9558,6 +9558,9 @@ public class WarehouseCtrl {
 					result.put("status", 103);
 					result.put("message", "添加运单号成功，但部分产品释放占用库存失败");
 				}
+				//订单状态：5-确认价格中,1-购买中,2-已到仓库,0-等待付款,3-出运中,4-完结,-1-后台取消订单,6-客户取消订单,7-预订单
+				//更新订单状态
+				owsService.updateOrderState(orderno);
 			}else {
 				result.put("status", 101);
 				result.put("message", "添加运单号出现错误");

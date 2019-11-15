@@ -172,4 +172,9 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
         return shopCarMarketingMapper.checkIsDistribution(userId, adminId) > 0;
     }
 
+    @Override
+    public List<ShopCarFollow> queryFollowInfoByUserId(int userId) {
+        return shopCarMarketingMapper.queryFollowInfoByUserId(userId);
+    }
+
 }

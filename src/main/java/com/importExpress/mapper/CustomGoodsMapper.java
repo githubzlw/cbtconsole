@@ -533,4 +533,29 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<GoodsOverSea> queryGoodsOverSeaInfoByPid(String pid);
+
+    /**
+     * 设置可搜索
+     *
+     * @param pid
+     * @param flag
+     * @return
+     */
+    int setSearchable(@Param("pid") String pid, @Param("flag") int flag);
+
+    /**
+     * 添加日志
+     * @param pid
+     * @param flag
+     * @param adminId
+     * @return
+     */
+    int insertSearchableLog(@Param("pid") String pid, @Param("flag") int flag, @Param("adminId") int adminId);
+
+    /**
+     * 更新海外仓数据
+     * @param goodsOverSea
+     * @return
+     */
+    int updateGoodsOverSeaInfo(GoodsOverSea goodsOverSea);
 }

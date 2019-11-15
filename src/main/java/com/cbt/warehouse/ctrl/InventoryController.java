@@ -36,6 +36,7 @@ import com.cbt.common.StringUtils;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoInfoList;
 import com.cbt.report.service.GeneralReportService;
+import com.cbt.report.service.GeneralReportServiceImpl;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.StrUtils;
@@ -114,7 +115,7 @@ public class InventoryController {
 		return mv;
 	}
 	/**
-	 * 仓库操作库存移库位
+	 * 库存修改库位（库存占用位置不对的情况下修改）
 	 * @param request
 	 * @param response
 	 * @return
@@ -124,7 +125,50 @@ public class InventoryController {
 	 */
 	@RequestMapping(value = "/barcode/update")
 	@ResponseBody
-	protected Map<String,Object> barcodeUpdate(HttpServletRequest request, HttpServletResponse response)
+	protected Map<String,Object> updateBarcode(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		Map<String,Object> result = new HashMap<>();
+		result.put("status", 200);
+		
+		String inid = request.getParameter("inid");
+		inid = StrUtils.isNum(inid) ? inid : "0";
+		
+		String beforeBarcode = request.getParameter("before");
+		beforeBarcode = StringUtil.isBlank(beforeBarcode) ? beforeBarcode : beforeBarcode.trim();
+		
+		String afterBarcode = request.getParameter("after");
+		afterBarcode = StringUtil.isBlank(afterBarcode) ? afterBarcode : afterBarcode.trim();
+		
+		String remaining = request.getParameter("remaining");
+		remaining = StrUtils.isNum(remaining) ? remaining : "0";
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("inid", Integer.parseInt(inid));
+		map.put("beforeBarcode", beforeBarcode);
+		map.put("afterBarcode", afterBarcode);
+		map.put("remaining", remaining);
+		map.put("admid",adm!=null? adm.getId() : 0);
+		int updateBarcode = inventoryService.updateBarcode(map);
+		if(updateBarcode < 1) {
+			result.put("status", 500);
+			result.put("reason", "数据错误:"+inid+"/"+beforeBarcode+"/"+afterBarcode);
+		}
+		return result;
+	}
+	/**
+	 * 仓库操作库存移库位
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/barcode/move")
+	@ResponseBody
+	protected Map<String,Object> moveBarcode(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
@@ -236,8 +280,11 @@ public class InventoryController {
 		page  = StrUtils.isNum(page) ? page : "1";
 		map.put("page", (Integer.valueOf(page) -1 ) * 20);
 		
-		List<InventoryDetailsWrap> toryList = inventoryService.inventoryDetails(map);
+		List<InventoryDetailsWrap> toryList = null;
 		int toryListCount = inventoryService.inventoryDetailsCount(map);
+		if(toryListCount > 0) {
+			toryList = inventoryService.inventoryDetails(map);
+		}
 		json.setRows(toryList);
 		json.setTotal(toryListCount);
 		return json;
@@ -443,6 +490,9 @@ public class InventoryController {
 				}
 				List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
 				mv.addObject("toryList", toryList);
+				List<String> barcodeList = inventoryService.barcodeList();
+				mv.addObject("barcodeList", barcodeList);
+				
 			}
 			mv.addObject("toryListCount", toryListCount);
 			
@@ -504,9 +554,14 @@ public class InventoryController {
 		}
 		
 		String isShowZero = request.getParameter("szero");
-		
-		
 		map.put("isShowZero", "1".equals(isShowZero)? 1 : 0);
+		String sttime = request.getParameter("sttime");
+		map.put("sttime", StringUtil.isBlank(sttime)? "" : sttime);
+		String edtime = request.getParameter("edtime");
+		map.put("edtime", StringUtil.isBlank(edtime)? "" : edtime);
+		String barcode = request.getParameter("barcode");
+		map.put("barcode", StringUtil.isBlank(barcode)? "" : barcode);
+		
 		return map;
 	}
 
@@ -1399,8 +1454,8 @@ public class InventoryController {
 			HSSFWorkbook wb = generalReportService.exportInventoryCheckExcel(dicRecord);
 			response.setContentType("application/vnd.ms-excel");
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String filename = "库存盘点数据导出" + sdf.format(new Date());
-			filename = StringUtils.getFileName(filename);
+			String filename = "inventory_check_数据导出" + sdf.format(new Date());
+//			filename = StringUtils.getFileName(filename);
 			response.setHeader("Content-disposition", "attachment;filename=" + filename);
 			OutputStream ouputStream = response.getOutputStream();
 			wb.write(ouputStream);
@@ -1411,7 +1466,7 @@ public class InventoryController {
 		}
 		
 	}
-	/**完成盘点
+	/**导出报表
 	 * @param request
 	 * @param response
 	 * @return
@@ -1420,14 +1475,14 @@ public class InventoryController {
 	public void checkPrint(HttpServletRequest request, HttpServletResponse response) {
 		Map<Object, Object> map = getObjectByInventory(request,true);
 		try {
-			
+			map.put("page", -1);
 			List<InventoryCheckWrap> checkList = inventoryService.invetoryCheckList(map);
 			
-			HSSFWorkbook wb = generalReportService.exportInventoryExcel(checkList);
+			HSSFWorkbook wb = generalReportService.exportInventory(checkList);
 			response.setContentType("application/vnd.ms-excel");
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String filename = "库存盘点数据导出" + sdf.format(new Date());
-			filename = StringUtils.getFileName(filename);
+			String filename = "inventory-list-" + sdf.format(new Date())+".xls";
+//			filename = StringUtils.getFileName(filename);
 			response.setHeader("Content-disposition", "attachment;filename=" + filename);
 			OutputStream ouputStream = response.getOutputStream();
 			wb.write(ouputStream);

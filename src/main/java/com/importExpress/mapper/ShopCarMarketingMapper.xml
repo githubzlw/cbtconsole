@@ -1898,4 +1898,11 @@
         select count(0) from shop_car_distribution
         where user_id =#{userId} and admin_id = #{adminId}
     </select>
+
+    <select id="queryFollowInfoByUserId" resultType="com.importExpress.pojo.ShopCarFollow">
+        select a.user_id as userId,a.content,a.admin_id as adminId,b.admName as adminName,
+        date_format(a.create_time,'%Y-%m-%d %H:%i:%s') as createTime
+        from shop_car_follow a left join admuser b  on a.admin_id = b.id
+        where a.user_id = #{userId} order by create_time desc
+    </select>
 </mapper>

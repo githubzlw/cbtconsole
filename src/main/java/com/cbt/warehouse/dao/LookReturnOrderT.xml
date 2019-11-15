@@ -86,11 +86,13 @@ taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1
 		<if test="pid !=null">
 			 AND rd.item =#{pid}
 	</if>
+	<if test="skuid!=null">and th.skuID=#{skuid}</if>
 		order by  rd.apply_time DESC  limit #{page},20
 	</select>
 	<select id="selectCount" resultType="java.lang.Integer" >
 		SELECT count(*) 
-from return_display as rd where 1=1
+from return_display as rd LEFT JOIN
+taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1
      <if test="nameString != null">
 			 AND rd.apply_user=#{nameString} 
 	</if>
@@ -113,5 +115,6 @@ from return_display as rd where 1=1
 		<if test="pid !=null">
 			AND rd.item =#{pid}
 		</if>
+		<if test="skuid!=null">and th.skuID=#{skuid}</if>
 	</select>
 </mapper>

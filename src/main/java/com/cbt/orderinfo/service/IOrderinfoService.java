@@ -159,7 +159,7 @@ public interface IOrderinfoService {
 	 * @param map
 	 * @return
 	 */
-	public List<Map<String,String>> allTrack(Map<String, String> map);
+	public List<Map<String,Object>> allTrack(Map<String, String> map);
 
 	/**
 	 * 更改订单销售和采购
@@ -596,4 +596,12 @@ public interface IOrderinfoService {
 	 * @return
 	 */
 	Map<String,Object> getOverseasWarehouseStockOrderDetail(String orderno,int userid);
+
+	/**
+	 * 更新订单为新的订单号
+	 * @param oldOrderNo
+	 * @param newOrderNo
+	 * @return
+	 */
+	int updateOrderNoToNewNo(String oldOrderNo, String newOrderNo);
 }

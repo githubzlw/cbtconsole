@@ -93,6 +93,8 @@ em,i{font-style: normal;}
 				
 				</label>
 				<button class="btn btn-info"  id="query_button">查询</button>
+			<label><a href="/cbtconsole/inventory/list" target="_blank"><button class="btn btn-success">库存清单</button></a></label>
+				<label><a href="/cbtconsole/inventory/check/list" target="_blank"><button class="btn btn-success button_loss"  id="query_button_loss">库存盘点</button></a></label>
 			</div>
 		</div>
 		<div class="row mt20">
@@ -113,7 +115,7 @@ em,i{font-style: normal;}
 					<tr id="datagrid-row-r2-2-${index.index}"  align="left">
 					<td>${l.changeTime }</td>
 					<td>${l.goodsPid }</td>
-					<td><img src="${l.img }" style="width: 100px;height: 100px;"></td>
+					<td><img src="/cbtconsole/img/beforeLoad.gif" data-original="${l.img }" style="width: 100px;height: 100px;" class="img-lazy" ></td>
 					<td>${l.skuid }<br>${l.specid }</td>
 					<td>${l.changeNumber }</td>
 					<td>${l.changeContext }</td>
@@ -141,8 +143,10 @@ em,i{font-style: normal;}
 </body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.min.js"></script>
 <script type="text/javascript">
 $(function(){
+	$('.img-lazy').lazyload({effect: "fadeIn"});	
 	var state = $("#i_state").val();
 	$("#query_state").val(state);//设置value为xx的option选项为默认选中
 	$("#query_button").click(function(){
