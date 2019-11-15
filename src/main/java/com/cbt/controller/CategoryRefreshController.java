@@ -172,6 +172,7 @@ public class CategoryRefreshController {
 	@RequestMapping(value = "/getCidInfo", method = {RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
 	public JsonResult getCidInfo(String cid) {
+		Assert.notNull(cid,"获取类别失败");
 		JsonResult json = new JsonResult();
 		if (StringUtils.isBlank(cid)) {
 			json.setOk(false);
@@ -184,6 +185,7 @@ public class CategoryRefreshController {
 				json.setOk(true);
 				json.setData(oldParentBean);
 			} else {
+				Assert.notNull(oldParentBean,"获取类别失败");
 				json.setOk(false);
 				json.setMessage("获取类别失败");
 			}
@@ -201,6 +203,7 @@ public class CategoryRefreshController {
     public JsonResult updateCategoryInfo(HttpServletRequest request, String cid, String oldCid, String parentCid,
                                          String chName, String enName) {
         JsonResult json = new JsonResult();
+        Assert.notNull(cid,"获取类别失败");
         if (StringUtils.isBlank(cid)) {
             json.setOk(false);
             json.setMessage("获取类别失败");
@@ -218,6 +221,7 @@ public class CategoryRefreshController {
 
         if ((StringUtils.isBlank(parentCid) && StringUtils.isBlank(oldCid))
                 && StringUtils.isBlank(chName) && StringUtils.isBlank(enName)) {
+        	Assert.isTrue(false,"获取修改参数失败");
             json.setOk(false);
             json.setMessage("获取修改参数失败");
             return json;
@@ -257,6 +261,7 @@ public class CategoryRefreshController {
 		} catch (Exception e) {
             e.printStackTrace();
             LOG.error("updateCategoryInfo", e);
+            Assert.isTrue(false,e.getMessage());
             json.setOk(false);
             json.setMessage("updateCategoryInfo error:" + e.getMessage());
         }
