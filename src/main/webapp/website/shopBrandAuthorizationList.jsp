@@ -89,7 +89,7 @@
                     });
                 }
             } else {
-                $.message.alert("请输入完整数据");
+                $.messager.alert("请输入完整数据");
                 return;
             }
         }

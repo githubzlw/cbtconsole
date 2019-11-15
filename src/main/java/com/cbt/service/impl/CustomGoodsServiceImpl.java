@@ -727,13 +727,32 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public JsonResult setGoodsWeightByWeigherInfo(String pid, SearchResultInfo weightAndSyn, int adminId) {
         JsonResult json = new JsonResult();
+        // JXW 2019-11-15 先保存数据，审核通过后更新
+
+        //  保存json数据
+        GoodsWeightChange weightChange = new GoodsWeightChange();
+        weightChange.setAdminId(adminId);
+        weightChange.setGoodsType(weightAndSyn.getGoods_type());
+        weightChange.setPid(pid);
+        weightChange.setVolumeWeight(weightAndSyn.getVolume_weight());
+        weightChange.setWeight(weightAndSyn.getWeight());
+        customGoodsMapper.saveGoodsWeightChange(weightChange);
+        json.setOk(true);
+
+        return json;
+    }
+
+    @Override
+    public JsonResult syncLocalWeightToOnline(GoodsWeightChange weightChange) {
+        // JXW 2019-11-15 称重sku更新
+        JsonResult json = new JsonResult();
         // 获取商品信息
-        CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
+        CustomGoodsPublish orGoods = queryGoodsDetails(weightChange.getPid(), 0);
         if (StringUtils.isNotBlank(orGoods.getSku())) {
             JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
             // 查找匹配的type数据
-            String typeStr = weightAndSyn.getGoods_type();
+            String typeStr = weightChange.getGoodsType();
             // Colour:black@32161,Size:S@4501,
             String[] typeStrList = typeStr.split(",");
             String ppId = "";
@@ -748,36 +767,37 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             double finalWeight = 0;
             for (ImportExSku exSku : skuList) {
                 if (StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds())) {
-                    finalWeight = BigDecimalUtil.truncateDouble(Float.valueOf(weightAndSyn.getWeight()), 3);
+                    finalWeight = BigDecimalUtil.truncateDouble(Float.parseFloat(weightChange.getWeight()), 3);
                     exSku.setFianlWeight(finalWeight);
-                    if (StringUtils.isNotBlank(weightAndSyn.getVolume_weight())) {
-                        double volumeWeight = BigDecimalUtil.truncateDouble(Float.valueOf(weightAndSyn.getVolume_weight()), 3);
+                    if (StringUtils.isNotBlank(weightChange.getVolumeWeight())) {
+                        double volumeWeight = BigDecimalUtil.truncateDouble(Float.parseFloat(weightChange.getVolumeWeight()), 3);
                         exSku.setVolumeWeight(volumeWeight);
                     }
                     break;
                 }
             }
             // 进行sku更新
-            updateGoodsSku(pid, orGoods.getSku(), skuList.toString(), adminId, finalWeight);
+            updateGoodsSku(weightChange.getPid(), orGoods.getSku(), skuList.toString(), weightChange.getAdminId(), finalWeight);
             skuList.clear();
         }
 
         // 插入日志记录
         GoodsEditBean editBean = new GoodsEditBean();
-        editBean.setNew_title(weightAndSyn.getGoodsType() + ",sku 更新");
-        editBean.setAdmin_id(adminId);
+        editBean.setNew_title(weightChange.getGoodsType() + ",sku 更新");
+        editBean.setAdmin_id(weightChange.getAdminId());
         if (StringUtils.isBlank(orGoods.getWeight()) || "0".equals(orGoods.getWeight()) || "0.00".equals(orGoods.getWeight())) {
             editBean.setWeight_old(orGoods.getWeight());
-            editBean.setWeight_new(weightAndSyn.getWeight());
+            editBean.setWeight_new(weightChange.getWeight());
         }
         editBean.setRevise_weight_old(orGoods.getReviseWeight());
         editBean.setFinal_weight_old(orGoods.getFinalWeight());
-        editBean.setRevise_weight_new(weightAndSyn.getWeight());
-        editBean.setFinal_weight_new(weightAndSyn.getWeight());
-        editBean.setPid(pid);
+        editBean.setRevise_weight_new(weightChange.getWeight());
+        editBean.setFinal_weight_new(weightChange.getWeight());
+        editBean.setPid(weightChange.getPid());
         customGoodsMapper.insertIntoGoodsPriceOrWeight(editBean);
+        weightChange.setSyncFlag(1);
+        customGoodsMapper.setGoodsWeightChangeFlag(weightChange);
         json.setOk(true);
-
         return json;
     }
 
@@ -879,6 +899,21 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public int setSearchable(String pid, int flag, int adminId) {
         customGoodsMapper.insertSearchableLog(pid, flag, adminId);
         return customGoodsMapper.setSearchable(pid, flag);
+    }
+
+    @Override
+    public int saveGoodsWeightChange(GoodsWeightChange weightChange) {
+        return customGoodsMapper.saveGoodsWeightChange(weightChange);
+    }
+
+    @Override
+    public List<GoodsWeightChange> queryGoodsWeightChangeList(GoodsWeightChange weightChange) {
+        return customGoodsMapper.queryGoodsWeightChangeList(weightChange);
+    }
+
+    @Override
+    public int queryGoodsWeightChangeListCount(GoodsWeightChange weightChange) {
+        return customGoodsMapper.queryGoodsWeightChangeListCount(weightChange);
     }
 
 

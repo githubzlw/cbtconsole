@@ -551,4 +551,32 @@ public interface CustomGoodsMapper {
      * @return
      */
     int insertSearchableLog(@Param("pid") String pid, @Param("flag") int flag, @Param("adminId") int adminId);
+
+    /**
+     * 保存重量改动信息
+     * @param weightChange
+     * @return
+     */
+    int saveGoodsWeightChange(GoodsWeightChange weightChange);
+
+    /**
+     * 分页查询重量改动信息
+     * @param weightChange
+     * @return
+     */
+    List<GoodsWeightChange> queryGoodsWeightChangeList(GoodsWeightChange weightChange);
+
+    /**
+     * 重量改动信息总数
+     * @param weightChange
+     * @return
+     */
+    int queryGoodsWeightChangeListCount(GoodsWeightChange weightChange);
+
+    /**
+     * 设置重量改动信息同步标识
+     * @param weightChange
+     * @return
+     */
+    int setGoodsWeightChangeFlag(GoodsWeightChange weightChange);
 }
