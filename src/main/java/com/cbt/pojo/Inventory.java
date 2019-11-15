@@ -3,6 +3,7 @@ package com.cbt.pojo;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 库存表实体类
@@ -102,7 +103,7 @@ public class Inventory {
 	 */
 	private String specid;
 	private String final_weight;//商品最终重量
-	private List<String> skuList;//商品详情集合
+	private Map<String,List<String>> skuList;//商品详情集合
 	private String entype;//商品详情集合
 	private int is_sold_flag;//商品详情集合
 	private String volume_weight;//商品详情集合
@@ -140,11 +141,11 @@ public class Inventory {
         this.final_weight = final_weight;
     }
 
-    public List<String> getSkuList() {
+    public Map<String,List<String>> getSkuList() {
         return skuList;
     }
 
-    public void setSkuList(List<String> skuList) {
+    public void setSkuList(Map<String,List<String>> skuList) {
         this.skuList = skuList;
     }
 

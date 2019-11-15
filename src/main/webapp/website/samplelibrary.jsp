@@ -161,6 +161,22 @@
 
             // var Tborder=$("#Tborderus").val()
             // var returnNO=$("#openRt").val()
+            var sku=new Array()
+            // sku= $('input:radio:checked').val();
+            /*sku= $("input[type='radio']:checked").val();
+           for (var i=0;i<sku.length;i++){
+
+           }*/
+
+            var arr = [];
+            var color_spc="";
+
+            $('.col_spc input:checked').each(function(){
+                var this_val = $(this).val();
+                arr.push(this_val);
+                color_spc = arr.toString();
+                console.log(color_spc);
+            })
 
             var cusorder=${odls}
             var OrderMap = new Array();
@@ -169,7 +185,7 @@
                 if ($(this).is(':checked')) {
                     var retunum=$("#openNum"+k).val();
                     cusorder[k].new_barcode=retunum
-                    OrderMap.push({userId:userid,orderNo:od,pid:cusorder[k].goods_pid,imgUrl:cusorder[k].car_img,skuId:cusorder[k].sku,enType:cusorder[k].sku,isChoose:1,
+                    OrderMap.push({userId:userid,orderNo:od,pid:cusorder[k].goods_pid,imgUrl:cusorder[k].car_img,skuId:cusorder[k].sku,enType:color_spc,isChoose:1,
                         goodsNum:retunum,enName:cusorder[k].good_name,catid:cusorder[k].catid1,weight:cusorder[k].weight,volumeWeight:cusorder[k].volume_weight,isSoldFlag:cusorder[k].is_sold_flag})
                 }
             })
@@ -223,9 +239,15 @@
         <td style="font-size: 18px"><a target="_blank" target="_blank" href="https://www.import-express.com/goodsinfo/cbtconsole-1${orderd.goods_pid}.html" >${orderd.good_name}</a></td>
 <td>${orderd.can_remaining}</td>
 <td>${orderd.goodsprice}</td>
-<td><c:forEach items="${orderd.skuList}" var="sku" varStatus="sk">
-    <span>${sku}</span><br/>
-</c:forEach>
+<td class="col_spc">
+    <c:forEach items="${orderd.skuList}" var="map">
+        <span ><c:out value="${map.key}:">${map.key}:</c:out>
+        <c:forEach items="${map.value}" var="sk">
+            <%--<span><c:out value="${sk}"></c:out></span>--%>
+            <label><input name="${map.key}" type="radio" value="${map.key}:${sk}" />${sk}</label>
+        </c:forEach>
+            </span><br><br>
+    </c:forEach>
     </td>
 <td><input name="odCount" type="checkbox"><span>送样.数量</span><input type="text" style="width: 20px" id="openNum${sd.index}"  value="1"></td>
     </tr>

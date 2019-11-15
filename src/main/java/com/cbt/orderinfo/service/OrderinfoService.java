@@ -1515,6 +1515,7 @@ public class OrderinfoService implements IOrderinfoService {
 
 
 			for (OrderDetailsBeans od:odbList){
+				od.setGoods_type(od.getGoods_type().replaceAll("规格:",""));
 				String sql="insert order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder," +
 						"userid,goodsname,goodsprice,goodsfreight,goodsdata_id,remark,goods_class,extra_freight,car_url,car_urlMD5,goods_pid," +
 						"car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,isFeight,seilUnit," +
