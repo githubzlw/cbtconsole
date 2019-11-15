@@ -53,8 +53,9 @@ public class CategoryRefreshControllerTest {
     }
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         this.mockMvc = webAppContextSetup(this.wac).build();
+        loginFirst();
     }
 
     @Test
