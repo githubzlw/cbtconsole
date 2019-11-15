@@ -32,6 +32,15 @@
             color: #ffffff;
             cursor: pointer;
         }
+
+        .btn_lh {
+            height: 30px;
+            width: 150px;
+            background: #1c9439;
+            border: 0px solid #dcdcdc;
+            color: #ffffff;
+            cursor: pointer;
+        }
     </style>
 
     <script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.js"></script>
@@ -71,7 +80,29 @@
                     }
                 });
             }
+        }
 
+        function setOverSeaOrder(orderNo) {
+            $("#show_notice").show().text("正在执行中...");
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: '/cbtconsole/orderSplit/setOverSeaOrder',
+                data: {
+                    orderNo: orderNo
+                },
+                success: function (data) {
+                    $("#show_notice").hide();
+                    if (data.ok) {
+                        $("#show_notice").show().text("执行成功，请关闭当前页面.");
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (XMLResponse) {
+                    $.messager.alert("提醒", "连接超时，请重试", "error");
+                }
+            });
         }
     </script>
     <title>订单海外仓拆单</title>
@@ -86,6 +117,7 @@
         <b style="font-size: 30px;">订单海外仓拆单</b>
         &nbsp;&nbsp;&nbsp;
         <button class="btn" onclick="doNumSplit('${param.orderNo}')">拆单</button>
+        <button class="btn_lh" onclick="setOverSeaOrder('${param.orderNo}')">设置整单为海外仓订单</button>
         <span id="show_notice" style="display: none;color: red;">正在执行...</span>
     </p>
 
