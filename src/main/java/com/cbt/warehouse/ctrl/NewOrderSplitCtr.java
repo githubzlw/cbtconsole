@@ -15,6 +15,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.cbt.service.CustomGoodsService;
+import com.importExpress.pojo.GoodsOverSea;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +83,8 @@ public class NewOrderSplitCtr {
     private IWarehouseService iWarehouseService;
     @Autowired
     private InventoryService inventoryService;
+    @Autowired
+    private CustomGoodsService customGoodsService;
 
     /**
      * 订单拆分(正常订单和Drop Ship订单)
@@ -324,7 +329,7 @@ public class NewOrderSplitCtr {
             OrderBean orderBean = splitDao.getOrders(orderNo);
             if(orderBean == null || StringUtils.isBlank(orderBean.getOrderNo())){
                 json.setOk(false);
-                json.setMessage("获取订单，请重试");
+                json.setMessage("获取订单失败，请重试");
                 return json;
             }
             // 获取新的订单号
@@ -721,6 +726,78 @@ public class NewOrderSplitCtr {
         return json;
     }
 
+
+    @RequestMapping(value = "/setOverSeaOrder")
+    @ResponseBody
+    public JsonResult setOverSeaOrder(HttpServletRequest request) {
+        JsonResult json = new JsonResult();
+        String orderNo = request.getParameter("orderNo");
+        try {
+
+            if (StringUtils.isBlank(orderNo)) {
+                json.setOk(false);
+                json.setMessage("获取订单号失败");
+                return json;
+            }
+
+            Admuser admuser = UserInfoUtils.getUserInfo(request);
+            if (admuser == null || admuser.getId() == 0) {
+                json.setOk(false);
+                json.setMessage("请登录后操作");
+                return json;
+            }
+
+            List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
+            boolean noOverSea = false;
+            for(OrderDetailsBean o : odb){
+                List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(o.getGoods_pid());
+                if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
+                    Long count = goodsOverSeaList.stream().filter(e-> e.getIsSupport() > 0).count();
+                    if(count > 0){
+                        o.setOverSeaFlag(1);
+                    }else{
+                        noOverSea = true;
+                        break;
+                    }
+                    goodsOverSeaList.clear();
+                } else{
+                    noOverSea = true;
+                    break;
+                }
+            }
+            odb.clear();
+            if(noOverSea){
+                json.setOk(false);
+                json.setMessage("含有非海外仓商品，不能设置整单为海外仓订单");
+                return json;
+            }
+
+            // 查询订单和订单详情
+            IOrderSplitDao splitDao = new OrderSplitDaoImpl();
+            OrderBean orderBean = splitDao.getOrders(orderNo);
+            if(orderBean == null || StringUtils.isBlank(orderBean.getOrderNo())){
+                json.setOk(false);
+                json.setMessage("获取订单失败，请重试");
+                return json;
+            }
+            // 获取新的订单号
+            String nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0, 1);
+
+            int rs = iOrderinfoService.updateOrderNoToNewNo(orderNo, nwOrderNo);
+            if(rs > 0){
+                 json.setOk(true);
+            } else {
+                json.setOk(false);
+                json.setMessage("更新订单失败，请重试");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("setOverSeaOrder error:", e);
+            json.setOk(false);
+            json.setMessage("orderNo:" + orderNo + ",setOverSeaOrder error:" + e.getMessage());
+        }
+        return json;
+    }
 
 
     /**

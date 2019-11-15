@@ -61,7 +61,7 @@ public class SendMailByAmazon implements SendMail {
         Session session = Session.getDefaultInstance(props);
 
         MimeMessage msg = new MimeMessage(session);
-        if (siteType == 2) {
+        if (siteType > 1) {
             msg.setFrom(new InternetAddress(FROM2, FROMNAME2));
         } else {
             msg.setFrom(new InternetAddress(FROM, FROMNAME));

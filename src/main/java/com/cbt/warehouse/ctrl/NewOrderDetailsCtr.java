@@ -266,6 +266,7 @@ public class NewOrderDetailsCtr {
 					if(count > 0){
 						o.setOverSeaFlag(1);
 					}
+					goodsOverSeaList.clear();
 				}
 			}
 			distributionList.clear();

@@ -235,7 +235,7 @@ public interface OrderinfoMapper {
 
 	public String getAdminid(@Param("shipno") String shipno);
 
-	public List<Map<String,String>> getOrderDataOne(@Param("shipno") String shipno);
+	public List<Map<String,Object>> getOrderDataOne(@Param("shipno") String shipno);
 
 	/**
 	 * 获取产品的店铺Id
@@ -243,7 +243,7 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	public String getShopId(@Param("goodsPid") String goodsPid);
-	public List<Map<String,String>> getOrderData(@Param("shipno") String shipno, @Param("adminid") int adminid);
+	public List<Map<String,Object>> getOrderData(@Param("shipno") String shipno, @Param("adminid") int adminid);
 	public List<OrderDetailsBean> getAllCancelDetails(Map<String, String> map);
 	public String getShopCustomId(@Param("goodsPid") String goodsPid);
 	/**
@@ -776,5 +776,12 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	Map<String,Object> getOverseasWarehouseStockOrderDetail(@Param("orderno")String orderno,@Param("userid")int userid);
-	
+
+	/**
+	 * 更新订单为新的订单号
+	 * @param oldOrderNo
+	 * @param newOrderNo
+	 * @return
+	 */
+	int updateOrderNoToNewNo(@Param("oldOrderNo") String oldOrderNo, @Param("newOrderNo") String newOrderNo);
 }

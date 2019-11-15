@@ -256,9 +256,9 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
-	public List<Map<String,String>> allTrack(Map<String, String> map) {
+	public List<Map<String,Object>> allTrack(Map<String, String> map) {
 		int adminid=orderinfoMapper.getAdmNameByShipno(map);
-		List<Map<String,String>> list=orderinfoMapper.getOrderData(map.get("shipno"),adminid);
+		List<Map<String,Object>> list=orderinfoMapper.getOrderData((String)map.get("shipno"),adminid);
 		return list;
 	}
 
@@ -440,7 +440,7 @@ public class OrderinfoService implements IOrderinfoService {
 		List<SearchResultInfo> info = new ArrayList<SearchResultInfo>();
 		List<SearchTaobaoInfo> taobaoinfoList = new ArrayList<SearchTaobaoInfo>();
 		int adminid = 520;
-		List<Map<String,String>> resultList=new ArrayList<Map<String,String>>();
+		List<Map<String,Object>> resultList=new ArrayList<Map<String,Object>>();
 		try{
 			String admin=orderinfoMapper.getAdminid(shipno);
 			if(StringUtil.isNotBlank(admin)){
@@ -454,11 +454,11 @@ public class OrderinfoService implements IOrderinfoService {
 				resultList=orderinfoMapper.getOrderData(shipno,adminid);
 			}
 			Set set=new HashSet();
-			for(Map<String,String> map:resultList){
+			for(Map<String,Object> map:resultList){
 				SearchResultInfo searchresultinfo = new SearchResultInfo();
 				String resultTaobaoItemId = null;
-				resultTaobaoItemId = map.get("tb_1688_itemid");
-				String car_type =map.get("car_type");
+				resultTaobaoItemId = (String)map.get("tb_1688_itemid");
+				String car_type =(String)map.get("car_type");
 				String types1 = "";
 				if (car_type.indexOf("<") > -1 && car_type.indexOf(">") > -1) {
 					for (int j = 1; j < 4 && car_type.indexOf("<") > -1 && car_type.indexOf(">") > -1; j++) {
@@ -534,7 +534,7 @@ public class OrderinfoService implements IOrderinfoService {
 				searchresultinfo.setShop_id(shop_id);
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
                 // 2018/11/06 11:39 ly 实秤重量 是否已同步到产品库
-                SearchResultInfo weightAndSyn = warehouseMapper.getGoodsWeight(map.get("goods_pid"), Integer.valueOf(String.valueOf(map.get("odid"))));
+                SearchResultInfo weightAndSyn = warehouseMapper.getGoodsWeight((String)map.get("goods_pid"), Integer.valueOf(String.valueOf(map.get("odid"))));
                 if (null != weightAndSyn){
                     searchresultinfo.setWeight(weightAndSyn.getWeight());
                     searchresultinfo.setSyn(weightAndSyn.getSyn());
@@ -547,7 +547,7 @@ public class OrderinfoService implements IOrderinfoService {
 				//获取验货商品的最大类别ID 王宏杰
 				String catid="";
 				if("1".equals(checked)){
-					String goodscatid=map.get("goodscatid");
+					String goodscatid=(String)map.get("goodscatid");
 					catid=orderinfoMapper.getCatid(goodscatid);
 				}
 				searchresultinfo.setCatid(catid);
@@ -574,24 +574,24 @@ public class OrderinfoService implements IOrderinfoService {
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
 				searchresultinfo.setOrderremark(orderremark);
 				//TODO zlc bug处理期，后期需要更改
-				searchresultinfo.setSource1688_img(map.get("source1688_img"));
-				searchresultinfo.setGoods_img_url(map.get("goods_img_url"));
-				searchresultinfo.setDp_num(Integer.valueOf(map.get("dp_num")));
-				searchresultinfo.setDp_total(Integer.valueOf(map.get("dp_total")));
-				searchresultinfo.setDp_city(map.get("dp_city"));
-				searchresultinfo.setDp_country(map.get("dp_country"));
-				searchresultinfo.setDp_province(map.get("dp_province"));
+				searchresultinfo.setSource1688_img((String)map.get("source1688_img"));
+				searchresultinfo.setGoods_img_url((String)map.get("goods_img_url"));
+				searchresultinfo.setDp_num(Integer.valueOf(map.get("dp_num").toString()));
+				searchresultinfo.setDp_total(Integer.valueOf(map.get("dp_total").toString()));
+				searchresultinfo.setDp_city((String)map.get("dp_city"));
+				searchresultinfo.setDp_country((String)map.get("dp_country"));
+				searchresultinfo.setDp_province((String)map.get("dp_province"));
 				//采购备注-2019.07.04-sj
-				searchresultinfo.setContext(map.get("context")!=null?map.get("context") : "");
+				searchresultinfo.setContext(map.get("context")!=null?(String)map.get("context") : "");
 				if(StringUtil.isBlank(car_type) || "0".equals(car_type)) {
-					searchresultinfo.setSpecId(map.get("tb_1688_itemid"));
-					searchresultinfo.setSkuID(map.get("tb_1688_itemid"));
+					searchresultinfo.setSpecId((String)map.get("tb_1688_itemid"));
+					searchresultinfo.setSkuID((String)map.get("tb_1688_itemid"));
 				}else {
-					searchresultinfo.setSpecId(map.get("specid")!=null?map.get("specid") : "");
-					searchresultinfo.setSkuID(map.get("skuid")!=null?map.get("skuid") : "");
+					searchresultinfo.setSpecId(map.get("specid")!=null?(String)map.get("specid") : "");
+					searchresultinfo.setSkuID(map.get("skuid")!=null?(String)map.get("skuid") : "");
 				}
-				if(org.apache.commons.lang3.StringUtils.isNotBlank(map.get("taobao_id"))){
-					searchresultinfo.setTaobaoId(Integer.parseInt(map.get("taobao_id")));
+				if(StrUtils.isNum(String.valueOf(map.get("taobao_id")))){
+					searchresultinfo.setTaobaoId(Integer.parseInt(map.get("taobao_id").toString()));
 				}
 
 				info.add(searchresultinfo);
@@ -614,7 +614,7 @@ public class OrderinfoService implements IOrderinfoService {
 	 * @param fileByOrderid
 	 * @return
 	 */
-	private StringBuffer getStringForRemark(Map<String, String> map, SearchResultInfo searchresultinfo, String orderid, String fileByOrderid) {
+	private StringBuffer getStringForRemark(Map<String, Object> map, SearchResultInfo searchresultinfo, String orderid, String fileByOrderid) {
 		if (fileByOrderid == null || fileByOrderid.length() < 10) {
 			searchresultinfo.setInvoice("");
 		} else {
@@ -667,16 +667,16 @@ public class OrderinfoService implements IOrderinfoService {
 	 * @param map
 	 * @param searchresultinfo
 	 */
-	private void saveValueForBean(Map<String, String> map, SearchResultInfo searchresultinfo) {
-		searchresultinfo.setTbOrderIdPositions(map.get("orderPOSITION"));
-		searchresultinfo.setGoodstatus(map.get("goodstatus"));
+	private void saveValueForBean(Map<String, Object> map, SearchResultInfo searchresultinfo) {
+		searchresultinfo.setTbOrderIdPositions((String)map.get("orderPOSITION"));
+		searchresultinfo.setGoodstatus(String.valueOf(map.get("goodstatus")));
 		searchresultinfo.setUserid(Integer.valueOf(String.valueOf(map.get("userid"))));
 		searchresultinfo.setOrdercount(Integer.valueOf(String.valueOf(map.get("ordercount"))));
 		searchresultinfo.setOrderbuycount(Integer.valueOf(String.valueOf(map.get("buycnt"))));
-		searchresultinfo.setGoods_pid(map.get("goods_pid"));
+		searchresultinfo.setGoods_pid((String)map.get("goods_pid"));
 		searchresultinfo.setChecked(Integer.valueOf(String.valueOf(map.get("checked"))));
-		searchresultinfo.setSeilUnit(map.get("seilUnit")==null || "".equals(map.get("seilUnit"))?"无":map.get("seilUnit"));
-		searchresultinfo.setGcUnit(map.get("gcUnit")==null || "".equals(map.get("gcUnit"))?"无":map.get("gcUnit"));
+		searchresultinfo.setSeilUnit(map.get("seilUnit")==null || "".equals(map.get("seilUnit"))?"无":(String)map.get("seilUnit"));
+		searchresultinfo.setGcUnit(map.get("gcUnit")==null || "".equals(map.get("gcUnit"))?"无":(String)map.get("gcUnit"));
 		searchresultinfo.setIsDropshipOrder(String.valueOf(map.get("isDropshipOrder")));
 		searchresultinfo.setTaobao_orderid(String.valueOf(map.get("taobaoOrderid")));
 		searchresultinfo.setPosition(String.valueOf(map.get("goodsPOSITION")));
@@ -686,7 +686,7 @@ public class OrderinfoService implements IOrderinfoService {
 		searchresultinfo.setGoods_url(String.valueOf(map.get("goods_url")));
 		searchresultinfo.setGoods_p_url(String.valueOf(map.get("goods_p_url")));
 		searchresultinfo.setGoods_img_url(String.valueOf(map.get("od_goods_img_url")).replace("80x80","400x400").replace("60x60","400x400"));
-		searchresultinfo.setImg(com.cbt.website.util.Utility.ImgMatch(map.get("img").replace("60x60","400x400").replace("80x80","400x400")));
+		searchresultinfo.setImg(com.cbt.website.util.Utility.ImgMatch(((String)map.get("img")).replace("60x60","400x400").replace("80x80","400x400")));
 		searchresultinfo.setCurrency(String.valueOf(map.get("currency")));
 		searchresultinfo.setGoods_price(Double.parseDouble(String.valueOf(map.get("odGoodsPrice"))));
 		searchresultinfo.setGoods_p_price(Double.parseDouble(String.valueOf(map.get("goods_p_price"))));
@@ -2243,6 +2243,15 @@ public class OrderinfoService implements IOrderinfoService {
 	public Map<String, Object> getOverseasWarehouseStockOrderDetail(String orderno, int userid) {
 		
 		return orderinfoMapper.getOverseasWarehouseStockOrderDetail(orderno, userid);
+	}
+
+	@Override
+	public int updateOrderNoToNewNo(String oldOrderNo, String newOrderNo) {
+		String sql = "update orderinfo set order_no = '" + newOrderNo + "' where order_no = '" + oldOrderNo + "';";
+		sql += "update order_details set orderid = '" + newOrderNo + "' where orderid = '" + oldOrderNo + "';";
+		sql +="update payment set orderid ='"+newOrderNo+"' where orderid='"+oldOrderNo +"';";
+		SendMQ.sendMsg(new RunSqlModel(sql));
+		return orderinfoMapper.updateOrderNoToNewNo(oldOrderNo, newOrderNo);
 	}
 }
 

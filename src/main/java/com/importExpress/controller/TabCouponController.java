@@ -162,13 +162,23 @@ public class TabCouponController {
         //登陆用户id
         Integer userId = user.getId();
         //用于权限校验 直接给销售$6美元以下现金券的发放权限 超过$6的需要管理员权限
-        if (valueRight >= 6){
+        if(valueLeft < 100){
+            resultMap.put("message", "最低消费金额不能小于100!");
+            resultMap.put("code", "4");
+            resultMap.put("state", "false");
+            return resultMap;
+        }/*else if (valueRight >= 50){
             if (!"0".endsWith(user.getRoletype())){
-                resultMap.put("message", "发放6$及超过6$的优惠卷需要管理员权限!");
+                resultMap.put("message", "发放50$的优惠卷需要管理员权限!");
                 resultMap.put("code", "4");
                 resultMap.put("state", "false");
                 return resultMap;
             }
+        }*/else if(0.07d * valueLeft  < 1.0d * valueRight){
+            resultMap.put("message", "折扣金额不能超过最低消费金额的7%!");
+            resultMap.put("code", "4");
+            resultMap.put("state", "false");
+            return resultMap;
         }
         //数据解析
         Date fromDate = null;

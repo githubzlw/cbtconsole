@@ -14,13 +14,13 @@ $(function(){
 		}
 		$("#in-shipno").attr("disabled","disabled");
 		$(".btn-shipno").hide();
-		/*$.ajax({
+		$.ajax({
 			url:"/cbtconsole/warehouse/shipno.do",
 			data:{
 				"shipno" : shipno,
 				"orderno" : orderno
 			},
-			type:"post",
+			type:"get",
 			success:function(data){
 				if(data.status == 200){
 					
@@ -31,11 +31,12 @@ $(function(){
 			error:function(e){
 				$.MsgBox.Alert("提示", "添加运单号失败");
 			}
-		})*/
+		})
 		
 	})
 	//出运
 	$(".btn-shipout").click(function(){
+		var orderno = $(".info-order-orderno").text();
 		var shipno = $("#in-shipno").val();
 		if(!shipno || shipno==''){
 			$("#in-shipno").removeAttr("disabled");
@@ -45,12 +46,14 @@ $(function(){
 		$.ajax({
 			url:"/cbtconsole/warehouse/shipout.do",
 			data:{
-				"shipno" : shipno
+				"shipno" : shipno,
+				"orderno" : orderno
 			},
-			type:"post",
+			type:"get",
 			success:function(data){
 				if(data.status == 200){
-					
+					$.MsgBox.Alert("提示", "出运成功");
+					$(".btn-shipno").hide();
 				}else{
 					$.MsgBox.Alert("提示", "出运错误:"+data.message);
 				}
