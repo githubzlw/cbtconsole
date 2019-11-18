@@ -93,7 +93,7 @@ input, textarea, select, button {
 				padding : '8 8 10 8'
 			},
 			onLoadError : function() {
-				$.message.alert("提示信息", "获取数据信息失败");
+				$.messager.alert("提示信息", "获取数据信息失败");
 				return;
 			}
 		});
@@ -102,7 +102,7 @@ input, textarea, select, button {
 	function doQuery() {
 		var orderNo = $("#query_order_no").val();
 		if (orderNo == null || orderNo == "") {
-			$.message.alert("提示信息", "请输入订单号");
+			$.messager.alert("提示信息", "请输入订单号");
 		} else {
 			$("#details-datagrid").datagrid("load", {
 				"orderNo" : orderNo

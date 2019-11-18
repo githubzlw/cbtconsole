@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>验货改动重量管理</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 80px;
+            height: 30px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+
+        #single_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .but_color {
+            padding: 5px;
+            font-size: 14px
+        }
+
+        #weight_top_toolbar {
+            padding: 20px 28px !important;
+            text-align: center !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        .enter_btn {
+            width: 140px;
+            height: 30px;
+            color: #ffffff;
+            background-color: #009688;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setDatagrid();
+            getAdminList();
+            /*var opts = $("#weight_easyui-datagrid").datagrid("options");
+            opts.url = "/cbtconsole/cutom/queryGoodsWeightList";*/
+        });
+
+        function setDatagrid() {
+            $('#weight_easyui-datagrid').datagrid({
+                title: '验货改动重量管理',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#weight_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/cutom/queryGoodsWeightList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 40,//默认选择的分页是每页50行数据
+                pageList: [40, 60],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.messager.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        showMessage(data.message);
+                    }
+                }
+            });
+        }
+
+        function getAdminList() {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/singleGoods/getAdminList",
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#query_admid").empty();
+                        var content = '<option value="0" selected="selected">全部</option>';
+                        var json = data.data;
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                        $("#query_admid").append(content);
+                    } else {
+                        console.log("获取用户列表失败，原因 :" + data.message);
+                    }
+                },
+                error: function (res) {
+                    console.log("网络获取失败");
+                }
+            });
+        }
+
+        function showMessage(message) {
+            $.messager.show({
+                title: '提醒',
+                msg: message,
+                timeout: 2000,
+                showType: 'slide',
+                style: {
+                    right: '',
+                    top: ($(window).height() * 0.15),
+                    bottom: ''
+                }
+            });
+        }
+
+        function doQuery(flag) {
+            var pid = $("#pid_id").val();
+            if (pid == null || pid == "") {
+                pid = "";
+            }
+            /*var sttime = $("#query_sttime").val();
+            if (sttime == null || sttime == "") {
+                sttime = "";
+            }
+            var edtime = $("#query_edtime").val();
+            if (edtime == null || edtime == "") {
+                edtime = "";
+            }*/
+            var admid = $("#query_admid").val();
+            if (admid == null || admid == "") {
+                admid = 0;
+            }
+            if (flag > 0) {
+                $("#weight_easyui-datagrid").datagrid("reload", {
+                    "pid": pid,
+                    "admid": admid
+                });
+            } else {
+                $("#weight_easyui-datagrid").datagrid("load", {
+                    "pid": pid,
+                    "admid": admid
+                });
+            }
+
+        }
+
+
+        function syncSkuToOnline(rowIndex) {
+            var row = $("#weight_easyui-datagrid").datagrid("getData").rows[rowIndex];  //获取某一行的值
+            var param = {};
+            param["adminId"] = row.adminId;
+            param["adminName"] = row.adminName;
+            param["goodsType"] = row.goodsType;
+            param["id"] = row.id;
+            param["pid"] = row.pid;
+            param["volumeWeight"] = row.volumeWeight;
+            param["weight"] = row.weight;
+            $.messager.confirm('系统提醒', '是否同步', function (r) {
+                if (r) {
+                    $.messager.progress({
+                            title: '正在处理数据',
+                            msg: '请等待...'
+                        });
+                    $.ajax({
+                        type: "POST",
+                        url: "/cbtconsole/cutom/syncLocalWeightToOnline",
+                        data: param,
+                        success: function (data) {
+                            $.messager.progress('close');
+                            if (data.ok) {
+                                showMessage('执行成功，页面即将刷新！');
+                                setTimeout(function () {
+                                    //window.location.reload();
+                                    doQuery(1);
+                                }, 1000);
+                            } else {
+                                $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                            }
+                        },
+                        error: function (res) {
+                            $.messager.progress('close');
+                            $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                        }
+                    });
+                }
+            });
+        }
+
+
+        function formatPid(val, row, index) {
+            return '<a target="_blank" href="/cbtconsole/editc/detalisEdit?pid='+val+'">'+val+'</a>';
+        }
+
+        function formatSync(val, row, index) {
+            if(val > 0){
+                return "同步";
+            } else {
+                return "";
+            }
+        }
+
+        function formatOperation(val, row, index) {
+            return '<button class="but_color" onclick="syncSkuToOnline(' + index + ')">同步到线上sku</button>';
+        }
+    </script>
+
+</head>
+<body>
+
+<div id="weight_top_toolbar" style="padding: 5px; height: auto">
+    <form id="single_query_form" action="#" onsubmit="return false;">
+			<span> PID: <input type="text" id="pid_id"
+                               style="width: 170px; height: 24px" value=""/></span>&nbsp;&nbsp;
+
+        <!--<span>
+				时间: <input id="query_sttime" class="Wdate"
+                           style="width: 100px; height: 24px" type="text" value=""
+                           onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate"
+                                                 style="width: 100px; height: 24px;" type="text" value=""
+                                                 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+			</span>&nbsp;&nbsp;-->
+
+        <span> 改动人: <select id="query_admid"
+                            style="font-size: 16px; height: 24px; width: 120px;">
+					<option value="0" selected="selected">全部</option>
+			</select></span>
+        &nbsp;&nbsp;<span><input type="button"
+                                 class="enter_btn" value="查询" onclick="doQuery(0)"/></span>
+    </form>
+</div>
+
+<table id="weight_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'pid',width:'120px',formatter:formatPid">PID</th>
+        <th
+                data-options="field:'goodsType',width:'500px'">商品更改规格
+        </th>
+        <th data-options="field:'weight',align:'center',width:'100px'">重量(KG)</th>
+        <th data-options="field:'volumeWeight',align:'center',width:'100px'">体积重量(KG)</th>
+        <th data-options="field:'adminName',align:'center',width:'100px'">录入人</th>
+        <th data-options="field:'createTime',align:'center',width:'150px'">创建时间</th>
+        <th data-options="field:'syncFlag',align:'center',width:'100px',formatter:formatSync">同步状态</th>
+        <th data-options="field:'updateAdminName',align:'center',width:'100px'">同步人</th>
+        <th data-options="field:'updateTime',align:'center',width:'150px'">同步时间</th>
+        <th
+                data-options="field:'opFlag',align:'center',width:'150px',formatter:formatOperation">操作
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+</body>
+</html>

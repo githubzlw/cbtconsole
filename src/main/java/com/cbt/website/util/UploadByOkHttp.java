@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.util.GoodsInfoUtils;
 import okhttp3.*;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class UploadByOkHttp {
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(UploadByOkHttp.class);
+
     private static final String ACCESS_URL_OLD = "http://104.247.194.50:3009/uploadImage";
     private static final String ACCESS_URL_NEW = "http://108.61.142.103:3009/uploadImage";
     private static final String TOKEN = "cerong2018jack";
@@ -92,6 +95,7 @@ public class UploadByOkHttp {
             }
         }
         if (!isSuccess) {
+            logger.error("doUploadByMap error :<:<:<:<,map:" + uploadMap);
             System.err.println("doUploadByMap error :<:<:<:<");
         }
         return isSuccess;
