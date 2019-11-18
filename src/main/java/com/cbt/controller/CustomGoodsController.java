@@ -4,22 +4,23 @@ import com.cbt.bean.*;
 import com.cbt.customer.service.IShopUrlService;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.service.CustomGoodsService;
-import com.cbt.util.GoodsInfoUtils;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
+import com.cbt.util.*;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsMd5Bean;
+import com.importExpress.pojo.GoodsWeightChange;
 import com.importExpress.pojo.OnlineGoodsStatistic;
 import com.importExpress.pojo.ShopMd5Bean;
 import com.importExpress.utli.EasyUiTreeUtils;
+import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +50,7 @@ public class CustomGoodsController {
     // private String localIP = "http://27.115.38.42:8083/";
     // private String wanlIP = "http://192.168.1.27:8083/";
 
+    private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 
     @Autowired
     private CustomGoodsService customGoodsService;
@@ -640,6 +643,10 @@ public class CustomGoodsController {
                 return json;
             }
 
+            ThreadPoolExecutor pool = new ThreadPoolExecutor(0, 100,
+                                      60L, TimeUnit.SECONDS,
+                                      new SynchronousQueue<Runnable>());
+
             for (CustomGoodsBean oldGd : cgLst) {
                 CustomGoodsPublish goods = customGoodsService.getGoods(oldGd.getPid(), 0);
                 /*
@@ -658,7 +665,23 @@ public class CustomGoodsController {
                     goods.setType("");
                 }
 
-                customGoodsService.publish(goods);
+                //判断不是正式环境的，不进行搜图图片更新
+                String ip = request.getRemoteAddr();
+                if (ip.contains("1.34") || ip.contains("38.42") || ip.contains("1.27") || ip.contains("1.9")) {
+                    if (goods.getIsUpdateImg() == 0) {
+                        goods.setIsUpdateImg(1);
+                        // 设置图片信息
+                    }
+                } else {
+                    goods.setIsUpdateImg(0);
+                }
+
+                PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(goods.getPid(),
+                        customGoodsService, ftpConfig, goods.getIsUpdateImg(), user.getId());
+
+                pool.execute(pbThread);
+
+                /*customGoodsService.publish(goods);
                 int publish = customGoodsService.updateState(4, goods.getPid(), user.getId());
                 if (publish > 0) {
                     json.setOk(true);
@@ -666,8 +689,12 @@ public class CustomGoodsController {
                 } else {
                     json.setOk(false);
                     json.setMessage("执行失败，本地发布状态未更新");
-                }
+                }*/
             }
+
+            pool.shutdown();
+            json.setOk(true);
+            json.setMessage("执行成功,后台发布中");
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
@@ -1412,5 +1439,80 @@ public class CustomGoodsController {
         return mv;
     }
 
+
+
+    @RequestMapping(value = "/queryGoodsWeightList", method = {RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
+	public EasyUiJsonResult queryGoodsWeightList(HttpServletRequest request, String pid,Integer adminId, Integer page, Integer rows) {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		if (StringUtils.isBlank(pid)) {
+			pid = null;
+		}
+		if (adminId == null || adminId< 0) {
+			adminId = null;
+		}
+		if (page == null || page < 1) {
+			page = 1;
+		}
+		if (rows == null || rows < 1) {
+			rows = 40;
+		}
+		int limitNum = rows;
+		int startNum = (page - 1) * limitNum;
+		try {
+		    GoodsWeightChange weightChange = new GoodsWeightChange();
+		    weightChange.setPid(pid);
+		    weightChange.setStartNum(startNum);
+		    weightChange.setLimitNum(limitNum);
+		    weightChange.setAdminId(adminId);
+
+			List<GoodsWeightChange> list = customGoodsService.queryGoodsWeightChangeList(weightChange);
+			int count = customGoodsService.queryGoodsWeightChangeListCount(weightChange);
+			json.setSuccess(true);
+			json.setTotal(count);
+			json.setRows(list);
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			LOG.error("queryGoodsWeightList", e);
+			json.setSuccess(false);
+			json.setMessage("queryGoodsWeightList error:" + e.getMessage());
+			Assert.assertTrue(e.getMessage(), false);
+		}
+		return json;
+	}
+
+	@RequestMapping("/syncLocalWeightToOnline")
+    @ResponseBody
+	public JsonResult syncLocalWeightToOnline(HttpServletRequest request, GoodsWeightChange weightChange){
+        JsonResult json = new JsonResult();
+
+        com.cbt.pojo.Admuser user = UserInfoUtils.getUserInfo(request);
+        if(user == null || user.getId() ==0){
+            Assert.assertNotNull("登录后重试",weightChange);
+            json.setMessage("登录后重试");
+            json.setOk(false);
+            return  json;
+        }
+
+        if(weightChange == null || StringUtils.isBlank(weightChange.getPid())){
+            Assert.assertNotNull("获取参数失败",weightChange);
+            json.setMessage("获取参数失败");
+            json.setOk(false);
+            return  json;
+        }
+        try{
+            weightChange.setAdminId(user.getId());
+            customGoodsService.syncLocalWeightToOnline(weightChange);
+            json.setOk(true);
+        }catch (Exception e){
+            Assert.assertTrue(e.getMessage(),false);
+            e.printStackTrace();
+            LOG.error("syncLocalWeightToOnline",e);
+            json.setOk(false);
+            json.setMessage("syncLocalWeightToOnline error:"+e.getMessage());
+        }
+        return json;
+    }
 
 }

@@ -2976,7 +2976,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                    list.addAll(inventories);
                 }
                 for (int i=0;i<list.size();i++){
-                    list.get(i).setSkuList(this.getSkulistSd(list.get(i).getNew_barcode(),list.get(i).getFinal_weight()));
+                    list.get(i).setSkuList(this.getSkulistSd(list.get(i).getEntype(),list.get(i).getFinal_weight()));
                 }
             }else {
                list = this.warehouseMapper.FindAllGoods(page * pagesize, pagesize, pid);
@@ -3042,18 +3042,31 @@ public class WarehouseServiceImpl implements IWarehouseService {
         return warehouseMapper.insertMqLog(sqlStr, shopNo, orderNo, paramStr);
     }
 
-    public List<String> getSkulist(String sku,String weight) {
+    public Map<String,List<String>> getSkulist(String sku,String weight) {
          String [] arr=sku.split(",");
          List<String> list = Arrays.asList(arr);
          List lists=new ArrayList(list);
-         lists.add("重量:"+weight);
-       return lists;
+        Map<String,List<String>> map=new HashMap<>();
+        map.put("规格",list);
+       return map;
     }
-    public List<String> getSkulistSd(String sku,String weight) {
-        List lists=new ArrayList();
-        lists.add("规格:"+sku);
-        lists.add("重量:"+weight);
-        return lists;
+    public Map<String,List<String>> getSkulistSd(String sku,String weight) {
+        List<EntypeBen> EntypeBens= JsonUtils.jsonToList(sku,EntypeBen.class);
+        Map<String,List<String>> map=new HashMap<>();
+        Set<String> set=new HashSet<>();
+        for (EntypeBen en:EntypeBens){
+         set.add(en.getType());
+        }
+        for(int i=0;i<set.size();i++){
+            List list=new ArrayList();
+        for (EntypeBen en:EntypeBens){
+                if (en.getType().equals(set.toArray()[i])){
+                    list.add(en.getValue()+"@"+en.getId());
+                    map.put(en.getType(),list);
+                }
+            }
+        }
+        return map;
     }
 
 

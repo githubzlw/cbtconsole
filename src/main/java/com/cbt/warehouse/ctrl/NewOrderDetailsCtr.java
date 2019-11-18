@@ -132,21 +132,34 @@ public class NewOrderDetailsCtr {
 			}
 		}
 
-		if(orderNo.contains("_SN") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)){
-		    try {
-                // 详情数据处理
-                iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderNo.substring(0, orderNo.indexOf("_")), orderNo);
-                // 数量拆单采购数据处理
-                iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
-                // 数量拆单入库数据处理
-                iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
-                // 数量拆单商品备注沟通数据处理
-                iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
-            }catch (Exception e){
-		        e.printStackTrace();
-            }
-
+		int isUpdate = 0;
+		if (orderNo.contains("_SN") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)) {
+			isUpdate = 1;
+		} else if (orderNo.contains("_") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)) {
+			String[] splitList = orderNo.split("_");
+			if (splitList != null && splitList.length > 1 && splitList[1].length() > 3 && splitList[0].contains(splitList[1])) {
+				// 判断补货订单
+				isUpdate = 1;
+			}
 		}
+		if(isUpdate > 0){
+			try {
+				// 采购数据
+				iOrderinfoService.updateOrderSplitNumGoodsDistribution(orderNo);
+				// 详情数据处理
+				iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderNo.substring(0, orderNo.indexOf("_")), orderNo);
+				// 数量拆单采购数据处理
+				iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
+				// 数量拆单入库数据处理
+				iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
+				// 数量拆单商品备注沟通数据处理
+				iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+			} catch (Exception e) {
+				e.printStackTrace();
+				LOG.error("updateOrderSplitNumOrderDetailsData error:", e);
+			}
+		}
+
 
 		//获取实际运费
 			Long start = System.currentTimeMillis();

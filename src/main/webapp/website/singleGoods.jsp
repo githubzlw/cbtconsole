@@ -136,7 +136,7 @@
                     padding: '8 8 10 8'
                 },
                 onLoadError: function () {
-                    $.message.alert("提示信息", "获取数据信息失败");
+                    $.messager.alert("提示信息", "获取数据信息失败");
                     return;
                 },
                 onLoadSuccess: function (data) {
@@ -337,8 +337,13 @@
             var goodsType = $("#goods_type").val();
             var aliPid = $("#ali_pid").val();
             var aliPrice = $("#ali_price").val();
+            var shopId = $("#shop_id").val();
             if (goodsUrl == "" || goodsUrl == null) {
                 $.messager.alert("提醒", '请输入1688URL', "info");
+                return false;
+            }
+            if (shopId == "" || shopId == null) {
+                $.messager.alert("提醒", '请输入店铺ID', "info");
                 return false;
             }
             if (goodsWeight == "" || goodsWeight == null || goodsWeight == "0") {
@@ -369,10 +374,10 @@
                         if(data.total > 0){
                             $.messager.confirm('系统提醒', data.message + '，执行保存操作，线上数据将被更新，是否执行？', function (r) {
                                 if (r) {
-                                    doAddAction(goodsUrl,goodsWeight,drainageFlag,goodsType,aliPid,aliPrice);
+                                    doAddAction(goodsUrl,goodsWeight,drainageFlag,goodsType,aliPid,aliPrice, shopId);
                                 }});
                         }else{
-                            doAddAction(goodsUrl,goodsWeight,drainageFlag,goodsType,aliPid,aliPrice);
+                            doAddAction(goodsUrl,goodsWeight,drainageFlag,goodsType,aliPid,aliPrice, shopId);
                         }
                     } else {
                         $.messager.alert("提醒", '执行错误:' + data.message, "info");
@@ -388,7 +393,7 @@
 
         }
 
-        function doAddAction(goodsUrl,goodsWeight,drainageFlag,goodsType,aliPid,aliPrice) {
+        function doAddAction(goodsUrl,goodsWeight,drainageFlag,goodsType,aliPid,aliPrice, shopId) {
             $.messager.progress({
                 title: '正在执行',
                 msg: '请等待...'
@@ -402,7 +407,8 @@
                     drainageFlag: drainageFlag,
                     goodsType: goodsType,
                     aliPid: aliPid,
-                    aliPrice: aliPrice
+                    aliPrice: aliPrice,
+                    shopId: shopId
                 },
                 success: function (data) {
                     $.messager.progress('close');
@@ -468,12 +474,16 @@
 
 
 <div id="enter_div_sty" class="easyui-dialog" title="新增1688商品"
-     data-options="modal:true" style="width: 888px; height: 300px;">
+     data-options="modal:true" style="width: 888px; height: 330px;">
     <form id="form_enter" action="#" onsubmit="return false">
         <table>
             <tr>
                 <td>1688URl：</td>
                 <td><input id="goods_url" value="" style="width: 555px; height: 28px;" placeholder="请输入1688商品url"/></td>
+            </tr>
+            <tr>
+                <td>店铺ID：</td>
+                <td><input id="shop_id" value="" style="width: 555px; height: 28px;" placeholder="请输入店铺ID"/></td>
             </tr>
             <tr>
                 <td>平均重量：</td>

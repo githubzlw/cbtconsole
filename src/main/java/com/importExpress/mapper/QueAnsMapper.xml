@@ -50,7 +50,7 @@
       and q.pname=#{goodsName}
     </if>
     <if test="adminId != 0">
-      and ad.id=#{adminId}
+      and a.adminid=#{adminId}
     </if>
     <if test="startdate != null">
       and q.create_time &gt; #{startdate}
@@ -64,7 +64,7 @@
       SELECT COUNT(1)
       FROM question_answer q LEFT JOIN custom_benchmark_ready c ON q.pid=c.pid LEFT JOIN admuser b ON q.reply_name=b.id
       left join admin_r_user a on q.userid=a.userid
-      left join admuser ad on a.adminid=ad.id
+      <!--left join admuser ad on a.adminid=ad.id-->
       WHERE q.is_delete=0
       <if test="replyStatus != 0 ">
           and q.reply_status=#{replyStatus}
@@ -82,7 +82,7 @@
           and q.pname=#{goodsName}
       </if>
       <if test="adminId != 0">
-          and ad.id=#{adminId}
+          and a.adminid=#{adminId}
       </if>
       <if test="startdate != null">
           and q.create_time &gt; #{startdate}

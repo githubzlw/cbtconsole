@@ -1480,4 +1480,46 @@
         values(#{pid},#{flag},#{adminId})
     </insert>
 
+    <insert id="saveGoodsWeightChange" parameterType="com.importExpress.pojo.GoodsWeightChange">
+        insert into goods_weight_change(pid,goods_type,weight,volume_weight,admin_id)
+        values(#{pid},#{goodsType},#{weight},#{volumeWeight},#{adminId})
+    </insert>
+
+    <select id="queryGoodsWeightChangeList" parameterType="com.importExpress.pojo.GoodsWeightChange"
+            resultType="com.importExpress.pojo.GoodsWeightChange">
+        select a.id,a.pid,a.goods_type as goodsType,a.weight,a.volume_weight as volumeWeight,a.admin_id as adminId,
+        b.admName as adminName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,a.sync_flag as syncFlag,
+        a.update_admin_id as updateAdminId,c.admName as updateAdminName, DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as updateTime
+        from goods_weight_change a left join admuser b  on a.admin_id = b.id left join admuser c  on a.update_admin_id = c.id
+        where 1=1
+        <if test="pid !=null">
+            and a.pid = #{pid}
+        </if>
+        <if test="adminId !=null">
+            and a.admin_id = #{adminId}
+        </if>
+        order by a.create_time desc,a.pid
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryGoodsWeightChangeListCount" parameterType="com.importExpress.pojo.GoodsWeightChange" resultType="int">
+        select count(0) from goods_weight_change a left join admuser b  on a.admin_id = b.id
+        left join admuser c  on a.update_admin_id = c.id
+        where 1=1
+        <if test="pid !=null">
+            and a.pid = #{pid}
+        </if>
+        <if test="adminId !=null">
+            and a.admin_id = #{adminId}
+        </if>
+    </select>
+
+    <update id="setGoodsWeightChangeFlag" parameterType="com.importExpress.pojo.GoodsWeightChange">
+        update goods_weight_change
+        set sync_flag = #{syncFlag},update_time = now(),update_admin_id = #{adminId}
+        where id = #{id}
+    </update>
+
 </mapper>

@@ -1161,16 +1161,35 @@ public class PurchaseController {
 			days = StringUtils.isStrNull(days) ? "" : days;
 			state = StringUtils.isStrNull(state) ? "" : state;
 
-			if(orderno.contains("_SN")){
-				// 详情数据处理
-				iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderno.substring(0, orderno.indexOf("_")), orderno);
-				// 数量拆单采购数据处理
-				iOrderinfoService.updateOrderSplitNumPurchaseData(orderno);
-				// 数量拆单入库数据处理
-				iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderno);
-				// 数量拆单商品备注沟通数据处理
-			    iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderno);
+			int isUpdate = 0;
+			if (orderno.contains("_SN")) {
+				isUpdate = 1;
+			} else if (orderno.contains("_")) {
+				String[] splitList = orderno.split("_");
+				if (splitList != null && splitList.length > 1 && splitList[1].length() > 3 && splitList[0].contains(splitList[1])) {
+					// 判断补货订单
+					isUpdate = 1;
+				}
 			}
+			if (isUpdate > 0) {
+				try {
+					// 采购数据
+					iOrderinfoService.updateOrderSplitNumGoodsDistribution(orderno);
+					// 详情数据处理
+					iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderno.substring(0, orderno.indexOf("_")), orderno);
+					// 数量拆单采购数据处理
+					iOrderinfoService.updateOrderSplitNumPurchaseData(orderno);
+					// 数量拆单入库数据处理
+					iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderno);
+					// 数量拆单商品备注沟通数据处理
+					iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderno);
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("updateOrderSplitNumOrderDetailsData error:", e);
+				}
+			}
+
+
 			int unpay = 0;
 			unpay = StringUtils.isStrNull(unpaid) ? 0 : Integer.parseInt(unpaid);
 			System.out.println("========开始执行,purchaseServer.findPageByCondition:" + sdf1.format(new Date()) + "========");
