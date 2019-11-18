@@ -2,22 +2,22 @@ package com.importExpress.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.bouncycastle.crypto.agreement.srp.SRP6Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cbt.jdbc.DBHelper;
-import com.cbt.parse.service.StrUtils;
+import com.cbt.util.StrUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.importExpress.mapper.OverseasWarehouseStockMapper;
 import com.importExpress.pojo.OverseasWarehouseStock;
 import com.importExpress.pojo.OverseasWarehouseStockLog;
 import com.importExpress.pojo.OverseasWarehouseStockParamter;
 import com.importExpress.pojo.OverseasWarehouseStockWrap;
 import com.importExpress.service.OverseasWarehouseStockService;
-import com.importExpress.utli.RunBatchSqlModel;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 @Service
@@ -26,38 +26,49 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
     private OverseasWarehouseStockMapper stockMapper;
 
     @Override
-    public int reduceOrderStock(OverseasWarehouseStock stock,String orderno,int odid,String remark) {
-    	/*int reduceOrderStock = stockMapper.reduceOrderStock(stock);
-    	if(reduceOrderStock > 0) {
-    		OverseasWarehouseStockLog log = OverseasWarehouseStockLog.builder()
-    				.changeStock(stock.getOrderStock())
-    				.changeType(1)
-    				.code(stock.getCode())
-    				.odid(odid)
-    				.orderno(orderno)
-    				.remark(remark)
-    				.build();
-    		stockMapper.addLog(log);
+    public int reduceOrderStock(String orderno,int odid,String remark) {
+    	int reduceOrderStock = 0;
+    	//获取订单数据
+    	List<Map<String,Object>> orderDetails = stockMapper.getOrderDetails(orderno,odid);
+    	Set<String> shipedCoden = Sets.newHashSet();
+    	for(Map<String,Object> m : orderDetails) {
+    		int changeType = Integer.parseInt(StrUtils.object2NumStr(m.get("change_type")));
+    		
+    		String od_id = StrUtils.object2NumStr(m.get("odid"));
+    		odid = Integer.parseInt(od_id);
+    		if(changeType > 0) {
+    			shipedCoden.add(od_id);
+    			continue;
+    		}
+    		if(shipedCoden.contains(od_id)) {
+    			continue;
+    		}
+    		String coden = StrUtils.object2Str(m.get("code_n"));
+    		int orderStock = Integer.parseInt(StrUtils.object2NumStr(m.get("yourorder")));
+    		orderno =  StrUtils.object2Str(m.get("orderid"));
+    		
+    		remark = remark.replace("orderno", orderno);
+    		remark = remark.replace("odid", StrUtils.object2NumStr(m.get("odid")));
+    		remark = remark.replace("orderStock", StrUtils.object2NumStr(m.get("yourorder")));
+    		
+    		String runSql = new StringBuilder("update overseas_warehouse_stock set order_stock=order_stock-")
+    				.append(orderStock).append(",available_stock=available_stock+")
+    				.append(orderStock).append(" where code_n='").append(coden).append("'").toString();
+    		//mq操作更新线上数据表
+    		reduceOrderStock += Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+    		if(reduceOrderStock > 0) {
+    			runSql = new StringBuilder("insert into overseas_warehouse_stock_log (ows_id,code, change_stock,od_id,orderno,change_type,remark,code_n,create_time)" )
+    					.append("values ((select id,code, from overseas_warehouse_stock where code_n='" )
+    					.append(coden).append("' limit 1),")
+    					.append(orderStock).append(", ")
+    					.append(odid).append(",'")
+    					.append(orderno).append("', 1,'")
+    					.append(remark).append("','")
+    					.append(coden).append("',now())")
+    					.toString();
+    			SendMQ.sendMsg(new RunSqlModel(runSql));
+    		}
     	}
-    	*/
-    	String runSql = new StringBuilder("update overseas_warehouse_stock set order_stock=order_stock-")
-    			.append(stock.getOrderStock()).append(",available_stock=available_stock+")
-    			.append(stock.getOrderStock()).append(" where code_n='").append(stock.getCoden()).append("'").toString();
-    	//mq操作更新线上数据表
-    	int reduceOrderStock = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
-    	if(reduceOrderStock > 0) {
-    		runSql = new StringBuilder("insert into overseas_warehouse_stock_log (ows_id,code, change_stock,od_id,orderno,change_type,remark,code_n,create_time)" )
-    				.append("values ((select id,code, from overseas_warehouse_stock where code_n='" )
-    				.append(stock.getCoden()).append("' limit 1),")
-    				.append(stock.getOrderStock()).append(", ")
-    				.append(odid).append(",'")
-    				.append(orderno).append("', 1,'")
-    				.append(remark).append("','")
-    				.append(stock.getCoden()).append("',now())")
-    				.toString();
-    		SendMQ.sendMsg(new RunSqlModel(runSql));
-    	}
-    	
         return reduceOrderStock;
     }
 	@Override

@@ -57,6 +57,7 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.service.OrderSplitRecordService;
+import com.importExpress.service.OverseasWarehouseStockService;
 import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
@@ -80,6 +81,8 @@ public class NewOrderSplitCtr {
     private IWarehouseService iWarehouseService;
     @Autowired
     private InventoryService inventoryService;
+    @Autowired
+    private OverseasWarehouseStockService owsService;
 
     /**
      * 订单拆分(正常订单和Drop Ship订单)
@@ -280,8 +283,14 @@ public class NewOrderSplitCtr {
                         json.setMessage("拆分成功");
                         json.setData(nwOrderNo);
                         if ("0".equals(state)) {
-                            // 拆单取消后取消的商品如果有使用库存则还原库存
-                        	inventoryService.cancelToInventory(odidLst, 0, "");
+                        	if(orderNo.indexOf("_H") > -1) {
+                        		for(String odid : odidLst) {
+                        			owsService.reduceOrderStock(null, Integer.parseInt(odid),  "订单orderno/odid已拆弹取消,释放其占用的库存orderStock");
+                        		}
+                        	}else {
+                        		// 拆单取消后取消的商品如果有使用库存则还原库存
+                        		inventoryService.cancelToInventory(odidLst, 0, "");
+                        	}
 //                            dao.cancelInventory(odidLst);
                         }
                     }
@@ -511,8 +520,14 @@ public class NewOrderSplitCtr {
                 // 执行退款操作:更新客户余额=新订单payprice;更新新订单状态为取消;
                 // 新增客户余额变更记录表recharge_record;新增支付记录payment
                 splitDao.cancelNewOrder(orderBeanTemp.getUserid(), nwOrderNo);
-                // 拆单取消后取消的商品如果有使用库存则还原库存
-                inventoryService.cancelToInventory(odidLst, admuser.getId(), admuser.getAdmName());
+                if(orderNo.indexOf("_H") > -1) {
+                	for(String odid : odidLst) {
+                		owsService.reduceOrderStock(null, Integer.parseInt(odid),  "订单orderno/odid已拆弹取消,释放其占用的库存orderStock");
+                	}
+                }else {
+                	// 拆单取消后取消的商品如果有使用库存则还原库存
+                	inventoryService.cancelToInventory(odidLst, admuser.getId(), admuser.getAdmName());
+                }
 //                splitDao.cancelInventory(odidLst);
                 // 5.如果是取消商品进余额，则调用统一接口进行客户余额变更
                 /*ChangUserBalanceDao balanceDao = new ChangUserBalanceDaoImpl();

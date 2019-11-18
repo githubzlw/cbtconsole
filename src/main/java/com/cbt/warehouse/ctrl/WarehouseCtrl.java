@@ -9541,18 +9541,10 @@ public class WarehouseCtrl {
 		if(logByOrderno == null || logByOrderno.isEmpty()) {
 			int owsAdd = owsService.shipoutOwsOrder(map );
 			if(owsAdd > 0) {
-				//释放占用
-				OverseasWarehouseStock stock;
-				int reduce = 0;
-				for(OverseasWarehouseStockLog l : logByOrderno) {
-					if(l.getChangeStock() == 0) {
-						continue;
-					}
-					String remark = "订单"+orderno+"/"+l.getOdid()+"已出运-"+shipno+",释放其占用的库存"+l.getChangeStock();
-					stock = OverseasWarehouseStock.builder().orderStock(l.getChangeStock()).code(l.getCode()).build();
-					reduce += owsService.reduceOrderStock(stock, orderno, l.getOdid(), remark);
-				}
-				if(logByOrderno.size()==reduce) {
+				String remark = "订单orderno/odid已出运-"+shipno+",释放其占用的库存orderStock";
+				int reduceOrderStock = owsService.reduceOrderStock(orderno, 0, remark);
+				
+				if(logByOrderno.size() == reduceOrderStock) {
 					result.put("status", 200);
 				}else {
 					result.put("status", 103);

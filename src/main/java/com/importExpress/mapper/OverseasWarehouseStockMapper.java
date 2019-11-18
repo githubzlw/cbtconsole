@@ -1,6 +1,9 @@
 package com.importExpress.mapper;
 
 import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
 
 import com.importExpress.pojo.OverseasWarehouseStock;
 import com.importExpress.pojo.OverseasWarehouseStockLog;
@@ -67,6 +70,12 @@ public interface OverseasWarehouseStockMapper {
      * @return
      */
     int getStockLogListCount(OverseasWarehouseStockParamter param);
+    
+    /**订单明细
+     * @param orderno
+     * @return
+     */
+    List<Map<String,Object>> getOrderDetails(@Param("orderno")String orderno,@Param("odid")int odid);
 
 
 }
