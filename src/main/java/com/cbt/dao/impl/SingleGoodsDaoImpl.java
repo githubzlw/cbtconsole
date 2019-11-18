@@ -17,7 +17,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SingleGoodsDaoImpl.class);
 
     @Override
-    public JsonResult saveGoods(String goodsUrl, int adminId, double goodsWeight, int drainageFlag, int goodsType, String aliPid, String aliPrice) {
+    public JsonResult saveGoods(String goodsUrl, int adminId, double goodsWeight, int drainageFlag, int goodsType, String aliPid, String aliPrice, String shopId) {
 
         JsonResult json = new JsonResult();
         Connection conn28 = DBHelper.getInstance().getConnection6();
@@ -26,8 +26,8 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         ResultSet rset = null;
         int count = 0;
         String querySql = "select count(0) from single_goods_offers where goods_pid =?";
-        String insertSql = "insert into single_goods_offers(goods_pid,good_url,set_weight,admin_id,drainage_flag,goods_type,ali_pid,ali_price)" +
-                " values(?,?,?,?,?,?,?,?) ";
+        String insertSql = "insert into single_goods_offers(goods_pid,good_url,set_weight,admin_id,drainage_flag,goods_type,ali_pid,ali_price,set_shop_id)" +
+                " values(?,?,?,?,?,?,?,?,?) ";
 
         try {
             String pid = goodsUrl.substring(goodsUrl.lastIndexOf("/") + 1, goodsUrl.indexOf(".html"));
@@ -52,6 +52,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
                 stmtSql.setInt(6, goodsType);
                 stmtSql.setString(7, aliPid);
                 stmtSql.setString(8, aliPrice);
+                stmtSql.setString(9,shopId);
                 count = stmtSql.executeUpdate();
                 if (count > 0) {
                     json.setOk(true);

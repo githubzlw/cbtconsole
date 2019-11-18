@@ -262,6 +262,11 @@ public class SingleGoodsController {
                 goodsUrl = goodsUrl.substring(0, goodsUrl.indexOf("?"));
             }
         }
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            json.setErrorInfo("获取店铺ID失败");
+            return json;
+        }
         String goodsWeight = request.getParameter("goodsWeight");
         if (goodsWeight == null || "".equals(goodsWeight)) {
             json.setOk(false);
@@ -272,14 +277,14 @@ public class SingleGoodsController {
         int drainageFlag = 0;
         String drainageFlagStr = request.getParameter("drainageFlag");
         if (StringUtils.isNotBlank(drainageFlagStr)) {
-            drainageFlag = Integer.valueOf(drainageFlagStr);
+            drainageFlag = Integer.parseInt(drainageFlagStr);
         }
 
 
         int goodsType = 0;
         String goodsTypeStr = request.getParameter("goodsType");
         if (StringUtils.isNotBlank(goodsTypeStr)) {
-            goodsType = Integer.valueOf(goodsTypeStr);
+            goodsType = Integer.parseInt(goodsTypeStr);
         }
 
         String aliPid = request.getParameter("aliPid");
@@ -299,7 +304,7 @@ public class SingleGoodsController {
 
         try {
 
-            json = sgGsService.saveGoods(goodsUrl, admuser.getId(), Double.valueOf(goodsWeight),drainageFlag,goodsType,aliPid,aliPrice);
+            json = sgGsService.saveGoods(goodsUrl, admuser.getId(), Double.parseDouble(goodsWeight),drainageFlag,goodsType,aliPid,aliPrice, shopId);
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("插入商品失败，原因 :" + e.getMessage());

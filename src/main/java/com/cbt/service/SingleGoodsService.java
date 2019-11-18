@@ -19,7 +19,7 @@ public interface SingleGoodsService {
 	 * @return
 	 * @return JsonResult
 	 */
-	public JsonResult saveGoods(String goodsUrl, int adminId, double goodsWeight, int drainageFlag, int goodsType, String aliPid, String aliPrice);
+	public JsonResult saveGoods(String goodsUrl, int adminId, double goodsWeight, int drainageFlag, int goodsType, String aliPid, String aliPrice, String shopId);
 
 	/**
 	 *
