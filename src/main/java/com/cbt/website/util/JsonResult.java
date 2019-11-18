@@ -35,6 +35,18 @@ public class JsonResult implements Serializable {
 
 	String batch;// 批次
 	Object allData;
+
+	public void setErrorInfo(String message){
+		this.ok = false;
+		this.message = message;
+	}
+
+	public void setSuccess(String message){
+		this.ok = true;
+		this.message = message;
+	}
+
+
 	public Object getAllData() {
 		return allData;
 	}
