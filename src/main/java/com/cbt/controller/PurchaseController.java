@@ -1168,7 +1168,7 @@ public class PurchaseController {
 				String[] splitList = orderno.split("_");
 				if (splitList != null && splitList.length > 1 && splitList[1].length() > 3 && splitList[0].contains(splitList[1])) {
 					// 判断补货订单
-					isUpdate = 1;
+					isUpdate = 2;
 				}
 			}
 			if (isUpdate > 0) {
@@ -1177,12 +1177,14 @@ public class PurchaseController {
 					iOrderinfoService.updateOrderSplitNumGoodsDistribution(orderno);
 					// 详情数据处理
 					iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderno.substring(0, orderno.indexOf("_")), orderno);
-					// 数量拆单采购数据处理
-					iOrderinfoService.updateOrderSplitNumPurchaseData(orderno);
-					// 数量拆单入库数据处理
-					iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderno);
 					// 数量拆单商品备注沟通数据处理
 					iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderno);
+					if(isUpdate == 1){
+						// 数量拆单采购数据处理
+						iOrderinfoService.updateOrderSplitNumPurchaseData(orderno);
+						// 数量拆单入库数据处理
+						iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderno);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 					LOG.error("updateOrderSplitNumOrderDetailsData error:", e);
