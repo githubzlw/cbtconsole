@@ -251,8 +251,13 @@ public class NewOrderDetailsCtr {
 			Map<String,Double> shopShippingCostMap= new HashedMap();
 			Double ShippingCost = 0d;
 			shopShippingCostMap.put("shopShippingCost",0d);
+			int overSeaTotal = 0;
 			for (int i = 0; i < odb.size(); i++) {
 				OrderDetailsBean o = odb.get(i);
+				if(o.getIsOverseasWarehouseProduct() > 0){
+				    overSeaTotal ++;
+				    o.setOverSeaFlag(1);
+                }
 				if(orderNo.contains("_SN") && distributionList != null && !distributionList.isEmpty()){
 					for (GoodsDistribution distribution : distributionList) {
 						if(distribution.getGoodsid().equals(String.valueOf(o.getGoodsid()))){
@@ -278,7 +283,7 @@ public class NewOrderDetailsCtr {
 				if(o.getIs_sold_flag() != 0){
 					feeWeight+=o.getOd_total_weight();
 				}
-				// 海外仓标识
+				/*// 海外仓标识
 				List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(o.getGoods_pid());
 				if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
 					Long count = goodsOverSeaList.stream().filter(e-> e.getIsSupport() > 0).count();
@@ -286,7 +291,7 @@ public class NewOrderDetailsCtr {
 						o.setOverSeaFlag(1);
 					}
 					goodsOverSeaList.clear();
-				}
+				}*/
 			}
 			distributionList.clear();
 			if(updistributionList.size() > 0){
@@ -420,6 +425,7 @@ public class NewOrderDetailsCtr {
 			if (str_oid.length() > 0) {
 				str_oid = str_oid.substring(0, str_oid.length() - 1);
 			}
+			request.setAttribute("overSeaTotal", overSeaTotal);
 			request.setAttribute("str_oid", str_oid);
 			request.setAttribute("shipMethod", shipMethod);
 			request.setAttribute("orderNo", orderNo);
