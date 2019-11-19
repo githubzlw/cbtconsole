@@ -139,7 +139,7 @@ public class NewOrderDetailsCtr {
 		int isUpdate = 0;
 		if (orderNo.contains("_SN") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)) {
 			isUpdate = 1;
-		} else if (orderNo.contains("_") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)) {
+		} else if (orderNo.contains("_")) {
 			String[] splitList = orderNo.split("_");
 			if (splitList != null && splitList.length > 1 && splitList[1].length() > 3 && splitList[0].contains(splitList[1])) {
 				// 判断补货订单
