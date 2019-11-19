@@ -753,17 +753,7 @@ public class NewOrderSplitCtr {
             List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
             boolean noOverSea = false;
             for(OrderDetailsBean o : odb){
-                List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(o.getGoods_pid());
-                if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
-                    Long count = goodsOverSeaList.stream().filter(e-> e.getIsSupport() > 0).count();
-                    if(count > 0){
-                        o.setOverSeaFlag(1);
-                    }else{
-                        noOverSea = true;
-                        break;
-                    }
-                    goodsOverSeaList.clear();
-                } else{
+                if(o.getIsOverseasWarehouseProduct() == 0){
                     noOverSea = true;
                     break;
                 }

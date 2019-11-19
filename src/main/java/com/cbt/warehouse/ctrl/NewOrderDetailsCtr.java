@@ -2597,21 +2597,8 @@ public class NewOrderDetailsCtr {
 			// 订单商品详情
 			List<OrderDetailsBean> odbList = iOrderinfoService.getOrdersDetails(orderNo);
 
-			List<OrderDetailsBean> nwOdbList = new ArrayList<>();
-			List<GoodsOverSea> goodsOverSeaList;
-			if(CollectionUtils.isNotEmpty(odbList)){
-				for(OrderDetailsBean orderDetailsBean: odbList){
-					goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(orderDetailsBean.getGoods_pid());
-					if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
-						Long count = goodsOverSeaList.stream().filter(e-> e.getIsSupport() > 0).count();
-						if(count > 0){
-							orderDetailsBean.setOverSeaFlag(1);
-							nwOdbList.add(orderDetailsBean);
-						}
-					}
-				}
-			}
-
+			List<OrderDetailsBean> nwOdbList = odbList.stream().filter(e-> e.getIsOverseasWarehouseProduct() > 0)
+					.collect(Collectors.toList());
 			odbList.clear();
 
 			request.setAttribute("odList", nwOdbList);
