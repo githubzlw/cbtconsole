@@ -4425,6 +4425,7 @@ public class WarehouseCtrl {
 			bf.append("<option value='yodel'>yodel</option>");
 			bf.append("<option value='zto'>中通</option>");
 			bf.append("<option value='迅邮'>迅邮</option>");
+			bf.append("<option value='usps'>USPS</option>");
 			bf.append("</select><script>$('#logistics_name_"+forwarder.getId()+"').val('"+forwarder.getTransportcompany()+"');</script>");
 			forwarder.setTransportcompany(bf.toString());
 			bf.setLength(0);
