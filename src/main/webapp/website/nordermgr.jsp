@@ -346,10 +346,10 @@ function fn(va) {
 		uemail = user.email;
         var emailFlag = json[i].emailFlag;
 		if(adminName=="ling"){
-		    var html_="<td style='"+show_changeState+"'><a target='_blank' href='javascript:void(0)' "
-                +"onclick='window.open(\"/cbtconsole/website/updateorderstate.jsp?orderNo="
-                + json[i].order_no+ "&state="+ state + "\",\"windows\",\"height=280,width=530,"
-                +"top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no\")'>修改</a>";
+		    var html_="<td style='"+show_changeState+"'><button "
+                +"onclick=\"window.open('/cbtconsole/website/updateorderstate.jsp?orderNo="
+                + json[i].order_no+ "&state="+ state + "','windows','height=280,width=530,"
+                +"top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no')\">修改</button>";
 		    if(checkType == "checkOrder"){
 		        if(emailFlag>0){
                     html_+="<br><a target='_blank' style='color:red'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
