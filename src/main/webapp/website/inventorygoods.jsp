@@ -124,7 +124,7 @@ em,i{font-style: normal;}
 .tc3 .other{position: absolute;top:15px;right:-222px;}
 .tc3 .wrap8{text-align: center;}
 .tc3 .wrap8 button{border:1px solid #999;background-color:#fff;padding:0 80px; line-height:28px;border-radius: 4px;}
-
+.warring-a{font-weight: bold;color: red;}
 .c_img{width: 100px;height: 100px;}
 .report .btn_page_in{width:100px;}
 .query_state{width: 500px;}
@@ -176,9 +176,9 @@ em,i{font-style: normal;}
 					<td style="width: 300px;">
 					产品ID:
 					<br>
-					${b. goodsPid}(订单)
+					${b.goodsPid}(订单)
 					<br>
-					${b. iskSGoodsPid}(库存)
+					${b.iskSGoodsPid}(库存)
 					<br>
 					产品名称:${b.iskGoodsName }
 					</td>
@@ -234,10 +234,20 @@ em,i{font-style: normal;}
 					<br>
 					<br>
 					<c:if test="${b.ibState== 4 || b.ibState== 5}">取消原因:${b.ibRemark }</c:if>
-					</td>
-					<td>
-					<c:if test="${b.ibState== 0}"><button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },0)">移出库存</button></c:if>
-					<c:if test="${b.ibState== 1}"><button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },1)">移入库存</button></c:if>
+				</td>
+
+				<td>
+	   <c:if test="${b.ibState== 0}">
+	   				<c:if test="${b.returnOrderNum>0 }">
+					<a href="/cbtconsole/website/ReturnDisplay.jsp?pid=${b.iskSGoodsPid}" target="_blank" class="warring-a">该库存可能有退货，请去退货管理页面人为确认后再继续操作</a>
+					</c:if>
+	   <button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },0)">移出库存</button></c:if>
+					<c:if test="${b.ibState== 1}">
+					<c:if test="${b.returnOrderNum>0 }">
+					<a href="/cbtconsole/website/ReturnDisplay.jsp?skuid=${b.iskSkuid}" target="_blank" class="warring-a">该库存可能有退货，请去退货管理页面人为确认后再继续操作</a>
+					</c:if>
+					<button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },1)">移入库存</button>
+					</c:if>
 					<c:if test="${b.ibState== 0 || b.ibState== 1}"><br><br><button class="btn btn-info btn-cancel" onclick="cancelInOut(${index.index},${b.ibid},${b.liid },${b.ibState})"> 取消操作 </button></c:if>
 					</td>
 					</tr>
@@ -391,7 +401,7 @@ function inoutInventory(index,ibid,liid,inorout){
 		orderbarcode = $(".order_barcode_"+index).text();
 	}
 	jQuery.ajax({
-		 url:"/cbtconsole/inventory/barcode/update",
+		 url:"/cbtconsole/inventory/barcode/move",
 		 data:{
 	    	   "ibid":ibid,
 	    	   "liid":liid,

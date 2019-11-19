@@ -132,6 +132,18 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private int isShowDetImgFlag;
 
     private int overSeaFlag;
+    /**
+     * earchable用于可搜索   1是可搜索  0是不可搜索   默认为0
+     */
+    private int searchable;
+
+    public int getSearchable() {
+        return searchable;
+    }
+
+    public void setSearchable(int searchable) {
+        this.searchable = searchable;
+    }
 
     public int getOverSeaFlag() {
         return overSeaFlag;

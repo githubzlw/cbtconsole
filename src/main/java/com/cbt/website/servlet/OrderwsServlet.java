@@ -32,6 +32,9 @@ import com.cbt.website.dao2.IWebsiteOrderDetailDao;
 import com.cbt.website.dao2.WebsiteOrderDetailDaoImpl;
 import com.cbt.website.service.*;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.importExpress.service.OverseasWarehouseStockService;
+import com.importExpress.service.impl.OverseasWarehouseStockServiceImpl;
+
 import net.minidev.json.JSONArray;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -55,6 +58,7 @@ import java.util.*;
  */
 public class OrderwsServlet extends HttpServlet {
 	private InventoryService inventoryService = new InventoryServiceImpl();
+	private OverseasWarehouseStockService owsService = new OverseasWarehouseStockServiceImpl();
 
 	private static final long serialVersionUID = 1L;
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderwsServlet.class);
@@ -1674,7 +1678,11 @@ public class OrderwsServlet extends HttpServlet {
 				res = orderwsServer.closeOrder(orderNo);
 				if(res>0){
 					//释放该订单占用的库存
-					inventoryService.cancelOrderToInventory(mainOrderNo, adminId, "");
+					if(mainOrderNo.indexOf("_H")>-1) {
+						owsService.reduceOrderStock(mainOrderNo, 0,  "订单orderno/odid已取消,释放其占用的库存orderStock");
+					}else {
+						inventoryService.cancelOrderToInventory(mainOrderNo, adminId, "");
+					}
 //					orderwsServer.cancelInventory(mainOrderNo);
 				}
 				// 修改dropshiporder表状态
@@ -1870,7 +1878,11 @@ public class OrderwsServlet extends HttpServlet {
 			res = orderwsServer.closeOrder(orderNo);
 			if(res>0){
 				//释放该订单占用的库存
-				inventoryService.cancelOrderToInventory(orderNo, adminId, "");
+				if(orderNo.indexOf("_H")>-1) {
+					owsService.reduceOrderStock(orderNo, 0,  "订单orderno/odid已取消,释放其占用的库存orderStock");
+				}else {
+					inventoryService.cancelOrderToInventory(orderNo, adminId, "");
+				}
 //				orderwsServer.cancelInventory(orderNo);
 			}
 			int userId = Integer.parseInt(request.getParameter("userId"));

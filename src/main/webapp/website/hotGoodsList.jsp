@@ -550,7 +550,7 @@
                 if (webType == 2) {
                     url = "https://www.kidsproductwholesale.com/goodslist?background=1&hotid=";
                 } else if (webType == 3){
-                    url = "https://www.lovelypetsupply.com/goodslist?background=1&hotid=";
+                    url = "https://www.petstoreinc.com/goodslist?background=1&hotid=";
                 } else if (webType == 4){
                     url = "https://www.restaurantkitchenequipments.com/goodslist?background=1&hotid=";
                 }

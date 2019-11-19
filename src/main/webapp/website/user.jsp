@@ -279,7 +279,7 @@ tr .td_class{width:230px;}
     }
 
     function openRecommendEmail(userId, site) {
-
+		$("#history_id").empty();
 		$.ajax({
 			type:'post',
 			url:'../userinfo/getUserAllInfoById',
@@ -313,9 +313,10 @@ tr .td_class{width:230px;}
 								content += '<td><a href="'+jsonList[i].sendUrl+'">链接</a></td>';
 								content += '</tr>';
 							}
-							$("#history_id").empty();
 							$("#history_id").append(content);
 							$("#history_table").show();
+						}else {
+							$("#history_table").hide();
 						}
 						$("#send_recommend_id").window('open');
 					}else{
@@ -368,6 +369,11 @@ tr .td_class{width:230px;}
 			return;
 		}
 
+	}
+
+	function openContent() {
+		var url = "/cbtconsole/catalog/list";
+		window.open(url);
 	}
 
 	function userlogin(userid, name, currency) {
@@ -719,7 +725,7 @@ tr .td_class{width:230px;}
             <span>kidsproductwholesale</span>
             <br /><br />
             <input type='radio' name='site' value='3'/>
-            <span>lovelypetsupply</span>
+            <span>petstoreinc</span>
             <br /><br />
         </div>
         <div style="margin-left: 260px;">
@@ -761,7 +767,7 @@ tr .td_class{width:230px;}
 			<input id="user_goods_require" style="width: 280px;"/></td>
 			</tr>
 			<tr>
-				<td>目录地址:</td><td><input id="send_url" style="width: 280px;"/><button>生成目录</button></td>
+				<td>目录地址:</td><td><input id="send_url" style="width: 280px;"/><button onclick="openContent()">生成目录</button></td>
 			</tr>
 			<tr>
 				<td>推送邮箱:</td><td><input id="sell_email" style="width: 280px;"/></td>

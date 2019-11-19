@@ -21,7 +21,7 @@ public class SearchFileUtils {
     //线上服务器地址
     public static String importexpressPath = "https://www.import-express.com";
     public static String kidsPath = "https://www.kidsproductwholesale.com";
-    public static String petsPath = "https://www.lovelypetsupply.com";
+    public static String petsPath = "https://www.petstoreinc.com";
     public static String restaurantPath = "https://www.restaurantkitchenequipments.com";
 
     //上传及访问路径

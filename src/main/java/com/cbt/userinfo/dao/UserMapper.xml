@@ -127,13 +127,15 @@
     <select id="queryRecommendEmailInfo" resultType="com.importExpress.pojo.UserRecommendEmail">
         select a.id,a.user_id as userId,a.email_content as emailContent,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,a.send_url as sendUrl,
-        a.admin_id as adminId,b.admName as adminName
-        from user_recommend_email a,admuser b where a.admin_id = b.id and a.user_id = #{userId}
+        a.admin_id as adminId,b.admName as adminName,a.catalog_id as catalogId,if(ifnull(c.id,0) > 0,1,0) as openFlag
+        from user_recommend_email a inner join admuser b on a.admin_id = b.id
+		left join recommend_catalog_record c on a.user_id = c.user_id and a.catalog_id = c.catalog_id
+        where  a.user_id = #{userId}
     </select>
 
     <insert id="insertIntoUserRecommendEmail" parameterType="com.importExpress.pojo.UserRecommendEmail">
-        insert into user_recommend_email(user_id,email_content,send_url,admin_id)
-        values(#{userId},#{emailContent},#{sendUrl},#{adminId})
+        insert into user_recommend_email(user_id,email_content,send_url,admin_id,catalog_id)
+        values(#{userId},#{emailContent},#{sendUrl},#{adminId},#{catalogId})
     </insert>
 
     <select id="getUserInfoById" resultType="hashmap">
@@ -143,12 +145,14 @@
     <select id="queryBusinessMembershipAuthorization" parameterType="com.cbt.website.bean.UserInfo"
             resultType="com.cbt.website.bean.UserInfo">
         select a.id as userid,a.email,DATE_FORMAT(a.createtime,'%Y-%m-%d %H:%i:%S') as creattime,b.businessinfo, d.country as zone,
-        b.productone,b.producttwo,b.requirementone,b.requirementtwo, ifnull(c.flag,0) as authFlag,a.site,
+        b.productone,b.producttwo,b.requirementone,b.requirementtwo, ifnull(c.flag,0) as authFlag,a.site,ad.admin_name as adminname,
         CAST(ifnull((select sum(googs_price * googs_number) from shop_car_marketing where userid =  a.id ),0) AS DECIMAL(11, 2)) as shopCarAmount,
         CAST((select ifnull(sum(pay_price),0) from orderinfo where user_id = a.id and state in(1,2,3,4,5)) AS DECIMAL(11, 2)) as historyAmount,
         DATE_FORMAT(b.application_time,'%Y-%m-%d %H:%i:%S') as applicationTime
         from user a inner join user_regist_info b on a.id  = b.userid left join user_checkout c on a.id = c.id
         left join zone d on a.countryId = d.id
+        left join (select admuser.id as admin_id,admuser.admName as admin_name,admin_r_user.userid from admuser , admin_r_user
+            where admuser.id = admin_r_user.adminid) ad on a.id  = ad.userid
         where 1=1
         <if test="userid > 0">
             and a.id = #{userid}
@@ -161,6 +165,20 @@
         </if>
         <if test="authFlag != null and authFlag > -1">
             and c.flag = #{authFlag}
+        </if>
+        <if test="adminId > 0">
+            and ad.admin_id = #{adminId}
+        </if>
+        <if test="site != null and site > -1">
+            <if test="site == 1">
+                and a.site in(0,1)
+            </if>
+            <if test="site == 2">
+                and a.site in(2,3)
+            </if>
+            <if test="site == 3">
+                and a.site = 4
+            </if>
         </if>
         order by b.application_time desc
         <if test="limitNum > 0">
@@ -172,6 +190,8 @@
         select count(0) from user a inner join user_regist_info b on a.id  = b.userid
         left join user_checkout c on a.id = c.id
         left join zone d on a.countryId = d.id
+        left join (select admuser.id as admin_id,admuser.admName as admin_name,admin_r_user.userid from admuser , admin_r_user
+            where admuser.id = admin_r_user.adminid) ad on a.id  = ad.userid
         where 1=1
         <if test="userid > 0">
             and a.id = #{userid}
@@ -184,6 +204,20 @@
         </if>
         <if test="authFlag != null and authFlag > -1">
             and c.flag = #{authFlag}
+        </if>
+        <if test="adminId > 0">
+            and ad.admin_id = #{adminId}
+        </if>
+        <if test="site != null and site > -1">
+            <if test="site == 1">
+                and a.site in(0,1)
+            </if>
+            <if test="site == 2">
+                and a.site in(2,3)
+            </if>
+            <if test="site == 3">
+                and a.site = 4
+            </if>
         </if>
     </select>
 

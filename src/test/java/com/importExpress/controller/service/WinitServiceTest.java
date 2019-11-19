@@ -19,18 +19,18 @@ public class WinitServiceTest {
 	@Autowired
 	private WinitService winitService;
 
-	@Test
+	/*@Test
 	public void queryWarehouse() {
 		List<WarehouseWrap> queryWarehouse = winitService.queryWarehouse();
 		queryWarehouse.stream().forEach(w->System.err.println(w.toString()));
 		
-	}
+	}*/
 	@Test
 	public void queryInventory() {
-		List<WarehouseWrap> queryWarehouse = winitService.queryWarehouse();
-		for(WarehouseWrap w : queryWarehouse) {
-			winitService.queryInventory(w);
-		}
+		WarehouseWrap wrap = WarehouseWrap.builder().code("US0001").id("1000008").build();
+		int syncCount = winitService.queryInventory(wrap);
+		
+		System.out.println("syncCount:"+syncCount);
 		
 	}
 

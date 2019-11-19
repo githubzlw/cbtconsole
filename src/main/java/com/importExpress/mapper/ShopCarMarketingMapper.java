@@ -130,4 +130,11 @@ public interface ShopCarMarketingMapper {
      * @return
      */
     int checkIsDistribution(@Param("userId") int userId, @Param("adminId") int adminId);
+
+    /**
+     * 获取跟进信息
+     * @param userId
+     * @return
+     */
+    List<ShopCarFollow> queryFollowInfoByUserId(@Param("userId") int userId);
 }

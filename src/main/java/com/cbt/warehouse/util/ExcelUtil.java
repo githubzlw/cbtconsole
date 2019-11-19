@@ -1,5 +1,6 @@
 package com.cbt.warehouse.util;
 
+import com.cbt.util.DateFormatUtil;
 import com.cbt.util.WebTool;
 import com.cbt.warehouse.pojo.Mabangshipment;
 import com.cbt.warehouse.pojo.Shipment;
@@ -317,8 +318,12 @@ public class ExcelUtil {
 						if (netIndex != null) {
 							shipMent.setTransporttype(getCellValue(currentRow.getCell(netIndex), true));
 						}
-						Date javaDate = HSSFDateUtil.getJavaDate(currentRow.getCell(sentTimeIndex).getNumericCellValue());
-						shipMent.setSenttime(javaDate);
+						// Date javaDate = HSSFDateUtil.getJavaDate(currentRow.getCell(sentTimeIndex).getNumericCellValue());
+						String tempDate = currentRow.getCell(sentTimeIndex).getStringCellValue();
+						if(StringUtils.isNotBlank(tempDate)){
+							shipMent.setSenttime(DateFormatUtil.getDateByTimeStr(tempDate));
+						}
+
 						if (countryIndex != null) {
 							shipMent.setCountry(getCellValue(currentRow.getCell(countryIndex), true));
 						}
@@ -327,7 +332,7 @@ public class ExcelUtil {
 						}
 						if (numbersIndex != null) {
 							String numbers = getCellValue(currentRow.getCell(numbersIndex), true);
-							shipMent.setNumbers(WebTool.isEmpty(numbers) == true ? 0 : Integer.parseInt(numbers));
+							shipMent.setNumbers(WebTool.isEmpty(numbers) ? 0 : Integer.parseInt(numbers));
 						}
 						if (weightIndex != null) {
 							String weight = getCellValue(currentRow.getCell(weightIndex), true).trim();

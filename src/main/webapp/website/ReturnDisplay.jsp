@@ -85,8 +85,9 @@ $(function(){
 		}
 	}
 	setDatagrid();
+    pid= '<%=request.getParameter("pid")%>'
 	var opts = $("#easyui-datagrid").datagrid("options");
-	opts.url = "/cbtconsole/Look/LookReturnOrder?mid=0";
+	opts.url = "/cbtconsole/Look/LookReturnOrder?mid=0&pid="+pid;
 	orderid = '<%=orderid%>';
 	if(orderid!==null && orderid!="null"){
 		$("#orderid").textbox('setValue',orderid);
@@ -125,6 +126,8 @@ function doQuery(page) {
 	var optTimeEnd = $("#optTimeEnd").val();
     var shipno = $("#shipno").val();
     var order = $("#order").val();
+    var pid = $("#pid").val();
+    var skuid = $("#skuid").val();
      var state = $('#state option:selected') .val();
 	$("#easyui-datagrid").datagrid("load", {
 		location_type : location_type,
@@ -133,6 +136,8 @@ function doQuery(page) {
 		optTimeEnd:optTimeEnd,
 		shipno:shipno,
         order:order,
+        pid2:pid,
+        skuid:skuid,
 		state:state
 	});
 }
@@ -142,12 +147,13 @@ function doReset(){
 	$("#optTimeStart").val('');
     $("#shipno").textbox('setValue','');
     $("#order").textbox('setValue','');
+    $("#pid").textbox('setValue','');
 	$("#optTimeEnd").val('');
 	$("#state").textbox('setValue','-2');
 }
 
 function resetLocation(barcode,short_term){
-	   $.ajax({
+    $.ajax({
 			type:"post", 
 			url:"/cbtconsole/Look/LookReturnOrder?mid=0",
 			dataType:"text",                                                      
@@ -415,6 +421,8 @@ function rejectedok(page) {
 				</select>
 				<input class="easyui-textbox" name="shipno" id="shipno" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'运单号:'">
 				<input class="easyui-textbox" name="order" id="order" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'客户订单号:'">
+				<input class="easyui-textbox" name="pid" id="pid" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'pid:'">
+				<input class="easyui-textbox" name="skuid" id="skuid" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'skuid:'" value="${param.skuid }">
 				<%--<input class="easyui-textbox" value="列:2019-01-17" name="optTimeStart" id="optTimeStart" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'发起时间:'">--%>
 				<%--<input class="easyui-textbox" value="列:2019-01-17" name="optTimeEnd" id="optTimeEnd" style="width:15%;"  data-options="label:'结束时间:',events:{blur:blurs,focus:focus},">--%>
 				时间：<input id="optTimeStart" class="Wdate"

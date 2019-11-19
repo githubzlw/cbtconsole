@@ -37,7 +37,7 @@
 				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid" value="${stockParamter.goodsPid }"></label>
 				<label>SKUID：<input type="text" class="form-control" id="query_goods_skuid" value="${stockParamter.skuid }"></label>
 				<label><button class="btn btn-info query_button"  id="query_button">查询</button></label>
-				<label><a href="/cbtconsole/inventory/check/list"><button class="btn btn-warning">核对库存</button></a></label>
+				<label><button class="btn btn-warning btn-check-stock">核对库存</button></label>
 			</div>
 		</div>
 		<div class="row mt20 row2">
@@ -67,12 +67,12 @@
 						<td class="datagrid-goodsPid">${stock.goodsPid}</td>
 						<td class="datagrid-goodsName">${stock.goodsName}</td>
 						<td align="left" class="datagrid-sku">
-						${stock.sku}<br>${stock.skuid}<br>${stock.specid}
+						${stock.sku=='null'?'':stock.sku}<br>${stock.skuid}<br>${stock.specid}
 						</td>
 						<td class="datagrid-pc"></td>
 						<td class="datagrid-ow-stock">${stock.owStock}</td>
 						<td class="datagrid-available-stock">${stock.availableStock}</td>
-						<td class="datagrid-remark">${stock.remark}</td>
+						<td class="datagrid-remark">${stock.remark=='null'?'':stock.remark}</td>
 						<td>
 						<button class="btn btn-warning btn-detail" name="${stock.id}">明细</button>
 						<br>

@@ -636,6 +636,36 @@ public class UserController {
             json.setMessage("获取销售邮箱失败");
             return json;
         }
+        int catalogIdInt = 0;
+
+        // https://www.kidsproductwholesale.com/apa/recatalog.html?id=2
+        String urlStr = sendUrl.substring(sendUrl.indexOf("?") + 1);
+        String[] andList = urlStr.split("&");
+        if(andList.length > 0){
+            int count = 0;
+            String[] tempStrs ;
+            for(String andCl : andList){
+                if(!andCl.contains("=")){
+                    continue;
+                }
+                tempStrs = andCl.split("=");
+                if(tempStrs.length == 2){
+                    if("id".equals(tempStrs[0])){
+                        catalogIdInt = Integer.parseInt(tempStrs[1]);
+                    }
+                    break;
+                }
+            }
+            if(catalogIdInt == 0){
+                json.setOk(false);
+                json.setMessage("获取链接数据异常");
+                return json;
+            }
+        } else {
+            json.setOk(false);
+            json.setMessage("推送链接数据异常");
+            return json;
+        }
 
         com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
         if (admuser == null) {
@@ -651,7 +681,15 @@ public class UserController {
             sendMap.put("goodsNeed",goodsNeed);
             sendMap.put("goodsRequire",goodsRequire);
             sendMap.put("sendUrl",sendUrl);
-            sendMap.put("webSite",webSite);
+            if("0".equals(webSite) || "1".equals(webSite)){
+                sendMap.put("webSite","1");
+            }else if("2".equals(webSite) || "3".equals(webSite)){
+                sendMap.put("webSite","2");
+            }else if("4".equals(webSite)){
+                sendMap.put("webSite","3");
+            }else{
+                sendMap.put("webSite","1");
+            }
 
             String title = "Our Recommendation";
             sendMap.put("title",title);
@@ -666,6 +704,7 @@ public class UserController {
             userRecommendEmail.setSendUrl(sendUrl);
             userRecommendEmail.setEmailContent(sendMap.toString());
             userRecommendEmail.setUserId(userId);
+            userRecommendEmail.setCatalogId(catalogIdInt);
 
             userInfoService.insertIntoUserRecommendEmail(userRecommendEmail);
 
@@ -682,9 +721,16 @@ public class UserController {
     @RequestMapping(value = "/queryMemAuthList", method = RequestMethod.POST)
     @ResponseBody
     public EasyUiJsonResult queryBusinessMembershipAuthorization(HttpServletRequest request,
-                               Integer page , Integer rows, Integer userId, String email, Integer countryId, Integer authFlag) {
+                                            Integer page , Integer rows, Integer userId, String email,
+                                            Integer countryId, Integer authFlag, Integer site) {
         EasyUiJsonResult json = new EasyUiJsonResult();
 
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if(admuser == null || admuser.getId() == 0){
+            json.setSuccess(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
 
         UserInfo userInfo = new UserInfo();
         if(page == null || page == 0){
@@ -704,8 +750,16 @@ public class UserController {
         userInfo.setCountryId(countryId);
         userInfo.setAuthFlag(authFlag);
 
+        if(site == null || site < -1){
+            site = -1;
+        }
+        userInfo.setSite(site);
+
         try {
 
+            if(admuser.getRoletype() > 0){
+                userInfo.setAdminId(admuser.getId());
+            }
 
             List<UserInfo> list= userInfoService.queryBusinessMembershipAuthorization(userInfo);
 

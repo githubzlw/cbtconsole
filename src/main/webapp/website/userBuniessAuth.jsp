@@ -107,7 +107,7 @@
                     padding: '8 8 10 8'
                 },
                 onLoadError: function () {
-                    $.message.alert("提示信息", "获取数据信息失败");
+                    $.messager.alert("提示信息", "获取数据信息失败");
                     return;
                 },
                 onLoadSuccess: function (data) {
@@ -181,7 +181,8 @@
                 "userId": userId,
                 "email": email,
                 "countryId": countryId,
-                "authFlag": authFlag
+                "authFlag": authFlag,
+                "site": 1
             };
             if (flag > 0) {
                 $("#user_easyui-datagrid").datagrid("load", param);
@@ -196,6 +197,14 @@
             content += '<br><span>邮箱:' + row.email + '</span>';
             content += '<br><span>国家:' + row.zone + '</span>';
             content += '<br><span>注册时间:' + row.creattime + '</span>';
+            if(row.site == 0 || row.site == 1){
+                content += '<br><span>网站:Import</span>';
+            }else if(row.site == 2 || row.site == 3){
+                content += '<br><span>网站:KIDS</span>';
+            }else if(row.site == 4){
+                content += '<br><span>网站:PETS</span>';
+            }
+            content += '<br><span>销售:' + row.admuser + '</span>';
             return content;
         }
 
@@ -286,7 +295,7 @@
         }
 
         function openRecommendEmail(userId, site) {
-
+            $("#history_id").empty();
             $.ajax({
                 type: 'post',
                 url: '../userinfo/getUserAllInfoById',
@@ -317,12 +326,19 @@
                                     content += '<tr>';
                                     content += '<td>时间:' + jsonList[i].createTime + '</td>';
                                     content += '<td>推送人:' + jsonList[i].adminName + '</td>';
+                                    if(jsonList[i].openFlag > 0){
+                                        content += '<td>打开</td>';
+                                    }else {
+                                        content += '<td>未打开</td>';
+                                    }
                                     content += '<td><a href="' + jsonList[i].sendUrl + '">链接</a></td>';
                                     content += '</tr>';
                                 }
-                                $("#history_id").empty();
+
                                 $("#history_id").append(content);
                                 $("#history_table").show();
+                            }else{
+                                $("#history_table").hide();
                             }
                             $("#send_recommend_id").dialog('open');
                         } else {
@@ -366,7 +382,7 @@
                         if (data.ok) {
                             closeSend();
                         } else {
-                            alert("执行报错");
+                            alert(data.message);
                         }
                     }
                 });
@@ -375,6 +391,11 @@
                 return;
             }
 
+        }
+
+        function openContent() {
+            var url = "/cbtconsole/catalog/list";
+            window.open(url);
         }
 
     </script>
@@ -414,7 +435,7 @@
      style="width:600px;height:420px;display: none;font-size: 16px;">
     <table align="center">
         <tr>
-            <td>用户邮箱:</td>
+            <td>客户邮箱:</td>
             <td>
                 <input id="send_user_id" value="0" style="display: none"/>
                 <input id="send_web_site" value="-1" style="display: none"/>
@@ -437,11 +458,11 @@
         <tr>
             <td>目录地址:</td>
             <td><input id="send_url" style="width: 330px;"/>
-                <button class="enter_btn">生成目录</button>
+                <button class="enter_btn" onclick="openContent()">生成目录</button>
             </td>
         </tr>
         <tr>
-            <td>推送邮箱:</td>
+            <td>销售邮箱:</td>
             <td><input id="sell_email" style="width: 330px;"/></td>
         </tr>
         <tr>

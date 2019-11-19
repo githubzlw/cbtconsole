@@ -40,10 +40,12 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.GoodsOverSea;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.OrderSplitChild;
+import com.importExpress.pojo.OverseasWarehouseStock;
 import com.importExpress.pojo.PurchaseInfoBean;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.OrderSplitRecordService;
+import com.importExpress.service.OverseasWarehouseStockService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.MultiSiteUtil;
@@ -97,6 +99,8 @@ public class NewOrderDetailsCtr {
 	@Autowired
 	private InventoryService inventoryService;
 	@Autowired
+	private OverseasWarehouseStockService owsService;
+	@Autowired
     private CustomGoodsService customGoodsService;
 	/**
 	/**
@@ -132,21 +136,36 @@ public class NewOrderDetailsCtr {
 			}
 		}
 
-		if(orderNo.contains("_SN") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)){
-		    try {
-                // 详情数据处理
-                iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderNo.substring(0, orderNo.indexOf("_")), orderNo);
-                // 数量拆单采购数据处理
-                iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
-                // 数量拆单入库数据处理
-                iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
-                // 数量拆单商品备注沟通数据处理
-                iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
-            }catch (Exception e){
-		        e.printStackTrace();
-            }
-
+		int isUpdate = 0;
+		if (orderNo.contains("_SN") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)) {
+			isUpdate = 1;
+		} else if (orderNo.contains("_") && (orderInfo.getState() == 1 || orderInfo.getState() == 2)) {
+			String[] splitList = orderNo.split("_");
+			if (splitList != null && splitList.length > 1 && splitList[1].length() > 3 && splitList[0].contains(splitList[1])) {
+				// 判断补货订单
+				isUpdate = 2;
+			}
 		}
+		if(isUpdate > 0){
+			try {
+				// 采购数据
+				iOrderinfoService.updateOrderSplitNumGoodsDistribution(orderNo);
+				// 详情数据处理
+				iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderNo.substring(0, orderNo.indexOf("_")), orderNo);
+				// 数量拆单商品备注沟通数据处理
+				iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+				if(isUpdate == 1){
+					// 数量拆单采购数据处理
+					iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
+					// 数量拆单入库数据处理
+					iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				LOG.error("updateOrderSplitNumOrderDetailsData error:", e);
+			}
+		}
+
 
 		//获取实际运费
 			Long start = System.currentTimeMillis();
@@ -1685,7 +1704,11 @@ public class NewOrderDetailsCtr {
 					if (res > 0) {
 						String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 						Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-						inventoryService.cancelOrderToInventory(orderNo, adminId, adm.getAdmName());
+						if(orderNo.indexOf("_H") == -1) {
+							inventoryService.cancelOrderToInventory(orderNo, adminId, adm.getAdmName());
+						}else {
+							owsService.reduceOrderStock(orderNo, 0,  "订单orderno/odid已取消,释放其占用的库存orderStock");
+						}
 						/*// 释放该订单占用的库存
 						orderwsServer.cancelInventory(mainOrderNo);
 						//对于没有使用库存订单的商品做库存增加到库存表中
@@ -1947,7 +1970,13 @@ public class NewOrderDetailsCtr {
 //				        boolean flag=orderwsServer.checkTestOrder(orderNo);
                         if (res > 0) {
                             // 释放该订单占用的库存
-    						inventoryService.cancelOrderToInventory(orderNo, adminId, adm==null?"" : adm.getAdmName());
+    						if(orderNo.indexOf("_H") == -1) {
+    							inventoryService.cancelOrderToInventory(orderNo, adminId, adm==null?"" : adm.getAdmName());
+    						}else {
+    							//海外仓
+    							
+    							
+    						}
     						
 //                            orderwsServer.cancelInventory(orderNo);
 //                            //对于没有使用库存订单的商品做库存增加到库存表中
@@ -1993,7 +2022,11 @@ public class NewOrderDetailsCtr {
 						// zlw add end
 						
 						 // 释放该订单占用的库存
-						inventoryService.cancelOrderToInventory(orderNo, adminId, adm == null ? "" : adm.getAdmName());
+						if(orderNo.indexOf("_H") > -1) {
+							owsService.reduceOrderStock(orderNo, 0,  "订单orderno/odid已取消,释放其占用的库存orderStock");
+						}else {
+							inventoryService.cancelOrderToInventory(orderNo, adminId, adm == null ? "" : adm.getAdmName());
+						}
 
 						// 执行取消完成后，插入退款数据
 						OrderCancelApproval cancelApproval = new OrderCancelApproval();
@@ -2022,7 +2055,7 @@ public class NewOrderDetailsCtr {
 							webType = TemplateType.CANCEL_ORDER_KID;
 							break;
 						case 3:
-							webSiteTitle = "LovelyPetSupply";
+							webSiteTitle = "PetStoreInc";
 							webType = TemplateType.CANCEL_ORDER_PET;
 							break;
 						case 4:

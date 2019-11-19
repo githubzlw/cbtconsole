@@ -14,7 +14,7 @@ public interface OverseasWarehouseStockService {
      * @param stock
      * @return
      */
-    int reduceOrderStock(OverseasWarehouseStock stock,String orderno,int odid,String remark);
+    int reduceOrderStock(String orderno,int odid,String remark);
     
     /**获取订单占用日志
      * @param orderno
@@ -74,4 +74,11 @@ public interface OverseasWarehouseStockService {
 	 * @return
 	 */
 	int shipoutOwsOrder(Map<String,Object> map);
+	
+	/**更新订单状态
+	 * @param orderid
+	 * @return
+	 */
+	int updateOrderState(String orderno);
+	
 }

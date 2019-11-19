@@ -1,6 +1,7 @@
 package com.importExpress.controller;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.admuser.service.AdmuserService;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Orderinfo;
@@ -174,12 +175,16 @@ public class CustomerRelationshipManagementController {
         //redis示例
 
         if(json.isOk()){
-            String userIdStr = String.valueOf(userId);
+//            String userIdStr = String.valueOf(userId);
+//            RedisModel redisModel= new RedisModel();
+//            redisModel.setType("3");
+//            redisModel.setUserid(new String[]{userIdStr});
 
-            RedisModel redisModel= new RedisModel();
-            redisModel.setType("3");
-            redisModel.setUserid(new String[]{userIdStr});
-            SendMQ.sendMsg(redisModel, MultiSiteUtil.getSiteTypeNum(orderNo) - 1);
+            JSONObject jsonOb = new JSONObject();
+            jsonOb.put("type", "35");
+            jsonOb.put("userid", new String[]{userId});
+
+            SendMQ.sendMessageStr(jsonOb.toJSONString(), MultiSiteUtil.getSiteTypeNum(orderNo) - 1);
         }
         return json;
     }

@@ -36,6 +36,7 @@ import com.cbt.common.StringUtils;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoInfoList;
 import com.cbt.report.service.GeneralReportService;
+import com.cbt.report.service.GeneralReportServiceImpl;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.StrUtils;
@@ -114,7 +115,7 @@ public class InventoryController {
 		return mv;
 	}
 	/**
-	 * 仓库操作库存移库位
+	 * 库存修改库位（库存占用位置不对的情况下修改）
 	 * @param request
 	 * @param response
 	 * @return
@@ -124,7 +125,50 @@ public class InventoryController {
 	 */
 	@RequestMapping(value = "/barcode/update")
 	@ResponseBody
-	protected Map<String,Object> barcodeUpdate(HttpServletRequest request, HttpServletResponse response)
+	protected Map<String,Object> updateBarcode(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		Map<String,Object> result = new HashMap<>();
+		result.put("status", 200);
+		
+		String inid = request.getParameter("inid");
+		inid = StrUtils.isNum(inid) ? inid : "0";
+		
+		String beforeBarcode = request.getParameter("before");
+		beforeBarcode = StringUtil.isBlank(beforeBarcode) ? beforeBarcode : beforeBarcode.trim();
+		
+		String afterBarcode = request.getParameter("after");
+		afterBarcode = StringUtil.isBlank(afterBarcode) ? afterBarcode : afterBarcode.trim();
+		
+		String remaining = request.getParameter("remaining");
+		remaining = StrUtils.isNum(remaining) ? remaining : "0";
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("inid", Integer.parseInt(inid));
+		map.put("beforeBarcode", beforeBarcode);
+		map.put("afterBarcode", afterBarcode);
+		map.put("remaining", remaining);
+		map.put("admid",adm!=null? adm.getId() : 0);
+		int updateBarcode = inventoryService.updateBarcode(map);
+		if(updateBarcode < 1) {
+			result.put("status", 500);
+			result.put("reason", "数据错误:"+inid+"/"+beforeBarcode+"/"+afterBarcode);
+		}
+		return result;
+	}
+	/**
+	 * 仓库操作库存移库位
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/barcode/move")
+	@ResponseBody
+	protected Map<String,Object> moveBarcode(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
@@ -236,8 +280,11 @@ public class InventoryController {
 		page  = StrUtils.isNum(page) ? page : "1";
 		map.put("page", (Integer.valueOf(page) -1 ) * 20);
 		
-		List<InventoryDetailsWrap> toryList = inventoryService.inventoryDetails(map);
+		List<InventoryDetailsWrap> toryList = null;
 		int toryListCount = inventoryService.inventoryDetailsCount(map);
+		if(toryListCount > 0) {
+			toryList = inventoryService.inventoryDetails(map);
+		}
 		json.setRows(toryList);
 		json.setTotal(toryListCount);
 		return json;
@@ -433,22 +480,29 @@ public class InventoryController {
 	protected ModelAndView inventoryInfo(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
 		ModelAndView mv = new ModelAndView("inventoryReport");
-		Map<Object, Object> map = getObjectByInventory(request,false);
-		int toryListCount = inventoryService.getIinOutInventoryCount(map);
-		if(toryListCount > 0) {
-			InventoryCheck lastInventoryCheck = inventoryService.getLastInventoryCheck();
-			if(lastInventoryCheck != null) {
-				mv.addObject("lastCheckTime", lastInventoryCheck.getCheckTime());
+		try {
+			Map<Object, Object> map = getObjectByInventory(request,false);
+			int toryListCount = inventoryService.getIinOutInventoryCount(map);
+			if(toryListCount > 0) {
+				InventoryCheck lastInventoryCheck = inventoryService.getLastInventoryCheck();
+				if(lastInventoryCheck != null) {
+					mv.addObject("lastCheckTime", lastInventoryCheck.getCheckTime());
+				}
+				List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
+				mv.addObject("toryList", toryList);
+				List<String> barcodeList = inventoryService.barcodeList();
+				mv.addObject("barcodeList", barcodeList);
+				
 			}
-			List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
-			mv.addObject("toryList", toryList);
+			mv.addObject("toryListCount", toryListCount);
+			
+			int toryListPage = toryListCount % 20 == 0 ? toryListCount / 20 : toryListCount / 20 + 1;
+			mv.addObject("toryListPage", toryListPage);
+			mv.addObject("page", map.get("current_page"));
+			mv.addObject("queryParam",map);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		mv.addObject("toryListCount", toryListCount);
-		
-		int toryListPage = toryListCount % 20 == 0 ? toryListCount / 20 : toryListCount / 20 + 1;
-		mv.addObject("toryListPage", toryListPage);
-		mv.addObject("page", map.get("current_page"));
-		mv.addObject("queryParam",map);
 //		//是否有待操作的移库请求，只有处理完才可以盘点
 //		int unDoneInventoryBarcode = inventoryService.getUnDoneInventoryBarcode();
 //		mv.addObject("isBarcodeDone",unDoneInventoryBarcode);
@@ -498,6 +552,15 @@ public class InventoryController {
 			check_id = StrUtils.isNum(check_id) && !"0".equals(check_id)? check_id : "0";
 			map.put("check_id", Integer.valueOf(check_id));
 		}
+		
+		String isShowZero = request.getParameter("szero");
+		map.put("isShowZero", "1".equals(isShowZero)? 1 : 0);
+		String sttime = request.getParameter("sttime");
+		map.put("sttime", StringUtil.isBlank(sttime)? "" : sttime);
+		String edtime = request.getParameter("edtime");
+		map.put("edtime", StringUtil.isBlank(edtime)? "" : edtime);
+		String barcode = request.getParameter("barcode");
+		map.put("barcode", StringUtil.isBlank(barcode)? "" : barcode);
 		
 		return map;
 	}
@@ -1192,29 +1255,33 @@ public class InventoryController {
 			return mv;
 		}
 		ModelAndView mv = new ModelAndView("inventorycheck");
-		Map<Object, Object> map = getObjectByInventory(request,true);
-		int checkListCount = inventoryService.getIinOutInventoryCount(map);
-		if(checkListCount == 0) {
-			return mv;
-		}
-		List<InventoryCheckWrap> invetoryCheckList = inventoryService.invetoryCheckList(map);
-		
-		mv.addObject("checkList", invetoryCheckList);
-		mv.addObject("checkListCount", checkListCount);
-		int toryListPage = checkListCount % 20 == 0 ? checkListCount / 20 : checkListCount / 20 + 1;
-		mv.addObject("toryListPage", toryListPage);
-		
-		if(Integer.parseInt(StrUtils.object2NumStr(map.get("check_id"))) == 0) {
-			List<InventoryCheck> unDoneInventoryCheck = inventoryService.getUnDoneInventoryCheck();
-			map.put("check_id", 
-					unDoneInventoryCheck==null || unDoneInventoryCheck.isEmpty() ? 0 : unDoneInventoryCheck.get(0).getId());
+		try {
+			Map<Object, Object> map = getObjectByInventory(request,true);
+			int checkListCount = inventoryService.getIinOutInventoryCount(map);
+			if(checkListCount == 0) {
+				return mv;
+			}
+			List<InventoryCheckWrap> invetoryCheckList = inventoryService.invetoryCheckList(map);
 			
+			mv.addObject("checkList", invetoryCheckList);
+			mv.addObject("checkListCount", checkListCount);
+			int toryListPage = checkListCount % 20 == 0 ? checkListCount / 20 : checkListCount / 20 + 1;
+			mv.addObject("toryListPage", toryListPage);
+			
+			if(Integer.parseInt(StrUtils.object2NumStr(map.get("check_id"))) == 0) {
+				List<InventoryCheck> unDoneInventoryCheck = inventoryService.getUnDoneInventoryCheck();
+				map.put("check_id", 
+						unDoneInventoryCheck==null || unDoneInventoryCheck.isEmpty() ? 0 : unDoneInventoryCheck.get(0).getId());
+				
+			}
+			mv.addObject("queryParam",map);
+			
+			//是否有待操作的移库请求，只有处理完才可以盘点
+			int unDoneInventoryBarcode = inventoryService.getUnDoneInventoryBarcode();
+			mv.addObject("isBarcodeDone",unDoneInventoryBarcode);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		mv.addObject("queryParam",map);
-		
-		//是否有待操作的移库请求，只有处理完才可以盘点
-		int unDoneInventoryBarcode = inventoryService.getUnDoneInventoryBarcode();
-		mv.addObject("isBarcodeDone",unDoneInventoryBarcode);
 		
 		return mv;
 		
@@ -1387,8 +1454,8 @@ public class InventoryController {
 			HSSFWorkbook wb = generalReportService.exportInventoryCheckExcel(dicRecord);
 			response.setContentType("application/vnd.ms-excel");
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String filename = "库存盘点数据导出" + sdf.format(new Date());
-			filename = StringUtils.getFileName(filename);
+			String filename = "inventory_check_数据导出" + sdf.format(new Date());
+//			filename = StringUtils.getFileName(filename);
 			response.setHeader("Content-disposition", "attachment;filename=" + filename);
 			OutputStream ouputStream = response.getOutputStream();
 			wb.write(ouputStream);
@@ -1399,7 +1466,7 @@ public class InventoryController {
 		}
 		
 	}
-	/**完成盘点
+	/**导出报表
 	 * @param request
 	 * @param response
 	 * @return
@@ -1408,14 +1475,14 @@ public class InventoryController {
 	public void checkPrint(HttpServletRequest request, HttpServletResponse response) {
 		Map<Object, Object> map = getObjectByInventory(request,true);
 		try {
-			
+			map.put("page", -1);
 			List<InventoryCheckWrap> checkList = inventoryService.invetoryCheckList(map);
 			
-			HSSFWorkbook wb = generalReportService.exportInventoryExcel(checkList);
+			HSSFWorkbook wb = generalReportService.exportInventory(checkList);
 			response.setContentType("application/vnd.ms-excel");
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String filename = "库存盘点数据导出" + sdf.format(new Date());
-			filename = StringUtils.getFileName(filename);
+			String filename = "inventory-list-" + sdf.format(new Date())+".xls";
+//			filename = StringUtils.getFileName(filename);
 			response.setHeader("Content-disposition", "attachment;filename=" + filename);
 			OutputStream ouputStream = response.getOutputStream();
 			wb.write(ouputStream);
@@ -1468,31 +1535,36 @@ public class InventoryController {
 	@RequestMapping("/check/info")
 	public ModelAndView checkInfo(HttpServletRequest request, HttpServletResponse response) {
 		ModelAndView mv = new ModelAndView("inventorycheckinfo");
-		String strInid = request.getParameter("inid");
-		strInid = StrUtils.isNum(strInid) ? strInid : "0";
-		
-		String strPage = request.getParameter("page");
-		strPage = StrUtils.isNum(strPage) ? strPage : "1";
-		
-		int page = (Integer.parseInt(strPage) - 1) * 50;
-		String goods_pid = request.getParameter("goods_pid");
-		goods_pid = StringUtil.isBlank(goods_pid) ? null : goods_pid;
-		
-		int inid = Integer.valueOf(strInid);
-		int icrHistoryCount = 0,totalPage = 0;
-		if(inid > 0) {
-			icrHistoryCount = inventoryService.getICRHistoryCount(inid,goods_pid);
-			if(icrHistoryCount > 0) {
-				List<InventoryCheckRecord> icrHistory = inventoryService.getICRHistory(inid,page,goods_pid);
-				mv.addObject("icrHistory", icrHistory);
-				totalPage = icrHistoryCount % 50 == 0 ? icrHistoryCount / 50 : icrHistoryCount / 50 + 1;
+		try {
+			String strInid = request.getParameter("inid");
+			strInid = StrUtils.isNum(strInid) ? strInid : "0";
+			
+			String strPage = request.getParameter("page");
+			strPage = StrUtils.isNum(strPage) ? strPage : "1";
+			
+			int page = (Integer.parseInt(strPage) - 1) * 50;
+			String goods_pid = request.getParameter("goods_pid");
+			goods_pid = StringUtil.isBlank(goods_pid) ? null : goods_pid;
+			
+			int inid = Integer.valueOf(strInid);
+			int icrHistoryCount = 0,totalPage = 0;
+			if(inid > 0) {
+				icrHistoryCount = inventoryService.getICRHistoryCount(inid,goods_pid);
+				if(icrHistoryCount > 0) {
+					List<InventoryCheckRecord> icrHistory = inventoryService.getICRHistory(inid,page,goods_pid);
+					mv.addObject("icrHistory", icrHistory);
+					totalPage = icrHistoryCount % 50 == 0 ? icrHistoryCount / 50 : icrHistoryCount / 50 + 1;
+				}
 			}
+			mv.addObject("currentPage", Integer.parseInt(strPage));
+			
+			mv.addObject("inid", inid);
+			mv.addObject("totalPage", totalPage);
+			mv.addObject("totalCount", icrHistoryCount);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		mv.addObject("currentPage", Integer.parseInt(strPage));
-		
-		mv.addObject("inid", inid);
-		mv.addObject("totalPage", totalPage);
-		mv.addObject("totalCount", icrHistoryCount);
 		return mv;
 	}
 	

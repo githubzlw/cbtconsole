@@ -789,6 +789,13 @@ public interface CustomGoodsService {
      */
     JsonResult setGoodsWeightByWeigherInfo(String pid, SearchResultInfo weightAndSyn, int adminId);
 
+    /**
+     * 人为判断后，根据规格更新 称重重量和体积重量
+     * @param weightChange
+     * @return
+     */
+    JsonResult syncLocalWeightToOnline(GoodsWeightChange weightChange);
+
     public List<CustomGoodsPublish> queryGoodsShowInfos(CustomGoodsQuery queryBean);
 
     public int queryGoodsShowInfosCount(CustomGoodsQuery queryBean);
@@ -888,6 +895,38 @@ public interface CustomGoodsService {
      * @return
      */
     List<GoodsOverSea> queryGoodsOverSeaInfoByPid(String pid);
+
+    /**
+     * 设置可搜索
+     *
+     * @param pid
+     * @param flag
+     * @param adminId
+     * @return
+     */
+    int setSearchable(String pid, int flag, int adminId);
+
+
+    /**
+     * 保存重量改动信息
+     * @param weightChange
+     * @return
+     */
+    int saveGoodsWeightChange(GoodsWeightChange weightChange);
+
+    /**
+     * 分页查询重量改动信息
+     * @param weightChange
+     * @return
+     */
+    List<GoodsWeightChange> queryGoodsWeightChangeList(GoodsWeightChange weightChange);
+
+    /**
+     * 重量改动信息总数
+     * @param weightChange
+     * @return
+     */
+    int queryGoodsWeightChangeListCount(GoodsWeightChange weightChange);
 
     /**
      * 更新海外仓数据

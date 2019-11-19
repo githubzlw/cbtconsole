@@ -71,5 +71,6 @@ public class UserInfo {
     private int limitNum;
     private int startNum;
 
+    private int adminId;
 
 }

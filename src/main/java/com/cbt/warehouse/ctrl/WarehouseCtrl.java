@@ -6698,7 +6698,7 @@ public class WarehouseCtrl {
 				}
 				if (MultiSiteUtil.getSiteTypeNum(orderid)==3){
 					modelM.put("websiteType",3);
-					modelM.put("toHref","https://www.lovelypetsupply.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+					modelM.put("toHref","https://www.petstoreinc.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
 					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK_PET);
 				}
 
@@ -7466,7 +7466,7 @@ public class WarehouseCtrl {
                         } else if (websiteType == 2) {
                             modelM.put("toHref", "https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         } else if (websiteType == 3) {
-                            modelM.put("toHref", "https://www.lovelypetsupply.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                            modelM.put("toHref", "https://www.petstoreinc.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         }
                         sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
 						//插入发送邮件记录
@@ -9541,23 +9541,18 @@ public class WarehouseCtrl {
 		if(logByOrderno == null || logByOrderno.isEmpty()) {
 			int owsAdd = owsService.shipoutOwsOrder(map );
 			if(owsAdd > 0) {
-				//释放占用
-				OverseasWarehouseStock stock;
-				int reduce = 0;
-				for(OverseasWarehouseStockLog l : logByOrderno) {
-					if(l.getChangeStock() == 0) {
-						continue;
-					}
-					String remark = "订单"+orderno+"/"+l.getOdid()+"已出运-"+shipno+",释放其占用的库存"+l.getChangeStock();
-					stock = OverseasWarehouseStock.builder().orderStock(l.getChangeStock()).code(l.getCode()).build();
-					reduce += owsService.reduceOrderStock(stock, orderno, l.getOdid(), remark);
-				}
-				if(logByOrderno.size()==reduce) {
+				String remark = "订单orderno/odid已出运-"+shipno+",释放其占用的库存orderStock";
+				int reduceOrderStock = owsService.reduceOrderStock(orderno, 0, remark);
+				
+				if(logByOrderno.size() == reduceOrderStock) {
 					result.put("status", 200);
 				}else {
 					result.put("status", 103);
 					result.put("message", "添加运单号成功，但部分产品释放占用库存失败");
 				}
+				//订单状态：5-确认价格中,1-购买中,2-已到仓库,0-等待付款,3-出运中,4-完结,-1-后台取消订单,6-客户取消订单,7-预订单
+				//更新订单状态
+				owsService.updateOrderState(orderno);
 			}else {
 				result.put("status", 101);
 				result.put("message", "添加运单号出现错误");

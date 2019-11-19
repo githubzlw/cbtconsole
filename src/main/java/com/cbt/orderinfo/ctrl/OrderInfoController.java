@@ -270,17 +270,36 @@ public class OrderInfoController{
 			e.printStackTrace();
 		}
 		for (SearchResultInfo searchResultInfo : list) {
+			String orderNo = searchResultInfo.getOrderid();
+			int isUpdate = 0;
 			if (searchResultInfo.getOrderid().contains("_SN")) {
 				// 数量拆单入库数据处理
-                String orderNo = searchResultInfo.getOrderid();
-                // 详情数据处理
-				iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderNo.substring(0, orderNo.indexOf("_")), orderNo);
-				// 数量拆单采购数据处理
-				iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
-				// 数量拆单入库数据处理
-				iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
-				// 数量拆单商品备注沟通数据处理
-			    iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+				isUpdate = 1;
+			} else if (orderNo.contains("_")) {
+				String[] splitList = orderNo.split("_");
+				if (splitList != null && splitList.length > 1 && splitList[1].length() > 3 && splitList[0].contains(splitList[1])) {
+					// 判断补货订单
+					isUpdate = 2;
+				}
+			}
+			if (isUpdate > 0) {
+				try {
+					// 采购数据
+					iOrderinfoService.updateOrderSplitNumGoodsDistribution(orderNo);
+					// 详情数据处理
+					iOrderinfoService.updateOrderSplitNumOrderDetailsData(orderNo.substring(0, orderNo.indexOf("_")), orderNo);
+					// 数量拆单商品备注沟通数据处理
+					iOrderinfoService.updateOrderSplitNumGoodsCommunicationInfoData(orderNo);
+					if(isUpdate == 1){
+						// 数量拆单采购数据处理
+						iOrderinfoService.updateOrderSplitNumPurchaseData(orderNo);
+						// 数量拆单入库数据处理
+						iOrderinfoService.updateOrderSplitNumIdRelationtableData(orderNo);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("updateOrderSplitNumOrderDetailsData error:", e);
+				}
 			}
 		}
 		out.print(net.minidev.json.JSONArray.toJSONString(list));
@@ -546,8 +565,8 @@ public class OrderInfoController{
 			map.put("status", "1");
 			map.put("repState", "1");
 			if("1".equals(type)){
-				List<Map<String,String>> allList=iOrderinfoService.allTrack(map);
-				for(Map<String,String> allMap:allList){
+				List<Map<String,Object>> allList=iOrderinfoService.allTrack(map);
+				for(Map<String,Object> allMap:allList){
 					String orderid = String.valueOf(allMap.get("orderid"));
 					String goodid =String.valueOf(allMap.get("goodsid"));
 					String goodurl = String.valueOf(allMap.get("goods_url"));
@@ -690,7 +709,7 @@ public class OrderInfoController{
 			}
 			if (MultiSiteUtil.getSiteTypeNum(orderNo)==3){
 				modelM.put("websiteType",3);
-				modelM.put("accountLink","https://www.lovelypetsupply.com/orderInfo/emailLink?orderNo="+orderNo+"");
+				modelM.put("accountLink","https://www.petstoreinc.com/orderInfo/emailLink?orderNo="+orderNo+"");
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE_PET);
 			}
 //			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
