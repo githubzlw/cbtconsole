@@ -25,4 +25,5 @@ public class GoodsWeightChange {
     private Integer updateAdminId;
     private int startNum;
     private int limitNum;
+    private String skuid;
 }

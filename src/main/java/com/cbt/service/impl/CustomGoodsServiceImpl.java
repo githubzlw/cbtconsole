@@ -731,6 +731,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
         //  保存json数据
         GoodsWeightChange weightChange = new GoodsWeightChange();
+        weightChange.setSkuid(weightAndSyn.getSkuID());
         weightChange.setAdminId(adminId);
         weightChange.setGoodsType(weightAndSyn.getGoods_type());
         weightChange.setPid(pid);
@@ -753,20 +754,26 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
             // 查找匹配的type数据
             String typeStr = weightChange.getGoodsType();
+            String skuid = weightChange.getSkuid();
             // Colour:black@32161,Size:S@4501,
             String[] typeStrList = typeStr.split(",");
             String ppId = "";
-            for (String childType : typeStrList) {
-                if (StringUtils.isNotBlank(childType)) {
-                    String[] childList = childType.split("@");
-                    if (childList.length == 2 && StringUtils.isNotBlank(childList[1])) {
-                        ppId += "," + childList[1];
-                    }
-                }
+            boolean isSkuid = skuid.equals(weightChange.getPid());
+            if(isSkuid) {
+            	for (String childType : typeStrList) {
+            		if (StringUtils.isNotBlank(childType)) {
+            			String[] childList = childType.split("@");
+            			if (childList.length == 2 && StringUtils.isNotBlank(childList[1])) {
+            				ppId += "," + childList[1];
+            			}
+            		}
+            	}
             }
             double finalWeight = 0;
             for (ImportExSku exSku : skuList) {
-                if (StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds())) {
+                if ((!isSkuid && skuid.equals(exSku.getSkuId())) 
+                		|| (isSkuid && StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds()))) {
+                	
                     finalWeight = BigDecimalUtil.truncateDouble(Float.parseFloat(weightChange.getWeight()), 3);
                     exSku.setFianlWeight(finalWeight);
                     if (StringUtils.isNotBlank(weightChange.getVolumeWeight())) {
