@@ -10,7 +10,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4cbtconsole/WebsiteServlet?action=getOrderDetail/loose.dtd">
 <html>
-<head>
+<head>window.open("/cbtconsole/
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <meta http-equiv=Content-Type content="text/html; charset=utf-8">
@@ -346,10 +346,10 @@ function fn(va) {
 		uemail = user.email;
         var emailFlag = json[i].emailFlag;
 		if(adminName=="ling"){
-		    var html_="<td style='"+show_changeState+"'><a target='_blank' href='javascript:void(0)' "
-                +"onclick='window.open(\"/cbtconsole/website/updateorderstate.jsp?orderNo="
-                + json[i].order_no+ "&state="+ state + "\",\"windows\",\"height=280,width=530,"
-                +"top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no\")'>修改</a>";
+		    var html_="<td style='"+show_changeState+"'><button "
+                +"onclick=\"window.open('/cbtconsole/website/updateorderstate.jsp?orderNo="
+                + json[i].order_no+ "&state="+ state + "','windows','height=280,width=530,"
+                +"top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no')\">修改</button>";
 		    if(checkType == "checkOrder"){
 		        if(emailFlag>0){
                     html_+="<br><a target='_blank' style='color:red'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
