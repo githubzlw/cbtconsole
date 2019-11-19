@@ -40,10 +40,12 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.GoodsOverSea;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.OrderSplitChild;
+import com.importExpress.pojo.OverseasWarehouseStock;
 import com.importExpress.pojo.PurchaseInfoBean;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.OrderSplitRecordService;
+import com.importExpress.service.OverseasWarehouseStockService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.MultiSiteUtil;
@@ -96,6 +98,8 @@ public class NewOrderDetailsCtr {
 	private OrderSplitRecordService orderSplitRecordService;
 	@Autowired
 	private InventoryService inventoryService;
+	@Autowired
+	private OverseasWarehouseStockService owsService;
 	@Autowired
     private CustomGoodsService customGoodsService;
 	/**
@@ -1699,7 +1703,11 @@ public class NewOrderDetailsCtr {
 					if (res > 0) {
 						String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 						Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-						inventoryService.cancelOrderToInventory(orderNo, adminId, adm.getAdmName());
+						if(orderNo.indexOf("_H") == -1) {
+							inventoryService.cancelOrderToInventory(orderNo, adminId, adm.getAdmName());
+						}else {
+							owsService.reduceOrderStock(orderNo, 0,  "订单orderno/odid已取消,释放其占用的库存orderStock");
+						}
 						/*// 释放该订单占用的库存
 						orderwsServer.cancelInventory(mainOrderNo);
 						//对于没有使用库存订单的商品做库存增加到库存表中
@@ -1961,7 +1969,13 @@ public class NewOrderDetailsCtr {
 //				        boolean flag=orderwsServer.checkTestOrder(orderNo);
                         if (res > 0) {
                             // 释放该订单占用的库存
-    						inventoryService.cancelOrderToInventory(orderNo, adminId, adm==null?"" : adm.getAdmName());
+    						if(orderNo.indexOf("_H") == -1) {
+    							inventoryService.cancelOrderToInventory(orderNo, adminId, adm==null?"" : adm.getAdmName());
+    						}else {
+    							//海外仓
+    							
+    							
+    						}
     						
 //                            orderwsServer.cancelInventory(orderNo);
 //                            //对于没有使用库存订单的商品做库存增加到库存表中
@@ -2007,7 +2021,11 @@ public class NewOrderDetailsCtr {
 						// zlw add end
 						
 						 // 释放该订单占用的库存
-						inventoryService.cancelOrderToInventory(orderNo, adminId, adm == null ? "" : adm.getAdmName());
+						if(orderNo.indexOf("_H") > -1) {
+							owsService.reduceOrderStock(orderNo, 0,  "订单orderno/odid已取消,释放其占用的库存orderStock");
+						}else {
+							inventoryService.cancelOrderToInventory(orderNo, adminId, adm == null ? "" : adm.getAdmName());
+						}
 
 						// 执行取消完成后，插入退款数据
 						OrderCancelApproval cancelApproval = new OrderCancelApproval();
