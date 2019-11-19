@@ -5473,7 +5473,7 @@ public class OrderwsDao implements IOrderwsDao {
                         "questionsRemarks,unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime," +
                         "old_shopid,tborderid,offline_purchase,tb_id from order_product_source " +
                         " where orderid = '" + orderNoOld + "' and goodsid=" + goodsid;
-                localSqlList.add(insertOrderProductSql);
+                // localSqlList.add(insertOrderProductSql);
 
                 // 入库
                 String insertIdRelationSql = "insert into id_relationtable(orderid,goodid,goodstatus,goodurl,barcode," +
@@ -5484,7 +5484,7 @@ public class OrderwsDao implements IOrderwsDao {
                         "POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,"
                         + count + " as itemqty,itemid,0 as odid " +
                         "from id_relationtable " + " where orderid = '" + orderNoOld + "' and goodid=" + goodsid;
-                localSqlList.add(insertIdRelationSql);
+                // localSqlList.add(insertIdRelationSql);
 
                 stmt27 = con27.createStatement();
 
@@ -5607,11 +5607,12 @@ public class OrderwsDao implements IOrderwsDao {
                     lstValues.add(rs.getString("user_id"));
                     lstValues.add("0");
                     String tempState = rs.getString("state");
-                    if("1".equals(tempState) || "2".equals(tempState)){
+                    /*if("1".equals(tempState) || "2".equals(tempState)){
                         lstValues.add(tempState);// 订单状态
                     }else{
                         lstValues.add("5");// 订单状态
-                    }
+                    }*/
+                    lstValues.add("5");// 订单状态
                     lstValues.add(rs.getString("delivery_time"));
                     lstValues.add(rs.getString("service_fee"));
                     lstValues.add("0");
