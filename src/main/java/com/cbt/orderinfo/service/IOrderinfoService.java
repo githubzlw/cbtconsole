@@ -589,6 +589,13 @@ public interface IOrderinfoService {
 	 * @return
 	 */
 	int updateOrderSplitNumGoodsCommunicationInfoData(String orderNo);
+
+	/**
+	 * 更新采购数据
+	 * @param orderNo
+	 * @return
+	 */
+	int updateOrderSplitNumGoodsDistribution(String orderNo);
 	/**
 	 * 订单信息
 	 * @param orderno

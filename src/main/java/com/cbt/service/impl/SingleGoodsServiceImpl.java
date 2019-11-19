@@ -17,8 +17,8 @@ public class SingleGoodsServiceImpl implements SingleGoodsService {
 	private SingleGoodsDao sgGdDao = new SingleGoodsDaoImpl();
 
 	@Override
-	public JsonResult saveGoods(String goodsUrl, int adminId, double goodsWeight,int drainageFlag,int goodsType,String aliPid,String aliPrice) {
-		return sgGdDao.saveGoods(goodsUrl, adminId, goodsWeight,drainageFlag,goodsType,aliPid,aliPrice);
+	public JsonResult saveGoods(String goodsUrl, int adminId, double goodsWeight,int drainageFlag,int goodsType,String aliPid,String aliPrice, String shopId) {
+		return sgGdDao.saveGoods(goodsUrl, adminId, goodsWeight,drainageFlag,goodsType,aliPid,aliPrice,shopId);
 	}
 
 	@Override

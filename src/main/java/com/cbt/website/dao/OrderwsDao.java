@@ -28,7 +28,6 @@ import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import com.mysql.jdbc.JDBC4PreparedStatement;
 import net.sf.json.JSONArray;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +35,8 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 
 // 订单管理功能的订单查询过程
 //由 孙秀文 2016-01-26 优化
@@ -5364,86 +5363,142 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public int addOrderDetails(String goodsid, String count, String newOrderid, String orderid, int admuserid) {
+        String orderNoOld = orderid;
+        String orderNoNew = newOrderid;
         String sql = "";
         IOrderAutoService preOrderAutoService = new PreOrderAutoService();
         PreparedStatement stmt = null;
+        Statement stmt27 = null;
         ResultSet rs = null;
         int row = 0;
         boolean flag = true;
-        Connection conn = DBHelper.getInstance().getConnection2();
+        Connection connAws = DBHelper.getInstance().getConnection2();
+        Connection con27 = DBHelper.getInstance().getConnection();
         try {
             sql = "select * from order_details where goodsid='" + goodsid + "' and orderid='" + newOrderid + "'";
-            stmt = conn.prepareStatement(sql);
+            stmt = connAws.prepareStatement(sql);
             rs = stmt.executeQuery();
             if (rs.next()) {
                 flag = false;
                 row = 1;
             }
             sql = "select * from order_details where goodsid='" + goodsid + "' and orderid='" + orderid + "'";
-            stmt = conn.prepareStatement(sql);
+            stmt = connAws.prepareStatement(sql);
             rs = stmt.executeQuery();
             if (rs.next() && flag) {
                 sql = " insert into order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder,userid,goodsname,goodsprice,goodsfreight,"
                         + "goodsdata_id,remark,goods_class,extra_freight,car_url,car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,car_urlMD5,goods_pid,actual_weight) "
                         + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 List<String> lstValues = new ArrayList<>(30);
-                lstValues.add( goodsid);
-                lstValues.add( newOrderid);
-                lstValues.add( rs.getString("dropshipid"));
-                lstValues.add( rs.getString("delivery_time"));
-                lstValues.add( rs.getString("checkprice_fee"));
-                lstValues.add( rs.getString("checkproduct_fee"));
-                lstValues.add( "0");
-                lstValues.add( rs.getString("fileupload"));
-                lstValues.add( count);
-                lstValues.add( rs.getString("userid"));
+                lstValues.add(goodsid);
+                lstValues.add(newOrderid);
+                lstValues.add(rs.getString("dropshipid"));
+                lstValues.add(rs.getString("delivery_time"));
+                lstValues.add(rs.getString("checkprice_fee"));
+                lstValues.add(rs.getString("checkproduct_fee"));
+                lstValues.add("0");
+                lstValues.add(rs.getString("fileupload"));
+                lstValues.add(count);
+                lstValues.add(rs.getString("userid"));
                 String goodsName = rs.getString("goodsname");
-                if(StringUtil.isNotBlank(goodsName)){
+                if (StringUtil.isNotBlank(goodsName)) {
                     lstValues.add(GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(goodsName));
-                }else{
+                } else {
                     lstValues.add("");
                 }
 
-                lstValues.add( rs.getString("goodsprice"));
-                lstValues.add( rs.getString("goodsfreight"));
-                lstValues.add( rs.getString("goodsdata_id"));
-                lstValues.add( rs.getString("remark"));
-                lstValues.add( rs.getString("goods_class"));
-                lstValues.add( rs.getString("extra_freight"));
-                lstValues.add( rs.getString("car_url"));
-                lstValues.add( rs.getString("car_img"));
+                lstValues.add(rs.getString("goodsprice"));
+                lstValues.add(rs.getString("goodsfreight"));
+                lstValues.add(rs.getString("goodsdata_id"));
+                lstValues.add(rs.getString("remark"));
+                lstValues.add(rs.getString("goods_class"));
+                lstValues.add(rs.getString("extra_freight"));
+                lstValues.add(rs.getString("car_url"));
+                lstValues.add(rs.getString("car_img"));
 
                 String car_type = rs.getString("car_type");
-                if(StringUtil.isNotBlank(car_type)){
+                if (StringUtil.isNotBlank(car_type)) {
                     lstValues.add(GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(car_type));
-                }else{
+                } else {
                     lstValues.add("");
                 }
-                lstValues.add( rs.getString("freight_free"));
+                lstValues.add(rs.getString("freight_free"));
                 String od_bulk_volume = rs.getString("od_bulk_volume");
-                if(StringUtil.isNotBlank(od_bulk_volume)){
+                if (StringUtil.isNotBlank(od_bulk_volume)) {
                     lstValues.add(GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(od_bulk_volume));
-                }else{
+                } else {
                     lstValues.add("");
                 }
-                lstValues.add( rs.getString("od_total_weight"));
-                lstValues.add( rs.getString("discount_ratio"));
-                lstValues.add( rs.getString("goodscatid"));
-                lstValues.add( rs.getString("car_urlMD5"));
-                lstValues.add( rs.getString("goods_pid"));
-                lstValues.add( rs.getString("actual_weight"));
+                lstValues.add(rs.getString("od_total_weight"));
+                lstValues.add(rs.getString("discount_ratio"));
+                lstValues.add(rs.getString("goodscatid"));
+                lstValues.add(rs.getString("car_urlMD5"));
+                lstValues.add(rs.getString("goods_pid"));
+                lstValues.add(rs.getString("actual_weight"));
 
-                String runSql = DBHelper.covertToSQL(sql,lstValues);
+                String runSql = DBHelper.covertToSQL(sql, lstValues);
 
                 String rsStr = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
-                if(org.apache.commons.lang3.StringUtils.isNotBlank(rsStr)){
+                if (org.apache.commons.lang3.StringUtils.isNotBlank(rsStr)) {
                     row += Integer.parseInt(rsStr);
                 }
 
-//                row = stmt.executeUpdate();
+                //  本地数据准备
+
+                List<String> localSqlList = new ArrayList<String>();
+                // 采购分配
+                String insertGoodsDistributionSql = "insert into goods_distribution(orderid,odid,goodsid,admuserid,goodscatid,goods_pid,"
+                        + "goods_url,createtime) select '" + orderNoNew + "' as orderid,0 as odid,goodsid,admuserid,goodscatid," +
+                        "goods_pid,goods_url,now() from goods_distribution where orderid = '"
+                        + orderNoOld + "' and goodsid=" + goodsid;
+                localSqlList.add(insertGoodsDistributionSql);
+                // 商品沟通备注数据
+                String insertGoodsCommunicationInfoSql = "insert into goods_communication_info(context,is_read,send_id,accept_id," +
+                        "create_time,orderid,goodsid,odid) " +
+                        " select context,is_read,send_id,accept_id,create_time,'" + orderNoNew + "' as orderid,goodsid, 0 as odid " +
+                        " from goods_communication_info where orderid = '" + orderNoOld + "' and goodsid=" + goodsid;
+                localSqlList.add(insertGoodsCommunicationInfoSql);
+
+                // 新增货源数据
+                String insertOrderProductSql = "insert into order_product_source(od_id,adminid,userid,addtime,orderid," +
+                        "confirm_userid,confirm_time,goodsid,goodsdataid,goods_url," +
+                        "goods_p_url,last_goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,usecount,buycount,currency," +
+                        "goods_p_name,bargainRemark,deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks," +
+                        "questionsRemarks,unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime," +
+                        "old_shopid,tborderid,offline_purchase,tb_id) " +
+                        " select 0 as od_id,adminid,userid,addtime,'" + orderNoNew + "' as orderid,confirm_userid,confirm_time," +
+                        "goodsid,goodsdataid,goods_url,goods_p_url,last_goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,"
+                        + count + " as usecount," + count + " as buycount,currency," +
+                        "goods_p_name,bargainRemark,deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks," +
+                        "questionsRemarks,unquestionsRemarks,purchase_state,tb_1688_itemid,last_tb_1688_itemid,purchasetime," +
+                        "old_shopid,tborderid,offline_purchase,tb_id from order_product_source " +
+                        " where orderid = '" + orderNoOld + "' and goodsid=" + goodsid;
+                // localSqlList.add(insertOrderProductSql);
+
+                // 入库
+                String insertIdRelationSql = "insert into id_relationtable(orderid,goodid,goodstatus,goodurl,barcode," +
+                        "picturepath,createtime," +
+                        "POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,itemqty,itemid,odid)" +
+                        " select '" + orderNoNew + "',goodid,goodstatus,goodurl,barcode," +
+                        "CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'/','" + orderNoNew + "','_',goodid,'.jpg'),createtime," +
+                        "POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,"
+                        + count + " as itemqty,itemid,0 as odid " +
+                        "from id_relationtable " + " where orderid = '" + orderNoOld + "' and goodid=" + goodsid;
+                // localSqlList.add(insertIdRelationSql);
+
+                stmt27 = con27.createStatement();
+
+                for (String tempSql27 : localSqlList) {
+                    stmt27.addBatch(tempSql27);
+                }
+
+                int localLength = stmt27.executeBatch().length;
+                System.err.println("addOrderDetails localLength:" + localLength);
+
+//               row = stmt.executeUpdate();
                 sql = "select id,goodsdata_id,goodscatid,car_url from order_details where orderid='" + newOrderid
                         + "' and goodsid='" + goodsid + "'";
-                stmt = conn.prepareStatement(sql);
+                stmt = connAws.prepareStatement(sql);
                 rs = stmt.executeQuery();
                 if (admuserid != 0 && rs.next()) {
                     Date date = new Date();
@@ -5466,11 +5521,13 @@ public class OrderwsDao implements IOrderwsDao {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            LOG.error("addOrderDetails",e);
+            LOG.error("addOrderDetails", e);
         } finally {
             DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeStatement(stmt27);
             DBHelper.getInstance().closeResultSet(rs);
-            DBHelper.getInstance().closeConnection(conn);
+            DBHelper.getInstance().closeConnection(connAws);
+            DBHelper.getInstance().closeConnection(con27);
         }
         return row;
     }
@@ -5549,6 +5606,12 @@ public class OrderwsDao implements IOrderwsDao {
                     lstValues.add(newOrderid);
                     lstValues.add(rs.getString("user_id"));
                     lstValues.add("0");
+                    String tempState = rs.getString("state");
+                    /*if("1".equals(tempState) || "2".equals(tempState)){
+                        lstValues.add(tempState);// 订单状态
+                    }else{
+                        lstValues.add("5");// 订单状态
+                    }*/
                     lstValues.add("5");// 订单状态
                     lstValues.add(rs.getString("delivery_time"));
                     lstValues.add(rs.getString("service_fee"));

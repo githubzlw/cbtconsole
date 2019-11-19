@@ -1543,6 +1543,12 @@
         set gci.odid = od.id
         where gci.orderid = od.orderid and gci.orderid =#{orderNo} and gci.goodsid = od.goodsid and (gci.odid  = 0 or gci.odid is null)
     </update>
+
+    <update id="updateOrderSplitNumGoodsDistribution">
+        update goods_distribution a,order_details b set a.odid = b.id where a.orderid = b.orderid and a.orderid = #{orderNo}
+        and a.goodsid = b.goodsid and (a.odid  = 0 or a.odid is null)
+    </update>
+
     <select id="getOverseasWarehouseStockOrder" resultType="java.util.Map">
     select user_id,order_no from orderinfo  where 1=1
     <if test="ordernoOrUserid!=null">and (order_no=#{ordernoOrUserid} or user_id=#{ordernoOrUserid})</if>

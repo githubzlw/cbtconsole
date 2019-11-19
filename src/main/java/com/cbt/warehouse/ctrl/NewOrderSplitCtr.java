@@ -84,6 +84,8 @@ public class NewOrderSplitCtr {
     @Autowired
     private InventoryService inventoryService;
     @Autowired
+    private OverseasWarehouseStockService owsService;
+    @Autowired
     private CustomGoodsService customGoodsService;
 
     /**
