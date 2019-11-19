@@ -19,6 +19,24 @@ public class CategoryBean {
 	private String name;
 	private String childids;
 	private String enName;
+	private String parentId;
+	private int adminId;
+
+	public int getAdminId() {
+		return adminId;
+	}
+
+	public void setAdminId(int adminId) {
+		this.adminId = adminId;
+	}
+
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
 
 	private List<CategoryBean> threelist;
 	private List<CategoryBean> towList;

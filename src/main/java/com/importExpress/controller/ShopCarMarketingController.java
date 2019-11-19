@@ -1153,41 +1153,44 @@ public class ShopCarMarketingController {
     }
 
     private boolean getMinFreightByUserId(int userId,ShopCarUserStatistic carUserStatistic, int website) {
-        boolean resutl= false;
-        double freight = 0;
-        OkHttpClient okHttpClient = new OkHttpClient();
-
-        String url = GET_MIN_FREIGHT_URL;
-        if(website > 0){
-            url = SwitchDomainNameUtil.checkNullAndReplace(GET_MIN_FREIGHT_URL,website);
-        }
-        RequestBody formBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
-        Request request = new Request.Builder().addHeader("Accept","*/*")
-				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
-                .url(url).post(formBody).build();
-        try {
-            Response response = okHttpClient.newCall(request).execute();
-            String resultStr = response.body().string();
-            JSONObject json = JSONObject.fromObject(resultStr);
-            if (json.getBoolean("ok")) {
-                System.out.println("getMinFreightByUserId success !!!");
-                freight = json.getJSONObject("data").getDouble("totalFreight");
-                if(freight > 0 ){
-                    carUserStatistic.setShippingName(json.getJSONObject("data").getString("transportation"));
-                    carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(freight, 2));
-                }
-                carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(json.getJSONObject("data").getDouble("freightCost"), 2));
-                resutl = true;
-            } else {
-                System.err.println("getMinFreightByUserId error :<:<:<");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println(e.getMessage());
-            logger.error("getMinFreightByUserId error:" + e.getMessage());
-            resutl = false;
-        }
-        return resutl;
+        return  true;
+//
+//        boolean resutl= false;
+//        double freight = 0;
+//
+//        OkHttpClient okHttpClient = new OkHttpClient();
+//
+//        String url = GET_MIN_FREIGHT_URL;
+//        if(website > 0){
+//            url = SwitchDomainNameUtil.checkNullAndReplace(GET_MIN_FREIGHT_URL,website);
+//        }
+//        RequestBody formBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
+//        Request request = new Request.Builder().addHeader("Accept","*/*")
+//				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+//                .url(url).post(formBody).build();
+//        try {
+//            Response response = okHttpClient.newCall(request).execute();
+//            String resultStr = response.body().string();
+//            JSONObject json = JSONObject.fromObject(resultStr);
+//            if (json.getBoolean("ok")) {
+//                System.out.println("getMinFreightByUserId success !!!");
+//                freight = json.getJSONObject("data").getDouble("totalFreight");
+//                if(freight > 0 ){
+//                    carUserStatistic.setShippingName(json.getJSONObject("data").getString("transportation"));
+//                    carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(freight, 2));
+//                }
+//                carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(json.getJSONObject("data").getDouble("freightCost"), 2));
+//                resutl = true;
+//            } else {
+//                System.err.println("getMinFreightByUserId error :<:<:<");
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.err.println(e.getMessage());
+//            logger.error("getMinFreightByUserId error:" + e.getMessage());
+//            resutl = false;
+//        }
+//        return resutl;
     }
 
 
