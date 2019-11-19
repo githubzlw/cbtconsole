@@ -10,7 +10,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4cbtconsole/WebsiteServlet?action=getOrderDetail/loose.dtd">
 <html>
-<head>window.open("/cbtconsole/
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <meta http-equiv=Content-Type content="text/html; charset=utf-8">
