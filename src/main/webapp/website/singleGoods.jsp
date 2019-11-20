@@ -307,7 +307,7 @@
             var content = '';
             if (row.syncFlag == 0 || row.syncFlag == 2) {
                 content += '<br><input type="button" class="style_btn_delete" value="删除商品" onclick="deleteGoodsByPid(\'' + row.goodsPid + '\')">';
-                content += '<br><input type="button" style="display: none;" onclick="openSyncWindow(\''+row.goodsPid + '\')"/>';
+                content += '<br><input type="button" style="display: none;" value="重新上传" onclick="openSyncWindow(\''+row.goodsPid + '\')"/>';
             } else if (row.syncFlag == 1) {
                 content += '<br>'
                     + '<a href="/cbtconsole/editc/detalisEdit?pid='
