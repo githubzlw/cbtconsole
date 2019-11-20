@@ -754,11 +754,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
             // 查找匹配的type数据
             String typeStr = weightChange.getGoodsType();
-            String skuid = weightChange.getSkuid();
+            String skuid = weightChange.getSkuid() == null ? "" : weightChange.getSkuid();
             // Colour:black@32161,Size:S@4501,
             String[] typeStrList = typeStr.split(",");
             String ppId = "";
-            boolean isSkuid = skuid.equals(weightChange.getPid());
+            boolean isSkuid = weightChange.getPid().equals(skuid);
             if(isSkuid) {
             	for (String childType : typeStrList) {
             		if (StringUtils.isNotBlank(childType)) {
