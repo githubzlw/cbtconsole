@@ -1567,6 +1567,7 @@
     <if test="userid!=0"> and oi.user_id=#{userid}</if>
     limit 1
     </select>
+    <select id="getCarTypeByOdid" resultType="String">select car_type from order_details where id=#{odid}</select>
 
     <update id="updateOrderNoToNewNo">
         update orderinfo set order_no = #{newOrderNo} where order_no = #{oldOrderNo};

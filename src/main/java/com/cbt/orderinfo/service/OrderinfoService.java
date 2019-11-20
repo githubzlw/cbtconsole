@@ -1810,6 +1810,10 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
+	public String getCarTypeByOdid(String odid) {
+		return orderinfoMapper.getCarTypeByOdid(odid);
+	}
+	@Override
 	public List<OrderDetailsBean> getOrdersDetails(String orderNo) {
 		DecimalFormat df = new DecimalFormat("######0.00");
 		Map<String, ArrayList<Object[]>> changInfo = new HashMap<String, ArrayList<Object[]>>();

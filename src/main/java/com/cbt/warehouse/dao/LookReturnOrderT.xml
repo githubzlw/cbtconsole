@@ -61,10 +61,6 @@ taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1
      <if test="nameString != null">
 			 AND rd.opt_user=#{nameString} 
 	</if>
-	<if test="state != null">
-			 AND rd.state=#{state} 
-	</if>
-	
 	<if test="a1688Shipno != null">
 			 AND (rd.shipno=#{a1688Shipno} or rd.1688_shipno=#{a1688Shipno} or rd.change_shipno=#{a1688Shipno}) 
 	</if>
@@ -75,7 +71,15 @@ taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1
 			 AND (rd.opt_time&lt;#{optTimeEnd} or rd.apply_time&lt;#{optTimeEnd}) 
 	</if>
 	<if test="state !=null">
-			 AND rd.state =#{state}
+		<if test="state == 6">
+			and rd.refund_money =0 and rd.apply_time &lt; DATE_SUB(now(),INTERVAL 5  DAY )
+		</if>
+		<if test="state == 7">
+			and rd.refund_money != rd.actual_money and rd.refund_money > 0
+		</if>
+		<if test="state &lt; 6">
+			AND rd.state =#{state}
+		</if>
 	</if>
 		<if test="userOther !=null">
 			 AND (rd.opt_user =#{userOther} OR rd.opt_user =#{user})
@@ -97,15 +101,20 @@ taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1
 			 AND rd.apply_user=#{nameString} 
 	</if>
 	<if test="state != null">
-			 AND rd.state=#{state} 
+		 <if test="state == 6">
+			and rd.refund_money =0 and rd.apply_time &lt; DATE_SUB(now(),INTERVAL 5  DAY )
+		</if>
+		<if test="state == 7">
+			and rd.refund_money != rd.actual_money and rd.refund_money > 0
+		</if>
+		<if test="state &lt; 6">
+			AND rd.state =#{state}
+		</if>
 	</if>
 	
 	 <if test="a1688Shipno != null">
 			 AND rd.1688_shipno=#{a1688Shipno} 
 	</if>
-		<if test="state !=null">
-			AND rd.state =#{state}
-		</if>
 		<if test="userOther !=null">
 			AND (rd.opt_user =#{userOther} OR rd.opt_user =#{user})
 		</if>
