@@ -15,6 +15,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.cbt.service.CustomGoodsService;
+import com.importExpress.pojo.GoodsOverSea;
+import com.importExpress.service.OverseasWarehouseStockService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +61,6 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.service.OrderSplitRecordService;
-import com.importExpress.service.OverseasWarehouseStockService;
 import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
@@ -83,6 +86,8 @@ public class NewOrderSplitCtr {
     private InventoryService inventoryService;
     @Autowired
     private OverseasWarehouseStockService owsService;
+    @Autowired
+    private CustomGoodsService customGoodsService;
 
     /**
      * 订单拆分(正常订单和Drop Ship订单)
@@ -283,14 +288,8 @@ public class NewOrderSplitCtr {
                         json.setMessage("拆分成功");
                         json.setData(nwOrderNo);
                         if ("0".equals(state)) {
-                        	if(orderNo.indexOf("_H") > -1) {
-                        		for(String odid : odidLst) {
-                        			owsService.reduceOrderStock(null, Integer.parseInt(odid),  "订单orderno/odid已拆弹取消,释放其占用的库存orderStock");
-                        		}
-                        	}else {
-                        		// 拆单取消后取消的商品如果有使用库存则还原库存
-                        		inventoryService.cancelToInventory(odidLst, 0, "");
-                        	}
+                            // 拆单取消后取消的商品如果有使用库存则还原库存
+                        	inventoryService.cancelToInventory(odidLst, 0, "");
 //                            dao.cancelInventory(odidLst);
                         }
                     }
@@ -333,7 +332,7 @@ public class NewOrderSplitCtr {
             OrderBean orderBean = splitDao.getOrders(orderNo);
             if(orderBean == null || StringUtils.isBlank(orderBean.getOrderNo())){
                 json.setOk(false);
-                json.setMessage("获取订单，请重试");
+                json.setMessage("获取订单失败，请重试");
                 return json;
             }
             // 获取新的订单号
@@ -520,14 +519,8 @@ public class NewOrderSplitCtr {
                 // 执行退款操作:更新客户余额=新订单payprice;更新新订单状态为取消;
                 // 新增客户余额变更记录表recharge_record;新增支付记录payment
                 splitDao.cancelNewOrder(orderBeanTemp.getUserid(), nwOrderNo);
-                if(orderNo.indexOf("_H") > -1) {
-                	for(String odid : odidLst) {
-                		owsService.reduceOrderStock(null, Integer.parseInt(odid),  "订单orderno/odid已拆弹取消,释放其占用的库存orderStock");
-                	}
-                }else {
-                	// 拆单取消后取消的商品如果有使用库存则还原库存
-                	inventoryService.cancelToInventory(odidLst, admuser.getId(), admuser.getAdmName());
-                }
+                // 拆单取消后取消的商品如果有使用库存则还原库存
+                inventoryService.cancelToInventory(odidLst, admuser.getId(), admuser.getAdmName());
 //                splitDao.cancelInventory(odidLst);
                 // 5.如果是取消商品进余额，则调用统一接口进行客户余额变更
                 /*ChangUserBalanceDao balanceDao = new ChangUserBalanceDaoImpl();
@@ -675,7 +668,6 @@ public class NewOrderSplitCtr {
             boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails,
                     OrderInfoConstantUtil.REVIEW,  1);
             if (isOk) {
-                splitDao.checkAndUpdateOrderState(orderNo, newOrderNo);
                 json.setOk(true);
             } else {
                 json.setOk(false);
@@ -737,6 +729,68 @@ public class NewOrderSplitCtr {
         return json;
     }
 
+
+    @RequestMapping(value = "/setOverSeaOrder")
+    @ResponseBody
+    public JsonResult setOverSeaOrder(HttpServletRequest request) {
+        JsonResult json = new JsonResult();
+        String orderNo = request.getParameter("orderNo");
+        try {
+
+            if (StringUtils.isBlank(orderNo)) {
+                json.setOk(false);
+                json.setMessage("获取订单号失败");
+                return json;
+            }
+
+            Admuser admuser = UserInfoUtils.getUserInfo(request);
+            if (admuser == null || admuser.getId() == 0) {
+                json.setOk(false);
+                json.setMessage("请登录后操作");
+                return json;
+            }
+
+            List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
+            boolean noOverSea = false;
+            for(OrderDetailsBean o : odb){
+                if(o.getIsOverseasWarehouseProduct() == 0){
+                    noOverSea = true;
+                    break;
+                }
+            }
+            odb.clear();
+            if(noOverSea){
+                json.setOk(false);
+                json.setMessage("含有非海外仓商品，不能设置整单为海外仓订单");
+                return json;
+            }
+
+            // 查询订单和订单详情
+            IOrderSplitDao splitDao = new OrderSplitDaoImpl();
+            OrderBean orderBean = splitDao.getOrders(orderNo);
+            if(orderBean == null || StringUtils.isBlank(orderBean.getOrderNo())){
+                json.setOk(false);
+                json.setMessage("获取订单失败，请重试");
+                return json;
+            }
+            // 获取新的订单号
+            String nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0, 1);
+
+            int rs = iOrderinfoService.updateOrderNoToNewNo(orderNo, nwOrderNo);
+            if(rs > 0){
+                 json.setOk(true);
+            } else {
+                json.setOk(false);
+                json.setMessage("更新订单失败，请重试");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("setOverSeaOrder error:", e);
+            json.setOk(false);
+            json.setMessage("orderNo:" + orderNo + ",setOverSeaOrder error:" + e.getMessage());
+        }
+        return json;
+    }
 
 
     /**

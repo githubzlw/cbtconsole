@@ -466,14 +466,15 @@
 		    return;
         }
         if(window.location.href.indexOf("127.0.0.1") > -1){
-		    url =  "http://127.0.0.1:8383/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
+
         }
+        url =  "http://192.168.1.153:8088/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         if(hotType > 0){
             url += "&hotClassId="+hotType;
         }
         url += "&freeFlag=1";
 
-        var param = "height=400,width=600,top=140,left=500,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        var param = "height=400,width=600,top=200,left=600,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open(url, "windows", param);
 		/*$.ajax({
 			type : "GET",

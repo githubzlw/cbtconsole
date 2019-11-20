@@ -408,6 +408,12 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	public List<OrderDetailsBean> getOrdersDetails(@Param("orderNo") String orderNo);
+	/**
+	 * 根据订单odid查询car_type
+	 * @param orderNo
+	 * @return
+	 */
+	String  getCarTypeByOdid(@Param("odid") String odid);
 
 	/**
 	 * 根据订单号获取订单变更信息
@@ -784,5 +790,12 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	Map<String,Object> getOverseasWarehouseStockOrderDetail(@Param("orderno")String orderno,@Param("userid")int userid);
-	
+
+	/**
+	 * 更新订单为新的订单号
+	 * @param oldOrderNo
+	 * @param newOrderNo
+	 * @return
+	 */
+	int updateOrderNoToNewNo(@Param("oldOrderNo") String oldOrderNo, @Param("newOrderNo") String newOrderNo);
 }

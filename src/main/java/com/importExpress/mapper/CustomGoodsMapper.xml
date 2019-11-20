@@ -1481,13 +1481,13 @@
     </insert>
 
     <insert id="saveGoodsWeightChange" parameterType="com.importExpress.pojo.GoodsWeightChange">
-        insert into goods_weight_change(pid,goods_type,weight,volume_weight,admin_id)
-        values(#{pid},#{goodsType},#{weight},#{volumeWeight},#{adminId})
+        insert into goods_weight_change(pid,goods_type,weight,volume_weight,admin_id,skuid)
+        values(#{pid},#{goodsType},#{weight},#{volumeWeight},#{adminId},#{skuid})
     </insert>
 
     <select id="queryGoodsWeightChangeList" parameterType="com.importExpress.pojo.GoodsWeightChange"
             resultType="com.importExpress.pojo.GoodsWeightChange">
-        select a.id,a.pid,a.goods_type as goodsType,a.weight,a.volume_weight as volumeWeight,a.admin_id as adminId,
+        select a.id,a.pid,a.goods_type as goodsType,a.weight,a.volume_weight as volumeWeight,a.admin_id as adminId,a.skuid,
         b.admName as adminName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,a.sync_flag as syncFlag,
         a.update_admin_id as updateAdminId,c.admName as updateAdminName, DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as updateTime
         from goods_weight_change a left join admuser b  on a.admin_id = b.id left join admuser c  on a.update_admin_id = c.id
@@ -1522,4 +1522,9 @@
         where id = #{id}
     </update>
 
+
+    <update id="updateGoodsOverSeaInfo" parameterType="com.importExpress.pojo.GoodsOverSea">
+        update custom_goods_oversea set is_support = #{isSupport} ,admin_id = #{adminId}
+        where pid = #{pid} and country_id = #{countryId}
+    </update>
 </mapper>

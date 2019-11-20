@@ -769,13 +769,18 @@
                            id="msg">(通知成功)</label>
                     &nbsp;&nbsp; &nbsp;&nbsp;
                     <c:if test="${order.state!=3 || order.state!=4 }">
-                        <input type="button"
+                        <c:if test="${overSeaTotal > 0}">
+                            <input type="button" style="position: fixed; bottom: 556px; right: 50px; width: 150px; height: 30px;" id="closeOrder" value="取消订单(有海外仓)">
+                        </c:if>
+                        <c:if test="${overSeaTotal == 0}">
+                            <input type="button"
                                style="position: fixed; bottom: 556px; right: 50px; width: 150px; height: 30px;"
                                id="closeOrder"
                                onclick="fnCloseOrder('${order.orderNo}',${order.userid},${order.pay_price},
                                        '${order.currency}',${order.order_ac},'${order.userEmail}','${order.email}',
                                    ${order.product_cost+preferential_price},${actual_ffreight_+foreign_freight},
-                                   ${order.actual_weight_estimate},${isDropshipOrder })" value="取消订单">&nbsp;&nbsp;
+                                   ${order.actual_weight_estimate},${isDropshipOrder })" value="取消订单">
+                        </c:if>
                     </c:if>
                     <c:if test="${count==1 }">
                         <input type="button"
@@ -784,18 +789,31 @@
                     </c:if>
                     &nbsp;&nbsp;
                     <c:if test="${isSplitOrder == 0 && order.state != 3 && order.state != 4}">
-                        <input type="button"
+                        <c:if test="${overSeaTotal > 0}">
+                            <input type="button" style="position: fixed; bottom: 524px; right: 50px; width: 150px; height: 30px;" id="split_order_btn" value="拆单(有海外仓)">
+                        </c:if>
+                        <c:if test="${overSeaTotal == 0}">
+                            <input type="button"
                                style="position: fixed; bottom: 524px; right: 50px; width: 150px; height: 30px;"
                                id="split_order_btn"
                                onclick="fnSplitOrder('${order.orderNo}','${order.email}','${param.paytime}')"
-                               value="拆单">&nbsp;&nbsp;
+                               value="拆单">
+                        </c:if>
                     </c:if>
                     <c:if test="${isSplitOrder == 1}">
-                        <input type="button"
+                        <c:if test="${overSeaTotal > 0}">
+                            <input type="button"
+                               style="position: fixed; bottom: 524px; right: 50px; width: 150px; height: 30px;"
+                               id="split_order_btn"  value="拆单(有海外仓)">
+                        </c:if>
+                        <c:if test="${overSeaTotal == 0}">
+                            <input type="button"
                                style="position: fixed; bottom: 524px; right: 50px; width: 150px; height: 30px;"
                                id="split_order_btn"
                                onclick="fnSplitDropShipOrder('${order.orderNo}','${order.email}','${param.paytime}')"
                         value="拆单">
+                        </c:if>
+
                         &nbsp;&nbsp;
                     </c:if>
                     <%--<input type="button"--%>
@@ -813,15 +831,22 @@
                            onclick="afterReplenishment()" value="售后补货">
                 </td>
                 <td>
-                    <input type="button"
+                    <c:if test="${overSeaTotal > 0}">
+                        <input type="button"
+                           style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;" id="spilt_num" value="数量拆单(有海外仓)">
+                    </c:if>
+                    <c:if test="${overSeaTotal == 0}">
+                        <input type="button"
                            style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;" id="spilt_num"
                            onclick="openSplitNumPage('${order.orderNo}')" value="数量拆单">
+                    </c:if>
+
                 </td>
-                <%--<td>
+                <td>
                     <input type="button"
                            style="position: fixed; bottom: 388px; right: 50px; width: 150px; height: 30px;"
                            onclick="openOverSeaSplit('${order.orderNo}')" value="海外仓拆单">
-                </td>--%>
+                </td>
                 <td>分配采购（整单）： <select id="Abuyer" onchange="changeAllBuyer('${order.orderNo}',this.value)">
                     <option value=""></option>
                     <c:forEach var="aub" items="${aublist }">
