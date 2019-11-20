@@ -758,7 +758,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             // Colour:black@32161,Size:S@4501,
             String[] typeStrList = typeStr.split(",");
             String ppId = "";
-            boolean isSkuid = weightChange.getPid().equals(skuid);
+            boolean isSkuid = weightChange.getPid().equals(skuid) || StringUtils.isBlank(skuid);
             if(isSkuid) {
             	for (String childType : typeStrList) {
             		if (StringUtils.isNotBlank(childType)) {
