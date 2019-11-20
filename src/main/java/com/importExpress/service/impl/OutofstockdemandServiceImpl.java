@@ -5,6 +5,7 @@ import com.importExpress.pojo.Outofstockdemandtable;
 import com.importExpress.pojo.OutofstockdemandtableExample;
 import com.importExpress.service.CustomBenchmarkService;
 import com.importExpress.service.OutofstockdemandService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
  * 1.0.0       8:55:122019/1/10     cjc                       初版
  * ******************************************************************************************
  */
+@Slf4j
 @Service
 public class OutofstockdemandServiceImpl implements OutofstockdemandService {
     @Autowired
@@ -131,7 +133,13 @@ public class OutofstockdemandServiceImpl implements OutofstockdemandService {
                     String typename = "";
                     String s = j.replaceAll("[^(0-9)]", "");
                     if(StringUtils.isNotBlank(s)){
-                        String typeNameByDataBase = custombenchmarkskuservice.selectTypeNameBySkuId(s);
+                        String typeNameByDataBase = null;
+                        try {
+                            typeNameByDataBase = custombenchmarkskuservice.selectTypeNameBySkuId(s);
+                        } catch (Exception ex) {
+                            System.out.println("ex = " + s);
+                            log.error("typeNameByDataBase error,skuid:[{}]",s);
+                        }
                         e.setGoodstype(e.getGoodstype()+typeNameByDataBase+"||");
                     }else{
                         e.setGoodstype(e.getGoodstype()+typename+j+"||");
