@@ -1730,7 +1730,7 @@ function saveWeight(orderid, odid, pid) {
             } else if (Number(data) == 2) {
                 document.getElementById("tip_" + orderid + odid).innerHTML = "保存商品重量的数据问题!";
             }
-            saveWeightFlag(orderid, odid, pid);//将修改商品重量 和 将重量同步到产品库 按钮合并（这里改动的页面中的）
+//            saveWeightFlag(orderid, odid, pid);//将修改商品重量 和 将重量同步到产品库 按钮合并（这里改动的页面中的）
         }
     });
 }

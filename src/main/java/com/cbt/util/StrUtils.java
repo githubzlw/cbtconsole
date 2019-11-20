@@ -15,7 +15,7 @@ public class StrUtils {
 	// 美元汇率
 	public static final double EXCHANGE_RATE = 6.3;
 	
-	/**Object转String
+	/**Object转数字String
 	 * @param object
 	 * @return
 	 */
@@ -24,6 +24,19 @@ public class StrUtils {
 			return "0";
 		}
 		if(!isMatch(object.toString(), "(\\d+)")){
+			return "0";
+		}
+		return object.toString();
+	}
+	/**Object转小数String
+	 * @param object
+	 * @return
+	 */
+	public static String object2DotNumStr(Object object){
+		if(object == null){
+			return "0";
+		}
+		if(!isMatch(object.toString(), "(\\d+\\.\\d+)")){
 			return "0";
 		}
 		return object.toString();

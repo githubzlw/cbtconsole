@@ -1,47 +1,106 @@
 package com.cbt.warehouse.service;
 
-import com.cbt.FreightFee.service.FreightFeeSerive;
-import com.cbt.bean.OrderBean;
-import com.cbt.bean.ZoneBean;
-import com.cbt.bean.*;
-import com.cbt.common.StringUtils;
-import com.cbt.jdbc.DBHelper;
-import com.cbt.orderinfo.dao.OrderinfoMapper;
-import com.cbt.pojo.*;
-import com.cbt.processes.servlet.Currency;
-import com.cbt.service.CustomGoodsService;
-import com.cbt.util.Util;
-import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.pojo.AdmuserPojo;
-import com.cbt.warehouse.pojo.ClassDiscount;
-import com.cbt.warehouse.pojo.*;
-import com.cbt.warehouse.util.StringUtil;
-import com.cbt.warehouse.util.Utility;
-import com.cbt.website.bean.*;
-import com.cbt.website.server.PurchaseServer;
-import com.cbt.website.server.PurchaseServerImpl;
-import com.importExpress.mapper.IPurchaseMapper;
-import com.importExpress.utli.*;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cbt.FreightFee.service.FreightFeeSerive;
+import com.cbt.bean.BlackList;
+import com.cbt.bean.CustomGoodsBean;
+import com.cbt.bean.Forwarder;
+import com.cbt.bean.LocationManagementInfo;
+import com.cbt.bean.LocationTracking;
+import com.cbt.bean.Logisticsinfo;
+import com.cbt.bean.OrderAddress;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.bean.OrderInfoPrint;
+import com.cbt.bean.Orderinfo;
+import com.cbt.bean.RechargeRecord;
+import com.cbt.bean.StorageInspectionLogPojo;
+import com.cbt.bean.StorageLocationBean;
+import com.cbt.bean.ZoneBean;
+import com.cbt.bean.badGoods;
+import com.cbt.common.StringUtils;
+import com.cbt.jdbc.DBHelper;
+import com.cbt.orderinfo.dao.OrderinfoMapper;
+import com.cbt.pojo.BuyerCommentPojo;
+import com.cbt.pojo.CustomsRegulationsPojo;
+import com.cbt.pojo.EntypeBen;
+import com.cbt.pojo.Inventory;
+import com.cbt.pojo.RedManProductBean;
+import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.processes.servlet.Currency;
+import com.cbt.service.CustomGoodsService;
+import com.cbt.util.StrUtils;
+import com.cbt.util.Util;
+import com.cbt.warehouse.dao.WarehouseMapper;
+import com.cbt.warehouse.pojo.AdmuserPojo;
+import com.cbt.warehouse.pojo.AllProblemPojo;
+import com.cbt.warehouse.pojo.ClassDiscount;
+import com.cbt.warehouse.pojo.DisplayBuyInfo;
+import com.cbt.warehouse.pojo.GoodsInventory;
+import com.cbt.warehouse.pojo.JcexPrintInfo;
+import com.cbt.warehouse.pojo.OrderFeePojo;
+import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.OrderInfoPojo;
+import com.cbt.warehouse.pojo.OrderProductSurcePojo;
+import com.cbt.warehouse.pojo.OrderReplenishmentPojo;
+import com.cbt.warehouse.pojo.RefundSamplePojo;
+import com.cbt.warehouse.pojo.SampleOrderBean;
+import com.cbt.warehouse.pojo.SbxxPojo;
+import com.cbt.warehouse.pojo.ShippingPackage;
+import com.cbt.warehouse.pojo.Tb1688Account;
+import com.cbt.warehouse.pojo.Tb1688Pojo;
+import com.cbt.warehouse.pojo.returndisplay;
+import com.cbt.warehouse.util.StringUtil;
+import com.cbt.warehouse.util.Utility;
+import com.cbt.website.bean.ConfirmUserInfo;
+import com.cbt.website.bean.PurchaseBean;
+import com.cbt.website.bean.PurchaseDetailsBean;
+import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
+import com.cbt.website.bean.SampleGoodsBean;
+import com.cbt.website.bean.SearchResultInfo;
+import com.cbt.website.bean.ShopManagerPojo;
+import com.cbt.website.bean.UserInfo;
+import com.cbt.website.bean.UserOrderDetails;
+import com.cbt.website.bean.outIdBean;
+import com.cbt.website.server.PurchaseServer;
+import com.cbt.website.server.PurchaseServerImpl;
+import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.mapper.ProductSkuWeightMapper;
+import com.importExpress.pojo.ProductSkuWeight;
+import com.importExpress.utli.JsonUtils;
+import com.importExpress.utli.MultiSiteUtil;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SearchFileUtils;
+import com.importExpress.utli.SendMQ;
 
 @Service
 public class WarehouseServiceImpl implements IWarehouseService {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(WarehouseServiceImpl.class);
+    @Autowired
+    private ProductSkuWeightMapper skuWeightMapper;
     @Autowired
     private WarehouseMapper warehouseMapper;
     @Autowired
@@ -67,12 +126,34 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int saveWeight(Map<String, String> map) {
+    	String weight = map.get("weight");
+    	double dWeight = Double.parseDouble(weight) * 1000;
+    	weight = String.valueOf(dWeight).split("\\.")[0];
+    	
+    	String vweight = StrUtils.object2DotNumStr(map.get("volumeWeight"));
+    	double dvweight = Double.parseDouble(vweight) * 1000;
+    	vweight = String.valueOf(dvweight).split("\\.")[0];
+    	
+    	int admid = Integer.parseInt(StrUtils.object2NumStr(map.get("adminid")));
+    	ProductSkuWeight wprap = ProductSkuWeight.builder()
+    			.adminid(admid)
+    			.pid(map.get("pid"))
+    			.skuid(map.get("skuid"))
+    			.weight(Integer.parseInt(weight) )
+    			.v_weight(Integer.parseInt(vweight)).build();
+		int updateWeight = skuWeightMapper.updateWeight(wprap );
+		if(updateWeight == 0) {
+			updateWeight = skuWeightMapper.insertWeight(wprap );
+		}
+//		int odid = Integer.parseInt(map.get("odid"));
+		//保存产品库表
+//		saveWeightFlag(map.get("pid"),admid,odid,map.get("skuid"));
         return warehouseMapper.saveWeight(map);
     }
 
     //result 0-处理异常;2-pid数据问题;1-同步到产品库成功;3-未找到重量数据;4-已经同步到产品库过;
     @Override
-    public int saveWeightFlag(String pid, int adminId, int odId) {
+    public int saveWeightFlag(String pid, int adminId, int odId,String skuid) {
         // 查询已保存的实秤重量
         SearchResultInfo weightAndSyn = warehouseMapper.getGoodsWeight(pid, odId);
         if (null == weightAndSyn){
@@ -81,10 +162,10 @@ public class WarehouseServiceImpl implements IWarehouseService {
         if (weightAndSyn.getSyn() == 1){
             return 4;
         }
+        weightAndSyn.setSkuID(skuid);
         //调整到异步处理
         Runnable task=new SetGoodsWeightByWeigherTask(pid, weightAndSyn, adminId);
         new Thread(task).start();
-//        customGoodsService.setGoodsWeightByWeigherNew(pid, weightAndSyn.getWeight()); //jxw同步重量到产品库接口
         return 1;
     }
 
