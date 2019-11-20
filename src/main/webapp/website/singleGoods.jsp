@@ -307,6 +307,7 @@
             var content = '';
             if (row.syncFlag == 0 || row.syncFlag == 2) {
                 content += '<br><input type="button" class="style_btn_delete" value="删除商品" onclick="deleteGoodsByPid(\'' + row.goodsPid + '\')">';
+                content += '<br><input type="button" style="display: none;" onclick="openSyncWindow(\''+row.goodsPid + '\')"/>';
             } else if (row.syncFlag == 1) {
                 content += '<br>'
                     + '<a href="/cbtconsole/editc/detalisEdit?pid='
@@ -461,6 +462,12 @@
                 }
             });
 
+        }
+
+        function openSyncWindow(pid) {
+            var url = "http://192.168.1.102:8080/syncGoodsToOnline/sync/singleGoodsSync?pid=" + pid;
+            var param = "height=400,width=600,top=200,left=600,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+            window.open(url, "windows", param);
         }
     </script>
 
