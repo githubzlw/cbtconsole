@@ -63,7 +63,8 @@
 						<td class="datagrid-goodsPid">${stock.goodsPid}</td>
 						<td class="datagrid-goodsName">${stock.goodsName}</td>
 						<td align="left" class="datagrid-sku">
-						${stock.sku}<br>${stock.skuid}<br>${stock.specid}
+						<c:if test="${stock.sku !='null'}">${stock.sku}</c:if>
+						<br>${stock.skuid}<br>${stock.specid}
 						</td>
 						<td class="datagrid-code">${stock.code}</td>
 						<td class="datagrid-order">${stock.orderno} / ${stock.odid}</td>
@@ -72,7 +73,9 @@
 						${stock.changeType==0?'占用':'释放'}
 						</td>
 						<td class="datagrid-create-time">${stock.createTime}</td>
-						<td class="datagrid-remark">${stock.stockRemark}<br>${stock.remark}</td>
+						<td class="datagrid-remark">
+						<c:if test="${stock.stockRemark!='null'}">${stock.stockRemark }</c:if>
+						<br>${stock.remark}</td>
 					</tr>
 					</c:forEach>
 				</tbody>
