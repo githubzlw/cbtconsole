@@ -64,6 +64,30 @@ $(function(){
 		$(".btn-updeta-add").show();
 		$('.tc,.trnasparent,.tc1').show();
 	})
+	$(".btn-updeta-add").click(function(){
+		
+		var catid = $("#update-catid").val()
+		var category = $("#update-category").val()
+		var content = $("#update-sy").val();
+		$.ajax({
+		       url:"/cbtconsole/synonyms/category/add",
+		       data:{"catid":catid,"content":content,"category":category},
+		       type:"post",
+		       success:function(data){
+		    	  if(data.status == 200){
+		    		  $('.tc,.trnasparent,.tc1').hide();
+		    		  $.MsgBox.Alert("提示", "更新成功");
+		    		  location.reload();
+		    	  }else{
+		    		  $.MsgBox.Alert("提示", data.message);
+		    	  }
+		       },
+		   	error:function(e){
+		   		$.MsgBox.Alert("提示", "更新失败");
+		   	}
+		   })
+		
+	})
 	
 })
 

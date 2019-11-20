@@ -114,6 +114,7 @@ padding: 20px;max-height: 800px;    width: 800px;}
 			<label>Category:<input value="" id="update-category" type="text" ></label>
 		</div>
 		<div class="wrap row">
+		<div>Note:多个词之间用","分割!!!</div>
 		<textarea rows="20" cols="70" id="update-sy"></textarea>
 		</div>
 		<div class="wrap row">

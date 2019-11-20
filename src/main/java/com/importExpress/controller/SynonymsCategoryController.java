@@ -18,7 +18,9 @@ import com.google.common.collect.Maps;
 import com.importExpress.pojo.SynonymsCategoryWrap;
 import com.importExpress.service.SynonymsCategoryService;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequestMapping("/synonyms/category")
 public class SynonymsCategoryController {
@@ -39,15 +41,15 @@ public class SynonymsCategoryController {
 		String page = request.getParameter("page");
 		page = StrUtils.isNum(page) ? page : "1";
 		int categoryListCount = 0;
+		categoryListCount = syCategoryService.categoryListCount(catid);
 		try {
-			categoryListCount = syCategoryService.categoryListCount(catid);
 			if(categoryListCount > 0) {
 				List<SynonymsCategoryWrap> categoryList = syCategoryService.getCategoryList(catid, (Integer.parseInt(page)-1)*20);
 				mv.addObject("categoryList", categoryList);
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("SynonymsCategoryController",e);
 		}
 		
 		int totalPage = categoryListCount% 20 == 0? categoryListCount/20:categoryListCount/20+1;
@@ -78,9 +80,9 @@ public class SynonymsCategoryController {
 		
 		int updateCategory = syCategoryService.addCategory(wrap);
 		result.put("status", 200);
-		if(updateCategory > 0) {
+		if(updateCategory < 1) {
 			result.put("status", 100);
-			result.put("messagw", "更新失败");
+			result.put("message", "更新失败");
 		}
 		return result;
 	}
@@ -102,7 +104,7 @@ public class SynonymsCategoryController {
 		}
 		int updateCategory = syCategoryService.updateCategory(catid, content);
 		result.put("status", 200);
-		if(updateCategory > 0) {
+		if(updateCategory < 1) {
 			result.put("status", 100);
 			result.put("message", "更新失败");
 		}
@@ -120,7 +122,7 @@ public class SynonymsCategoryController {
 		String catid = request.getParameter("catid");
 		int delete = syCategoryService.delete(catid);
 		result.put("status", 200);
-		if(delete > 0) {
+		if(delete < 1) {
 			result.put("status", 100);
 			result.put("message", "删除失败");
 		}

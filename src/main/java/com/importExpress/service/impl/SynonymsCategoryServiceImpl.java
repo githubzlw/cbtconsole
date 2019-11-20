@@ -55,7 +55,7 @@ public class SynonymsCategoryServiceImpl implements SynonymsCategoryService {
 
 	@Override
 	public int addCategory(SynonymsCategoryWrap wrap) {
-		String sql = "insert into  synonyms_category (category,catid,synonyms_category,valid) values(?,?,?,?)";
+		String sql = "insert into  synonyms_category(category,catid,synonyms_category,valid) values(?,?,?,?)";
 		List<String> lstValue = Lists.newArrayList();
 		lstValue.add(wrap.getCategory());
 		lstValue.add(wrap.getCatid());
