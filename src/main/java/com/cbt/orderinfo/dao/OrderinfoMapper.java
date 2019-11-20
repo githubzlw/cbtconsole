@@ -790,5 +790,12 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	Map<String,Object> getOverseasWarehouseStockOrderDetail(@Param("orderno")String orderno,@Param("userid")int userid);
-	
+
+	/**
+	 * 更新订单为新的订单号
+	 * @param oldOrderNo
+	 * @param newOrderNo
+	 * @return
+	 */
+	int updateOrderNoToNewNo(@Param("oldOrderNo") String oldOrderNo, @Param("newOrderNo") String newOrderNo);
 }

@@ -1522,4 +1522,9 @@
         where id = #{id}
     </update>
 
+
+    <update id="updateGoodsOverSeaInfo" parameterType="com.importExpress.pojo.GoodsOverSea">
+        update custom_goods_oversea set is_support = #{isSupport} ,admin_id = #{adminId}
+        where pid = #{pid} and country_id = #{countryId}
+    </update>
 </mapper>

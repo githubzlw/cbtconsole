@@ -737,7 +737,7 @@
         select DISTINCT oi.isDropshipOrder,adr.country,ifnull(cast(getExchangeRMB(ors.goods_price*(ifnull(buycount,1)),ifnull(ors.currency,'USD'))as DECIMAL(10,2)),0) as sumGoods_price,
         IFNULL((ors.goods_p_price*(ifnull(ors.buycount,1))),0)as sumGoods_p_price,
         ors.purchase_state orsstate,od.orderid,od.od_state,od.shipno, 6 as ropType,ors.goods_p_url newValue,ors.last_goods_p_url AS lastValue,ors.tb_1688_itemid,ors.last_tb_1688_itemid,ors.confirm_time,ors.confirm_userid,
-        ors.goods_p_price oldValue,ifnull(ors.goods_p_name,'--') as goodsPName,ors.buycount,ors.del del_state,od.userid,od.id oid,od.goodsname,od.checkprice_fee,od.state,od.paytime,
+        ors.goods_p_price oldValue,ifnull(ors.goods_p_name,'--') as goodsPName,ors.buycount,ors.del del_state,od.userid,od.id oid,od.goodsname,od.checkprice_fee,od.state,od.paytime,od.isOverseasWarehouseProduct,
         car_img,od.car_url, convert(od.goodsprice, decimal(12,2)) as goodsprice,od.yourorder,goodsfreight,od.remark,od.delivery_time,od.Actual_price,od.Actual_freight,od.Actual_weight, od.od_bulk_volume,od.od_total_weight,
         od.Actual_volume,od.goodsid,od.extra_freight,od.fileupload,od.freight_free,od.purchase_state,ifnull(od.purchase_time,ors.purchasetime) as purchase_time,purchase_confirmation,car_type,
         (SELECT z.id FROM zone z WHERE REPLACE(z.country,' ','')=REPLACE(adr.country,' ','')) new_zid ,
@@ -1568,4 +1568,10 @@
     limit 1
     </select>
     <select id="getCarTypeByOdid" resultType="String">select car_type from order_details where id=#{odid}</select>
+
+    <update id="updateOrderNoToNewNo">
+        update orderinfo set order_no = #{newOrderNo} where order_no = #{oldOrderNo};
+		update order_details set orderid = #{newOrderNo} where orderid = #{oldOrderNo};
+		update payment set orderid = #{newOrderNo} where orderid = #{oldOrderNo};
+    </update>
 </mapper>

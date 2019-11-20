@@ -2254,6 +2254,15 @@ public class OrderinfoService implements IOrderinfoService {
 		
 		return orderinfoMapper.getOverseasWarehouseStockOrderDetail(orderno, userid);
 	}
+
+	@Override
+	public int updateOrderNoToNewNo(String oldOrderNo, String newOrderNo) {
+		String sql = "update orderinfo set order_no = '" + newOrderNo + "' where order_no = '" + oldOrderNo + "';";
+		sql += "update order_details set orderid = '" + newOrderNo + "' where orderid = '" + oldOrderNo + "';";
+		sql +="update payment set orderid ='"+newOrderNo+"' where orderid='"+oldOrderNo +"';";
+		SendMQ.sendMsg(new RunSqlModel(sql));
+		return orderinfoMapper.updateOrderNoToNewNo(oldOrderNo, newOrderNo);
+	}
 }
 
 

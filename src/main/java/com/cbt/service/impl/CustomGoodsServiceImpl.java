@@ -923,5 +923,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryGoodsWeightChangeListCount(weightChange);
     }
 
+    @Override
+    public int updateGoodsOverSeaInfo(GoodsOverSea goodsOverSea) {
+        return customGoodsMapper.updateGoodsOverSeaInfo(goodsOverSea);
+    }
+
 
 }
