@@ -56,6 +56,7 @@ padding: 20px;max-height: 800px;    width: 800px;}
 <label>Catid:<input type="text" id="catid-p" value="${catid }"></label>
 <label><button class="btn btn-info btn-search">查询</button></label>
 <label><button class="btn btn-info btn-add">新增</button></label>
+<label><button class="btn btn-info btn-flush">同步刷新线上</button></label>
 </div>
 </div>
 

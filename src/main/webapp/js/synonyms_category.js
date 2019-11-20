@@ -46,13 +46,15 @@ $(function(){
 		       success:function(data){
 		    	  if(data.status == 200){
 		    		  $('.tc,.trnasparent,.tc1').hide();
-		    		  location.reload();
+		    		  $.MsgBox.Confirm("提示", "新增成功,等待数据同步后刷新列表",function(){
+		    			  location.reload();
+		    		  });
 		    	  }else{
 		    		  $.MsgBox.Alert("提示", data.message);
 		    	  }
 		       },
 		   	error:function(e){
-		   		$.MsgBox.Alert("提示", "更新失败");
+		   		$.MsgBox.Alert("提示", "新增失败");
 		   	}
 		   })
 	})
@@ -76,8 +78,9 @@ $(function(){
 		       success:function(data){
 		    	  if(data.status == 200){
 		    		  $('.tc,.trnasparent,.tc1').hide();
-		    		  $.MsgBox.Alert("提示", "更新成功");
-		    		  location.reload();
+		    		  $.MsgBox.Confirm("提示", "更新成功,等待数据同步后刷新列表",function(){
+		    			  location.reload();
+		    		  });
 		    	  }else{
 		    		  $.MsgBox.Alert("提示", data.message);
 		    	  }
@@ -87,6 +90,20 @@ $(function(){
 		   	}
 		   })
 		
+	})
+	
+	$(".btn-flush").click(function(){
+		$.ajax({
+			url:'https://www.import-express.com/app/flush/synonyms/category',
+			data:{},
+			type:"post",
+			success:function(data){
+				$.MsgBox.Alert("提示", "刷新成功");
+			},
+			error:function(e){
+				$.MsgBox.Alert("提示", "请求错误");
+			}
+		});
 	})
 	
 })
@@ -119,7 +136,9 @@ function deleteCatid(catid){
 		       type:"post",
 		       success:function(data){
 		    	  if(data.status == 200){
-		    		  location.reload();
+		    		  $.MsgBox.Confirm("提示", "删除成功,等待数据同步后刷新列表",function(){
+		    			  location.reload();
+		    		  });
 		    	  }else{
 		    		  $.MsgBox.Alert("提示", data.message);
 		    	  }
