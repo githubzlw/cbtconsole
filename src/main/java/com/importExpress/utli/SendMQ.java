@@ -201,7 +201,6 @@ public class SendMQ {
             return response;
         } catch (IOException | TimeoutException | InterruptedException e) {
             log.error("sendMsgByRPC", e);
-            e.printStackTrace();
             return null;
         }
     }
