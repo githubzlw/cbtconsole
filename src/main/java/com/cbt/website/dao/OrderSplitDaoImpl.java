@@ -2652,11 +2652,11 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 	@Override
 	public boolean checkAndUpdateOrderState(String oldOrder, String newOrder) {
-		Connection conn2 = DBHelper.getInstance().getConnection2();
+		// Connection conn2 = DBHelper.getInstance().getConnection2();
 		String sql1 = "call checkupdate_ordersate(?)";
 		String sql2 = "call checkupdate_ordersate(?)";
-		CallableStatement cStmt1 = null;
-		CallableStatement cStmt2 = null;
+		// CallableStatement cStmt1 = null;
+		// CallableStatement cStmt2 = null;
 		try {
 			if (GetConfigureInfo.openSync()) {
 				String sqlStr1 = "{call checkupdate_ordersate('" + oldOrder + "')}"; // 执行SQL体
@@ -2665,19 +2665,28 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				SaveSyncTable.InsertOnlineDataInfo(0, newOrder, "拆单,更新新订单状态", "orderinfo", sqlStr2);
 				return true;
 			} else {
-				cStmt1 = conn2.prepareCall(sql1);
+				String sqlOld = "UPDATE orderinfo  SET state=(SELECT (CASE WHEN COUNT(*) =SUM(state) THEN 2 WHEN " +
+						"SUM((case when purchase_state=3 then 1 else 0 end))>0 THEN 1 ELSE 5 END ) FROM order_details " +
+						"WHERE orderid='"+oldOrder+"' AND state<2 ) WHERE order_no='"+oldOrder+"' and state not in(-1,6);";
+				String sqlNew = "UPDATE orderinfo  SET state=(SELECT (CASE WHEN COUNT(*) =SUM(state) THEN 2 WHEN " +
+						"SUM((case when purchase_state=3 then 1 else 0 end))>0 THEN 1 ELSE 5 END ) FROM order_details " +
+						"WHERE orderid='"+newOrder+"' AND state<2 ) WHERE order_no='"+newOrder+"' and state not in(-1,6);";
+
+				System.err.println(sqlOld + sqlNew);
+				SendMQ.sendMsg(new RunSqlModel(sqlOld + sqlNew));
+				/*cStmt1 = conn2.prepareCall(sql1);
 				cStmt1.setString(1, oldOrder);
 				cStmt1.execute();
 				cStmt2 = conn2.prepareCall(sql2);
 				cStmt2.setString(1, newOrder);
-				cStmt2.execute();
+				cStmt2.execute();*/
 				return true;
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (cStmt1 != null) {
+			/*if (cStmt1 != null) {
 				try {
 					cStmt1.close();
 				} catch (SQLException e) {
@@ -2690,8 +2699,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
-			}
-			DBHelper.getInstance().closeConnection(conn2);
+			}*/
+			// DBHelper.getInstance().closeConnection(conn2);
 		}
 		return false;
 
