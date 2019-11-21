@@ -40,6 +40,8 @@
 .tc1{position:absolute;z-index:10;display:none;top:100px;left:62%;margin-left:-600px;background-color:#fff;
 padding: 20px;max-height: 800px;    width: 800px;}
 .transparent,.transparent-bg{width:100%;height:100%;background-color:rgba(0,0,0,0);position: fixed;z-index:1;display: none;text-align: center;}
+.wrap-note{font-size: 20px;font-weight: bold;color: #a94442;    margin-left: 87px;}
+.row-t{margin-left: -69px;}
 </style>
 <title>类别同义词管理</title>
 </head>
@@ -114,8 +116,15 @@ padding: 20px;max-height: 800px;    width: 800px;}
 			<label>Catid:<input value="" id="update-catid" type="text" ></label>
 			<label>Category:<input value="" id="update-category" type="text" ></label>
 		</div>
+		<br>
 		<div class="wrap row">
-		<div>Note:多个词之间用","分割!!!</div>
+		<div class="row wrap-note">
+		<div class="col-xs-1">Notes:</div>
+		<div class="col-xs-5">
+		<div class="row row-m">①多个词之间用","分割 ②无需考虑大小写</div>
+		<div class="row row-t">③需考虑单复数④需考虑单词顺序</div>
+		</div>
+		</div>
 		<textarea rows="20" cols="70" id="update-sy"></textarea>
 		</div>
 		<div class="wrap row">

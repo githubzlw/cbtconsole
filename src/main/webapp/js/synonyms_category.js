@@ -46,7 +46,7 @@ $(function(){
 		       success:function(data){
 		    	  if(data.status == 200){
 		    		  $('.tc,.trnasparent,.tc1').hide();
-		    		  $.MsgBox.Confirm("提示", "新增成功,等待数据同步后刷新列表",function(){
+		    		  $.MsgBox.Confirm("提示", "更新成功,等待数据同步后刷新列表",function(){
 		    			  location.reload();
 		    		  });
 		    	  }else{
@@ -54,7 +54,7 @@ $(function(){
 		    	  }
 		       },
 		   	error:function(e){
-		   		$.MsgBox.Alert("提示", "新增失败");
+		   		$.MsgBox.Alert("提示", "更新失败");
 		   	}
 		   })
 	})
@@ -78,7 +78,7 @@ $(function(){
 		       success:function(data){
 		    	  if(data.status == 200){
 		    		  $('.tc,.trnasparent,.tc1').hide();
-		    		  $.MsgBox.Confirm("提示", "更新成功,等待数据同步后刷新列表",function(){
+		    		  $.MsgBox.Confirm("提示", "新增成功,等待数据同步后刷新列表",function(){
 		    			  location.reload();
 		    		  });
 		    	  }else{
@@ -86,7 +86,7 @@ $(function(){
 		    	  }
 		       },
 		   	error:function(e){
-		   		$.MsgBox.Alert("提示", "更新失败");
+		   		$.MsgBox.Alert("提示", "新增失败");
 		   	}
 		   })
 		

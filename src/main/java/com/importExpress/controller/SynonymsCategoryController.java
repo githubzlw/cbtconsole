@@ -86,7 +86,15 @@ public class SynonymsCategoryController {
 		}
 		return result;
 	}
-	private static String reg = "[\\-&\\{\\}\\[\\]\\(\\)\\*\\:;\"\\.\\?/<>《》。？：；“’”‘#@！~·%-——\\+\\=、|（）\\^]";
+	private static String reg = "[\\[\\]\\{\\}<>《》。？/：；“”‘’、+=|）（*&%￥#@！~·~`\\!@#\\$%\\^&\\*\\(\\)\\|\\-_\\+\\=\\\\\\.\\:;'\"\\?/]";
+	
+	public static void main(String[] args) {
+		String str = "Hamster Toys,Toys Hamster*";
+		str = str.replace("，", ",")
+				.replaceAll(reg, " ");
+		System.out.println("***"+str+"****");
+		
+	}
 	/**更新类别同义词
 	 * @param request
 	 * @param response
@@ -100,7 +108,7 @@ public class SynonymsCategoryController {
 		String content = request.getParameter("content");
 		if(StringUtil.isNotBlank(content)) {
 			content = content.replace("，", ",")
-					.replaceAll(reg, " ");
+					.replaceAll(reg, " ").trim().replaceAll("(\\s+)", " ");
 		}
 		int updateCategory = syCategoryService.updateCategory(catid, content);
 		result.put("status", 200);
