@@ -110,10 +110,10 @@
 	<insert id="addSyncStockTime">insert into overseas_warehouse_stock_synchronization(create_time,sync_count) values(now(),#{syncCount})</insert>
 	
 	<select id="getOrderDetails" resultType="java.util.Map">
-	select od.orderid,od.id as odid,od.yourorder,goods_pid,car_type,ows.code_n,ows.ows_id,ows.change_type
+	select od.orderid,od.id as odid,od.yourorder,goods_pid,car_type,ows.code_n,ows.code,ows.ows_id,ows.change_type
 	
 	from order_details od left join overseas_warehouse_stock_log ows on od.id=ows.od_id 
-	where ows.change_type in(0,1)
+	where ows.change_type in(0,1) and od.orderid like '%_H%'
 	<if test="orderno!=null">and od.orderid=#{orderno}</if>
 	<if test="odid!=0">and od.id=#{odid}</if>
 	order by od.id asc,ows.change_type desc
