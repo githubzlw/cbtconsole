@@ -1,8 +1,6 @@
 package com.importExpress.utli;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.cbt.parse.service.DownloadMain;
 import okhttp3.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,10 +43,10 @@ public class OKHttpUtils {
 		/*client = new OkHttpClient().Builder().connectTimeout(600, TimeUnit.SECONDS).readTimeout(300, TimeUnit.SECONDS)
 		.writeTimeout(300, TimeUnit.SECONDS);*/
 
-        client = getClientInstence();
+        client = getClientInstance();
     }
 
-    public static OkHttpClient getClientInstence() {
+    public static OkHttpClient getClientInstance() {
         OkHttpClient clientIns = new OkHttpClient.Builder().connectTimeout(1200, TimeUnit.SECONDS)
                 .readTimeout(600, TimeUnit.SECONDS).writeTimeout(600, TimeUnit.SECONDS).build();
         return clientIns;
@@ -74,7 +72,7 @@ public class OKHttpUtils {
                     .addFormDataPart("unsellableReason", String.valueOf(unsellableReason))
                     .addFormDataPart("method", String.valueOf(method))
                     .build();*/
-            // Request request = new Request.Builder().addHeader("Accept", "*/*").addHeader("Connection", "close").addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").url(IMG_ONLINE_AND_DELETE_URL).post(formBody).build();
+            // Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*").addHeader("Connection", "close").addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").url(IMG_ONLINE_AND_DELETE_URL).post(formBody).build();
             // client = new OkHttpClient();
             /*OkHttpClient client = getClientInstence();
             Response response = client.newCall(request).execute();
@@ -108,7 +106,7 @@ public class OKHttpUtils {
     public String get(String url, Headers mHeaders) throws Exception {
         checkAndInitOkHttp();
 
-        Request request = new Request.Builder().url(url).headers(mHeaders).build();
+        Request request = new Request.Builder().addHeader("Connection", "close").url(url).headers(mHeaders).build();
         Response response = client.newCall(request).execute();
         if (response.isSuccessful()) {
             return response.body().string();
@@ -136,7 +134,7 @@ public class OKHttpUtils {
         RequestBody body = RequestBody.create(MediaType.parse(mediaType), param);
         //发送post请求
 //		System.out.println("-------body:"+body);
-        Request request = new Request.Builder().url(url).headers(mHeaders).post(body).build();
+        Request request = new Request.Builder().addHeader("Connection", "close").url(url).headers(mHeaders).post(body).build();
 
         Response response = client.newCall(request).execute();
         if (response.isSuccessful()) {
@@ -184,7 +182,7 @@ public class OKHttpUtils {
 
 
         //发送post请求o
-        Request request = new Request.Builder().addHeader("Connection", "close").url(url)
+        Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Connection", "close").url(url)
                 .headers(mHeaders).post(requestBody.build()).build();
         Response response = new OkHttpClient().newBuilder()
                 .connectTimeout(50, TimeUnit.SECONDS)
@@ -214,7 +212,7 @@ public class OKHttpUtils {
         RequestBody formBody = RequestBody.create(MediaType.parse(mediaType), param);
 
         //发送patch请求
-        Request request = new Request.Builder().addHeader("Connection", "close")
+        Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Connection", "close")
                 .url(url)
                 .headers(mHeaders)
                 .patch(formBody)
@@ -238,7 +236,7 @@ public class OKHttpUtils {
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("uploadFile", file.getName(), fileBody)
                 .build();
-        Request request = new Request.Builder().addHeader("Accept", "*/*").addHeader("Connection", "close")
+        Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*").addHeader("Connection", "close")
                 .addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
                 .post(body)
                 .url(url)
@@ -264,7 +262,7 @@ public class OKHttpUtils {
                 .setType(MultipartBody.FORM)
                 .addFormDataPart(uploadFileName, file.getName(), fileBody)
                 .build();
-        Request request = new Request.Builder().addHeader("Accept", "*/*").addHeader("Connection", "close")
+        Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*").addHeader("Connection", "close")
                 .addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
                 .post(body)
                 .url(url)
@@ -283,7 +281,7 @@ public class OKHttpUtils {
         total++;
         if (total % 100 == 0) {
             total = 0;
-            client = getClientInstence();
+            client = getClientInstance();
         }
     }
 
