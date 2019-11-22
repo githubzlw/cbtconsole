@@ -59,6 +59,7 @@ public class GoodsSkuAttrServiceImpl implements GoodsSkuAttrService {
 			return matchSkuId;
 		}
 		matchSkuId = new GoodsSkuAttr();
+		matchSkuId.setPid(pid);
 		Map<String, String> goodsByPid = customGoodsService.getGoodsByPid(pid);
 		if(goodsByPid == null || goodsByPid.size() == 0) {
 			matchSkuId.setErrorCode(101);
