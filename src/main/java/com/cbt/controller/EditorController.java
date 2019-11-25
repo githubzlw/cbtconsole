@@ -3590,7 +3590,7 @@ public class EditorController {
             File imgFile = new File(pidEnInfoFile);
             if (isDown && imgFile.exists() && imgFile.isFile()) {
                 // 调用替换中文图片到英文图片的接口
-                OkHttpClient client = OKHttpUtils.getClientInstence();
+                OkHttpClient client = OKHttpUtils.getClientInstance();
 
                 String imageType = "image/jpg";
                 RequestBody fileBody = RequestBody.create(MediaType.parse(imageType), imgFile);

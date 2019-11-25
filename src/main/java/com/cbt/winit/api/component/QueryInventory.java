@@ -203,6 +203,7 @@ public class QueryInventory extends QueryBase{
 			int syncStock = owsService.syncStock(stock );
 //			System.out.println(syncStock+"----"+syncStock);
 			skuExistenceMap(mapExistence, productId, eName, skuid);
+//			System.out.println(productCode+"^^^^^^"+syncStock);
 		}
 		
 		setStock(totalStock);
