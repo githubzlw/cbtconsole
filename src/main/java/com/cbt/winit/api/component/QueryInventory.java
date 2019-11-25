@@ -201,7 +201,7 @@ public class QueryInventory extends QueryBase{
 												.specid(specid)
 												.build();
 			int syncStock = owsService.syncStock(stock );
-			System.out.println(syncStock+"----"+syncStock);
+//			System.out.println(syncStock+"----"+syncStock);
 			skuExistenceMap(mapExistence, productId, eName, skuid);
 		}
 		
