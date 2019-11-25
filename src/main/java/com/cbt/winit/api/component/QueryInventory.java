@@ -16,6 +16,7 @@ import com.cbt.winit.api.model.WarehouseWrap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.pojo.GoodsSkuAttr;
+import com.importExpress.pojo.GoodsSkuExistence;
 import com.importExpress.pojo.OverseasWarehouseStock;
 import com.importExpress.service.GoodsSkuAttrService;
 import com.importExpress.service.OverseasWarehouseStockService;
@@ -75,6 +76,7 @@ public class QueryInventory extends QueryBase{
 
 	@Override
 	protected void parseRequestResult(String result) {
+		Map<String,GoodsSkuExistence> mapExistence = Maps.newHashMap();
 //		System.out.println(result);
 		JSONObject resultObject = JSONObject.parseObject(result);
 		JSONObject dataObject = (JSONObject)resultObject.get("data");
@@ -187,24 +189,92 @@ public class QueryInventory extends QueryBase{
 				specid = productCode;
 				coden = productCode;
 			}
-			
+			eName = eName.replace("'", "\\'");
 			OverseasWarehouseStock stock = OverseasWarehouseStock.builder()
 												.code(productCode)
 												.coden(coden)
-												.goodsName(eName.replace("'", "\\'"))
+												.goodsName(eName)
 												.goodsPid(productId)
 												.owStock(Integer.parseInt(qtyAvailable))
 												.sku(specification)
 												.skuid(skuid)
 												.specid(specid)
 												.build();
-//			System.out.println(stock.toString());
 			int syncStock = owsService.syncStock(stock );
+//			System.out.println(syncStock+"----"+syncStock);
+			skuExistenceMap(mapExistence, productId, eName, skuid);
 //			System.out.println(productCode+"^^^^^^"+syncStock);
 		}
 		
 		setStock(totalStock);
+		
+		//产品剩下的sku默认库存为0
+		otherSku(mapExistence);
+		
 	}
+	
+	private void skuExistenceMap(Map<String,GoodsSkuExistence> mapExistence ,String productId,String name,String skuid) {
+		GoodsSkuExistence goodsSkuExistence = mapExistence.get(productId);
+		if(goodsSkuExistence == null) {
+			goodsSkuExistence = new GoodsSkuExistence();
+		}
+		List<String> lstSkuid = goodsSkuExistence.getLstSkuid();
+		if(lstSkuid == null) {
+			lstSkuid = Lists.newArrayList();
+		}
+		lstSkuid.add(skuid);
+		goodsSkuExistence.setPid(productId);
+		goodsSkuExistence.setName(name);
+		goodsSkuExistence.setLstSkuid(lstSkuid);
+		mapExistence.put(productId, goodsSkuExistence);
+	} 
+	
+	
+	private void otherSku(Map<String,GoodsSkuExistence> mapExistence) {
+		mapExistence.entrySet().stream().forEachOrdered(m->{
+			String pid = m.getKey();
+			GoodsSkuExistence value = m.getValue();
+			List<String> lstSkuid = value.getLstSkuid();
+			List<GoodsSkuAttr> ergodicSkuid = goodsSkuAttrService.ergodicSkuid(pid);
+			if(ergodicSkuid != null && !ergodicSkuid.isEmpty()) {
+				for(GoodsSkuAttr e : ergodicSkuid) {
+					if(lstSkuid == null || !lstSkuid.contains(e.getSkuid())) {
+						String sortSkuarr = sortSkuarr(e.getSkuattr());
+						String coden = pid+sortSkuarr;
+						OverseasWarehouseStock stock = OverseasWarehouseStock.builder()
+						.code(coden)
+						.coden(coden)
+						.goodsName(value.getName())
+						.goodsPid(pid)
+						.owStock(0)
+						.sku("")
+						.skuid(e.getSkuid())
+						.specid(e.getSpecid())
+						.build();
+						//System.out.println(stock.toString());
+						owsService.syncStock(stock );
+					}
+				}
+			}
+		});
+
+	}
+	
+	private String sortSkuarr(String skuArr){
+		List<Long> list = Lists.newArrayList();
+		String[] skuArrs = skuArr.split(",");
+		for(String s : skuArrs) {
+			list.add(Long.parseLong(s));
+		}
+		list = list.stream().sorted().collect(Collectors.toList());
+		String sku = "";
+		for(Long l : list) {
+			sku =sku+"-"+String.valueOf(l);
+		}
+		return sku;
+	}
+	
+	
 
 	public void setWarehouse(WarehouseWrap warehouse) {
 		this.warehouse = warehouse;

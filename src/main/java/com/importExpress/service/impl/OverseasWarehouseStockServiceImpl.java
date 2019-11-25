@@ -109,7 +109,10 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
 		if(updateStock == 0) {
 			updateStock = stockMapper.addStock(stock);
 		}*/
-		String runSql = new StringBuilder("update overseas_warehouse_stock set ow_stock=")
+		String runSql = new StringBuilder("update overseas_warehouse_stock set ")
+				.append("code='").append(stock.getCode())
+				.append("',goods_name='").append(stock.getGoodsName())
+				.append("',ow_stock=")
 				.append(stock.getOwStock())
 				.append(",available_stock=")
 				.append(stock.getOwStock())
