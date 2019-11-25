@@ -1,5 +1,7 @@
 package com.importExpress.service;
 
+import java.util.List;
+
 import com.importExpress.pojo.GoodsSkuAttr;
 
 public interface GoodsSkuAttrService {
@@ -22,4 +24,9 @@ public interface GoodsSkuAttrService {
 	 * @return
 	 */
 	GoodsSkuAttr parseGoodsSku(String code);
+	/**海外仓商品解析sku
+	 * @param code
+	 * @return
+	 */
+	List<GoodsSkuAttr> ergodicSkuid(String pid);
 }
