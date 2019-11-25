@@ -100,7 +100,7 @@ public class QueryInventory extends QueryBase{
 			if(!StrUtils.isMatch(productCode, "(\\d+(\\-\\d+)*)")) {
 				continue;
 			}
-			System.out.println(productCode);
+//			System.out.println(productCode);
 			//仓库名称
 //			String warehouseName = lstObject.getString("warehouseName");
 			//仓库code
@@ -200,7 +200,7 @@ public class QueryInventory extends QueryBase{
 												.build();
 //			System.out.println(stock.toString());
 			int syncStock = owsService.syncStock(stock );
-			System.out.println(productCode+"^^^^^^"+syncStock);
+//			System.out.println(productCode+"^^^^^^"+syncStock);
 		}
 		
 		setStock(totalStock);
