@@ -16,7 +16,7 @@
 <style type="text/css">
 /* 主页 */
 .report .form-control {display: inline-block;width: 70%;}
-.report select.form-control {width: 48%;}
+.report select.form-control {width: 106%;}
 .report {font-size: 16px;color: #333;}
 .report label {margin-right: 10px;}
 .report .mt20 {margin-top: 20px; margin-right: 18px;margin-left: 18px;}
@@ -25,7 +25,9 @@
 .report .w200 {width: 200px;}
 .mt5 {margin-top: 5px;}
 .report .btn_page_in{width:100px;}
-.datagrid-goodsName{width: 300px;}
+.datagrid-goodsName{width: 200px;}
+.datagrid-change-type{width: 150px;}
+.datagrid-remark{width: 350px;}
 </style>
 </head>
 <body>
@@ -38,8 +40,16 @@
 				<label>产品编码：<input type="text" class="form-control" id="query_goods_code" value="${stockParamter.code }"></label>
 				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid" value="${stockParamter.goodsPid }"></label>
 				<label>SKUID：<input type="text" class="form-control" id="query_goods_skuid" value="${stockParamter.skuid }"></label>
+				<label>ODID：<input type="text" class="form-control" id="query_goods_odid" value="${stockParamter.odid }"></label>
+				<label>
+				<select id="query_goods_type" class="form-control">
+				<option value="-1" >全部</option>
+				<option value="0" ${stockParamter.changeType==0 ? 'selected="selected"':''}>占用</option>
+				<option value="1" ${stockParamter.changeType==1 ? 'selected="selected"':''}>释放</option>
+				</select>
+				
+				</label>
 				<label><button class="btn btn-info query_button"  id="query_button">查询</button></label>
-				<label><a href="/cbtconsole/inventory/check/list"><button class="btn btn-success">核对库存</button></a></label>
 			</div>
 		</div>
 		<div class="row mt20">
@@ -67,10 +77,17 @@
 						<br>${stock.skuid}<br>${stock.specid}
 						</td>
 						<td class="datagrid-code">${stock.code}</td>
-						<td class="datagrid-order">${stock.orderno} / ${stock.odid}</td>
+						<td class="datagrid-order"><a href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=${stock.orderno}" target="_blank" style="color: #c7211d;">${stock.orderno} </a> / ${stock.odid}</td>
 						<td class="datagrid-change-stock">${stock.changeStock}</td>
 						<td class="datagrid-change-type">
-						${stock.changeType==0?'占用':'释放'}
+						<span style="color: #c7211d;">${stock.changeType==0?'占用':'释放'}</span>
+						<c:if test="${stock.changeType==0 }">
+						<br>
+						<c:if test="${stock.occupy==1 }">(库存充足)</c:if>
+						<c:if test="${stock.occupy==2 }">(库存部分不足)</c:if>
+						<c:if test="${stock.occupy==3 }">(库存严重不足)</c:if>
+						
+						</c:if>
 						</td>
 						<td class="datagrid-create-time">${stock.createTime}</td>
 						<td class="datagrid-remark">

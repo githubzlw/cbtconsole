@@ -47,7 +47,9 @@ function search(){
 	var pid= $("#query_goods_pid").val();
 	var skuid = $("#query_goods_skuid").val();
 	var owsid = $("#query_owsid").val();
-	var href= "/cbtconsole/owstock/log?page="+page+"&pid="+pid+"&skuid="+skuid+"&owsid="+owsid+"&code="+code;
+	var type = $("#query_goods_type").val();
+	var odid = $("#query_goods_odid").val();
+	var href= "/cbtconsole/owstock/log?page="+page+"&pid="+pid+"&skuid="+skuid+"&owsid="+owsid+"&code="+code+"&type="+type+"&odid="+odid;
 	window.open(href,"_self");
 	
 }

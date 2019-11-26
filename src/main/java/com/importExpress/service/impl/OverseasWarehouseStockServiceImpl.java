@@ -60,7 +60,7 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
     		//mq操作更新线上数据表
     		reduceOrderStock += Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
     		if(reduceOrderStock > 0) {
-    			runSql = new StringBuilder("insert into overseas_warehouse_stock_log (ows_id,code, change_stock,od_id,orderno,change_type,remark,code_n,create_time)" )
+    			runSql = new StringBuilder("insert into overseas_warehouse_stock_log (ows_id,code, change_stock,od_id,orderno,change_type,remark,code_n,create_time,occupy)" )
     					.append("values (" )
     					.append(ows_id).append(",'")
     					.append(code).append(",'")
@@ -68,7 +68,7 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
     					.append(odid).append(",'")
     					.append(orderno).append("', 1,'")
     					.append(remark).append("','")
-    					.append(coden).append("',now())")
+    					.append(coden).append("',now(),0)")
     					.toString();
     			SendMQ.sendMsg(new RunSqlModel(runSql));
     		}

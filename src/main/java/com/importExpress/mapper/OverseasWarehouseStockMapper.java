@@ -12,29 +12,6 @@ import com.importExpress.pojo.OverseasWarehouseStockWrap;
 
 public interface OverseasWarehouseStockMapper {
 
-	/**更新库存
-	 * @param stock
-	 * @return
-	 */
-	int updateStock(OverseasWarehouseStock stock);
-	/**新增库存
-	 * @param stock
-	 * @return
-	 */
-	int addStock(OverseasWarehouseStock stock);
-    /**订单完结或者取消减少订单占用库存，可用库存增加
-     * @param stock
-     * @return
-     */
-    int reduceOrderStock(OverseasWarehouseStock stock);
-
-    /**
-     * 海外仓库存变更记录日志
-     * @param log
-     * @return
-     */
-    int addLog(OverseasWarehouseStockLog log);
-    
     /**获取订单占用日志
      * @param orderno
      * @return

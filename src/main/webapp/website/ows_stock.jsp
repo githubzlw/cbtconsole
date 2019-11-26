@@ -38,6 +38,7 @@
 				<label>SKUID：<input type="text" class="form-control" id="query_goods_skuid" value="${stockParamter.skuid }"></label>
 				<label><button class="btn btn-info query_button"  id="query_button">查询</button></label>
 				<label><button class="btn btn-warning btn-check-stock">核对库存</button></label>
+				<label><a href="/cbtconsole/owstock/log"><button class="btn btn-warning btn-log">库存记录</button></a></label>
 			</div>
 		</div>
 		<div class="row mt20 row2">
