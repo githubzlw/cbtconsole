@@ -7,6 +7,7 @@ import com.cbt.paypal.config.PayPalPaymentIntentEnum;
 import com.cbt.paypal.config.PayPalPaymentMethodEnum;
 import com.cbt.stripe.StripeService;
 import com.cbt.stripe.impl.StripeServiceImpl;
+import com.cbt.util.DateFormatUtil;
 import com.cbt.website.dao.OrderInfoDao;
 import com.cbt.website.dao.OrderInfoImpl;
 import com.cbt.website.util.JsonResult;
@@ -37,6 +38,8 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
     @Autowired
     private RefundResultInfoMapper refundResultInfoMapper;
     private OrderInfoDao orderInfoDao = new OrderInfoImpl();
+
+    LocalDateTime NEW_STRIPE_PAY_TIME = DateFormatUtil.getTimeWithStr("2019-11-06 00:00:00");
 
     @Override
     public Payment createPayment(
@@ -275,7 +278,17 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
 
                         Double amountDouble = Double.valueOf(amountMoney) * 100D;
                         StripeService stripeService = new StripeServiceImpl();
-                        com.stripe.model.Refund detailedRefund = stripeService.refund(saleId, amountDouble.longValue());
+
+
+                        String payTime = paymentInfo.get("payTime").toString();
+                        boolean isNew = false;
+                        LocalDateTime payTimeBean = DateFormatUtil.getTimeWithStr(payTime);
+
+                        if(payTimeBean.isAfter(NEW_STRIPE_PAY_TIME)){
+                            isNew = true;
+                        }
+
+                        com.stripe.model.Refund detailedRefund = stripeService.refund(saleId, amountDouble.longValue(), isNew);
 
                         if (detailedRefund != null) {
                             refundResultInfo.setRefundid(detailedRefund.getId());
@@ -359,7 +372,8 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
 
                 Double amountDouble = Double.valueOf(refundAmount) * 100D;
                 StripeService stripeService = new StripeServiceImpl();
-                com.stripe.model.Refund detailedRefund = stripeService.refund(payNo, amountDouble.longValue());
+
+                com.stripe.model.Refund detailedRefund = stripeService.refund(payNo, amountDouble.longValue(), true);
 
                 if (detailedRefund != null) {
                     refundResultInfo.setRefundid(detailedRefund.getId());

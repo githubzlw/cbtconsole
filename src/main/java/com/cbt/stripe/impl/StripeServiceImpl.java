@@ -22,12 +22,16 @@ import com.stripe.model.Refund;
 public class StripeServiceImpl implements StripeService {
 
     public static final String API_KEY = "sk_live_tP8CyVx39v29ar8pZQStuo1q";
+    /**
+     * 2019-11-06后新的stripe支付
+     */
+    public static final String API_KEY_NEW = "sk_live_h8CwB8wMJL65RITyizSSywlG00LW0zDEKs";
 
     private static Logger logger = LoggerFactory.getLogger(StripeServiceImpl.class);
 
     public static void main(String[] args) throws Exception {
 //        new StripeServiceImpl().doPay(10000, "luohao518@yeah.net", "xxxx", "111111");
-        new StripeServiceImpl().refund("ch_1DTgnGLiluVmKKa3ZZL84nXS",6600);
+        new StripeServiceImpl().refund("ch_1DTgnGLiluVmKKa3ZZL84nXS",6600, false);
     }
 
     /**
@@ -66,9 +70,14 @@ public class StripeServiceImpl implements StripeService {
     }
 
     @Override
-    public Refund refund(String chargeId, long amount)  {
+    public Refund refund(String chargeId, long amount, boolean isNew)  {
 
-        Stripe.apiKey = API_KEY;
+        if(isNew){
+            Stripe.apiKey = API_KEY_NEW;
+        } else {
+            Stripe.apiKey = API_KEY;
+        }
+
 
         Map<String, Object> params = new HashMap<>();
         params.put("charge", chargeId);
