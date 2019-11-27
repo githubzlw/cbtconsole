@@ -784,7 +784,7 @@
                     </c:if>
                     <c:if test="${count==1 }">
                         <input type="button"
-                               style="position: fixed; bottom: 400px; right: 50px; width: 150px; height: 30px; border-color: red"
+                               style="position: fixed; bottom: 350px; right: 50px; width: 150px; height: 30px; border-color: red"
                                onclick="fnChangeProduct('${order.orderNo}')" value="建议替换">
                     </c:if>
                     &nbsp;&nbsp;

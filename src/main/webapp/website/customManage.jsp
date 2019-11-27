@@ -534,7 +534,8 @@ b {
 			sessionStorage.setItem("chKeyWord", queryParams.chKeyWord);
 
 			$('#goods_list').empty();
-			var url = "/cbtconsole/cutom/clist?page=" + queryParams.page + "&catid=" + queryParams.catid
+			// /cutom/clist
+			var url = "/cbtconsole/mongo/queryListByParam?page=" + queryParams.page + "&catid=" + queryParams.catid
 			+ "&state=" + queryParams.state + "&sttime=" + queryParams.sttime + "&edtime="
 			+ queryParams.edtime + "&adminid=" + queryParams.adminid+ "&isBenchmark=" + queryParams.isBenchmark
 			+ "&weightCheck=" + queryParams.weightCheck+ "&isEdited=" + queryParams.isEdited + "&isAbnormal=" + queryParams.isAbnormal
@@ -879,7 +880,7 @@ b {
 
 
 			<div class="div_right">
-				<iframe id="goods_list" src="/cbtconsole/cutom/clist" height="93%"
+				<iframe id="goods_list" src="/cbtconsole/mongo/queryListByParam" height="93%"
 					width="100%"> </iframe>
 
 			</div>

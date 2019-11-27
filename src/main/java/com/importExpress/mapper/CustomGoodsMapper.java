@@ -586,4 +586,39 @@ public interface CustomGoodsMapper {
      * @return
      */
     int updateGoodsOverSeaInfo(GoodsOverSea goodsOverSea);
+
+    /**
+     * 分页获取数据
+     * @param minId
+     * @param maxId
+     * @return
+     */
+    List<MongoGoodsBean> queryBeanByLimit(@Param("minId") int minId, @Param("maxId") int maxId);
+
+    /**
+     * 查询单个bean
+     * @param pid
+     * @return
+     */
+    MongoGoodsBean queryBeanByPid(@Param("pid") String pid);
+
+    /**
+     * 插入分类数据
+     * @param cidMap
+     * @return
+     */
+    int insertIntoPidCatidNum(@Param("map") Map<String, Integer> cidMap);
+
+    /**
+     * 获取所有Categorybean
+     * @return
+     */
+    List<CategoryBean> queryAllCategoryBean();
+
+    /**
+     * 根据类别获取类别和子类数据
+     * @param catid
+     * @return
+     */
+    List<String> queryCatidByPath(String catid);
 }

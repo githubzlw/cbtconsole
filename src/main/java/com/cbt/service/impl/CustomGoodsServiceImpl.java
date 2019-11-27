@@ -698,9 +698,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 1.更新产品表sku数据和标识
         customGoodsMapper.updateSkuInfo(pid, newSku);
         // 2.插入sku日志
-        return customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
+        customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
         // 3.走child表进行线上更新
-        //return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
+        return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
     }
 
     @Override
@@ -754,11 +754,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
             // 查找匹配的type数据
             String typeStr = weightChange.getGoodsType();
-            String skuid = weightChange.getSkuid();
+            String skuid = weightChange.getSkuid() == null ? "" : weightChange.getSkuid();
             // Colour:black@32161,Size:S@4501,
             String[] typeStrList = typeStr.split(",");
             String ppId = "";
-            boolean isSkuid = skuid.equals(weightChange.getPid());
+            boolean isSkuid = weightChange.getPid().equals(skuid) || StringUtils.isBlank(skuid);
             if(isSkuid) {
             	for (String childType : typeStrList) {
             		if (StringUtils.isNotBlank(childType)) {

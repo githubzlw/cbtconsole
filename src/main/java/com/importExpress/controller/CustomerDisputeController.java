@@ -251,7 +251,7 @@ public class CustomerDisputeController {
 				resonFlag = "product not received".equals(dispute.getReason().toLowerCase())? 2: resonFlag;
 				resonFlag = "product unacceptable".equals(dispute.getReason().toLowerCase())? 3: resonFlag;
 				resonFlag = "unrecognized".equals(dispute.getReason().toLowerCase())? 4: resonFlag;
-				
+
 				resonFlag = "subscription canceled".equals(dispute.getReason().toLowerCase())? 5: resonFlag;
 				resonFlag = "duplicate".equals(dispute.getReason().toLowerCase())? 6: resonFlag;
 				resonFlag = "credit not processed".equals(dispute.getReason().toLowerCase())? 7: resonFlag;
