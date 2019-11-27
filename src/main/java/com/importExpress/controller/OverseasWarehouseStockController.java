@@ -89,6 +89,9 @@ public class OverseasWarehouseStockController {
 			String strPage = request.getParameter("page");
 			int page = StrUtils.isNum(strPage) ? Integer.parseInt(strPage) : 1;
 			
+			String strType = request.getParameter("type");
+			int type = StrUtils.isNum(strType) ? Integer.parseInt(strType) : -1;
+			
 			String goodsPid = request.getParameter("pid");
 			goodsPid = StringUtils.isBlank(goodsPid) ? null : goodsPid;
 			
@@ -101,12 +104,17 @@ public class OverseasWarehouseStockController {
 			String owsid = request.getParameter("owsid");
 			owsid = StrUtils.isNum(owsid) ? owsid : "0";
 			
+			String odid = request.getParameter("odid");
+			odid = StrUtils.isNum(odid) ? odid : "0";
+			
 			OverseasWarehouseStockParamter param = OverseasWarehouseStockParamter.builder()
 					.page((page - 1) * 20)
 					.goodsPid(goodsPid)
 					.skuid(skuid)
 					.code(code)
 					.owsid(Integer.parseInt(owsid))
+					.changeType(type)
+					.odid(Integer.parseInt(odid))
 					.build();
 			
 			int stockLogListCount = stockService.getStockLogListCount(param);
