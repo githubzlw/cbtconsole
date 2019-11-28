@@ -142,6 +142,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 //否则插入或者更新SingleOffersChild信息
                 customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
             }*/
+
+            customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.parseDouble(bean.getFinalWeight()));
         }else{
             customGoodsMapper.insertIntoGoodsImgUpLog(bean.getPid(),"",bean.getAdminId(),"publish error");
         }
