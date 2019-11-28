@@ -3,15 +3,13 @@ package com.importExpress.controller;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -115,7 +113,9 @@ public class WebHookPaymentController {
 //            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
 //        }
         String type = request.getParameter("type");
-        
+
+        String importFlag = request.getParameter("importFlag");
+
         String sttime = request.getParameter("sttime");
         if (sttime == null || "".equals(sttime)) {
             sttime = sdf.format(new Date()).split("(\\s+)")[0]+" 00:00:00";
@@ -133,6 +133,34 @@ public class WebHookPaymentController {
 			int tatal = (int)result.get("total");
 			if(tatal > 0) {
 				List<WebhookPaymentBean> data = (List<WebhookPaymentBean>)result.get("data");
+
+				Map<String, List<WebhookPaymentBean>> rsMap = data.stream()
+						.filter(e-> Double.parseDouble(e.getAmount().replace("USD","").trim()) > 0
+								&& "ImportExpress".equalsIgnoreCase(e.getType()))
+						.collect(Collectors.groupingBy(WebhookPaymentBean::getOrderNO));
+
+				if(StringUtils.isNotBlank(importFlag) || "1".equals(importFlag)) {
+					List<WebhookPaymentBean> resultData = new ArrayList<>();
+					Map<String, WebhookPaymentBean> tempPaymentBean;
+					List<WebhookPaymentBean> tempList;
+					for (String orderNo : rsMap.keySet()) {
+						tempList = rsMap.get(orderNo);
+						if (CollectionUtils.isNotEmpty(tempList) && tempList.size() > 1) {
+							tempPaymentBean = new HashMap<>();
+							for (WebhookPaymentBean paymentBean : tempList) {
+								tempPaymentBean.put(paymentBean.getAmount(), paymentBean);
+							}
+							if (tempPaymentBean.size() > 0) {
+								resultData.addAll(tempPaymentBean.values());
+							}
+						} else {
+							resultData.addAll(rsMap.get(orderNo));
+						}
+					}
+					data.clear();
+					data = resultData;
+				}
+
 				
 				Calendar c = Calendar.getInstance();
 				int yy = c.get(Calendar.YEAR);
