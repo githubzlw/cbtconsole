@@ -545,10 +545,10 @@
 		from
 		orderinfo oi inner join user u on oi.user_id=u.id
 		where 1=1 and oi.state in(1,2,3,4,5)
-		and left(oi.order_no,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		and SUBSTRING(CONCAT(oi.order_no,'_'),1,locate('_',CONCAT(oi.order_no,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
-		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR})) and oi.pay_price > 0
 		order by oi.create_time
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -561,10 +561,10 @@
 		INNER JOIN USER u ON oi.user_id=u.id
 		LEFT JOIN shipping_package sp ON (oi.order_no=sp.orderid OR (LOCATE(oi.order_no,sp.remarks)>0 AND LOCATE(oi.order_no,sp.orderid)&lt;=0))
 		where 1=1 and oi.state in(1,2,3,4,5)
-		and left(oi.order_no,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		and SUBSTRING(CONCAT(oi.order_no,'_'),1,locate('_',CONCAT(oi.order_no,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
-		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR})) and oi.pay_price > 0
 	</select>
 
 	<select id="queryPayPalRevenue" resultMap="payPalInfoResultMap">
@@ -572,10 +572,10 @@
 		orderid,paymentid,userid,payment_amount,payment_cc,payflag,paytype,createtime
 		from payment
 		where 1=1 and paystatus=1 and paytype =0 and
-		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		SUBSTRING(CONCAT(orderid,'_'),1,locate('_',CONCAT(orderid,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
-		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR})) and payment_amount > 0
 		order by createtime
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -587,10 +587,10 @@
 		select count(*)
 		from payment
 		where 1=1 and paystatus=1 and paytype =0 and
-		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		SUBSTRING(CONCAT(orderid,'_'),1,locate('_',CONCAT(orderid,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
-		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR})) and payment_amount > 0
 	</select>
 
 
@@ -599,10 +599,10 @@
 		orderid,paymentid,userid,payment_amount,payment_cc,payflag,paytype,createtime
 		from payment
 		where 1=1 and paystatus=1 and paytype =1 and
-		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		SUBSTRING(CONCAT(orderid,'_'),1,locate('_',CONCAT(orderid,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
-		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR})) and payment_amount > 0
 		order by createtime
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -614,10 +614,10 @@
 		select count(*)
 		from payment
 		where 1=1 and paystatus=1 and paytype =1 and
-		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		SUBSTRING(CONCAT(orderid,'_'),1,locate('_',CONCAT(orderid,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
-		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR})) and payment_amount > 0
 	</select>
 
 
@@ -626,10 +626,10 @@
 		orderid,userid,payment_amount,payment_cc,payflag,paytype,createtime
 		from payment
 		where 1=1 and paystatus=1 and paytype =2 and
-		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		SUBSTRING(CONCAT(orderid,'_'),1,locate('_',CONCAT(orderid,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
-		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))  and payment_amount > 0
 		order by createtime
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -641,10 +641,10 @@
 		select
 		count(id) from payment
 		where 1=1 and paystatus=1 and paytype =2 and
-		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		SUBSTRING(CONCAT(orderid,'_'),1,locate('_',CONCAT(orderid,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
-		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR})) and payment_amount > 0
 	</select>
 
 	<select id="queryNotStartedOrderAmount" resultMap="orderInfoResultMap">
@@ -792,7 +792,7 @@
 
 		select userid ,ifnull(price,0) as amount,remark_id,remark
 		from recharge_record where type in(1,5) and usesign=0 and
-		left(remark_id,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		SUBSTRING(CONCAT(remark_id,'_'),1,locate('_',CONCAT(remark_id,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
@@ -808,7 +808,7 @@
 		count(*)
 		from (select userid from recharge_record where type in(1,5) and
 		usesign=0 and
-		left(remark_id,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		SUBSTRING(CONCAT(remark_id,'_'),1,locate('_',CONCAT(remark_id,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))) bcs
@@ -918,10 +918,10 @@
 		orderid,paymentid,userid,payment_amount,payment_cc,payflag,paytype,createtime
 		from payment
 		where 1=1 and paystatus=1 and paytype = 5 and
-		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		SUBSTRING(CONCAT(orderid,'_'),1,locate('_',CONCAT(orderid,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid in(select id from user where is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
-		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR})) and payment_amount > 0
 		order by createtime
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -933,10 +933,10 @@
 		select count(*)
 		from payment
 		where 1=1 and paystatus=1 and paytype = 5 and
-		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		SUBSTRING(CONCAT(orderid,'_'),1,locate('_',CONCAT(orderid,'_'))-1) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid in(select id from user where is_test = 0) and payment.paystatus=1
 		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
-		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR})) and payment_amount > 0
 	</select>
 
 
