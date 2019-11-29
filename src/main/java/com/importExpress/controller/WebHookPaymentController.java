@@ -134,12 +134,15 @@ public class WebHookPaymentController {
 			if(tatal > 0) {
 				List<WebhookPaymentBean> data = (List<WebhookPaymentBean>)result.get("data");
 
-				Map<String, List<WebhookPaymentBean>> rsMap = data.stream()
+
+
+				if(StringUtils.isNotBlank(importFlag) && "1".equals(importFlag)) {
+
+					Map<String, List<WebhookPaymentBean>> rsMap = data.stream()
 						.filter(e-> Double.parseDouble(e.getAmount().replace("USD","").trim()) > 0
 								&& "ImportExpress".equalsIgnoreCase(e.getType()))
 						.collect(Collectors.groupingBy(WebhookPaymentBean::getOrderNO));
 
-				if(StringUtils.isNotBlank(importFlag) || "1".equals(importFlag)) {
 					List<WebhookPaymentBean> resultData = new ArrayList<>();
 					Map<String, WebhookPaymentBean> tempPaymentBean;
 					List<WebhookPaymentBean> tempList;
@@ -159,6 +162,9 @@ public class WebHookPaymentController {
 					}
 					data.clear();
 					data = resultData;
+					if(CollectionUtils.isNotEmpty(resultData)){
+						resultData.sort(Comparator.comparing(WebhookPaymentBean::getCreateTime).reversed());
+					}
 				}
 
 				
