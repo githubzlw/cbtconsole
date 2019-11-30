@@ -141,6 +141,7 @@ public class MongoDBController {
 
             for (int i = 1; i <= fc; i++) {
                 list = mongoGoodsService.queryBeanByLimit((i - 1) * limitNum, i * limitNum);
+                System.err.println("-- " + i + "/" + fc);
                 queryTotal += list.size();
                 if (CollectionUtils.isNotEmpty(list)) {
 

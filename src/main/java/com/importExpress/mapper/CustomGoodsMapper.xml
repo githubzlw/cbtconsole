@@ -985,7 +985,7 @@
     <update id="updateGoodsDetailsByInfo" parameterType="com.cbt.bean.CustomGoodsPublish">
         update custom_goods_edit a,custom_benchmark_ready b
         set b.enname = #{enname},b.img = #{img},b.endetail = #{endetail},
-        b.eninfo=#{eninfo},b.goodsstate=#{goodsState},b.keyword=#{keyword},a.admin_id = #{adminId},
+        b.eninfo=#{eninfo},b.goodsstate=#{goodsState},a.admin_id = #{adminId},
         bm_flag=1,a.update_count = a.update_count + 1 ,b.fprice_str=#{fpriceStr},b.size_info_en=#{sizeInfoEn}
         <if test="rangePrice != null">
             ,b.range_price=#{rangePrice},b.sku=#{sku}
