@@ -26,9 +26,9 @@ public class TabSeachPageServiceImpl implements TabSeachPageService {
 	}
 
 	@Override
-	public List<TabSeachPageBean> list(int id) {
+	public List<TabSeachPageBean> list(int id, int webSite) {
 		// TODO Auto-generated method stub
-		return tabSeachPageMapper.list(id);
+		return tabSeachPageMapper.list(id, webSite);
 	}
 
 	@Override

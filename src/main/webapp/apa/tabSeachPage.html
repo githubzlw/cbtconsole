@@ -20,11 +20,41 @@ function imgError(obj, fileName) {
 $(function(){
 	keywords_show();
 	cate_reflush();
+	loadWebSize();
 });
+
+function loadWebSize() {
+            $.ajax({
+                type: 'POST',
+                url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+
+                        var data = data.data;
+                        var content = '';
+                        for(var key in data){
+                            content += '<option value="'+key+'">'+data[key]+'</option>'
+                        }
+                        $("#web_size_type").empty();
+                        $("#web_size_type").append(content);
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
 function cate_reflush(){
+	var webSite = $("#web_size_type").val();
 	  $.ajax({
 	        url:"../tabseachpage/getAllCat",  
 	        dataType:"json",
+		    data:{
+	        	webSite:webSite
+			},
 	        success:function(data){                                 
 	                    //绑定第一个下拉框
 	                    $("#parentId").combobox({
@@ -56,8 +86,9 @@ function isURL(str_url) {
 }
 
 function keywords_show(){
+	var webSite = $("#web_size_type").val();
 	 $('#keyword_tt').tree({
-         url:'../tabseachpage/list',
+         url:'../tabseachpage/list?webSite=' + webSite,
          onClick: function(node){
 				var id = node.id; 
 				if(node.pid==0){return;}
@@ -279,7 +310,7 @@ function detail(id) {
                 var row = {'name':'底部banner图片','value':bannerImg};
                 $('#keyword_neirong').propertygrid('appendRow',row);
 				
-				var buttonstr = "<input id='staticize_button' onclick='toStaticize("+res.id+",\""+res.keyword+"\")' type='button' value='生成关键词专页静态页'>&nbsp;&nbsp;&nbsp;&nbsp;<input onclick='preview("+res.id+",\""+res.importPath+"\")' type='button' value='预览关键词专页'>";
+				var buttonstr = "<input id='staticize_button' onclick='toStaticize("+res.id+",\""+res.keyword+"\","+res.webSite+")' type='button' value='生成关键词专页静态页'>&nbsp;&nbsp;&nbsp;&nbsp;<input onclick='preview("+res.id+",\""+res.importPath+"\")' type='button' value='预览关键词专页'>";
 				
 				if(res.isshow == 1){
 					buttonstr += "&nbsp;&nbsp;&nbsp;&nbsp;<input id='staticize_button' onclick='isshow("+res.id+",0)' type='button' value='停用'>";
@@ -351,11 +382,11 @@ function preview(id,importPath) {
 	
 } 
 
-function toStaticize(id,keyword) {
+function toStaticize(id,keyword,webSite) {
 	$.ajax({
 		url : '../tabseachpage/staticize.do',
 		method : 'post',
-		data: {sid : id,keyword:keyword},
+		data: {sid : id,keyword:keyword,webSite:webSite},
 		dataType:'json',
 		success : function(data) {
 			var res = data;
@@ -378,7 +409,7 @@ function toStaticizeAll() {
 		method : 'get',
 		dataType:'json',
 		success : function(data) {
-			$(".messager-window .panel-tool-close").click()
+			$(".messager-window .panel-tool-close").click();
 			var res = data;
 			if(res.status){
 				detail(keyword_id);
@@ -566,6 +597,49 @@ function delKeyword(){
 	});
 	
 	
+}
+
+function setWebSite() {
+	var website = $("#web_size_type").val();
+	if (website == null || website == "") {
+		$.messager.alert('message', "请选择网站！");
+		return;
+	}
+	if (!keyword_id) {
+		$.messager.alert('message', "请选中要修改的热搜词！");
+		return;
+	}
+	var messageStr = "";
+	if(website == 1){
+		messageStr = "IMPORT";
+	}else if(website == 2){
+		messageStr = "KIDS";
+	}else if(website == 3){
+		messageStr = "PETS";
+	}
+	$.messager.confirm('确认', '您确认想要'+messageStr+'吗？', function (r) {
+		if (r) {
+			$.ajax({
+				url: '../tabseachpage/setWebSite',
+				method: 'post',
+				data: {id: keyword_id,website:website},
+				dataType: 'json',
+				success: function (data) {
+					if (data.status) {
+						//$.messager.alert('message',data.message);
+						keywords_show();
+					} else {
+						$.messager.alert('message', data.message);
+					}
+
+				},
+				error: function (msg) {
+					alert(msg);
+				}
+			});
+		}
+	});
+
 }
 
 var flag = 0
@@ -932,6 +1006,15 @@ function updateDetail() {
 <body class="easyui-layout">  
 	<div id="cc" class="easyui-layout" style="width:100%;height:900px;">   
 	    <div data-options="region:'west',title:'关键词',split:true" style="width:20%;">
+
+			<p><span>网站:
+				<select id="web_size_type" style="height: 28px;width: 120px;">
+					<option value="1">import</option>
+					<option value="2">kids</option>
+					<option value="3">pets</option>
+				</select>
+			</span><button onclick="keywords_show()">查询</button></p>
+
 	    	<ul id="keyword_tt">
 			</ul> 
 	    </div>
@@ -951,13 +1034,14 @@ function updateDetail() {
 	    <div data-options="region:'center',title:'编辑'" style="padding:5px;background:#eee;">
 	    	<div id="bb" class="easyui-layout" style="width:100%;height:100%;">   
 			    <div data-options="region:'north',title:'主热搜词详情'" style="height:36%;">
-    				<a id="btn" href="#" onclick="add_show()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">新增热搜词</a>
-    				<a id="btn" href="#" onclick="update_show()" class="easyui-linkbutton" data-options="iconCls:'icon-save'">修改热搜词</a>
-    				<a id="btn" href="#" onclick="delKeyword()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除热搜词</a>
+    				<a id="btna" href="#" onclick="add_show()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">新增热搜词</a>
+    				<a id="btnb" href="#" onclick="update_show()" class="easyui-linkbutton" data-options="iconCls:'icon-save'">修改热搜词</a>
+    				<a id="btnc" href="#" onclick="delKeyword()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除热搜词</a>
+					<a id="btnd" href="#" onclick="setWebSite()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">设置当前网站</a>
     				<div id="keyword_neirong_div"></div>
 			    </div>   
 			    <div data-options="region:'center',title:'主商品名列表'" style="height:30%;">
-			    	<a id="btn" href="#" onclick="add_detail_show()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">新增主商品</a>
+			    	<a id="btne" href="#" onclick="add_detail_show()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">新增主商品</a>
 			    	<!-- <a id="btn" href="#" onclick="update_detail_show()" class="easyui-linkbutton" data-options="iconCls:'icon-save'">修改</a> -->
     				<!-- <a id="btn" href="#" onclick="delDetail()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除</a> -->
     				<input type="hidden" id="check_detail_id" value="">
