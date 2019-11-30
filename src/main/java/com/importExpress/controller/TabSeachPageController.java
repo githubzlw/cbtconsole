@@ -1066,8 +1066,8 @@ public class TabSeachPageController {
 				params.add(new BasicNameValuePair("sid", sid));
 				params.add(new BasicNameValuePair("keyword", keyword));
 				params.add(new BasicNameValuePair("webSite", webSite));
-				String url = "http://192.168.1.65:8383/CbtStaticize/tabseachpage/staticize.do";
-				// cbtstaticizePath + "/tabseachpage/staticize.do"
+				// String url = "http://192.168.1.65:8383/CbtStaticize/tabseachpage/staticize.do";
+				String url = cbtstaticizePath + "/tabseachpage/staticize.do";
 				result = getContentClientPost(url, params);
 			} else {
 				result = "{\"status\":false,\"message\":\"主关键词没有对应的类别！请添加下面的类别\"}";
@@ -1124,8 +1124,8 @@ public class TabSeachPageController {
 					params.add(new BasicNameValuePair("sid", bean.getId() + ""));
 					params.add(new BasicNameValuePair("keyword", bean.getKeyword()));
 					params.add(new BasicNameValuePair("webSite", String.valueOf(bean.getWebSite())));
-					String url = "http://192.168.1.65:8383/CbtStaticize/tabseachpage/staticize.do";
-					// cbtstaticizePath + "/tabseachpage/staticize.do"
+					// String url = "http://192.168.1.65:8383/CbtStaticize/tabseachpage/staticize.do";
+					String url = cbtstaticizePath + "/tabseachpage/staticize.do";
 					result = getContentClientPost(url, params, "\"status\":true", 3);
 				}
 			}
