@@ -4,13 +4,13 @@ import com.cbt.bean.CategoryBean;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
 import com.cbt.service.CustomGoodsService;
-import com.cbt.service.MongoGoodsService;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.listener.ContextListener;
 import com.importExpress.pojo.MongoGoodsBean;
+import com.importExpress.service.MongoGoodsService;
 import com.importExpress.utli.EasyUiTreeUtils;
 import com.importExpress.utli.GoodsBeanUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -173,7 +173,7 @@ public class MongoDBController {
 
                     List<String> checkList = mongoGoodsService.checkIsMongoByList(tempList);
                     tempList.clear();
-                    if (CollectionUtils.isNotEmpty(tempList)) {
+                    if (CollectionUtils.isNotEmpty(checkList)) {
                         List<MongoGoodsBean> updateList = list.stream().filter(e -> checkList.contains(e.getPid()))
                                 .collect(Collectors.toList());
                         insertTotal += mongoGoodsService.batchUpdateGoodsInfoToMongoDb(updateList);
@@ -223,17 +223,12 @@ public class MongoDBController {
         }
 
         try {
-            MongoGoodsBean bean = mongoGoodsService.queryBeanByPid(pid);
-            if (bean == null || StringUtils.isBlank(bean.getPid())) {
+
+            int isRs = mongoGoodsService.insertOrUpdateMongodb(pid);
+            if (isRs == 0) {
                 json.setOk(false);
-                json.setMessage("获取PID失败");
+                json.setMessage("执行失败");
             } else {
-                boolean isExists = mongoGoodsService.checkIsMongoByPid(pid);
-                if (isExists) {
-                    mongoGoodsService.updateGoodsInfoToMongoDb(bean);
-                } else {
-                    mongoGoodsService.insertGoodsToMongoSingle(bean);
-                }
                 json.setOk(true);
             }
         } catch (Exception e) {

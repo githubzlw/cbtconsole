@@ -121,4 +121,11 @@ public interface MongoGoodsService {
      */
     long batchUpdateGoodsInfoToMongoDb(List<MongoGoodsBean> list) throws Exception;
 
+    /**
+     * 插入或者更新MongoDB数据
+     * @param pid
+     * @return
+     */
+    int insertOrUpdateMongodb(String pid) throws Exception;
+
 }

@@ -16,8 +16,10 @@ import com.importExpress.pojo.GoodsWeightChange;
 import com.importExpress.pojo.OnlineGoodsStatistic;
 import com.importExpress.pojo.ShopMd5Bean;
 import com.importExpress.utli.EasyUiTreeUtils;
+import com.importExpress.utli.GoodsMongoDbLocalUtil;
 import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,6 +60,11 @@ public class CustomGoodsController {
 
     @Autowired
     private IShopUrlService shopUrlService;
+
+    @Autowired
+    private GoodsMongoDbLocalUtil mongoDbLocalUtil;
+
+
 
     /**
      * 列出指定产品的操作记录
@@ -250,6 +257,11 @@ public class CustomGoodsController {
                     CustomGoodsBean.class);// 这里的t是Class<T>
             if (cgLst.size() > 0) {
                 customGoodsService.batchSaveEnName(user, cgLst);
+                if (CollectionUtils.isNotEmpty(cgLst)) {
+                    for (CustomGoodsBean bean : cgLst) {
+                        mongoDbLocalUtil.updatePid(bean.getPid());
+                    }
+                }
             } else {
                 json.setOk(false);
                 json.setMessage("获取保存列表失败，请重试");
@@ -301,6 +313,7 @@ public class CustomGoodsController {
             CustomGoodsPublish goods = customGoodsService.getGoods(pid, 0);
             customGoodsService.publish(goods);
             customGoodsService.updateState(4, pid, user.getId());
+             mongoDbLocalUtil.updatePid(pid);
             json.setOk(true);
             json.setMessage("执行成功");
 
@@ -357,6 +370,7 @@ public class CustomGoodsController {
         } else {
             result = "fail";
         }
+         mongoDbLocalUtil.updatePid(pid);
         // customGoodsService.updateValid(1, pid);
 
         /*

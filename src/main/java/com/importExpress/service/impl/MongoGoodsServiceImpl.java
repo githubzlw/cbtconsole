@@ -3,9 +3,9 @@ package com.importExpress.service.impl;
 import com.cbt.bean.CategoryBean;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
-import com.cbt.service.MongoGoodsService;
 import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.pojo.MongoGoodsBean;
+import com.importExpress.service.MongoGoodsService;
 import com.importExpress.utli.MapAndBeanUtil;
 import com.importExpress.utli.MongoDBHelp;
 import com.mongodb.BasicDBObject;
@@ -411,6 +411,22 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
     public long batchUpdateGoodsInfoToMongoDb(List<MongoGoodsBean> list) throws Exception {
         List<UpdateManyModel<Document>> upList = changeToMongoUpdateDocument(list);
         return MongoDBHelp.INSTANCE.updateBatch3(GOODS_COLLECTION_NAME, upList);
+    }
+
+    @Override
+    public int insertOrUpdateMongodb(String pid) throws Exception {
+        MongoGoodsBean bean = queryBeanByPid(pid);
+            if (bean == null || StringUtils.isBlank(bean.getPid())) {
+                return 0;
+            } else {
+                boolean isExists = checkIsMongoByPid(pid);
+                if (isExists) {
+                    updateGoodsInfoToMongoDb(bean);
+                } else {
+                    insertGoodsToMongoSingle(bean);
+                }
+                return 1;
+            }
     }
 
     private List<WriteModel<Document>> changeToMongoInsertDocument(List<MongoGoodsBean> list) throws Exception {

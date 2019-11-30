@@ -1,8 +1,8 @@
 package com.importExpress.listener;
 
 import com.cbt.bean.CategoryBean;
-import com.cbt.service.MongoGoodsService;
-import com.cbt.service.impl.MongoGoodsServiceImpl;
+import com.importExpress.service.MongoGoodsService;
+import com.importExpress.service.impl.MongoGoodsServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.context.WebApplicationContext;

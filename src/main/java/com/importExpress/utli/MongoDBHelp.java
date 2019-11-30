@@ -371,7 +371,7 @@ public enum MongoDBHelp {
         this.getConnection();
         List<String> result = new ArrayList<>();
         BasicDBObject find = new BasicDBObject();
-        find.put("pid", new BasicDBObject(QueryOperators.AND, pidList));
+        find.put("pid", new BasicDBObject(QueryOperators.IN, pidList));
         BasicDBObject fields = new BasicDBObject();
         fields.put("pid", 1);
         FindIterable<Document> documents = mongoDatabase3.getCollection(collectionName).find(find).projection(fields);

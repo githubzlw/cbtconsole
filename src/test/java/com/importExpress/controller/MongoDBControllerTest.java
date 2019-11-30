@@ -1,7 +1,7 @@
 package com.importExpress.controller;
 
 import com.cbt.service.CustomGoodsService;
-import com.cbt.service.MongoGoodsService;
+import com.importExpress.service.MongoGoodsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
