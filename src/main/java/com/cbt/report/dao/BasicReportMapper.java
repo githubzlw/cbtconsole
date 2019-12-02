@@ -124,6 +124,11 @@ public interface BasicReportMapper {
     public List<OrderInfoBean> queryOrderSales(@Param("beginDate") String beginDate, @Param("endDate") String endDate,
                                                @Param("start") int start, @Param("rows") int rows);
 
+    List<OrderInfoBean> queryOrderTranscriptSales(@Param("beginDate") String beginDate, @Param("endDate") String endDate,
+                                               @Param("start") int start, @Param("rows") int rows);
+
+    int queryOrderTranscriptSalesCount(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
+
     /**
      * 查询每月的订单的总数
      *
@@ -315,6 +320,17 @@ public interface BasicReportMapper {
      */
     public List<OrderCancelBean> queryOrderCancel(@Param("beginDate") String beginDate,
                                                   @Param("endDate") String endDate, @Param("start") int start, @Param("rows") int rows);
+
+    /**
+     * 查询确认取消的订单数据
+     * @param beginDate
+     * @param start
+     * @param rows
+     * @return
+     */
+    List<OrderCancelBean> queryOrderConfirmCancel(@Param("beginDate") String beginDate, @Param("start") int start, @Param("rows") int rows);
+
+    int queryOrderConfirmCancelCount(@Param("beginDate") String beginDate);
 
     /**
      * 查询每月的订单取消(全部或部分)详情总数
