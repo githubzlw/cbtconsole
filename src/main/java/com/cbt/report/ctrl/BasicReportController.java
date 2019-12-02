@@ -12,6 +12,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Controller
@@ -1146,10 +1148,43 @@ public class BasicReportController {
 
 		List<Map<String, String>> monthLst = Util.genQueryDate(yearStr, monthStr);
 		try {
-			List<OrderCancelBean> orderCancels = basicReportService.queryOrderCancel(monthLst.get(0).get("beginDate"),
+			LocalDateTime beginDate = DateFormatUtil.getTimeWithStr(monthLst.get(0).get("beginDate"));
+			LocalDateTime checkDate = LocalDateTime.of(2019, 3, 1, 0, 0, 0);
+
+			List<OrderCancelBean> orderCancels;
+			int total;
+
+			if(beginDate.isBefore(checkDate)){
+				orderCancels = basicReportService.queryOrderCancel(monthLst.get(0).get("beginDate"),
 					monthLst.get(0).get("endDate"), (stateNum - 1) * pageNum, pageNum);
-			int total = basicReportService.queryOrderCancelCount(monthLst.get(0).get("beginDate"),
+				total = basicReportService.queryOrderCancelCount(monthLst.get(0).get("beginDate"),
 					monthLst.get(0).get("endDate"));
+			} else {
+				String paramStr = "";
+				if(monthStr.length() == 1){
+					paramStr = yearStr + "-0" + monthStr;
+				} else {
+					paramStr = yearStr + "-" +monthStr;
+				}
+				orderCancels = basicReportService.queryOrderConfirmCancel(paramStr, (stateNum - 1) * pageNum, pageNum);
+			    total = basicReportService.queryOrderConfirmCancelCount(paramStr);
+			    if(CollectionUtils.isNotEmpty(orderCancels)){
+			    	for (OrderCancelBean  cancelBean: orderCancels) {
+						if (cancelBean.getPayType() > -1) {
+							// 订单支付类型 0 paypal;1 TT;2 余额 ;5 stripe
+							if (cancelBean.getPayType() == 0) {
+								cancelBean.setRemark("paypal");
+							} else if (cancelBean.getPayType() == 1) {
+								cancelBean.setRemark("TT");
+							} else if (cancelBean.getPayType() == 2) {
+								cancelBean.setRemark("余额");
+							} else if (cancelBean.getPayType() == 5) {
+								cancelBean.setRemark("Stripe");
+							}
+						}
+					}
+				}
+			}
 
 			for (OrderCancelBean ocb : orderCancels) {
 				ocb.setYear(monthLst.get(0).get("year"));
@@ -1182,8 +1217,43 @@ public class BasicReportController {
 			List<Map<String, String>> monthLst = Util.genQueryDate(yearStr, monthStr);
 			OutputStream ouputStream = null;
 			try {
-				List<OrderCancelBean> orderCancels = basicReportService
-						.queryOrderCancel(monthLst.get(0).get("beginDate"), monthLst.get(0).get("endDate"), 0, 0);
+				/*List<OrderCancelBean> orderCancels = basicReportService
+						.queryOrderCancel(monthLst.get(0).get("beginDate"), monthLst.get(0).get("endDate"), 0, 0);*/
+
+				LocalDateTime beginDate = DateFormatUtil.getTimeWithStr(monthLst.get(0).get("beginDate"));
+				LocalDateTime checkDate = LocalDateTime.of(2019, 3, 1, 0, 0, 0);
+
+				List<OrderCancelBean> orderCancels;
+				int total;
+
+				if (beginDate.isBefore(checkDate)) {
+					orderCancels = basicReportService.queryOrderCancel(monthLst.get(0).get("beginDate"),
+							monthLst.get(0).get("endDate"), 0, 0);
+				} else {
+					String paramStr = "";
+					if (monthStr.length() == 1) {
+						paramStr = yearStr + "-0" + monthStr;
+					} else {
+						paramStr = yearStr + "-" + monthStr;
+					}
+					orderCancels = basicReportService.queryOrderConfirmCancel(paramStr, 0, 0);
+					for (OrderCancelBean  cancelBean: orderCancels) {
+						if (cancelBean.getPayType() > -1) {
+							// 订单支付类型 0 paypal;1 TT;2 余额 ;5 stripe
+							if (cancelBean.getPayType() == 0) {
+								cancelBean.setRemark("paypal");
+							} else if (cancelBean.getPayType() == 1) {
+								cancelBean.setRemark("TT");
+							} else if (cancelBean.getPayType() == 2) {
+								cancelBean.setRemark("余额");
+							} else if (cancelBean.getPayType() == 5) {
+								cancelBean.setRemark("Stripe");
+							}
+						}
+					}
+				}
+
+
 				for (OrderCancelBean ocb : orderCancels) {
 					ocb.setYear(monthLst.get(0).get("year"));
 					ocb.setMonth(monthLst.get(0).get("month"));

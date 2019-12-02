@@ -3,6 +3,7 @@ package com.cbt.report.service;
 import com.cbt.pojo.BasicReport;
 import com.cbt.refund.bean.PayPalImportInfo;
 import com.cbt.report.vo.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,11 @@ public interface BasicReportService {
 	 * @return
 	 */
 	public List<OrderInfoBean> queryOrderSales(String beginDate, String endDate, int start, int rows, int type);
+
+	List<OrderInfoBean> queryOrderTranscriptSales(@Param("beginDate") String beginDate, @Param("endDate") String endDate,
+												  @Param("start") int start, @Param("rows") int rows);
+
+    int queryOrderTranscriptSalesCount(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
 
 	/**
 	 *重新生成订单及销售额对账报表
@@ -272,6 +278,17 @@ public interface BasicReportService {
 	 * @return
 	 */
 	public List<OrderCancelBean> queryOrderCancel(String beginDate, String endDate, int start, int rows);
+
+	/**
+     * 查询确认取消的订单数据
+     * @param beginDate
+     * @param start
+     * @param rows
+     * @return
+     */
+    List<OrderCancelBean> queryOrderConfirmCancel(String beginDate, int start, int rows);
+
+    int queryOrderConfirmCancelCount(String beginDate);
 
 	/**
 	 * 查询每月的订单取消(全部或部分)详情总数
