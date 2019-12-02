@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author: JiangXW
@@ -336,7 +337,9 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
                             paramBean.put("shop_id", map.get(key).toString());
                             break;
                         case "chKeyWord":
-                            paramBean.put("name", "/" + map.get(key).toString() + "/");
+                            Pattern pattern = Pattern.compile("^.*"+map.get(key).toString()+".*$", Pattern.CASE_INSENSITIVE);
+                            // paramBean.put("name", "/" + map.get(key).toString() + "/");
+                            paramBean.put("name", pattern);
                             break;
                         default:
                             // paramBean.put(key, map.get(key));

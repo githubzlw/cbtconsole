@@ -408,7 +408,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             CustomGoodsPublish good = customGoodsDao.getGoods(editBean.getPid(), 0);
             double finalWeight = 0;
             if (StringUtils.isNotBlank(good.getFinalWeight())) {
-                finalWeight = Double.valueOf(good.getFinalWeight());
+                finalWeight = Double.parseDouble(good.getFinalWeight());
             }
             customGoodsDao.setNoBenchmarking(editBean.getPid(), finalWeight);
         }

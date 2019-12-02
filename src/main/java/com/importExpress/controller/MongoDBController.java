@@ -177,12 +177,17 @@ public class MongoDBController {
                     if (CollectionUtils.isNotEmpty(checkList)) {
                         List<MongoGoodsBean> updateList = list.stream().filter(e -> checkList.contains(e.getPid()))
                                 .collect(Collectors.toList());
-                        insertTotal += mongoGoodsService.batchUpdateGoodsInfoToMongoDb(updateList);
-                        updateList.clear();
+                        if(CollectionUtils.isNotEmpty(updateList)){
+                            insertTotal += mongoGoodsService.batchUpdateGoodsInfoToMongoDb(updateList);
+                            updateList.clear();
+                        }
+
                         List<MongoGoodsBean> insertList = list.stream().filter(e -> !checkList.contains(e.getPid()))
                                 .collect(Collectors.toList());
-                        insertTotal += mongoGoodsService.insertGoodsToMongoBatch(insertList);
-                        insertList.clear();
+                        if(CollectionUtils.isNotEmpty(insertList)){
+                            insertTotal += mongoGoodsService.insertGoodsToMongoBatch(insertList);
+                            insertList.clear();
+                        }
                     } else {
                         insertTotal += mongoGoodsService.insertGoodsToMongoBatch(list);
                     }
