@@ -6087,7 +6087,7 @@ public class OrderwsDao implements IOrderwsDao {
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
         ResultSet rs = null;
         Statement stmt = null;
-        String sql = "select a.*,b.buyForMeCarConfig from (select id,email,createtime from user where 1=1 ";
+        String sql = "select a.*,b.buyForMeCarConfig from (select id,email,createtime,site from user where 1=1 ";
         if (StringUtil.isNotBlank(beginDate)) {
             sql += " and createtime >= '" + beginDate + "'";
         }
@@ -6111,6 +6111,7 @@ public class OrderwsDao implements IOrderwsDao {
                 bhDtl.setUserId(rs.getInt("id"));
                 bhDtl.setEmail(rs.getString("email"));
                 bhDtl.setCreateTime(rs.getString("createtime"));
+                bhDtl.setSite(rs.getInt("site"));
                 String carStr = rs.getString("buyForMeCarConfig");
                 if(org.apache.commons.lang3.StringUtils.isNotBlank(carStr)){
                     List<GoodsCarActiveSimplBean> listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carStr), GoodsCarActiveSimplBean.class);

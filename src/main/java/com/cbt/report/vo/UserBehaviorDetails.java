@@ -14,6 +14,16 @@ public class UserBehaviorDetails {
     private String pid;
     private int carNum;
     private String orderAmount;
+    private int site;
+
+    public int getSite() {
+        return site;
+    }
+
+    public void setSite(int site) {
+        this.site = site;
+    }
+
     public String getOrderAmount() {
         return orderAmount;
     }

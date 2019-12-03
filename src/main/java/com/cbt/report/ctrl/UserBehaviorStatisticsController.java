@@ -628,6 +628,10 @@ public class UserBehaviorStatisticsController {
         cell = row.createCell(2);
         cell.setCellValue("时间");
         cell.setCellStyle(style);
+        cell = row.createCell(3);
+        cell.setCellValue("归属网站1:import,2:kids,4:pets");
+        cell.setCellStyle(style);
+
 
         for (int i = 0; i < list.size(); i++) {
             row = sheet.createRow((int) i + 1);
@@ -636,6 +640,7 @@ public class UserBehaviorStatisticsController {
             row.createCell(0).setCellValue(usBh.getUserId());
             row.createCell(1).setCellValue(usBh.getEmail());
             row.createCell(2).setCellValue(usBh.getCreateTime());
+            row.createCell(3).setCellValue(usBh.getSite());
         }
         return wb;
     }
