@@ -47,6 +47,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.importExpress.utli.*;
+import okhttp3.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
@@ -216,20 +218,9 @@ import com.importExpress.pojo.OverseasWarehouseStockLog;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OverseasWarehouseStockService;
 import com.importExpress.service.TabCouponService;
-import com.importExpress.utli.DESUtils;
-import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
-import com.importExpress.utli.MultiSiteUtil;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SearchFileUtils;
-import com.importExpress.utli.SendMQ;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import sun.misc.BASE64Encoder;
 
 @SuppressWarnings("deprecation")
@@ -2943,12 +2934,23 @@ public class WarehouseCtrl {
 	public String getQtFs(HttpServletRequest request, Model model) {
 		JcgjSoapHttpPost jc = new JcgjSoapHttpPost();
 		Map<String, Object> map = new HashMap<String, Object>();
+		String icId = "14972";
+		String secret = "Yb70MrMh9Q4Odl5";
 		map.put("RequestName", "EmsKindList"); // PreInputSet
+		map.put("icID", icId);
+		Long timeStamp = System.currentTimeMillis() - 8 * 60 * 60 * 1000;
+		map.put("TimeStamp", timeStamp);
+		map.put("MD5",Md5Util.md5Operation(icId + timeStamp + secret));
+		System.err.println(map);
 		String t = jc.objToGson(map);
 		System.out.println(t);
 		String r = "";
 		try {
-			r = jc.preInputSet(t);
+			OKHttpUtils okHttpUtils = new OKHttpUtils();
+			// r = jc.preInputSet(t);
+			Headers headers = new Headers.Builder().add("Content-Type","application/json;charset=UTF-8").build();
+			// json : application/json
+			r = okHttpUtils.post("http://api.cne.com/cgi-bin/EmsData.dll?DoApi",headers,"",t);
 			System.out.println(r);
 		} catch (Exception e) {
 			e.printStackTrace();

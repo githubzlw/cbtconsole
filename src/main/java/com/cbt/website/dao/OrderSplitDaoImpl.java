@@ -2672,8 +2672,11 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 						"SUM((case when purchase_state=3 then 1 else 0 end))>0 THEN 1 ELSE 5 END ) FROM order_details " +
 						"WHERE orderid='"+newOrder+"' AND state<2 ) WHERE order_no='"+newOrder+"' and state not in(-1,6);";
 
-				System.err.println(sqlOld + sqlNew);
-				SendMQ.sendMsg(new RunSqlModel(sqlOld + sqlNew));
+				System.err.println(sqlOld);
+				SendMQ.sendMsg(new RunSqlModel(sqlOld));
+
+				System.err.println(sqlNew);
+				SendMQ.sendMsg(new RunSqlModel(sqlNew));
 				/*cStmt1 = conn2.prepareCall(sql1);
 				cStmt1.setString(1, oldOrder);
 				cStmt1.execute();

@@ -1225,7 +1225,7 @@
 									)</span>
                             <c:if test="${orderd.overSeaFlag > 0}">
                                 <br>
-                                <span style="color: red;background-color: #35de2a;">海外仓商品</span>
+                                <a href="/cbtconsole/owstock/log?odid=${orderd.id}" target="_blank"><span style="color: red;background-color: #35de2a;">海外仓商品</span></a>
                                 <br>
                             </c:if>
                             <span style="color: red">成交价格：</span>$

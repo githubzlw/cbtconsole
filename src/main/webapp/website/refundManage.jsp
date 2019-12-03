@@ -136,7 +136,7 @@
         <span style="margin-left: 100px;"><a href="/cbtconsole/refundss/rlist" target="_blank">未匹配用户申诉记录</a></span>
         <c:if test="${roleType == '0' && (operatorName=='emmaxie' || operatorName=='Ling' || operatorName=='Mandy')}">
             <span style="margin-left: 65px;"><input type="button" onclick="showSecondValid(${operatorId})" value="二次验证密码" class="btn_sty"></span>
-            <span><input type="button" onclick="openWindow('/cbtconsole/apa/refundByPayNo.html')" value="交易号退款" class="btn_sty"></span>
+            <span style="display: none"><input type="button" onclick="openWindow('/cbtconsole/apa/refundByPayNo.html')" value="交易号退款" class="btn_sty"></span>
             &nbsp;&nbsp;&nbsp;<span><a href="/cbtconsole/apa/refundResultList.html" target="_blank">API退款结果列表</a> </span>
         </c:if>
         <span class="sp_style ${chooseState == -1 ? ' is_choose':''}" onclick="changeAndQuery(-1)">全部</span>

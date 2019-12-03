@@ -84,9 +84,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         if (StringUtils.isNotBlank(bean.getRangePrice())) {
             //sku更新
             List<CustomBenchmarkSkuNew> insertList = new ArrayList<>();
-            JSONArray sku_json = JSONArray.fromObject(bean.getSku());
+            /*JSONArray sku_json = JSONArray.fromObject(bean.getSku());
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-
+*/
+            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(bean.getSku(),ImportExSku.class);
             for (ImportExSku exSku : skuList) {
                 CustomBenchmarkSkuNew skuNew = new CustomBenchmarkSkuNew();
                 skuNew.setFinalWeight(bean.getFinalWeight());
@@ -141,6 +142,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 //否则插入或者更新SingleOffersChild信息
                 customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
             }*/
+
+            customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.parseDouble(bean.getFinalWeight()));
         }else{
             customGoodsMapper.insertIntoGoodsImgUpLog(bean.getPid(),"",bean.getAdminId(),"publish error");
         }
@@ -750,8 +753,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 获取商品信息
         CustomGoodsPublish orGoods = queryGoodsDetails(weightChange.getPid(), 0);
         if (StringUtils.isNotBlank(orGoods.getSku())) {
-            JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
-            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+            /*JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
+            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
+
+            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(orGoods.getSku(),ImportExSku.class);
             // 查找匹配的type数据
             String typeStr = weightChange.getGoodsType();
             String skuid = weightChange.getSkuid() == null ? "" : weightChange.getSkuid();

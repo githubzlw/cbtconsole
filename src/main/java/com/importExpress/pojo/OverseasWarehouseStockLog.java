@@ -52,4 +52,9 @@ public class OverseasWarehouseStockLog {
      * 商品号
      */
     private String coden;
+    
+    /**
+     * 占用情况
+     */
+    private int occupy;
 }
