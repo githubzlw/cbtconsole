@@ -42,5 +42,17 @@ public class OverseasWarehouseStockParamter {
 	 * overseas_warehouse_stock 表id
 	 */
 	private int owsid;
+	
+	/**
+	 * 0-占用 1-释放   -1 全部
+	 */
+	@Builder.Default
+	private int changeType=-1;
+	
+	/**
+	 * 订单odid
+	 */
+	@Builder.Default
+	private int odid = 0;
 
 }

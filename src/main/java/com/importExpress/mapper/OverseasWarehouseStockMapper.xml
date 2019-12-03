@@ -34,19 +34,8 @@
     <result column="change_stock" property="changeStock" jdbcType="INTEGER" />
     <result column="change_type" property="changeType" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+    <result column="occupy" property="occupy" jdbcType="INTEGER" />
   </resultMap>
-
-<!-- 订单完结或者取消减少订单占用库存，可用库存增加 -->
-  <update id="reduceOrderStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
-    update overseas_warehouse_stock set order_stock=order_stock-#{orderStock},
-    available_stock=ow_stock-order_stock where code=#{code}
-  </update>
-<!-- 日志记录  -->
-  <insert id="addLog" parameterType="com.importExpress.pojo.OverseasWarehouseStockLog" >
-    insert into overseas_warehouse_stock_log (ows_id, change_stock,od_id,orderno,change_type,remark,code,code_n,create_time)
-    values ((select id from overseas_warehouse_stock where code=#{code} limit 1), #{changeStock}, #{odid},
-      #{orderno}, #{changeType}, #{remark},#{code},#{coden},now())
-  </insert>
   
   <select id="getLogByOrderno" resultMap="StockLogResultMap">
   select id,ows_id, change_stock,od_id,orderno,change_type,remark,code,code_n,create_time 
@@ -76,7 +65,7 @@
 	<!-- 库存日志列表  -->
 	<select id="getStockLogList" resultMap="StockLogResultMap" parameterType="com.importExpress.pojo.OverseasWarehouseStockParamter">
 	
-	select a.id,a.ows_id,a.od_id,a.orderno,a.change_stock,a.change_type,a.create_time,a.remark,a.code,
+	select a.id,a.ows_id,a.od_id,a.orderno,a.change_stock,a.change_type,a.create_time,a.remark,a.code,a.occupy,
 	b.goods_pid,b.goods_name,b.sku,b.skuid,b.specid,b.remark as stock_remark from overseas_warehouse_stock_log a
 	left join overseas_warehouse_stock b on a.ows_id=b.id where 1=1
 	
@@ -84,6 +73,9 @@
 	<if test="code != null"> and a.code=#{code}</if>
 	<if test="goodsPid != null"> and b.goods_pid=#{goodsPid}</if>
 	<if test="skuid != null"> and b.skuid=#{skuid}</if>
+	<if test="changeType != -1"> and a.change_type=#{changeType}</if>
+	<if test="odid != 0"> and a.od_id=#{odid}</if>
+	order by a.create_time asc
 	limit #{page},20
 	</select>
 	<!-- 库存日志列表数量 -->
@@ -96,24 +88,18 @@
 	<if test="code != null"> and a.code=#{code}</if>
 	<if test="goodsPid != null"> and b.goods_pid=#{goodsPid}</if>
 	<if test="skuid != null"> and b.skuid=#{skuid}</if>
+	<if test="changeType != -1"> and a.change_type=#{changeType}</if>
+	<if test="odid != 0"> and a.od_id=#{odid}</if>
 	
 	</select>
-	<insert id="addStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
-	insert into overseas_warehouse_stock(ow_stock,order_stock,available_stock,goods_pid,goods_name,
-	code,code_n,sku,skuid,specid,create_time,update_time,remark) 
-	values(#{owStock},0,#{owStock},#{goodsPid},#{goodsName},#{code},#{coden},#{sku},#{skuid},#{specid},now(),now(),#{remark})
-	</insert>
 	
-	<update id="updateStock" parameterType="com.importExpress.pojo.OverseasWarehouseStock">
-	update overseas_warehouse_stock set ow_stock=#{owStock},available_stock=#{owStock}-order_stock,update_time=now() where code=#{code}
-	</update>
 	<insert id="addSyncStockTime">insert into overseas_warehouse_stock_synchronization(create_time,sync_count) values(now(),#{syncCount})</insert>
 	
 	<select id="getOrderDetails" resultType="java.util.Map">
-	select od.orderid,od.id as odid,od.yourorder,goods_pid,car_type,ows.code_n,ows.ows_id,ows.change_type
-	
+	select od.orderid,od.id as odid,od.yourorder,od.goods_pid,od.car_type,
+	ows.code_n,ows.code,ows.ows_id,ows.change_type
 	from order_details od left join overseas_warehouse_stock_log ows on od.id=ows.od_id 
-	where ows.change_type in(0,1)
+	where ows.change_type in(0,1) and od.orderid like '%_H%'
 	<if test="orderno!=null">and od.orderid=#{orderno}</if>
 	<if test="odid!=0">and od.id=#{odid}</if>
 	order by od.id asc,ows.change_type desc

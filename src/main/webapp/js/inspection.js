@@ -527,6 +527,9 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     	alert("未能自动匹配到商品,请输入验货数量进行手动验货");
     	return;
     }
+    //同步重量
+    saveWeight(orderid, odid, itemid);
+    
    $.ajax({
             url: "/cbtconsole/order/updateCheckStatus",
             type: "post",
@@ -1111,11 +1114,12 @@ function search() {
                                 + '<h4>体积重量(kg):<input type="text" style="width: 70px;" id="' + json[i].orderid + 'volumeWeight' + json[i].odid + '"></h4>';
                             /*'<input type="button" value="获取商品重量" onclick="getWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\')">' +*/
                             if (json[i].weight == undefined) {
-                                str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+//                            	str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+                                str += '<span name="save_weight">未保存过重量!</span>';
                             } else {
                                 str += '<span name="save_weight">已保存的重量:' + json[i].weight + '<em>Kg</em></span>'
-                                    + '<br><span name="save_volume_weight">已保存的体积重量:' + json[i].volume_weight + '<em>Kg</em></span>'
-                                    + '<input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+                                    + '<br><span name="save_volume_weight">已保存的体积重量:' + json[i].volume_weight + '<em>Kg</em></span>';
+//                                    + '<input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
                             }
                             str += '<br />';
                             if (json[i].syn == undefined || json[i].syn == '0') {
@@ -1515,11 +1519,12 @@ function search() {
                                     + '</span></h4><h4>单件重量(kg):<input type="text" style="width: 70px;" id="\'+json[i].orderid+\'weight\'+json[i].odid+\'"></h4>'
                                     + '<h4>体积重量(kg):<input type="text" style="width: 70px;" id="' + json[i].orderid + 'volumeWeight' + json[i].odid + '"></h4>';
                                 if (json[i].weight == undefined) {
-                                    str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+//                                	str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+                                    str += '<span name="save_weight">未保存过重量!</span>';
                                 } else {
                                     str += '<span name="save_weight">已保存的重量:' + json[i].weight + '<em>Kg</em></span>'
-                                        + '<br><span name="save_volume_weight">已保存的体积重量:' + json[i].volume_weight + '<em>Kg</em></span>'
-                                        + '<input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+                                        + '<br><span name="save_volume_weight">已保存的体积重量:' + json[i].volume_weight + '<em>Kg</em></span>';
+//                                        + '<input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
                                 }
                                 str += '<br />';
                                 if (json[i].syn == undefined || json[i].syn == '0') {

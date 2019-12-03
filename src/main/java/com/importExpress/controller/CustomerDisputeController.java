@@ -248,13 +248,12 @@ public class CustomerDisputeController {
 				mv.addObject("dispute", dispute);
 				
 				resonFlag = "fraudulent".equals(dispute.getReason().toLowerCase())? 1: resonFlag;
-				resonFlag = "product not received".equals(dispute.getReason().toLowerCase())? 2: resonFlag;
-				resonFlag = "product unacceptable".equals(dispute.getReason().toLowerCase())? 3: resonFlag;
+				resonFlag = "product_not_received".equals(dispute.getReason().toLowerCase())? 2: resonFlag;
+				resonFlag = "product_unacceptable".equals(dispute.getReason().toLowerCase())? 3: resonFlag;
 				resonFlag = "unrecognized".equals(dispute.getReason().toLowerCase())? 4: resonFlag;
-
-				resonFlag = "subscription canceled".equals(dispute.getReason().toLowerCase())? 5: resonFlag;
+				resonFlag = "subscription_canceled".equals(dispute.getReason().toLowerCase())? 5: resonFlag;
 				resonFlag = "duplicate".equals(dispute.getReason().toLowerCase())? 6: resonFlag;
-				resonFlag = "credit not processed".equals(dispute.getReason().toLowerCase())? 7: resonFlag;
+				resonFlag = "credit_not_processed".equals(dispute.getReason().toLowerCase())? 7: resonFlag;
 				int submitFor = 0;
 				mv.addObject("submitFor", submitFor);
 			}	

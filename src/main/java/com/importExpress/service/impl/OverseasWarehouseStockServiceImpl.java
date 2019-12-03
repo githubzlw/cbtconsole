@@ -51,20 +51,24 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
     		remark = remark.replace("odid", StrUtils.object2NumStr(m.get("odid")));
     		remark = remark.replace("orderStock", StrUtils.object2NumStr(m.get("yourorder")));
     		
+    		String ows_id = StrUtils.object2NumStr(m.get("ows_id"));
+    		String code = StrUtils.object2Str(m.get("code"));
+    		
     		String runSql = new StringBuilder("update overseas_warehouse_stock set order_stock=order_stock-")
     				.append(orderStock).append(",available_stock=available_stock+")
     				.append(orderStock).append(" where code_n='").append(coden).append("'").toString();
     		//mq操作更新线上数据表
     		reduceOrderStock += Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
     		if(reduceOrderStock > 0) {
-    			runSql = new StringBuilder("insert into overseas_warehouse_stock_log (ows_id,code, change_stock,od_id,orderno,change_type,remark,code_n,create_time)" )
-    					.append("values ((select id,code, from overseas_warehouse_stock where code_n='" )
-    					.append(coden).append("' limit 1),")
+    			runSql = new StringBuilder("insert into overseas_warehouse_stock_log (ows_id,code, change_stock,od_id,orderno,change_type,remark,code_n,create_time,occupy)" )
+    					.append("values (" )
+    					.append(ows_id).append(",'")
+    					.append(code).append(",'")
     					.append(orderStock).append(", ")
     					.append(odid).append(",'")
     					.append(orderno).append("', 1,'")
     					.append(remark).append("','")
-    					.append(coden).append("',now())")
+    					.append(coden).append("',now(),0)")
     					.toString();
     			SendMQ.sendMsg(new RunSqlModel(runSql));
     		}
@@ -105,7 +109,10 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
 		if(updateStock == 0) {
 			updateStock = stockMapper.addStock(stock);
 		}*/
-		String runSql = new StringBuilder("update overseas_warehouse_stock set ow_stock=")
+		String runSql = new StringBuilder("update overseas_warehouse_stock set ")
+				.append("code='").append(stock.getCode())
+				.append("',goods_name='").append(stock.getGoodsName())
+				.append("',ow_stock=")
 				.append(stock.getOwStock())
 				.append(",available_stock=")
 				.append(stock.getOwStock())

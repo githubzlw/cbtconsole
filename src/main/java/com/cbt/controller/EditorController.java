@@ -229,8 +229,9 @@ public class EditorController {
             // 判断是否是区间价格，含有区间价格的获取sku数据进行处理
             if (StringUtils.isNotBlank(goods.getRangePrice()) && StringUtils.isNotBlank(goods.getSku())) {
                 List<ImportExSku> skuList = new ArrayList<ImportExSku>();
-                JSONArray sku_json = JSONArray.fromObject(goods.getSku());
-                skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
+                skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
+                skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
                 // 规格标题名称集合
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
                 // 集合排序
@@ -574,7 +575,8 @@ public class EditorController {
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
             if (StringUtils.isNotBlank(goods.getSku())) {
                 JSONArray sku_json = JSONArray.fromObject(goods.getSku());
-                List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
                 for (ImportExSkuShow exSku : cbSkus) {
                     if (StringUtils.isNotBlank(exSku.getSpecId())) {
@@ -643,8 +645,9 @@ public class EditorController {
 
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
-            JSONArray sku_json = JSONArray.fromObject(goods.getSku());
-            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+            /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
+            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
+            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
             String[] skuStrList = skuStr.split(";");
             String[] volumeSkuList = volumeSkuStr.split(";");
             double finalWeight = 0;
@@ -999,8 +1002,9 @@ public class EditorController {
                     json.setMessage("获取单规格价数据失败");
                     return json;
                 } else {
-                    JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
-                    List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                   /* JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
+                    List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
+                    List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(orGoods.getSku(),ImportExSku.class);
                     boolean isSuccess = GoodsInfoUtils.dealSkuByParam(skuList, sku, cgp);
                     if (!isSuccess) {
                         json.setOk(false);
@@ -1414,8 +1418,9 @@ public class EditorController {
             String sku = request.getParameter("sku");
             // System.err.println("sku:"+sku);
             if (sku != null && !sku.isEmpty() && sku.startsWith("[")) {
-                JSONArray sku_json = JSONArray.fromObject(sku);
-                List<SkuAttrBean> skuList = (List<SkuAttrBean>) JSONArray.toCollection(sku_json, SkuAttrBean.class);
+                /*JSONArray sku_json = JSONArray.fromObject(sku);
+                List<SkuAttrBean> skuList = (List<SkuAttrBean>) JSONArray.toCollection(sku_json, SkuAttrBean.class);*/
+                List<SkuAttrBean> skuList = com.alibaba.fastjson.JSONArray.parseArray(sku,SkuAttrBean.class);
                 for (SkuAttrBean skuBean : skuList) {
                     // System.err.println(skuBean.toString());
                     SkuValBean skuVal = skuBean.getSkuVal();
@@ -3624,7 +3629,7 @@ public class EditorController {
             File imgFile = new File(pidEnInfoFile);
             if (isDown && imgFile.exists() && imgFile.isFile()) {
                 // 调用替换中文图片到英文图片的接口
-                OkHttpClient client = OKHttpUtils.getClientInstence();
+                OkHttpClient client = OKHttpUtils.getClientInstance();
 
                 String imageType = "image/jpg";
                 RequestBody fileBody = RequestBody.create(MediaType.parse(imageType), imgFile);

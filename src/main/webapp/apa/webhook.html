@@ -101,7 +101,7 @@
         $(document).ready(function () {
             setDatagrid();
         });
-        function fnexport(){
+        function fnexport(importFlag){
         	
         	var sttime = $("#query_sttime").val();
             if (sttime == null || sttime == "") {
@@ -115,7 +115,8 @@
             if (type == null || type == "") {
                 type = -1;
             }
-            window.location.href ="/cbtconsole/webhook/payment/export?sttime="+sttime+"&edtime="+edtime+"&type="+type;
+            window.location.href ="/cbtconsole/webhook/payment/export?sttime="+sttime+"&edtime="+edtime
+                +"&type="+type + "&importFlag="+ importFlag;
         }
           
         /**
@@ -208,7 +209,9 @@
         &nbsp;&nbsp;&nbsp;&nbsp; 
         <span><input type="button" class="enter_btn" value="查询" onclick="doQuery()"/></span>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <span><input type="button" class="enter_btn export_btn" id ="export_btn" value="导出" onclick="fnexport()"/></span>
+        <span><input type="button" class="enter_btn export_btn" id ="export_btn" value="导出全部" onclick="fnexport(0)"/></span>
+
+        <span><input type="button" class="enter_btn export_btn" id ="export_btn_single" value="导出电商网站" onclick="fnexport(1)"/></span>
       
     </form>
 </div>
