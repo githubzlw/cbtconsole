@@ -73,10 +73,9 @@
 
 	<resultMap id="balanceChangeResultMap" type="com.cbt.report.vo.CustomerBalanceChangeBean">
 		<result column="userid" property="userId" jdbcType="INTEGER" />
-		<result column="current_balance" property="currentBalance"
-			jdbcType="FLOAT" />
-		<result column="change_balance" property="changeBalance"
-			jdbcType="FLOAT" />
+		<result column="current_balance" property="currentBalance" jdbcType="FLOAT" />
+		<result column="change_balance" property="changeBalance" jdbcType="FLOAT" />
+		<result column="changetime" property="createTime" jdbcType="TIMESTAMP" />
 	</resultMap>
 
 	<resultMap id="balanceCompensationResultMap" type="com.cbt.report.vo.BalanceCompensation">
@@ -501,31 +500,53 @@
 	<select id="queryCustomerBalanceChange" resultMap="balanceChangeResultMap">
 
 		select btc.userid,btc.change_balance,us.available_m as current_balance
-		from (select userid ,cast(ifnull(sum(changeblance-beforblance),0) as
-		DECIMAL(11,2)) as
-		change_balance
+		from (select userid ,cast(ifnull(sum(changeblance-beforblance),0) as DECIMAL(11,2)) as change_balance
 		from tab_blancechangelog where
 		date(changetime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
 		date(changetime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
 		in(select id from `user` where is_test = 0)
 		group by userid
+		) btc left join (select id,available_m from `user`) us
+		on btc.userid =us.id
+		where btc.change_balance != 0
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
 		</if>
-		) btc left join (select id,available_m from `user`) us
-		on btc.userid =
-		us.id
-
 	</select>
 
 	<select id="queryCustomerBalancesChangeCount" resultType="java.lang.Integer">
 		select
-		count(*) from (select userid from tab_blancechangelog where
+		count(*) from (select userid,cast(ifnull(sum(changeblance-beforblance),0) as DECIMAL(11,2)) as change_balance
+		from tab_blancechangelog where
 		date(changetime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
 		date(changetime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
 		in(select id from `user` where is_test = 0)
 		group by userid) tbc
+		where tbc.change_balance != 0
 	</select>
+
+
+	<select id="queryBalanceDetailsAll" resultMap="balanceChangeResultMap">
+		select btc.userid ,cast(ifnull(btc.changeblance,0)-ifnull(btc.beforblance,0) as DECIMAL(11,2)) as change_balance,btc.changetime
+		from tab_blancechangelog btc
+		where date(btc.changetime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(btc.changetime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and
+		btc.userid in(select id from `user` where is_test = 0)
+		order by btc.userid,btc.changetime
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+
+	</select>
+
+	<select id="queryBalanceDetailsAllCount" resultType="java.lang.Integer">
+		select count(0)
+		from tab_blancechangelog btc
+		where date(btc.changetime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(btc.changetime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and
+		btc.userid in(select id from `user` where is_test = 0)
+	</select>
+
 
 	<select id="queryOrderSales" resultMap="orderInfoResultMap">
 		select oi.exchange_rate,oi.order_no,oi.user_id,if(oi.memberFee>=10,oi.pay_price-oi.memberFee,oi.pay_price) as pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email as userEmail
@@ -880,9 +901,9 @@
 		userid,cast(ifnull(sum(account),0) AS DECIMAL(11, 2)) as
 		refund_amount
 		from refund
-		where 1=1 and valid=1 and status =2 and type=0
-		and date(endtime) &lt;=date(#{endDate,jdbcType=VARCHAR}) and
-		date(endtime) &gt;=date(#{beginDate,jdbcType=VARCHAR})
+		where 1=1 and valid=1 and status in(0,1,2,3) and type=0
+		and date(apptime) &lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(apptime) &gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and userid
 		in(SELECT id FROM USER WHERE is_test = 0)
 		group by userid
@@ -893,12 +914,11 @@
 
 	<select id="queryBalanceWithdrawalCount" resultType="java.lang.Integer">
 		select
-		count(*) from (select userid from refund
-		where 1=1 and valid=1 and
-		status =2 and type=0
-		and date(endtime)
+		count(0) from (select userid from refund
+		where 1=1 and valid=1 and status in(0,1,2,3) and type=0
+		and date(apptime)
 		&lt;=date(#{endDate,jdbcType=VARCHAR}) and
-		date(endtime)
+		date(apptime)
 		&gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and userid
 		in(SELECT id FROM USER WHERE is_test = 0)

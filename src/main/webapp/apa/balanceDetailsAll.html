@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>余额提现审批中详情</title>
+<title>余额变更全部明细</title>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript"
 	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
@@ -30,7 +30,11 @@
 	color: #fff;
 }
 
-#bwi_query_form {
+#dta_query_form {
+	font-size: 18px;
+}
+
+#button_style {
 	font-size: 18px;
 }
 
@@ -40,16 +44,16 @@
 	font-size: 24px;
 }
 
-.bwd_rYear, .bwd_rMonth, .but_color {
+.dta_rYear, .dta_rMonth, .but_color {
 	padding: 5px;
 	font-size: 14px
 }
 
-.bwd_rYear, .bwd_rMonth {
+.dta_rYear, .dta_rMonth {
 	margin-right: 18px
 }
 
-#bwi_top_toolbar {
+#dta_top_toolbar {
 	padding: 20px 28px !important;
 }
 
@@ -61,35 +65,35 @@
 </style>
 <script type="text/javascript">
 	$(function() {
+	    genYearSelect();
 		setDatagrid();
-		genYearSelect();
-		var opts = $("#bwi_easyui-datagrid").datagrid("options");
-		opts.url = "/cbtconsole/basicStatistical/queryBalanceWithdrawalInfo";
+		var opts = $("#dta_easyui-datagrid").datagrid("options");
+		opts.url = "/cbtconsole/basicStatistical/queryBalanceDetailsAll";
 	});
 
 	function genYearSelect() {
         var mydate = new Date();
         var rYear = mydate.getFullYear();
-        $(".bwd_rYear").empty();
+        $(".dta_rYear").empty();
         var content = "";
         for (var yr = 2016; yr <= rYear; yr++) {
             content += "<option value='" + yr + "'>" + yr + "</option>";
         }
-        $(".bwd_rYear").append(content);
+        $(".dta_rYear").append(content);
     }
 
 	function setDatagrid() {
-		$('#bwi_easyui-datagrid').datagrid({
-			title : '余额提现审批中详情',
+		$('#dta_easyui-datagrid').datagrid({
+			title : '余额变更全部明细',
 			width : "100%",
 			fit : true,//自动补全 
 			striped : true,//设置为true将交替显示行背景。
 			collapsible : true,//显示可折叠按钮
-			toolbar : "#bwi_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+			toolbar : "#dta_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
 			url : '',//url调用Action方法
 			loadMsg : '数据装载中......',
 			singleSelect : true,//为true时只能选择单行
-			fitColumns : true,//允许表格自动缩放，以适应父容器
+			//fitColumns : true,//允许表格自动缩放，以适应父容器
 			rownumbers : true,
 			pageSize : 50,//默认选择的分页是每页50行数据
 			pageList : [ 20, 50, 100 ],//可以选择的分页集合
@@ -123,14 +127,18 @@
 		});
 	}
 
-	function doBwiQuery() {
-		var year = $(".bwd_rYear").val();
+	function doBpiQuery() {
+		var year = $(".dta_rYear").val();
 		if (year == null || year == "" || year == "0" || year == "-1") {
 			showMessage('请选择年份');
 			return;
 		}
-		var month = $(".bwd_rMonth").val();
-		$("#bwi_easyui-datagrid").datagrid("load", {
+		var month = $(".dta_rMonth").val();
+		if (year == null || year == "" || year == "0" || year == "-1") {
+			showMessage('请选择月份');
+			return;
+		}
+		$("#dta_easyui-datagrid").datagrid("load", {
 			"year" : year,
 			"month" : month
 		});
@@ -176,51 +184,60 @@
 				+ " " + hour + seperator2 + minute + seperator2 + seconds;
 	}
 
-	doBwdSelectChange()
-	{
+
+	function doBpiSelectChange() {
 		var mydate = new Date();
-		var bwd_rYear = mydate.getFullYear();
-		var bwd_rMonth = mydate.getMonth();
+		var rYear = mydate.getFullYear();
+		var rMonth = mydate.getMonth();
 		var monthop = "";
-		$('.bwd_rMonth').empty();
-		if ($('.bwd_rYear').val() == bwd_rYear) {
-			for (var i = 1; i <= bwd_rMonth + 1; i++) {
+		$('.dta_rMonth').empty();
+		var selectYear = $('.dta_rYear').val();
+		if (selectYear == rYear) {
+			for (var i = 1; i <= rMonth + 1; i++) {
 				monthop += "<option value='"+i+"'>" + i + "</oiption>";
 			}
-			$('.bwd_rMonth').append(monthop);
-		} else {
+			$('.dta_rMonth').append(monthop);
+		} else if (selectYear < rYear) {
 			for (var i = 1; i <= 12; i++) {
 				monthop += "<option value='"+i+"'>" + i + "</oiption>";
 			}
-			$('.bwd_rMonth').append(monthop);
+			$('.dta_rMonth').append(monthop);
+		} else if (selectYear > rYear) {
+			$('.dta_rYear').val(rYear);
+			for (var i = 1; i <= rMonth + 1; i++) {
+				monthop += "<option value='"+i+"'>" + i + "</oiption>";
+			}
+			$('.dta_rMonth').append(monthop);
 		}
 	}
 
-	function exportBwiExcel() {
-		var year = $(".bwd_rYear").val();
+
+
+	function exportBpiExcel() {
+		var year = $(".dta_rYear").val();
 		if (year == null || year == "" || year == "0" || year == "-1") {
 			showMessage('请选择年份');
 			return;
 		}
-		var month = $(".bwd_rMonth").val();
-		if (month == null || month == "" || month == "0" || month == "-1") {
-			showMessage('请选择月份');
+		var month = $(".dta_rMonth").val();
+		if (year == null || year == "" || year == "0" || year == "-1") {
+			showMessage('请选择年份');
 			return;
 		}
-		window.location.href = "/cbtconsole/basicStatistical/exportBalanceWithdrawalExcel?year="
+		window.location.href = "/cbtconsole/basicStatistical/exportBalanceDetailsAllExcel?year="
 				+ year + "&month=" + month;
 	}
 </script>
 <body>
-	<div id="bwi_top_toolbar" style="padding: 5px; height: auto">
-		<form id="bwi_query_form" action="#" onsubmit="return false;">
-			<label for="bwd_rYear">年份选择<font color="red">*</font>：
-			</label> <select name="year" class="bwd_rYear" onchange="doBwdSelectChange()">
+	<div id="dta_top_toolbar" style="padding: 5px; height: auto">
+		<form id="dta_query_form" action="#" onsubmit="return false;">
+			<label for="dta_rYear">年份选择<font color="red">*</font>：
+			</label> <select name="year" class="dta_rYear" onchange="doBpiSelectChange()">
 				<option value='2016'>2016</option>
 				<option value='2017'>2017</option>
 				<option value='2018'>2018</option>
-			</select><label for="bwd_rMonth">月份选择： </label> <select name="month"
-				class="bwd_rMonth">
+			</select><label for="dta_rMonth">月份选择<font color="red">*</font>：
+			</label> <select name="month" class="dta_rMonth">
 				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>
@@ -234,20 +251,20 @@
 				<option value="11">11</option>
 				<option value="12">12</option>
 			</select> <input class="but_color" type="button" value="查询"
-				onclick="doBwiQuery()"> <input class="but_color"
-				type="button" value="重置" onclick="doBwiReset()"> <input
+				onclick="doBpiQuery()"> <input class="but_color"
+				type="button" value="重置" onclick="doBpiReset()"> <input
 				class="but_color" type="button" value="导出Excel"
-				onclick="exportBwiExcel()">
+				onclick="exportBpiExcel()">
 		</form>
 	</div>
-	<table id="bwi_easyui-datagrid" style="width: 100%; height: 100%;"
+	<table id="dta_easyui-datagrid" style="width: 100%; height: 100%;"
 		class="easyui-datagrid">
 		<thead>
 			<tr>
-				<th data-options="field:'year',align:'center',width:'60px'">年份</th>
-				<th data-options="field:'month',align:'center',width:'60px'">月份</th>
-				<th data-options="field:'userId',align:'center',width:'100px'">客户id</th>
-				<th data-options="field:'refundAmount',align:'center',width:'100px'">提现金额(USD)</th>
+				<th data-options="field:'userId',width:'120px'">客户id</th>
+				<th data-options="field:'changeBalance',align:'center',width:'150px'">变更金额(USD)</th>
+				<th
+					data-options="field:'createTime',align:'center',width:'200px',formatter:formatTime">变更时间</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -271,13 +288,13 @@
 						if (sgParamLst[0] == "year") {
 							year = sgParamLst[1];
 							if (!(year == null || year == "")) {
-								$(".bwd_rYear").val(year);
+								$(".dta_rYear").val(sgParamLst[1]);
 							}
 							continue;
 						} else if (sgParamLst[0] == "month") {
 							month = sgParamLst[1];
 							if (!(month == null || month == "")) {
-								$(".bwd_rMonth").val(month);
+								$(".dta_rMonth").val(sgParamLst[1]);
 							}
 							continue;
 						}
@@ -285,7 +302,7 @@
 				}
 				if (!(year == null || year == "" || year == "-1"
 						|| month == null || month == "" || month == "-1")) {
-					doBwiQuery();
+					doBpiQuery();
 				}
 			}
 		}
