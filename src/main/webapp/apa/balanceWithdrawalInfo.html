@@ -210,6 +210,10 @@
 		window.location.href = "/cbtconsole/basicStatistical/exportBalanceWithdrawalExcel?year="
 				+ year + "&month=" + month;
 	}
+
+    function formatUserId(val, row, index) {
+        return  '<a href="/cbtconsole/userinfo/getUserInfo.do?userId='+val+'" target="_blank">'+val+'</a>';
+    }
 </script>
 <body>
 	<div id="bwi_top_toolbar" style="padding: 5px; height: auto">
@@ -246,7 +250,7 @@
 			<tr>
 				<th data-options="field:'year',align:'center',width:'60px'">年份</th>
 				<th data-options="field:'month',align:'center',width:'60px'">月份</th>
-				<th data-options="field:'userId',align:'center',width:'100px'">客户id</th>
+				<th data-options="field:'userId',align:'center',width:'100px',formatter:formatUserId">客户id</th>
 				<th data-options="field:'refundAmount',align:'center',width:'100px'">提现金额(USD)</th>
 			</tr>
 		</thead>

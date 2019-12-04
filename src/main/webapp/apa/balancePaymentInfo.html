@@ -254,6 +254,10 @@
 		window.location.href = "/cbtconsole/basicStatistical/exportBalancePaymentExcel?year="
 				+ year + "&month=" + month;
 	}
+
+	function formatUserId(val, row, index) {
+        return  '<a href="/cbtconsole/userinfo/getUserInfo.do?userId='+val+'" target="_blank">'+val+'</a>';
+    }
 </script>
 <body>
 	<div id="bpi_top_toolbar" style="padding: 5px; height: auto">
@@ -289,7 +293,7 @@
 		<thead>
 			<tr>
 				<th data-options="field:'orderid',width:'100px'">订单号</th>
-				<th data-options="field:'userId',width:'100px'">客户id</th>
+				<th data-options="field:'userId',width:'100px',formatter:formatUserId">客户id</th>
 				<th data-options="field:'paymentAmount',width:'100px'">付款金额</th>
 				<th data-options="field:'paymentCc',align:'center',width:'100px'">付款币种</th>
 				<th
