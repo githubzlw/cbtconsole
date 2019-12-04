@@ -75,6 +75,27 @@ public interface BasicReportService {
 	public int queryCustomerBalancesChangeCount(String beginDate, String endDateint);
 
 	/**
+	 * 分页查询每月的客户余额变更信息全部
+	 *
+	 * @param beginDate
+	 * @param endDate
+	 * @param start
+	 * @param rows
+	 * @return
+	 */
+	public List<CustomerBalanceChangeBean> queryBalanceDetailsAll(String beginDate, String endDate, int start,
+                                                                      int rows);
+
+	/**
+	 * 查询客户的总数
+	 *
+	 * @param beginDate
+	 * @param endDateint
+	 * @return
+	 */
+	public int queryBalanceDetailsAllCount(String beginDate, String endDateint);
+
+	/**
 	 * 分页查询每月的实际订单销售额
 	 *
 	 * @param beginDate

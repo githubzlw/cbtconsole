@@ -89,12 +89,33 @@ public interface BasicReportMapper {
      * 查询客户的总数
      *
      * @param beginDate
-     * @param endDateint
+     * @param endDate
+     * @return
+     */
+    public int queryCustomerBalancesChangeCount(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
+
+
+    /**
+     * 分页查询每月的客户余额变更信息
+     *
+     * @param beginDate
+     * @param endDate
      * @param start
      * @param rows
      * @return
      */
-    public int queryCustomerBalancesChangeCount(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
+    List<CustomerBalanceChangeBean> queryBalanceDetailsAll(@Param("beginDate") String beginDate,
+                                                                      @Param("endDate") String endDate, @Param("start") int start, @Param("rows") int rows);
+
+    /**
+     * 查询客户的总数
+     *
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    int queryBalanceDetailsAllCount(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
+
 
     /**
      * 重新生成订单及销售额对账报表

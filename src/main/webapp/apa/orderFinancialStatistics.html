@@ -300,12 +300,15 @@
 				<a href="javascript:openNewWindow('/cbtconsole/apa/balanceCompensation.html');" class="easyui-linkbutton"
 					data-options="iconCls:'icon-search',plain:true">余额补偿详情</a> <a
 					href="javascript:openNewWindow('/cbtconsole/apa/orderCancel.html');" class="easyui-linkbutton"
-					data-options="iconCls:'icon-search',plain:true">订单取消(全部或部分)详情</a> <a
-					href="javascript:openNewWindow('/cbtconsole/apa/customerBalanceInfo.html');" class="easyui-linkbutton"
-					data-options="iconCls:'icon-search',plain:true">余额变更(期末-期初)详情</a> <a
+					data-options="iconCls:'icon-search',plain:true">订单取消(全部或部分)详情</a>
+				<a
 					href="javascript:openNewWindow('/cbtconsole/apa/balanceWithdrawalInfo.html');"
 					class="easyui-linkbutton"
-					data-options="iconCls:'icon-search',plain:true">余额提现(Z)详情</a>
+					data-options="iconCls:'icon-search',plain:true">余额提现审批(Z)详情</a>
+
+				<!--<a
+					href="javascript:openNewWindow('/cbtconsole/apa/customerBalanceInfo.html');" class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">余额变更(期末-期初)详情</a> -->
 			</div>
 		</div>
 	</div>
@@ -323,11 +326,13 @@
 				<th data-options="field:'balancePayment',width:'100px'">余额支付(Q)</th>
 				<th data-options="field:'newAddBalance',width:'100px'">新增加的余额之和(U)</th>
 				<th data-options="field:'balanceCompensation',width:'100px'">余额补偿</th>
+				<th data-options="field:'orderCancel',width:'100px'">订单取消(全部或部分)</th>
+				<th data-options="field:'balanceWithdrawal',width:'100px'">余额提现审批(Z)</th>
 				<th data-options="field:'payForBalance',width:'100px'">客户充值</th>
 				<th data-options="field:'overPaymentBalance',width:'100px'">客户多付</th>
-				<th data-options="field:'orderCancel',width:'100px'">订单取消(全部或部分)</th>
-				<th data-options="field:'balanceChanges',width:'100px'">余额变更(期末-期初)</th>
-				<th data-options="field:'balanceWithdrawal',width:'100px'">余额提现(Z)</th>
+
+				<!--<th data-options="field:'balanceChanges',width:'100px'">余额变更(期末-期初)</th>
+				-->
 			</tr>
 		</thead>
 		<tbody>

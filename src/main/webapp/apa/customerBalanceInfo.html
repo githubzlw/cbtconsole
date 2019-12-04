@@ -122,6 +122,19 @@
 			"month" : month
 		});
 	}
+
+	function openNewWindow(url) {
+		var year = $("#cbi_rYear").val();
+		var month = $("#cbi_rMonth").val();
+		if (year == null || year == "" || year == "-1") {
+			showMessage("请选择年份");
+			return;
+		} else if (month == null || month == "" || month == "-1") {
+			showMessage("请选择月份");
+			return;
+		}
+		window.open(url + "?year=" + year + "&month=" + Number(month));
+	}
 	
 	function exportCbiExcel() {
 		var year = $("#cbi_rYear").val();
@@ -169,6 +182,11 @@
 					type="button" value="重置" onclick="doCbiReset()"> <input
 					class="but_color" type="button" value="导出Excel"
 					onclick="exportCbiExcel()">
+				<a
+					href="javascript:openNewWindow('/cbtconsole/apa/balanceDetailsAll.html');"
+					class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">余额变更全部</a>
+
 			</form>
 
 		</div>

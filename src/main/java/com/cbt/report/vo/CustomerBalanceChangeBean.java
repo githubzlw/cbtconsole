@@ -1,5 +1,7 @@
 package com.cbt.report.vo;
 
+import java.sql.Timestamp;
+
 /**
  * 客户余额变更
  * 
@@ -12,6 +14,7 @@ public class CustomerBalanceChangeBean {
 	private int userId;// 客户id
 	private float changeBalance;// 变更余额=月末余额-月初余额
 	private float currentBalance;// 当前余额
+	private Timestamp createTime;// 创建时间
 
 	public String getYear() {
 		return year;
@@ -51,6 +54,14 @@ public class CustomerBalanceChangeBean {
 
 	public void setChangeBalance(float changeBalance) {
 		this.changeBalance = changeBalance;
+	}
+
+	public Timestamp getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Timestamp createTime) {
+		this.createTime = createTime;
 	}
 
 	@Override
