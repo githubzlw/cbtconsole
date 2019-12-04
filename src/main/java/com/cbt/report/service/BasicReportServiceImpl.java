@@ -59,6 +59,17 @@ public class BasicReportServiceImpl implements BasicReportService {
 	}
 
 	@Override
+	public List<CustomerBalanceChangeBean> queryBalanceDetailsAll(String beginDate, String endDate, int start,
+			int rows) {
+		return reportMapper.queryBalanceDetailsAll(beginDate, endDate, start, rows);
+	}
+
+	@Override
+	public int queryBalanceDetailsAllCount(String beginDate, String endDate) {
+		return reportMapper.queryBalanceDetailsAllCount(beginDate, endDate);
+	}
+
+	@Override
 	public int onloadOrderFinancialDate(Map<String, String> map) {
 		map.put("time",map.get("year")+"-"+map.get("month"));
 		return reportMapper.onloadOrderFinancialDate(map);
