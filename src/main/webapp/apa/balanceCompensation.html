@@ -139,6 +139,9 @@
 		window.location.href = "/cbtconsole/basicStatistical/exportBalanceCompensationExcel?year="
 				+ year + "&month=" + month;
 	}
+	function formatUserId(val, row, index) {
+        return  '<a href="/cbtconsole/userinfo/getUserInfo.do?userId='+val+'" target="_blank">'+val+'</a>';
+    }
 </script>
 
 </head>
@@ -181,7 +184,7 @@
 			<tr>
 				<th data-options="field:'year',align:'center',width:'60px'">年份</th>
 				<th data-options="field:'month',align:'center',width:'60px'">月份</th>
-				<th data-options="field:'userId',align:'center',width:'120px'">客户ID</th>
+				<th data-options="field:'userId',align:'center',width:'120px',formatter:formatUserId">客户ID</th>
 				<th data-options="field:'amount',align:'center',width:'220px'">补偿金额(USD)</th>
 			</tr>
 		</thead>
