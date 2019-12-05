@@ -49,21 +49,25 @@ public class SynonymsCategoryServiceImpl implements SynonymsCategoryService {
 		lstValue.add(catid);
 		String runSql = DBHelper.covertToSQL(sql, lstValue);
 		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
-		
 		return sendMsgByRPC == null ? 0 : Integer.parseInt(sendMsgByRPC);
 	}
 
 	@Override
 	public int addCategory(SynonymsCategoryWrap wrap) {
-		String sql = "insert into  synonyms_category(category,catid,synonyms_category,valid) values(?,?,?,?)";
-		List<String> lstValue = Lists.newArrayList();
-		lstValue.add(wrap.getCategory());
-		lstValue.add(wrap.getCatid());
-		lstValue.add(wrap.getSynonymsCategory());
-		lstValue.add("1");
-		String runSql = DBHelper.covertToSQL(sql, lstValue);
-		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
-		return sendMsgByRPC == null ? 0 : Integer.parseInt(sendMsgByRPC);
+		int updateCategory = updateCategory(wrap.getCatid(), wrap.getCategory());
+		if(updateCategory < 1) {
+			String sql = "insert into  synonyms_category(category,catid,synonyms_category,valid) values(?,?,?,?)";
+			List<String> lstValue = Lists.newArrayList();
+			lstValue.add(wrap.getCategory());
+			lstValue.add(wrap.getCatid());
+			lstValue.add(wrap.getSynonymsCategory());
+			lstValue.add("1");
+			String runSql = DBHelper.covertToSQL(sql, lstValue);
+			String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+			updateCategory = sendMsgByRPC == null ? 0 : Integer.parseInt(sendMsgByRPC);
+		}
+		
+		return updateCategory;
 	}
 
 }

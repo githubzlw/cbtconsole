@@ -60,7 +60,7 @@ public class SynonymsCategoryController {
 		return mv;
 	}
 	
-	/**更新类别同义词
+	/**新增类别同义词
 	 * @param request
 	 * @param response
 	 * @return
