@@ -258,6 +258,10 @@
 		window.location.href = "/cbtconsole/basicStatistical/exportOrderSalesExcel?year="
 				+ year + "&month=" + month;
 	}
+
+	function formatUserId(val, row, index) {
+        return  '<a href="/cbtconsole/userinfo/getUserInfo.do?userId='+val+'" target="_blank">'+val+'</a>';
+    }
 </script>
 <body>
 	<div id="oso_top_toolbar" style="padding: 5px; height: auto">
@@ -293,7 +297,7 @@
 		<thead>
 			<tr>
 				<th data-options="field:'orderNo',width:'100px',align:'center'">订单号</th>
-				<th data-options="field:'userId',width:'60px',align:'center'">客户id</th>
+				<th data-options="field:'userId',width:'60px',align:'center',formatter:formatUserId">客户id</th>
 				<th data-options="field:'userEmail',width:'150px',align:'center'">客户邮箱地址</th>
 				<th data-options="field:'payPrice',width:'60px',align:'center'">实际支付金额(USD)</th>
 				<th data-options="field:'buyAmount',width:'60px',align:'center'">录入采购金额(USD)</th>

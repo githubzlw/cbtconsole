@@ -79,7 +79,11 @@ public class SupplierScoringController {
             Integer salesShop = StringUtils.isBlank(request.getParameter("salesShop"))?0:Integer.parseInt(request.getParameter("salesShop"));
             String nowdate1 = StringUtils.isBlank(request.getParameter("nowdate1"))?"":request.getParameter("nowdate1");
             String nowdate2 = StringUtils.isBlank(request.getParameter("nowdate2"))?"":request.getParameter("nowdate2");
+			Integer siteFlag = StringUtils.isBlank(request.getParameter("siteFlag"))?0:Integer.parseInt(request.getParameter("siteFlag"));
+			Integer validFlag = StringUtils.isBlank(request.getParameter("validFlag"))?0:Integer.parseInt(request.getParameter("validFlag"));
             request.setAttribute("salesShop", salesShop);
+			request.setAttribute("siteFlag", siteFlag);
+			request.setAttribute("validFlag", validFlag);
             request.setAttribute("nowdate1", nowdate1);
             request.setAttribute("nowdate2", nowdate2);
 
@@ -110,16 +114,16 @@ public class SupplierScoringController {
 			int start = Utility.getStringIsNull(request.getParameter("currpage")) ? Integer.parseInt(request.getParameter("currpage")) : 1;
 			int pagesize = 20;
 			Page<SupplierScoringBean> pageInfo = supplierScoringService.queryList(start, pagesize, shop_id, level,quality,services,
-					authorizedFlag,flag,userid,categoryName, salesShop, nowdate1, nowdate2);
+					authorizedFlag,flag,userid,categoryName, salesShop, nowdate1, nowdate2,siteFlag,validFlag);
 			List<SupplierScoringBean> scoringlist = pageInfo.getList();
 			if (scoringlist == null) {
 				LOG.warn("工厂列表查询为空");
 			}
-			List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsService.queryShopGoodsSalesAmountAll();
-			for(SupplierScoringBean supplierScoringBean :  scoringlist){
-				genShopPrice(supplierScoringBean,shopGoodsSalesAmountList);
-			}
-			shopGoodsSalesAmountList.clear();
+//			List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsService.queryShopGoodsSalesAmountAll();
+//			for(SupplierScoringBean supplierScoringBean :  scoringlist){
+//				genShopPrice(supplierScoringBean,shopGoodsSalesAmountList);
+//			}
+//			shopGoodsSalesAmountList.clear();
 			request.setAttribute("pageInfo", pageInfo);
 			request.setAttribute("shop_id", StringUtil.isBlank(shop_id)?"":shop_id);
 			//合作过的供应商

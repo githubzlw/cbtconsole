@@ -24,7 +24,7 @@ public interface SupplierScoringMapper {
                                                          @Param("pagesize") int pagesize, @Param("shop_id") String shop_id, @Param("level") String level, @Param("quality") String quality, @Param("qualitys") String qualitys,
                                                          @Param("services") String services, @Param("servicess") String servicess, @Param("authorized") String authorized,
                                                          @Param("flag") boolean flag, @Param("userid") String userid,@Param("categoryName") String categoryName,
-                                                         @Param("salesShop") Integer salesShop, @Param("nowdate1") String nowdate1, @Param("nowdate2") String nowdate2);
+                                                         @Param("salesShop") Integer salesShop, @Param("nowdate1") String nowdate1, @Param("nowdate2") String nowdate2,@Param("siteFlag") int siteFlag, @Param("validFlag") int validFlag);
 
 	/**
 	 * 判断该店铺是否为精品店铺
@@ -45,7 +45,7 @@ public interface SupplierScoringMapper {
                             @Param("qualitys") String qualitys, @Param("services") String services, @Param("servicess") String servicess,
                             @Param("authorized") String authorized, @Param("flag") boolean flag, @Param("userid") String userid,
                             @Param("categoryName") String categoryName, @Param("salesShop") Integer salesShop,
-                            @Param("nowdate1") String nowdate1, @Param("nowdate2") String nowdate2);
+                            @Param("nowdate1") String nowdate1, @Param("nowdate2") String nowdate2,@Param("siteFlag") int siteFlag, @Param("validFlag") int validFlag);
 	/**
 	 * 合作过的供应商
 	 * @return

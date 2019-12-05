@@ -144,6 +144,9 @@
 		window.location.href = "/cbtconsole/basicStatistical/exportOrderCancelExcel?year="
 				+ year + "&month=" + month;
 	}
+	function formatUserId(val, row, index) {
+        return  '<a href="/cbtconsole/userinfo/getUserInfo.do?userId='+val+'" target="_blank">'+val+'</a>';
+    }
 </script>
 
 </head>
@@ -186,7 +189,7 @@
 			<tr>
 				<th data-options="field:'year',align:'center',width:'50px'">年份</th>
 				<th data-options="field:'month',align:'center',width:'50px'">月份</th>
-				<th data-options="field:'userId',align:'center',width:'70px'">客户ID</th>
+				<th data-options="field:'userId',align:'center',width:'70px',formatter:formatUserId">客户ID</th>
 				<th data-options="field:'amount',align:'center',width:'80px'">订单取消金额(USD)</th>
 				<th data-options="field:'remarkId',align:'left',width:'120px'">订单号</th>
 				<th data-options="field:'remark',align:'left',width:'600px'">备注信息</th>

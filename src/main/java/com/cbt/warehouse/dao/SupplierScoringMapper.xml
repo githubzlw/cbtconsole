@@ -51,16 +51,24 @@
 		SELECT b.en_name as category,smi.shop_id AS shopId,smi.catid,smi.noSupplier,sa.addr AS address,s.id,s.quality_avg,
           s.service_avg,s.level,s.inventory_agreement,s.return_days,smi.allcounts,smi.counts,su.shop_type AS shopType,
           su.authorized_flag AS authorizedFlag, smi.sell
+		  ,sgsa.total_price as shopPrice, smi.site_flag as siteFlag, smi.valid_flag as validFlag
 		FROM shop_manager_info smi
 		INNER JOIN 1688_category b ON smi.catid=b.category_id
 		LEFT JOIN shop_addr_spider sa ON sa.shop_id=smi.shop_id
 		LEFT JOIN supplier_scoring s ON smi.shop_id=s.shop_id
 		LEFT JOIN shop_url_bak su ON su.shop_id=smi.shop_id
+		LEFT JOIN shop_goods_sales_amount sgsa ON sgsa.shop_id=smi.shop_id
 		where 1=1
 		<if test="flag">
 		</if>
 		<if test="shop_id != null and shop_id != ''">
 			and smi.shop_id=#{shop_id}
+		</if>
+		<if test="siteFlag != 0">
+			and smi.site_flag=#{siteFlag}
+		</if>
+		<if test="validFlag != 0">
+			and smi.valid_flag=#{validFlag}
 		</if>
 		<if test="level != null and level != ''">
 			and s.level =#{level}
@@ -102,7 +110,8 @@
             )
         </if>
 		/*GROUP BY smi.shop_id*/
-        ORDER BY smi.sell DESC
+        -- ORDER BY smi.sell DESC
+		ORDER BY shopPrice DESC
 		limit #{startindex},#{pagesize}
 -- 		) a
 	</select>
@@ -120,6 +129,12 @@
 		</if>
 		<if test="shop_id != null and shop_id != ''">
 			and c.shop_id=#{shop_id}
+		</if>
+		<if test="siteFlag != 0">
+			and c.site_flag=#{siteFlag}
+		</if>
+		<if test="validFlag != 0">
+			and c.valid_flag=#{validFlag}
 		</if>
 		<if test="level != null and level != ''">
 			and s.level =#{level}

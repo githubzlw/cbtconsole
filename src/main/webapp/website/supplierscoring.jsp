@@ -72,6 +72,21 @@
                                     <span class="glyphicon glyphicon-calendar"></span>
                                 </span>
                     </a>
+
+					<span style="float: left;">站点区分:</span>
+					<select id="siteFlag"  name="siteFlag" style="float: left;">
+						<option value="0" >---全部---</option>
+						<option value="1">import</option>
+						<option value="2">kids</option>
+						<option value="3">pets</option>
+					</select>
+					<span style="float: left;">是否在线:</span>
+					<select id="validFlag"  name="validFlag" style="float: left;">
+						<option value="0" >---全部---</option>
+						<option value="1">是</option>
+						<option value="2">否</option>
+					</select>
+
                     <input type="submit" style="margin-left:20px;height: 20px;line-height: 16px;" value="查询">
                     <input type="reset"  style="margin-left:20px;height: 20px;line-height: 16px;" value="重置">
                 </div>
@@ -90,7 +105,9 @@
 			<td>供应商地址</td>
 			<td>产品打分</td>
 			<td>售卖金额($)</td>
-			<td>支持退换货天数</td>
+				<td>站点区分</td>
+				<td>是否在线</td>
+				<td>支持退换货天数</td>
 			<td colspan="3">库存协议</td>
 			</tr>
 		</thead>
@@ -129,6 +146,15 @@
 			</td>
 			<td><a target="_blank" href="/cbtconsole/supplierscoring/supplierproducts?shop_id=${supplierScoringBean.shopId }&flag=1">进入店铺、商品评分</a></td>
 			<td>${supplierScoringBean.shopPrice}</td>
+				<td>
+					<c:if test="${supplierScoringBean.siteFlag==1 }">import</c:if>
+					<c:if test="${supplierScoringBean.siteFlag==2 }">kids</c:if>
+					<c:if test="${supplierScoringBean.siteFlag==3 }">pets</c:if>
+				</td>
+				<td>
+					<c:if test="${supplierScoringBean.validFlag==1 }">是</c:if>
+					<c:if test="${supplierScoringBean.validFlag==2 }">否</c:if>
+				</td>
 			<td>
 				<c:if test="${supplierScoringBean.returnDays!=0 }">${supplierScoringBean.returnDays }</c:if>
 			</td>
@@ -186,6 +212,8 @@
 			var categoryName=$("#categoryName").val();
       		/* var services=$("#services").val(); */
       		var flag=$('input[type=radio][name=flag]:checked').val();
+        	var siteFlag = $("#siteFlag").val();
+        	var validFlag = $("#validFlag").val();
 			topage =parseInt(topage)
 			countpage =parseInt(countpage)
 			if(topage == 0){
@@ -200,7 +228,7 @@
 		    window.location.href="/cbtconsole/supplierscoring/querySupplierScoringList?currpage="+topage
                 +"&shop_id="+shop_id+"&level="+level+"&quality="+quality
                 +"&salesShop="+salesShop+"&nowdate1="+nowdate1+"&nowdate2="+nowdate2
-                +"&flag="+flag+"&categoryName="+categoryName;
+                +"&flag="+flag+"&categoryName="+categoryName+"&siteFlag="+siteFlag+"&validFlag="+validFlag;
 
 		}
 
@@ -264,6 +292,8 @@
         <%--var flag='${flag}';--%>
         var categoryName='${categoryName}';
         var salesShop='${salesShop}';
+        var siteFlag='${siteFlag}';
+        var validFlag='${validFlag}';
         var nowdate1 = '${nowdate1}';
         var nowdate2 = '${nowdate2}';
         $("#quality").val(quality);
@@ -272,6 +302,8 @@
 		$("#categoryName").val(categoryName);
 		$("#authorizedFlag").val(authorizedFlag);
 		$("#salesShop").val(salesShop);
+        $("#siteFlag").val(siteFlag);
+        $("#validFlag").val(validFlag);
 		$("#nowdate1").val(nowdate1);
 		$("#nowdate2").val(nowdate2);
 		// if("true" == flag){
