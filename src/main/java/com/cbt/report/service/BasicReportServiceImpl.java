@@ -4,12 +4,14 @@ import com.cbt.pojo.BasicReport;
 import com.cbt.refund.bean.PayPalImportInfo;
 import com.cbt.report.dao.BasicReportMapper;
 import com.cbt.report.vo.*;
+import com.cbt.util.DateFormatUtil;
 import com.cbt.util.Util;
 import com.cbt.warehouse.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +59,17 @@ public class BasicReportServiceImpl implements BasicReportService {
 	}
 
 	@Override
+	public List<CustomerBalanceChangeBean> queryBalanceDetailsAll(String beginDate, String endDate, int start,
+			int rows) {
+		return reportMapper.queryBalanceDetailsAll(beginDate, endDate, start, rows);
+	}
+
+	@Override
+	public int queryBalanceDetailsAllCount(String beginDate, String endDate) {
+		return reportMapper.queryBalanceDetailsAllCount(beginDate, endDate);
+	}
+
+	@Override
 	public int onloadOrderFinancialDate(Map<String, String> map) {
 		map.put("time",map.get("year")+"-"+map.get("month"));
 		return reportMapper.onloadOrderFinancialDate(map);
@@ -64,7 +77,18 @@ public class BasicReportServiceImpl implements BasicReportService {
 
 	@Override
 	public List<OrderInfoBean> queryOrderSales(String beginDate, String endDate, int start, int rows,int type) {
-		List<OrderInfoBean> list=reportMapper.queryOrderSales(beginDate, endDate, start, rows);
+
+	    List<OrderInfoBean> list;
+	    LocalDateTime beginDateTime = DateFormatUtil.getTimeWithStr(beginDate);
+		LocalDateTime checkDate = LocalDateTime.of(2019, 11, 1, 0, 0, 0);
+
+		// 2019-12月份之前的数据查询老订单，之后的数据查询副本数据
+		if(beginDateTime.isBefore(checkDate)){
+		    list=reportMapper.queryOrderSales(beginDate, endDate, start, rows);
+        }else{
+		    list=reportMapper.queryOrderTranscriptSales(beginDate, endDate, start, rows);
+        }
+
 		DecimalFormat df = new DecimalFormat("######0.00");
 		for(int i=0;i<list.size();i++){
 			OrderInfoBean o=list.get(i);
@@ -72,22 +96,39 @@ public class BasicReportServiceImpl implements BasicReportService {
 				o.setOrderNo("<a target='_blank' href='/cbtconsole/orderDetails/queryByOrderNo.do?orderNo="+o.getOrderNo()+"'>"+o.getOrderNo()+"</a>");
 				o.setUserId("<a target='_blank' href='/cbtconsole/userinfo/getUserInfo.do?userId="+o.getUserId()+"'>"+o.getUserId()+"</a>");
 			}
-			o.setProfit(Double.valueOf(df.format(o.getPayPrice()-o.getBuyAmount()/Util.EXCHANGE_RATE-o.getFrightAmount()/Util.EXCHANGE_RATE)));
-			o.setBuyAmount(Double.valueOf(df.format((o.getBuyAmount()+o.getPid_amount())/ Util.EXCHANGE_RATE)));
-			o.setFrightAmount(Double.valueOf(df.format(o.getFrightAmount()/Util.EXCHANGE_RATE)));
+			o.setProfit(Double.parseDouble(df.format(o.getPayPrice()-o.getBuyAmount()/Util.EXCHANGE_RATE-o.getFrightAmount()/Util.EXCHANGE_RATE)));
+			o.setBuyAmount(Double.parseDouble(df.format((o.getBuyAmount()+o.getPid_amount())/ Util.EXCHANGE_RATE)));
+			o.setFrightAmount(Double.parseDouble(df.format(o.getFrightAmount()/Util.EXCHANGE_RATE)));
 			o.setExpressNo(Util.getStr(o.getExpressNo()).toString());
 			
 			if(StringUtil.isBlank(o.getExchange_rate()) || "null".equals(o.getExchange_rate())){
 				o.setExchange_rate("6.3");
 			}
-			o.setEstimatefreight(Double.valueOf(df.format(o.getEstimatefreight()*Double.parseDouble(o.getExchange_rate()))));
+			o.setEstimatefreight(Double.parseDouble(df.format(o.getEstimatefreight()*Double.parseDouble(o.getExchange_rate()))));
 		}
 		return list;
 	}
 
-	@Override
+    @Override
+    public List<OrderInfoBean> queryOrderTranscriptSales(String beginDate, String endDate, int start, int rows) {
+        return reportMapper.queryOrderTranscriptSales(beginDate, endDate, start, rows);
+    }
+
+    @Override
+    public int queryOrderTranscriptSalesCount(String beginDate, String endDate) {
+        return reportMapper.queryOrderTranscriptSalesCount(beginDate, endDate);
+    }
+
+    @Override
 	public int queryOrderSalesCount(String beginDate, String endDate) {
-		return reportMapper.queryOrderSalesCount(beginDate, endDate);
+	    // 2019-12月份之前的数据查询老订单，之后的数据查询副本数据
+	    LocalDateTime beginDateTime = DateFormatUtil.getTimeWithStr(beginDate);
+		LocalDateTime checkDate = LocalDateTime.of(2019, 11, 1, 0, 0, 0);
+		if(beginDateTime.isBefore(checkDate)){
+		    return reportMapper.queryOrderSalesCount(beginDate, endDate);
+        }else{
+		    return reportMapper.queryOrderTranscriptSalesCount(beginDate, endDate);
+        }
 	}
 
 	@Override
@@ -168,6 +209,16 @@ public class BasicReportServiceImpl implements BasicReportService {
 	@Override
 	public List<OrderCancelBean> queryOrderCancel(String beginDate, String endDate, int start, int rows) {
 		return reportMapper.queryOrderCancel(beginDate, endDate, start, rows);
+	}
+
+	@Override
+	public List<OrderCancelBean> queryOrderConfirmCancel(String beginDate, int start, int rows) {
+		return reportMapper.queryOrderConfirmCancel(beginDate, start, rows);
+	}
+
+	@Override
+	public int queryOrderConfirmCancelCount(String beginDate) {
+		return reportMapper.queryOrderConfirmCancelCount(beginDate);
 	}
 
 	@Override

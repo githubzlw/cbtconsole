@@ -571,6 +571,6 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectTypeNameBySkuId" resultType ="String">
-    select type_name from custom_benchmark_sku where sku_id=#{skuId}
+    select type_name from custom_benchmark_sku_type_name where spec_id=#{skuId}
   </select>
 </mapper>

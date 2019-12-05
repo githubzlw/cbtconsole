@@ -21,7 +21,7 @@ public interface StripeService {
      */
     Charge doPay(long amount, String orderId, String receiptEmail, String token);
 
-    Refund refund(String chargeId, long amount);
+    Refund refund(String chargeId, long amount, boolean isNew);
     
     Dispute dispute(String disputeId);
     

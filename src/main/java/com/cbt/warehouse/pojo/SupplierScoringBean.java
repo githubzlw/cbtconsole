@@ -27,6 +27,25 @@ public class SupplierScoringBean implements Serializable{
 	private String category;
 	private int noSupplier;
 	private int sell;  // 店铺内销量
+	private int siteFlag;
+	private int validFlag;
+
+	public int getSiteFlag() {
+		return siteFlag;
+	}
+
+	public void setSiteFlag(int siteFlag) {
+		this.siteFlag = siteFlag;
+	}
+
+	public int getValidFlag() {
+		return validFlag;
+	}
+
+	public void setValidFlag(int validFlag) {
+		this.validFlag = validFlag;
+	}
+
 	/**
 	 * 店铺售卖金额
 	 */

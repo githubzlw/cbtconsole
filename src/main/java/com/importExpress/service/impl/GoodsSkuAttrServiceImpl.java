@@ -1,6 +1,7 @@
 package com.importExpress.service.impl;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.service.CustomGoodsService;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.importExpress.mapper.GoodsSkuAttrMapper;
 import com.importExpress.pojo.GoodsSkuAttr;
@@ -50,7 +52,35 @@ public class GoodsSkuAttrServiceImpl implements GoodsSkuAttrService {
 		}
 		return matchSkuId;
 	}
-	
+	@Override
+	public List<GoodsSkuAttr> ergodicSkuid(String pid) {
+		Map<String, String> goodsByPid = customGoodsService.getGoodsByPid(pid);
+		if(goodsByPid == null || goodsByPid.size() == 0) {
+			return null;
+		}
+		
+		String sku = goodsByPid.get("sku");
+		if(StringUtils.isBlank(sku)) {
+			return null;
+		}
+		JSONArray parseArray = null ;
+		try {
+			parseArray = JSONObject.parseArray(sku);
+		} catch (Exception e) {
+			parseArray = null ;
+//			System.err.println("产品ID:"+pid);
+		}
+		if(parseArray == null ) {
+			return null;
+		}
+		List<GoodsSkuAttr> result = Lists.newArrayList();
+		for(int i=0,size=parseArray.size();i<size;i++) {
+			GoodsSkuAttr insertGoodsSkuAttr = goodsAttr(String.valueOf(parseArray.get(i)), pid);
+			insertGoodsSkuAttr.setErrorCode(200);
+			result.add(insertGoodsSkuAttr);
+		}
+		return result;
+	}
 	
 	private GoodsSkuAttr matchSkuId(String pid, String skuattr) {
     	GoodsSkuAttr matchSkuId = countGoodsSku(pid, skuattr);
@@ -59,6 +89,7 @@ public class GoodsSkuAttrServiceImpl implements GoodsSkuAttrService {
 			return matchSkuId;
 		}
 		matchSkuId = new GoodsSkuAttr();
+		matchSkuId.setPid(pid);
 		Map<String, String> goodsByPid = customGoodsService.getGoodsByPid(pid);
 		if(goodsByPid == null || goodsByPid.size() == 0) {
 			matchSkuId.setErrorCode(101);
@@ -99,18 +130,9 @@ public class GoodsSkuAttrServiceImpl implements GoodsSkuAttrService {
 		GoodsSkuAttr skuAttr;
 		boolean isMatch = false;
 		for(int i=0,size=parseArray.size();i<size;i++) {
-			JSONObject skubject = JSONObject.parseObject(String.valueOf(parseArray.get(i)));
-			String skuPropIds = skubject.getString("skuPropIds");
-			String specId = skubject.getString("specId");
-			String skuId = skubject.getString("skuId");
-			skuAttr = new GoodsSkuAttr();
-			skuAttr.setPid(pid);
-			skuAttr.setSkuattr(skuPropIds);
-			skuAttr.setSkuid(skuId);
-			skuAttr.setSpecid(specId);
-			GoodsSkuAttr insertGoodsSkuAttr = insertGoodsSkuAttr(skuAttr);
+			GoodsSkuAttr insertGoodsSkuAttr = goodsAttr(String.valueOf(parseArray.get(i)), pid);
 			insertGoodsSkuAttr.setErrorCode(200);
-			if(!isMatch && isMatch(skuattr, skuPropIds)) {
+			if(!isMatch && isMatch(skuattr, insertGoodsSkuAttr.getSkuattr())) {
 				matchSkuId = insertGoodsSkuAttr;
 				isMatch = true;
 			}
@@ -119,6 +141,19 @@ public class GoodsSkuAttrServiceImpl implements GoodsSkuAttrService {
 		return matchSkuId;
 	}
 	
+	private GoodsSkuAttr goodsAttr(String array,String pid) {
+		JSONObject skubject = JSONObject.parseObject(array);
+		String skuPropIds = skubject.getString("skuPropIds");
+		String specId = skubject.getString("specId");
+		String skuId = skubject.getString("skuId");
+		GoodsSkuAttr skuAttr = new GoodsSkuAttr();
+		skuAttr.setPid(pid);
+		skuAttr.setSkuattr(skuPropIds);
+		skuAttr.setSkuid(skuId);
+		skuAttr.setSpecid(specId);
+		GoodsSkuAttr insertGoodsSkuAttr = insertGoodsSkuAttr(skuAttr);
+		return insertGoodsSkuAttr;
+	}
 	
 	
 	/**匹配规格组合

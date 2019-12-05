@@ -1810,6 +1810,10 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
+	public String getCarTypeByOdid(String odid) {
+		return orderinfoMapper.getCarTypeByOdid(odid);
+	}
+	@Override
 	public List<OrderDetailsBean> getOrdersDetails(String orderNo) {
 		DecimalFormat df = new DecimalFormat("######0.00");
 		Map<String, ArrayList<Object[]>> changInfo = new HashMap<String, ArrayList<Object[]>>();
@@ -2249,6 +2253,15 @@ public class OrderinfoService implements IOrderinfoService {
 	public Map<String, Object> getOverseasWarehouseStockOrderDetail(String orderno, int userid) {
 		
 		return orderinfoMapper.getOverseasWarehouseStockOrderDetail(orderno, userid);
+	}
+
+	@Override
+	public int updateOrderNoToNewNo(String oldOrderNo, String newOrderNo) {
+		String sql = "update orderinfo set order_no = '" + newOrderNo + "' where order_no = '" + oldOrderNo + "';";
+		sql += "update order_details set orderid = '" + newOrderNo + "' where orderid = '" + oldOrderNo + "';";
+		sql +="update payment set orderid ='"+newOrderNo+"' where orderid='"+oldOrderNo +"';";
+		SendMQ.sendMsg(new RunSqlModel(sql));
+		return orderinfoMapper.updateOrderNoToNewNo(oldOrderNo, newOrderNo);
 	}
 }
 

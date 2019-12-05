@@ -579,4 +579,11 @@ public interface CustomGoodsMapper {
      * @return
      */
     int setGoodsWeightChangeFlag(GoodsWeightChange weightChange);
+
+    /**
+     * 更新海外仓数据
+     * @param goodsOverSea
+     * @return
+     */
+    int updateGoodsOverSeaInfo(GoodsOverSea goodsOverSea);
 }

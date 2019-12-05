@@ -89,12 +89,33 @@ public interface BasicReportMapper {
      * 查询客户的总数
      *
      * @param beginDate
-     * @param endDateint
+     * @param endDate
+     * @return
+     */
+    public int queryCustomerBalancesChangeCount(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
+
+
+    /**
+     * 分页查询每月的客户余额变更信息
+     *
+     * @param beginDate
+     * @param endDate
      * @param start
      * @param rows
      * @return
      */
-    public int queryCustomerBalancesChangeCount(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
+    List<CustomerBalanceChangeBean> queryBalanceDetailsAll(@Param("beginDate") String beginDate,
+                                                                      @Param("endDate") String endDate, @Param("start") int start, @Param("rows") int rows);
+
+    /**
+     * 查询客户的总数
+     *
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    int queryBalanceDetailsAllCount(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
+
 
     /**
      * 重新生成订单及销售额对账报表
@@ -123,6 +144,11 @@ public interface BasicReportMapper {
      */
     public List<OrderInfoBean> queryOrderSales(@Param("beginDate") String beginDate, @Param("endDate") String endDate,
                                                @Param("start") int start, @Param("rows") int rows);
+
+    List<OrderInfoBean> queryOrderTranscriptSales(@Param("beginDate") String beginDate, @Param("endDate") String endDate,
+                                               @Param("start") int start, @Param("rows") int rows);
+
+    int queryOrderTranscriptSalesCount(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
 
     /**
      * 查询每月的订单的总数
@@ -315,6 +341,17 @@ public interface BasicReportMapper {
      */
     public List<OrderCancelBean> queryOrderCancel(@Param("beginDate") String beginDate,
                                                   @Param("endDate") String endDate, @Param("start") int start, @Param("rows") int rows);
+
+    /**
+     * 查询确认取消的订单数据
+     * @param beginDate
+     * @param start
+     * @param rows
+     * @return
+     */
+    List<OrderCancelBean> queryOrderConfirmCancel(@Param("beginDate") String beginDate, @Param("start") int start, @Param("rows") int rows);
+
+    int queryOrderConfirmCancelCount(@Param("beginDate") String beginDate);
 
     /**
      * 查询每月的订单取消(全部或部分)详情总数

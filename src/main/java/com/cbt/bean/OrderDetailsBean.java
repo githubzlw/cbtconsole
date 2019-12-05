@@ -148,6 +148,15 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private String locationNum;
 	private int downSample;//拆样数量
 	private int overSeaFlag;// 海外仓标识
+	private int isOverseasWarehouseProduct;//是否是海外仓商品
+
+	public int getIsOverseasWarehouseProduct() {
+		return isOverseasWarehouseProduct;
+	}
+
+	public void setIsOverseasWarehouseProduct(int isOverseasWarehouseProduct) {
+		this.isOverseasWarehouseProduct = isOverseasWarehouseProduct;
+	}
 
 	public int getOverSeaFlag() {
 		return overSeaFlag;

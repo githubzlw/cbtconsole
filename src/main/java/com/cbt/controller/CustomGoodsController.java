@@ -1506,11 +1506,11 @@ public class CustomGoodsController {
             customGoodsService.syncLocalWeightToOnline(weightChange);
             json.setOk(true);
         }catch (Exception e){
-            Assert.assertTrue(e.getMessage(),false);
             e.printStackTrace();
             LOG.error("syncLocalWeightToOnline",e);
             json.setOk(false);
             json.setMessage("syncLocalWeightToOnline error:"+e.getMessage());
+            Assert.assertTrue(e.getMessage(),false);
         }
         return json;
     }

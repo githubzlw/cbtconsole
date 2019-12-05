@@ -229,8 +229,9 @@ public class EditorController {
             // 判断是否是区间价格，含有区间价格的获取sku数据进行处理
             if (StringUtils.isNotBlank(goods.getRangePrice()) && StringUtils.isNotBlank(goods.getSku())) {
                 List<ImportExSku> skuList = new ArrayList<ImportExSku>();
-                JSONArray sku_json = JSONArray.fromObject(goods.getSku());
-                skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
+                skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
+                skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
                 // 规格标题名称集合
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
                 // 集合排序
@@ -488,11 +489,15 @@ public class EditorController {
 
             // 获取海外仓标识信息
             List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
+
             if(CollectionUtils.isEmpty(goodsOverSeaList)){
-                mv.addObject("goodsOverSeaList","[]");
+                mv.addObject("goodsOverSeaList",null);
             }else{
                 mv.addObject("goodsOverSeaList",goodsOverSeaList);
-                goods.setOverSeaFlag(1);
+                long count = goodsOverSeaList.stream().filter(e -> e.getIsSupport() > 0).count();
+                if(count > 0){
+                    goods.setOverSeaFlag(1);
+                }
             }
 
         } catch (Exception e) {
@@ -570,7 +575,8 @@ public class EditorController {
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
             if (StringUtils.isNotBlank(goods.getSku())) {
                 JSONArray sku_json = JSONArray.fromObject(goods.getSku());
-                List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
                 for (ImportExSkuShow exSku : cbSkus) {
                     if (StringUtils.isNotBlank(exSku.getSpecId())) {
@@ -638,8 +644,9 @@ public class EditorController {
         try {
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
-            JSONArray sku_json = JSONArray.fromObject(goods.getSku());
-            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+            /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
+            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
+            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
             String[] skuStrList = skuStr.split(";");
             String[] volumeSkuList = volumeSkuStr.split(";");
             double finalWeight = 0;
@@ -961,8 +968,9 @@ public class EditorController {
                     json.setMessage("获取单规格价数据失败");
                     return json;
                 } else {
-                    JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
-                    List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                   /* JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
+                    List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
+                    List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(orGoods.getSku(),ImportExSku.class);
                     boolean isSuccess = GoodsInfoUtils.dealSkuByParam(skuList, sku, cgp);
                     if (!isSuccess) {
                         json.setOk(false);
@@ -1376,8 +1384,9 @@ public class EditorController {
             String sku = request.getParameter("sku");
             // System.err.println("sku:"+sku);
             if (sku != null && !sku.isEmpty() && sku.startsWith("[")) {
-                JSONArray sku_json = JSONArray.fromObject(sku);
-                List<SkuAttrBean> skuList = (List<SkuAttrBean>) JSONArray.toCollection(sku_json, SkuAttrBean.class);
+                /*JSONArray sku_json = JSONArray.fromObject(sku);
+                List<SkuAttrBean> skuList = (List<SkuAttrBean>) JSONArray.toCollection(sku_json, SkuAttrBean.class);*/
+                List<SkuAttrBean> skuList = com.alibaba.fastjson.JSONArray.parseArray(sku,SkuAttrBean.class);
                 for (SkuAttrBean skuBean : skuList) {
                     // System.err.println(skuBean.toString());
                     SkuValBean skuVal = skuBean.getSkuVal();
@@ -3586,7 +3595,7 @@ public class EditorController {
             File imgFile = new File(pidEnInfoFile);
             if (isDown && imgFile.exists() && imgFile.isFile()) {
                 // 调用替换中文图片到英文图片的接口
-                OkHttpClient client = OKHttpUtils.getClientInstence();
+                OkHttpClient client = OKHttpUtils.getClientInstance();
 
                 String imageType = "image/jpg";
                 RequestBody fileBody = RequestBody.create(MediaType.parse(imageType), imgFile);
@@ -3739,11 +3748,7 @@ public class EditorController {
                     }
                 }
             }
-            if(isUpdate > 0) {
-                json.setOk(false);
-                json.setMessage("此国家已经被设置");
-                return json;
-            }
+
             int supportFlag = Integer.parseInt(isSupport);
             GoodsOverSea overSea = new GoodsOverSea();
             overSea.setAdminId(admuser.getId());
@@ -3751,10 +3756,18 @@ public class EditorController {
             overSea.setCountryId(Integer.parseInt(countryId));
             overSea.setIsSupport(supportFlag);
 
-            customGoodsService.insertIntoGoodsOverSeaInfo(overSea);
-            String sql = "insert into custom_goods_oversea(pid,country_id,admin_id,is_support)" +
-                    " values('" + pid + "'," + countryId + "," + admuser.getId() + "," + isSupport + ")";
-            NotifyToCustomerUtil.sendSqlByMq(sql);
+
+            if (isUpdate > 0) {
+                customGoodsService.updateGoodsOverSeaInfo(overSea);
+                String sql = "update custom_goods_oversea set is_support = " + isSupport + " ,admin_id = " + admuser.getId() + " " +
+                        "where pid =  " + pid + " and country_id = " + countryId;
+                NotifyToCustomerUtil.sendSqlByMq(sql);
+            } else {
+                customGoodsService.insertIntoGoodsOverSeaInfo(overSea);
+                String sql = "insert into custom_goods_oversea(pid,country_id,admin_id,is_support)" +
+                        " values('" + pid + "'," + countryId + "," + admuser.getId() + "," + isSupport + ")";
+                NotifyToCustomerUtil.sendSqlByMq(sql);
+            }
 
             // 加入到热卖区
             if(supportFlag > 0){

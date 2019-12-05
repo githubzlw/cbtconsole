@@ -527,6 +527,9 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     	alert("未能自动匹配到商品,请输入验货数量进行手动验货");
     	return;
     }
+    //同步重量
+    saveWeight(orderid, odid, itemid);
+    
    $.ajax({
             url: "/cbtconsole/order/updateCheckStatus",
             type: "post",
@@ -1111,11 +1114,12 @@ function search() {
                                 + '<h4>体积重量(kg):<input type="text" style="width: 70px;" id="' + json[i].orderid + 'volumeWeight' + json[i].odid + '"></h4>';
                             /*'<input type="button" value="获取商品重量" onclick="getWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\')">' +*/
                             if (json[i].weight == undefined) {
-                                str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+//                            	str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+                                str += '<span name="save_weight">未保存过重量!</span>';
                             } else {
                                 str += '<span name="save_weight">已保存的重量:' + json[i].weight + '<em>Kg</em></span>'
-                                    + '<br><span name="save_volume_weight">已保存的体积重量:' + json[i].volume_weight + '<em>Kg</em></span>'
-                                    + '<input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+                                    + '<br><span name="save_volume_weight">已保存的体积重量:' + json[i].volume_weight + '<em>Kg</em></span>';
+//                                    + '<input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
                             }
                             str += '<br />';
                             if (json[i].syn == undefined || json[i].syn == '0') {
@@ -1515,11 +1519,12 @@ function search() {
                                     + '</span></h4><h4>单件重量(kg):<input type="text" style="width: 70px;" id="\'+json[i].orderid+\'weight\'+json[i].odid+\'"></h4>'
                                     + '<h4>体积重量(kg):<input type="text" style="width: 70px;" id="' + json[i].orderid + 'volumeWeight' + json[i].odid + '"></h4>';
                                 if (json[i].weight == undefined) {
-                                    str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+//                                	str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+                                    str += '<span name="save_weight">未保存过重量!</span>';
                                 } else {
                                     str += '<span name="save_weight">已保存的重量:' + json[i].weight + '<em>Kg</em></span>'
-                                        + '<br><span name="save_volume_weight">已保存的体积重量:' + json[i].volume_weight + '<em>Kg</em></span>'
-                                        + '<input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
+                                        + '<br><span name="save_volume_weight">已保存的体积重量:' + json[i].volume_weight + '<em>Kg</em></span>';
+//                                        + '<input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].goods_pid + '\')">';
                                 }
                                 str += '<br />';
                                 if (json[i].syn == undefined || json[i].syn == '0') {
@@ -1807,12 +1812,14 @@ function saveWeight(orderid, odid, pid) {
         document.getElementById("tip_" + orderid + odid).innerHTML = "录入单件商品重量值不正确!";
         return;
     }
+    var skuid = $(".skuID_"+orderid+"_"+odid).text();
     //更新
     $.ajax({
         type: "POST",//方法类型
+        async: true,
         dataType: 'json',
         url: '/cbtconsole/warehouse/saveWeight',
-        data: {orderid: orderid, odid: odid, weight: weight, pid: pid, volumeWeight: volumeWeight},
+        data: {orderid: orderid, odid: odid, weight: weight, pid: pid, volumeWeight: volumeWeight,skuid:skuid},
         dataType: "json",
         success: function (data) {
             if (Number(data) == 1) {
@@ -1825,13 +1832,13 @@ function saveWeight(orderid, odid, pid) {
             } else if (Number(data) == 2) {
                 document.getElementById("tip_" + orderid + odid).innerHTML = "保存商品重量的数据问题!";
             }
-            saveWeightFlag(orderid, odid, pid);//将修改商品重量 和 将重量同步到产品库 按钮合并（这里改动的页面中的）
+            saveWeightFlag(orderid, odid, pid,skuid);//将修改商品重量 和 将重量同步到产品库 按钮合并（这里改动的页面中的）
         }
     });
 }
 
 //将重量同步至产品库
-function saveWeightFlag(orderid, odid, pid) {
+function saveWeightFlag(orderid, odid, pid,skuid) {
     //网页中获取之前保存记录
     var his_weight = $("#tip_" + orderid + odid).parent().parent().find("span[name=save_weight]").html();
     var volume_weight = $("#tip_" + orderid + odid).parent().parent().find("span[name=save_volume_weight]").html();
@@ -1845,7 +1852,7 @@ function saveWeightFlag(orderid, odid, pid) {
         type: "POST",//方法类型
         dataType: 'json',
         url: '/cbtconsole/warehouse/saveWeightFlag',
-        data: {pid: pid, odId: odid},
+        data: {pid: pid, odId: odid,skuid:skuid},
         success: function (data) {
             //result 0-处理异常;2-pid数据问题;1-同步到产品库成功;3-未找到重量数据;4-已经同步到产品库过;
             if (Number(data) == 1) {

@@ -251,8 +251,13 @@ public class NewOrderDetailsCtr {
 			Map<String,Double> shopShippingCostMap= new HashedMap();
 			Double ShippingCost = 0d;
 			shopShippingCostMap.put("shopShippingCost",0d);
+			int overSeaTotal = 0;
 			for (int i = 0; i < odb.size(); i++) {
 				OrderDetailsBean o = odb.get(i);
+				if(o.getIsOverseasWarehouseProduct() > 0){
+				    overSeaTotal ++;
+				    o.setOverSeaFlag(1);
+                }
 				if(orderNo.contains("_SN") && distributionList != null && !distributionList.isEmpty()){
 					for (GoodsDistribution distribution : distributionList) {
 						if(distribution.getGoodsid().equals(String.valueOf(o.getGoodsid()))){
@@ -278,14 +283,15 @@ public class NewOrderDetailsCtr {
 				if(o.getIs_sold_flag() != 0){
 					feeWeight+=o.getOd_total_weight();
 				}
-				// 海外仓标识
+				/*// 海外仓标识
 				List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(o.getGoods_pid());
 				if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
 					Long count = goodsOverSeaList.stream().filter(e-> e.getIsSupport() > 0).count();
 					if(count > 0){
 						o.setOverSeaFlag(1);
 					}
-				}
+					goodsOverSeaList.clear();
+				}*/
 			}
 			distributionList.clear();
 			if(updistributionList.size() > 0){
@@ -419,6 +425,7 @@ public class NewOrderDetailsCtr {
 			if (str_oid.length() > 0) {
 				str_oid = str_oid.substring(0, str_oid.length() - 1);
 			}
+			request.setAttribute("overSeaTotal", overSeaTotal);
 			request.setAttribute("str_oid", str_oid);
 			request.setAttribute("shipMethod", shipMethod);
 			request.setAttribute("orderNo", orderNo);
@@ -2590,21 +2597,8 @@ public class NewOrderDetailsCtr {
 			// 订单商品详情
 			List<OrderDetailsBean> odbList = iOrderinfoService.getOrdersDetails(orderNo);
 
-			List<OrderDetailsBean> nwOdbList = new ArrayList<>();
-			List<GoodsOverSea> goodsOverSeaList;
-			if(CollectionUtils.isNotEmpty(odbList)){
-				for(OrderDetailsBean orderDetailsBean: odbList){
-					goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(orderDetailsBean.getGoods_pid());
-					if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
-						Long count = goodsOverSeaList.stream().filter(e-> e.getIsSupport() > 0).count();
-						if(count > 0){
-							orderDetailsBean.setOverSeaFlag(1);
-							nwOdbList.add(orderDetailsBean);
-						}
-					}
-				}
-			}
-
+			List<OrderDetailsBean> nwOdbList = odbList.stream().filter(e-> e.getIsOverseasWarehouseProduct() > 0)
+					.collect(Collectors.toList());
 			odbList.clear();
 
 			request.setAttribute("odList", nwOdbList);

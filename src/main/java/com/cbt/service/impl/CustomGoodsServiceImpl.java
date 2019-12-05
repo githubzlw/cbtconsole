@@ -84,9 +84,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         if (StringUtils.isNotBlank(bean.getRangePrice())) {
             //sku更新
             List<CustomBenchmarkSkuNew> insertList = new ArrayList<>();
-            JSONArray sku_json = JSONArray.fromObject(bean.getSku());
+            /*JSONArray sku_json = JSONArray.fromObject(bean.getSku());
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-
+*/
+            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(bean.getSku(),ImportExSku.class);
             for (ImportExSku exSku : skuList) {
                 CustomBenchmarkSkuNew skuNew = new CustomBenchmarkSkuNew();
                 skuNew.setFinalWeight(bean.getFinalWeight());
@@ -141,6 +142,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 //否则插入或者更新SingleOffersChild信息
                 customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
             }*/
+
+            customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.parseDouble(bean.getFinalWeight()));
         }else{
             customGoodsMapper.insertIntoGoodsImgUpLog(bean.getPid(),"",bean.getAdminId(),"publish error");
         }
@@ -698,9 +701,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 1.更新产品表sku数据和标识
         customGoodsMapper.updateSkuInfo(pid, newSku);
         // 2.插入sku日志
-        return customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
+        customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
         // 3.走child表进行线上更新
-        //return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
+        return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
     }
 
     @Override
@@ -731,6 +734,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
         //  保存json数据
         GoodsWeightChange weightChange = new GoodsWeightChange();
+        weightChange.setSkuid(weightAndSyn.getSkuID());
         weightChange.setAdminId(adminId);
         weightChange.setGoodsType(weightAndSyn.getGoods_type());
         weightChange.setPid(pid);
@@ -749,24 +753,32 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 获取商品信息
         CustomGoodsPublish orGoods = queryGoodsDetails(weightChange.getPid(), 0);
         if (StringUtils.isNotBlank(orGoods.getSku())) {
-            JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
-            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+            /*JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
+            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
+
+            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(orGoods.getSku(),ImportExSku.class);
             // 查找匹配的type数据
             String typeStr = weightChange.getGoodsType();
+            String skuid = weightChange.getSkuid() == null ? "" : weightChange.getSkuid();
             // Colour:black@32161,Size:S@4501,
             String[] typeStrList = typeStr.split(",");
             String ppId = "";
-            for (String childType : typeStrList) {
-                if (StringUtils.isNotBlank(childType)) {
-                    String[] childList = childType.split("@");
-                    if (childList.length == 2 && StringUtils.isNotBlank(childList[1])) {
-                        ppId += "," + childList[1];
-                    }
-                }
+            boolean isSkuid = weightChange.getPid().equals(skuid) || StringUtils.isBlank(skuid);
+            if(isSkuid) {
+            	for (String childType : typeStrList) {
+            		if (StringUtils.isNotBlank(childType)) {
+            			String[] childList = childType.split("@");
+            			if (childList.length == 2 && StringUtils.isNotBlank(childList[1])) {
+            				ppId += "," + childList[1];
+            			}
+            		}
+            	}
             }
             double finalWeight = 0;
             for (ImportExSku exSku : skuList) {
-                if (StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds())) {
+                if ((!isSkuid && skuid.equals(exSku.getSkuId())) 
+                		|| (isSkuid && StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds()))) {
+                	
                     finalWeight = BigDecimalUtil.truncateDouble(Float.parseFloat(weightChange.getWeight()), 3);
                     exSku.setFianlWeight(finalWeight);
                     if (StringUtils.isNotBlank(weightChange.getVolumeWeight())) {
@@ -914,6 +926,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int queryGoodsWeightChangeListCount(GoodsWeightChange weightChange) {
         return customGoodsMapper.queryGoodsWeightChangeListCount(weightChange);
+    }
+
+    @Override
+    public int updateGoodsOverSeaInfo(GoodsOverSea goodsOverSea) {
+        return customGoodsMapper.updateGoodsOverSeaInfo(goodsOverSea);
     }
 
 

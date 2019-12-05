@@ -101,9 +101,10 @@ public class ProductEditorController {
 				|| "".equals(goods.getSku())) {
 			// request.setAttribute("showSku", JSONArray.fromObject("[]"));
 		} else {
-			List<ImportExSku> skuList = new ArrayList<ImportExSku>();
+			/*List<ImportExSku> skuList = new ArrayList<ImportExSku>();
 			JSONArray sku_json = JSONArray.fromObject(goods.getSku());
-			skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+			skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
+			List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
 			// 规格标题名称集合
 			List<ImportExSkuShow> cbSkus = combineSkuList(typeList, skuList);
 			// 集合排序

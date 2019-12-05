@@ -13,6 +13,15 @@ public class OrderCancelBean {
     private double amount;// 取消商品金额
     private String remarkId;//备注ID一般是订单号
     private String remark;//备注信息
+    private int payType = -1;// 退款类型
+
+    public int getPayType() {
+        return payType;
+    }
+
+    public void setPayType(int payType) {
+        this.payType = payType;
+    }
 
     public String getYear() {
         return year;

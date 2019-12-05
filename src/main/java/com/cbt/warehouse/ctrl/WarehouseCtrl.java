@@ -47,6 +47,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.importExpress.utli.*;
+import okhttp3.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
@@ -216,20 +218,9 @@ import com.importExpress.pojo.OverseasWarehouseStockLog;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OverseasWarehouseStockService;
 import com.importExpress.service.TabCouponService;
-import com.importExpress.utli.DESUtils;
-import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
-import com.importExpress.utli.MultiSiteUtil;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SearchFileUtils;
-import com.importExpress.utli.SendMQ;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import sun.misc.BASE64Encoder;
 
 @SuppressWarnings("deprecation")
@@ -577,29 +568,29 @@ public class WarehouseCtrl {
 		Map<String,String> map=new HashMap<String,String>(3);
 		PrintWriter out = response.getWriter();
 		try{
+			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+			Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 			String orderid=request.getParameter("orderid");
 			String odid=request.getParameter("odid");
 			String weight=request.getParameter("weight");
 			String volumeWeight=request.getParameter("volumeWeight");
 			String pid=request.getParameter("pid");
+			String skuid=request.getParameter("skuid");
+			skuid = StringUtil.isBlank(skuid) ? pid : skuid;
 			//数据校验
 			if (StringUtil.isBlank(pid) || pid.length() < 3 || StringUtil.isBlank(weight) || !Pattern.compile("(\\d+([.]{1}\\d+)?)").matcher(weight).matches()) {
 				out.print(2);
 				out.close();
 				return;
 			}
-			List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderid);
-			String goods_type = "";
-			for(OrderDetailsBean orderDetails : odb){
-				if(orderDetails.getId() == Integer.valueOf(odid)){
-					goods_type = orderDetails.getCar_type();
-					break;
-				}
-			}
+			
+			String goods_type = iOrderinfoService.getCarTypeByOdid(odid);
 			map.put("orderid",orderid);
 			map.put("odid",odid);
 			map.put("weight",weight);
 			map.put("pid",pid);
+			map.put("skuid",skuid);
+			map.put("adminid",adm == null ? "0" : String.valueOf(adm.getId()));
 			map.put("goodsType",goods_type);
 			if(org.apache.commons.lang3.StringUtils.isBlank(volumeWeight) || "0".equals(volumeWeight)){
 				map.put("volumeWeight","");
@@ -626,10 +617,12 @@ public class WarehouseCtrl {
     public void saveWeightFlag(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         PrintWriter out = response.getWriter();
         try{
-        	String sessionId = request.getSession().getId();
-			String userJson = Redis.hget(sessionId, "admuser");
-			com.cbt.website.userAuth.bean.Admuser user = (com.cbt.website.userAuth.bean.Admuser) SerializeUtil.JsonToObj(userJson, com.cbt.website.userAuth.bean.Admuser.class);
+			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+			Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+			
             String pid=request.getParameter("pid");
+			String skuid=request.getParameter("skuid");
+			skuid = StringUtil.isBlank(skuid) ? pid : skuid;
             String odId=request.getParameter("odId");
             //数据校验
             if (StringUtil.isBlank(pid) || pid.length() < 3) {
@@ -637,7 +630,7 @@ public class WarehouseCtrl {
                 out.close();
                 return;
             }
-            int result = iWarehouseService.saveWeightFlag(pid, user.getId(), Integer.valueOf(odId));
+            int result = iWarehouseService.saveWeightFlag(pid, adm==null?0:adm.getId(), Integer.valueOf(odId),skuid);
             out.print(result);
         }catch(Exception e){
             out.print(0);
@@ -2941,12 +2934,23 @@ public class WarehouseCtrl {
 	public String getQtFs(HttpServletRequest request, Model model) {
 		JcgjSoapHttpPost jc = new JcgjSoapHttpPost();
 		Map<String, Object> map = new HashMap<String, Object>();
+		String icId = "14972";
+		String secret = "Yb70MrMh9Q4Odl5";
 		map.put("RequestName", "EmsKindList"); // PreInputSet
+		map.put("icID", icId);
+		Long timeStamp = System.currentTimeMillis() - 8 * 60 * 60 * 1000;
+		map.put("TimeStamp", timeStamp);
+		map.put("MD5",Md5Util.md5Operation(icId + timeStamp + secret));
+		System.err.println(map);
 		String t = jc.objToGson(map);
 		System.out.println(t);
 		String r = "";
 		try {
-			r = jc.preInputSet(t);
+			OKHttpUtils okHttpUtils = new OKHttpUtils();
+			// r = jc.preInputSet(t);
+			Headers headers = new Headers.Builder().add("Content-Type","application/json;charset=UTF-8").build();
+			// json : application/json
+			r = okHttpUtils.post("http://api.cne.com/cgi-bin/EmsData.dll?DoApi",headers,"",t);
 			System.out.println(r);
 		} catch (Exception e) {
 			e.printStackTrace();

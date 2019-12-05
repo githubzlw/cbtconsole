@@ -159,7 +159,7 @@ public class OrderInfoUtil {
         String nwOrderNo = null;
         // 拆单新生成的订单号
         String orderNo1 = null;
-        if (orderNo.length() > 17) {
+        /*if (orderNo.length() > 17) {
             OrderBean orderBean1 = null;
             if (orderNo.contains("_")) {
                 String[] n = orderNo.split("_");
@@ -180,21 +180,23 @@ public class OrderInfoUtil {
                 }
             }
         } else {
+
+        }*/
+        if (isSplitNum > 0) {
+            nwOrderNo = orderNo + "_1_SN";
+        } else if (isOverSea > 0) {
+            nwOrderNo = orderNo + "_1_H";
+        } else {
+            nwOrderNo = orderNo + "_1";
+        }
+        String maxSplitOrderNo = orderBean.getMaxSplitOrder();
+        if (maxSplitOrderNo.contains("_") && !maxSplitOrderNo.contains("_SP")) {
+            String[] orderSplitList = maxSplitOrderNo.split("_");
+            int splitIndex = Integer.parseInt(orderSplitList[orderSplitList.length - 1]);
             if (isSplitNum > 0) {
-                nwOrderNo = orderNo + "_1_SN";
-            } else if (isOverSea > 0) {
-                nwOrderNo = orderNo + "_1_H";
+                nwOrderNo = orderNo + "_" + (splitIndex + 1) + "_SN";
             } else {
-                nwOrderNo = orderNo + "_1";
-            }
-            String maxSplitOrderNo = orderBean.getMaxSplitOrder();
-            if (maxSplitOrderNo.contains("_") && !maxSplitOrderNo.contains("_SP")) {
-                int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
-                if (isSplitNum > 0) {
-                    nwOrderNo = orderNo + "_" + (splitIndex + 1) + "_SN";
-                } else {
-                    nwOrderNo = orderNo + "_" + (splitIndex + 1);
-                }
+                nwOrderNo = orderNo + "_" + (splitIndex + 1);
             }
         }
         return nwOrderNo;

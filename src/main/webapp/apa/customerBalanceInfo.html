@@ -122,6 +122,19 @@
 			"month" : month
 		});
 	}
+
+	function openNewWindow(url) {
+		var year = $("#cbi_rYear").val();
+		var month = $("#cbi_rMonth").val();
+		if (year == null || year == "" || year == "-1") {
+			showMessage("请选择年份");
+			return;
+		} else if (month == null || month == "" || month == "-1") {
+			showMessage("请选择月份");
+			return;
+		}
+		window.open(url + "?year=" + year + "&month=" + Number(month));
+	}
 	
 	function exportCbiExcel() {
 		var year = $("#cbi_rYear").val();
@@ -137,6 +150,10 @@
 		window.location.href = "/cbtconsole/basicStatistical/exportBalanceChangeExcel?year="
 				+ year + "&month=" + month;
 	}
+
+	function formatUserId(val, row, index) {
+        return  '<a href="/cbtconsole/userinfo/getUserInfo.do?userId='+val+'" target="_blank">'+val+'</a>';
+    }
 </script>
 
 </head>
@@ -169,6 +186,11 @@
 					type="button" value="重置" onclick="doCbiReset()"> <input
 					class="but_color" type="button" value="导出Excel"
 					onclick="exportCbiExcel()">
+				<a
+					href="javascript:openNewWindow('/cbtconsole/apa/balanceDetailsAll.html');"
+					class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">余额变更全部</a>
+
 			</form>
 
 		</div>
@@ -179,7 +201,7 @@
 			<tr>
 				<th data-options="field:'year',align:'center',width:'60px'">年份</th>
 				<th data-options="field:'month',align:'center',width:'60px'">月份</th>
-				<th data-options="field:'userId',align:'center',width:'120px'">客户ID</th>
+				<th data-options="field:'userId',align:'center',width:'120px',formatter:formatUserId">客户ID</th>
 				<th data-options="field:'changeBalance',align:'center',width:'220px'">余额变更(USD)=月末余额-月初余额</th>
 				<th data-options="field:'currentBalance',align:'center',width:'150px'">当前余额(USD)</th>
 			</tr>

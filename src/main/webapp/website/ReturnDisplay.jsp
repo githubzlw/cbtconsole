@@ -432,7 +432,7 @@ function rejectedok(page) {
 												 style="width: 110px; height: 24px;" type="text" value=""
 												 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
 				</span>&nbsp;&nbsp;&nbsp;&nbsp;
-				退货状态：<select class="easyui-combobox" id="state" >
+				退货状态：<select class="easyui-combobox" id="state" style="width:15%;">
 					<option value ="-2">全部</option>
 					<option value ="-1">同意/驳回</option>
 					<option value ="0">未处理</option>
@@ -441,6 +441,8 @@ function rejectedok(page) {
 					<option value="3">换货/线下补发</option>
 					<option value="4">到账完结</option>
 					<option value="5">驳回完结</option>
+					<option value="6">超过五天未退款</option>
+					<option value="7">差异退款</option>
 				</select>&nbsp;&nbsp;&nbsp;&nbsp;
 				<input class="but_color" type="button" value="查询" onclick="doQuery(1)">
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
