@@ -17,6 +17,7 @@ import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,17 +25,15 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service("payPalService")
 public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
 
+    private final static Logger REFUNDLOG = LoggerFactory.getLogger(PayPalServiceImpl.class);
     //private static Logger logger = REFUNDLOGFactory.getREFUNDLOG(PayPalServiceImpl.class);
-    private final static org.slf4j.Logger REFUNDLOG = LoggerFactory.getLogger("refund");
+    // private final static org.slf4j.Logger REFUNDLOG = LoggerFactory.getLogger("refund");
     @Autowired
     private RefundResultInfoMapper refundResultInfoMapper;
     private OrderInfoDao orderInfoDao = new OrderInfoImpl();
@@ -191,6 +190,8 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
 //                    return json;
 //                }
 
+                String today = DateFormatUtil.getWithSeconds(new Date());
+
                 Map<String, Object> paymentInfo = orderInfoDao.queryPaymentInfoByOrderNo(orderNo);
                 if (paymentInfo == null || paymentInfo.size() == 0) {
                     json.setOk(false);
@@ -213,6 +214,8 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                         refundResultInfo.setPayprice(String.valueOf(orderInfo.getPay_price()));
                         refundResultInfo.setTotalRefundedAmount(amountMoney);
                         refundResultInfo.setState("readyRefund");
+                        refundResultInfo.setCreateTime(today);
+                        refundResultInfo.setUpdateTime(today);
 
                         REFUNDLOG.info("begin refund:" + refundResultInfo.toString());
                         refundResultInfoMapper.insertSelective(refundResultInfo);
@@ -272,6 +275,8 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                         refundResultInfo.setPayprice(String.valueOf(orderInfo.getPay_price()));
                         refundResultInfo.setTotalRefundedAmount(amountMoney);
                         refundResultInfo.setState("readyRefund");
+                        refundResultInfo.setCreateTime(today);
+                        refundResultInfo.setUpdateTime(today);
 
                         REFUNDLOG.info("begin refund:" + refundResultInfo.toString());
                         refundResultInfoMapper.insertSelective(refundResultInfo);
@@ -296,6 +301,8 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                             refundResultInfo.setState(detailedRefund.getStatus());
                             refundResultInfo.setSaleId(detailedRefund.getId());
                             refundResultInfo.setInfo(detailedRefund.toString().getBytes());
+                            refundResultInfo.setCreateTime(today);
+                            refundResultInfo.setUpdateTime(today);
                             REFUNDLOG.info("refund result:" + refundResultInfo.toString());
                             refundResultInfoMapper.insertSelective(refundResultInfo);
                             json.setOk(true);
@@ -322,6 +329,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage("API退款失败，原因：" + e.getMessage());
+            REFUNDLOG.error("orderNo:"+orderNo+",amountMoney:" + amountMoney + ",error:",e);
         }
         return json;
     }
@@ -395,6 +403,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                 json.setMessage("无支付信息，请确认支付类型");
             }
         } catch (Exception e) {
+            REFUNDLOG.error("payNo:"+payNo+",refundAmount:" + refundAmount + ",error:",e);
             e.printStackTrace();
             json.setOk(false);
             json.setMessage("API退款失败，原因：" + e.getMessage());
