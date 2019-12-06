@@ -415,11 +415,11 @@ function inoutInventory(index,ibid,liid,inorout){
 		    	  if(data.status == 200){
 		    		 location.reload();
 		    	  }else{
-		    		  alert("获取类别列表错误:"+data.reason);
+		    		  alert("移库操作发生错误:"+data.reason);
 		    	  }
 		       },
 		   	error:function(e){
-		   		alert("获取类别列表失败");
+		   		alert("移库操作失败");
 		   	}
 	})
 }

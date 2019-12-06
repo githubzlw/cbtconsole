@@ -1726,8 +1726,8 @@ public class InventoryServiceImpl implements  InventoryService{
 		Map<String, String> inventory = Maps.newHashMap();
 		inventory.put("change_type", "0");
 		inventory.put("inventory_count", "0");
-		inventory.put("before_remaining", map.get("remaining").toString());
-		inventory.put("after_remaining", map.get("remaining").toString());
+		inventory.put("before_remaining", StrUtils.object2NumStr(map.get("remaining")));
+		inventory.put("after_remaining", StrUtils.object2NumStr(map.get("remaining")));
 		inventory.put("inventory_sku_id", map.get("inid").toString());
 		inventory.put("log_remark",  map.get("beforeBarcode").toString()+"库位修改为"+ map.get("afterBarcode").toString());
 		int addInventoryLog = inventoryMapper.addInventoryLogByInventoryid(inventory );
