@@ -168,37 +168,42 @@ public class InventoryController {
 	 */
 	@RequestMapping(value = "/barcode/move")
 	@ResponseBody
-	protected Map<String,Object> moveBarcode(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, ParseException {
+	protected Map<String,Object> moveBarcode(HttpServletRequest request, HttpServletResponse response){
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		Map<String,Object> result = new HashMap<>();
 		result.put("status", 200);
-		String stribid = request.getParameter("ibid");
-		stribid = StrUtils.isNum(stribid) ? stribid : "0";
-		
-		String strliid = request.getParameter("liid");
-		strliid = StrUtils.isNum(strliid) ? strliid : "0";
-		
-		String strinorout= request.getParameter("inorout");
-		strinorout = StrUtils.isNum(strinorout) ? strinorout : "0";
-		
-		String orderbarcode = request.getParameter("orderbarcode");
-		orderbarcode = StringUtil.isBlank(orderbarcode) ? orderbarcode : orderbarcode.trim();
-		String inbarcode = request.getParameter("inbarcode");
-		inbarcode = StringUtil.isBlank(inbarcode) ? inbarcode : inbarcode.trim();
-		Map<String,Object> map = new HashMap<>();
-		map.put("ibid", Integer.parseInt(stribid));
-		map.put("liid", Integer.parseInt(strliid));
-		map.put("inorout", Integer.parseInt(strinorout));
-		map.put("inbarcode", inbarcode);
-		map.put("orderbarcode", orderbarcode);
-		map.put("admid",adm!=null? adm.getId() : 0);
-		int updateBarcode = inventoryService.updateBarcode(map);
-		if(updateBarcode < 1) {
+		try {
+			String stribid = request.getParameter("ibid");
+			stribid = StrUtils.isNum(stribid) ? stribid : "0";
+			
+			String strliid = request.getParameter("liid");
+			strliid = StrUtils.isNum(strliid) ? strliid : "0";
+			
+			String strinorout= request.getParameter("inorout");
+			strinorout = StrUtils.isNum(strinorout) ? strinorout : "0";
+			
+			String orderbarcode = request.getParameter("orderbarcode");
+			orderbarcode = StringUtil.isBlank(orderbarcode) ? orderbarcode : orderbarcode.trim();
+			String inbarcode = request.getParameter("inbarcode");
+			inbarcode = StringUtil.isBlank(inbarcode) ? inbarcode : inbarcode.trim();
+			Map<String,Object> map = new HashMap<>();
+			map.put("ibid", Integer.parseInt(stribid));
+			map.put("liid", Integer.parseInt(strliid));
+			map.put("inorout", Integer.parseInt(strinorout));
+			map.put("inbarcode", inbarcode);
+			map.put("orderbarcode", orderbarcode);
+			map.put("admid",adm!=null? adm.getId() : 0);
+			int updateBarcode = inventoryService.moveBarcode(map);
+			if(updateBarcode < 1) {
+				result.put("status", 500);
+				result.put("reason", "数据错误:"+stribid+"/"+strliid+"/"+strinorout+"/"+inbarcode+"/"+orderbarcode);
+			}
+		} catch (Exception e) {
 			result.put("status", 500);
-			result.put("reason", "数据错误:"+stribid+"/"+strliid+"/"+strinorout+"/"+inbarcode+"/"+orderbarcode);
+			result.put("reason", e.getMessage());
 		}
+		
 		return result;
 	}
 	
@@ -219,42 +224,48 @@ public class InventoryController {
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		
 		Map<String,Object> result = new HashMap<>();
-		result.put("status", 200);
-		String stribid = request.getParameter("ibid");
-		stribid = StrUtils.isNum(stribid) ? stribid : "0";
-		
-		String strliid = request.getParameter("liid");
-		strliid = StrUtils.isNum(strliid) ? strliid : "0";
-		
-		String stribState= request.getParameter("ibState");
-		stribState = StrUtils.isNum(stribState) ? stribState : "0";
-		
-		String orderbarcode = request.getParameter("orderbarcode");
-		orderbarcode = StringUtil.isBlank(orderbarcode) ? orderbarcode : orderbarcode.trim();
-		String inbarcode = request.getParameter("inbarcode");
-		inbarcode = StringUtil.isBlank(inbarcode) ? inbarcode : inbarcode.trim();
-		String remark = request.getParameter("remark");
-		remark = StringUtil.isBlank(remark) ? remark : remark.trim();
-		
-		int ibState = Integer.parseInt(stribState);
-		Map<String,Object> map = new HashMap<>();
-		map.put("ibid", Integer.parseInt(stribid));
-		map.put("liid", Integer.parseInt(strliid));
-		map.put("ibState", ibState);
-		map.put("inbarcode", inbarcode);
-		map.put("orderbarcode", orderbarcode);
-		map.put("admid",adm!=null? adm.getId() : 0);
-		map.put("remark", remark);
-		if(ibState == 0) {
-			map.put("state", 4);
-		}else if(ibState == 1){
-			map.put("state", 5);
-		}
-		int updateBarcode = inventoryService.updateRemark(map);
-		if(updateBarcode < 1) {
+		try {
+			result.put("status", 200);
+			String stribid = request.getParameter("ibid");
+			stribid = StrUtils.isNum(stribid) ? stribid : "0";
+			
+			String strliid = request.getParameter("liid");
+			strliid = StrUtils.isNum(strliid) ? strliid : "0";
+			
+			String stribState= request.getParameter("ibState");
+			stribState = StrUtils.isNum(stribState) ? stribState : "0";
+			
+			String orderbarcode = request.getParameter("orderbarcode");
+			orderbarcode = StringUtil.isBlank(orderbarcode) ? orderbarcode : orderbarcode.trim();
+			String inbarcode = request.getParameter("inbarcode");
+			inbarcode = StringUtil.isBlank(inbarcode) ? inbarcode : inbarcode.trim();
+			String remark = request.getParameter("remark");
+			remark = StringUtil.isBlank(remark) ? remark : remark.trim();
+			
+			int ibState = Integer.parseInt(stribState);
+			Map<String,Object> map = new HashMap<>();
+			map.put("ibid", Integer.parseInt(stribid));
+			map.put("liid", Integer.parseInt(strliid));
+			map.put("ibState", ibState);
+			map.put("inbarcode", inbarcode);
+			map.put("orderbarcode", orderbarcode);
+			map.put("admid",adm!=null? adm.getId() : 0);
+			map.put("remark", remark);
+			if(ibState == 0) {
+				map.put("state", 4);
+			}else if(ibState == 1){
+				map.put("state", 5);
+			}
+			int updateBarcode = inventoryService.updateRemark(map);
+			if(updateBarcode < 1) {
+				result.put("status", 500);
+				result.put("reason", "数据错误:"+stribid+"/"+strliid+"/"+stribState+"/"+inbarcode+"/"+orderbarcode);
+			}
+		} catch (Exception e) {
 			result.put("status", 500);
-			result.put("reason", "数据错误:"+stribid+"/"+strliid+"/"+stribState+"/"+inbarcode+"/"+orderbarcode);
+			result.put("reason", e.getMessage());
 		}
+		
 		return result;
 	}
 	
