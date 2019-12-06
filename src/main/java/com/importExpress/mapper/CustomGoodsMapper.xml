@@ -434,7 +434,7 @@
         cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
         ifnull(cge.click_num,0) as click_num,
         ifnull(cbc.complain_id,'') as complain_id,
-        ifnull(cbc.complain_id,0) as reviewCount
+        (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount
         from custom_benchmark_ready cbu
         <if test="catid !=null">
             inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 = ct.category_id
@@ -442,7 +442,6 @@
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
-        left join (select count(0) as reviewCount,goods_pid from goods_review group by goods_pid) gr on gr.goods_pid=cbu.pid
         where 1=1
 
         <if test="unsellableReason !=null">
@@ -600,7 +599,7 @@
             order by cbu.catid1
         </if>
 
-        limit #{page},40
+        limit #{page},50
     </select>
 
     <select id="queryForListByParamCount" parameterType="com.cbt.bean.CustomGoodsQuery" resultType="java.lang.Integer">
@@ -986,7 +985,7 @@
     <update id="updateGoodsDetailsByInfo" parameterType="com.cbt.bean.CustomGoodsPublish">
         update custom_goods_edit a,custom_benchmark_ready b
         set b.enname = #{enname},b.img = #{img},b.endetail = #{endetail},
-        b.eninfo=#{eninfo},b.goodsstate=#{goodsState},b.keyword=#{keyword},a.admin_id = #{adminId},
+        b.eninfo=#{eninfo},b.goodsstate=#{goodsState},a.admin_id = #{adminId},
         bm_flag=1,a.update_count = a.update_count + 1 ,b.fprice_str=#{fpriceStr},b.size_info_en=#{sizeInfoEn}
         <if test="rangePrice != null">
             ,b.range_price=#{rangePrice},b.sku=#{sku}
@@ -1527,4 +1526,63 @@
         update custom_goods_oversea set is_support = #{isSupport} ,admin_id = #{adminId}
         where pid = #{pid} and country_id = #{countryId}
     </update>
+
+    <select id="queryBeanByLimit" resultType="com.importExpress.pojo.MongoGoodsBean">
+        select
+        cbu.keyword,cbu.shop_id,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
+        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,cbu.final_weight,cbu.max_price,cbu.weight_flag,
+        cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,cbu.sku,
+        ifnull(cge.infringing_flag,0) as infringing_flag,cbu.priority_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
+        ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as
+        admin_name,cbu.ali_price,
+        ifnull(adu.id,0) as admin_id,ifnull(cge.is_edited,0) as is_edited,cbu.is_sold_flag,cbu.weight,
+        cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
+        ifnull(cge.click_num,0) as click_num,
+        ifnull(cbc.complain_id,'') as complain_id,ifnull(cge.price_1688,'') as price_1688,ifnull(cge.weight_check,'') as weight_check,
+        (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount
+        from custom_benchmark_ready cbu
+        left join custom_goods_edit cge on cbu.pid = cge.pid
+        left join custom_benchmark_complain cbc on cbc.pid = cge.pid
+        left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
+        where 1=1 and cbu.id > #{minId} and #{maxId}>= cbu.id
+    </select>
+
+
+    <select id="queryBeanByPid" resultType="com.importExpress.pojo.MongoGoodsBean">
+        select
+        cbu.keyword,cbu.shop_id,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
+        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,cbu.final_weight,cbu.max_price,cbu.weight_flag,
+        cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,cbu.sku,
+        ifnull(cge.infringing_flag,0) as infringing_flag,cbu.priority_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
+        ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as
+        admin_name,cbu.ali_price,
+        ifnull(adu.id,0) as admin_id,ifnull(cge.is_edited,0) as is_edited,cbu.is_sold_flag,cbu.weight,
+        cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
+        ifnull(cge.click_num,0) as click_num,
+        ifnull(cbc.complain_id,'') as complain_id,ifnull(cge.price_1688,'') as price_1688,ifnull(cge.weight_check,'') as weight_check,
+        (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount
+        from custom_benchmark_ready cbu
+        left join custom_goods_edit cge on cbu.pid = cge.pid
+        left join custom_benchmark_complain cbc on cbc.pid = cge.pid
+        left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
+        where cbu.pid = #{pid}
+    </select>
+
+    <insert id="insertIntoPidCatidNum" parameterType="java.util.Map">
+        insert into pid_catid_num(catid,total)
+        values
+        <foreach collection="map" item="value" index="key" separator=",">
+            (#{key},#{value})
+        </foreach>
+    </insert>
+
+
+    <select id="queryAllCategoryBean" resultMap="categoryResultMap">
+        select category_id as cid,name as category_name,
+        path,lv,0 as total from 1688_category where lv > 0
+    </select>
+
+    <select id="queryCatidByPath" resultType="java.lang.String">
+        select category_id from 1688_category where find_in_set(#{catid},path)
+    </select>
 </mapper>

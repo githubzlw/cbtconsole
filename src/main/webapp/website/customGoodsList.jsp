@@ -499,18 +499,24 @@ b {
 	<br>
 	<table id="table" border="1" cellpadding="0" cellspacing="0"
 		class="table">
-		<tr align="center" bgcolor="#DAF3F5">
-			<td style="width: 65px;"><span style="font-size: 14px;"><input
-					id="checked_all" type="checkbox" style="height: 16px; width: 16px;"
-					value="0" onclick="fnselect(0)">全选</span></td>
-			<td style="width: 140px;">1688PID</td>
-			<td style="width: 415px;">1688信息</td>
-			<td style="width: 270px;">ImportE翻译名称</td>
-			<td style="width: 415px;">AliExpress信息</td>
-			<td style="width: 240px;">状态标识</td>
-			<%--<td style="width: 50px;">预览</td>--%>
-			<td style="width: 130px;">操作</td>
-		</tr>
+		<thead>
+			<tr align="center" bgcolor="#DAF3F5">
+				<td style="width: 65px;"><span style="font-size: 14px;"><input
+						id="checked_all" type="checkbox" style="height: 16px; width: 16px;"
+						value="0" onclick="fnselect(0)">全选</span></td>
+				<td style="width: 140px;">1688PID</td>
+				<td style="width: 415px;">1688信息</td>
+				<td style="width: 270px;">ImportE翻译名称</td>
+				<td style="width: 415px;">AliExpress信息</td>
+				<td style="width: 240px;">状态标识</td>
+				<%--<td style="width: 50px;">预览</td>--%>
+				<td style="width: 130px;">操作</td>
+			</tr>
+		</thead>
+
+		<tbody>
+
+
 
 
 		<c:forEach items="${goodsList}" var="list" varStatus="index">
@@ -671,6 +677,7 @@ b {
 			</tr>
 
 		</c:forEach>
+		</tbody>
 
 	</table>
 	<br>

@@ -642,6 +642,7 @@ public class EditorController {
             return json;
         }
         try {
+
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
             /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
@@ -650,13 +651,26 @@ public class EditorController {
             String[] skuStrList = skuStr.split(";");
             String[] volumeSkuList = volumeSkuStr.split(";");
             double finalWeight = 0;
+
+            List<GoodsWeightChange> changeList = new ArrayList<>(skuStrList.length * 2);
+            Map<String, GoodsWeightChange> changeMap = new HashMap<>(skuStrList.length * 2);
             for (String singleSku : skuStrList) {
                 String[] slSkuList = singleSku.split("@");
                 String ppid = slSkuList[0].replace("_", ",");
                 String pWeight = slSkuList[1];
                 for (ImportExSku exSku : skuList) {
                     if (ppid.equals(exSku.getSkuPropIds())) {
-                        finalWeight = BigDecimalUtil.truncateDouble(Float.valueOf(pWeight), 3);
+                        finalWeight = BigDecimalUtil.truncateDouble(Float.parseFloat(pWeight), 3);
+                        if (Math.abs(exSku.getFianlWeight() - finalWeight) < 0.01) {
+                            GoodsWeightChange weightChange = new GoodsWeightChange();
+                            weightChange.setSkuid(exSku.getSkuId());
+                            weightChange.setAdminId(user.getId());
+                            weightChange.setPid(pid);
+                            weightChange.setWeight(pWeight);
+
+                            changeMap.put(ppid, weightChange);
+                            changeList.add(weightChange);
+                        }
                         exSku.setFianlWeight(finalWeight);
                         break;
                     }
@@ -669,15 +683,35 @@ public class EditorController {
                 String pWeight = vlSkuList[1];
                 for (ImportExSku exSku : skuList) {
                     if (ppid.equals(exSku.getSkuPropIds())) {
-                        volumeWeight = BigDecimalUtil.truncateDouble(Float.valueOf(pWeight), 3);
+                        volumeWeight = BigDecimalUtil.truncateDouble(Float.parseFloat(pWeight), 3);
                         exSku.setVolumeWeight(volumeWeight);
+                        if (changeMap.containsKey(ppid)) {
+                            changeMap.get(ppid).setVolumeWeight(pWeight);
+                        } else {
+                            GoodsWeightChange weightChange = new GoodsWeightChange();
+                            weightChange.setSkuid(exSku.getSkuId());
+                            weightChange.setAdminId(user.getId());
+                            weightChange.setPid(pid);
+                            weightChange.setVolumeWeight(pWeight);
+                            changeMap.put(ppid, weightChange);
+                            changeList.add(weightChange);
+                        }
                         break;
                     }
                 }
             }
-            customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight);
+
+
+            if(CollectionUtils.isNotEmpty(changeList)){
+                for(GoodsWeightChange changeBean : changeList){
+                    customGoodsService.saveGoodsWeightChange(changeBean);
+                }
+            }
+
+            // customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight);
+
             json.setOk(true);
-            json.setMessage("执行成功");
+            json.setMessage("执行成功，请到改动重量管理页面审核");
             skuList.clear();
             typeList.clear();
         } catch (Exception e) {
