@@ -17,6 +17,7 @@
     	<result column="page_description" property="pageDescription" />
     	<result column="page_banner_name" property="pageBannerName" />
     	<result column="page_banner_url" property="pageBannerUrl" />
+		<result column="web_site" property="webSite" />
 	</resultMap>
 	
 	<resultMap type="com.importExpress.pojo.TabSeachPagesDetailBean" id="detailBaseResultMap">
@@ -37,15 +38,15 @@
 	
 	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.importExpress.pojo.TabSeachPageBean">
 		insert into tab_seach_pages(keyword,keyword1,banner,filename,createtime,sate,catid,pid,
-		  page_title, page_keywords, page_description, page_banner_name, page_banner_url)
+		  page_title, page_keywords, page_description, page_banner_name, page_banner_url,web_site)
 		values (#{keyword},#{keyword1},#{banner},#{filename},now(),0,#{catId},#{parentId},
-		  #{pageTitle},#{pageKeywords},#{pageDescription},#{pageBannerName},#{pageBannerUrl})
+		  #{pageTitle},#{pageKeywords},#{pageDescription},#{pageBannerName},#{pageBannerUrl},#{webSite})
 	</insert>
 	
 	<select id="list" resultMap="BaseResultMap">
 		select id,keyword,keyword1,banner,filename,createtime,sate,pid,isshow,
-		  page_title, page_keywords, page_description, page_banner_name, page_banner_url
-		from tab_seach_pages where sate=0 and pid=#{id} order by createtime asc
+		  page_title, page_keywords, page_description, page_banner_name, page_banner_url,web_site
+		from tab_seach_pages where sate=0 and pid=#{id} and web_site in(0,#{webSite}) order by createtime asc
 	</select>
 	
 	<update id="delete">
@@ -56,7 +57,7 @@
 	</update>
 	<select id="get" resultMap="BaseResultMap">
 		select pid,id,keyword,keyword1,banner,filename,createtime,isshow,sate,
-		  page_title, page_keywords, page_description, page_banner_name, page_banner_url
+		  page_title, page_keywords, page_description, page_banner_name, page_banner_url,web_site
 		from tab_seach_pages
 		where id=#{id} limit 1
 	</select>
@@ -163,7 +164,7 @@
 	
 	<!-- public List<TabSeachPageBean> queryStaticizeAll(); -->
 	<select id="queryStaticizeAll" resultMap="BaseResultMap">
-		select id,keyword from tab_seach_pages where pid not in(0,-1)
+		select id,keyword,web_site from tab_seach_pages where pid not in(0,-1)
 	</select>
 
     <!--long updateAuthorizedInfoValid(@Param("shopId") String shopId, @Param("valid") int valid);-->

@@ -31,7 +31,20 @@ public class TabSeachPageBean {
 	private String pageBannerName; //底部banner图片 本地
 	private String pageBannerUrl; //底部banner图片 图片服务器
 
-    public String getPageTitle() {
+	/**
+	 * 按照网站分类
+	 */
+	private int webSite;
+
+	public int getWebSite() {
+		return webSite;
+	}
+
+	public void setWebSite(int webSite) {
+		this.webSite = webSite;
+	}
+
+	public String getPageTitle() {
         return pageTitle;
     }
 
