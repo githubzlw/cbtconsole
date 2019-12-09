@@ -425,7 +425,11 @@ public class NewOrderDetailsCtr {
 			if (str_oid.length() > 0) {
 				str_oid = str_oid.substring(0, str_oid.length() - 1);
 			}
-			request.setAttribute("overSeaTotal", overSeaTotal);
+			if(orderNo.contains("_H")){
+				request.setAttribute("overSeaTotal", overSeaTotal);
+			} else {
+				request.setAttribute("overSeaTotal", 0);
+			}
 			request.setAttribute("str_oid", str_oid);
 			request.setAttribute("shipMethod", shipMethod);
 			request.setAttribute("orderNo", orderNo);

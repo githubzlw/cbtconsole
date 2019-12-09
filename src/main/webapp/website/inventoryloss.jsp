@@ -87,12 +87,14 @@ em,i{font-style: normal;}
 						<option value="3">添加</option>
 						<option value="4">补货</option>
 						<option value="5">漏发</option>
+						<option value="8">送样</option>
 						<option value="7">其他</option>
 						
 				</select>
 				
 				</label>
 				<button class="btn btn-info"  id="query_button">查询</button>
+				<button class="btn btn-info"  id="download_button">下载</button>
 			<label><a href="/cbtconsole/inventory/list" target="_blank"><button class="btn btn-success">库存清单</button></a></label>
 				<label><a href="/cbtconsole/inventory/check/list" target="_blank"><button class="btn btn-success button_loss"  id="query_button_loss">库存盘点</button></a></label>
 			</div>
@@ -122,6 +124,10 @@ em,i{font-style: normal;}
 					<td>${l.remark }</td>
 					</tr>
 					</c:forEach>
+					<tr>
+					<td colspan="3">总数:</td>
+					<td colspan="4">${lossListSum }</td>
+					</tr>
 				</tbody>
 			</table>
 				<div>
@@ -152,6 +158,13 @@ $(function(){
 	$("#query_button").click(function(){
 		$("#current_page").val(1);
 		doQuery();
+	})
+	//下载
+	$("#download_button").click(function(){
+		var state = $('#query_state').val();
+		var startdate = $('#startdate').val();
+		var enddate = $('#enddate').val();
+		window.location.href="/cbtconsole/inventory/loss/download?type="+state+"&enddate="+enddate+"&startdate="+startdate;
 	})
 	
 })
@@ -189,6 +202,7 @@ function doNextPage(){
 	}
 	doQuery();
 }
+
 
 </script>
 </html>

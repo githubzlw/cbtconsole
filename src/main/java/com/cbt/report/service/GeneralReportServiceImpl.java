@@ -12,6 +12,7 @@ import com.cbt.warehouse.pojo.ShippingPackage;
 import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
+import com.cbt.website.bean.LossInventoryWrap;
 
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +89,7 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	String[] excelTota24 = { "序号","商品ID","产品名","skuid","specid","sku","盘点前库存","盘点后库存","差异值","库位","时间"};
 	String[] excelTota25 = { "序号","类别","商品ID","商品名称","商品sku","商品图片","上次盘点数量","库存数量","库位","盘点数量"};
 	String[] excelTota26 = { "序号","时间","odid","商品ID","商品名称","商品sku","库存数量","库位","价格","盘点数量"};
+	String[] excelTota27 = { "序号","时间","商品ID","skuid","类型","数量","备注"};
 
 	@Override
 	public HSSFWorkbook exportUserProfitByMonth(List<OrderSalesAmountPojo> list) {
@@ -1268,6 +1270,44 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 				row.createCell(7).setCellValue(bg.getBarcode());
 				row.createCell(8).setCellValue(bg.getGoodsPrice());
 				row.createCell(9).setCellValue("");
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return wb;
+	}
+	@Override
+	public HSSFWorkbook exportInventoryLoss(List<LossInventoryWrap> list){
+		String sheetName = "库存报损报表"; //报表页名
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(sheetName);
+		int rows =0;  //记录行数
+		HSSFRow row = sheet.createRow(rows++);
+		HSSFCellStyle style = wb.createCellStyle();
+		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+		HSSFCell hcell = row.createCell(0); //添加标题
+		hcell.setCellValue("库存报损列表");
+		row = sheet.createRow(rows++);  //到下一行添加数据
+		for (int i = 0; i < excelTota27.length; i++) {
+			HSSFCell cell = row.createCell(i);
+			cell.setCellValue(excelTota27[i]);
+			cell.setCellStyle(style);
+		}
+		try{
+			//写入报表汇总
+			//String[] excelTota26 = { "序号","时间","商品ID","skuid","类型","数量","备注"};
+			for (int i = 0; i < list.size(); i++) {
+				row = sheet.createRow(rows++);
+				LossInventoryWrap bg = list.get(i);
+				row.createCell(0).setCellValue((i+1));
+				row.createCell(1).setCellValue(bg.getChangeTime());
+				row.createCell(2).setCellValue(bg.getGoodsPid());
+				row.createCell(3).setCellValue(bg.getSkuid());
+				int type = bg.getChangeType();
+				String content = type==1?"遗失":type==3?"添加":type==4?"补货":type==5?"漏发":type==7?"其他原因":type==8?"送样":"损坏";
+				row.createCell(4).setCellValue(type+"("+content+")");
+				row.createCell(5).setCellValue(bg.getChangeNumber());
+				row.createCell(6).setCellValue(bg.getRemark());
 			}
 		}catch(Exception e){
 			e.printStackTrace();

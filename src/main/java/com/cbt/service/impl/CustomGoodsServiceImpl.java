@@ -14,9 +14,12 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.GoodsMongoDbLocalUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +29,13 @@ import java.util.Map;
 
 @Service
 public class CustomGoodsServiceImpl implements CustomGoodsService {
+
+    private static final Log logger = LogFactory.getLog(CustomGoodsServiceImpl.class);
+
     private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
+
+    @Autowired
+    private GoodsMongoDbLocalUtil mongoDbLocalUtil;
 
     @Autowired
     private CustomGoodsMapper customGoodsMapper;
@@ -74,6 +83,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int updateInfo(CustomGoodsBean bean) {
 
+        mongoDbLocalUtil.updatePid(bean.getPid());
         return customGoodsDao.updateInfo(bean);
     }
 
@@ -84,10 +94,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         if (StringUtils.isNotBlank(bean.getRangePrice())) {
             //sku更新
             List<CustomBenchmarkSkuNew> insertList = new ArrayList<>();
-            /*JSONArray sku_json = JSONArray.fromObject(bean.getSku());
+            JSONArray sku_json = JSONArray.fromObject(bean.getSku());
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-*/
-            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(bean.getSku(),ImportExSku.class);
+
             for (ImportExSku exSku : skuList) {
                 CustomBenchmarkSkuNew skuNew = new CustomBenchmarkSkuNew();
                 skuNew.setFinalWeight(bean.getFinalWeight());
@@ -142,11 +151,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 //否则插入或者更新SingleOffersChild信息
                 customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
             }*/
-
-            customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.parseDouble(bean.getFinalWeight()));
-        }else{
-            customGoodsMapper.insertIntoGoodsImgUpLog(bean.getPid(),"",bean.getAdminId(),"publish error");
+        } else {
+            customGoodsMapper.insertIntoGoodsImgUpLog(bean.getPid(), "", bean.getAdminId(), "publish error");
         }
+        mongoDbLocalUtil.updatePid(bean.getPid());
         return res;
     }
 
@@ -160,12 +168,14 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int updateState(int state, String pid, int adminid) {
 
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsDao.updateState(state, pid, adminid);
     }
 
     @Override
     public int updateValid(int valid, String pid) {
 
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsDao.updateValid(valid, pid);
     }
 
@@ -194,12 +204,14 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // GoodsInfoUpdateOnlineUtil.batchUpdateGoodsStateByMQ(state, pids, adminid);
         GoodsInfoUpdateOnlineUtil.batchUpdateGoodsStateMongoDB(state, pids, adminid);
         // 本地更新
+        mongoDbLocalUtil.updatePidList(pids);
         return customGoodsDao.updateStateList(state, pids, adminid, reason);
     }
 
     @Override
     public int updateValidList(int valid, String pids) {
 
+        mongoDbLocalUtil.updatePidList(pids);
         return customGoodsDao.updateValidList(valid, pids);
     }
 
@@ -219,6 +231,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public int updateInfoList(List<CustomGoodsBean> list) {
         if (list == null || list.isEmpty()) {
             return 0;
+        }
+        for(CustomGoodsBean goodsBean :list){
+            mongoDbLocalUtil.updatePid(goodsBean.getPid());
         }
 
         return customGoodsDao.updateInfoList(list);
@@ -244,17 +259,20 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public void batchSaveEnName(Admuser user, List<CustomGoodsBean> cgLst) {
         customGoodsDao.batchSaveEnName(user, cgLst);
+        for(CustomGoodsBean goodsBean :cgLst){
+            mongoDbLocalUtil.updatePid(goodsBean.getPid());
+        }
     }
 
     @Override
     public CustomGoodsPublish queryGoodsDetails(String pid, int type) {
         DataSourceSelector.restore();
         CustomGoodsPublish bean = customGoodsMapper.queryGoodsDetailsByPid(pid);
-        if(bean != null){
+        if (bean != null) {
             bean.setOnlineUrl(GoodsInfoUtils.genOnlineUrl(bean));
         }
-        if(type >0){
-            SwitchDomainNameUtil.changeCustomGoodsPublishBean(bean,type + 1);
+        if (type > 0) {
+            SwitchDomainNameUtil.changeCustomGoodsPublishBean(bean, type + 1);
         }
         return bean;
     }
@@ -262,6 +280,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int saveEditDetalis(CustomGoodsPublish cgp, String adminName, int adminId, int type) {
         //return customGoodsDao.saveEditDetalis(cgp, adminName, adminId, type);
+        mongoDbLocalUtil.updatePid(cgp.getPid());
         cgp.setAdminId(adminId);
         cgp.setGoodsState(type == 1 ? 4 : 5);
         return customGoodsMapper.updateGoodsDetailsByInfo(cgp);
@@ -284,6 +303,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // GoodsInfoUpdateOnlineUtil.setGoodsValidByMq(pid,type);
         // MongoDB
         GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid, type);
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6, remark);
     }
 
@@ -304,11 +324,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int updateGoodsState(String pid, int goodsState) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsDao.updateGoodsState(pid, goodsState);
     }
 
     @Override
     public boolean updateBmFlagByPids(String[] pidLst, int adminid) {
+        mongoDbLocalUtil.updatePidArr(pidLst);
         return customGoodsDao.updateBmFlagByPids(pidLst, adminid) == pidLst.length;
     }
 
@@ -329,6 +351,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public boolean setGoodsFlagByPid(GoodsEditBean editBean) {
+        mongoDbLocalUtil.updatePid(editBean.getPid());
         return customGoodsDao.setGoodsFlagByPid(editBean);
     }
 
@@ -344,27 +367,32 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public boolean deleteWordSizeInfoByPid(String pid) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsDao.deleteWordSizeInfoByPid(pid);
     }
 
     @Override
     public boolean setNoBenchmarking(String pid, double finalWeight) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsDao.setNoBenchmarking(pid, finalWeight);
     }
 
     @Override
     public boolean upCustomerReady(String pid, String aliPid, String aliPrice, int bmFlag, int isBenchmark, String edName, String rwKeyword, int flag) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsDao.upCustomerReady(pid, aliPid, aliPrice, bmFlag, isBenchmark, edName, rwKeyword, flag);
     }
 
 
     @Override
     public boolean setNeverOff(String pid) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsDao.setNeverOff(pid);
     }
 
     @Override
     public int insertPidIsEdited(String shopId, String pid, int adminId) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsMapper.insertPidIsEdited(shopId, pid, adminId);
     }
 
@@ -380,10 +408,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             CustomGoodsPublish good = customGoodsDao.getGoods(editBean.getPid(), 0);
             double finalWeight = 0;
             if (StringUtils.isNotBlank(good.getFinalWeight())) {
-                finalWeight = Double.valueOf(good.getFinalWeight());
+                finalWeight = Double.parseDouble(good.getFinalWeight());
             }
             customGoodsDao.setNoBenchmarking(editBean.getPid(), finalWeight);
         }
+        mongoDbLocalUtil.updatePid(editBean.getPid());
         return customGoodsMapper.updatePidIsEdited(editBean);
     }
 
@@ -404,6 +433,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int saveBenchmarking(String pid, String aliPid, String aliPrice) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsMapper.saveBenchmarking(pid, aliPid, aliPrice);
     }
 
@@ -414,6 +444,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int insertIntoGoodsEditBean(GoodsEditBean editBean) {
+        mongoDbLocalUtil.updatePid(editBean.getPid());
         return customGoodsMapper.insertIntoGoodsEditBean(editBean);
     }
 
@@ -439,6 +470,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int updateCustomGoodsStatistic(GoodsParseBean goodsParseBean) {
+        mongoDbLocalUtil.updatePid(goodsParseBean.getPid());
         return customGoodsMapper.updateCustomGoodsStatistic(goodsParseBean);
     }
 
@@ -449,11 +481,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int insertCustomGoodsStatistic(GoodsParseBean goodsParseBean) {
+        mongoDbLocalUtil.updatePid(goodsParseBean.getPid());
         return customGoodsMapper.insertCustomGoodsStatistic(goodsParseBean);
     }
 
     @Override
     public int updateGoodsSearchNum(String pid) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsMapper.updateGoodsSearchNum(pid);
     }
 
@@ -469,11 +503,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 数据库字段值 source_pro_flag = 7 标识是人为修改的重量
         // 数据库字段值weight 如果weight值是空的或者0，设置数weight =  newWeight
         // 数据库字段值old_weight,记录老的重量数据，old_weight = oldWeight
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsMapper.updateGoodsWeightByPid(pid, newWeight, oldWeight, weightIsEdit);
     }
 
     @Override
     public int editAndLockProfit(String pid, int type, double editProfit) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsMapper.editAndLockProfit(pid, type, editProfit);
     }
 
@@ -483,6 +519,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 获取商品信息
         CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
         boolean is = updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(orGoods.getFinalWeight()), weightIsEdit) > 0;
+        mongoDbLocalUtil.updatePid(pid);
         if (is) {
             /*// 重新刷新价格数据
             String url = EditorController.SHOPGOODSWEIGHTCLEARURL + "pid=" + pid + "&finalWeight=" + newWeight
@@ -544,6 +581,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             json.setOk(false);
             json.setMessage("更新数据失败");
         }
+        mongoDbLocalUtil.updatePid(pid);
         return json;
     }
 
@@ -588,13 +626,15 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             }*/
         }
 
+        mongoDbLocalUtil.updatePid(bean.getPid());
         return count > 0;
     }
 
     @Override
     public int updatePromotionFlag(String pid) {
         CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
-        customGoodsDao.insertIntoSingleOffersChild(orGoods.getPid(), Double.valueOf(orGoods.getFinalWeight()));
+        customGoodsDao.insertIntoSingleOffersChild(orGoods.getPid(), Double.parseDouble(orGoods.getFinalWeight()));
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsDao.updatePromotionFlag(pid);
     }
 
@@ -610,9 +650,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public List<CustomGoodsPublish> queryGoodsByPidList(List<String> pidList) {
-        if(pidList != null && pidList.size() > 0){
+        if (pidList != null && pidList.size() > 0) {
             return customGoodsMapper.queryGoodsByPidList(pidList);
-        }else{
+        } else {
             return new ArrayList<>();
         }
     }
@@ -621,6 +661,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public boolean updatePidEnInfo(CustomGoodsPublish gd) {
         customGoodsDao.updatePidEnInfo(gd);
         customGoodsMapper.updatePidEnInfo(gd);
+        mongoDbLocalUtil.updatePid(gd.getPid());
         return GoodsInfoUpdateOnlineUtil.updatePidEnInfo(gd);
     }
 
@@ -672,7 +713,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public int setNewAliPidInfo(String pid, String aliPid, String aliPrice) {
         customGoodsDao.setNewAliPidInfo(pid, aliPid, aliPrice);
         CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
-        customGoodsDao.insertIntoSingleOffersChild(pid, Double.valueOf(orGoods.getFinalWeight()));
+        customGoodsDao.insertIntoSingleOffersChild(pid, Double.parseDouble(orGoods.getFinalWeight()));
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsMapper.setNewAliPidInfo(pid, aliPid, aliPrice);
     }
 
@@ -683,6 +725,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int insertIntoGoodsPriceOrWeight(GoodsEditBean editBean) {
+        mongoDbLocalUtil.updatePid(editBean.getPid());
         return customGoodsMapper.insertIntoGoodsPriceOrWeight(editBean);
     }
 
@@ -693,6 +736,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int updateWeightFlag(String pid, int flag) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsMapper.updateWeightFlag(pid, flag);
     }
 
@@ -703,11 +747,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 2.插入sku日志
         customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
         // 3.走child表进行线上更新
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
     }
 
     @Override
     public int remarkSoftGoodsValid(String pid, int reason) {
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsMapper.remarkSoftGoodsValid(pid, reason);
     }
 
@@ -753,10 +799,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 获取商品信息
         CustomGoodsPublish orGoods = queryGoodsDetails(weightChange.getPid(), 0);
         if (StringUtils.isNotBlank(orGoods.getSku())) {
-            /*JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
-            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
-
-            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(orGoods.getSku(),ImportExSku.class);
+            JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
+            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
             // 查找匹配的type数据
             String typeStr = weightChange.getGoodsType();
             String skuid = weightChange.getSkuid() == null ? "" : weightChange.getSkuid();
@@ -764,21 +808,21 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             String[] typeStrList = typeStr.split(",");
             String ppId = "";
             boolean isSkuid = weightChange.getPid().equals(skuid) || StringUtils.isBlank(skuid);
-            if(isSkuid) {
-            	for (String childType : typeStrList) {
-            		if (StringUtils.isNotBlank(childType)) {
-            			String[] childList = childType.split("@");
-            			if (childList.length == 2 && StringUtils.isNotBlank(childList[1])) {
-            				ppId += "," + childList[1];
-            			}
-            		}
-            	}
+            if (isSkuid) {
+                for (String childType : typeStrList) {
+                    if (StringUtils.isNotBlank(childType)) {
+                        String[] childList = childType.split("@");
+                        if (childList.length == 2 && StringUtils.isNotBlank(childList[1])) {
+                            ppId += "," + childList[1];
+                        }
+                    }
+                }
             }
             double finalWeight = 0;
             for (ImportExSku exSku : skuList) {
-                if ((!isSkuid && skuid.equals(exSku.getSkuId())) 
-                		|| (isSkuid && StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds()))) {
-                	
+                if ((!isSkuid && skuid.equals(exSku.getSkuId()))
+                        || (isSkuid && StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds()))) {
+
                     finalWeight = BigDecimalUtil.truncateDouble(Float.parseFloat(weightChange.getWeight()), 3);
                     exSku.setFianlWeight(finalWeight);
                     if (StringUtils.isNotBlank(weightChange.getVolumeWeight())) {
@@ -810,6 +854,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         weightChange.setSyncFlag(1);
         customGoodsMapper.setGoodsWeightChangeFlag(weightChange);
         json.setOk(true);
+
         return json;
     }
 
@@ -892,10 +937,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-	public Map<String, String> getGoodsByPid(String pid) {
-		// TODO Auto-generated method stub
-		return customGoodsMapper.getGoodsByPid(pid);
-	}
+    public Map<String, String> getGoodsByPid(String pid) {
+        // TODO Auto-generated method stub
+        return customGoodsMapper.getGoodsByPid(pid);
+    }
 
     @Override
     public int insertIntoGoodsOverSeaInfo(GoodsOverSea goodsOverSea) {
@@ -910,6 +955,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int setSearchable(String pid, int flag, int adminId) {
         customGoodsMapper.insertSearchableLog(pid, flag, adminId);
+        mongoDbLocalUtil.updatePid(pid);
         return customGoodsMapper.setSearchable(pid, flag);
     }
 

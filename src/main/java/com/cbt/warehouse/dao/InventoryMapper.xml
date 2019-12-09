@@ -824,10 +824,9 @@
 	 where 1=1
 	 <if test="type!=-1">and lr.change_type=#{type}</if>
 	 <if test="startdate!=''">and lr.change_time>#{startdate}</if>
-	 <if test="enddate!=''">and lr.change_time$lt;#{enddate}</if>
+	 <if test="enddate!=''">and lr.change_time &lt; #{enddate}</if>
 	 order by change_time desc
-	 limit #{page},20
-    
+	 <if test="page > -1">limit #{page},20</if>
     </select>
     <select id="inventoryLossListCount" resultType="Integer">
      select count(id)

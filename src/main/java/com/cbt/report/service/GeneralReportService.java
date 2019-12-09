@@ -25,6 +25,7 @@ import com.cbt.warehouse.pojo.ShippingPackage;
 import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
+import com.cbt.website.bean.LossInventoryWrap;
 
 public interface GeneralReportService {
 
@@ -140,5 +141,11 @@ public interface GeneralReportService {
     HSSFWorkbook exportInventoryExcel(List<InventoryCheckWrap> list);
     
     HSSFWorkbook exportInventory(List<InventoryCheckWrap> list);
+    
+    /**库存报损报表
+     * @param list
+     * @return
+     */
+    HSSFWorkbook exportInventoryLoss(List<LossInventoryWrap> list);
 
 }
