@@ -617,16 +617,16 @@ function addLoss(){
         	  $('.tc,.trnasparent,.tc3').hide();
               window.location.reload();
           }else{
-        	  $.MsgBox.Alert("提示", "修改库存失败:"+data.reason);
+        	  $.MsgBox.Alert("提示", "报损失败:"+data.reason);
           }
       },
       error:function(e){
-    	  $.MsgBox.Alert("提示", "修改库存失败");
+    	  $.MsgBox.Alert("提示", "报损失败");
       }
   });
 }
 /*
-* 库存报损
+* 盘点
 */
 function addcheck(){
  var igoodsId=$("#index_check_igoodsID").val();
@@ -646,7 +646,7 @@ function addcheck(){
  var index_c = $("#index_check_index").val();
  var goods_name = $("#index_check_igoodsname").text().trim();
  if(index_iremaining != index_icanremaining){
-	 $.MsgBox.Confirm("温馨提示", "请先完成该产品的移库处理操作后再来！点击'确定'跳转移库列表", function(){
+	 $.MsgBox.Confirm("温馨提示", "请先完成该产品的移库处理操作后再来盘点！点击'确定'跳转移库列表", function(){
 		 window.location.href = "/cbtconsole/inventory/barcode?inid="+in_id;
 	 });
 	 return ;
@@ -680,42 +680,42 @@ function addcheck(){
         	  $('.tc,.trnasparent,.tc4').hide();
               window.location.reload();
           }else{
-        	  $.MsgBox.Alert("提示", "库存报损失败:"+data.reason);
+        	  $.MsgBox.Alert("提示", "盘点失败:"+data.reason);
           }
       },
       error:function(e){
-    	  $.MsgBox.Alert("提示", "库存报损失败");
+    	  $.MsgBox.Alert("提示", "盘点失败");
       }
   });
 }
 
 
 //导出报表
-function exportData(){
-	//生成报表
-	var have_barcode=$('#have_barcode').combobox('getValue');
-	var flag =$('#flag').val();
-	var type =$('#type').val();
-	var goodinfo =$('#goodinfo').val();
-	var scope =$('#scope').val();
-	var count =$('#count').val();
-	var sku =$('#sku').val()
-	var barcode =$('#barcode').val();
-	var type1 =$('#type1').val();
-	var type_="0";
-	var startdate = $("#startdate").val();
-	var enddate = $("#enddate").val();
-  var goodscatid=$('#goodscatid').combobox('getValue');
-	if(type1!=null){
-		type_=type1;
-	}
-	if(goodscatid == "全部"){
-      goodscatid="abc";
-	}else if(goodscatid == "其他"){
-      goodscatid="bcd"
-	}
-	window.location.href ="/cbtconsole/inventory/exportGoodsInventory?startdate="+startdate+"&enddate="+enddate+"&type="+type+"&goodinfo="+goodinfo+"&scope="+scope+"&count="+count+"&sku="+sku+"&type_="+type_+"&barcode="+barcode+"&flag="+flag+"&goodscatid="+goodscatid;
-}
+//function exportData(){
+//	//生成报表
+//	var have_barcode=$('#have_barcode').combobox('getValue');
+//	var flag =$('#flag').val();
+//	var type =$('#type').val();
+//	var goodinfo =$('#goodinfo').val();
+//	var scope =$('#scope').val();
+//	var count =$('#count').val();
+//	var sku =$('#sku').val()
+//	var barcode =$('#barcode').val();
+//	var type1 =$('#type1').val();
+//	var type_="0";
+//	var startdate = $("#startdate").val();
+//	var enddate = $("#enddate").val();
+//  var goodscatid=$('#goodscatid').combobox('getValue');
+//	if(type1!=null){
+//		type_=type1;
+//	}
+//	if(goodscatid == "全部"){
+//      goodscatid="abc";
+//	}else if(goodscatid == "其他"){
+//      goodscatid="bcd"
+//	}
+//	window.location.href ="/cbtconsole/inventory/exportGoodsInventory?startdate="+startdate+"&enddate="+enddate+"&type="+type+"&goodinfo="+goodinfo+"&scope="+scope+"&count="+count+"&sku="+sku+"&type_="+type_+"&barcode="+barcode+"&flag="+flag+"&goodscatid="+goodscatid;
+//}
 
 function saveInventory(){
 	var lu_pid = $("#lu_pid").val();

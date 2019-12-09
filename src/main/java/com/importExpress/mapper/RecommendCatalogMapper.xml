@@ -37,7 +37,8 @@
 	from recommend_catalog where status=1 
 	<if test="template !=0"> and template=#{template}</if>
 	<if test="catalogName !=null"> and catalog_name=#{catalogName}</if>
-	limit #{page},40
+	order by create_time desc
+	limit #{page},20
 	</select>
 	
 	<!-- 目录 -->
