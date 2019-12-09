@@ -63,6 +63,7 @@
             setDatagrid();
             queryAllCountry();
             getAdminList();
+            loadWebSize();
         });
 
         function setDatagrid() {
@@ -106,8 +107,8 @@
         }
 
         function doQuery() {
-            var allCus=1
-            var cal=document.getElementById("newCus").checked
+            var allCus=1;
+            var cal=document.getElementById("newCus").checked;
             if(cal==true){
                 allCus=0;
             }
@@ -120,6 +121,7 @@
             var countryId = $('#query_country_id').combobox('getValue');
             var beginMoney = $("#query_begin_money").val();
             var endMoney = $("#query_end_money").val();
+            var webSite = $("#web_size_type").val();
             $("#shop_marketing_easyui-datagrid").datagrid("load", {
                 "isOrder": isOrder,
                 "userId": userId,
@@ -130,7 +132,8 @@
                 "beginMoney": beginMoney,
                 "endMoney": endMoney,
                 "allCus": allCus,
-                "follow": follow
+                "follow": follow,
+                "site": webSite
             });
         }
 
@@ -164,6 +167,30 @@
             });
         }
 
+        function loadWebSize() {
+            $.ajax({
+                type: 'POST',
+                url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
+                data: {},
+                success: function (json) {
+                    if (json.ok) {
+                        var data = json.data;
+                        var content = '<option value="-1">全部</option>';
+                        for(var key in data){
+                            content += '<option value="'+key+'">'+data[key]+'</option>'
+                        }
+                        $("#web_size_type").empty();
+                        $("#web_size_type").append(content);
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
+
         function formatUserId(val, row, index) {
             return '<a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=' + val + '">' + val + '</a>';
         }
@@ -176,11 +203,11 @@
                 dataType:"json",
                 success: function(msg) {
                 if (msg.data!=1){
-                 $("#cusid").val(msg.data.userId)
-                    $("#cusname").val(msg.data.userName)
-                    $("#cusemail").val(usermail)
-                    $("#custime").val(msg.data.createTime)
-                    $("#reworkmesB").val(msg.data.userTypeDesc)
+                 $("#cusid").val(msg.data.userId);
+                    $("#cusname").val(msg.data.userName);
+                    $("#cusemail").val(usermail);
+                    $("#custime").val(msg.data.createTime);
+                    $("#reworkmesB").val(msg.data.userTypeDesc);
                     $("#reworkmesY").val(msg.data.remarks)
                 }
                 }
@@ -197,6 +224,25 @@
                     row.userId + '" target="_blank" >'+val+'</a>';
             }
         }
+
+        function formatSite(val, row, index) {
+            if (val) {
+                if (val == 0 || val == 1) {
+                    return 'IMPORT';
+                } else if (val == 2) {
+                    return 'KIDS';
+                } else if (val == 3) {
+                    return 'IMPORT/KIDS';
+                } else if (val == 4) {
+                    return 'PETS';
+                } else {
+                    return '';
+                }
+            } else {
+                return '';
+            }
+        }
+
         function formatFirstdiscount(val, row, index) {
             if(val > 0){
                 return "否";
@@ -280,14 +326,20 @@
                                                           style="font-size: 16px; height: 26px; width: 90px;">
 					<option value="-1" selected="selected">全部</option>
             </select></span>&nbsp;&nbsp;
+        <span>网站:<select id="web_size_type" style="height: 28px;width: 120px;">
+                                <option value="1">import</option>
+                                <option value="2">kids</option>
+                                <option value="3">pets</option>
+                            </select></span>
         <!--<span>跟进人: <select id="query_follow_id"-->
                                                            <!--style="font-size: 16px; height: 26px; width: 90px;">-->
                         <!--<option value="-1" selected="selected">全部</option>-->
 			<!--</select>-->
     <!--</span>&nbsp;&nbsp;-->
-        <input id="newCus" type="checkbox" style="">是否填写问卷  是勾选/否不勾选
+        <br><input id="newCus" type="checkbox" style="">是否填写问卷  是勾选/否不勾选
         <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
         <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
+
     </form>
 
 </div>
@@ -295,17 +347,18 @@
 <table id="shop_marketing_easyui-datagrid" class="easyui-datagrid">
     <thead>
     <tr>
-        <th data-options="field:'userId',align:'center',width:'100px',formatter:formatUserId">用户ID</th>
+        <th data-options="field:'userId',align:'center',width:'90px',formatter:formatUserId">用户ID</th>
         <th data-options="field:'userEmail',width:'150px'">用户Email</th>
         <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
-        <th data-options="field:'firstdiscount',align:'center',width:'100px',formatter:formatFirstdiscount">是否下单</th>
-        <th data-options="field:'usco',align:'center',width:'100px',formatter:formatuso">问卷</th>
+        <th data-options="field:'site',align:'center',width:'80px',formatter:formatSite">网站</th>
+        <th data-options="field:'firstdiscount',align:'center',width:'80px',formatter:formatFirstdiscount">是否下单</th>
+        <th data-options="field:'usco',align:'center',width:'90px',formatter:formatuso">问卷</th>
         <th data-options="field:'totalCatid',align:'center',width:'80px'">购物车商品种类</th>
         <th data-options="field:'totalPrice',align:'center',width:'100px',formatter:formatMoney">购物车总金额</th>
         <th data-options="field:'num',align:'center',width:'100px',formatter:formatCount">用户浏览商品次数</th>
-        <th data-options="field:'averagePrice',align:'center',width:'100px'">均价</th>
+        <th data-options="field:'averagePrice',align:'center',width:'90px'">均价</th>
         <th data-options="field:'lastAddCartTime',align:'center',width:'130px'">注册时间</th>
-        <th data-options="field:'saleName',align:'center',width:'100px'">销售</th>
+        <th data-options="field:'saleName',align:'center',width:'90px'">销售</th>
         <th data-options="field:'lastLoginTime',align:'center',width:'130px'">销售跟进时间</th>
         <!--<th data-options="field:'followAdminName',align:'center',width:'100px'">跟进人员</th>-->
         <th data-options="field:'followTime',align:'center',width:'130px'">购物车营销跟进时间</th>

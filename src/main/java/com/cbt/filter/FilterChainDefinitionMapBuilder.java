@@ -17,6 +17,10 @@ public class FilterChainDefinitionMapBuilder {
 		map.put("/jquery-easyui-1.5.2/**", "anon");
 		map.put("/js/**", "anon");
 		map.put("/userLogin/checkUserInfo.do", "anon");
+		// 定时任务调用过滤
+		map.put("/mongo/syncAllGoodsToMongo", "anon");
+		// 接口调用
+		map.put("/mongo/insertOrUpdateMongodb", "anon");
 		map.put("/userLogin/loginOut.do", "logout");
 		
 		// xxx.html* = anon （未登录可以访问）  xxx.html* =authc （必须登录才能访问 ）  xxx.html* = perms[权限] （需要特定权限才能访问）  

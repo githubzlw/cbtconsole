@@ -121,6 +121,7 @@
         <result column ="follow_time" property="followTime"/>
         <result column ="adminid" property="saleId"/>
         <result column ="admName" property="saleName"/>
+        <result column ="site" property="site"/>
     </resultMap>
 
 
@@ -1651,13 +1652,14 @@
 
     <select id="FindCustomList" parameterType="com.importExpress.pojo.ShopCarUserStatistic"
             resultMap="shopCarUserStatisticResultMap">
-        select DISTINCT(uo.userid) AS usco ,y.senddate as lastLoginTime,us.id as userid,us.email,us.firstdiscount,gdf.total_catid,DATE_FORMAT(us.createtime,'%Y-%m-%d %H:%i:%s') as last_add_cart_time,
+        select DISTINCT(uo.userid) AS usco ,y.senddate as lastLoginTime,us.id as userid,us.email,us.firstdiscount,us.site,
+        gdf.total_catid,DATE_FORMAT(us.createtime,'%Y-%m-%d %H:%i:%s') as last_add_cart_time,
         convert(gdf.total_price,decimal(10,2)) as total_price,convert(gdf.average_price,decimal(10,2)) as average_price,
         us.countryId,zone.country,au.adminid,au.admName,
         '' as last_login_time,ifnull(adm.id,0) as follow_admin_id,ifnull(adm.admName,'') as follow_admin_name,
         DATE_FORMAT(gdf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time,rv.ck as num
         from
-        (SELECT id,email,countryId,createtime,currency,firstdiscount from `user` WHERE 1=1
+        (SELECT id,email,countryId,createtime,currency,firstdiscount,site from `user` WHERE 1=1
         <if test="firstdiscount == 0">
         and  firstdiscount>0
         </if>
@@ -1717,6 +1719,17 @@
         <if test="totalPrice == 0">
        and  uo.userid is NOT NULL
         </if>
+        <if test="site > -1">
+            <if test="site == 1">
+                and us.site in(0,1,3)
+            </if>
+            <if test="site == 2">
+                and us.site in(2,3)
+            </if>
+            <if test="site == 3">
+                and us.site = 4
+            </if>
+        </if>
         order by us.createtime desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
@@ -1726,7 +1739,7 @@
     <select id="FindCustomCount" parameterType="com.importExpress.pojo.ShopCarUserStatistic"
             resultType="java.lang.Integer">
         select count(1) FROM
-        (SELECT id,email,countryId,createtime,currency,firstdiscount from `user` WHERE 1=1
+        (SELECT id,email,countryId,createtime,currency,firstdiscount,site from `user` WHERE 1=1
         <if test="firstdiscount == 0">
             and  firstdiscount>0
         </if>
@@ -1784,6 +1797,17 @@
         </if>
         <if test="totalPrice == 0">
             and  uo.userid is NOT NULL
+        </if>
+        <if test="site > -1">
+            <if test="site == 1">
+                and us.site in(0,1,3)
+            </if>
+            <if test="site == 2">
+                and us.site in(2,3)
+            </if>
+            <if test="site == 3">
+                and us.site = 4
+            </if>
         </if>
     </select>
 

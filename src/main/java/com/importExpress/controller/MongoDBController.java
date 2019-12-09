@@ -122,6 +122,7 @@ public class MongoDBController {
     }
 
     @RequestMapping("/syncAllGoodsToMongo")
+    @ResponseBody
     public JsonResult syncAllGoodsToMongo() {
         JsonResult json = new JsonResult();
         List<String> errorList = new ArrayList<>();
@@ -220,6 +221,7 @@ public class MongoDBController {
 
 
     @RequestMapping("/insertOrUpdateMongodb")
+    @ResponseBody
     public JsonResult insertOrUpdateMongodb(String pid) {
         JsonResult json = new JsonResult();
         if (StringUtils.isBlank(pid)) {
