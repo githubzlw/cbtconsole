@@ -321,6 +321,10 @@
             if (goods_off.attr("id") == "nw_goods_flag_on") {
                 flag = 1;
             }
+            $.messager.progress({
+                    title: '正在执行中',
+                    msg: '请等待...'
+                });
             $.ajax({
                 type: 'POST',
                 url: '/cbtconsole/hotGoods/saveGoods.do',
@@ -339,6 +343,7 @@
                     "flag": flag
                 },
                 success: function (data) {
+                    $.messager.progress('close');
                     if (data.ok) {
                         $("#add_goods").hide();
                         alert("保存成功，请等待数据拉取");
@@ -347,6 +352,7 @@
                     }
                 },
                 error: function (res) {
+                    $.messager.progress('close');
                     $.messager.alert("提醒", "保存错误，请联系管理员", "error");
                 }
             });
