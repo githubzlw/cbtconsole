@@ -108,6 +108,11 @@ public class NewCustomersFollowController {
         if (StringUtils.isNotBlank(countryIdStr)) {
             countryId = Integer.parseInt(countryIdStr);
         }
+
+        String siteStr = request.getParameter("site");
+        if(StringUtils.isBlank(siteStr)){
+            siteStr = "-1";
+        }
         statistic.setFollowAdminId(followId);
         statistic.setSaleId(adminId);
         statistic.setIsOrder(isOrder);
@@ -119,6 +124,7 @@ public class NewCustomersFollowController {
         statistic.setLimitNum(limitNum);
         statistic.setTotalPrice(allCus);
         statistic.setFirstdiscount(follow);
+        statistic.setSite(Integer.parseInt(siteStr));
         json = this.newCustomersFollowService.FindCustomList(statistic,admuser);
 
         return json;
