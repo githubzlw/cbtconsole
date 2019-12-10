@@ -9,7 +9,6 @@ import com.cbt.pay.service.SpidersServer;
 import com.cbt.util.Md5Util;
 import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
-import net.sf.json.JSONObject;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -273,7 +272,7 @@ public class OrderInfoNewController {
 			        map.put("zonelist", zonelist);
 			        map.put("addresslist", addresslist);
 			        if(addresslist.size() > 0){
-			        	map.put("defaultaddress", JSONObject.fromObject(addresslist.get(0)).toString().replaceAll("'", "&apos;"));
+			        	map.put("defaultaddress", addresslist.get(0).toString().replaceAll("'", "&apos;"));
 			        }
 			        map.put("total", total);
 //			        map.put("service_fee", service_fee);

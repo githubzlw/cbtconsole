@@ -1,5 +1,7 @@
 package com.cbt.util;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.ImportExSku;
 import com.cbt.bean.ImportExSkuShow;
@@ -9,8 +11,6 @@ import com.cbt.parse.service.StrUtils;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.utli.OKHttpUtils;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -750,7 +750,7 @@ public class GoodsInfoUtils {
         }
         //step v1. @author: cjc @date：2019/1/14 14:05:34  TODO 根据skuid 解析出价格
         String typePrice = "";
-        JSONArray jsonArray = JSONArray.fromObject(skuStr);
+        JSONArray jsonArray = JSONArray.parseArray(skuStr);
         for (int i = 0; i < jsonArray.size(); i++) {
             Object o = jsonArray.get(i);
             JSONObject o1 = (JSONObject) o;

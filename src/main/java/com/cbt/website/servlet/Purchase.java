@@ -1,5 +1,7 @@
 package com.cbt.website.servlet;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.CodeMaster;
 import com.cbt.bean.GoodsCheckBean;
 import com.cbt.bean.OrderDatailsNew;
@@ -27,8 +29,6 @@ import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.userAuth.Dao.AdmUserDao;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.impl.AdmUserDaoImpl;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -479,7 +479,7 @@ public class Purchase extends HttpServlet {
 		}
 		System.out.println("=======================全部结束====:" + sdf1.format(new Date()) + "=================");
 		List<OrderProductSource> goodsids = purchaseServer.getAllGoodsids(adminid);
-		request.setAttribute("goodsids", JSONArray.fromObject(goodsids).toString());
+		request.setAttribute("goodsids", JSONArray.toJSONString(goodsids));
 		long end = System.currentTimeMillis();
 		System.out.println(end - start);
 		request.setAttribute("hideTr", "<script>hideTr()</script>");
@@ -726,9 +726,8 @@ public class Purchase extends HttpServlet {
 		String goodid = request.getParameter("goodid");
 		response.setCharacterEncoding("UTF-8");
 		OrderProductSource orderProductSource = purchaseServer.ShowRmark(orderNo, Integer.parseInt(goodsdataid), Integer.parseInt(goodid));
-		JSONObject json  =JSONObject.fromObject(orderProductSource);
 		PrintWriter out = response.getWriter();
-		out.write(json.toString());
+		out.write(JSONObject.toJSONString(orderProductSource));
 		out.flush();
 		out.close();
 	}
@@ -900,7 +899,7 @@ public class Purchase extends HttpServlet {
 
 	// 取消确认采购 不用这个方法了
 	public void allQxcgQr(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, NumberFormatException, InterruptedException, ExecutionException {
+			throws ServletException, IOException, NumberFormatException, InterruptedException, ExecutionException {/*
 		String listmap = request.getParameter("listmap");
 		JSONObject json = JSONObject.fromObject(listmap);
 		List<Map<String, String>> edit = (List<Map<String, String>>) json.getJSONArray("listmap");
@@ -941,7 +940,7 @@ public class Purchase extends HttpServlet {
 		out.print(JSONArray.fromObject(list).toString());
 		out.flush();
 		out.close();
-	}
+	*/}
 
 	public int PurchaseComfirmOne(String sql, String sqltwo, String sqlthree) {
 		String orderNo = null;
@@ -1115,7 +1114,7 @@ public class Purchase extends HttpServlet {
 
 	// 一键确认采购 本地 不用这个方法了
 	public void allcgqrQr_crossshop(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, NumberFormatException, InterruptedException, ExecutionException {
+			throws ServletException, IOException, NumberFormatException, InterruptedException, ExecutionException {/*
 		String listmap = request.getParameter("listmap");
 		JSONObject json = JSONObject.fromObject(listmap);
 		List<Map<String, String>> edit = (List<Map<String, String>>) json.getJSONArray("listmap");
@@ -1160,11 +1159,11 @@ public class Purchase extends HttpServlet {
 		out.print(JSONArray.fromObject(list).toString());
 		out.flush();
 		out.close();
-	}
+	*/}
 
 	// 一键确认采购 线上 不用这个方法了
 	public void allcgqrQr(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, NumberFormatException, InterruptedException, ExecutionException {
+			throws ServletException, IOException, NumberFormatException, InterruptedException, ExecutionException {/*
 		String listmap = request.getParameter("listmap");
 		JSONObject json = JSONObject.fromObject(listmap);
 		List<Map<String, String>> edit = (List<Map<String, String>>) json.getJSONArray("listmap");
@@ -1209,7 +1208,7 @@ public class Purchase extends HttpServlet {
 		out.print(JSONArray.fromObject(list).toString());
 		out.flush();
 		out.close();
-	}
+	*/}
 
 	// 确认采购 //不用这个方法了
 	public void PurchaseComfirmTwo(HttpServletRequest request, HttpServletResponse response)
@@ -1311,8 +1310,8 @@ public class Purchase extends HttpServlet {
 	private static HashMap<String, String> toHashMap(Object object) {
 		HashMap<String, String> data = new HashMap<String, String>();
 		// 将json字符串转换成jsonObject
-		JSONObject jsonObject = JSONObject.fromObject(object);
-		Iterator it = jsonObject.keys();
+		JSONObject jsonObject = JSONObject.parseObject(object.toString());
+		Iterator it = jsonObject.keySet().iterator();
 		// 遍历jsonObject数据，添加到Map对象
 		while (it.hasNext()) {
 			String key = String.valueOf(it.next());
@@ -1375,7 +1374,7 @@ public class Purchase extends HttpServlet {
 		String goods_p_url=request.getParameter("goods_p_url");
 		List<PreferentialPrice> list =purchaseServer.queryPreferentialPrice(orderid,goodsid,goods_p_url);
 		PrintWriter out = response.getWriter();
-		out.print(JSONArray.fromObject(list).toString());
+		out.print(JSONArray.toJSONString(list));
 		out.flush();
 		out.close();
 	}
@@ -1455,8 +1454,8 @@ public class Purchase extends HttpServlet {
 	public void allQxQr(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, NumberFormatException, InterruptedException, ExecutionException {
 		String listmap = request.getParameter("listmap");
-		JSONObject json = JSONObject.fromObject(listmap);
-		List<Map<String, String>> edit = (List<Map<String, String>>) json.getJSONArray("listmap");
+		JSONObject json = JSONObject.parseObject(listmap);
+		List<Map> edit = JSONArray.parseArray(json.getString("listmap"), Map.class);
 
 		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
 		ExecutorService exec = Executors.newCachedThreadPool();
@@ -1492,7 +1491,7 @@ public class Purchase extends HttpServlet {
 		exec.shutdown();
 		PrintWriter out = response.getWriter();
 		//
-		out.print(JSONArray.fromObject(list).toString());
+		out.print(JSONArray.toJSONString(list));
 		out.flush();
 		out.close();
 	}
@@ -1622,8 +1621,8 @@ public class Purchase extends HttpServlet {
 	public void allQr(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, InterruptedException, ExecutionException {
 		String listmap = request.getParameter("listmap");
-		JSONObject json = JSONObject.fromObject(listmap);
-		final List<Map<String, String>> edit = (List<Map<String, String>>) json.getJSONArray("listmap");
+		JSONObject json = JSONObject.parseObject(listmap);
+		final List<Map> edit = JSONArray.parseArray(json.getString("listmap"),Map.class) ;
 
 		final List<Map<String, String>> list = new ArrayList<Map<String, String>>();
 
@@ -1670,7 +1669,7 @@ public class Purchase extends HttpServlet {
 		exec.shutdown();
 
 		PrintWriter out = response.getWriter();
-		out.print(JSONArray.fromObject(list).toString());
+		out.print(JSONArray.toJSON(list));
 		out.flush();
 		out.close();
 	}
@@ -2530,7 +2529,7 @@ public class Purchase extends HttpServlet {
 			List<PriceReturnJsonNew> list = jc.getJcFreight(pd);
 			if (list != null) {
 
-				fee = JSONArray.fromObject(list.get(0).getMsg()).toString();
+				fee = JSONArray.toJSONString(list.get(0).getMsg());
 			} else {
 				fee = "count_failure";
 				// System.out.println("佳成接口调用失败");

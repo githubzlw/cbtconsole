@@ -1,5 +1,7 @@
 package com.cbt.website.dao;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.Payment;
 import com.cbt.jdbc.DBHelper;
@@ -7,8 +9,6 @@ import com.cbt.pay.dao.IPaymentDao;
 import com.cbt.pay.dao.PaymentDao;
 import com.cbt.util.BigDecimalUtil;
 import com.cbt.warehouse.util.StringUtil;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -373,7 +373,7 @@ public class OrderInfoImpl implements OrderInfoDao {
 			while (rs.next()) {
 				String paymentinfo = rs.getString("pay_info");
 //				payment = JSON.parseObject("[" + rs.getString("pay_info") + "]",com.paypal.api.payments.Payment.class);
-				JSONObject jsonObject = JSONArray.fromObject("[" + paymentinfo + "]")
+				JSONObject jsonObject = JSONArray.parseArray("[" + paymentinfo + "]")
 						.getJSONObject(0)
 						.getJSONArray("transactions")
 						.getJSONObject(0)
@@ -416,7 +416,7 @@ public class OrderInfoImpl implements OrderInfoDao {
 				String paymentInfo = rs.getString("pay_info");
 				resultMap.put("payTime", rs.getString("createtime"));
 				if (payType == 0 || payType == 1) {
-					JSONObject jsonObject = JSONArray.fromObject("[" + paymentInfo + "]")
+					JSONObject jsonObject = JSONArray.parseArray("[" + paymentInfo + "]")
 							.getJSONObject(0)
 							.getJSONArray("transactions")
 							.getJSONObject(0)
@@ -427,7 +427,7 @@ public class OrderInfoImpl implements OrderInfoDao {
 					resultMap.put("saleId", jsonObject.getString("id"));
 					resultMap.put("payAmount", jsonObject.getJSONObject("amount").getString("total"));
 				} else if (payType == 5) {
-					JSONObject jsonObject = JSONArray.fromObject("[" + paymentInfo + "]").getJSONObject(0);
+					JSONObject jsonObject = JSONArray.parseArray("[" + paymentInfo + "]").getJSONObject(0);
 					double total = jsonObject.getDouble("amount");
 					resultMap.put("payType", "stripe");
 					resultMap.put("saleId", jsonObject.getString("id"));

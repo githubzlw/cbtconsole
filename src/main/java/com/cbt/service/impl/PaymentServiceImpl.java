@@ -1,11 +1,11 @@
 package com.cbt.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.Payment;
 import com.cbt.dao.IPaymentSSMDao;
 import com.cbt.dao.IRechargeRecordSSMDao;
 import com.cbt.refund.bean.RefundBeanExtend;
 import com.cbt.service.IPaymentService;
-import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +39,7 @@ public class PaymentServiceImpl implements IPaymentService {
 		Payment payment =paymentSSMDao.getById(id);
 		if(payment!=null){
 			String strjs="";
-			strjs=JSONArray.fromObject(payment).toString();
+			strjs= JSONObject.toJSONString(payment);
 			System.out.println(strjs);
 		}
 		return paymentSSMDao.getById(id);

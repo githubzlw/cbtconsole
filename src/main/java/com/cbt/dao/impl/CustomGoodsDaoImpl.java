@@ -1,5 +1,6 @@
 package com.cbt.dao.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.*;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.jdbc.DBHelper;
@@ -15,7 +16,6 @@ import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import com.importExpress.utli.UpdateTblModel;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -3186,7 +3186,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             conn28.setAutoCommit(false);
             stmt28 = conn28.prepareStatement(insertSqlString);
             stmt28.setString(1, pid);
-            stmt28.setString(2, JSONObject.fromObject(model).toString());
+            stmt28.setString(2, JSONObject.toJSONString(model));
             rs = stmt28.executeUpdate();
             if (rs >= 0) {
                 rs = 0;
@@ -3409,7 +3409,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             if (rs > 0) {
                 stmt = conn.prepareStatement(insertSqlLog);
                 stmt.setString(1, bean.getId());
-                stmt.setString(2, JSONObject.fromObject(model).toString());
+                stmt.setString(2, JSONObject.toJSONString(model));
                 rs = stmt.executeUpdate();
                 if (rs > 0) {
                     conn.commit();

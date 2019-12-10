@@ -1,5 +1,6 @@
 package com.cbt.warehouse.ctrl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.auto.service.IOrderAutoService;
 import com.cbt.auto.service.PreOrderAutoService;
@@ -51,7 +52,6 @@ import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -123,7 +123,7 @@ public class NewOrderDetailsCtr {
 			String payTime = request.getParameter("paytime");
 			request.setAttribute("payToTime", payTime);
 			// 获取所有采购人员信息
-			request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(iOrderinfoService.getBuyerAndAll()));
+			request.setAttribute("aublist", JSONArray.toJSON(iOrderinfoService.getBuyerAndAll()));
 
 //			String allFreight = String.valueOf(iOrderinfoService.getAllFreightByOrderid(orderNo));
 			// 订单信息
@@ -1185,7 +1185,7 @@ public class NewOrderDetailsCtr {
 			IOrderwsServer server = new OrderwsServer();
 //			List<Admuser> aublist = server.getAllBuyer();
 			List<Admuser> aublist =iOrderinfoService.getAllBuyer();
-			request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(aublist));
+			request.setAttribute("aublist", JSONArray.toJSON(aublist));
 			// 订单信息
 //			OrderBean order = server.getChildrenOrders(orderNo);
 			OrderBean order =iOrderinfoService.getChildrenOrders(orderNo);
@@ -1887,8 +1887,7 @@ public class NewOrderDetailsCtr {
 						model.put("accountLink",AppConfig.center_path);
 						model.put("orderNo",orderNo);
 						model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
-						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
-						String modeStr = jsonObject.toString();
+						String modeStr = JSONObject.toJSONString(model);
 						if(isKidFlag){
 							sendMailFactory.sendMail(toEmail, null, "Your KidsProductWholesale Order " + orderNo + " transaction is closed!",
 									model, TemplateType.CANCEL_ORDER_KID);
@@ -2101,8 +2100,7 @@ public class NewOrderDetailsCtr {
                     model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
                     model.put("accountLink", SwitchDomainNameUtil.checkNullAndReplace(AppConfig.center_path, MultiSiteUtil.getSiteTypeNum(orderNo)));
                     model.put("orderNo", orderNo);
-                    net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
-                    String modeStr = jsonObject.toString();
+                    String modeStr = JSONObject.toJSONString(model);
                     try {
 						sendMailFactory.sendMail(toEmail, null, "Your "+webSiteTitle+" Order " + orderNo + " transaction is closed!",
 									model, webType);

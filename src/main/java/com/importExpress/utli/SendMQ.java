@@ -1,11 +1,11 @@
 package com.importExpress.utli;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.mq.RPCClient;
 import com.cbt.util.SysParamUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -67,7 +67,7 @@ public class SendMQ {
      */
     public static void sendMsg(UpdateTblModel model) {
 
-        sendMsg(JSONObject.fromObject(model).toString());
+        sendMsg(JSONObject.toJSONString(model));
     }
 
     public static void sendMsg(String data) {
@@ -90,7 +90,7 @@ public class SendMQ {
      * @throws Exception
      */
     public static void sendMsg(RunSqlModel model) {
-        sendMsg(JSONObject.fromObject(model).toString());
+        sendMsg(JSONObject.toJSONString(model));
     }
 
     /**
@@ -146,11 +146,11 @@ public class SendMQ {
     public static void sendMsg(RunBatchSqlModel model) throws Exception {
         Channel channel = getChannel();
         channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        JSONObject jsonObject = JSONObject.fromObject(model);
-        System.out.println(jsonObject.toString().getBytes("UTF-8"));
+        String jsonStr = JSONObject.toJSONString(model);
+        System.out.println(jsonStr.getBytes("UTF-8"));
 
-        channel.basicPublish("", QUEUE_NAME, null, jsonObject.toString().getBytes("UTF-8"));
-        System.out.println(" [x] Sent '" + jsonObject.toString() + "'");
+        channel.basicPublish("", QUEUE_NAME, null, jsonStr.getBytes("UTF-8"));
+        System.out.println(" [x] Sent '" + jsonStr + "'");
         closeChannel(channel);
     }
 
@@ -194,10 +194,9 @@ public class SendMQ {
     public static String sendMsgByRPC(RunSqlModel model) {
         try (RPCClient rpcClient = new RPCClient()) {
 
-            JSONObject jsonObject = JSONObject.fromObject(model);
-            log.info(" [x] Sent [{}]", jsonObject);
-            System.err.println("[x] Sent" + jsonObject);
-            String response = rpcClient.call(jsonObject.toString());
+            log.info(" [x] Sent [{}]", model);
+            System.err.println("[x] Sent" + model);
+            String response = rpcClient.call(JSONObject.toJSONString(model));
             log.info(" [x] response [{}]", response);
             return response;
         } catch (IOException | TimeoutException | InterruptedException e) {
@@ -213,8 +212,7 @@ public class SendMQ {
      * @throws Exception
      */
     public static void sendMsg(RedisModel model, int website) throws Exception {
-        JSONObject jsonObject = JSONObject.fromObject(model);
-        sendMessageStr(jsonObject.toString(), website);
+        sendMessageStr(JSONObject.toJSONString(model), website);
     }
 
     public static void sendMessageStr(String json, int website) throws Exception {

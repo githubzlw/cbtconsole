@@ -9,7 +9,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.userAuth.impl.AdmUserDaoImpl;
 import com.cbt.website.userAuth.impl.UserAuthDaoImpl;
-import net.sf.json.JSONArray;
+import net.minidev.json.JSONArray;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -60,7 +60,7 @@ public class AdmUserServlet extends HttpServlet {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			String result = (JSONArray.fromObject(admuserList).toString());
+			String result = (JSONArray.toJSONString(admuserList));
 			WebTool.writeJson(result, response);
 		}else if (action != null && "findAdmuserAuth".equals(action)) {
 			List<AuthInfo> authinfoList = new ArrayList<AuthInfo>();
@@ -74,7 +74,7 @@ public class AdmUserServlet extends HttpServlet {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			String result = (JSONArray.fromObject(userauthList).toString());
+			String result = (JSONArray.toJSONString(userauthList));
 			WebTool.writeJson(result, response);
 		}else if (action != null && "update".equals(action)) {
 			String admName = request.getParameter("admName");

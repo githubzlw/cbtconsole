@@ -1,8 +1,8 @@
 package com.cbt.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.bean.Payment;
 import com.cbt.service.IPaymentService;
-import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,9 +24,9 @@ public class PaymentController {
 	public JSONArray add(Payment payment) {
 		Integer rows =paymentService.add(payment);
 		if(rows>0){
-			return JSONArray.fromObject("添加成功");
+			return JSONArray.parseArray("添加成功");
 		}else{
-			return JSONArray.fromObject("添加失败");
+			return JSONArray.parseArray("添加失败");
 		}
 	}
 	
@@ -35,9 +35,9 @@ public class PaymentController {
 	public JSONArray delById(Integer id) {
 		Integer rows =paymentService.delById(id);
 		if(rows>0){
-			return JSONArray.fromObject("删除单条成功");
+			return JSONArray.parseArray("删除单条成功");
 		}else{
-			return JSONArray.fromObject("删除单条失败");
+			return JSONArray.parseArray("删除单条失败");
 		}
 	}
 	
@@ -46,9 +46,9 @@ public class PaymentController {
 	public JSONArray update(Payment payment) {
 		Integer rows =paymentService.update(payment);
 		if(rows>0){
-			return JSONArray.fromObject("修改单条成功");
+			return JSONArray.parseArray("修改单条成功");
 		}else{
-			return JSONArray.fromObject("修改单条失败");
+			return JSONArray.parseArray("修改单条失败");
 		}
 	}
 	

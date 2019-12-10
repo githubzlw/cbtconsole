@@ -47,6 +47,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.importExpress.utli.*;
 import okhttp3.*;
 import org.apache.commons.collections.map.HashedMap;
@@ -219,8 +221,6 @@ import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OverseasWarehouseStockService;
 import com.importExpress.service.TabCouponService;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import sun.misc.BASE64Encoder;
 
 @SuppressWarnings("deprecation")
@@ -1555,7 +1555,7 @@ public class WarehouseCtrl {
 			//产品被取消次数
 			oicp = iWarehouseService.getCancelData(map);
 		}
-		return JSONObject.fromObject(oicp).toString();
+		return JSONObject.toJSONString(oicp);
 	}
 	/**
 	 *
@@ -1657,7 +1657,7 @@ public class WarehouseCtrl {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("sql", sql);
 		Tb1688Pojo oicp = iWarehouseService.getTbState(map);
-		return JSONObject.fromObject(oicp).toString();
+		return JSONObject.toJSONString(oicp);
 	}
 
 	/**
@@ -2468,7 +2468,7 @@ public class WarehouseCtrl {
 				}
 			}
 		}
-		return net.sf.json.JSONArray.fromObject(oflist).toString();
+		return JSONArray.toJSONString(oflist);
 	}
 
 	/**
@@ -2503,7 +2503,7 @@ public class WarehouseCtrl {
 	@ResponseBody
 	public String getFpxCountryCode(HttpServletRequest request, Model model) {
 		List<OrderFeePojo> countryCodeList = iWarehouseService.getFpxCountryCode();
-		return net.sf.json.JSONArray.fromObject(countryCodeList).toString();
+		return JSONArray.toJSONString(countryCodeList);
 	}
 
 	/**
@@ -2520,7 +2520,7 @@ public class WarehouseCtrl {
 	public String getNotMoneyOrderinfo(HttpServletRequest request, Model model) {
 		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
 		List<OrderInfoPojo> orderInfoPojoList = iWarehouseService.getNotMoneyOrderinfo(map);
-		return net.sf.json.JSONArray.fromObject(orderInfoPojoList).toString();
+		return JSONArray.toJSONString(orderInfoPojoList);
 	}
 
 	// 起他出货方式
@@ -2528,7 +2528,7 @@ public class WarehouseCtrl {
 	@ResponseBody
 	public String getCodemaster(HttpServletRequest request, Model model) {
 		List<OrderFeePojo> countryCodeList = iWarehouseService.getCodemaster();
-		return net.sf.json.JSONArray.fromObject(countryCodeList).toString();
+		return JSONArray.toJSONString(countryCodeList);
 	}
 
 	// 4px运输方式
@@ -2536,7 +2536,7 @@ public class WarehouseCtrl {
 	@ResponseBody
 	public String getFpxProductCode(HttpServletRequest request, Model model) {
 		List<OrderInfoPojo> fpxProductCode = iWarehouseService.getFpxProductCode();
-		return net.sf.json.JSONArray.fromObject(fpxProductCode).toString();
+		return JSONArray.toJSONString(fpxProductCode);
 	}
 
 	// 出库和欠费数量
@@ -2544,7 +2544,7 @@ public class WarehouseCtrl {
 	@ResponseBody
 	public String getOutCount(HttpServletRequest request, Model model) {
 		List<OrderInfoPojo> fpxProductCode = iWarehouseService.getOutCount();
-		return net.sf.json.JSONArray.fromObject(fpxProductCode).toString();
+		return JSONArray.toJSONString(fpxProductCode);
 	}
 
 	// 所有金额
@@ -2573,7 +2573,7 @@ public class WarehouseCtrl {
 		b = new BigDecimal(t);
 		f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 		fpxProductCode.setActual_lwh(f1);
-		return net.sf.json.JSONObject.fromObject(fpxProductCode).toString();
+		return JSONObject.toJSONString(fpxProductCode);
 	}
 
 	// 获得嘉城运输方式
@@ -2851,9 +2851,9 @@ public class WarehouseCtrl {
 				} catch (Exception e) {
 					LOG.info("获取CNE物流单号失败");
 				}
-				JSONObject json = JSONObject.fromObject(ret);
-				List<Map<String, String>> edit = (List<Map<String, String>>) json.getJSONArray("ErrList");
-				String cNum = edit.get(0).get("cNum");
+				JSONObject json = JSONObject.parseObject(ret);
+				JSONArray jsonArray = JSONArray.parseArray(json.getString("ErrList"));
+				String cNum = jsonArray.getJSONObject(0).getString("cNum");
 				String logistics_name = (String) mainMap.get("logistics_name");
 				String orderlist = (String) mainMap.get("orderid") + "<br/>";// 合并订单
 				Purchase p = new Purchase();
@@ -2903,7 +2903,7 @@ public class WarehouseCtrl {
 				List<PriceReturnJsonNew> list = jc.getJcFreight(pd);
 				if (list != null) {
 					getJcexTime(pd);
-					return net.sf.json.JSONArray.fromObject(list).toString();
+					return JSONArray.toJSONString(list);
 				} else {
 					return "500";
 				}
@@ -2955,14 +2955,14 @@ public class WarehouseCtrl {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		JSONObject json = JSONObject.fromObject(r);
-		List<Map<String, String>> edit = (List<Map<String, String>>) json.getJSONArray("List");
+		JSONObject json = JSONObject.parseObject(r);
+		JSONArray jsonArray = json.getJSONArray("List");
 		List<String> ls = new ArrayList<String>();
-		for (int i = 0; i < edit.size(); i++) {
-			String oName = edit.get(i).get("oName");
+		for (int i = 0; i < jsonArray.size(); i++) {
+			String oName = jsonArray.getJSONObject(i).getString("oName");
 			ls.add(oName);
 		}
-		return net.sf.json.JSONArray.fromObject(ls).toString();
+		return JSONArray.toJSONString(ls);
 	}
 
 	// 4px运输方式对应运输时间
@@ -2990,7 +2990,7 @@ public class WarehouseCtrl {
 				ofplist.remove(i); // 查询不出来运费的 我给他删掉
 			}
 		}
-		return net.sf.json.JSONArray.fromObject(ofplist).toString();
+		return JSONArray.toJSONString(ofplist);
 	}
 
 	// 计算运费
@@ -3030,7 +3030,7 @@ public class WarehouseCtrl {
 		Map<String, Object> map = new HashMap<String, Object>(); //
 		map.put("order_no", order_no);
 		OrderInfoPojo oiflist = iWarehouseService.getOutOrderInfo(map);
-		return net.sf.json.JSONArray.fromObject(oiflist).toString();
+		return JSONArray.toJSONString(oiflist);
 	}
 
 	@RequestMapping(value ="/deleteVideoPath",method = RequestMethod.POST)
@@ -3922,9 +3922,9 @@ public class WarehouseCtrl {
 		reqMap.put("orderid", hBOrders.replace(",", ";"));
 		reqMap.put("sp_id", shipmentno);
 		reqMap.put("userid", userid);
-		JSONArray.fromObject(reqMap).toString();
-		System.out.println(JSONArray.fromObject(reqMap).toString());
-		return JSONArray.fromObject(reqMap).toString();
+		JSONArray.toJSONString(reqMap);
+		System.out.println(JSONArray.toJSONString(reqMap));
+		return JSONArray.toJSONString(reqMap);
 	}
 
 	// 取消拆分
@@ -4595,8 +4595,8 @@ public class WarehouseCtrl {
 		map.put("goodsid", goodsid);
 		List<Logisticsinfo> lgis = iWarehouseService
 				.getlogisticsidAndState(map);
-		System.out.println(JSONArray.fromObject(lgis).toString());
-		return JSONArray.fromObject(lgis).toString();
+		System.out.println(JSONArray.toJSONString(lgis));
+		return JSONArray.toJSONString(lgis);
 	}
 	/**
 	 * 采样订单整单退货
@@ -5042,7 +5042,7 @@ public class WarehouseCtrl {
 			}
 		}
 
-		return JSONArray.fromObject(list).toString();
+		return JSONArray.toJSONString(list);
 	}
 
 	// 多货源查询
@@ -5060,7 +5060,7 @@ public class WarehouseCtrl {
 		List<OrderReplenishmentPojo> list = iWarehouseService
 				.getIsReplenishment(map);
 
-		return JSONArray.fromObject(list).toString();
+		return JSONArray.toJSONString(list);
 	}
 
 	// 发送邮件
@@ -5554,7 +5554,7 @@ public class WarehouseCtrl {
 		List<Map<String, String>> retMap = iWarehouseService.getGoodsCar(map);
 		DataSourceSelector.restore();
 
-		return JSONArray.fromObject(retMap).toString();
+		return JSONArray.toJSONString(retMap);
 	}
 
 	// 获得原商品链接
@@ -5578,7 +5578,7 @@ public class WarehouseCtrl {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("shipmentno", shipmentno);
 		ShippingPackage shippingPackage =null;// iWarehouseService.getPackageInfo(map);
-		return JSONObject.fromObject(shippingPackage).toString();
+		return JSONObject.toJSONString(shippingPackage);
 	}
 
 	@RequestMapping(value = "/getPackageInfo")
@@ -5644,7 +5644,7 @@ public class WarehouseCtrl {
 							HttpServletResponse response) {
 		List<Tb1688Account> list = new ArrayList<Tb1688Account>();
 		list = iWarehouseService.getAllBuy();
-		return JSONArray.fromObject(list).toString();
+		return JSONArray.toJSONString(list);
 	}
 
 	// 获得采购订单信息
@@ -5684,7 +5684,7 @@ public class WarehouseCtrl {
 		for (int i = 0; i < orders.size(); i++) {
 			orders.get(i).setBuycount(acount);
 		}
-		return JSONArray.fromObject(orders).toString();
+		return JSONArray.toJSONString(orders);
 	}
 
 	// 获得库位信息
@@ -5698,7 +5698,7 @@ public class WarehouseCtrl {
 			map.put("orderid", orderid);
 			List<OrderDetailsBean> list = iWarehouseService
 					.getOrderDetailsInfo(map);
-			return JSONArray.fromObject(list).toString();
+			return JSONArray.toJSONString(list);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -6243,7 +6243,7 @@ public class WarehouseCtrl {
 		List<CustomsRegulationsPojo> list=new ArrayList<CustomsRegulationsPojo>();
 		CustomsRegulationsPojo c=iWarehouseService.getCustomsRegulationsPojo(orderid);
 		list.add(c);
-		return JSONArray.fromObject(list).toString();
+		return JSONArray.toJSONString(list);
 	}
 
 	public static String LOCALHOST; //本地服务器地址
@@ -6359,9 +6359,8 @@ public class WarehouseCtrl {
 			}
 			list.get(0).setCount(count);
 		}
-		JSONArray json = JSONArray.fromObject(list);
 		PrintWriter out = response.getWriter();
-		out.write(json.toString());
+		out.write(JSONArray.toJSONString(list));
 		out.close();
 	}
 
@@ -6376,9 +6375,8 @@ public class WarehouseCtrl {
 		mb.setEnd_time(end_time);
 		List<Mabangshipment> list = mabangshipmentService
 				.selectPurchaseCost(mb);
-		JSONArray json = JSONArray.fromObject(list);
 		PrintWriter out = response.getWriter();
-		out.write(json.toString());
+		out.write(JSONArray.toJSONString(list));
 		out.close();
 	}
 
@@ -6431,7 +6429,7 @@ public class WarehouseCtrl {
 		map.put("orderid", orderid);
 		List<ShippingPackage> list = iWarehouseService
 				.getShippingPackageById(map);
-		return JSONArray.fromObject(list).toString();
+		return JSONArray.toJSONString(list);
 	}
 
 	// 插入申报信息
@@ -6649,17 +6647,18 @@ public class WarehouseCtrl {
 						LOG.info("==============t2==================="+t2);
 						//调用CNE的API
 						String ret = jc.preInputSet(t2);
-						JSONObject json = JSONObject.fromObject(ret);
+						JSONObject json = JSONObject.parseObject(ret);
 						if(!json.toString().contains("请及时付款")){
-							List<Map<String, Object>> edit = (List<Map<String, Object>>) json.getJSONArray("ErrList");
-							int iID = (Integer) edit.get(0).get("iID");
+							JSONArray edit = json.getJSONArray("ErrList");
+							int iID = edit.getJSONObject(0).getInteger("iID");
 							if (iID == 0) {
-								LOG.info("【订单号:" + orderid+ "】 对接CNE获取运单号有误  -----"+ edit.get(0).get("cMess").toString());
+								LOG.info("【订单号:" + orderid+ "】 对接CNE获取运单号有误  -----"
+										+ edit.getJSONObject(0).getString("cMess"));
 								removeId.add(bgList.get(j).get("shipmentno"));
 								continue;
 							}
 							//CNE包裹号
-							String cNum = (String) edit.get(0).get("cNum");
+							String cNum = (String) edit.getJSONObject(0).getString("cNum");
 							expressNo = cNum;
 						}
 					}
@@ -7028,12 +7027,12 @@ public class WarehouseCtrl {
 			if (statusCode == HttpStatus.SC_OK){
 				String body = EntityUtils.toString(response.getEntity());
 				System.out.println("body=="+body);
-				JSONObject json = JSONObject.fromObject(body);
+				JSONObject json = JSONObject.parseObject(body);
 				String Success=json.getString("Success");
 				if(StringUtil.isNotBlank(Success) && "true".equals(Success)){
 					System.out.println("上传飞特订单接口成功");
 					String ErpSuccessOrders=json.getString("ErpSuccessOrders").replace("[","").replace("]","");
-					json = JSONObject.fromObject(ErpSuccessOrders);
+					json = JSONObject.parseObject(ErpSuccessOrders);
 					expressno=json.get("TraceId").toString();
 				}
 			}
@@ -7612,9 +7611,8 @@ public class WarehouseCtrl {
 						  HttpServletResponse response) throws ServletException, IOException,
 			NumberFormatException, InterruptedException, ExecutionException {
 		String listmap = request.getParameter("listmap");
-		JSONObject json = JSONObject.fromObject(listmap);
-		List<Map<String, String>> edit = (List<Map<String, String>>) json
-				.getJSONArray("listmap");
+		JSONObject json = JSONObject.parseObject(listmap);
+		JSONArray edit = json.getJSONArray("listmap");
 
 		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
 		ExecutorService exec = Executors.newCachedThreadPool();
@@ -7623,17 +7621,17 @@ public class WarehouseCtrl {
 
 		for (int i = 0; i < edit.size(); i++) {
 			try {
-				results.add(exec.submit(new AllcgqrQr(edit.get(i))));
+				results.add(exec.submit(new AllcgqrQr(JSONObject.parseObject(edit.getString(i),Map.class))));
 			} catch (Exception e) {
-				System.out.println("死锁：" + edit.get(i).get("goodsid"));
-				results.add(exec.submit(new AllcgqrQr(edit.get(i))));
+				System.out.println("死锁：" + edit.getJSONObject(i).getString("goodsid"));
+				results.add(exec.submit(new AllcgqrQr(JSONObject.parseObject(edit.getString(i),Map.class))));
 			}
 
 		}
 
 		for (int i = 0; i < results.size(); i++) {
 			Future<String> fs = results.get(i);
-			Map<String, String> map = edit.get(i);
+			Map<String, String> map = JSONObject.parseObject(edit.getString(i),Map.class);
 			// (Future<String> fs : results) {
 			String orderNo = (String) map.get("orderno");
 			String goodidd = (String) map.get("goodsid");
@@ -7649,13 +7647,13 @@ public class WarehouseCtrl {
 			} else {
 				System.out.println("错误：" + fs.get() + "----------"
 						+ (String) map.get("goodsid"));
-				exec.submit(new AllcgqrQr(edit.get(i)));
+				exec.submit(new AllcgqrQr(JSONObject.parseObject(edit.getString(i),Map.class)));
 			}
 		}
 		exec.shutdown();
 		PrintWriter out = response.getWriter();
 		//
-		out.print(JSONArray.fromObject(list).toString());
+		out.print(JSONArray.toJSONString(list));
 		out.flush();
 		out.close();
 	}
@@ -7704,9 +7702,8 @@ public class WarehouseCtrl {
 						  HttpServletResponse response) throws ServletException, IOException,
 			NumberFormatException, InterruptedException, ExecutionException {
 		String listmap = request.getParameter("listmap");
-		JSONObject json = JSONObject.fromObject(listmap);
-		List<Map<String, String>> edit = (List<Map<String, String>>) json
-				.getJSONArray("listmap");
+		JSONObject json = JSONObject.parseObject(listmap);
+		JSONArray edit = json.getJSONArray("listmap");
 
 		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
 		ExecutorService exec = Executors.newCachedThreadPool();
@@ -7715,15 +7712,15 @@ public class WarehouseCtrl {
 
 		for (int i = 0; i < edit.size(); i++) {
 			try {
-				results.add(exec.submit(new AllQxcgQr(edit.get(i))));
+				results.add(exec.submit(new AllQxcgQr(JSONObject.parseObject(edit.getString(i),Map.class))));
 			} catch (Exception e) {
-				results.add(exec.submit(new AllQxcgQr(edit.get(i))));
+				results.add(exec.submit(new AllQxcgQr(JSONObject.parseObject(edit.getString(i),Map.class))));
 			}
 		}
 
 		for (int i = 0; i < results.size(); i++) {
 			Future<String> fs = results.get(i);
-			Map<String, String> map = edit.get(i);
+			Map<String, String> map = JSONObject.parseObject(edit.getString(i),Map.class);
 			String orderNo = (String) map.get("orderno");
 			String goodidd = (String) map.get("goodsid");
 			int goodid = Integer.parseInt(goodidd);
@@ -7738,13 +7735,13 @@ public class WarehouseCtrl {
 			} else {
 				System.out.println("错误：" + fs.get() + "----------"
 						+ (String) map.get("goodsid"));
-				exec.submit(new AllQxcgQr(edit.get(i)));
+				exec.submit(new AllQxcgQr(JSONObject.parseObject(edit.getString(i),Map.class)));
 			}
 		}
 		exec.shutdown();
 		PrintWriter out = response.getWriter();
 		//
-		out.print(JSONArray.fromObject(list).toString());
+		out.print(JSONArray.toJSONString(list));
 		out.flush();
 		out.close();
 	}

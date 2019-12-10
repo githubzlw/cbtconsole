@@ -8,10 +8,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang.StringUtils;
 
 import okhttp3.*;
-import net.sf.json.JSONArray;
 
 /**
  * 图片分辨率压缩
@@ -48,7 +48,7 @@ public class ImageCompressionByNoteJs {
 			if(StringUtils.isBlank(resultStr) || "null".equals(resultStr)){
 				isSuccess = false;
 			}else{
-				jsAr = JSONArray.fromObject(resultStr);
+				jsAr = JSONArray.parseArray(resultStr);
 				if ("OK".equals(jsAr.getJSONObject(0).get("result"))) {
 					isSuccess = true;
 				} else {

@@ -1,5 +1,7 @@
 package com.importExpress.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.orderinfo.service.OrderinfoService;
 import com.cbt.service.CustomGoodsService;
@@ -19,9 +21,6 @@ import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.ShopCarMarketingService;
 import com.importExpress.service.TabCouponService;
 import com.importExpress.utli.*;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1806,9 +1805,9 @@ public class ShopCarMarketingController {
             List<GoodsCarActiveSimplBean> listActive;
 
             if ("2".equals(websiteType)) {
-                listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getKidscarconfig()), GoodsCarActiveSimplBean.class);
+                listActive = (List<GoodsCarActiveSimplBean>) JSONArray.parseArray(carconfigWithBLOBs.getKidscarconfig(), GoodsCarActiveSimplBean.class);
             } else {
-                listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
+                listActive = (List<GoodsCarActiveSimplBean>) JSONArray.parseArray(carconfigWithBLOBs.getBuyformecarconfig(), GoodsCarActiveSimplBean.class);
             }
             List<GoodsCarActiveSimplBean> activeList = new ArrayList<>();
             System.err.println("shopMarketing userId:" + userId + ",websiteType:" + websiteType);

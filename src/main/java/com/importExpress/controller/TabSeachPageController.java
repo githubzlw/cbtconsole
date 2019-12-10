@@ -1,5 +1,7 @@
 package com.importExpress.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.jcys.util.HttpUtil;
 import com.cbt.pojo.Admuser;
@@ -12,8 +14,6 @@ import com.importExpress.pojo.TabSeachPageBean;
 import com.importExpress.pojo.TabSeachPagesDetailBean;
 import com.importExpress.service.TabSeachPageService;
 import com.importExpress.utli.*;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.io.IOUtils;
@@ -156,8 +156,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -217,8 +216,7 @@ public class TabSeachPageController {
 			e.printStackTrace();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -250,8 +248,7 @@ public class TabSeachPageController {
 			e.printStackTrace();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -275,8 +272,7 @@ public class TabSeachPageController {
 			e.printStackTrace();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 	}
 
 	/**
@@ -324,8 +320,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(bean);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(bean));
 		out.close();
 	}
 
@@ -397,8 +392,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -608,8 +602,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -641,9 +634,8 @@ public class TabSeachPageController {
 		}finally {
 			DataSourceSelector.restore();
 		}
-		JSONArray jsonarr = JSONArray.fromObject(list);
 		PrintWriter out = response.getWriter();
-		out.print(jsonarr);
+		out.print(JSONArray.toJSON(list));
 		out.close();
 	}
 
@@ -674,8 +666,7 @@ public class TabSeachPageController {
 			e.printStackTrace();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 	/**
@@ -705,8 +696,7 @@ public class TabSeachPageController {
 			e.printStackTrace();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -735,8 +725,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(bean);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(bean));
 		out.close();
 	}
 
@@ -758,8 +747,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(bean);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(bean));
 		out.close();
 	}
 
@@ -860,8 +848,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 	
@@ -1038,8 +1025,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -1083,8 +1069,7 @@ public class TabSeachPageController {
 		}
 
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 	
@@ -1141,8 +1126,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -1175,8 +1159,7 @@ public class TabSeachPageController {
 	        DataSourceSelector.restore();
         }
         PrintWriter out = response.getWriter();
-        JSONObject jsonob = JSONObject.fromObject(result);
-        out.print(jsonob);
+        out.print(JSONObject.toJSON(result));
         out.close();
     }
 
@@ -1226,8 +1209,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -1293,7 +1275,7 @@ public class TabSeachPageController {
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		if (StringUtil.isNotBlank(text)) {
-			JSONArray jsonarr = JSONArray.fromObject(text);
+			JSONArray jsonarr = JSONArray.parseArray(text);
 			for (int i = 0; i < jsonarr.size(); i++) {
 				Map<String, Object> map = new HashMap<String, Object>();
 				JSONObject jsonob = jsonarr.getJSONObject(i);
