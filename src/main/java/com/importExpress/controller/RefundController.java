@@ -451,7 +451,7 @@ public class RefundController {
 
         JsonResult json = new JsonResult();
         try {
-            json = ppApiService.reFundNew(detailsBean.getOrderNo(), decimalFormat.format(detailsBean.getRefundAmount()));
+            json = ppApiService.refundByMq(detailsBean.getOrderNo(), decimalFormat.format(detailsBean.getRefundAmount()));
             if (json.isOk()) {
                 //如果是PayPal申请退款，则自动添加一条余额补偿记录(非余额补偿)
                 if (type == 1) {

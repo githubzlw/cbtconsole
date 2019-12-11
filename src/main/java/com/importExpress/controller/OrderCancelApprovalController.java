@@ -443,9 +443,9 @@ public class OrderCancelApprovalController {
                     // 优先PayPal TT stripe支付值退款
                     if (orderPay > 0) {
                         if (orderPay - approvalBean.getAgreeAmount() >= -0.01) {
-                            json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(approvalBean.getAgreeAmount()));
+                            json = ppApiService.refundByMq(refundOrderNo, decimalFormat.format(approvalBean.getAgreeAmount()));
                         } else {
-                            json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(orderPay));
+                            json = ppApiService.refundByMq(refundOrderNo, decimalFormat.format(orderPay));
                             approvalBean.setRemainAmount(approvalBean.getAgreeAmount() - orderPay);
                         }
                     } else {
