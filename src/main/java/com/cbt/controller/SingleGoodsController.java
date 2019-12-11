@@ -1,5 +1,6 @@
 package com.cbt.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.bean.*;
 import com.cbt.customer.service.IShopUrlService;
 import com.cbt.pojo.Admuser;
@@ -8,15 +9,11 @@ import com.cbt.service.SingleGoodsService;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.util.StringUtil;
-import com.cbt.website.bean.ConfirmUserInfo;
-import com.cbt.website.dao.UserDao;
-import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.KjPidBean;
 import com.importExpress.utli.EasyUiTreeUtils;
 import com.importExpress.utli.UserInfoUtils;
-import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -932,9 +929,7 @@ public class SingleGoodsController {
         }
         String shopId = request.getParameter("shopId");
         try {
-
-            JSONArray jsonArray = JSONArray.fromObject(pidList);// 把String转换为json
-            List<KjPidBean> goodsInfos = (List<KjPidBean>) JSONArray.toCollection(jsonArray,KjPidBean.class);
+            List<KjPidBean> goodsInfos = JSONArray.parseArray(pidList, KjPidBean.class);
 
             for (KjPidBean pidBean : goodsInfos) {
                 String imgUrl = pidBean.getImgUrl();

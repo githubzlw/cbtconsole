@@ -15,15 +15,15 @@ public enum WebSiteEnum {
     /**
      * PETS网站
      */
-    PETS(3,"https://www.petstoreinc.com"),
+    PETS(3,"https://www.petstoreinc.com");
     /**
      * RESTAURANT网站
      */
-    RESTAURANT(4,"https://www.restaurantkitchenequipments.com"),
+    // RESTAURANT(4,"https://www.restaurantkitchenequipments.com"),
     /**
      * MEDICAL网站
      */
-    MEDICAL(5,"https://www.medicalequipments.com");
+    // MEDICAL(5,"https://www.medicalequipments.com");
 
 
     /**

@@ -85,8 +85,7 @@
                 type: 'POST',
                 url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
                 data: {},
-                success: function (data) {
-                    var json = eval("(" + data + ")");
+                success: function (json) {
                     if (json.ok) {
 
                         var data = json.data;

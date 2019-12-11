@@ -1,5 +1,7 @@
 package com.importExpress.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.jcys.util.HttpUtil;
 import com.cbt.pojo.Admuser;
@@ -12,8 +14,6 @@ import com.importExpress.pojo.TabSeachPageBean;
 import com.importExpress.pojo.TabSeachPagesDetailBean;
 import com.importExpress.service.TabSeachPageService;
 import com.importExpress.utli.*;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.io.IOUtils;
@@ -72,12 +72,16 @@ public class TabSeachPageController {
 	private static String cbtstaticizePath = SysParamUtil.getParam("cbtstaticize");
 
 	@RequestMapping("getAllCat")
-	public @ResponseBody
-    List<TabSeachPageBean> getAllCat() {
+	@ResponseBody
+	public List<TabSeachPageBean> getAllCat(Integer webSite) {
+		if(webSite == null || webSite < 1){
+			webSite = 1;
+		}
 		List<TabSeachPageBean> list=new ArrayList<TabSeachPageBean>();
 		try{
 			DataSourceSelector.set("dataSource127hop");
-			list = tabSeachPageService.list(0);
+			list = tabSeachPageService.list(0, webSite);
+			DataSourceSelector.restore();
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {
@@ -152,8 +156,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -170,10 +173,13 @@ public class TabSeachPageController {
 		if (org.apache.commons.lang.StringUtils.isBlank(pid)) {
 			pid = "0";
 		}
+		String webSiteStr = request.getParameter("webSite");
+		int webSite = Integer.parseInt(webSiteStr);
+
 		String jsontree="";
 		try{
 			DataSourceSelector.set("dataSource127hop");
-			List<TabSeachPageBean> li = this.tabSeachPageService.list(Integer.parseInt(pid));
+			List<TabSeachPageBean> li = this.tabSeachPageService.list(Integer.parseInt(pid), webSite);
 			jsontree = JsonTreeUtils.jsonTree(li);
 			if (StringUtils.isNotBlank(jsontree)) {  // 解决乱码
                 response.setCharacterEncoding("utf-8");
@@ -187,6 +193,33 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 	}
+
+
+	@RequestMapping("/setWebSite")
+	public void setWebSite(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		response.setContentType("text/json;charset=utf-8");
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		String id = request.getParameter("id");
+		String website = request.getParameter("website");
+		String result = null;
+		int res = 1;
+		try {
+
+			SendMQ.sendMsg(new RunSqlModel("update tab_seach_pages set web_site="+website +" where id=" + id + ""));
+
+			if (res > 0) {
+				result = "{\"status\":true,\"message\":\"设置成功！\"}";
+			} else {
+				result = "{\"status\":false,\"message\":\"设置失败！\"}";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		PrintWriter out = response.getWriter();
+		out.print(JSONObject.toJSON(result));
+		out.close();
+	}
+
 
 	/**
 	 * 删除关键词
@@ -215,8 +248,7 @@ public class TabSeachPageController {
 			e.printStackTrace();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -240,8 +272,7 @@ public class TabSeachPageController {
 			e.printStackTrace();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 	}
 
 	/**
@@ -261,10 +292,23 @@ public class TabSeachPageController {
 			String id = request.getParameter("id");
 			if(org.apache.commons.lang3.StringUtils.isNotBlank(id)){
 				bean = tabSeachPageService.get(Integer.parseInt(id));
-				bean.setImportPath(SearchFileUtils.importexpressPath);
+				switch (bean.getWebSite()) {
+					case 1:
+						bean.setImportPath(SearchFileUtils.importexpressPath);
+						break;
+					case 2:
+						bean.setImportPath(SearchFileUtils.kidsPath);
+						break;
+					case 3:
+						bean.setImportPath(SearchFileUtils.petsPath);
+						break;
+					default:
+						bean.setImportPath(SearchFileUtils.importexpressPath);
+				}
+
 
 				if (StringUtil.isNotBlank(bean.getFilename())) {
-					bean.setFilename(SearchFileUtils.importexpressPath + bean.getFilename());
+					bean.setFilename(bean.getImportPath() + bean.getFilename());
 				}
 				if (StringUtil.isNotBlank(bean.getPageBannerName())){
 					bean.setPageBannerName(SearchFileUtils.IMAGEHOSTURL + bean.getPageBannerName());
@@ -276,8 +320,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(bean);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(bean));
 		out.close();
 	}
 
@@ -349,8 +392,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -560,8 +602,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -593,9 +634,8 @@ public class TabSeachPageController {
 		}finally {
 			DataSourceSelector.restore();
 		}
-		JSONArray jsonarr = JSONArray.fromObject(list);
 		PrintWriter out = response.getWriter();
-		out.print(jsonarr);
+		out.print(JSONArray.toJSON(list));
 		out.close();
 	}
 
@@ -626,8 +666,7 @@ public class TabSeachPageController {
 			e.printStackTrace();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 	/**
@@ -657,8 +696,7 @@ public class TabSeachPageController {
 			e.printStackTrace();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -687,8 +725,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(bean);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(bean));
 		out.close();
 	}
 
@@ -710,8 +747,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(bean);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(bean));
 		out.close();
 	}
 
@@ -812,8 +848,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 	
@@ -990,8 +1025,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -1008,6 +1042,7 @@ public class TabSeachPageController {
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		String sid = request.getParameter("sid");
 		String keyword = request.getParameter("keyword");
+		String webSite = request.getParameter("webSite");
 		String result ="";
 		try{
 			DataSourceSelector.set("dataSource127hop");
@@ -1016,7 +1051,10 @@ public class TabSeachPageController {
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("sid", sid));
 				params.add(new BasicNameValuePair("keyword", keyword));
-				result = getContentClientPost(cbtstaticizePath + "/tabseachpage/staticize.do", params);
+				params.add(new BasicNameValuePair("webSite", webSite));
+				// String url = "http://192.168.1.65:8383/CbtStaticize/tabseachpage/staticize.do";
+				String url = cbtstaticizePath + "/tabseachpage/staticize.do";
+				result = getContentClientPost(url, params);
 			} else {
 				result = "{\"status\":false,\"message\":\"主关键词没有对应的类别！请添加下面的类别\"}";
 			}
@@ -1031,8 +1069,7 @@ public class TabSeachPageController {
 		}
 
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 	
@@ -1059,16 +1096,26 @@ public class TabSeachPageController {
 
 			DataSourceSelector.set("dataSource127hop");
 			list = tabSeachPageService.queryStaticizeAll();
+			DataSourceSelector.restore();
 			if (list == null || list.size() == 0) {
 				result = "{\"status\":false,\"message\":\"未找到启动的关键词!\"}";
+				return;
 			}
+			int total = 0;
 			for (TabSeachPageBean bean : list) {
-				List<NameValuePair> params = new ArrayList<NameValuePair>();
-				params.add(new BasicNameValuePair("sid", bean.getId() + ""));
-				params.add(new BasicNameValuePair("keyword", bean.getKeyword()));
-				result = getContentClientPost(cbtstaticizePath + "/tabseachpage/staticize.do", params, "\"status\":true", 3);
+				if (bean.getWebSite() > 0) {
+					total ++;
+					List<NameValuePair> params = new ArrayList<NameValuePair>();
+					params.add(new BasicNameValuePair("sid", bean.getId() + ""));
+					params.add(new BasicNameValuePair("keyword", bean.getKeyword()));
+					params.add(new BasicNameValuePair("webSite", String.valueOf(bean.getWebSite())));
+					// String url = "http://192.168.1.65:8383/CbtStaticize/tabseachpage/staticize.do";
+					String url = cbtstaticizePath + "/tabseachpage/staticize.do";
+					result = getContentClientPost(url, params, "\"status\":true", 3);
+				}
 			}
-			result = "{\"status\":true,\"message\":\"静态页全部生成完毕, 总数量:" + list.size() + "\"}";
+			list.clear();
+			result = "{\"status\":true,\"message\":\"静态页全部生成完毕, 总数量:" + total + "\"}";
 
 			if (StringUtil.isBlank(result)) {
 				result = "{\"status\":false,\"message\":\"静态化页面生成失败\"}";
@@ -1079,8 +1126,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -1113,8 +1159,7 @@ public class TabSeachPageController {
 	        DataSourceSelector.restore();
         }
         PrintWriter out = response.getWriter();
-        JSONObject jsonob = JSONObject.fromObject(result);
-        out.print(jsonob);
+        out.print(JSONObject.toJSON(result));
         out.close();
     }
 
@@ -1164,8 +1209,7 @@ public class TabSeachPageController {
 			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
+		out.print(JSONObject.toJSON(result));
 		out.close();
 	}
 
@@ -1231,7 +1275,7 @@ public class TabSeachPageController {
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		if (StringUtil.isNotBlank(text)) {
-			JSONArray jsonarr = JSONArray.fromObject(text);
+			JSONArray jsonarr = JSONArray.parseArray(text);
 			for (int i = 0; i < jsonarr.size(); i++) {
 				Map<String, Object> map = new HashMap<String, Object>();
 				JSONObject jsonob = jsonarr.getJSONObject(i);

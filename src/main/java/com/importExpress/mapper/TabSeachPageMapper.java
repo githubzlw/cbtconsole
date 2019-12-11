@@ -11,7 +11,7 @@ import java.util.Map;
 public interface TabSeachPageMapper {
 	public int insert(TabSeachPageBean bean);
 	
-	public List<TabSeachPageBean> list(@Param("id") int id);
+	public List<TabSeachPageBean> list(@Param("id") int id, @Param("webSite") int webSite);
 
 	public int delete(@Param("id") Integer id);
 

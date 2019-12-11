@@ -1,6 +1,6 @@
 package com.cbt.report.ctrl;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.bean.*;
@@ -32,7 +32,6 @@ import com.importExpress.pojo.AliBillingDetails;
 import com.importExpress.pojo.AliPayInfo;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import net.sf.json.JSONArray;
 import org.apache.ibatis.annotations.Param;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +88,7 @@ public class StatisticalReportController {
      *
      * @param request
      * @param response
-     * @return com.alibaba.fastjson.JSONArray
+     * @return JSONArray
      * @throws ServletException
      * @throws IOException
      * @throws ParseException
@@ -98,7 +97,7 @@ public class StatisticalReportController {
      */
     @RequestMapping(value = "/getHavebarcode", method = RequestMethod.GET)
     @ResponseBody
-    protected com.alibaba.fastjson.JSONArray getHavebarcode(HttpServletRequest request, HttpServletResponse response)
+    protected JSONArray getHavebarcode(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ParseException {
         List<Inventory> list = new ArrayList<Inventory>();
         Inventory i = new Inventory();
@@ -109,13 +108,13 @@ public class StatisticalReportController {
         for (Inventory inventory : list1) {
             list.add(inventory);
         }
-        com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(list));
+        JSONArray jsonArr = JSONArray.parseArray(JSONArray.toJSONString(list));
         return jsonArr;
     }
 
     @RequestMapping(value = "/getAllUser", method = RequestMethod.GET)
     @ResponseBody
-    protected com.alibaba.fastjson.JSONArray getAllUser(HttpServletRequest request, HttpServletResponse response)
+    protected JSONArray getAllUser(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ParseException {
         List<Inventory> list = new ArrayList<Inventory>();
         Inventory i = new Inventory();
@@ -125,7 +124,7 @@ public class StatisticalReportController {
         for (Inventory inventory : list1) {
             list.add(inventory);
         }
-        com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(list));
+        JSONArray jsonArr = JSONArray.parseArray(JSONArray.toJSONString(list));
         return jsonArr;
     }
 
@@ -1103,9 +1102,9 @@ public class StatisticalReportController {
                 request.setAttribute("orderids", bf.toString());
             }
             List<TaoBaoOrderInfo> buyCount = taoBaoOrderService.queryBuyCount(orderid, orders);
-            request.setAttribute("buyCount", JSONArray.fromObject(buyCount));
+            request.setAttribute("buyCount", JSONArray.toJSON(buyCount));
             request.setAttribute("totalqty", totalqty);
-            request.setAttribute("list", JSONArray.fromObject(list));
+            request.setAttribute("list", JSONArray.toJSON(list));
         }
 
         return "taobaoOrderDetailsReport";
@@ -1502,10 +1501,10 @@ public class StatisticalReportController {
      */
     @RequestMapping(value = "/getAllBuyer", method = RequestMethod.GET)
     @ResponseBody
-    protected com.alibaba.fastjson.JSONArray getAllBuyer(HttpServletRequest request, HttpServletResponse response)
+    protected JSONArray getAllBuyer(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ParseException {
         List<Tb1688Account> adm_list = iWarehouseService.getAllBuy();
-        com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(adm_list));
+        JSONArray jsonArr = JSONArray.parseArray(JSONArray.toJSONString(adm_list));
         return jsonArr;
     }
 
@@ -1519,10 +1518,10 @@ public class StatisticalReportController {
      */
     @RequestMapping(value = "/getAllAdm", method = RequestMethod.GET)
     @ResponseBody
-    protected com.alibaba.fastjson.JSONArray getAllAdm(HttpServletRequest request, HttpServletResponse response)
+    protected JSONArray getAllAdm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ParseException {
         List<com.cbt.pojo.Admuser> adm_list = taoBaoOrderService.getAllBuyer();
-        com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(adm_list));
+        JSONArray jsonArr = JSONArray.parseArray(JSONArray.toJSONString(adm_list));
         return jsonArr;
     }
 
@@ -1536,7 +1535,7 @@ public class StatisticalReportController {
      */
     @RequestMapping(value = "/getNewBarcode", method = RequestMethod.GET)
     @ResponseBody
-    protected com.alibaba.fastjson.JSONArray getNewBarcode(HttpServletRequest request, HttpServletResponse response)
+    protected JSONArray getNewBarcode(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ParseException {
         List<String> list = taoBaoOrderService.getNewBarcode();
         List<AliCategory> barcode_list = new ArrayList<AliCategory>();
@@ -1546,7 +1545,7 @@ public class StatisticalReportController {
             a.setPath(string);
             barcode_list.add(a);
         }
-        com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(barcode_list));
+        JSONArray jsonArr = JSONArray.parseArray(JSONArray.toJSONString(barcode_list));
         return jsonArr;
     }
 
@@ -3841,7 +3840,7 @@ public class StatisticalReportController {
 
     @RequestMapping(value = "/getAllInventory", method = RequestMethod.GET)
     @ResponseBody
-    protected com.alibaba.fastjson.JSONArray getAllInventory(HttpServletRequest request, HttpServletResponse response)
+    protected JSONArray getAllInventory(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ParseException {
         List<InventoryData> list = taoBaoOrderService.getAllInventory();
         InventoryData i = new InventoryData();
@@ -3852,7 +3851,7 @@ public class StatisticalReportController {
         ii.setGoodsCatid("-1");
         ii.setCategoryName("Other");
         list.add(list.size(), ii);
-        com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(list));
+        JSONArray jsonArr = JSONArray.parseArray(JSONArray.toJSONString(list));
         return jsonArr;
     }
 
@@ -4041,7 +4040,7 @@ public class StatisticalReportController {
         map.put("count", count);
         map.put("page", page);
         PrintWriter out = response.getWriter();
-        out.print(JSONArray.fromObject(map));
+        out.print(JSONArray.toJSON(map));
         out.flush();
         out.close();
     }

@@ -113,9 +113,38 @@ public class Address {
 	}
 	@Override
 	public String toString() {
-		return String
-				.format("{\"id\":\"%s\", \"userid\":\"%s\", \"recipients\":\"%s\", \"address\":\"%s\",\"street\":\"%s\", \"country\":\"%s\", \"phone_number\":\"%s\", \"zip_code\":\"%s\", \"countryname\":\"%s\", \"address2\":\"%s\", \"statename\":\"%s\"}",
-						id, userid, recipients, address, street, country, phone_number,
-						zip_code, countryname, address2, statename);
+		final StringBuilder sb = new StringBuilder("{");
+		sb.append("\"id\":")
+				.append(id);
+		sb.append(",\"userid\":")
+				.append(userid);
+		sb.append(",\"recipients\":\"")
+				.append(recipients).append('\"');
+		sb.append(",\"address\":\"")
+				.append(address).append('\"');
+		sb.append(",\"country\":\"")
+				.append(country).append('\"');
+		sb.append(",\"phone_number\":\"")
+				.append(phone_number).append('\"');
+		sb.append(",\"zip_code\":\"")
+				.append(zip_code).append('\"');
+		sb.append(",\"countryname\":\"")
+				.append(countryname).append('\"');
+		sb.append(",\"address2\":\"")
+				.append(address2).append('\"');
+		sb.append(",\"statename\":\"")
+				.append(statename).append('\"');
+		sb.append(",\"createtime\":\"")
+				.append(createtime).append('\"');
+		sb.append(",\"modifytime\":\"")
+				.append(modifytime).append('\"');
+		sb.append(",\"defaultaddress\":")
+				.append(defaultaddress);
+		sb.append(",\"delflag\":\"")
+				.append(delflag).append('\"');
+		sb.append(",\"street\":\"")
+				.append(street).append('\"');
+		sb.append('}');
+		return sb.toString();
 	}
 }

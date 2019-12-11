@@ -38,7 +38,7 @@ public class ShopCarUserStatistic {
     /**
      * 网站类型
      */
-    private int site;
+    private int site = -1;
 
     public int getSite() {
         return site;

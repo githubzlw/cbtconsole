@@ -11,7 +11,7 @@ public interface TabSeachPageService {
 	
 	public int insert(TabSeachPageBean bean);
 	
-	public List<TabSeachPageBean> list(int i);
+	public List<TabSeachPageBean> list(int i, int webSite);
 	
 	public int delete(Integer id);
 	
