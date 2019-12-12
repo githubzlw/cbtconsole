@@ -26,7 +26,7 @@ public class UserMessageUtil {
      * @param type
      * @return
      */
-    public boolean sendMessage(int userId, String orderNo, int type, String content, String jumpUrl) {
+    public boolean sendMessage(int userId, String orderNo, int type, String content, String jumpUrl,String question,String answer) {
 
         if (userId == 0 && StringUtils.isBlank(orderNo)) {
             return false;
@@ -43,6 +43,8 @@ public class UserMessageUtil {
             }
         }
         userMessage.setJumpUrl(jumpUrl);
+        userMessage.setQuestion(question);
+        userMessage.setAnswer(answer);
         paraseType(userMessage);
 
         sendByMq(userMessage);
@@ -101,12 +103,26 @@ public class UserMessageUtil {
         } else {
             jumpUrl = "";
         }
-        StringBuffer sb = new StringBuffer("insert into user_message(user_id,order_no,content,type,jump_url) values(");
+        String question ;
+        if (StringUtils.isNotBlank(userMessage.getQuestion())) {
+            question = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(userMessage.getQuestion());
+        } else {
+            question = "";
+        }
+        String answer ;
+        if (StringUtils.isNotBlank(userMessage.getAnswer())) {
+            answer = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(userMessage.getAnswer());
+        } else {
+            answer = "";
+        }
+        StringBuffer sb = new StringBuffer("insert into user_message(user_id,order_no,content,type,jump_url,question,answer) values(");
         sb.append(userMessage.getUserId() + ",")
                 .append("\'" + userMessage.getOrderNo() + "\',")
                 .append("\'" + content + "\',")
                 .append(+userMessage.getType() + ",")
-                .append("\'" + jumpUrl + "\')");
+                .append("\'" + jumpUrl + "\')")
+                .append("\'" + question + "\')")
+                .append("\'" + answer + "\')");
         NotifyToCustomerUtil.sendSqlByMq(sb.toString());
     }
 }

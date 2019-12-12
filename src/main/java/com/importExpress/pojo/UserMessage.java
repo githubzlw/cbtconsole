@@ -23,5 +23,7 @@ public class UserMessage {
 
     private int startNum;
     private int limitNum;
+    private String question;
+    private String answer;
 
 }

@@ -313,7 +313,8 @@ public class QueAnsController {
 //		}
 
 		// 发送消息给客户
-		userMessageUtil.sendMessage(Integer.parseInt(userId), pid, 2, q.getQuestion_content(), url);
+		userMessageUtil.sendMessage(Integer.parseInt(userId), pid, 2, q.getQuestion_content(), purl,
+				q.getQuestion_content(), replyContent);
 		return updateReplyContent;
 	}
 	@RequestMapping("/remark")

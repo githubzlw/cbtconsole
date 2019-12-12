@@ -86,7 +86,7 @@
     <select id="queryUserMessageForList" parameterType="com.importExpress.pojo.UserMessage"
             resultType="com.importExpress.pojo.UserMessage">
         select id,user_id as userId,order_no as orderNo,content,type,jump_url as jumpUrl,
-        ready_state as readyState,del_state as delState,
+        ready_state as readyState,del_state as delState,question,answer,
         DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as createTime,
         DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as updateTime
         from user_message where 1=1
@@ -125,8 +125,8 @@
 
 
     <insert id="insertIntoUserMessage" parameterType="com.importExpress.pojo.UserMessage">
-        insert into user_message(user_id,order_no,content,type,jump_url)
-        values(#{userId},#{orderNo},#{content},#{type},#{jumpUrl})
+        insert into user_message(user_id,order_no,content,type,jump_url,question,answer)
+        values(#{userId},#{orderNo},#{content},#{type},#{jumpUrl},#{question},#{answer})
     </insert>
 
 </mapper>

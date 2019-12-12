@@ -106,7 +106,8 @@ public class ProblemFeedBackController {
 					// sendMailFactory.sendMail(String.valueOf(modelM.get("first_name")), null, "Shopping Question Reply", modelM, TemplateType.SHOPPING_REPLY);
 
 					// 发送消息给客户
-					userMessageUtil.sendMessage(Integer.parseInt(userIdStr), report_id, 1, list.get(0).getQustion(), jumpUrl);
+					userMessageUtil.sendMessage(Integer.parseInt(userIdStr), report_id, 1, list.get(0).getQustion(),
+							jumpUrl, list.get(0).getQustion(), text);
 
 					json.setOk(true);
 				}else{
