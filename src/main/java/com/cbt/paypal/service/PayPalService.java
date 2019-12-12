@@ -107,4 +107,12 @@ public interface PayPalService {
      * @return
      */
     JsonResult refundByPayNo(String payNo, String payType, String refundAmount, String remark, int adminId);
+
+    /**
+     * 调用线上MQ接口进行退款
+     * @param orderNo
+     * @param amountMoney
+     * @return
+     */
+    JsonResult refundByMq(String orderNo, String amountMoney);
 }

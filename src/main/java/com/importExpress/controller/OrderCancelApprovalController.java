@@ -267,13 +267,17 @@ public class OrderCancelApprovalController {
                     json.setOk(false);
                     json.setMessage("获取退款金额失败,请重试");
                     return json;
+                } else if (Double.parseDouble(refundAmountStr) > 300) {
+                    json.setOk(false);
+                    json.setMessage("该退款金额超过300，请转账");
+                    return json;
                 } else {
-                    refundAmount = Double.valueOf(refundAmountStr);
+                    refundAmount = Double.parseDouble(refundAmountStr);
                 }
             }
 
             String refundMethodStr = request.getParameter("refundMethod");
-            if (StringUtils.isBlank(refundMethodStr) || Integer.valueOf(refundMethodStr) == 0) {
+            if (StringUtils.isBlank(refundMethodStr) || Integer.parseInt(refundMethodStr) == 0) {
                 json.setOk(false);
                 json.setMessage("获取退款方式失败,请重试");
                 return json;
@@ -429,6 +433,12 @@ public class OrderCancelApprovalController {
             }
             list.clear();
 
+            if(orderPay > 300){
+                json.setOk(false);
+                json.setMessage("该订单总支付金额:" + orderPay + "超过300，请转账");
+                return json;
+            }
+
             OrderCancelApproval approvalOld = approvalService.queryForSingle(approvalBean.getId());
             if (approvalBean.getRefundMethod() == 1) {
                 // PayPal或者Stripe退款
@@ -443,9 +453,9 @@ public class OrderCancelApprovalController {
                     // 优先PayPal TT stripe支付值退款
                     if (orderPay > 0) {
                         if (orderPay - approvalBean.getAgreeAmount() >= -0.01) {
-                            json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(approvalBean.getAgreeAmount()));
+                            json = ppApiService.refundByMq(refundOrderNo, decimalFormat.format(approvalBean.getAgreeAmount()));
                         } else {
-                            json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(orderPay));
+                            json = ppApiService.refundByMq(refundOrderNo, decimalFormat.format(orderPay));
                             approvalBean.setRemainAmount(approvalBean.getAgreeAmount() - orderPay);
                         }
                     } else {

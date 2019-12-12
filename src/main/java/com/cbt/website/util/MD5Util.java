@@ -1,11 +1,14 @@
 package com.cbt.website.util;
 
+import org.apache.commons.codec.binary.Hex;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 public class MD5Util {  
     /** 
@@ -68,7 +71,47 @@ public class MD5Util {
         char c1 = hexDigits[bt & 0xf];// 取字节中低 4 位的数字转换   
         stringbuffer.append(c0);  
         stringbuffer.append(c1);  
-    }  
+    }
+
+    /**
+     * 加盐MD5
+     * @param password
+     * @return
+     */
+    public static String generate(String password) {
+        Random r = new Random();
+        StringBuilder sb = new StringBuilder(16);
+        sb.append(r.nextInt(99999999)).append(r.nextInt(99999999));
+        int len = sb.length();
+        if (len < 16) {
+            for (int i = 0; i < 16 - len; i++) {
+                sb.append("0");
+            }
+        }
+        String salt = sb.toString();
+        password = md5Hex(password + salt);
+        char[] cs = new char[48];
+        for (int i = 0; i < 48; i += 3) {
+            cs[i] = password.charAt(i / 3 * 2);
+            char c = salt.charAt(i / 3);
+            cs[i + 1] = c;
+            cs[i + 2] = password.charAt(i / 3 * 2 + 1);
+        }
+        return new String(cs);
+    }
+
+    /**
+     * 获取十六进制字符串形式的MD5摘要
+     */
+    private static String md5Hex(String src) {
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            byte[] bs = md5.digest(src.getBytes());
+            return new String(new Hex().encode(bs));
+        } catch (Exception e) {
+            return null;
+        }
+    }
       
     public static void main(String[] args) throws IOException {  
         long begin = System.currentTimeMillis();  
