@@ -1,5 +1,6 @@
 package com.importExpress.mapper;
 
+import com.importExpress.pojo.UserMessage;
 import com.importExpress.pojo.UserOtherInfoBean;
 
 import java.util.List;
@@ -37,6 +38,27 @@ public interface UserOtherInfoMapper {
      * @return
      */
     int insertFollowInfoByAdminId(UserOtherInfoBean userOtherInfo);
+
+    /**
+     * 查询客户消息
+     * @param userMessage
+     * @return
+     */
+    List<UserMessage> queryUserMessageForList(UserMessage userMessage);
+
+    /**
+     * 查询客户消息总数
+     * @param userMessage
+     * @return
+     */
+    int queryUserMessageForListCount(UserMessage userMessage);
+
+    /**
+     * 插入客户消息
+     * @param userMessage
+     * @return
+     */
+    int insertIntoUserMessage(UserMessage userMessage);
 
 
 }

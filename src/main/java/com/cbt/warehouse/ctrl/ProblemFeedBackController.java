@@ -14,6 +14,9 @@ import com.cbt.website.util.JsonResult;
 
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.UserMessage;
+import com.importExpress.service.UserOtherInfoService;
+import com.importExpress.utli.UserMessageUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.apache.poi.hssf.usermodel.*;
@@ -44,6 +47,10 @@ public class ProblemFeedBackController {
 	private ProblemFeedBackService problemFeedBackService;
 	@Autowired
 	private SendMailFactory sendMailFactory;
+
+	@Autowired
+	private UserMessageUtil userMessageUtil;
+
 	
 	/**
 	 * 客户返回页面回复客户反馈内容并发送邮件给客户
@@ -62,8 +69,11 @@ public class ProblemFeedBackController {
 		try{
 			String report_id=request.getParameter("report_id");
 			String text=request.getParameter("text");
+			String userIdStr=request.getParameter("userId");
             Integer websiteType = StringUtils.isStrNull(request.getParameter("websiteType"))?1:Integer.parseInt(request.getParameter("websiteType"));
-            if(StringUtils.isStrNull(report_id)){
+            if(StringUtils.isStrNull(report_id) || StringUtils.isStrNull(userIdStr)){
+            	json.setOk(false);
+            	json.setMessage("参数异常");
 				return json;
 			}
 			//发送邮件给客户
@@ -83,14 +93,21 @@ public class ProblemFeedBackController {
 					modelM.put("createtime",list.get(0).getCreatetime());
 					modelM.put("reply_content",text);
 					modelM.put("websiteType", websiteType);
+					String jumpUrl = "";
 					if (websiteType == 1) {
-                        modelM.put("toHref", "https://www.import-express.com/Goods/getShopCar");
+						jumpUrl = "https://www.import-express.com/Goods/getShopCar";
+
                     } else if (websiteType == 2){
-                        modelM.put("toHref", "https://www.kidsproductwholesale.com/Goods/getShopCar");
+                        jumpUrl = "https://www.kidsproductwholesale.com/Goods/getShopCar";
                     } else if (websiteType == 3){
-                        modelM.put("toHref", "https://www.petstoreinc.com/Goods/getShopCar");
+                        jumpUrl = "https://www.petstoreinc.com/Goods/getShopCar";
                     }
-					sendMailFactory.sendMail(String.valueOf(modelM.get("first_name")), null, "Shopping Question Reply", modelM, TemplateType.SHOPPING_REPLY);
+					modelM.put("toHref", jumpUrl);
+					// sendMailFactory.sendMail(String.valueOf(modelM.get("first_name")), null, "Shopping Question Reply", modelM, TemplateType.SHOPPING_REPLY);
+
+					// 发送消息给客户
+					userMessageUtil.sendMessage(Integer.parseInt(userIdStr), report_id, 1, list.get(0).getQustion(), jumpUrl);
+
 					json.setOk(true);
 				}else{
 					json.setOk(false);

@@ -82,4 +82,51 @@
         values(#{id},#{userId} ,#{adminId},#{remarks})
     </insert>
 
+
+    <select id="queryUserMessageForList" parameterType="com.importExpress.pojo.UserMessage"
+            resultType="com.importExpress.pojo.UserMessage">
+        select id,user_id as userId,order_no as orderNo,content,type,jump_url as jumpUrl,
+        ready_state as readyState,del_state as delState,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as createTime,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as updateTime
+        from user_message where 1=1
+        <if test="userId > 0">
+            and user_id = #{userId}
+        </if>
+        <if test="orderNo != null">
+            and orderNo = #{orderNo}
+        </if>
+        <if test="readyState > -1">
+            and ready_state = #{readyState}
+        </if>
+        <if test="delState > -1">
+            and del_state = #{delState}
+        </if>
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryUserMessageForListCount" resultType="java.lang.Integer">
+        select count(0) from user_message where 1=1
+        <if test="userId > 0">
+            and user_id = #{userId}
+        </if>
+        <if test="orderNo != null">
+            and orderNo = #{orderNo}
+        </if>
+        <if test="readyState > -1">
+            and ready_state = #{readyState}
+        </if>
+        <if test="delState > -1">
+            and del_state = #{delState}
+        </if>
+    </select>
+
+
+    <insert id="insertIntoUserMessage" parameterType="com.importExpress.pojo.UserMessage">
+        insert into user_message(user_id,order_no,content,type,jump_url)
+        values(#{userId},#{orderNo},#{content},#{type},#{jumpUrl})
+    </insert>
+
 </mapper>

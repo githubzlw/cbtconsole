@@ -264,11 +264,11 @@ $('#dlg').dialog('close');
 							<textarea rows="2" cols="28" id="${qa.questionid}_replay">${qa.reply_content}</textarea>
 							<br>
 							<c:if test="${not empty qa.reply_content}">
-								<a class="easyui-linkbutton"  onclick="replay('${qa.questionid}','${qa.c_shop_id}','${qa.pid}','${qa.purl}')">修改 </a>
+								<a class="easyui-linkbutton"  onclick="replay(${qa.userid},'${qa.pid}','${qa.questionid}','${qa.c_shop_id}','${qa.pid}','${qa.purl}')">修改 </a>
 								<a class="easyui-linkbutton"  onclick="sendEmail('${qa.questionid}','${qa.c_shop_id}','${qa.pid}','${qa.purl}')">邮件发送</a>
 							</c:if>
 							<c:if test="${empty qa.reply_content}">
-								<a class="easyui-linkbutton"  onclick="replay('${qa.questionid}','${qa.c_shop_id}','${qa.pid}','${qa.purl}')"> 确认 </a>
+								<a class="easyui-linkbutton"  onclick="replay(${qa.userid},'${qa.pid}','${qa.questionid}','${qa.c_shop_id}','${qa.pid}','${qa.purl}')"> 确认 </a>
 							</c:if>
 						</div>
 					</td>
@@ -430,7 +430,7 @@ function influenceShop(qid,contextFlag,shop_id,state){
 	});
 }
 //回复
-function replay(qid,shop_id,url,purl){
+function replay(userId, pid, qid,shop_id,url,purl){
 	var content = $("#"+qid+"_replay").val();
 	if(content == ''){
 		return ;
@@ -444,7 +444,7 @@ function replay(qid,shop_id,url,purl){
 		type:'POST',
 		dataType:'text',
 		url:'/cbtconsole/question/edit',
-		data:{qid:qid,rcontent:content,isShow:isShow,shop_flag:shop_flag,url:url,shop_id:shop_id,purl:purl},
+		data:{userId:userId,pid:pid,qid:qid,rcontent:content,isShow:isShow,shop_flag:shop_flag,url:url,shop_id:shop_id,purl:purl},
 		success:function(res){
 			if(res>0){
 				var ccontent = $("#"+qid+"_replay").val();
