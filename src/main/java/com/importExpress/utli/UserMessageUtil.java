@@ -120,8 +120,8 @@ public class UserMessageUtil {
                 .append("\'" + userMessage.getOrderNo() + "\',")
                 .append("\'" + content + "\',")
                 .append(+userMessage.getType() + ",")
-                .append("\'" + jumpUrl + "\')")
-                .append("\'" + question + "\')")
+                .append("\'" + jumpUrl + "\',")
+                .append("\'" + question + "\',")
                 .append("\'" + answer + "\')");
         NotifyToCustomerUtil.sendSqlByMq(sb.toString());
     }
