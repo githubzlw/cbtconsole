@@ -459,17 +459,17 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                         // detailedRefund = refundByLocal(json);
 
                         if (json.isOk()) {
-                            refundResultInfo.setRefundFromTransactionFee(detailedRefund.getRefundFromTransactionFee().getValue());
-                            refundResultInfo.setRefundFromReceivedAmount(detailedRefund.getRefundFromReceivedAmount().getValue());
-                            refundResultInfo.setTotalRefundedAmount(detailedRefund.getTotalRefundedAmount().getValue());
+                            // refundResultInfo.setRefundFromTransactionFee(detailedRefund.getRefundFromTransactionFee().getValue());
+                            // refundResultInfo.setRefundFromReceivedAmount(detailedRefund.getRefundFromReceivedAmount().getValue());
+                            // refundResultInfo.setTotalRefundedAmount(detailedRefund.getTotalRefundedAmount().getValue());
                             refundResultInfo.setRefundid(detailedRefund.getId());
-                            refundResultInfo.setAmountTotal(detailedRefund.getAmount().getTotal());
-                            refundResultInfo.setState(detailedRefund.getState());
-                            refundResultInfo.setSaleId(detailedRefund.getSaleId());
+                            //refundResultInfo.setAmountTotal(detailedRefund.getAmount().getTotal());
+                            // refundResultInfo.setState(detailedRefund.getState());
+                            // refundResultInfo.setSaleId(detailedRefund.getSaleId());
                             // refundResultInfo.setParentPayment(detailedRefund.getParentPayment());
                             refundResultInfo.setCreateTime(detailedRefund.getCreateTime());
                             refundResultInfo.setUpdateTime(detailedRefund.getUpdateTime());
-                            refundResultInfo.setInfo(detailedRefund.toString().getBytes());
+                            // refundResultInfo.setInfo(detailedRefund.toString().getBytes());
                             REFUNDLOG.info("refund result:" + refundResultInfo.toString());
                             refundResultInfoMapper.insertSelective(refundResultInfo);
                             json.setOk(true);
@@ -505,15 +505,15 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
     private DetailedRefund refundByLocal(JsonResult json){
         json.setOk(true);
         DetailedRefund detailedRefund = new DetailedRefund();
-        detailedRefund.setTotalRefundedAmount(new Currency("USD", "50.00"));
-        detailedRefund.setId("3PE956036M7631605");
-        detailedRefund.setAmount(new Amount("USD", "50.00"));
-        detailedRefund.setRefundFromTransactionFee(new Currency("USD", "2.20"));
-        detailedRefund.setRefundFromReceivedAmount(new Currency("USD", "47.80"));
-        detailedRefund.setCreateTime("2019-12-13T03:14:48Z");
-        detailedRefund.setUpdateTime("2019-12-13T03:14:48Z");
+        detailedRefund.setTotalRefundedAmount(new Currency("USD", "5.25"));
+        detailedRefund.setId("7BL32239LM841653B");
+        detailedRefund.setAmount(new Amount("USD", "5.25"));
+        detailedRefund.setRefundFromTransactionFee(new Currency("USD", "0.23"));
+        detailedRefund.setRefundFromReceivedAmount(new Currency("USD", "5.02"));
+        detailedRefund.setCreateTime("2019-12-16T03:51:53Z");
+        detailedRefund.setUpdateTime("2019-12-16T03:51:53Z");
         detailedRefund.setState("completed");
-        detailedRefund.setDescription("parent_payment\": \"PAYID-LWOVFOQ76W04870DD140644J");
+        detailedRefund.setDescription("\"parent_payment\": \"PAYID-LXU6J4Y00C30346K54464746\"");
         return detailedRefund;
     }
 
@@ -556,9 +556,14 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                         && StringUtils.isNotBlank(rsJson.getString("data"))) {
 
                     REFUNDLOG.info("saleId:"+saleId+",refundAmount:" + amountMoney + ",RPC result rsJson:" + rsJson);
-                    JSONObject refundJson = rsJson.getJSONObject("data");
 
-                    DetailedRefund detailedRefund = JSONObject.parseObject(rsJson.getString("data"),DetailedRefund.class);
+                    DetailedRefund detailedRefund = new DetailedRefund();
+                    detailedRefund.setId(rsJson.getString("data"));
+
+                    // JSONObject refundJson = rsJson.getJSONObject("data");
+
+                    // DetailedRefund detailedRefund = JSONObject.parseObject(rsJson.getString("data"),DetailedRefund.class);
+
                     /*JSONObject tempAmount = refundJson.getJSONObject("amount");
                     DetailedRefund detailedRefund = new DetailedRefund();
                     detailedRefund.setTotalRefundedAmount(new Currency(tempAmount.getString("currency"), tempAmount.getString("total")));

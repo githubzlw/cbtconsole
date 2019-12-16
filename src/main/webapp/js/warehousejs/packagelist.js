@@ -260,7 +260,7 @@ function getType(t){
 }
 //批量出库                                      
 function batchCk(){
-    var Web_site=$("#Web_site").val()
+    var Web_site=$("#Web_site").val();
 	$.jBox.tip("正在操作，清稍候", 'loading');                                             
 	var tempOrderid;
 	var tempFpxCountryCode;
