@@ -456,6 +456,8 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                              detailedRefund = refundByMq(saleId, amountMoney,0, json);
                         }
 
+                        // detailedRefund = refundByLocal(json);
+
                         if (json.isOk()) {
                             refundResultInfo.setRefundFromTransactionFee(detailedRefund.getRefundFromTransactionFee().getValue());
                             refundResultInfo.setRefundFromReceivedAmount(detailedRefund.getRefundFromReceivedAmount().getValue());
@@ -500,6 +502,21 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
     }
 
 
+    private DetailedRefund refundByLocal(JsonResult json){
+        json.setOk(true);
+        DetailedRefund detailedRefund = new DetailedRefund();
+        detailedRefund.setTotalRefundedAmount(new Currency("USD", "50.00"));
+        detailedRefund.setId("3PE956036M7631605");
+        detailedRefund.setAmount(new Amount("USD", "50.00"));
+        detailedRefund.setRefundFromTransactionFee(new Currency("USD", "2.20"));
+        detailedRefund.setRefundFromReceivedAmount(new Currency("USD", "47.80"));
+        detailedRefund.setCreateTime("2019-12-13T03:14:48Z");
+        detailedRefund.setUpdateTime("2019-12-13T03:14:48Z");
+        detailedRefund.setState("completed");
+        detailedRefund.setDescription("parent_payment\": \"PAYID-LWOVFOQ76W04870DD140644J");
+        return detailedRefund;
+    }
+
     /**
      * 远程调用RPC执行退款
      * @param saleId
@@ -532,6 +549,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
             rsJson.clear();
             String resultStr = SendMQ.sendRefundByRPC(jsonParam);
             if (StringUtils.isNotBlank(resultStr)) {
+                REFUNDLOG.info("saleId:"+saleId+",refundAmount:" + amountMoney + ",RPC result【" + resultStr + "】");
                 rsJson = JSONObject.parseObject(resultStr);
                 System.err.println(rsJson);
                 if (rsJson != null && "200".equals(rsJson.getString("code"))

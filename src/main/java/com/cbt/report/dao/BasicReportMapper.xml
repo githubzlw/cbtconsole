@@ -870,7 +870,10 @@
 		select a.user_id as userid,b.pay_amount as amount,b.order_no as remark_id,b.pay_type
 		from orderinfo a,order_cancel_approval_amount b
 		where a.order_no = b.order_no and SUBSTRING(CONCAT(b.order_no,'_'),1,locate('_',CONCAT(b.order_no,'_'))-1)
-		in( select orderid from tem_payment1 where DATE_FORMAT(createtime,'%Y-%m')=#{beginDate,jdbcType=VARCHAR} )
+		in( select orderid from (select orderid,min(payment.createtime) createtime from payment
+		where userid in(select id from user where is_test = 0) and payment.paystatus=1 and paytype in(0,1,2,5) and payment_amount > 0
+		and payment.createtime >= DATE_SUB(CONCAT(createtime,'-01'),INTERVAL 6 MONTH) group by orderid) tem_payment1
+		where DATE_FORMAT(createtime,'%Y-%m')=#{beginDate,jdbcType=VARCHAR} )
 		and DATE_FORMAT(b.create_time,'%Y-%m')=#{beginDate,jdbcType=VARCHAR}
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -881,7 +884,10 @@
 		select count(0)
 		from orderinfo a,order_cancel_approval_amount b
 		where a.order_no = b.order_no and SUBSTRING(CONCAT(b.order_no,'_'),1,locate('_',CONCAT(b.order_no,'_'))-1)
-		in( select orderid from tem_payment1 where DATE_FORMAT(createtime,'%Y-%m')=#{beginDate,jdbcType=VARCHAR} )
+		in( select orderid from (select orderid,min(payment.createtime) createtime from payment
+		where userid in(select id from user where is_test = 0) and payment.paystatus=1 and paytype in(0,1,2,5) and payment_amount > 0
+		and payment.createtime >= DATE_SUB(CONCAT(createtime,'-01'),INTERVAL 6 MONTH) group by orderid) tem_payment1
+		where DATE_FORMAT(createtime,'%Y-%m')=#{beginDate,jdbcType=VARCHAR} )
 		and DATE_FORMAT(b.create_time,'%Y-%m')=#{beginDate,jdbcType=VARCHAR}
 	</select>
 
