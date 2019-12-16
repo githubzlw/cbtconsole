@@ -258,6 +258,13 @@ public class OrderCancelApprovalController {
                 }
             }
 
+            String refundMethodStr = request.getParameter("refundMethod");
+            if (StringUtils.isBlank(refundMethodStr) || Integer.parseInt(refundMethodStr) == 0) {
+                json.setOk(false);
+                json.setMessage("获取退款方式失败,请重试");
+                return json;
+            }
+
             String refundAmountStr = request.getParameter("refundAmount");
             double refundAmount = 0;
             if (dealState == 4) {
@@ -267,7 +274,7 @@ public class OrderCancelApprovalController {
                     json.setOk(false);
                     json.setMessage("获取退款金额失败,请重试");
                     return json;
-                } else if (Double.parseDouble(refundAmountStr) > 300) {
+                } else if ("1".equals(refundMethodStr) && Double.parseDouble(refundAmountStr) > 300) {
                     json.setOk(false);
                     json.setMessage("该退款金额超过300，请转账");
                     return json;
@@ -276,12 +283,7 @@ public class OrderCancelApprovalController {
                 }
             }
 
-            String refundMethodStr = request.getParameter("refundMethod");
-            if (StringUtils.isBlank(refundMethodStr) || Integer.parseInt(refundMethodStr) == 0) {
-                json.setOk(false);
-                json.setMessage("获取退款方式失败,请重试");
-                return json;
-            }
+
 
 
             String remark = request.getParameter("remark");
