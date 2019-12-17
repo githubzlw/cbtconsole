@@ -355,7 +355,7 @@ public class RefundController {
                 json.setOk(false);
                 json.setMessage("获取退款金额失败,请重试");
                 return json;
-            } else if (Double.parseDouble(refundAmountStr) > 300) {
+            } else if (Double.parseDouble(refundAmountStr) >= 300) {
                 json.setOk(false);
                 json.setMessage("该退款金额超过300，请转账");
                 return json;
@@ -715,6 +715,18 @@ public class RefundController {
                 json.setMessage("获取备注信息失败,请重试");
                 return json;
             }
+            String txnId = request.getParameter("txnId");
+            if (StringUtils.isBlank(txnId)) {
+                json.setOk(false);
+                json.setMessage("获取退款交易号失败,请重试");
+                return json;
+            }
+            String amount = request.getParameter("amount");
+            if (StringUtils.isBlank(amount) || Double.parseDouble(amount) <= 0) {
+                json.setOk(false);
+                json.setMessage("获取退款金额失败,请重试");
+                return json;
+            }
             String orderNo = request.getParameter("orderNo");
 
             RefundDetailsBean detailsBean = new RefundDetailsBean();
@@ -722,7 +734,7 @@ public class RefundController {
             detailsBean.setAdminId(user.getId());
             detailsBean.setOrderNo(orderNo == null ? "" : orderNo);
             detailsBean.setRefundState(actionFlag);
-            detailsBean.setRefundAmount(0);
+            detailsBean.setRefundAmount(Double.parseDouble(amount));
             detailsBean.setRemark(remark);
             detailsBean.setUserId(userId);
             refundNewService.setAndRemark(detailsBean);
@@ -730,7 +742,7 @@ public class RefundController {
             updateOnlineRefundState(detailsBean);
 
             detailsBean.setRefundState(4);
-            detailsBean.setRemark("已经确认线下退款，退款自动完结");
+            detailsBean.setRemark("已经确认线下退款，退款自动完结,交易号["+txnId+","+amount+"]");
             refundNewService.setAndRemark(detailsBean);
             //使用MQ更新线上状态
             updateOnlineRefundState(detailsBean);

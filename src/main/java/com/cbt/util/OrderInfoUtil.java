@@ -7,6 +7,8 @@ import com.cbt.website.dao.OrderSplitDaoImpl;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 订单拆分相关的工具类
@@ -192,12 +194,20 @@ public class OrderInfoUtil {
         String maxSplitOrderNo = orderBean.getMaxSplitOrder();
         if (maxSplitOrderNo.contains("_") && !maxSplitOrderNo.contains("_SP")) {
             String[] orderSplitList = maxSplitOrderNo.split("_");
-            int splitIndex = Integer.parseInt(orderSplitList[orderSplitList.length - 1]);
-            if (isSplitNum > 0) {
-                nwOrderNo = orderNo + "_" + (splitIndex + 1) + "_SN";
+            Pattern p = Pattern.compile("^[1-9]");
+            Matcher m = p.matcher(orderSplitList[orderSplitList.length - 1]);
+            boolean result = m.find();
+            if (result) {
+                nwOrderNo = maxSplitOrderNo + "_" + 1;
             } else {
-                nwOrderNo = orderNo + "_" + (splitIndex + 1);
+                int splitIndex = Integer.parseInt(orderSplitList[orderSplitList.length - 1]);
+                if (isSplitNum > 0) {
+                    nwOrderNo = orderNo + "_" + (splitIndex + 1) + "_SN";
+                } else {
+                    nwOrderNo = orderNo + "_" + (splitIndex + 1);
+                }
             }
+
         }
         return nwOrderNo;
     }
