@@ -278,7 +278,7 @@ public class OrderCancelApprovalController {
                     json.setOk(false);
                     json.setMessage("获取退款金额失败,请重试");
                     return json;
-                } else if ("1".equals(refundMethodStr) && Double.parseDouble(refundAmountStr) > 300) {
+                } else if ("1".equals(refundMethodStr) && Double.parseDouble(refundAmountStr) >= 300) {
                     json.setOk(false);
                     json.setMessage("该退款金额超过300，请转账");
                     return json;
