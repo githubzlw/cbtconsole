@@ -435,11 +435,11 @@ public class OrderCancelApprovalController {
             }
             list.clear();
 
-            if(orderPay > 300){
+            /*if(orderPay > 300){
                 json.setOk(false);
                 json.setMessage("该订单总支付金额:" + orderPay + "超过300，请转账");
                 return json;
-            }
+            }*/
 
             OrderCancelApproval approvalOld = approvalService.queryForSingle(approvalBean.getId());
             if (approvalBean.getRefundMethod() == 1) {
