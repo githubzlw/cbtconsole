@@ -357,4 +357,7 @@ public interface BasicReportService {
 
 	int queryStripPayInfoCount(String beginDate, String endDate);
 
+	List<OrderCancelBean> orderCancelWithIpn(String beginDate, int start, int rows);
+
+	int orderCancelWithIpnCount(String beginDate);
 }

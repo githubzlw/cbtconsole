@@ -1027,4 +1027,34 @@
 	</select>
 
 
+	<select id="orderCancelWithIpn" resultType="com.cbt.report.vo.OrderCancelBean">
+		  select * from (select a.orderNo as ipnOrderNo,a.payAmount as payAmount,a.userId,date_format(a.createtime,'%Y-%m-%d %H:%i:%s') as payTime,
+		a.txn_id as txnId,b.pay_amount as amount,b.pay_type as payType,b.order_no as remarkId    from ipn_info a
+		left join order_cancel_approval_amount b on a.orderNo = b.order_no
+		where a.payAmount &lt;0 and DATE_FORMAT(a.createtime,'%Y-%m')= #{beginDate,jdbcType=VARCHAR}
+		 UNION
+		select a.orderNo as ipnOrderNo,a.payAmount as payAmount,a.userId,date_format(a.createtime,'%Y-%m-%d %H:%i:%s') as payTime,
+		a.txn_id as txnId,b.pay_amount as amount,b.pay_type  as payType,b.order_no as remarkId  from order_cancel_approval_amount b
+		left join ipn_info a on a.orderNo = b.order_no where a.orderNo is null
+		and DATE_FORMAT(b.create_time,'%Y-%m')=#{beginDate,jdbcType=VARCHAR}
+		) cc order by cc.ipnOrderNo desc,cc.remarkId desc
+		 <if test="rows > 0">
+			 limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		 </if>
+	</select>
+
+	<select id="orderCancelWithIpnCount" resultType="java.lang.Integer">
+		select count(0) from (
+			select a.orderNo as ipnOrderNo,a.payAmount as payAmount,a.userId,date_format(a.createtime,'%Y-%m-%d %H:%i:%s') as payTime,
+		a.txn_id as txnId,b.pay_amount as amount,b.pay_type as payType,b.order_no as remarkId    from ipn_info a
+		left join order_cancel_approval_amount b on a.orderNo = b.order_no
+		where a.payAmount &lt;0 and DATE_FORMAT(a.createtime,'%Y-%m')= #{beginDate,jdbcType=VARCHAR}
+		 UNION
+		select a.orderNo as ipnOrderNo,a.payAmount as payAmount,a.userId,date_format(a.createtime,'%Y-%m-%d %H:%i:%s') as payTime,
+		a.txn_id as txnId,b.pay_amount as amount,b.pay_type  as payType,b.order_no as remarkId  from order_cancel_approval_amount b
+		left join ipn_info a on a.orderNo = b.order_no where a.orderNo is null
+		and DATE_FORMAT(b.create_time,'%Y-%m')=#{beginDate,jdbcType=VARCHAR}
+		) cc
+	</select>
+
 </mapper>

@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>订单取消(全部或部分)详情</title>
+<title>IPN取消数据比对本地详情</title>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript"
 	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
@@ -23,7 +23,7 @@
 	color: #fff;
 }
 
-#ocb_query_form {
+#ipn_query_form {
 	font-size: 18px;
 }
 
@@ -33,16 +33,16 @@
 	font-size: 24px;
 }
 
-#ocb_rYear, #ocb_rMonth, .but_color {
+#ipn_rYear, #ipn_rMonth, .but_color {
 	padding: 5px;
 	font-size: 14px
 }
 
-#ocb_rYear, #ocb_rMonth {
+#ipn_rYear, #ipn_rMonth {
 	margin-right: 18px
 }
 
-#ocb_top_toolbar {
+#ipn_top_toolbar {
 	padding: 20px 28px !important;
 }
 
@@ -57,29 +57,29 @@
 	$(function() {
 	    genYearSelect();
 		setDatagrid();
-		var opts = $("#ocb_main-datagrid").datagrid("options");
-		opts.url = "/cbtconsole/basicStatistical/orderCancel";
+		var opts = $("#ipn_main-datagrid").datagrid("options");
+		opts.url = "/cbtconsole/basicStatistical/orderCancelWithIpn";
 	});
 	function genYearSelect() {
         var mydate = new Date();
         var rYear = mydate.getFullYear();
-        $("#ocb_rYear").empty();
+        $("#ipn_rYear").empty();
         var content = "";
         for (var yr = 2016; yr <= rYear; yr++) {
             content += "<option value='" + yr + "'>" + yr + "</option>";
         }
-        $("#ocb_rYear").append(content);
+        $("#ipn_rYear").append(content);
     }
 	function setDatagrid() {
-		$('#ocb_main-datagrid').datagrid({
-			title : '订单取消(全部或部分)详情',
+		$('#ipn_main-datagrid').datagrid({
+			title : 'IPN取消数据比对本地详情',
 			width : "100%",
 			height : "100%",
 			fit : true,//自动补全
             nowrap: false,//设置为true，当数据长度超出列宽时将会自动截取
 			striped : true,//设置为true将交替显示行背景。
 			collapsible : true,//显示可折叠按钮
-			toolbar : "#ocb_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+			toolbar : "#ipn_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
 			url : '',//url调用Action方法
 			loadMsg : '数据装载中......',
 			singleSelect : true,//为true时只能选择单行
@@ -114,69 +114,59 @@
 	}
 
 	function doOcbQuery() {
-		var year = $("#ocb_rYear").val();
+		var year = $("#ipn_rYear").val();
 		if (year == null || year == "" || year == "0" || year == "-1") {
 			showMessage('请选择年份');
 			return;
 		}
-		var month = $("#ocb_rMonth").val();
+		var month = $("#ipn_rMonth").val();
 		if (month == null || month == "" || month == "0" || month == "-1") {
 			showMessage('请选择月份');
 			return;
 		}
-		$("#ocb_main-datagrid").datagrid("load", {
+		$("#ipn_main-datagrid").datagrid("load", {
 			"year" : year,
 			"month" : month
 		});
 	}
 	
 	function exportOcbExcel() {
-		var year = $("#ocb_rYear").val();
+		var year = $("#ipn_rYear").val();
 		if (year == null || year == "" || year == "0" || year == "-1") {
 			showMessage('请选择年份');
 			return;
 		}
-		var month = $("#ocb_rMonth").val();
+		var month = $("#ipn_rMonth").val();
 		if (month == null || month == "" || month == "0" || month == "-1") {
 			showMessage('请选择月份');
 			return;
 		}
-		window.location.href = "/cbtconsole/basicStatistical/exportOrderCancelExcel?year="
+		var url = "/cbtconsole/basicStatistical/exportOrderCancelWithIpnExcel?year="
 				+ year + "&month=" + month;
-	}
-	function formatUserId(val, row, index) {
-        return  '<a href="/cbtconsole/userinfo/getUserInfo.do?userId='+val+'" target="_blank">'+val+'</a>';
-    }
-
-    function orderCancelWithIPN() {
-		var year = $("#ocb_rYear").val();
-		if (year == null || year == "" || year == "0" || year == "-1") {
-			showMessage('请选择年份');
-			return;
-		}
-		var month = $("#ocb_rMonth").val();
-		if (month == null || month == "" || month == "0" || month == "-1") {
-			showMessage('请选择月份');
-			return;
-		}
-		var url = "/cbtconsole/apa/orderCancelWithIPN.html?year=" + year + "&month=" + month;
 		window.open(url);
 	}
+	function formatUserId(val, row, index) {
+		if(val > 0){
+			return  '<a href="/cbtconsole/userinfo/getUserInfo.do?userId='+val+'" target="_blank">'+val+'</a>';
+		}else{
+			return '';
+		}
+    }
 </script>
 
 </head>
 <body>
 
-	<div id="ocb_top_toolbar" style="padding: 5px; height: auto">
+	<div id="ipn_top_toolbar" style="padding: 5px; height: auto">
 		<div>
-			<form id="ocb_query_form" action="#" onsubmit="return false;">
-				<label for="ocb_rYear">年份选择<font color="red">*</font>：
-				</label> <select name="year" id="ocb_rYear">
+			<form id="ipn_query_form" action="#" onsubmit="return false;">
+				<label for="ipn_rYear">年份选择<font color="red">*</font>：
+				</label> <select name="year" id="ipn_rYear">
 					<option value='2016'>2016</option>
 					<option value='2017'>2017</option>
 					<option value='2018'>2018</option>
-				</select><label for="ocb_rMonth">月份选择<font color="red">*</font>：
-				</label> <select name="month" id="ocb_rMonth">
+				</select><label for="ipn_rMonth">月份选择<font color="red">*</font>：
+				</label> <select name="month" id="ipn_rMonth">
 					<option value="1">1</option>
 					<option value="2">2</option>
 					<option value="3">3</option>
@@ -194,21 +184,24 @@
 					type="button" value="重置" onclick="doOcbReset()"> <input
 					class="but_color" type="button" value="导出Excel"
 					onclick="exportOcbExcel()">
-				<a href="#" onclick="orderCancelWithIPN()">IPN取消详情</a>
 			</form>
 
 		</div>
 	</div>
-	<table id="ocb_main-datagrid" style="width: 100%; height: 100%;"
+	<table id="ipn_main-datagrid" style="width: 100%; height: 100%;"
 		class="easyui-datagrid">
 		<thead>
 			<tr>
 				<th data-options="field:'year',align:'center',width:'50px'">年份</th>
 				<th data-options="field:'month',align:'center',width:'50px'">月份</th>
 				<th data-options="field:'userId',align:'center',width:'70px',formatter:formatUserId">客户ID</th>
-				<th data-options="field:'amount',align:'center',width:'80px'">订单取消金额(USD)</th>
-				<th data-options="field:'remarkId',align:'left',width:'120px'">订单号</th>
-				<th data-options="field:'remark',align:'left',width:'600px'">备注信息</th>
+				<th data-options="field:'ipnOrderNo',align:'left',width:'120px'">订单号</th>
+				<th data-options="field:'payAmount',align:'left',width:'80px'">交易金额(USD)</th>
+				<th data-options="field:'payTime',align:'center',width:'120px'">交易时间</th>
+				<th data-options="field:'txnId',align:'left',width:'100px'">交易号</th>
+				<th data-options="field:'remarkId',align:'left',width:'120px'">取消订单号</th>
+				<th data-options="field:'amount',align:'left',width:'80px'">取消商品金额(USD)</th>
+				<th data-options="field:'remark',align:'left',width:'150px'">备注</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -233,13 +226,13 @@
 						if (sgParamLst[0] == "year") {
 							year = sgParamLst[1];
 							if (!(year == null || year == "")) {
-								$("#ocb_rYear").val(sgParamLst[1]);
+								$("#ipn_rYear").val(sgParamLst[1]);
 							}
 							continue;
 						} else if (sgParamLst[0] == "month") {
 							month = sgParamLst[1];
 							if (!(month == null || month == "")) {
-								$("#ocb_rMonth").val(sgParamLst[1]);
+								$("#ipn_rMonth").val(sgParamLst[1]);
 							}
 							continue;
 						}
