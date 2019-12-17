@@ -197,7 +197,7 @@ public class OrderInfoUtil {
             Pattern p = Pattern.compile("^[1-9]");
             Matcher m = p.matcher(orderSplitList[orderSplitList.length - 1]);
             boolean result = m.find();
-            if (result) {
+            if (!result) {
                 nwOrderNo = maxSplitOrderNo + "_" + 1;
             } else {
                 int splitIndex = Integer.parseInt(orderSplitList[orderSplitList.length - 1]);
