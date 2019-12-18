@@ -828,7 +828,10 @@ public class QueryUserServiceImpl implements QueryUserService {
             // 更新本地
             queryUserMapper.updateUserCheckout(userid, type);
             // 更新线上
-            String sql = "INSERT INTO user_checkout (id, flag) VALUES (" + userid + ", " + type + ") ON DUPLICATE KEY UPDATE flag = " + type + ";";
+            String sql = "INSERT INTO user_checkout (id, flag) VALUES (" + userid + ", " + type + ") ON DUPLICATE KEY UPDATE flag = "
+                    + type + ";";
+
+            // sql = "update user_authorization set auth_flag= " + type + " where user_id = " + userid;
 
             try {
 

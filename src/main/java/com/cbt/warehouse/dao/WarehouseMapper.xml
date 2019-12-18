@@ -3760,8 +3760,8 @@
 
     <!--List<Integer> queryUserCheckByUserid(@Param("list") List<UserInfo> list);-->
     <select id="queryUserCheckByUserid" resultType="Integer">
-        SELECT id FROM user_checkout
-        WHERE flag = 1 AND id IN
+        SELECT user_id FROM user_authorization
+        WHERE auth_flag = 1 AND user_id IN
         <foreach collection="list" item="item" open="(" close=")" separator=",">
             #{item.userid}
         </foreach>
