@@ -1008,7 +1008,8 @@
 
     <!--void updateUserCheckout(@Param("userid") Integer userid, @Param("type") Integer type);-->
     <update id="updateUserCheckout">
-        INSERT INTO user_checkout (id, flag) VALUES (#{userid}, #{type}) ON DUPLICATE KEY UPDATE flag = #{type};
+        <!--INSERT INTO user_checkout (id, flag) VALUES (#{userid}, #{type}) ON DUPLICATE KEY UPDATE flag = #{type};-->
+        update user_authorization set auth_flag = #{type} where user_id = #{userid}
     </update>
 
     <!--List<TimingWarningInfo> queryTimingWarningInfo(@Param("valid") Integer valid, @Param("day") Integer day);-->
@@ -1045,9 +1046,9 @@
     </update>
 
     <select id="queryAllCheckout" resultType="int">
-        select id from user_checkout where flag = #{flag}
+        select user_id from user_authorization where auth_flag = #{flag}
         <if test="updateTime != null">
-            and updatetime >= #{updateTime}
+            and update_time >= #{updateTime}
         </if>
     </select>
 
