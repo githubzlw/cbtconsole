@@ -4,23 +4,25 @@ import com.cbt.bean.CategoryBean;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
 import com.cbt.service.CustomGoodsService;
+import com.cbt.util.GoodsInfoUtils;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.listener.ContextListener;
+import com.importExpress.pojo.InputData;
 import com.importExpress.pojo.MongoGoodsBean;
 import com.importExpress.service.MongoGoodsService;
 import com.importExpress.utli.EasyUiTreeUtils;
 import com.importExpress.utli.GoodsBeanUtil;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -178,14 +180,14 @@ public class MongoDBController {
                     if (CollectionUtils.isNotEmpty(checkList)) {
                         List<MongoGoodsBean> updateList = list.stream().filter(e -> checkList.contains(e.getPid()))
                                 .collect(Collectors.toList());
-                        if(CollectionUtils.isNotEmpty(updateList)){
+                        if (CollectionUtils.isNotEmpty(updateList)) {
                             insertTotal += mongoGoodsService.batchUpdateGoodsInfoToMongoDb(updateList);
                             updateList.clear();
                         }
 
                         List<MongoGoodsBean> insertList = list.stream().filter(e -> !checkList.contains(e.getPid()))
                                 .collect(Collectors.toList());
-                        if(CollectionUtils.isNotEmpty(insertList)){
+                        if (CollectionUtils.isNotEmpty(insertList)) {
                             insertTotal += mongoGoodsService.insertGoodsToMongoBatch(insertList);
                             insertList.clear();
                         }
@@ -247,5 +249,219 @@ public class MongoDBController {
         }
 
         return json;
+    }
+
+
+    @GetMapping("/getOffLineOrInfringementGoods")
+    public ModelAndView getOffLineOrInfringementGoods(@RequestParam(value = "type", required = true, defaultValue = "0") Integer type,
+                                                      @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
+                                                      @RequestParam(value = "catid", required = false) String catid,
+                                                      @RequestParam(value = "shopId", required = false) String shopId) {
+        ModelAndView mv = new ModelAndView("offLineOrInfringementGoods");
+        // type 1侵权 2硬下架
+        if (type <= 0) {
+            mv.addObject("isSu", 0);
+            mv.addObject("message", "获取参数失败");
+            return mv;
+        }
+        int limitNum = 30;
+        try {
+            CustomGoodsQuery queryBean = new CustomGoodsQuery();
+            queryBean.setCurrPage(page);
+            queryBean.setPage((queryBean.getCurrPage() - 1) * limitNum);
+            queryBean.setLimitNum(limitNum);
+            if (StringUtils.isNotBlank(catid)) {
+                queryBean.setCatid(catid);
+            }
+            if (StringUtils.isNotBlank(shopId)) {
+                queryBean.setShopId(shopId);
+            }
+            mv.addObject("catid", catid);
+            mv.addObject("shopId", shopId);
+            mv.addObject("type", type);
+
+            List<CustomGoodsPublish> goodsList = new ArrayList<>();
+            int count = 0;
+            if (type == 1) {
+                goodsList = customGoodsService.queryGoodsDeleteInfo(queryBean);
+                count = customGoodsService.queryGoodsDeleteInfoCount(queryBean);
+            } else if (type == 2) {
+                queryBean.setSoldFlag(-1);
+                queryBean.setFromFlag(-1);
+                goodsList = customGoodsService.queryGoodsInfos(queryBean);
+                count = customGoodsService.queryGoodsInfosCount(queryBean);
+            }
+            dealGoodsList(goodsList);
+            mv.addObject("goodsList", goodsList);
+            mv.addObject("count", count);
+            mv.addObject("currPage", page);
+            if (count % limitNum > 0) {
+                mv.addObject("totalPage", count / limitNum + 1);
+            } else {
+                mv.addObject("totalPage", count / limitNum + 1);
+            }
+            mv.addObject("isSu", 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mv.addObject("isSu", 0);
+            mv.addObject("message", e.getMessage());
+            logger.error("getOffLineOrInfringementGoods,error:", e);
+        }
+
+        return mv;
+    }
+
+
+    @PostMapping("/deleteImg")
+    @ResponseBody
+    public JsonResult deleteImg(@RequestParam(value = "type", required = true, defaultValue = "0") Integer type,
+                                @RequestParam(value = "pids", required = true) String pids) {
+        JsonResult json = new JsonResult();
+        if (StringUtils.isBlank(pids)) {
+            json.setErrorInfo("获取PID失败");
+            return json;
+        }
+
+        try {
+            String[] pidList = pids.split(",");
+            int total = 0;
+            for (String pid : pidList) {
+                CustomGoodsPublish goods = null;
+                if (type == 1) {
+                    goods = customGoodsService.queryGoodsDeleteDetails(pid);
+                } else {
+                    goods = customGoodsService.queryGoodsDetails(pid, 0);
+                }
+                if (goods != null) {
+                    if (GoodsInfoUtils.deleteByOkHttp(goods)) {
+                        total++;
+                        if (type == 2) {
+                            goods.setEninfo("");
+                            customGoodsService.updatePidEnInfo(goods);
+                        }
+                    }
+                }
+            }
+            json.setSuccess("总数:" + pidList.length + ",成功数:" + total);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+            logger.error("pids:" + pids + ",error:", e);
+        }
+        return json;
+    }
+
+
+    @PostMapping("/deleteData")
+    @ResponseBody
+    public JsonResult deleteData(@RequestParam(value = "pids", required = true) String pids) {
+        JsonResult json = new JsonResult();
+        if (StringUtils.isBlank(pids)) {
+            json.setErrorInfo("获取PID失败");
+            return json;
+        }
+
+        try {
+            String[] pidList = pids.split(",");
+            int total = 0;
+            for (String pid : pidList) {
+                if (deleteDataAll(pid)) {
+                    total++;
+                }
+            }
+            json.setSuccess("总数:" + pidList.length + ",成功数:" + total);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+            logger.error("pids:" + pids + ",error:", e);
+        }
+        return json;
+    }
+
+
+    @GetMapping("/syncDeleteInfo")
+    @ResponseBody
+    public JsonResult syncDeleteInfo() {
+        JsonResult json = new JsonResult();
+        try {
+            List<String> pidList = customGoodsService.queryOrinfringementPids();
+            if (CollectionUtils.isNotEmpty(pidList)) {
+                int total = 0;
+                for (String pid : pidList) {
+                    if (syncInfo(pid)) {
+                        total++;
+                    }
+                }
+                json.setSuccess("总数:" + pidList.size() + ",成功数:" + total);
+            } else {
+                json.setSuccess("总数:" + 0 + ",成功数:" + 0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+            logger.error("syncDeleteInfo error:", e);
+        }
+        return json;
+    }
+
+
+    private boolean syncInfo(String pid) {
+        boolean isSu = false;
+        try {
+            customGoodsService.syncDataToDeleteInfo(pid);
+            isSu = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("syncInfo pid:" + pid + ",error:" + e);
+        }
+        return isSu;
+    }
+
+    private boolean deleteDataAll(String pid) {
+        boolean isSu = false;
+        try {
+            // 删除MongoDB
+            InputData inputData = new InputData('d');
+            inputData.setPid(pid);
+            isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            if (isSu) {
+                // 删除图片
+                CustomGoodsPublish goods = customGoodsService.queryGoodsDeleteDetails(pid);
+                GoodsInfoUtils.deleteByOkHttp(goods);
+                // 删除数据库
+                customGoodsService.deleteDataByPid(pid);
+                // 删除标识
+                customGoodsService.updateDeleteInfoFlag(pid);
+                isSu = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("deleteDataAll pid:" + pid + ",error:" + e);
+        }
+        return isSu;
+    }
+
+    private void dealGoodsList(List<CustomGoodsPublish> goodsList) {
+        if (CollectionUtils.isNotEmpty(goodsList)) {
+            goodsList.forEach(e -> {
+                if (e.getShowMainImage().contains("http")) {
+                    e.setCustomMainImage(e.getShowMainImage());
+                } else {
+                    e.setCustomMainImage(e.getRemotpath() + e.getShowMainImage());
+                }
+                List<String> imgList = GoodsInfoUtils.genDetailsImgList(e.getEninfo(), e.getRemotpath());
+                if (CollectionUtils.isNotEmpty(imgList)) {
+                    if (imgList.size() > 5) {
+                        e.setInfoList(imgList.stream().limit(5).collect(Collectors.toList()));
+                    } else {
+                        e.setInfoList(imgList);
+                    }
+                }
+            });
+        }
     }
 }

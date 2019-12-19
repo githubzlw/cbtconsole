@@ -80,4 +80,6 @@ public class CustomGoodsQuery {
 
 	private Integer source;
 
+	private int limitNum;
+
 }

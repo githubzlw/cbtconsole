@@ -9,6 +9,7 @@ import com.cbt.bean.TypeBean;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.utli.OKHttpUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1349,6 +1350,46 @@ public class GoodsInfoUtils {
 
     }
 
+
+    public static boolean deleteImgByGoodsBean(String pid) {
+        /*boolean isSu = false;
+        CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+        if (checkIsKidsCatid(goods.getCatid1()) && goods.getValid() == 0) {
+            // 接口调用
+            isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
+                    *//*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
+                    boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                    if (!isSu) {
+                        isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                    }
+                    if (!isSu) {
+                        LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
+                    }*//*
+
+        } else {
+            isSu = true;
+        }*/
+        return OKHttpUtils.optionGoodsInterface(pid, 0, 6, 2);
+    }
+
+    public static boolean deleteByOkHttp(CustomGoodsPublish goods) {
+        boolean isSu = false;
+        if (goods != null) {
+            List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
+            try {
+                isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                if (!isSu) {
+                    isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                }
+                if (!isSu) {
+                    LOG.error("deleteByOkHttp pid : " + goods.getPid() + " 删除图片异常");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return isSu;
+    }
 
     public static boolean deleteImgByUrl(String pid) {
         /*boolean isSu = false;
