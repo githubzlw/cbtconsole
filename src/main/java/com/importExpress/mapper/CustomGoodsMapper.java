@@ -621,4 +621,33 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<String> queryCatidByPath(String catid);
+
+    /**
+     * 查询侵权商品
+     * @param queryBean
+     * @return
+     */
+    List<CustomGoodsPublish> queryGoodsDeleteInfo(CustomGoodsQuery queryBean);
+
+    /**
+     * 查询侵权商品总数
+     * @param queryBean
+     * @return
+     */
+    int queryGoodsDeleteInfoCount(CustomGoodsQuery queryBean);
+
+    /**
+     * 侵权单个数据
+     * @param pid
+     * @return
+     */
+    CustomGoodsPublish queryGoodsDeleteDetails(String pid);
+
+    List<String> queryOrinfringementPids();
+
+    int syncDataToDeleteInfo(String pid);
+
+    int deleteDataByPid(String pid);
+
+    int updateDeleteInfoFlag(String pid);
 }

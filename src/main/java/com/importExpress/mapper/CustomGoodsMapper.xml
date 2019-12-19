@@ -598,8 +598,9 @@
         <if test="isSort == 4">
             order by cbu.catid1
         </if>
-
-        limit #{page},50
+        <if test="limitNum > 0">
+            limit #{page},#{limitNum}
+        </if>
     </select>
 
     <select id="queryForListByParamCount" parameterType="com.cbt.bean.CustomGoodsQuery" resultType="java.lang.Integer">
@@ -1585,4 +1586,55 @@
     <select id="queryCatidByPath" resultType="java.lang.String">
         select category_id from 1688_category where find_in_set(#{catid},path)
     </select>
+
+    <select id="queryGoodsDeleteInfo" parameterType="com.cbt.bean.CustomGoodsQuery" resultMap="queryGoodsResultMap">
+        select id,catid1,pid,custom_main_image,img,name,enname,eninfo,remotpath,valid,localpath,catid1,shop_id
+        from custom_benchmark_ready_delete_log where delete_flag = 0
+        <if test="catid != null">
+            and catid1 = #{catid}
+        </if>
+        <if test="shopId != null">
+            and shop_id = #{shopId}
+        </if>
+        <if test="limitNum > 0">
+            limit #{page},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryGoodsDeleteInfoCount" parameterType="com.cbt.bean.CustomGoodsQuery" resultType="java.lang.Integer">
+        select count(0)
+        from custom_benchmark_ready_delete_log where delete_flag = 0
+        <if test="catid != null">
+            and catid1 = #{catid}
+        </if>
+        <if test="shopId != null">
+            and shop_id = #{shopId}
+        </if>
+    </select>
+
+    <select id="queryGoodsDeleteDetails"  resultMap="queryGoodsResultMap">
+        select id,catid1,pid,custom_main_image,img,name,enname,eninfo,remotpath,valid,localpath,catid1,shop_id
+        from custom_benchmark_ready_delete_log where delete_flag = 0 and pid = #{pid}
+    </select>
+
+    <select id="queryOrinfringementPids" resultType="java.lang.String">
+        select pid from custom_benchmark_ready where unsellableReason in(10,11)
+        union
+        select pid from custom_goods_edit where off_reason like '%侵权%'
+    </select>
+
+    <insert id="syncDataToDeleteInfo">
+        insert into custom_benchmark_ready_delete_log(id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feeprice,fprice,name,enname,morder,entype,sku,endetail,eninfo,ali_sold,ali_pid,ali_price,ali_weight,ali_freight,ali_sellunit,ali_morder,ali_unit,ali_name,remotpath,valid,localpath,createtime,catid,catidparenta,catidparentb,keyword,sold,catidb,catpath,originalcatid,originalcatpath,ali_img,img_check,revise_weight,final_weight,range_price,shop_id,wholesale_price,fprice_str,pvids,infoReviseFlag,priceReviseFlag,isBenchmark,isNewCloud,finalName,sellunit,cur_time,bm_flag,source_pro_flag,is_sold_flag,priority_flag,is_add_car_flag,source_used_flag,ocr_match_flag,is_show_det_img_flag,is_show_det_table_flag,flag,goodsstate,beforesku,is_stock_flag,unsellableReason,samplingStatus,sendFrom,matchSource,updateDate,validationDate,best_match,ocean_price,validationDealDate,video_url,average_deliver_time,core_flag,score,updatetime,is_edited,admin_id,promotion_flag,size_info_en,sold_flag,from_flag,rw_keyword,new_arrival_date,max_price,description_en,add_price_lv,weight_flag,category_name,volume_weight,import_score,weight_sort_flag,brand_id,brand_name,shop_enname,entype_new,wholesale_price_new,feight_price_rate,searchable,range_price_free)
+select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feeprice,fprice,name,enname,morder,entype,sku,endetail,eninfo,ali_sold,ali_pid,ali_price,ali_weight,ali_freight,ali_sellunit,ali_morder,ali_unit,ali_name,remotpath,valid,localpath,createtime,catid,catidparenta,catidparentb,keyword,sold,catidb,catpath,originalcatid,originalcatpath,ali_img,img_check,revise_weight,final_weight,range_price,shop_id,wholesale_price,fprice_str,pvids,infoReviseFlag,priceReviseFlag,isBenchmark,isNewCloud,finalName,sellunit,cur_time,bm_flag,source_pro_flag,is_sold_flag,priority_flag,is_add_car_flag,source_used_flag,ocr_match_flag,is_show_det_img_flag,is_show_det_table_flag,flag,goodsstate,beforesku,is_stock_flag,unsellableReason,samplingStatus,sendFrom,matchSource,updateDate,validationDate,best_match,ocean_price,validationDealDate,video_url,average_deliver_time,core_flag,score,updatetime,is_edited,admin_id,promotion_flag,size_info_en,sold_flag,from_flag,rw_keyword,new_arrival_date,max_price,description_en,add_price_lv,weight_flag,category_name,volume_weight,import_score,weight_sort_flag,brand_id,brand_name,shop_enname,entype_new,wholesale_price_new,feight_price_rate,searchable,range_price_free from custom_benchmark_ready where pid = #{pid}
+    </insert>
+
+    <delete id="deleteDataByPid">
+        delete from custom_benchmark_ready where pid = #{pid};
+        delete from custom_goods_edit where pid = #{pid};
+    </delete>
+
+    <update id="updateDeleteInfoFlag">
+        update custom_benchmark_ready_delete_log set delete_flag= 1 where pid =  #{pid}
+    </update>
+
 </mapper>

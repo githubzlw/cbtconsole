@@ -977,5 +977,41 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.updateGoodsOverSeaInfo(goodsOverSea);
     }
 
+    @Override
+    public List<CustomGoodsPublish> queryGoodsDeleteInfo(CustomGoodsQuery queryBean) {
+        return customGoodsMapper.queryGoodsDeleteInfo(queryBean);
+    }
+
+    @Override
+    public int queryGoodsDeleteInfoCount(CustomGoodsQuery queryBean) {
+        return customGoodsMapper.queryGoodsDeleteInfoCount(queryBean);
+    }
+
+    @Override
+    public CustomGoodsPublish queryGoodsDeleteDetails(String pid) {
+        return customGoodsMapper.queryGoodsDeleteDetails(pid);
+    }
+
+    @Override
+    public List<String> queryOrinfringementPids() {
+        return customGoodsMapper.queryOrinfringementPids();
+    }
+
+    @Override
+    public int syncDataToDeleteInfo(String pid) {
+        return customGoodsMapper.syncDataToDeleteInfo(pid);
+    }
+
+    @Override
+    public int deleteDataByPid(String pid) {
+        customGoodsDao.deleteDataByPid(pid);
+        return customGoodsMapper.deleteDataByPid(pid);
+    }
+
+    @Override
+    public int updateDeleteInfoFlag(String pid) {
+        return customGoodsMapper.updateDeleteInfoFlag(pid);
+    }
+
 
 }

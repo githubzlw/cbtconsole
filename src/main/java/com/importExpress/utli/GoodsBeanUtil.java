@@ -24,6 +24,7 @@ public class GoodsBeanUtil {
         }
         queryBean.setCurrPage(Integer.valueOf(strPage));
         queryBean.setPage((queryBean.getCurrPage() - 1) * 50);
+        queryBean.setLimitNum(50);
 
         String catid = request.getParameter("catid");
         if (StringUtils.isNotBlank(catid) && !"0".equals(catid)) {

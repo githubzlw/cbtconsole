@@ -4152,4 +4152,26 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         return count;
     }
 
+    @Override
+    public int deleteDataByPid(String pid) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        PreparedStatement stmt28 = null;
+
+        String updateSql = "delete from custom_benchmark_ready_newest where pid = ?";
+        int count = 0;
+        try {
+            stmt28 = conn28.prepareStatement(updateSql);
+            stmt28.setString(1, pid);
+            count = stmt28.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",deleteDataByPid error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",deleteDataByPid error",e);
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+        }
+        return count;
+    }
+
 }
