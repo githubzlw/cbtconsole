@@ -352,6 +352,7 @@ public class ShopUrlController {
         String inputShopBrand = request.getParameter("inputShopBrand");
         String urlType = request.getParameter("urlType");
         String saveTypeStr = request.getParameter("saveType");
+        String memberId = request.getParameter("memberId");
         String[] typeShopUrls = request.getParameter("typeShopUrls").split(",");
         // 获取登录用户
         String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
@@ -427,6 +428,7 @@ public class ShopUrlController {
         su.setCreateTime(new Date());
         su.setUpdatetime(new Date());
         su.setIsTrade(Integer.valueOf(isTrade));
+        su.setMemberId(memberId);
 
         int result = shopUrlService.insertOrUpdate(su, typeShopUrls, isChange);
         if (result == 1) {

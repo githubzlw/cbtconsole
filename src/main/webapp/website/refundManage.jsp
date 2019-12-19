@@ -67,26 +67,47 @@
             top: 25%;
             background: #8cdab6;
             padding: 50px;
-            left: 45%;
+            left: 40%;
             box-shadow: 1px 10px 15px #e2e2e2;
         }
 
+        #offline_dlg {
+            display: none;
+            position: fixed;
+            top: 25%;
+            background: #8cdab6;
+            padding: 50px;
+            left: 40%;
+            box-shadow: 1px 10px 15px #e2e2e2;
+        }
     </style>
     <script>
 
         $(function () {
             initParam();
+            closeDialog();
         });
-        
+
         function initParam() {
             var type = "${type}";
-            if(type !=null || type != ""){
+            if (type != null || type != "") {
                 $("#query_type").val(type);
             }
             var appMoney = "${appMoney}";
-            if(appMoney !=null || appMoney != ""){
+            if (appMoney != null || appMoney != "") {
                 $("#query_app_money").val(appMoney);
             }
+        }
+
+        function closeDialog() {
+            $('#offline_dlg').hide();
+            $("#offline_refund_id").val('');
+            $("#offline_user_id").val('');
+            $("#offline_order_no").val('');
+            $("#offline_operator_id").val('');
+            $("#offline_amount").val('');
+            $("#offline_txn_id").val('');
+            $("#offline_remark").val('');
         }
     </script>
 </head>
@@ -103,7 +124,7 @@
         <div><span> 客户ID: <input type="text" id="query_user_id" style="width: 200px; height: 24px" value="${userId}"
                                  name="userId"/></span>
             <span> 账号: <input type="text" id="query_payPal_email" style="width: 200px; height: 24px"
-                                    value="${payPalEmail}" name="payPalEmail"/></span>
+                              value="${payPalEmail}" name="payPalEmail"/></span>
             <span> 申请时间: <input id="query_begin_time" class="Wdate"
                                 style="width: 110px; height: 24px" type="text" value="${beginTime}" name="beginTime"
                                 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
@@ -124,7 +145,7 @@
                     <option value="2">大于50</option>
 			</select></span>
             <span><input type="submit" class="btn_sty" value="查询" onclick="doQuery()"/></span>
-        <span>&nbsp;&nbsp;&nbsp;操作人：${operatorName}</span></div>
+            <span>&nbsp;&nbsp;&nbsp;操作人：${operatorName}</span></div>
         <%--<input type="hidden" id="query_state" value="${state}" name="state">--%>
         <input type="hidden" id="query_current_page" value="${page}" name="page">
         <input type="hidden" id="query_choose_state" value="${chooseState}" name="chooseState">
@@ -135,8 +156,10 @@
 
         <span style="margin-left: 100px;"><a href="/cbtconsole/refundss/rlist" target="_blank">未匹配用户申诉记录</a></span>
         <c:if test="${roleType == '0' && (operatorName=='emmaxie' || operatorName=='Ling' || operatorName=='Mandy')}">
-            <span style="margin-left: 65px;"><input type="button" onclick="showSecondValid(${operatorId})" value="二次验证密码" class="btn_sty"></span>
-            <span style="display: none"><input type="button" onclick="openWindow('/cbtconsole/apa/refundByPayNo.html')" value="交易号退款" class="btn_sty"></span>
+            <span style="margin-left: 65px;"><input type="button" onclick="showSecondValid(${operatorId})"
+                                                    value="二次验证密码" class="btn_sty"></span>
+            <span style="display: none"><input type="button" onclick="openWindow('/cbtconsole/apa/refundByPayNo.html')"
+                                               value="交易号退款" class="btn_sty"></span>
             &nbsp;&nbsp;&nbsp;<span><a href="/cbtconsole/apa/refundResultList.html" target="_blank">API退款结果列表</a> </span>
         </c:if>
         <span class="sp_style ${chooseState == -1 ? ' is_choose':''}" onclick="changeAndQuery(-1)">全部</span>
@@ -181,13 +204,14 @@
                         <span>状态：${refund.stateDesc}</span>
                     </c:if>
                 </td>
-                <%--<td style="width: 60px;"><a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${refund.userId}" title="点击查看客户对账信息">
-                        ${refund.userId}</a><br>销售:${refund.salesName}</td>--%>
+                    <%--<td style="width: 60px;"><a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${refund.userId}" title="点击查看客户对账信息">
+                            ${refund.userId}</a><br>销售:${refund.salesName}</td>--%>
                 <td style="width: 100px;">
-                    <span>客户ID:<a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${refund.userId}" title="点击查看客户对账信息">
-                        ${refund.userId}</a><br>销售:${refund.salesName}
-                    <c:if test="${fn:length(refund.paymentEmail) >0}"></span><br><br>
-                        <span>PayPal帐号:<br>${refund.paymentEmail}</span><br>
+                    <span>客户ID:<a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${refund.userId}"
+                                  title="点击查看客户对账信息">
+                            ${refund.userId}</a><br>销售:${refund.salesName}
+                        <c:if test="${fn:length(refund.paymentEmail) >0}"></span><br><br>
+                    <span>PayPal帐号:<br>${refund.paymentEmail}</span><br>
                     </c:if>
                     <c:if test="${fn:length(refund.userEmail) >0}">
                         <span>客户邮箱:<br>${refund.userEmail}</span>
@@ -206,7 +230,8 @@
                         <span>交易号:<br>${refund.paymentNo}</span><br>
                     </c:if>
                     <c:if test="${refund.type == 1}">
-                        <a href="javascript:void(0);" onclick="openOrderDeal(${refund.userId},'${refund.orderNo}',this)" title="查看交易信息">查看交易信息</a><br>
+                        <a href="javascript:void(0);" onclick="openOrderDeal(${refund.userId},'${refund.orderNo}',this)"
+                           title="查看交易信息">查看交易信息</a><br>
                     </c:if>
                     <c:if test="${fn:length(refund.reasonCode) >0}">
                         <span>payPal类型:${refund.reasonCode}</span><br>
@@ -261,15 +286,17 @@
                         <input type="button" value="驳回" class="refuse_sty"
                                onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},-1,this)"/>
                     </c:if>
-                    <%--Emma可以进行线下转账操作--%>
+                    <c:if test="${refund.state < 4 && roleType == '0'}">
+                        <input type="button" value="线下转账" class="btn_sty"
+                               onclick="beforeOffLineRefund(${refund.id},${refund.type},${refund.userId},'${refund.orderNo}',${operatorId},this)"/><br>
+                    </c:if>
+                        <%--Emma可以进行线下转账操作--%>
                     <c:if test="${refund.state == 3}">
                         <a href="javascript:void(0);" onclick="openDetails(${refund.id},this)" title="查看流程详细">查看流程详细</a>
                         <c:if test="${operatorId == 83 || operatorId == 8}">
                             <br><br>
                             <input type="button" value="执行退款" class="btn_sty"
-                               onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},3,this)"/>
-                            <input type="button" value="线下转账" class="btn_sty"
-                                   onclick="offLineRefund(${refund.id},${refund.type},${refund.userId},'${refund.orderNo}',${operatorId},this)"/>
+                                   onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},3,this)"/>
                         </c:if>
                     </c:if>
                     <c:if test="${refund.state == 4}">
@@ -288,8 +315,10 @@
     <div style="text-align: center;">
         <span>当前页：<span id="query_page">${page}</span>/<span id="query_total_page">${totalPage}</span></span>
         <span>&nbsp;&nbsp;总数：<span id="query_total">${total}</span></span>
-        <span>&nbsp;&nbsp;<input type="button" class="btn_sty" value="上一页" onclick="beforeQuery(${page},${page-1},${totalPage})"/></span>
-        <span>&nbsp;&nbsp;<input type="button" class="btn_sty" value="下一页" onclick="beforeQuery(${page},${page+1},${totalPage})"/></span>
+        <span>&nbsp;&nbsp;<input type="button" class="btn_sty" value="上一页"
+                                 onclick="beforeQuery(${page},${page-1},${totalPage})"/></span>
+        <span>&nbsp;&nbsp;<input type="button" class="btn_sty" value="下一页"
+                                 onclick="beforeQuery(${page},${page+1},${totalPage})"/></span>
         <span>&nbsp;&nbsp;&nbsp;&nbsp;跳转页：<input id="jump_page" type="number" value="1"/>
         <input type="button" value="翻页" class="btn_sty" onclick="jumpPage(${page},${totalPage})"/></span>
     </div>
@@ -315,7 +344,8 @@
             <td><input type="text" id="refund_order_no" value="" style="width: 265px;"/></td>
         </tr>
         <tr id="order_no_tr">
-            <td colspan="2"><select id="select_order_no" onchange="chooseOrderNo(this)" style="width: 253px;height: 24px;">
+            <td colspan="2"><select id="select_order_no" onchange="chooseOrderNo(this)"
+                                    style="width: 253px;height: 24px;">
                 <option value="">请选择订单号</option>
             </select><input type="button" value="查询可用订单" onclick="findCanRefundOrderNo()"/><br></td>
         </tr>
@@ -354,17 +384,57 @@
             <td><input type="password" id="secvlid_pwd" value="" style="width: 265px;"/></td>
         </tr>
         <tr>
-            <td colspan="2" style="text-align: center;"><input type="button" id="refund_bnt_enter" class="btn_sty" value="确定" onclick="setAndRemark()"/>
+            <td colspan="2" style="text-align: center;"><input type="button" id="refund_bnt_enter" class="btn_sty"
+                                                               value="确定" onclick="setAndRemark()"/>
                 <input type="button" class="btn_sty" value="取消" onclick="hideDivRemark()"/>
-            <span id="show_notice" style="color: red;display: none;">正在执行,请等待...</span></td>
+                <span id="show_notice" style="color: red;display: none;">正在执行,请等待...</span></td>
         </tr>
     </table>
 </div>
+
+<div id="offline_dlg">
+
+    <table>
+        <caption>线下退款确认</caption>
+        <tr style="display: none;">
+            <input type="hidden" id="offline_refund_id" value="">
+            <input type="hidden" id="offline_operator_id" value="">
+        </tr>
+        <tr>
+            <td>客户ID:</td>
+            <td><input id="offline_user_id" value="" disabled="disabled" style="width: 290px;"></td>
+        </tr>
+        <tr>
+            <td>订单号:</td>
+            <td><input id="offline_order_no" value="" disabled="disabled" style="width: 290px;"></td>
+        </tr>
+        <tr>
+            <td>退款金额:</td>
+            <td><input id="offline_amount" value="" style="width: 290px;"/></td>
+        </tr>
+        <tr>
+            <td>交易号:</td>
+            <td><input id="offline_txn_id" value="" style="width: 290px;"/></td>
+        </tr>
+        <tr>
+            <td>备注:</td>
+            <td><textarea name="offlineRemark" id="offline_remark"
+                          style="width: 290px;height: 75px;"></textarea></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: center"><a href="javascript:void(0)" class="easyui-linkbutton"
+                                                          onclick="offLineRefund()" style="width: 80px">保存</a> <a
+                    href="javascript:void(0)" class="easyui-linkbutton"
+                    onclick="closeDialog()" style="width: 80px">关闭</a></td>
+        </tr>
+    </table>
+</div>
+
 </body>
 <script>
 
 
-    function beforeAddRemark(refundId, state, type,userId,amount,orderNo,operatorId, actionFlag,obj) {
+    function beforeAddRemark(refundId, state, type, userId, amount, orderNo, operatorId, actionFlag, obj) {
         //背景色变色
         setChooseTr(obj);
 
@@ -372,12 +442,12 @@
         if (actionFlag < 0) {
             //拒绝退款
             var str = prompt('是否拒绝退款？请输入备注:', '');
-            if(str){
-                rejectRefund(refundId,9,userId,orderNo,operatorId,str);
+            if (str) {
+                rejectRefund(refundId, 9, userId, orderNo, operatorId, str);
             }
         } else if (actionFlag == 1) {
             if (state == 0) {
-                showDivSecvlid(refundId,type,state,1,userId,amount,orderNo,operatorId);
+                showDivSecvlid(refundId, type, state, 1, userId, amount, orderNo, operatorId);
                 /*if(roleType == 3 || roleType == 4){
                     //销售同意退款
                     showDivSecvlid(refundId,type,state,1,userId,amount,orderNo,operatorId);
@@ -387,25 +457,25 @@
                     return false;
                 }*/
             } else if (state == 1 || state == 2) {
-                if(roleType == 0){
+                if (roleType == 0) {
                     //主管同意退款
 
-                    if(state == 1){
+                    if (state == 1) {
                         //Ling退款
-                        if(operatorId == 1 || operatorId == 8 || operatorId == 6){
-                            showDivSecvlid(refundId,type,state,state + 1,userId,amount,orderNo,operatorId);
-                        }else{
+                        if (operatorId == 1 || operatorId == 8 || operatorId == 6) {
+                            showDivSecvlid(refundId, type, state, state + 1, userId, amount, orderNo, operatorId);
+                        } else {
                             alert("需要Ling或者Mandy同意，您无权限操作！");
                         }
-                    }else if(state == 2){
+                    } else if (state == 2) {
                         //EMMA退款
-                        if(operatorId == 8 || operatorId == 83){
-                            showDivSecvlid(refundId,type,state,state + 1,userId,amount,orderNo,operatorId);
-                        }else{
+                        if (operatorId == 8 || operatorId == 83) {
+                            showDivSecvlid(refundId, type, state, state + 1, userId, amount, orderNo, operatorId);
+                        } else {
                             alert("需要EMMA或者Mandy同意，您无权限操作！");
                         }
                     }
-                }else{
+                } else {
                     alert("需要主管同意，您无权限操作！");
                     hideDivRemark();
                     return false;
@@ -416,10 +486,10 @@
                 return false;
             }
         } else if (actionFlag == 3) {
-            if(roleType == 0){
+            if (roleType == 0) {
                 //执行退款操作
-                showDivSecvlid(refundId,type,state,4,userId,amount,orderNo,operatorId);
-            }else{
+                showDivSecvlid(refundId, type, state, 4, userId, amount, orderNo, operatorId);
+            } else {
                 alert("无权限操作！");
                 hideDivRemark();
                 return false;
@@ -435,58 +505,58 @@
         var userId = $("#refund_user_id").val();
         var orderNo = $("#refund_order_no").val();
         var operatorId = $("#select_op_id").val();
-        if(operatorId == null || operatorId == "" || operatorId == 0){
+        if (operatorId == null || operatorId == "" || operatorId == 0) {
             operatorId = $("#option_admin_id").val();
         }
         var refundAmount = $("#refund_amount").val();
         var secvlidPwd = $("#secvlid_pwd").val();
         var remark = $("#refund_remark").val();
-        if(orderNo == null || orderNo == ""){
+        if (orderNo == null || orderNo == "") {
             alert("获取订单号失败");
             return false;
-        }else if(refundAmount == null || refundAmount == "" || refundAmount <= 0){
+        } else if (refundAmount == null || refundAmount == "" || refundAmount <= 0) {
             alert("获取退款金额失败");
             return false;
-        }else if(remark == null || remark == ""){
+        } else if (remark == null || remark == "") {
             alert("获取备注信息失败");
             return false;
-        }else if(actionFlag > 1 && operatorId !=1 && (secvlidPwd == null || secvlidPwd == "")){
+        } else if (actionFlag > 1 && operatorId != 1 && (secvlidPwd == null || secvlidPwd == "")) {
             alert("获取密码失败");
             return false;
-        }else{
+        } else {
             /*$.messager.progress({
                 title: '正在执行',
                 msg: '请等待...'
             });*/
-            $("#refund_bnt_enter").prop("disabled",true);
+            $("#refund_bnt_enter").prop("disabled", true);
             $("#show_notice").show();
             $.ajax({
                 type: 'POST',
                 dataType: 'text',
                 url: '/cbtconsole/refundCtr/setAndRemark',
                 data: {
-                    "refundId":refundId,
-                    "state":state,
-                    "actionFlag":actionFlag,
-                    "type":type,
-                    "userId":userId,
-                    "orderNo":orderNo,
-                    "operatorId":operatorId,
-                    "refundAmount":refundAmount,
-                    "remark":remark,
-                    "secvlidPwd":secvlidPwd
+                    "refundId": refundId,
+                    "state": state,
+                    "actionFlag": actionFlag,
+                    "type": type,
+                    "userId": userId,
+                    "orderNo": orderNo,
+                    "operatorId": operatorId,
+                    "refundAmount": refundAmount,
+                    "remark": remark,
+                    "secvlidPwd": secvlidPwd
                 },
                 success: function (data) {
                     //$.messager.progress('close');
-                    $("#refund_bnt_enter").prop("disabled",false);
+                    $("#refund_bnt_enter").prop("disabled", false);
                     $("#show_notice").hide();
                     var json = eval("(" + data + ")");
                     if (json.ok) {
                         //alert("执行成功");
                         hideDivRemark();
-                        if(json.message == null || json.message == ""){
+                        if (json.message == null || json.message == "") {
                             alert("执行成功");
-                        }else{
+                        } else {
                             alert("执行成功," + json.message);
                         }
                         window.location.reload();
@@ -495,7 +565,7 @@
                     }
                 },
                 error: function () {
-                    $("#refund_bnt_enter").prop("disabled",false);
+                    $("#refund_bnt_enter").prop("disabled", false);
                     $("#show_notice").hide();
                     //$.messager.progress('close');
                     alert("执行失败,请联系管理员");
@@ -512,7 +582,7 @@
      * @param operatorId
      * @param remark
      */
-    function rejectRefund(refundId,actionFlag,userId,orderNo,operatorId,remark) {
+    function rejectRefund(refundId, actionFlag, userId, orderNo, operatorId, remark) {
         $.messager.progress({
             title: '正在执行',
             msg: '请等待...'
@@ -522,12 +592,12 @@
             dataType: 'text',
             url: '/cbtconsole/refundCtr/rejectRefund',
             data: {
-                "refundId":refundId,
-                "actionFlag":actionFlag,
-                "userId":userId,
-                "orderNo":orderNo,
-                "operatorId":operatorId,
-                "remark":remark
+                "refundId": refundId,
+                "actionFlag": actionFlag,
+                "userId": userId,
+                "orderNo": orderNo,
+                "operatorId": operatorId,
+                "remark": remark
             },
             success: function (data) {
                 $.messager.progress('close');
@@ -546,6 +616,20 @@
         });
     }
 
+    function beforeOffLineRefund(refundId, type, userId, orderNo, operatorId, obj) {
+        //背景色变色
+        setChooseTr(obj);
+        $("#offline_refund_id").val(refundId);
+        $("#offline_user_id").val(userId);
+        $("#offline_order_no").val(orderNo);
+        $("#offline_operator_id").val(operatorId);
+        $("#offline_amount").val('');
+        $("#offline_txn_id").val('');
+        $("#offline_remark").val('');
+
+        $('#offline_dlg').show();
+    }
+
     /**
      * 已经线下转账
      * @param refundId
@@ -553,23 +637,30 @@
      * @param operatorId
      * @param orderNo
      */
-    function offLineRefund(refundId,type,userId,orderNo,operatorId,obj) {
-        //背景色变色
-        setChooseTr(obj);
-        var str = prompt('是否线下转账？请输入备注:', '');
-        if(str){
+    function offLineRefund() {
+        var refundId = $("#offline_refund_id").val();
+        var userId = $("#offline_user_id").val();
+        var orderNo = $("#offline_order_no").val();
+        var operatorId = $("#offline_operator_id").val();
+        var amount = $("#offline_amount").val();
+        var txnId = $("#offline_txn_id").val();
+        var remark = $("#offline_remark").val();
+
+        if (refundId > 0 && userId > 0 && operatorId > 0 && amount > 0 && txnId && remark) {
             $.ajax({
                 type: 'POST',
                 dataType: 'text',
                 url: '/cbtconsole/refundCtr/offLineRefund',
                 data: {
-                    "refundId":refundId,
-                    "type":type,
-                    "actionFlag":3,
-                    "userId":userId,
-                    "operatorId":operatorId,
-                    "orderNo":orderNo,
-                    "remark":str
+                    "refundId": refundId,
+                    "amount": amount,
+                    "txnId": txnId,
+                    "type": 1,
+                    "actionFlag": 3,
+                    "userId": userId,
+                    "operatorId": operatorId,
+                    "orderNo": orderNo,
+                    "remark": remark
                 },
                 success: function (data) {
                     $.messager.progress('close');
@@ -586,9 +677,11 @@
                     alert("执行失败,请联系管理员");
                 }
             });
-        }else{
-            hideTrChoose();
+        } else {
+            $.messager.alert("请输入全部数据");
         }
+
+
     }
 
     /**
@@ -596,19 +689,19 @@
      * @param userId
      * @param accId
      */
-    function findCanRefundOrderNo(){
+    function findCanRefundOrderNo() {
         $("#select_order_no").empty();
         $("#select_order_no").append('<option value="">请选择订单号</option>');
         var refundAmount = $("#refund_amount").val();
         var userId = $("#refund_user_id").val();
         var refundType = $("#refund_type").val();
 
-        if(userId == 0){
+        if (userId == 0) {
             alert("获取用户ID失败");
-        }else if(refundAmount == null || refundAmount == "" || refundAmount == 0){
+        } else if (refundAmount == null || refundAmount == "" || refundAmount == 0) {
             alert("获取退款金额失败");
-        }else{
-            if(refundType == 0){
+        } else {
+            if (refundType == 0) {
                 $.ajax({
                     type: 'POST',
                     dataType: 'json',
@@ -619,20 +712,20 @@
                     },
                     success: function (data) {
                         if (data.ok) {
-                            if(data.total > 0){
+                            if (data.total > 0) {
                                 $("#select_order_no").empty();
                                 var json = data.data;
                                 var context = '';
                                 var count = 0;
-                                for(var key in json){
-                                    if(count == 0){
+                                for (var key in json) {
+                                    if (count == 0) {
                                         $("#refund_order_no").val(key);
                                     }
-                                    context +='<option value="'+key+'">'+json[key]+'</option>';
-                                    count ++;
+                                    context += '<option value="' + key + '">' + json[key] + '</option>';
+                                    count++;
                                 }
                                 $("#select_order_no").append(context);
-                            }else{
+                            } else {
                                 alert("无匹配的订单可用");
                             }
                         } else {
@@ -649,7 +742,7 @@
 
 
     function addToRemark(obj) {
-        if($(obj).is(":checked")){
+        if ($(obj).is(":checked")) {
             var content = $(obj).val();
             var remarkVal = $("#refund_remark").val();
             $("#refund_remark").val(remarkVal + "@" + content);
@@ -660,50 +753,50 @@
         var orderNo = $(obj).val();
         $("#refund_order_no").val(orderNo);
     }
-    
+
     function changeAndQuery(chooseState) {
         $("#query_choose_state").val(chooseState);
         doQuery();
     }
-    
+
     function doQuery() {
         $("#refund_query_form").submit();
     }
-    
-    function beforeQuery(currentPage,nextPage,totalPage) {
-        if(nextPage >0 && nextPage <=totalPage){
+
+    function beforeQuery(currentPage, nextPage, totalPage) {
+        if (nextPage > 0 && nextPage <= totalPage) {
             $("#query_current_page").val(nextPage);
             doQuery();
-        }else{
+        } else {
             alert("无法翻页！");
             return false;
         }
     }
 
-    function jumpPage(currentPage,totalPage){
+    function jumpPage(currentPage, totalPage) {
 
         var nextPage = $("#jump_page").val();
-        if(nextPage == null || nextPage == "" || nextPage < 1){
+        if (nextPage == null || nextPage == "" || nextPage < 1) {
             alert("请输入跳转页");
             return false;
-        }else{
-            if(nextPage >0 && nextPage <=totalPage){
+        } else {
+            if (nextPage > 0 && nextPage <= totalPage) {
                 $("#query_current_page").val(nextPage);
                 doQuery();
-            }else{
+            } else {
                 alert("无法翻页！");
                 return false;
             }
         }
     }
 
-    function showDivSecvlid(refundId,type,state,actionFlag,userId,amount,orderNo,operatorId) {
-        if(actionFlag == 1 || operatorId == 1){
-            $("#second_admid").css("display","none");
-            $("#second_pwd").css("display","none");
+    function showDivSecvlid(refundId, type, state, actionFlag, userId, amount, orderNo, operatorId) {
+        if (actionFlag == 1 || operatorId == 1) {
+            $("#second_admid").css("display", "none");
+            $("#second_pwd").css("display", "none");
         }
-        if(state > 0 || type == 1){
-            $("#order_no_tr").css("display","none");
+        if (state > 0 || type == 1) {
+            $("#order_no_tr").css("display", "none");
         }
         $("#refund_id").val(refundId);
         $("#refund_type").val(type);
@@ -712,8 +805,8 @@
         $("#refund_user_id").val(userId);
         $("#refund_amount").val(amount);
         $("#refund_order_no").val(orderNo);
-        if(state > 1 && orderNo.length > 0){
-            $("#refund_order_no").attr("disbaled","disbaled");
+        if (state > 1 && orderNo.length > 0) {
+            $("#refund_order_no").attr("disbaled", "disbaled");
         }
         $("#select_op_id").val(operatorId);
         $("#option_admin_id").val(operatorId);
@@ -722,9 +815,9 @@
 
     function hideDivRemark() {
         hideTrChoose();
-        $("#second_admid").css("display","");
-        $("#second_pwd").css("display","");
-        $("#order_no_tr").css("display","");
+        $("#second_admid").css("display", "");
+        $("#second_pwd").css("display", "");
+        $("#order_no_tr").css("display", "");
         $("#secvlid_pwd").val("");
         $("#refund_id").val("");
         $("#refund_type").val("");
@@ -737,32 +830,32 @@
         $("#refund_remark").val("");
         $("#option_admin_id").val("");
         $("#div_secvlid").hide();
-        $("#refund_bnt_enter").prop("disabled",false);
+        $("#refund_bnt_enter").prop("disabled", false);
         $("#show_notice").hide();
     }
-    
+
     function hideTrChoose() {
         $("#refund_table tbody").find("tr").each(function () {
             $(this).removeClass("is_tr");
         });
     }
-    
-    function openOrderDeal(userId,orderNo,obj) {
+
+    function openOrderDeal(userId, orderNo, obj) {
         setChooseTr(obj);
         var url = "/cbtconsole/refundCtr/queryOrderDeal?userId=" + userId + "&orderNo=" + orderNo;
         var param = "height=860,width=1330,top=70,left=350,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open(url, "windows", param);
     }
-    
-    function openDetails(refundId,obj) {
+
+    function openDetails(refundId, obj) {
         setChooseTr(obj);
         var url = "/cbtconsole/refundCtr/queryRefundDetails?refundId=" + refundId;
         var param = "height=860,width=1090,top=70,left=360,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open(url, "windows", param);
     }
-    
+
     function showSecondValid(operatorId) {
-        var url = "/cbtconsole/apa/secondaryValidation.html?operatorId="+operatorId;
+        var url = "/cbtconsole/apa/secondaryValidation.html?operatorId=" + operatorId;
         var param = "height=460,width=680,top=235,left=666,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open(url, "windows", param);
     }

@@ -37,6 +37,16 @@ public class ShopUrl {
 	private String onlineStatusView;
 	private int isAuto;
 
+	private String memberId;
+
+	public String getMemberId() {
+		return memberId;
+	}
+
+	public void setMemberId(String memberId) {
+		this.memberId = memberId;
+	}
+
 	/**
 	 * 是否黑名单
 	 */

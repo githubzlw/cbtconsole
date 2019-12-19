@@ -20,6 +20,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.RefundDetailsBean;
 import com.importExpress.pojo.RefundNewBean;
 import com.importExpress.pojo.RefundResultInfo;
+import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.service.RefundNewService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +59,8 @@ public class RefundController {
 
     @Autowired
     private PayPalService ppApiService;
+    @Autowired
+    private PaymentServiceNew paymentServiceNew;
 
 
     /**
@@ -325,7 +328,7 @@ public class RefundController {
                 json.setOk(false);
                 json.setMessage("获取订单号失败,请重试");
                 return json;
-            }else if(orderNo.contains("_")){
+            } else if (orderNo.contains("_")) {
                 json.setOk(false);
                 json.setMessage("拆单或者补货订单号，不可退款");
                 return json;
@@ -352,8 +355,12 @@ public class RefundController {
                 json.setOk(false);
                 json.setMessage("获取退款金额失败,请重试");
                 return json;
+            } else if (Double.parseDouble(refundAmountStr) >= 300) {
+                json.setOk(false);
+                json.setMessage("该退款金额超过300，请转账");
+                return json;
             } else {
-                refundAmount = Double.valueOf(refundAmountStr);
+                refundAmount = Double.parseDouble(refundAmountStr);
             }
 
             String remark = request.getParameter("remark");
@@ -451,7 +458,40 @@ public class RefundController {
 
         JsonResult json = new JsonResult();
         try {
-            json = ppApiService.reFundNew(detailsBean.getOrderNo(), decimalFormat.format(detailsBean.getRefundAmount()));
+
+            String refundOrderNo = detailsBean.getOrderNo();
+            if (refundOrderNo.contains("_")) {
+                String[] orderSplit = refundOrderNo.split("_");
+                if (orderSplit[1].trim().length() > 2) {
+                    json.setOk(false);
+                    json.setMessage("拆单或者补货订单号，不可退款");
+                    return json;
+                } else {
+                    refundOrderNo = orderSplit[0].trim();
+                }
+            }
+
+            // 判断此订单没有PayPal或stripe的付款，如果PayPal或stripe的付款小于申请金额并且余额付款并且大于等于申请金额，则直接退给客户余额
+            List<PaymentDetails> list = paymentServiceNew.queryPaymentDetails(refundOrderNo);
+
+            double orderPay = 0;
+
+            for (PaymentDetails pd : list) {
+                if (pd.getPayType() == 0 || pd.getPayType() == 1 || pd.getPayType() == 5) {
+                    // 计算PayPal TT stripe支付值
+                    orderPay += pd.getPaymentAmount();
+                }
+            }
+            list.clear();
+
+            /*if (orderPay > 300) {
+                json.setOk(false);
+                json.setMessage("该订单总支付金额:" + orderPay + "超过300，请转账");
+                return json;
+            }*/
+
+
+            json = ppApiService.refundByMq(detailsBean.getOrderNo(), decimalFormat.format(detailsBean.getRefundAmount()));
             if (json.isOk()) {
                 //如果是PayPal申请退款，则自动添加一条余额补偿记录(非余额补偿)
                 if (type == 1) {
@@ -675,6 +715,18 @@ public class RefundController {
                 json.setMessage("获取备注信息失败,请重试");
                 return json;
             }
+            String txnId = request.getParameter("txnId");
+            if (StringUtils.isBlank(txnId)) {
+                json.setOk(false);
+                json.setMessage("获取退款交易号失败,请重试");
+                return json;
+            }
+            String amount = request.getParameter("amount");
+            if (StringUtils.isBlank(amount) || Double.parseDouble(amount) <= 0) {
+                json.setOk(false);
+                json.setMessage("获取退款金额失败,请重试");
+                return json;
+            }
             String orderNo = request.getParameter("orderNo");
 
             RefundDetailsBean detailsBean = new RefundDetailsBean();
@@ -682,7 +734,7 @@ public class RefundController {
             detailsBean.setAdminId(user.getId());
             detailsBean.setOrderNo(orderNo == null ? "" : orderNo);
             detailsBean.setRefundState(actionFlag);
-            detailsBean.setRefundAmount(0);
+            detailsBean.setRefundAmount(Double.parseDouble(amount));
             detailsBean.setRemark(remark);
             detailsBean.setUserId(userId);
             refundNewService.setAndRemark(detailsBean);
@@ -690,7 +742,7 @@ public class RefundController {
             updateOnlineRefundState(detailsBean);
 
             detailsBean.setRefundState(4);
-            detailsBean.setRemark("已经确认线下退款，退款自动完结");
+            detailsBean.setRemark("已经确认线下退款，退款自动完结,交易号["+txnId+","+amount+"]");
             refundNewService.setAndRemark(detailsBean);
             //使用MQ更新线上状态
             updateOnlineRefundState(detailsBean);

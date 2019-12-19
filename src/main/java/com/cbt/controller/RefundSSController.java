@@ -1096,7 +1096,7 @@ public class RefundSSController {
             RefundBean rfBean = paymentDao.queryRefundBeanById(rdId, userId);
             if (rfBean != null) {
                 DecimalFormat dcft = new DecimalFormat("0.00");
-                json = ppApiService.reFundNew(rfBean.getOrderid(), dcft.format(rfBean.getAccount()));
+                json = ppApiService.refundByMq(rfBean.getOrderid(), dcft.format(rfBean.getAccount()));
                 if (json.isOk()) {
                     //如果是PayPal申请退款，则自动添加一条余额补偿记录(非余额补偿)
                     if(rfBean.getType() == 1){

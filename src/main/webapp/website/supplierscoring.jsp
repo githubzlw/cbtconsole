@@ -114,7 +114,10 @@
 		<tbody>
 		 <c:forEach items="${pageInfo.list }" var="supplierScoringBean" varStatus="status">
 			<tr>
-			<td><a target='_blank' href='https://www.import-express.com/shop?sid=${supplierScoringBean.shopId }'>${supplierScoringBean.shopId }</a>
+			<td>
+				<c:if test="${supplierScoringBean.siteFlag==1 }"><a target='_blank' href='https://www.import-express.com/shop?sid=${supplierScoringBean.shopId }'>${supplierScoringBean.shopId }</a></c:if>
+				<c:if test="${supplierScoringBean.siteFlag==2 }"><a target='_blank' href='https://www.kidsproductwholesale.com/shop?sid=${supplierScoringBean.shopId }'>${supplierScoringBean.shopId }</a></c:if>
+				<c:if test="${supplierScoringBean.siteFlag==3 }"><a target='_blank' href='https://www.petstoreinc.com/shop?sid=${supplierScoringBean.shopId }'>${supplierScoringBean.shopId }</a></c:if>
 			</td>
 			<td>${supplierScoringBean.category}</td>
 			<td>${supplierScoringBean.allcounts }|${supplierScoringBean.counts }|${supplierScoringBean.sell }</td>
