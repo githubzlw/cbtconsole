@@ -217,7 +217,7 @@ public class AutoOrderController {
 			detailBean.setOrderid(orderNo);
 			detailBean.setDelivery_time("15");
 			detailBean.setUserid(userId);
-			detailBean.setGoodsname("Import Express Product");
+			detailBean.setGoodsname("China Wholesale Product");
 			detailBean.setGoodsprice(format.format(productCost));
 			detailBean.setRemark(remark);
 			detailBean.setYourorder(yourOrder);

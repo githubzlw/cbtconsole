@@ -721,4 +721,18 @@ public interface TaoBaoOrderMapper {
 	    */
 	public int updateInventory(Map<Object, Object> map);
 
+	/**
+    * 抓取正常采购订单退款明细
+    * @param map
+    * @return
+    */
+   List<TaoBaoOrderInfo> getRefundAmount(Map<Object, Object> map);
+
+   /**
+    * 抓取正常采购订单退款明细数量
+    * @param map
+    * @return
+    */
+   List<TaoBaoOrderInfo> getRefundAmountCount(Map<Object, Object> map);
+
 }
