@@ -9549,7 +9549,7 @@ public class WarehouseCtrl {
 				String remark = "订单orderno/odid已出运-"+shipno+",释放其占用的库存orderStock";
 				int reduceOrderStock = owsService.reduceOrderStock(orderno, 0, remark);
 				
-				if(logByOrderno.size() == reduceOrderStock) {
+				if(reduceOrderStock > 0) {
 					result.put("status", 200);
 				}else {
 					result.put("status", 103);
