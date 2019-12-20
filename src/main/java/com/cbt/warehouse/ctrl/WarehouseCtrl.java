@@ -2273,7 +2273,7 @@ public class WarehouseCtrl {
 		String cateId=request.getParameter("cateId");
 		String keyword=request.getParameter("keyword");
 		Map<String, String> map = new HashMap<String, String>(); // sql 参数
-		map.put("keyword", keyword);
+		map.put("keyword", org.apache.commons.lang3.StringUtils.replace(keyword, "'", "\'"));
 		map.put("cateId", cateId);
 		return iWarehouseService.addKeyword(map) + "";
 	}
