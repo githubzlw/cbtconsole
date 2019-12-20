@@ -1366,6 +1366,17 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 
 		return taoBaoOrderMapper.getOperationRemark(map);
 	}
+
+	@Override
+	public List<TaoBaoOrderInfo> getRefundAmount(Map<Object, Object> map) {
+		return taoBaoOrderMapper.getRefundAmount(map);
+	}
+
+	@Override
+	public List<TaoBaoOrderInfo> getRefundAmountCount(Map<Object, Object> map) {
+		return taoBaoOrderMapper.getRefundAmountCount(map);
+	}
+
 	@Override
 	public List<TaoBaoOrderInfo> queryBuyCount(String torderid,
 	                                           String opsorderid) {
