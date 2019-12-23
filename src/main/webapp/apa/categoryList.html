@@ -468,8 +468,7 @@
                         if (data.ok) {
                             showMessage("更新成功");
                             closeCatidDialog();
-                            var currCid = $("#query_catid").textbox('getValue');
-                            createCategoryTree(currCid, "", 1);
+                            createCategoryTree(parentCid, "", 1);
                         } else {
                             $.messager.alert("提示信息", data.message, "error");
                         }
