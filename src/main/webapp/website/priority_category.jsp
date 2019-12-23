@@ -289,7 +289,7 @@ function saveKeyWord(){
 				</div>
 			</form>
 		</div>
-		<a href="javascript:addKeyword();" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">新增</a>
+		<a href="javascript:addKeyword();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">新增</a>
 		<a href="https://www.import-express.com/app/flushCategoryList" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">刷新Import缓存优先类别数据</a>
 		<a href="https://www.kidsproductwholesale.com/app/flushCategoryList" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">刷新Kids缓存优先类别数据</a>
 		<a href="https://www.petstoreinc.com/app/flushCategoryList" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">刷新Pets缓存优先类别数据</a>

@@ -9,7 +9,7 @@
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/report/datechoise.js"></script>
-<title>抓取正常采购订单明细</title>
+<title>抓取正常采购订单退款明细</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" href="script/style.css" type="text/css">
 <link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
@@ -79,7 +79,7 @@ table.imagetable td {
 $(function(){
 	setDatagrid();
 	var opts = $("#easyui-datagrid").datagrid("options");
-	opts.url = "/cbtconsole/StatisticalReport/BuyOrderDetails";
+	opts.url = "/cbtconsole/StatisticalReport/getRefundOrderDetails";
 	$("#data").combobox({
 		onChange: function (n,o) {
 			getZfuDate();
@@ -89,7 +89,7 @@ $(function(){
 
 function setDatagrid() {
 		$('#easyui-datagrid').datagrid({
-			title : '抓取正常采购订单明细(单位:RMB)',
+			title : '抓取正常采购订单退款明细(单位:RMB)',
 			//iconCls : 'icon-ok',
 			width : "100%",
 			fit : true,//自动补全 
@@ -122,8 +122,7 @@ function doQuery(page) {
 	$("#easyui-datagrid").datagrid("load", {
 		"page":page,
 		"times":times,
-		"userName":userName,
-	     "type":"5"	
+		"userName":userName
 	});
 }
 
@@ -154,7 +153,7 @@ function doReset(){
 	  if(!userName){
 	      userName = "";
 	  }
- 	 window.location.href ="/cbtconsole/StatisticalReport/exportBuyOrderDetails?times="+times+"&userName="+userName+"&type=5";
+ 	 window.location.href ="/cbtconsole/StatisticalReport/exportRefundOrderDetails?times="+times+"&userName="+userName;
  }
 
  function initAdminList(){
@@ -188,11 +187,10 @@ function doReset(){
 				<input type="hidden" id="type" value="2" name="type"/>
 				 <input class="but_color" type="button" value="查询" onclick="doQuery(1)"> 
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
-				<a target="_blank" href="/cbtconsole/website/grabNormalOrderRefund.jsp?times=${param.times}">查看退款数据</a>
 			</form>
 		</div>
 		<a href="javascript:exportdata();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">导出</a>
-		<span>【${param.times}】采购订单取消销售订单总金额</span><span style="color:red">￥【${param.amount}】</span>
+		<span>【${param.times}】</span>
 	</div>
 	
 		<table class="easyui-datagrid" id="easyui-datagrid"   style="width:1500px;height:900px">
