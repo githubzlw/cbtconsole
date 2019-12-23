@@ -210,11 +210,12 @@ function cancel(){
     $("#cateId").textbox('setValue','');
 }
 
-function openEditKeyword(id,catId,akey){
+function openEditKeyword(id,catId,akey,antiKey){
     $('#dlg1').dialog('open');
     $("#pId").val(id);
     $("#cid").textbox('setValue',catId);
     $("#a-Key").textbox('setValue',akey);
+    $("#antikey").textbox('setValue',antiKey);
 }
 
 function editKeyword(){
@@ -293,7 +294,7 @@ function saveKeyWord(){
 				</div>
 					<div style="margin-bottom:20px;margin-left:35px;">
 					<input class="easyui-textbox" name="antiKey" id="antikey"  style="width:70%;"  data-options="label:'反关键词:'">
-					<input type="hidden" id="a-Key">
+					<input type="hidden" id="a-Key" class="easyui-textbox">
 				</div>
 				<div style="text-align:center;padding:5px 0">
 					<a href="javascript:void(0)" class="easyui-linkbutton" onclick="editKeyword()" style="width:80px">提交</a>

@@ -1261,10 +1261,10 @@ public class WarehouseServiceImpl implements IWarehouseService {
         for(ShopManagerPojo s:list){
             if("1".equals(s.getStatus())){
                 s.setStatus("<span style='color:red'>停用</span>");
-                s.setRemark("<button onclick=\"updateState("+s.getId()+",0)\" style='background-color:green'>启用搜索词优先类别</button>|<button onclick=\"openEditKeyword("+s.getId()+",'"+s.getCategory()+"','"+s.getKeyword()+"')\">修改搜索词优先类别</button>");
+                s.setRemark("<button onclick=\"updateState("+s.getId()+",0)\" style='background-color:green'>启用搜索词优先类别</button>|<button onclick=\"openEditKeyword("+s.getId()+",'"+s.getCategory()+"','"+s.getKeyword()+"','"+s.getAntiKey()+"')\">修改搜索词优先类别</button>");
             }else{
                 s.setStatus("<span style='color:green'>启用</span>");
-                s.setRemark("<button onclick=\"updateState("+s.getId()+",1)\" style='background-color:red'>停用搜索词优先类别</button>|<button onclick=\"openEditKeyword("+s.getId()+",'"+s.getCategory()+"','"+s.getKeyword()+"')\">修改搜索词优先类别</button>");
+                s.setRemark("<button onclick=\"updateState("+s.getId()+",1)\" style='background-color:red'>停用搜索词优先类别</button>|<button onclick=\"openEditKeyword("+s.getId()+",'"+s.getCategory()+"','"+s.getKeyword()+"','"+s.getAntiKey()+"')\">修改搜索词优先类别</button>");
             }
             s.setMinPrice("<input type='text' id='"+s.getId()+"_min'  title='按回车修改价格' onkeyup='if(event.keyCode==13){updatePrice(0,"+s.getId()+")}' value='"+(StringUtil.isBlank(s.getMinPrice())?"-":s.getMinPrice())+"'>");
             s.setAntiKey("<input type='text' id='"+s.getId()+"_anti'  title='按回车修改反关键词' onkeyup=\"if(event.keyCode==13){updateAntikey("+s.getId()+","+s.getAntiId()+",'"+(StringUtil.isBlank(s.getKeyword())?"":s.getKeyword())+"')}\" value='"+(StringUtil.isBlank(s.getAntiKey())?"":s.getAntiKey())+"'>");
