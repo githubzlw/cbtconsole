@@ -1261,12 +1261,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
         for(ShopManagerPojo s:list){
             if("1".equals(s.getStatus())){
                 s.setStatus("<span style='color:red'>停用</span>");
-                s.setRemark("<button onclick=\"updateState("+s.getId()+",0)\" style='background-color:green'>启用搜索词优先类别</button>|<button onclick=\"openEditKeyword("+s.getId()+",'"+s.getCategory()+"')\">修改搜索词优先类别</button>");
+                s.setRemark("<button onclick=\"updateState("+s.getId()+",0)\" style='background-color:green'>启用搜索词优先类别</button>|<button onclick=\"openEditKeyword("+s.getId()+",'"+s.getCategory()+"','"+s.getKeyword()+"')\">修改搜索词优先类别</button>");
             }else{
                 s.setStatus("<span style='color:green'>启用</span>");
-                s.setRemark("<button onclick=\"updateState("+s.getId()+",1)\" style='background-color:red'>停用搜索词优先类别</button>|<button onclick=\"openEditKeyword("+s.getId()+",'"+s.getCategory()+"')\">修改搜索词优先类别</button>");
+                s.setRemark("<button onclick=\"updateState("+s.getId()+",1)\" style='background-color:red'>停用搜索词优先类别</button>|<button onclick=\"openEditKeyword("+s.getId()+",'"+s.getCategory()+"','"+s.getKeyword()+"')\">修改搜索词优先类别</button>");
             }
             s.setMinPrice("<input type='text' id='"+s.getId()+"_min'  title='按回车修改价格' onkeyup='if(event.keyCode==13){updatePrice(0,"+s.getId()+")}' value='"+(StringUtil.isBlank(s.getMinPrice())?"-":s.getMinPrice())+"'>");
+            s.setAntiKey("<input type='text' id='"+s.getId()+"_anti'  title='按回车修改反关键词' onkeyup=\"if(event.keyCode==13){updateAntikey("+s.getId()+","+s.getAntiId()+",'"+(StringUtil.isBlank(s.getKeyword())?"":s.getKeyword())+"')}\" value='"+(StringUtil.isBlank(s.getAntiKey())?"":s.getAntiKey())+"'>");
 //            s.setMaxPrice("<input type='text' id='"+s.getId()+"_max' title='按回车修改价格' onkeyup='if(event.keyCode==13){updatePrice(1,"+s.getId()+")}' value='"+(StringUtil.isBlank(s.getMaxPrice())?"-":s.getMaxPrice())+"'>");
             String enName=s.getEnName();
             String category=s.getCategory();
@@ -1818,7 +1819,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
             row=warehouseMapper.addKeyword(map);
             if(row>0){
-                SendMQ.sendMsg(new RunSqlModel("insert into priority_category(keyword,category) values('"+map.get("keyword")+"','"+map.get("cateId")+"')"));
+                SendMQ.sendMsg(new RunSqlModel("insert into priority_category(keyword,category) values('"+org.apache.commons.lang3.StringUtils.replace(map.get("keyword"), "'", "\\'")+"','"+map.get("cateId")+"')"));
+                RunSqlModel runSqlModel = new RunSqlModel("update anti_key_words set flag =0,auti_word = '"+map.get("antiKey")+"' where keyword='"+org.apache.commons.lang3.StringUtils.replace(map.get("keyword"), "'", "\\'")+"')");
+                int res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
+                if(res < 1) {
+                	runSqlModel = new RunSqlModel("insert into anti_key_words (keyword,auti_word,flag) values('"+map.get("keyword")+"','"+map.get("antiKey")+"',0)");
+                	res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
+                }
             }
 
         }catch (Exception e){
@@ -1835,6 +1842,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
             row=warehouseMapper.editKeyword(map);
             if(row>0){
                 SendMQ.sendMsg(new RunSqlModel("update priority_category set category="+map.get("cid")+" where id="+map.get("id")+""));
+                
+                RunSqlModel runSqlModel = new RunSqlModel("update anti_key_words set flag =0,auti_word = '"+map.get("antiKey")+"' where keyword='"+map.get("akey")+"')");
+                int res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
+                if(res < 1) {
+                	runSqlModel = new RunSqlModel("insert into anti_key_words (keyword,auti_word,flag) values('"+map.get("akey")+"','"+map.get("antiKey")+"',0)");
+                	res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
+                }
             }
 
         }catch (Exception e){

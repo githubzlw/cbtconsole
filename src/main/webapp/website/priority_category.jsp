@@ -142,6 +142,24 @@ function updatePrice(type,id){
         }
     });
 }
+function updateAntikey(id,antiId,keyword){
+    var antikey=$("#"+id+"_anti").val();
+    $.ajax({
+        type:"post",
+        url:"/cbtconsole/warehouse/updateAntikey",
+        data:{antiId:antiId,keyword:keyword,antikey:antikey},
+        dataType:"text",
+        async:true,
+        success : function(data){
+            console.log(data);
+            if(data >0){
+                $('#easyui-datagrid').datagrid('reload');
+            }else{
+                topCenter("更新失败");
+            }
+        }
+    });
+}
 	
 function doQuery(page) {
     var keyword = $.trim(document.getElementById("kWord").value);
@@ -192,15 +210,18 @@ function cancel(){
     $("#cateId").textbox('setValue','');
 }
 
-function openEditKeyword(id,catId){
+function openEditKeyword(id,catId,akey){
     $('#dlg1').dialog('open');
     $("#pId").val(id);
     $("#cid").textbox('setValue',catId);
+    $("#a-Key").textbox('setValue',akey);
 }
 
 function editKeyword(){
     var pId=$("#pId").val();
     var cid = $.trim(document.getElementById("cid").value);
+    var antikey = $.trim(document.getElementById("antikey").value);
+    var akey = $.trim(document.getElementById("a-Key").value);
     if(cid == null || cid == ""){
         topCenter("请输入优先类别数据");
         return;
@@ -208,7 +229,7 @@ function editKeyword(){
     $.ajax({
         type:"post",
         url:"/cbtconsole/warehouse/editKeyword",
-        data:{id:pId,cid:cid},
+        data:{id:pId,cid:cid,antikey:antikey,akey:akey},
         dataType:"text",
         async:true,
         success : function(data){
@@ -231,6 +252,7 @@ function addKeyword(){
 function saveKeyWord(){
     var keyword = $.trim(document.getElementById("word").value);
     var cateId = $.trim(document.getElementById("cateId").value);
+    var antiKey = $.trim(document.getElementById("antiKey").value);
     if(keyword == null || keyword == "" || cateId == null || cateId == ""){
         topCenter("请输入优先类别数据");
         return;
@@ -238,7 +260,7 @@ function saveKeyWord(){
     $.ajax({
         type:"post",
         url:"/cbtconsole/warehouse/addKeyword",
-        data:{cateId:cateId,keyword:keyword},
+        data:{cateId:cateId,keyword:keyword,antiKey:antiKey},
         dataType:"text",
         async:true,
         success : function(data){
@@ -263,11 +285,15 @@ function saveKeyWord(){
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
 			</form>
 		</div>
-		<div id="dlg1" class="easyui-dialog" title="修改关键词的优先类别" data-options="modal:true" style="width:400px;height:150px;padding:10px;autoOpen:false;;closed:true;display: none;">
+		<div id="dlg1" class="easyui-dialog" title="修改关键词的优先类别" data-options="modal:true" style="width:400px;height:200px;padding:10px;autoOpen:false;;closed:true;display: none;">
 			<form id="ff" method="post" style="height:100%;">
 				<div style="margin-bottom:20px;margin-left:35px;">
 					<input class="easyui-textbox" name="cid" id="cid"  style="width:70%;"  data-options="label:'优先类别:'">
 					<input type="hidden" id="pId">
+				</div>
+					<div style="margin-bottom:20px;margin-left:35px;">
+					<input class="easyui-textbox" name="antiKey" id="antikey"  style="width:70%;"  data-options="label:'反关键词:'">
+					<input type="hidden" id="a-Key">
 				</div>
 				<div style="text-align:center;padding:5px 0">
 					<a href="javascript:void(0)" class="easyui-linkbutton" onclick="editKeyword()" style="width:80px">提交</a>
@@ -275,13 +301,16 @@ function saveKeyWord(){
 				</div>
 			</form>
 		</div>
-		<div id="dlg2" class="easyui-dialog" title="新增关键词的优先类别" data-options="modal:true" style="width:400px;height:200px;padding:10px;autoOpen:false;;closed:true;display: none;">
+		<div id="dlg2" class="easyui-dialog" title="新增关键词的优先类别" data-options="modal:true" style="width:400px;height:250px;padding:10px;autoOpen:false;;closed:true;display: none;">
 			<form  method="post" style="height:100%;">
 				<div style="margin-bottom:20px;margin-left:35px;">
 					<input class="easyui-textbox" name="word" id="word"  style="width:70%;"  data-options="label:'搜索词:'">
 				</div>
 				<div style="margin-bottom:20px;margin-left:35px;">
 					<input class="easyui-textbox" name="cateId" id="cateId"  style="width:70%;"  data-options="label:'优先类别:'">
+				</div>
+				<div style="margin-bottom:20px;margin-left:35px;">
+					<input class="easyui-textbox" name="antiKey" id="antiKey"  style="width:70%;"  data-options="label:'反关键词:'">
 				</div>
 				<div style="text-align:center;padding:5px 0">
 					<a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveKeyWord()" style="width:80px">提交</a>
@@ -302,6 +331,8 @@ function saveKeyWord(){
 			<tr>
 				<th data-options="field:'keyword',width:25,align:'center'">搜索词</th>
 				<th data-options="field:'category',width:50,align:'center'">优先类别</th>
+				<th data-options="field:'antiKey',width:50,align:'center'">反关键词
+				</th>
 				<th data-options="field:'enName',width:50,align:'center'">类别名称</th>
 				<th data-options="field:'status',width:50,align:'center'">状态</th>
 				<th data-options="field:'minPrice',width:50,align:'center'">最低价</th>

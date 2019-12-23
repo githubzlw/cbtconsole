@@ -66,6 +66,7 @@ import org.jbarcode.paint.EAN13TextPainter;
 import org.jbarcode.paint.WidthCodedPainter;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.StringRedisConnection.StringTuple;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -446,6 +447,39 @@ public class WarehouseCtrl {
 				sql="update priority_category set minPrice="+minPrice+" where id="+id+"";
 				SendMQ.sendMsg(new RunSqlModel(sql));
 
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			row=0;
+		}
+		out.print(row);
+		out.close();
+	}
+	/**
+	 * 优先类别模块更新类别的反关键词
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "/updateAntikey")
+	public void updateAntikey(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		PrintWriter out = response.getWriter();
+		int row=0;
+		try{
+			String keyword=request.getParameter("keyword");
+			String antikey=request.getParameter("antikey");
+			if(StringUtil.isBlank(antikey) || StringUtil.isBlank(keyword)) {
+				row=0;
+			}else {
+				antikey = org.apache.commons.lang3.StringUtils.replace(antikey, "'", "\\'");
+				keyword = org.apache.commons.lang3.StringUtils.replace(keyword, "'", "\\'");
+				String sql = "update anti_key_words set flag =0,auti_word = '"+antikey+"' where keyword='"+keyword+"')";
+				row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(sql)));
+				if(row < 1) {
+					sql = "insert into anti_key_words (keyword,auti_word,flag) values('"+keyword+"','"+antikey+"',0)";
+					row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(sql)));
+				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -1151,7 +1185,7 @@ public class WarehouseCtrl {
 		}
 		keyword=StringUtil.isBlank(keyword)?null:keyword;
 		map.put("page", page);
-		map.put("keyword",keyword);
+		map.put("keyword", org.apache.commons.lang3.StringUtils.replace(keyword, "'", "\\'"));
 		int counts=0;
 		list = iWarehouseService.getPriorityCategory(map);
 		counts = iWarehouseService.getPriorityCategoryCount(map);
@@ -2255,9 +2289,13 @@ public class WarehouseCtrl {
 	public String editKeyword(HttpServletRequest request, Model model) {
 		String id=request.getParameter("id");
 		String cid=request.getParameter("cid");
+		String antikey=request.getParameter("antikey");
+		String akey=request.getParameter("akey");
 		Map<String, String> map = new HashMap<String, String>(); // sql 参数
 		map.put("cid", cid);
 		map.put("id", id);
+		map.put("antikey", org.apache.commons.lang3.StringUtils.replace(antikey, "'", "\\'"));
+		map.put("akey", org.apache.commons.lang3.StringUtils.replace(akey, "'", "\\'"));
 		return iWarehouseService.editKeyword(map) + "";
 	}
 
@@ -2272,9 +2310,11 @@ public class WarehouseCtrl {
 	public String addKeyword(HttpServletRequest request, Model model) {
 		String cateId=request.getParameter("cateId");
 		String keyword=request.getParameter("keyword");
+		String antiKey=request.getParameter("antiKey");
 		Map<String, String> map = new HashMap<String, String>(); // sql 参数
-		map.put("keyword", org.apache.commons.lang3.StringUtils.replace(keyword, "'", "\\'"));
+		map.put("keyword", keyword);
 		map.put("cateId", cateId);
+		map.put("antiKey", org.apache.commons.lang3.StringUtils.replace(antiKey, "'", "\\'"));
 		return iWarehouseService.addKeyword(map) + "";
 	}
 	/**
