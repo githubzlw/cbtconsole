@@ -6,6 +6,9 @@ import com.cbt.bean.CategoryBean;
 import com.cbt.service.CategoryService;
 import com.importExpress.mapper.CategoryMapper;
 
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -100,5 +103,31 @@ public class CategoryServiceImpl implements CategoryService {
     public int updateChangeAllBeanInfo(CategoryAllBean categoryBean) {
         return categoryMapper.updateChangeAllBeanInfo(categoryBean);
     }
+
+	@Override
+	public int insertIntoCatidInfo(CategoryAllBean categoryBean) {
+		CategoryBean oldParentBean = categoryMapper.queryCategoryById(categoryBean.getParentId());
+		synchronized (CategoryServiceImpl.class) {
+			// 9 + lv+ 数据库ID作为新的类别
+			int maxId = categoryMapper.queryMaxIdByCatidInfo();
+			String nwCaitd = "9" + oldParentBean.getLv() + maxId;
+			categoryBean.setCategoryId(nwCaitd);
+			categoryBean.setPath(oldParentBean.getPath() + "," + nwCaitd);
+			categoryBean.setLv(oldParentBean.getLv() + 1);
+			categoryMapper.insertIntoCatidInfo(categoryBean);
+			// MQ更新线上
+			String sql = "insert into 1688_category(id,lv,category_id,name,path,parent_id,en_name,description) values(";
+			sql += categoryBean.getId() + ",";
+			sql += categoryBean.getLv() + ",";
+			sql += "'" + categoryBean.getCategoryId() + "',";
+			sql += "'" + GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(categoryBean.getName()) + "',";
+			sql += "'" + categoryBean.getPath() + "',";
+			sql += "'" + categoryBean.getParentId() + "',";
+			sql += "'" + GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(categoryBean.getEnName()) + "',";
+			sql += "'" + categoryBean.getDescription() + "')";
+			SendMQ.sendMsg(new RunSqlModel(sql));
+		}
+		return categoryBean.getId();
+	}
 
 }

@@ -26,12 +26,12 @@
             line-height: 20px;
         }
 
-        .btn_sy{
+        .btn_sy {
             background-color: #a8f7a8;
             border-color: #a8f7a8;
         }
 
-        .btn_pr{
+        .btn_pr {
             background-color: #f1c9ba;
             border-color: #f1c9ba;
         }
@@ -45,7 +45,9 @@
 
         $(function () {
             closeDialog();
+            closeCatidDialog();
             setDatagrid();
+            loadWebSize();
             $('#btn').bind('click', function () {
                 doQuery();
             });
@@ -137,13 +139,28 @@
                 onDblClick: function (node) {
                     currCidOP = node.id;
                     loadDatagrid(0, node.id);
+                },
+                onContextMenu: function (e, node) {
+                    e.preventDefault();
+                    $('#easyui-tree-id').tree('select', node.target);
+                    $('#add_parent_catid').val(node.id);
+                    var nodeName = node.text;
+                    if (nodeName.indexOf("(") > -1) {
+                        $('#parent_catid_name').text(nodeName.substring(0, nodeName.indexOf("(")));
+                    } else {
+                        $('#parent_catid_name').text(nodeName);
+                    }
+                    $('#tree_menu').menu('show', {
+                        left: e.pageX,
+                        top: e.pageY
+                    });
                 }
             });
         }
 
-        function reloadTree(nodeId,categoryName) {
+        function reloadTree(nodeId, categoryName) {
             var param = {categoryId: nodeId, categoryName: categoryName};
-            $('#easyui-tree-id').tree("reload",param);
+            $('#easyui-tree-id').tree("reload", param);
         }
 
         function setDatagrid() {
@@ -157,7 +174,7 @@
                 pageList: [40, 60, 80],//可以选择的分页集合
                 nowrap: false,//设置为true，当数据长度超出列宽时将会自动截取
                 striped: true,//设置为true将交替显示行背景。
-    			collapsible : true,//显示可折叠按钮
+                collapsible: true,//显示可折叠按钮
                 // toolbar: "#top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
                 url: '',//url调用Action方法
                 loadMsg: '数据装载中......',
@@ -165,7 +182,7 @@
                 fitColumns: true,//允许表格自动缩放，以适应父容器
                 idField: 'itemid',
                 //sortName : 'xh',//当数据表格初始化时以哪一列来排序
-    // 			sortOrder : 'desc',//定义排序顺序，可以是'asc'或者'desc'（正序或者倒序）。
+                // 			sortOrder : 'desc',//定义排序顺序，可以是'asc'或者'desc'（正序或者倒序）。
                 pagination: true,//分页
                 rownumbers: true
             });
@@ -252,9 +269,9 @@
         }
 
         function formatLv(val, row, index) {
-            if(val && val > -1){
+            if (val && val > -1) {
                 return val;
-            }else{
+            } else {
                 return '';
             }
         }
@@ -292,7 +309,7 @@
             $.ajax({
                 type: "POST",
                 url: "/cbtconsole/category/getCidInfo",
-                data: {cid:cid},
+                data: {cid: cid},
                 success: function (data) {
                     if (data.ok) {
                         var json = data.data;
@@ -383,11 +400,11 @@
                     if (data.ok) {
                         showMessage("更新成功");
                         closeDialog();
-                        if(type == 3){
+                        if (type == 3) {
                             loadDatagrid(1, currCidOP);
                         } else {
                             var currCid = $("#query_catid").textbox('getValue');
-                            createCategoryTree(currCid,"",1);
+                            createCategoryTree(currCid, "", 1);
                         }
                     } else {
                         $.messager.alert("提示信息", data.message, "error");
@@ -403,6 +420,10 @@
 
         function closeDialog() {
             $('#update_div_sty').dialog('close');
+        }
+
+        function closeCatidDialog() {
+            $('#add_div_sty').dialog('close');
         }
 
         function loadDatagrid(flag, cid) {
@@ -423,10 +444,131 @@
                 $.parser.parse('#cid_easyui-datagrid');
             }
         }
+
+        function beforeAddCatidInfo() {
+            $('#add_div_sty').dialog('open');
+        }
+
+        function saveCatidInfo() {
+            var parentCid = $("#add_parent_catid").val();
+            var chName = $("#add_catid_ch_name").val();
+            var enName = $("#add_catid_en_name").val();
+            if (parentCid && chName && enName) {
+                $.messager.progress({
+                    title: '正在保存',
+                    msg: '请等待...'
+                });
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/category/addCategoryInfo",
+                    data: {parentCid: parentCid, chName: chName, enName: enName},
+                    success: function (data) {
+                        // $("#notice_id").hide();
+                        $.messager.progress('close');
+                        if (data.ok) {
+                            showMessage("更新成功");
+                            closeCatidDialog();
+                            var currCid = $("#query_catid").textbox('getValue');
+                            createCategoryTree(currCid, "", 1);
+                        } else {
+                            $.messager.alert("提示信息", data.message, "error");
+                        }
+                    },
+                    error: function (res) {
+                        // $("#notice_id").hide();
+                        $.messager.progress('close');
+                        $.messager.alert("提示信息", "网络连接错误", "error");
+                    }
+                });
+            } else {
+                $.messager.alert("提示信息", "请填写完整信息", "info");
+            }
+        }
+
+        function flushToOnline() {
+            var localUrl = window.location.href;
+            var url = "http://192.168.1.153/app/rcategory";
+
+            var webType = $("#web_size_type").val();
+            if(webType == 1){
+                url = "https://www.import-express.com/app/rcategory";
+            }else if(webType == 2){
+                url = "https://www.kidsproductwholesale.com/app/rcategory";
+            }else if(webType == 3){
+                url = "https://www.petstoreinc.com/popProducts/app/rcategory";
+            }else{
+                $.messager.alert("提示信息", "获取网站失败", "info");
+                return;
+            }
+            if(localUrl.indexOf("127.0.0.1") || localUrl.indexOf("localhost")){
+                url = "http://192.168.1.153/app/rcategory";
+            }
+            var param = "height=400,width=600,top=200,left=600,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+            window.open(url, "windows", param);
+        }
+
+        function loadWebSize() {
+            $.ajax({
+                type: 'POST',
+                url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
+                data: {},
+                success: function (json) {
+                    if (json.ok) {
+
+                        var data = json.data;
+                        var content = '';
+                        for (var key in data) {
+                            content += '<option value="' + key + '">' + data[key] + '</option>'
+                        }
+                        $("#web_size_type").empty();
+                        $("#web_size_type").append(content);
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
+
     </script>
 </head>
 <body class="easyui-layout">
 
+<div id="tree_menu" class="easyui-menu" style="width:120px;">
+    <div onclick="beforeAddCatidInfo()" data-options="iconCls:'icon-add'">新增类别</div>
+</div>
+
+<div id="add_div_sty" class="easyui-dialog" title="新增类别"
+     data-options="modal:true" style="width: 330px; height: 200px;">
+    <form id="form_add" action="#" onsubmit="return false">
+        <table>
+            <tr>
+                <td>父类别:</td>
+                <td><input type="hidden" id="add_parent_catid"/>
+                    <span id="parent_catid_name"></span></td>
+            </tr>
+            <tr>
+                <td>类别中文名称:</td>
+                <td><input id="add_catid_ch_name"/></td>
+            </tr>
+            <tr>
+                <td>类别英文名称:</td>
+                <td><input id="add_catid_en_name"/></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+                       class="easyui-linkbutton" onclick="saveCatidInfo()" style="width: 80px">保存</a>
+                    <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+                       class="easyui-linkbutton" onclick="closeCatidDialog()"
+                       style="width: 80px">取消</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
 
 <div id="update_div_sty" class="easyui-dialog" title="更新类别"
      data-options="modal:true" style="width: 430px; height: 200px;">
@@ -468,12 +610,22 @@
 	<div onclick="remove()" data-options="iconCls:'icon-remove'">Remove</div>
 </div>-->
 
-<div data-options="region:'north',title:'1688类别管理(拖动替换类别,双击查询类别数据)',split:true" style="height:70px;">
+<div data-options="region:'north',title:'1688类别管理(拖动替换类别,双击查询类别数据,类别树右击新增类别)',split:true" style="height:70px;">
     <div style="margin-top: 5px;text-align: center;">
         <span>类别ID:<input id="query_catid" class="easyui-textbox"/></span>
         <span>类别名称:<input id="query_name" class="easyui-textbox"/></span>
         <button id="btn" onclick="doQuery()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</button>
         <span id="notice_id" style="color: red;display: none;">正在查询...</span>
+
+
+        <span>网站:<select id="web_size_type" style="height: 28px;width: 120px;">
+                        <option value="1">import</option>
+                        <option value="2">kids</option>
+                        <option value="3">pets</option>
+                    </select>
+                </span>
+        <button onclick="flushToOnline()" class="easyui-linkbutton" data-options="iconCls:'icon-search'">实时刷新到网站
+        </button>
     </div>
 
 </div>

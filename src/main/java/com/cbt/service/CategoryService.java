@@ -95,5 +95,12 @@ public interface CategoryService {
      * @return
      */
     int updateChangeAllBeanInfo(CategoryAllBean categoryBean);
+
+    /**
+     * 插入新的类别
+     * @param categoryBean
+     * @return
+     */
+    int insertIntoCatidInfo(CategoryAllBean categoryBean);
     
 }
