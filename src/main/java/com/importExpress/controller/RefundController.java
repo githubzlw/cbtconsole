@@ -17,9 +17,11 @@ import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.OrderCancelApprovalAmount;
 import com.importExpress.pojo.RefundDetailsBean;
 import com.importExpress.pojo.RefundNewBean;
 import com.importExpress.pojo.RefundResultInfo;
+import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.service.RefundNewService;
 import com.importExpress.utli.NotifyToCustomerUtil;
@@ -61,6 +63,8 @@ public class RefundController {
     private PayPalService ppApiService;
     @Autowired
     private PaymentServiceNew paymentServiceNew;
+    @Autowired
+    private OrderCancelApprovalService approvalService;
 
 
     /**
@@ -499,6 +503,13 @@ public class RefundController {
                             "System Add:客户PayPal申请退款完结后,自动生成的数据", adminName,
                             "refundId_" + detailsBean.getRefundId(), detailsBean.getOrderNo()));
                 }
+                // 插入退款金额
+                OrderCancelApprovalAmount approvalAmount = new OrderCancelApprovalAmount();
+                approvalAmount.setApprovalId(0);
+                approvalAmount.setOrderNo(detailsBean.getOrderNo());
+                approvalAmount.setPayAmount(detailsBean.getRefundAmount());
+                approvalAmount.setPayType(0);
+                approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
             } else {
                 logger.error("userId:" + detailsBean.getUserId() + ",rdId:" + detailsBean.getRefundId() + ",refundByPayPalApi error :" + json.getMessage());
                 System.err.println("userId:" + detailsBean.getUserId() + ",rdId:" + detailsBean.getRefundId() + ",refundByPayPalApi error :" + json.getMessage());
