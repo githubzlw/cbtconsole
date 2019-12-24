@@ -1033,7 +1033,7 @@
 		left join order_cancel_approval_amount b on a.orderNo = b.order_no
 		where a.payAmount &lt;0 and DATE_FORMAT(a.createtime,'%Y-%m')= #{beginDate,jdbcType=VARCHAR}
 		 UNION
-		select a.orderNo as ipnOrderNo,a.payAmount as payAmount,a.userId,date_format(a.createtime,'%Y-%m-%d %H:%i:%s') as payTime,
+		select a.orderNo as ipnOrderNo,a.payAmount as payAmount,a.userId,date_format(b.create_time,'%Y-%m-%d %H:%i:%s') as payTime,
 		a.txn_id as txnId,b.pay_amount as amount,b.pay_type  as payType,b.order_no as remarkId  from order_cancel_approval_amount b
 		left join ipn_info a on a.orderNo = b.order_no where a.orderNo is null
 		and DATE_FORMAT(b.create_time,'%Y-%m')=#{beginDate,jdbcType=VARCHAR}
@@ -1050,7 +1050,7 @@
 		left join order_cancel_approval_amount b on a.orderNo = b.order_no
 		where a.payAmount &lt;0 and DATE_FORMAT(a.createtime,'%Y-%m')= #{beginDate,jdbcType=VARCHAR}
 		 UNION
-		select a.orderNo as ipnOrderNo,a.payAmount as payAmount,a.userId,date_format(a.createtime,'%Y-%m-%d %H:%i:%s') as payTime,
+		select a.orderNo as ipnOrderNo,a.payAmount as payAmount,a.userId,date_format(b.create_time,'%Y-%m-%d %H:%i:%s') as payTime,
 		a.txn_id as txnId,b.pay_amount as amount,b.pay_type  as payType,b.order_no as remarkId  from order_cancel_approval_amount b
 		left join ipn_info a on a.orderNo = b.order_no where a.orderNo is null
 		and DATE_FORMAT(b.create_time,'%Y-%m')=#{beginDate,jdbcType=VARCHAR}
