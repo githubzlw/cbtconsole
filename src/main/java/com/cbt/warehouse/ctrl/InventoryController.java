@@ -76,17 +76,27 @@ public class InventoryController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping("/log/print")
+	@RequestMapping("/log/download")
 	public void logPrint(HttpServletRequest request, HttpServletResponse response) {
-		Map<Object, Object> map = getObjectByInventory(request,true);
 		try {
-			map.put("page", -1);
-			List<InventoryCheckWrap> checkList = inventoryService.invetoryCheckList(map);
+			String enddate = request.getParameter("enddate");
+			enddate = StringUtil.isBlank(enddate) ? "" : enddate;
+			String startdate = request.getParameter("startdate");
+			startdate = StringUtil.isBlank(startdate) ? "" : startdate;
 			
-			HSSFWorkbook wb = generalReportService.exportInventory(checkList);
+			String strtype = request.getParameter("type");
+			int type = StrUtils.isMatch(strtype, "(\\d+)") ? Integer.valueOf(strtype) : -1;
+			
+			Map<String,Object> map = new HashMap<>();
+			map.put("startdate",startdate);
+			map.put("enddate",enddate);
+			map.put("page",-1 );
+			map.put("type",type );
+			List<InventoryLog> logList = inventoryService.inventoryLogList(map);
+			HSSFWorkbook wb = generalReportService.exportInventoryLog(logList);
 			response.setContentType("application/vnd.ms-excel");
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String filename = "inventory-list-" + sdf.format(new Date())+".xls";
+			String filename = "inventory-log-" + sdf.format(new Date())+".xls";
 //			filename = StringUtils.getFileName(filename);
 			response.setHeader("Content-disposition", "attachment;filename=" + filename);
 			OutputStream ouputStream = response.getOutputStream();

@@ -2209,24 +2209,23 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		//inventory_sku
 		
 		Map<String, Object> taobaoOrderHistory = inventoryMapper.getInventoryDetailSku(inventory_sku_id);
-		if(taobaoOrderHistory == null || taobaoOrderHistory.isEmpty()) {
-			return 0;
+		if(taobaoOrderHistory != null && !taobaoOrderHistory.isEmpty()) {
+			//tbOr1688,orderid,itemname,itemid,sku,shipno,shipper,username,imgurl,itemurl,specId,skuID
+			map.put("tborderid", (String)taobaoOrderHistory.get("1688_orderid"));
+			map.put("shipno", (String)taobaoOrderHistory.get("1688_shipno"));
+			map.put("itemid", (String)taobaoOrderHistory.get("goods_pid"));
+			map.put("taobaospec", (String)taobaoOrderHistory.get("sku"));
+			map.put("specid", (String)taobaoOrderHistory.get("goods_specid"));
+			map.put("skuid", (String)taobaoOrderHistory.get("good_skuid"));
+			map.put("goodurl", (String)taobaoOrderHistory.get("goodurl"));
+			map.put("picturepath", (String)taobaoOrderHistory.get("picturepath"));
+			map.put("taobaoprice", com.cbt.util.StrUtils.object2PriceStr(taobaoOrderHistory.get("goods_p_price")));
 		}
-		
 		int goodsUnit = 1;
 		String strgoodsUnit = map.get("goodsUnit");
 		strgoodsUnit = StrUtils.matchStr(strgoodsUnit, "([1-9]\\d*)");
 		goodsUnit = StrUtils.isNum(strgoodsUnit) ? Integer.valueOf(strgoodsUnit) : goodsUnit;
 		
-		//tbOr1688,orderid,itemname,itemid,sku,shipno,shipper,username,imgurl,itemurl,specId,skuID
-		map.put("tborderid", (String)taobaoOrderHistory.get("1688_orderid"));
-		map.put("shipno", (String)taobaoOrderHistory.get("1688_shipno"));
-		map.put("itemid", (String)taobaoOrderHistory.get("goods_p_pid"));
-		map.put("taobaospec", (String)taobaoOrderHistory.get("sku"));
-		map.put("specid", (String)taobaoOrderHistory.get("goods_p_specid"));
-		map.put("skuid", (String)taobaoOrderHistory.get("goods_p_skuid"));
-		map.put("goodurl", (String)taobaoOrderHistory.get("goods_p_url"));
-		map.put("taobaoprice", com.cbt.util.StrUtils.object2PriceStr(taobaoOrderHistory.get("goods_p_price")));
 		//'0为 未出货，1已出货'
 		map.put("state", "0");
 		//'入库删除标记:0.已入库;1.入库已取消'

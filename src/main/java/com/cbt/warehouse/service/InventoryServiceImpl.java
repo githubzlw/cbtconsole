@@ -450,7 +450,6 @@ public class InventoryServiceImpl implements  InventoryService{
 			iSku.setDbFlag(0);
 			iSku.setBarcode(inventory.get("barcode"));
 			iSku.setRemaining(Integer.valueOf(StrUtils.object2NumStr(inventory.get("yourorder"))));
-			
 			iDetail.setGoodsPImg(inventory.get("goods_p_img"));
 			iDetail.setTbOrderid(inventory.get("tborderid"));
 			iDetail.setGoodsNumber(Integer.valueOf(StrUtils.object2NumStr(inventory.get("yourorder"))));
@@ -534,6 +533,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		iDetail.setGoodsName(iSku.getGoodsName());
 		iDetail.setGoodsImg(iSku.getCarImg());
 		iDetail.setGoodsNumber(inventory_count);
+		iDetail.setGoodsPPid(iSku.getGoodsPPid());
 		iDetail.setGoodsPid(iSku.getGoodsPid());
 		iDetail.setGoodsPrice(iSku.getGoodsPrice());
 		iDetail.setGoodsUrl(iSku.getGoodsUrl());
