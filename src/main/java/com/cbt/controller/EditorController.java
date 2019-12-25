@@ -1147,13 +1147,9 @@ public class EditorController {
                     //判断不是正式环境的，不进行搜图图片更新
                     String ip = request.getRemoteAddr();
 
-                    if (ip.contains("1.34") || ip.contains("38.42") || ip.contains("1.27") || ip.contains("1.9")) {
-                        if (cgp.getIsUpdateImg() == 0) {
-                            cgp.setIsUpdateImg(1);
-                            // 设置图片信息
-                        }
-                    } else {
-                        cgp.setIsUpdateImg(0);
+                    System.err.println("ip:" + ip);
+                    if (cgp.getIsUpdateImg() == 0) {
+                        cgp.setIsUpdateImg(1);
                     }
                     if (StringUtils.isNotBlank(updateTimeStr)) {
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
