@@ -600,6 +600,51 @@ public class GoodsInfoUtils {
     }
 
 
+
+    public static String genOnlineUrlByParam(String pid,String pathCatid,String enName) {
+
+        String itemid = pid;
+        String dataType = "1";
+        String type = "D";
+        String catid1 = "0";
+        String catid2 = "0";
+
+        if (StringUtils.isNotBlank(pathCatid) && pathCatid.indexOf(",") > -1) {
+            String[] catidList = pathCatid.split(",");
+            catid1 = catidList[0];
+            catid2 = catidList[1];
+        }
+
+        enName = enName.toLowerCase().replaceAll("[^a-zA-Z0-9]", " ").trim();
+
+        //去除静态页名字中一些不需要的词
+        enName = removeGoodsNameWords(enName);
+        String[] nameArr = enName.split("\\s+");
+        StringBuffer goodNameNew = new StringBuffer();
+        if (nameArr.length > 10) {
+            for (int i = 0; i < 10; i++) {
+                if (StringUtils.isNotBlank(nameArr[i])) {
+                    goodNameNew.append(nameArr[i] + "-");
+                }
+            }
+        } else {
+            goodNameNew.append(enName.replaceAll("(\\s+)", "-"));
+        }
+        String url = "";
+        if (StringUtils.isNotBlank(goodNameNew.toString())) {
+            if (StringUtils.isBlank(catid1) || StringUtils.isBlank(catid2)) {
+                url = "https://www.import-express.com/goodsinfo/" + goodNameNew.deleteCharAt(goodNameNew.length() - 1) + "-" + dataType + itemid + ".html";
+            } else {
+                url = "https://www.import-express.com/goodsinfo/" + goodNameNew.deleteCharAt(goodNameNew.length() - 1) + "-" + catid1 + "-" + catid2 + "-" + dataType + itemid + ".html";
+            }
+        } else {
+            url = "https://www.import-express.com/spider/getSpider?item=" + itemid + "&source=" + itemIDToUUID(itemid, type);
+        }
+        return url;
+    }
+
+
+
     public static String itemIDToUUID(String itemId, String type) {
         if (StringUtils.isBlank(itemId)) {
             return "";

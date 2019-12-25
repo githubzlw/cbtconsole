@@ -29,6 +29,18 @@ public class EasyUiJsonResult implements Serializable {
 	 */
 	private Object footer;
 
+
+	public void setSuccess(Object rows, int total){
+		this.success = true;
+		this.rows = rows;
+		this.total = total;
+	}
+
+	public void setError(String message){
+		this.success = false;
+		this.message = message;
+	}
+
 	public String getMessage() {
 		return message;
 	}
