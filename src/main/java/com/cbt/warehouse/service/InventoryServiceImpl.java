@@ -1482,6 +1482,18 @@ public class InventoryServiceImpl implements  InventoryService{
 		return inventoryMapper.inventoryBarcodeListCount(map);
 	}
 	@Override
+	public List<InventoryLog> inventoryLogList(Map<String, Object> map) {
+		List<InventoryLog> inventoryLogList = inventoryMapper.inventoryLogList(map);
+		if(inventoryLogList == null || inventoryLogList.isEmpty()) {
+			return Lists.newArrayList();
+		}
+		return inventoryLogList;
+	}
+	@Override
+	public int inventoryLogListCount(Map<String, Object> map) {
+		return inventoryMapper.inventoryLogListCount(map);
+	}
+	@Override
 	public int moveBarcode(Map<String, Object> mapParam) {
 		String position = dao.getPosition((String)mapParam.get("orderbarcode"));
 		mapParam.put("position", position);
