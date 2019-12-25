@@ -908,7 +908,9 @@
     <if test="startdate!=''">and createtime>#{startdate}</if>
     <if test="enddate!=''">and createtime &lt;#{enddate}</if>
     <if test="type !=-1">and change_type =#{type}</if>
+    order by goods_pid asc,createtime asc
     <if test="page != -1">limit #{page},20</if>
+    
     </select>
     
     <select id="inventoryLogListCount" resultType="Integer">
