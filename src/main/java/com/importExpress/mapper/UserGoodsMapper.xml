@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.UserGoodsMapper">
+
+    <resultMap id="UserGoodsResultMap" type="com.importExpress.pojo.UserGoods">
+        <result column="goods_pid" property="pid"/>
+        <result column="user_id" property="userId"/>
+        <result column="custom_main_image" property="mainImg"/>
+        <result column="remotpath" property="remotePath"/>
+        <result column="enname" property="goodsName"/>
+        <result column="valid" property="valid"/>
+        <result column="sell_num" property="sellNum"/>
+    </resultMap>
+
+    <select id="queryForList" resultMap="UserGoodsResultMap">
+        select pp.user_id,pp.goods_pid,pp.sell_num,c.valid,c.custom_main_image,c.remotpath,c.enname
+        from ( select a.user_id,b.goods_pid,count(b.goods_pid) as sell_num from orderinfo a,order_details b
+        where a.order_no = b.orderid and a.state in(1,2,3,4,5) and b.state in(0,1) and b.goods_pid is not null
+        <if test="userId !=null and userId > 0">
+            and a.user_id = #{userId}
+        </if>
+        <if test="pid !=null">
+            and b.goods_pid = #{pid}
+        </if>
+        group by b.goods_pid
+        order by a.orderid desc
+        <if test="rows > 0"></if>
+        limit #{startNum},#{rows}
+        ) pp
+        left join custom_benchmark_ready c on pp.goods_pid = c.pid
+    </select>
+
+    <select id="queryForListCount" resultType="java.lang.Integer">
+        select count(0) from (select a.user_id,b.goods_pid,count(b.goods_pid) as sell_num
+        from orderinfo a,order_details b
+        where a.order_no = b.orderid and a.state in(1,2,3,4,5) and b.state in(0,1) and b.goods_pid is not null
+        <if test="userId !=null and userId > 0">
+            and a.user_id = #{userId}
+        </if>
+        <if test="pid !=null">
+            and b.goods_pid = #{pid}
+        </if>
+        group by b.goods_pid) pp
+    </select>
+
+</mapper>
