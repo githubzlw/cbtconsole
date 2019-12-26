@@ -360,7 +360,7 @@ public interface IShopUrlService {
      * @param admuser
      * @return
      */
-    int reDownShopGoods(String shopId, Admuser admuser);
+    int reDownShopGoods(String shopId, Admuser admuser,String memberId);
 
     /**
      * 根据店铺ID查询店铺品牌和授权信息

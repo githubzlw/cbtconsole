@@ -1054,7 +1054,7 @@
                     if(data.total > 0){
                         $.messager.confirm("提示", "已经存在此店铺，需要重新抓取数据吗？", function (rs) {
                             if (rs) {
-                                reDownShopGoods(data.data);
+                                reDownShopGoods(data.data,member_id);
                             }
                         });
                     }else{
@@ -1071,11 +1071,11 @@
         });
     }
 
-    function reDownShopGoods(shopId) {
+    function reDownShopGoods(shopId,member_id) {
         $.ajax({
             url: '/cbtconsole/ShopUrlC/reDownShopGoods.do',
             type: "post",
-            data: {"shopId":shopId},
+            data: {"shopId":shopId,memberId:member_id},
             success: function (data) {
                 if (data.ok) {
                     $('#dlg').dialog('close');
