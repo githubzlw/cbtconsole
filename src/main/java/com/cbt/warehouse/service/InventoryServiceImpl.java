@@ -1203,6 +1203,9 @@ public class InventoryServiceImpl implements  InventoryService{
 			//订单产品要入库， 状态要验货无误
 //			order_details.state=1 order_details.checked=1 
 			orderinfoMapper.updateChecked(map);
+
+			// 插入入库数据
+			// orderinfoMapper.insertInventoryIdRelationtable(map);
 			
 			//查询是否是DP订单
 			int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
@@ -1212,9 +1215,10 @@ public class InventoryServiceImpl implements  InventoryService{
 			orderinfoMapper.updateOrderDetails(map);
 			SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 			
-			int counts=orderinfoMapper.getDtailsState(map);
+
 			
 			if (isDropshipOrder == 1) {
+				int counts=orderinfoMapper.getDtailsState(map);
 //				orderinfoMapper.updateOrderDetails(map);
 //				SendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 //				int counts=orderinfoMapper.getDtailsState(map);
@@ -1252,6 +1256,7 @@ public class InventoryServiceImpl implements  InventoryService{
 					}
 				}*/
 			}
+			int counts=orderinfoMapper.getDetailsState(map);
 			if(counts == 0){
 				orderinfoMapper.updateOrderInfoState(map);
 				SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
@@ -1274,6 +1279,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			//insertOrderProductSource
 			pruchaseMapper.insertOrderProductSource(map);
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOG.error("新订单相关表状态",e);
 		}
 		
