@@ -1819,14 +1819,19 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
             row=warehouseMapper.addKeyword(map);
             if(row>0){
-            	if(org.apache.commons.lang3.StringUtils.isNotBlank(map.get("keyword")) && org.apache.commons.lang3.StringUtils.isNotBlank(map.get("antiKey"))) {
+            	if(org.apache.commons.lang3.StringUtils.isNotBlank(map.get("keyword"))) {
             		String keyword = org.apache.commons.lang3.StringUtils.replace(map.get("keyword"), "'", "\\'");
             		SendMQ.sendMsg(new RunSqlModel("insert into priority_category(keyword,category) values('"+keyword+"','"+map.get("cateId")+"')"));
-            		RunSqlModel runSqlModel = new RunSqlModel("update anti_key_words set flag =0,auti_word = '"+map.get("antiKey")+"' where keyword='"+keyword+"')");
-            		int res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
-            		if(res < 1) {
-            			runSqlModel = new RunSqlModel("insert into anti_key_words (keyword,auti_word,flag) values('"+keyword+"','"+map.get("antiKey")+"',0)");
-            			res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
+            		if(org.apache.commons.lang3.StringUtils.isNotBlank(map.get("antiKey"))) {
+            			RunSqlModel runSqlModel = new RunSqlModel("update anti_key_words set flag =0,auti_word = '"+map.get("antiKey")+"' where keyword='"+keyword+"')");
+            			int res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
+            			if(res < 1) {
+            				runSqlModel = new RunSqlModel("insert into anti_key_words (keyword,auti_word,flag) values('"+keyword+"','"+map.get("antiKey")+"',0)");
+            				res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
+            			}
+            		}else {
+            			RunSqlModel runSqlModel = new RunSqlModel("update anti_key_words set flag =1,auti_word = '' where keyword='"+keyword+"')");
+            			SendMQ.sendMsg(runSqlModel);
             		}
             	}
             }
@@ -1845,13 +1850,18 @@ public class WarehouseServiceImpl implements IWarehouseService {
             row=warehouseMapper.editKeyword(map);
             if(row>0){
                 SendMQ.sendMsg(new RunSqlModel("update priority_category set category="+map.get("cid")+" where id="+map.get("id")+""));
-                
-                if(org.apache.commons.lang3.StringUtils.isNotEmpty(map.get("antiKey")) && org.apache.commons.lang3.StringUtils.isNotBlank(map.get("akey"))) {
-                	RunSqlModel runSqlModel = new RunSqlModel("update anti_key_words set flag =0,auti_word = '"+map.get("antiKey")+"' where keyword='"+map.get("akey")+"')");
-                	int res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
-                	if(res < 1) {
-                		runSqlModel = new RunSqlModel("insert into anti_key_words (keyword,auti_word,flag) values('"+map.get("akey")+"','"+map.get("antiKey")+"',0)");
-                		res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
+                if(org.apache.commons.lang3.StringUtils.isNotBlank(map.get("akey"))) {
+                	
+                	if(org.apache.commons.lang3.StringUtils.isNotEmpty(map.get("antiKey"))) {
+                		RunSqlModel runSqlModel = new RunSqlModel("update anti_key_words set flag =0,auti_word = '"+map.get("antiKey")+"' where keyword='"+map.get("akey")+"')");
+                		int res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
+                		if(res < 1) {
+                			runSqlModel = new RunSqlModel("insert into anti_key_words (keyword,auti_word,flag) values('"+map.get("akey")+"','"+map.get("antiKey")+"',0)");
+                			res = Integer.parseInt(SendMQ.sendMsgByRPC(runSqlModel));
+                		}
+                	}else {
+                		RunSqlModel runSqlModel = new RunSqlModel("update anti_key_words set flag =1,auti_word = '' where keyword='"+map.get("akey")+"')");
+                		SendMQ.sendMsg(runSqlModel);
                 	}
                 }
             }

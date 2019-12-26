@@ -469,16 +469,21 @@ public class WarehouseCtrl {
 		try{
 			String keyword=request.getParameter("keyword");
 			String antikey=request.getParameter("antikey");
-			if(StringUtil.isBlank(antikey) || StringUtil.isBlank(keyword)) {
+			if(StringUtil.isBlank(keyword)) {
 				row=0;
 			}else {
-				antikey = org.apache.commons.lang3.StringUtils.replace(antikey, "'", "\\'");
 				keyword = org.apache.commons.lang3.StringUtils.replace(keyword, "'", "\\'");
-				String sql = "update anti_key_words set flag =0,auti_word = '"+antikey+"' where keyword='"+keyword+"')";
-				row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(sql)));
-				if(row < 1) {
-					sql = "insert into anti_key_words (keyword,auti_word,flag) values('"+keyword+"','"+antikey+"',0)";
+				if(StringUtil.isBlank(antikey)) {
+					String sql = "update anti_key_words set flag =1,auti_word = '' where keyword='"+keyword+"')";
 					row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(sql)));
+				}else {
+					antikey = org.apache.commons.lang3.StringUtils.replace(antikey, "'", "\\'");
+					String sql = "update anti_key_words set flag =0,auti_word = '"+antikey+"' where keyword='"+keyword+"')";
+					row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(sql)));
+					if(row < 1) {
+						sql = "insert into anti_key_words (keyword,auti_word,flag) values('"+keyword+"','"+antikey+"',0)";
+						row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(sql)));
+					}
 				}
 			}
 		}catch(Exception e){
