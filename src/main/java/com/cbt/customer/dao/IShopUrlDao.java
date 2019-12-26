@@ -466,7 +466,7 @@ public interface IShopUrlDao {
      * @param admuser
      * @return
      */
-    int reDownShopGoods(String shopId, Admuser admuser);
+    int reDownShopGoods(String shopId, Admuser admuser, String memberId);
 
     /**
      * 更新新的负责人ID

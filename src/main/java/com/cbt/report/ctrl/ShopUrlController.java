@@ -3827,9 +3827,12 @@ public class ShopUrlController {
             return json;
         }
 
-
+        String memberId = request.getParameter("memberId");
+        if(StringUtils.isBlank(memberId)){
+            memberId = "";
+        }
         try {
-            shopUrlService.reDownShopGoods(shopId, user);
+            shopUrlService.reDownShopGoods(shopId, user, memberId);
             json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();

@@ -3387,12 +3387,12 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     }
 
     @Override
-    public int reDownShopGoods(String shopId, Admuser admuser) {
+    public int reDownShopGoods(String shopId, Admuser admuser, String memberId) {
         Connection conn = DBHelper.getInstance().getConnection5();
         Statement stmt = null;
         String upShopSql = "update shop_url_bak set flag=0,is_valid=0,online_status=0,is_auto = 0," +
                 "spider_goods_flag = 0,service_ip='',admin_id = " + admuser.getId() + ",admuser='" + admuser.getAdmName() + "'"
-                + ",createtime = now(),is_shop_flag =1,"
+                + ",createtime = now(),is_shop_flag =1,member_id='"+memberId+"',"
                 + "sales_volume_threshold = 0,download_num = 1000  where shop_id = '" + shopId + "' ";
         String clearSql = "update shop_clear_state set online_state = 0,shop_state = 0 where shop_id = '" + shopId + "'";
         int count = 0;
