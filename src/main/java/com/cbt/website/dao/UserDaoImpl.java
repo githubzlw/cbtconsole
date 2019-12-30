@@ -474,7 +474,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<ConfirmUserInfo> getAllUserHasOffUser() {
         // TODO Auto-generated method stub
-        String sql = "SELECT id,admName,roleType FROM admuser  WHERE roleType in(0,2,3,4,5) and status = 1 order by roleType desc,admName";
+        String sql = "SELECT id,admName,roleType FROM admuser  WHERE roleType in(0,1,2,3,4,5) and status = 1 order by roleType desc,admName";
         Connection conn = DBHelper.getInstance().getConnection();
         List<ConfirmUserInfo> list = new ArrayList<ConfirmUserInfo>();
         PreparedStatement stmt = null;
