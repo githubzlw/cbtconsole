@@ -1497,6 +1497,9 @@
         <if test="adminId !=null">
             and a.admin_id = #{adminId}
         </if>
+        <if test="updateAdminId !=null">
+            and a.update_admin_id = #{updateAdminId}
+        </if>
         order by a.create_time desc,a.pid
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
@@ -1512,6 +1515,9 @@
         </if>
         <if test="adminId !=null">
             and a.admin_id = #{adminId}
+        </if>
+        <if test="updateAdminId !=null">
+            and a.update_admin_id = #{updateAdminId}
         </if>
     </select>
 
