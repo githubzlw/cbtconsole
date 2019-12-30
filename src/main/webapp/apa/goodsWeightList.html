@@ -119,12 +119,14 @@
                 success: function (data) {
                     if (data.ok) {
                         $("#query_admid").empty();
+                        $("#update_admid").empty();
                         var content = '<option value="0" selected="selected">全部</option>';
                         var json = data.data;
                         for (var i = 0; i < json.length; i++) {
                             content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
                         }
                         $("#query_admid").append(content);
+                        $("#update_admid").append(content);
                     } else {
                         console.log("获取用户列表失败，原因 :" + data.message);
                     }
@@ -162,19 +164,26 @@
             if (edtime == null || edtime == "") {
                 edtime = "";
             }*/
-            var admid = $("#query_admid").val();
-            if (admid == null || admid == "") {
-                admid = 0;
+            var adminId = $("#query_admid").val();
+            if (adminId == null || adminId == "") {
+                adminId = 0;
+            }
+
+            var updateAdminId = $("#update_admid").val();
+            if (updateAdminId == null || updateAdminId == "") {
+                updateAdminId = 0;
             }
             if (flag > 0) {
                 $("#weight_easyui-datagrid").datagrid("reload", {
                     "pid": pid,
-                    "admid": admid
+                    "adminId": adminId,
+                    "updateAdminId": updateAdminId
                 });
             } else {
                 $("#weight_easyui-datagrid").datagrid("load", {
                     "pid": pid,
-                    "admid": admid
+                    "adminId": adminId,
+                    "updateAdminId": updateAdminId
                 });
             }
 
@@ -195,9 +204,9 @@
             $.messager.confirm('系统提醒', '是否同步', function (r) {
                 if (r) {
                     $.messager.progress({
-                            title: '正在处理数据',
-                            msg: '请等待...'
-                        });
+                        title: '正在处理数据',
+                        msg: '请等待...'
+                    });
                     $.ajax({
                         type: "POST",
                         url: "/cbtconsole/cutom/syncLocalWeightToOnline",
@@ -225,11 +234,11 @@
 
 
         function formatPid(val, row, index) {
-            return '<a target="_blank" href="/cbtconsole/editc/detalisEdit?pid='+val+'">'+val+'</a>';
+            return '<a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=' + val + '">' + val + '</a>';
         }
 
         function formatSync(val, row, index) {
-            if(val > 0){
+            if (val > 0) {
                 return "同步";
             } else {
                 return "";
@@ -246,23 +255,16 @@
 
 <div id="weight_top_toolbar" style="padding: 5px; height: auto">
     <form id="single_query_form" action="#" onsubmit="return false;">
-			<span> PID: <input type="text" id="pid_id"
-                               style="width: 170px; height: 24px" value=""/></span>&nbsp;&nbsp;
-
-        <!--<span>
-				时间: <input id="query_sttime" class="Wdate"
-                           style="width: 100px; height: 24px" type="text" value=""
-                           onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
-				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate"
-                                                 style="width: 100px; height: 24px;" type="text" value=""
-                                                 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
-			</span>&nbsp;&nbsp;-->
-
-        <span> 改动人: <select id="query_admid"
+		<span> PID: <input type="text" id="pid_id" style="width: 170px; height: 24px" value=""/></span>&nbsp;&nbsp;
+        <span>录入人: <select id="query_admid"
+                            style="font-size: 16px; height: 24px; width: 120px;">
+					<option value="0" selected="selected">全部</option>
+			</select></span>&nbsp;&nbsp;
+        <span>同步人: <select id="update_admid"
                             style="font-size: 16px; height: 24px; width: 120px;">
 					<option value="0" selected="selected">全部</option>
 			</select></span>
-        &nbsp;&nbsp;<span><input type="button"
+        <span><input type="button"
                                  class="enter_btn" value="查询" onclick="doQuery(0)"/></span>
     </form>
 </div>
