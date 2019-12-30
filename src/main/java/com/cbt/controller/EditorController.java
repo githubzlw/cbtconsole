@@ -702,13 +702,13 @@ public class EditorController {
             }
 
 
-            if(CollectionUtils.isNotEmpty(changeList)){
+            /*if(CollectionUtils.isNotEmpty(changeList)){
                 for(GoodsWeightChange changeBean : changeList){
                     customGoodsService.saveGoodsWeightChange(changeBean);
                 }
-            }
+            }*/
 
-            // customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight);
+            customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight);
 
             json.setOk(true);
             json.setMessage("执行成功，请到改动重量管理页面审核");
