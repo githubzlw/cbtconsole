@@ -173,17 +173,20 @@
             if (updateAdminId == null || updateAdminId == "") {
                 updateAdminId = 0;
             }
+            var dealState = $("#deal_state").val();
             if (flag > 0) {
                 $("#weight_easyui-datagrid").datagrid("reload", {
                     "pid": pid,
                     "adminId": adminId,
-                    "updateAdminId": updateAdminId
+                    "updateAdminId": updateAdminId,
+                    "dealState":dealState
                 });
             } else {
                 $("#weight_easyui-datagrid").datagrid("load", {
                     "pid": pid,
                     "adminId": adminId,
-                    "updateAdminId": updateAdminId
+                    "updateAdminId": updateAdminId,
+                    "dealState":dealState
                 });
             }
 
@@ -214,6 +217,7 @@
                         success: function (data) {
                             $.messager.progress('close');
                             if (data.ok) {
+                                // showMessage('执行成功！');
                                 showMessage('执行成功，页面即将刷新！');
                                 setTimeout(function () {
                                     //window.location.reload();
@@ -263,6 +267,12 @@
         <span>同步人: <select id="update_admid"
                             style="font-size: 16px; height: 24px; width: 120px;">
 					<option value="0" selected="selected">全部</option>
+			</select></span>
+        <span>状态: <select id="deal_state"
+                            style="font-size: 16px; height: 24px; width: 120px;">
+					<option value="-1" selected="selected">全部</option>
+                    <option value="0">未同步</option>
+                    <option value="1">已同步</option>
 			</select></span>
         <span><input type="button"
                                  class="enter_btn" value="查询" onclick="doQuery(0)"/></span>
