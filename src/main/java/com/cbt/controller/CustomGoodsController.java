@@ -1225,7 +1225,8 @@ public class CustomGoodsController {
 
     @RequestMapping(value = "/queryGoodsWeightList", method = {RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
-	public EasyUiJsonResult queryGoodsWeightList(String pid,Integer adminId, Integer page, Integer rows, Integer updateAdminId) {
+	public EasyUiJsonResult queryGoodsWeightList(String pid,Integer adminId, Integer page, Integer rows,
+                                                 Integer updateAdminId, Integer dealState) {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		if (StringUtils.isBlank(pid)) {
 			pid = null;
@@ -1235,6 +1236,9 @@ public class CustomGoodsController {
 		}
 		if (updateAdminId == null || updateAdminId< 1) {
 			updateAdminId = null;
+		}
+		if (dealState == null || dealState < 0) {
+			dealState = -1;
 		}
 		if (page == null || page < 1) {
 			page = 1;
@@ -1251,6 +1255,7 @@ public class CustomGoodsController {
 		    weightChange.setLimitNum(limitNum);
 		    weightChange.setAdminId(adminId);
 		    weightChange.setUpdateAdminId(updateAdminId);
+		    weightChange.setSyncFlag(dealState);
 
 			List<GoodsWeightChange> list = customGoodsService.queryGoodsWeightChangeList(weightChange);
 			int count = customGoodsService.queryGoodsWeightChangeListCount(weightChange);
