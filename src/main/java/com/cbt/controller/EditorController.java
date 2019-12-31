@@ -3888,6 +3888,25 @@ public class EditorController {
         return json;
     }
 
+
+    @RequestMapping(value = "/testOkHttp")
+    @ResponseBody
+    public JsonResult testOkHttp() {
+        JsonResult json = new JsonResult();
+        try {
+            // 批量上传测试
+        File testFile = new File("/home/data/cbtconsole/cbtimg/test");
+        String filePath = "/usr/local/goodsimg/importcsvimg/test/1122456";
+            UploadByOkHttp.uploadFileBatchOld(testFile,filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
     private void praseEninfoAndUpdate(GoodsParseBean gd) {
         try {
             // 获取配置文件信息
