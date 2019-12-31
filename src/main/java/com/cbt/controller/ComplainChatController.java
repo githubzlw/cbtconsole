@@ -61,16 +61,18 @@ public class ComplainChatController {
                                        @RequestParam(value = "websiteType", defaultValue = "1", required = false) Integer websiteType //网站名
                                        ){
 		JsonResult js = new JsonResult();
+		String uuid = UUID.randomUUID().toString();
 		if(t.getComplainid()!=0 && dealAdminId!=0 &&t.getChatText().trim()!=null){
+			t.setUuid(uuid);
 			int complainChatid=complainChatService.addChat(t);
 			int result = complainService.responseCustomer(t, dealAdmin, dealAdminId,t.getComplainid());
-			if(complainChatid>0){
-				if(!"".equals(urls)){
+			if(!"".equals(urls)){
 					ComplainFile cf = new ComplainFile();
-					cf.setComplainChatid(complainChatid);
+					cf.setComplainChatid(0);
 					cf.setComplainid(t.getComplainid());
 					cf.setFlag(1);
 					cf.setImgUrl(urls);
+					cf.setUuid(uuid);
 					complainChatService.add(cf);
 				}
 				StringBuffer sb = new StringBuffer(t.getChatText());
@@ -81,16 +83,10 @@ public class ComplainChatController {
 				model.put("chatText",chatText);
 				model.put("name",userEmail);
 				model.put("email",userEmail);
-				model.put("chatText",chatText);
-				model.put("chatText",chatText);
 				model.put("websiteType",websiteType);
 				sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Reply to your support request", model, TemplateType.COMPLAINT);
 				js.setOk(true);
 				js.setMessage("回复成功");
-			}else{
-				js.setOk(false);
-				js.setMessage("回复失败,请联系后台管理员");
-			}
 		}else{
 			js.setOk(false);
 			js.setMessage("提交参数中，必要的字段为空"+t.getComplainid()+dealAdminId+t.getChatText());
