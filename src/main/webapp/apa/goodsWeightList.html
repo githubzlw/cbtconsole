@@ -27,6 +27,8 @@
             height: 30px;
             border: 1px #aaa solid;
             color: #fff;
+            padding: 5px;
+            font-size: 14px;
         }
 
         #single_query_form {
@@ -39,9 +41,14 @@
             font-size: 24px;
         }
 
-        .but_color {
+        .but_del{
+            background: red;
+            width: 80px;
+            height: 30px;
+            border: 1px #aaa solid;
+            color: #fff;
             padding: 5px;
-            font-size: 14px
+            font-size: 14px;
         }
 
         #weight_top_toolbar {
@@ -237,20 +244,69 @@
         }
 
 
+        function giveUp(rowIndex) {
+            var row = $("#weight_easyui-datagrid").datagrid("getData").rows[rowIndex];  //获取某一行的值
+            var param = {};
+            param["adminId"] = row.adminId;
+            param["adminName"] = row.adminName;
+            param["goodsType"] = row.goodsType;
+            param["id"] = row.id;
+            param["pid"] = row.pid;
+            param["skuid"] = row.skuid;
+            param["volumeWeight"] = row.volumeWeight;
+            param["weight"] = row.weight;
+            $.messager.confirm('系统提醒', '是否放弃', function (r) {
+                if (r) {
+                    $.messager.progress({
+                        title: '正在处理数据',
+                        msg: '请等待...'
+                    });
+                    $.ajax({
+                        type: "POST",
+                        url: "/cbtconsole/cutom/giveUp",
+                        data: param,
+                        success: function (data) {
+                            $.messager.progress('close');
+                            if (data.ok) {
+                                // showMessage('执行成功！');
+                                showMessage('执行成功，页面即将刷新！');
+                                setTimeout(function () {
+                                    //window.location.reload();
+                                    doQuery(1);
+                                }, 1000);
+                            } else {
+                                $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                            }
+                        },
+                        error: function (res) {
+                            $.messager.progress('close');
+                            $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                        }
+                    });
+                }
+            });
+        }
+
         function formatPid(val, row, index) {
             return '<a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=' + val + '">' + val + '</a>';
         }
 
         function formatSync(val, row, index) {
             if (val > 0) {
-                return "同步";
+                if(val == 1){
+                    return "同步";
+                }else{
+                    return "放弃";
+                }
             } else {
                 return "";
             }
         }
 
         function formatOperation(val, row, index) {
-            return '<button class="but_color" onclick="syncSkuToOnline(' + index + ')">同步到线上sku</button>';
+            var content = '<button class="but_color" onclick="syncSkuToOnline(' + index + ')">同步到线上sku</button>';
+            content += '&nbsp;&nbsp;<button class="but_del" onclick="giveUp(' + index + ')">放弃</button>';
+            return content;
         }
     </script>
 
@@ -273,6 +329,7 @@
 					<option value="-1" selected="selected">全部</option>
                     <option value="0">未同步</option>
                     <option value="1">已同步</option>
+                    <option value="2">放弃</option>
 			</select></span>
         <span><input type="button"
                                  class="enter_btn" value="查询" onclick="doQuery(0)"/></span>
@@ -298,7 +355,7 @@
         <th data-options="field:'updateAdminName',align:'center',width:'100px'">同步人</th>
         <th data-options="field:'updateTime',align:'center',width:'150px'">同步时间</th>
         <th
-                data-options="field:'opFlag',align:'center',width:'150px',formatter:formatOperation">操作
+                data-options="field:'opFlag',align:'center',width:'180px',formatter:formatOperation">操作
         </th>
     </tr>
     </thead>

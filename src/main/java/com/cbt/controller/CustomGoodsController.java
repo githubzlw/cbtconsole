@@ -1306,4 +1306,38 @@ public class CustomGoodsController {
         return json;
     }
 
+    @RequestMapping("/giveUp")
+    @ResponseBody
+	public JsonResult giveUp(HttpServletRequest request, GoodsWeightChange weightChange){
+        JsonResult json = new JsonResult();
+
+        com.cbt.pojo.Admuser user = UserInfoUtils.getUserInfo(request);
+        if(user == null || user.getId() ==0){
+            Assert.assertNotNull("登录后重试",weightChange);
+            json.setMessage("登录后重试");
+            json.setOk(false);
+            return  json;
+        }
+
+        if(weightChange == null || StringUtils.isBlank(weightChange.getPid())){
+            Assert.assertNotNull("获取参数失败",weightChange);
+            json.setMessage("获取参数失败");
+            json.setOk(false);
+            return  json;
+        }
+        try{
+            weightChange.setAdminId(user.getId());
+            weightChange.setSyncFlag(2);
+            customGoodsService.setGoodsWeightChangeFlag(weightChange);
+            json.setOk(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            LOG.error("giveUp",e);
+            json.setOk(false);
+            json.setMessage("giveUp error:"+e.getMessage());
+            Assert.assertTrue(e.getMessage(),false);
+        }
+        return json;
+    }
+
 }

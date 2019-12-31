@@ -979,5 +979,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.updateGoodsOverSeaInfo(goodsOverSea);
     }
 
+    @Override
+    public int setGoodsWeightChangeFlag(GoodsWeightChange weightChange) {
+        return customGoodsMapper.setGoodsWeightChangeFlag(weightChange);
+    }
+
 
 }
