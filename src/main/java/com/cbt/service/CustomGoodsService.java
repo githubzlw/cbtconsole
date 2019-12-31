@@ -934,4 +934,11 @@ public interface CustomGoodsService {
      * @return
      */
     int updateGoodsOverSeaInfo(GoodsOverSea goodsOverSea);
+
+    /**
+     * 设置重量改动信息同步标识
+     * @param weightChange
+     * @return
+     */
+    int setGoodsWeightChangeFlag(GoodsWeightChange weightChange);
 }
