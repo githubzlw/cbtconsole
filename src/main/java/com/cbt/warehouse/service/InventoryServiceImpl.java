@@ -990,7 +990,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		iDetail.setGoodsPrice(param.get("goods_price"));
 		iDetail.setGoodsSkuid(param.get("skuid"));
 		iDetail.setGoodsSpecid(param.get("specid"));
-		iDetail.setType(0);
+		iDetail.setType(5);
 		iDetail.setSku(param.get("sku"));
 		iDetail.setInventoryId(inventorySkuId);
 		iDetail.setGoodsUrl(goodsUrl);
