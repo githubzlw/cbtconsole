@@ -582,27 +582,6 @@ public class InventoryController {
 		return result;
 	}
 
-	/**
-	 * 查询库存统计报表
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws ServletException
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	@RequestMapping(value = "/searchGoodsInventoryInfo")
-	@ResponseBody
-	protected EasyUiJsonResult searchGoodsInventoryInfo(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, ParseException {
-		EasyUiJsonResult json = new EasyUiJsonResult();
-		Map<Object, Object> map = getObjectByInventory(request,false);
-		List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
-		int toryListCount = inventoryService.getIinOutInventoryCount(map);
-		json.setRows(toryList);
-		json.setTotal(toryListCount);
-		return json;
-	}
 	
 	/**
 	 * 查询库存统计报表
@@ -1715,5 +1694,27 @@ public class InventoryController {
 		json.setData(list);
 		return json;
 	}
+	/**
+	 * 查询库存统计报表
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/searchGoodsInventoryInfo")
+	@ResponseBody
+	protected EasyUiJsonResult searchGoodsInventoryInfo(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<Object, Object> map = getObjectByInventory(request,false);
+		List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
+		int toryListCount = inventoryService.getIinOutInventoryCount(map);
+		json.setRows(toryList);
+		json.setTotal(toryListCount);
+		return json;
+	}
+	
 	
 }
