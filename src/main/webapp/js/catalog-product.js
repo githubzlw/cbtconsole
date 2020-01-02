@@ -350,7 +350,8 @@ function searchFromRemote(){
 		data:{
 			"keyword" : keyword,
 			"catid" : catid,
-			"page":page
+			"page":page,
+			"site":temp
 		},
 		type:"post",
 		success:function(data){
@@ -372,12 +373,12 @@ function searchFromRemote(){
 					continue;
 				}
 				productHtml = productHtml +'<div class="col-xs-2 product"><div class="product_in">';//src="https://www.import-express.com/newindex/img/dot.gif" data-
-				productHtml = productHtml +'<a href="'+requestHost+goodslist[i].goods_url+'"><img src="/cbtconsole/img/beforeLoad.gif" data-original="'+goodslist[i].goods_image+'" class="product-img img-lazy img-responsive"></a>';
-				productHtml = productHtml +'<input type="checkbox" class="is_boutique_check" name="is_selected" value="'+goodslist[i].goods_pid+'" onclick="checkClick(this)">';
+				productHtml = productHtml +'<a href="'+requestHost+goodslist[i].url+'"><img src="/cbtconsole/img/beforeLoad.gif" data-original="'+goodslist[i].image+'" class="product-img img-lazy img-responsive"></a>';
+				productHtml = productHtml +'<input type="checkbox" class="is_boutique_check" name="is_selected" value="'+goodslist[i].id+'" onclick="checkClick(this)">';
 				productHtml = productHtml +'<div class="info-product">';
-				productHtml = productHtml +'<div class="product-name">'+goodslist[i].goods_name+'</div>';
-				productHtml = productHtml +'<div class="product-price">Price:$'+goodslist[i].goods_price+' /'+goodslist[i].goodsPriceUnit+'</div>';
-				productHtml = productHtml +'<div class="product-sold">Sols:'+goodslist[i].goods_solder+'</div>';
+				productHtml = productHtml +'<div class="product-name">'+goodslist[i].name+'</div>';
+				productHtml = productHtml +'<div class="product-price">Price:$'+goodslist[i].price+' /'+goodslist[i].goodsPriceUnit+'</div>';
+				productHtml = productHtml +'<div class="product-sold">Sols:'+goodslist[i].sold+'</div>';
 				productHtml = productHtml +'</div></div></div>';
 			}
 			var categoryHtml = "";
@@ -385,24 +386,24 @@ function searchFromRemote(){
 			if(rootTree){
 				for(var i=0;i<rootTree.length;i++){
 					categoryHtml = categoryHtml +'<div class="category-lev1';
-					if(qcatid==rootTree[i].cid){
+					if(qcatid==rootTree[i].id){
 						categoryHtml = categoryHtml +' category-lev1-select';
 					}
-					categoryHtml = categoryHtml+'"><span name="'+rootTree[i].cid+'" onclick="categorysearch(this)">'+rootTree[i].category+'</span>';
-					var childens = rootTree[i].childens;
+					categoryHtml = categoryHtml+'"><span name="'+rootTree[i].id+'" onclick="categorysearch(this)">'+rootTree[i].name+'</span>';
+					var childens = rootTree[i].childen;
 					for(var j=0;j<childens.length;j++){
 						categoryHtml = categoryHtml +'<div class="category-lev2';
-						if(qcatid==childens[j].cid){
+						if(qcatid==childen[j].id){
 							categoryHtml = categoryHtml +' category-lev2-select';
 						}
-						categoryHtml = categoryHtml +'"><span name="'+childens[j].cid+'" onclick="categorysearch(this)">'+childens[j].category+'</span>';
-						var childens_c = childens[j].childens;
+						categoryHtml = categoryHtml +'"><span name="'+childens[j].id+'" onclick="categorysearch(this)">'+childens[j].name+'</span>';
+						var childens_c = childens[j].childen;
 						for(var k=0;k<childens_c.length;k++){
 							categoryHtml = categoryHtml +'<div class="category-lev3'
-							if(qcatid==childens_c[k].cid){
+							if(qcatid==childens_c[k].id){
 								categoryHtml = categoryHtml +' category-lev3-select';
 							}
-							categoryHtml = categoryHtml +'"><span name="'+childens_c[k].cid+'" onclick="categorysearch(this)">'+childens_c[k].category+'</span>'+'</div>';
+							categoryHtml = categoryHtml +'"><span name="'+childens_c[k].id+'" onclick="categorysearch(this)">'+childens_c[k].name+'</span>'+'</div>';
 						}
 						categoryHtml = categoryHtml +'</div>';
 					}
