@@ -1225,13 +1225,20 @@ public class CustomGoodsController {
 
     @RequestMapping(value = "/queryGoodsWeightList", method = {RequestMethod.POST, RequestMethod.GET})
 	@ResponseBody
-	public EasyUiJsonResult queryGoodsWeightList(HttpServletRequest request, String pid,Integer adminId, Integer page, Integer rows) {
+	public EasyUiJsonResult queryGoodsWeightList(String pid,Integer adminId, Integer page, Integer rows,
+                                                 Integer updateAdminId, Integer dealState) {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		if (StringUtils.isBlank(pid)) {
 			pid = null;
 		}
-		if (adminId == null || adminId< 0) {
+		if (adminId == null || adminId < 1) {
 			adminId = null;
+		}
+		if (updateAdminId == null || updateAdminId< 1) {
+			updateAdminId = null;
+		}
+		if (dealState == null || dealState < 0) {
+			dealState = -1;
 		}
 		if (page == null || page < 1) {
 			page = 1;
@@ -1247,6 +1254,8 @@ public class CustomGoodsController {
 		    weightChange.setStartNum(startNum);
 		    weightChange.setLimitNum(limitNum);
 		    weightChange.setAdminId(adminId);
+		    weightChange.setUpdateAdminId(updateAdminId);
+		    weightChange.setSyncFlag(dealState);
 
 			List<GoodsWeightChange> list = customGoodsService.queryGoodsWeightChangeList(weightChange);
 			int count = customGoodsService.queryGoodsWeightChangeListCount(weightChange);
@@ -1292,6 +1301,40 @@ public class CustomGoodsController {
             LOG.error("syncLocalWeightToOnline",e);
             json.setOk(false);
             json.setMessage("syncLocalWeightToOnline error:"+e.getMessage());
+            Assert.assertTrue(e.getMessage(),false);
+        }
+        return json;
+    }
+
+    @RequestMapping("/giveUp")
+    @ResponseBody
+	public JsonResult giveUp(HttpServletRequest request, GoodsWeightChange weightChange){
+        JsonResult json = new JsonResult();
+
+        com.cbt.pojo.Admuser user = UserInfoUtils.getUserInfo(request);
+        if(user == null || user.getId() ==0){
+            Assert.assertNotNull("登录后重试",weightChange);
+            json.setMessage("登录后重试");
+            json.setOk(false);
+            return  json;
+        }
+
+        if(weightChange == null || StringUtils.isBlank(weightChange.getPid())){
+            Assert.assertNotNull("获取参数失败",weightChange);
+            json.setMessage("获取参数失败");
+            json.setOk(false);
+            return  json;
+        }
+        try{
+            weightChange.setAdminId(user.getId());
+            weightChange.setSyncFlag(2);
+            customGoodsService.setGoodsWeightChangeFlag(weightChange);
+            json.setOk(true);
+        }catch (Exception e){
+            e.printStackTrace();
+            LOG.error("giveUp",e);
+            json.setOk(false);
+            json.setMessage("giveUp error:"+e.getMessage());
             Assert.assertTrue(e.getMessage(),false);
         }
         return json;

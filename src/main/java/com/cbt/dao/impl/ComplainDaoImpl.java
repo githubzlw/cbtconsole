@@ -171,11 +171,11 @@ public class ComplainDaoImpl implements IComplainDao{
 				lstValues.add(String.valueOf(t.getComplainid()));
 
 				String runSql = DBHelper.covertToSQL(sql3,lstValues);
-				SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+				SendMQ.sendMsg(new RunSqlModel(runSql));
 
 
 				sql3 = "update tb_complain_chat set readorno=1 where complainid ="+t.getComplainid()+" and flag=0";
-				SendMQ.sendMsgByRPC(new RunSqlModel(sql3));
+				SendMQ.sendMsg(new RunSqlModel(sql3));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -193,7 +193,8 @@ public class ComplainDaoImpl implements IComplainDao{
 				"from tb_complain_chat cc " + 
 				"inner join tb_complain  on  tb_complain.id=cc.complainid " + 
 				"left join admin_r_user on tb_complain.userid=admin_r_user.userid " + 
-				"LEFT JOIN tb_complain_file f ON cc.id=f.complainChatid AND f.flag=1 " + 
+				"LEFT JOIN tb_complain_file f ON f.complainid =cc.complainid and ((f.complainChatid > 0 and cc.id=f.complainChatid) " +
+				" or (f.complainChatid =0 and cc.uuid = f.uuid )) AND f.flag=1 " +
 				"WHERE cc.complainid = ? ORDER BY chatTime";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;

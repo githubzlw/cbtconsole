@@ -40,6 +40,26 @@ public class ShopManagerPojo implements Serializable{
 	private String goods_p_url;
 	
 	private String status;
+	
+	private String antiKey;//反关键词
+	private int antiId;//反关键词id
+	
+
+	public int getAntiId() {
+		return antiId;
+	}
+
+	public void setAntiId(int antiId) {
+		this.antiId = antiId;
+	}
+
+	public String getAntiKey() {
+		return antiKey;
+	}
+
+	public void setAntiKey(String antiKey) {
+		this.antiKey = antiKey;
+	}
 
 	public String getEnName() {
 		return enName;

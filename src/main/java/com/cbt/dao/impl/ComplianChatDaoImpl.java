@@ -21,13 +21,13 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 
 	@Override
 	public Integer addChat(ComplainChat t) {
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
+		// Connection conn = null;
+		// PreparedStatement stmt = null;
+		// ResultSet rs = null;
 		int row=0;
-		String sql = "insert into tb_complain_chat (complainid,chatText,chatTime,chatAdmin,chatAdminid,flag) values(?,?,now(),?,?,1)";
-		String sql1= "select max(id) as maxId from tb_complain_chat where  complainid = ?";
-		conn = DBHelper.getInstance().getConnection2();
+		String sql = "insert into tb_complain_chat (complainid,chatText,chatTime,chatAdmin,chatAdminid,flag,uuid) values(?,?,now(),?,?,1,?)";
+		// String sql1= "select max(id) as maxId from tb_complain_chat where  complainid = ?";
+		// conn = DBHelper.getInstance().getConnection2();
 		try {
 //			stmt=conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
 //			stmt.setInt(1, t.getComplainid());
@@ -41,9 +41,11 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 			lstValues.add(t.getChatText());
 			lstValues.add(t.getChatAdmin());
 			lstValues.add(String.valueOf(t.getChatAdminid()));
+			lstValues.add(t.getUuid());
 
 			String runSql = DBHelper.covertToSQL(sql,lstValues);
-			row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+			SendMQ.sendMsg(new RunSqlModel(runSql));
+			// row = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 
 //			rs = stmt.getGeneratedKeys();
 //			if (rs.next()) {
@@ -51,16 +53,16 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 //                row =id ;
 //            }
 
-			stmt = conn.prepareStatement(sql1);
+			/*stmt = conn.prepareStatement(sql1);
 			stmt.setInt(1, t.getComplainid());
 			rs = stmt.executeQuery();
 			while (rs.next()) {
 				row = rs.getInt("maxId");
-			}
+			}*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (rs != null) {
+			/*if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException e) {
@@ -74,7 +76,7 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 					e.printStackTrace();
 				}
 			}
-			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeConnection(conn);*/
 		}
 		return row;
 	}
@@ -85,7 +87,7 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 		PreparedStatement stmt = null;
 //		ResultSet rs = null;
 //		String sql="insert into tb_complain_file(complainid,imgUrl,delState,complainChatid,flag) values('"+t.getComplainid()+"','"+t.getImgUrl()+"',0,'"+t.getComplainChatid()+"',"+t.getFlag()+")";
-		String sql="insert into tb_complain_file(complainid,imgUrl,delState,complainChatid,flag) values(?,?,0,?,?)";
+		String sql="insert into tb_complain_file(complainid,imgUrl,delState,complainChatid,flag,uuid) values(?,?,0,?,?,?)";
 //		conn = DBHelper.getInstance().getConnection2();
 		try {
 			// stmt=conn.prepareStatement(sql);
@@ -96,9 +98,10 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 			lstValues.add(String.valueOf(t.getImgUrl()));
 			lstValues.add(String.valueOf(t.getComplainChatid()));
 			lstValues.add(String.valueOf(t.getFlag()));
+			lstValues.add(t.getUuid());
 
 			String runSql = DBHelper.covertToSQL(sql,lstValues);
-			SendMQ.sendMsgByRPC(new RunSqlModel(runSql));
+			SendMQ.sendMsg(new RunSqlModel(runSql));
 
 
 
