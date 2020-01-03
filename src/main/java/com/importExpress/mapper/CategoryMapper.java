@@ -95,4 +95,17 @@ public interface CategoryMapper {
      */
     int updateChangeAllBeanInfo(CategoryAllBean categoryBean);
 
+    /**
+     * 获取1688_category表最大ID
+     * @return
+     */
+    int queryMaxIdByCatidInfo();
+
+     /**
+     * 插入新的类别
+     * @param categoryBean
+     * @return
+     */
+    int insertIntoCatidInfo(CategoryAllBean categoryBean);
+
 }

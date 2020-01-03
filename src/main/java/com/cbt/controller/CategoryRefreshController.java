@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -309,6 +310,50 @@ public class CategoryRefreshController {
 			json.setOk(false);
 			json.setMessage("changeCategoryData error:" + e.getMessage());
 			LOG.error("changeCategoryData error:", e);
+		}
+		return json;
+	}
+
+
+	@RequestMapping(value = "/addCategoryInfo", method = {RequestMethod.POST, RequestMethod.GET})
+	@ResponseBody
+	public JsonResult addCategoryInfo(HttpServletRequest request, @RequestParam(name = "parentCid", required = true) String parentCid,
+									  @RequestParam(name = "chName", required = true) String chName,
+									  @RequestParam(name = "enName", required = true) String enName) {
+		JsonResult json = new JsonResult();
+		Admuser admuser = UserInfoUtils.getUserInfo(request);
+
+		Assert.notNull(admuser, "未登录");
+		if (admuser == null || admuser.getId() == 0) {
+			json.setOk(false);
+			json.setMessage("请登录后操作");
+			return json;
+		}
+
+		if (StringUtils.isBlank(parentCid) || StringUtils.isBlank(chName) || StringUtils.isBlank(enName)) {
+			Assert.isTrue(false, "获取新增参数失败");
+			json.setOk(false);
+			json.setMessage("获取新增参数失败");
+			return json;
+		}
+		try {
+
+			CategoryAllBean categoryBean = new CategoryAllBean();
+			categoryBean.setName(chName);
+			categoryBean.setEnName(enName);
+			categoryBean.setParentId(parentCid);
+
+			categoryBean.setDescription("import catid");
+			categoryBean.setUpdateAdminId(admuser.getId());
+			categoryService.insertIntoCatidInfo(categoryBean);
+
+			json.setSuccess("更新成功，ID："  + categoryBean.getId());
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("updateCategoryInfo", e);
+			Assert.isTrue(false, e.getMessage());
+			json.setOk(false);
+			json.setMessage("updateCategoryInfo error:" + e.getMessage());
 		}
 		return json;
 	}

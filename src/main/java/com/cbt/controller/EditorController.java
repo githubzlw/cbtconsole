@@ -376,7 +376,7 @@ public class EditorController {
             // 直接使用远程路径
             String localpath = goods.getRemotpath();
             // 设置默认图的路径
-            if (!(goods.getShowMainImage().indexOf("http://") > -1 || goods.getShowMainImage().indexOf("https://") > -1)) {
+            if (!(goods.getShowMainImage().contains("http"))) {
                 goods.setShowMainImage(localpath + goods.getShowMainImage());
             }
             // 分割eninfo数据，不替换remotepath相同的路径

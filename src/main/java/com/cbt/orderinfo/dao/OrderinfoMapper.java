@@ -798,4 +798,11 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	int updateOrderNoToNewNo(@Param("oldOrderNo") String oldOrderNo, @Param("newOrderNo") String newOrderNo);
+
+	/**
+	 * 插入使用库存订单入库信息
+	 * @param map
+	 * @return
+	 */
+	int insertInventoryIdRelationtable(Map<String, String> map);
 }

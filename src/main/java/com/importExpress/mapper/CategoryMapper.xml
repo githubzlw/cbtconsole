@@ -178,4 +178,13 @@
         where category_id = #{categoryId}
     </update>
 
+	<select id="queryMaxIdByCatidInfo" resultType="java.lang.Integer">
+		select max(id) from 1688_category
+	</select>
+
+	<insert id="insertIntoCatidInfo" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.bean.CategoryAllBean">
+		insert into 1688_category(lv,category_id,name,path,parent_id,en_name,description)
+		values (#{lv},#{categoryId},#{name},#{path},#{parentId},#{enName},#{description})
+	</insert>
+
 </mapper>
