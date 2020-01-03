@@ -35,6 +35,7 @@ public class UploadByOkHttp {
         boolean isSuccess = false;
         File originFile;
 
+        isKids = 0;
         for (String mapKey : uploadMap.keySet()) {
 
             originFile = new File(mapKey);
@@ -56,9 +57,9 @@ public class UploadByOkHttp {
                 }
                 if (isKids > 0) {
                     // 维护kids的后，维护import
-                    boolean isImport = uploadFile(originFile, uploadMap.get(mapKey), 0);
+                    boolean isImport = uploadFile(originFile, uploadMap.get(mapKey), isKids);
                     if (!isImport) {
-                        isImport = uploadFile(originFile, uploadMap.get(mapKey), 0);
+                        isImport = uploadFile(originFile, uploadMap.get(mapKey), isKids);
                     }
                     if (!isImport) {
                         System.err.println("originFile:" + originFile.getAbsolutePath() + ",upload import path:"
@@ -70,7 +71,7 @@ public class UploadByOkHttp {
                     int importCount = 0;
                     while (!isUpload && importCount < 5) {
                         importCount++;
-                        isUpload = uploadFile(originFile, uploadMap.get(mapKey), 1);
+                        isUpload = uploadFile(originFile, uploadMap.get(mapKey), isKids);
                         if (!isUpload) {
                             // 休眠5秒
                             try {
@@ -107,21 +108,16 @@ public class UploadByOkHttp {
         if (originFile.getName().endsWith(".png")) {
             imageType = "image/png";
         }
-        String uploadFileName = originFile.getName();
-        String[] destPathArr = destPath.split("@@@@");
-        if (destPathArr.length == 2) {
-            destPath = destPathArr[0];
-            uploadFileName = destPathArr[1];
-        }
         try {
             String accessUrl = ACCESS_URL_OLD;
             if (isKids > 0) {
                 accessUrl = ACCESS_URL_NEW;
                 destPath = destPath.replace(GoodsInfoUtils.SERVICE_LOCAL_IMPORT_PATH, GoodsInfoUtils.SERVICE_LOCAL_KIDS_PATH);
             }
+            System.err.println("originFile:" + originFile.getAbsolutePath() + "@" + destPath);
             RequestBody formBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
 //					.addFormDataPart("image", originFile.getName(),
-                    .addFormDataPart("userPhoto", uploadFileName,
+                    .addFormDataPart("userPhoto", originFile.getName(),
                             RequestBody.create(MediaType.parse(imageType), originFile))
                     .addFormDataPart("token", TOKEN).addFormDataPart("destPath", destPath).build();
             Request request = new Request.Builder().url(accessUrl).post(formBody).build();
