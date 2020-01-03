@@ -978,6 +978,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
+    public int setGoodsWeightChangeFlag(GoodsWeightChange weightChange) {
+        return customGoodsMapper.setGoodsWeightChangeFlag(weightChange);
+    }
+
+    @Override
     public List<CustomGoodsPublish> queryGoodsDeleteInfo(CustomGoodsQuery queryBean) {
         return customGoodsMapper.queryGoodsDeleteInfo(queryBean);
     }

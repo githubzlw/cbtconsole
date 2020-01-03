@@ -72,10 +72,11 @@ public class PublishGoodsToOnlineThread extends Thread {
 
             // 根据pid获取商品信息
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-            int isKids = 0;
+            /*int isKids = 0;
             if (checkIsKidsCatid(goods.getCatid1())) {
                 isKids = 1;
-            }
+            }*/
+            int isKids = 0;
             if(StringUtils.isNotBlank(goods.getEninfo()) && goods.getEninfo().length() > 20){
                 goods.setIsShowDetImgFlag(1);
             }

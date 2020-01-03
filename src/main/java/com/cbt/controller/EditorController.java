@@ -700,13 +700,13 @@ public class EditorController {
             }
 
 
-            if(CollectionUtils.isNotEmpty(changeList)){
+            /*if(CollectionUtils.isNotEmpty(changeList)){
                 for(GoodsWeightChange changeBean : changeList){
                     customGoodsService.saveGoodsWeightChange(changeBean);
                 }
-            }
+            }*/
 
-            // customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight);
+            customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight);
 
             json.setOk(true);
             json.setMessage("执行成功，请到改动重量管理页面审核");
@@ -1145,13 +1145,9 @@ public class EditorController {
                     //判断不是正式环境的，不进行搜图图片更新
                     String ip = request.getRemoteAddr();
 
-                    if (ip.contains("1.34") || ip.contains("38.42") || ip.contains("1.27") || ip.contains("1.9")) {
-                        if (cgp.getIsUpdateImg() == 0) {
-                            cgp.setIsUpdateImg(1);
-                            // 设置图片信息
-                        }
-                    } else {
-                        cgp.setIsUpdateImg(0);
+                    System.err.println("ip:" + ip);
+                    if (cgp.getIsUpdateImg() == 0) {
+                        cgp.setIsUpdateImg(1);
                     }
                     if (StringUtils.isNotBlank(updateTimeStr)) {
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -3889,6 +3885,25 @@ public class EditorController {
         }
         return json;
     }
+
+
+    @RequestMapping(value = "/testOkHttp")
+    @ResponseBody
+    public JsonResult testOkHttp() {
+        JsonResult json = new JsonResult();
+        try {
+            // 批量上传测试
+        File testFile = new File("/home/data/cbtconsole/cbtimg/test");
+        String filePath = "/usr/local/goodsimg/importcsvimg/test/1122456";
+            UploadByOkHttp.uploadFileBatchOld(testFile,filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
 
     private void praseEninfoAndUpdate(GoodsParseBean gd) {
         try {

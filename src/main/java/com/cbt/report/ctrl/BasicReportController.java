@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "/basicStatistical")
@@ -1574,7 +1575,12 @@ public class BasicReportController {
                     }
                 }
             }
-            HSSFWorkbook wb = genOrderCancelWithIpnExcel(orderCancels, yearStr + "年" + monthStr + "IPN订单取消详情");
+
+            List<OrderCancelBean> filterList = orderCancels.stream()
+                    .filter(e-> Math.abs(e.getAmount()) == Math.abs(e.getPayAmount()) || e.getAmount() == 0 || e.getPayAmount()==0)
+                    .collect(Collectors.toList());
+            orderCancels.clear();
+            HSSFWorkbook wb = genOrderCancelWithIpnExcel(filterList, yearStr + "年" + monthStr + "IPN订单取消详情");
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition",
                     "attachment;filename=" + yearStr + "-" + monthStr + "-IpnOrderCancel.xls");

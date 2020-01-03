@@ -3492,9 +3492,11 @@
 		AND a.admName=#{admName}
 	</select>
 	<select id="getPriorityCategory" resultType="com.cbt.website.bean.ShopManagerPojo">
-		SELECT  p.id,p.keyword,p.category,p.status,p.minPrice,p.maxPrice,c.en_name as enName
+		SELECT  p.id,p.keyword,p.category,p.status,p.minPrice,p.maxPrice,c.en_name as enName,
+		aw.auti_word as antiKey,aw.id as antiId
 		FROM priority_category p
 		LEFT JOIN 1688_category c ON c.category_id=p.category
+		left join anti_key_words aw on aw.keyword=p.keyword and aw.flag=0
 		<if test="keyword != null">
 			where p.keyword like CONCAT('%','${keyword}','%' )
 		</if>
