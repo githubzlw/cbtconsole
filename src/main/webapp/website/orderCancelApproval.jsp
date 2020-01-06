@@ -110,6 +110,10 @@
         });
     }
 
+    function closeDialog() {
+        $("#offline_dlg").hide();
+    }
+
 </script>
 <body style="overflow-y: hidden;">
 
