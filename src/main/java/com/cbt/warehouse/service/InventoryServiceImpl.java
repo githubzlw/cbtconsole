@@ -450,7 +450,6 @@ public class InventoryServiceImpl implements  InventoryService{
 			iSku.setDbFlag(0);
 			iSku.setBarcode(inventory.get("barcode"));
 			iSku.setRemaining(Integer.valueOf(StrUtils.object2NumStr(inventory.get("yourorder"))));
-			
 			iDetail.setGoodsPImg(inventory.get("goods_p_img"));
 			iDetail.setTbOrderid(inventory.get("tborderid"));
 			iDetail.setGoodsNumber(Integer.valueOf(StrUtils.object2NumStr(inventory.get("yourorder"))));
@@ -534,6 +533,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		iDetail.setGoodsName(iSku.getGoodsName());
 		iDetail.setGoodsImg(iSku.getCarImg());
 		iDetail.setGoodsNumber(inventory_count);
+		iDetail.setGoodsPPid(iSku.getGoodsPPid());
 		iDetail.setGoodsPid(iSku.getGoodsPid());
 		iDetail.setGoodsPrice(iSku.getGoodsPrice());
 		iDetail.setGoodsUrl(iSku.getGoodsUrl());
@@ -990,7 +990,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		iDetail.setGoodsPrice(param.get("goods_price"));
 		iDetail.setGoodsSkuid(param.get("skuid"));
 		iDetail.setGoodsSpecid(param.get("specid"));
-		iDetail.setType(0);
+		iDetail.setType(5);
 		iDetail.setSku(param.get("sku"));
 		iDetail.setInventoryId(inventorySkuId);
 		iDetail.setGoodsUrl(goodsUrl);
@@ -1486,6 +1486,18 @@ public class InventoryServiceImpl implements  InventoryService{
 	@Override
 	public int inventoryBarcodeListCount(Map<String, Object> map) {
 		return inventoryMapper.inventoryBarcodeListCount(map);
+	}
+	@Override
+	public List<InventoryLog> inventoryLogList(Map<String, Object> map) {
+		List<InventoryLog> inventoryLogList = inventoryMapper.inventoryLogList(map);
+		if(inventoryLogList == null || inventoryLogList.isEmpty()) {
+			return Lists.newArrayList();
+		}
+		return inventoryLogList;
+	}
+	@Override
+	public int inventoryLogListCount(Map<String, Object> map) {
+		return inventoryMapper.inventoryLogListCount(map);
 	}
 	@Override
 	public int moveBarcode(Map<String, Object> mapParam) {

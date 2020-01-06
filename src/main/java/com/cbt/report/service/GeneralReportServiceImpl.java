@@ -12,6 +12,7 @@ import com.cbt.warehouse.pojo.ShippingPackage;
 import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
+import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.LossInventoryWrap;
 
 import org.apache.poi.hssf.usermodel.*;
@@ -90,7 +91,8 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	String[] excelTota25 = { "序号","类别","商品ID","商品名称","商品sku","商品图片","上次盘点数量","库存数量","库位","盘点数量"};
 	String[] excelTota26 = { "序号","时间","odid","商品ID","商品名称","商品sku","库存数量","库位","价格","盘点数量"};
 	String[] excelTota27 = { "序号","时间","商品ID","skuid","类型","数量","备注"};
-
+	String[] excelTota28 = { "序号","时间","商品ID","产品名称","产品Sku","变更前库存","变更数量","变更后库存","变更类型","备注"};
+	
 	@Override
 	public HSSFWorkbook exportUserProfitByMonth(List<OrderSalesAmountPojo> list) {
 		String sheetName = "用户月利润统计报表";
@@ -1270,6 +1272,55 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 				row.createCell(7).setCellValue(bg.getBarcode());
 				row.createCell(8).setCellValue(bg.getGoodsPrice());
 				row.createCell(9).setCellValue("");
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return wb;
+	}
+	@Override
+	public HSSFWorkbook exportInventoryLog(List<InventoryLog> list) {
+		String sheetName = "库存报表"; //报表页名
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(sheetName);
+		int rows =0;  //记录行数
+		HSSFRow row = sheet.createRow(rows++);
+		HSSFCellStyle style = wb.createCellStyle();
+		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+		HSSFCell hcell = row.createCell(0); //添加标题
+		hcell.setCellValue("库存列表");
+		row = sheet.createRow(rows++);  //到下一行添加数据
+		for (int i = 0; i < excelTota28.length; i++) {
+			HSSFCell cell = row.createCell(i);
+			cell.setCellValue(excelTota28[i]);
+			cell.setCellStyle(style);
+		}
+		try{
+			//写入报表汇总
+			//{ "序号","时间","商品ID","产品名称","产品Sku","变更前库存","变更数量","变更后库存","变更类型","备注"};
+			for (int i = 0; i < list.size(); i++) {
+				row = sheet.createRow(rows++);
+				InventoryLog bg = list.get(i);
+				row.createCell(0).setCellValue((i+1));
+				row.createCell(1).setCellValue(bg.getCreatetime());
+				row.createCell(2).setCellValue(bg.getGoodsPid());
+				row.createCell(3).setCellValue(bg.getGoodsName());
+				row.createCell(4).setCellValue(bg.getSku()+"\n"+bg.getSkuid()+"\n"+bg.getSpecid());
+				row.createCell(5).setCellValue(bg.getBeforeRemaining());
+				row.createCell(6).setCellValue(bg.getRemaining());
+				row.createCell(7).setCellValue(bg.getAfterRemaining());
+				if(bg.getChangeType() == 1) {
+					row.createCell(8).setCellValue("入库");
+				}else if(bg.getChangeType() == 2) {
+					row.createCell(8).setCellValue("出库");
+				}else if(bg.getChangeType() == 3) {
+					row.createCell(8).setCellValue("盘点");
+				}else if(bg.getChangeType() == 4) {
+					row.createCell(8).setCellValue("占用");
+				}else if(bg.getChangeType() == 5) {
+					row.createCell(8).setCellValue("取消占用");
+				}
+				row.createCell(9).setCellValue(bg.getRemark());
 			}
 		}catch(Exception e){
 			e.printStackTrace();
