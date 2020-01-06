@@ -12,6 +12,7 @@ import com.cbt.parse.bean.Set;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.parse.service.*;
+import com.cbt.service.CategoryService;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
 import com.cbt.warehouse.pojo.HotCategory;
@@ -86,6 +87,8 @@ public class EditorController {
     private HotGoodsService hotGoodsService;
     @Autowired
     private HotManageService hotManageService;
+    @Autowired
+	private CategoryService categoryService;
 
     @SuppressWarnings({"static-access", "unchecked"})
     @RequestMapping(value = "/detalisEdit", method = {RequestMethod.POST, RequestMethod.GET})
@@ -3902,6 +3905,56 @@ public class EditorController {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/changePidToNewCatid")
+    @ResponseBody
+    public JsonResult changePidToNewCatid(HttpServletRequest request, @RequestParam(name = "pid",required = true) String pid,
+                                          @RequestParam(name = "oldCatid",required = true) String oldCatid,
+                                          @RequestParam(name = "newCatid",required = true) String newCatid) {
+        JsonResult json = new JsonResult();
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null || admuser.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        try {
+            // 验证合法性
+            CategoryBean oldBean = categoryService.queryCategoryById(newCatid);
+            if (oldBean == null) {
+                json.setOk(false);
+                json.setMessage("无新类别ID");
+            } else {
+                CustomGoodsPublish good = new CustomGoodsPublish();
+                good.setPid(pid);
+                good.setCatid1(newCatid);
+                good.setPathCatid(oldBean.getPath());
+                InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+                inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+                inputData.setPid(pid);
+                inputData.setCatid1(good.getCatid1());
+                inputData.setPath_catid(good.getPathCatid());
+
+                boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+                if (isSu) {
+                    good.setAdminId(admuser.getId());
+                    good.setCatid(oldCatid);
+                    categoryService.changePidToNewCatid(good);
+                    json.setOk(true);
+                } else {
+                    json.setOk(false);
+                    json.setMessage("更新MongoDB失败，请重试");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("changePidToNewCatid 执行错误，原因：" + e.getMessage());
         }
         return json;
     }

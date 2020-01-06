@@ -187,4 +187,15 @@
 		values (#{lv},#{categoryId},#{name},#{path},#{parentId},#{enName},#{description})
 	</insert>
 
+
+	<update id="changePidToNewCatid" parameterType="com.cbt.bean.CustomGoodsPublish">
+		update custom_benchmark_ready set catid1 = #{catid1},path_catid = #{pathCatid}
+		where pid = #{pid}
+	</update>
+
+	<insert id="insertIntoCatidChangeLog" parameterType="com.cbt.bean.CustomGoodsPublish">
+		insert into custom_goods_catid_change_log(pid,admin_id,old_catid,new_catid)
+		values(#{pid},#{adminId},#{catid},#{catid1})
+	</insert>
+
 </mapper>

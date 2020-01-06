@@ -3,6 +3,7 @@ package com.cbt.service.impl;
 import com.cbt.bean.Category1688Bean;
 import com.cbt.bean.CategoryAllBean;
 import com.cbt.bean.CategoryBean;
+import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.service.CategoryService;
 import com.importExpress.mapper.CategoryMapper;
 
@@ -128,6 +129,12 @@ public class CategoryServiceImpl implements CategoryService {
 			SendMQ.sendMsg(new RunSqlModel(sql));
 		}
 		return categoryBean.getId();
+	}
+
+	@Override
+	public int changePidToNewCatid(CustomGoodsPublish good) {
+		categoryMapper.changePidToNewCatid(good);
+		return categoryMapper.insertIntoCatidChangeLog(good);
 	}
 
 }
