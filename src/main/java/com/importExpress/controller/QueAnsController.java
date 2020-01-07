@@ -13,6 +13,7 @@ import com.importExpress.pojo.QueAns;
 import com.importExpress.service.QuestionAndAnswerService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.WebSiteEnum;
 import org.apache.commons.lang.StringUtils;
 
 import org.slf4j.LoggerFactory;
@@ -25,11 +26,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 后台提问回答功能
@@ -291,16 +292,17 @@ public class QueAnsController {
 				}
 			}
 		}
-		String Website="0";
-		String reg=".*kidsproductwholesale.*";  //判断字符串中是否含有ll
-		boolean isValid=purl.matches(reg);
-		if (isValid){
-			Website="1";
-		}
+		AtomicReference<String> website= new AtomicReference<>("1");
+
+		Arrays.stream(WebSiteEnum.values()).forEach(e->{
+			if(purl.contains(e.getName().toLowerCase())){
+				website.set(String.valueOf(e.getCode()));
+			}
+		});
 
 		//给客户发送邮件
 		QueAns q=questionAndAnswerService.getQueAnsinfo(qid);
-		questionAndAnswerService.replyReportQes(q.getQuestionid(),replyContent, date, q.getEmail(), q.getQuestion_content(), q.getEmail(), Integer.valueOf(q.getUserid()), q.getSale_email(),url,Website);
+		questionAndAnswerService.replyReportQes(q.getQuestionid(),replyContent, date, q.getEmail(), q.getQuestion_content(), q.getEmail(), Integer.parseInt(q.getUserid()), q.getSale_email(),url, website.get());
 //		}
 		return updateReplyContent;
 	}

@@ -186,6 +186,7 @@ public class SendMQ {
     private static void sendAuthorizationFlagStr(Channel channel,String json) throws Exception {
         channel.exchangeDeclare(EXCHANGE_USER_AUTH_NAME, "fanout", true);
         channel.basicPublish(EXCHANGE_USER_AUTH_NAME, "", null, json.getBytes("UTF-8"));
+        System.err.println(EXCHANGE_USER_AUTH_NAME + ":" + json);
     }
 
 
