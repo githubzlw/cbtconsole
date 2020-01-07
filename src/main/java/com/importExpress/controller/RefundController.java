@@ -101,7 +101,7 @@ public class RefundController {
         String userIdStr = request.getParameter("userId");
         int userId = 0;
         if (StringUtils.isNotBlank(userIdStr)) {
-            userId = Integer.valueOf(userIdStr);
+            userId = Integer.parseInt(userIdStr);
         }
         if (userId > 0) {
             mv.addObject("userId", userId);
@@ -133,7 +133,7 @@ public class RefundController {
         String typeStr = request.getParameter("type");
         int type = -1;
         if (StringUtils.isNotBlank(typeStr)) {
-            type = Integer.valueOf(typeStr);
+            type = Integer.parseInt(typeStr);
         }
         mv.addObject("type", type);
 
@@ -142,14 +142,14 @@ public class RefundController {
         /*String stateStr = request.getParameter("state");
 
         if (StringUtils.isNotBlank(stateStr)) {
-            state = Integer.valueOf(stateStr);
+            state = Integer.parseInt(stateStr);
         }
         mv.addObject("state", state);*/
 
         String appMoneyStr = request.getParameter("appMoney");
         int appMoney = 0;
         if (StringUtils.isNotBlank(appMoneyStr)) {
-            appMoney = Integer.valueOf(appMoneyStr);
+            appMoney = Integer.parseInt(appMoneyStr);
         }
         mv.addObject("appMoney", appMoney);
 
@@ -157,7 +157,7 @@ public class RefundController {
         int chooseState = -1;
         String chooseStateStr = request.getParameter("chooseState");
         if (StringUtils.isNotBlank(chooseStateStr)) {
-            chooseState = Integer.valueOf(chooseStateStr);
+            chooseState = Integer.parseInt(chooseStateStr);
         }
         mv.addObject("chooseState", chooseState);
         if (chooseState == 0) {
@@ -190,7 +190,7 @@ public class RefundController {
         int page = 1;
         String pageStr = request.getParameter("page");
         if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
-            page = Integer.valueOf(pageStr);
+            page = Integer.parseInt(pageStr);
             startNum = (page - 1) * limitNum;
         }
         mv.addObject("page", page);
@@ -284,7 +284,7 @@ public class RefundController {
                 json.setMessage("获取id失败,请重试");
                 return json;
             } else {
-                refundId = Integer.valueOf(refundIdStr);
+                refundId = Integer.parseInt(refundIdStr);
             }
 
             String typeStr = request.getParameter("type");
@@ -294,7 +294,7 @@ public class RefundController {
                 json.setMessage("获取申请类型失败,请重试");
                 return json;
             } else {
-                type = Integer.valueOf(typeStr);
+                type = Integer.parseInt(typeStr);
             }
 //
 //            String stateStr = request.getParameter("state");
@@ -304,7 +304,7 @@ public class RefundController {
 //                json.setMessage("获取状态失败,请重试");
 //                return json;
 //            } else {
-//                state = Integer.valueOf(stateStr);
+//                state = Integer.parseInt(stateStr);
 //            }
 
             String actionFlagStr = request.getParameter("actionFlag");
@@ -314,7 +314,7 @@ public class RefundController {
                 json.setMessage("获取操作状态失败,请重试");
                 return json;
             } else {
-                actionFlag = Integer.valueOf(actionFlagStr);
+                actionFlag = Integer.parseInt(actionFlagStr);
             }
 
             String userIdStr = request.getParameter("userId");
@@ -324,7 +324,7 @@ public class RefundController {
                 json.setMessage("获取客户ID失败,请重试");
                 return json;
             } else {
-                userId = Integer.valueOf(userIdStr);
+                userId = Integer.parseInt(userIdStr);
             }
 
             String orderNo = request.getParameter("orderNo");
@@ -345,7 +345,7 @@ public class RefundController {
                 json.setMessage("获取操作人ID失败,请重试");
                 return json;
             } else {
-                operatorId = Integer.valueOf(operatorIdStr);
+                operatorId = Integer.parseInt(operatorIdStr);
                 if (operatorId != user.getId()) {
                     json.setOk(false);
                     json.setMessage("获取非当前操作人操作");
@@ -359,7 +359,7 @@ public class RefundController {
                 json.setOk(false);
                 json.setMessage("获取退款金额失败,请重试");
                 return json;
-            } else if (Double.parseDouble(refundAmountStr) >= 300) {
+            } else if (Double.parseDouble(refundAmountStr) >= 300 && actionFlag > 1) {
                 json.setOk(false);
                 json.setMessage("该退款金额超过300，请转账");
                 return json;
@@ -564,7 +564,7 @@ public class RefundController {
                 json.setMessage("获取id失败,请重试");
                 return json;
             } else {
-                refundId = Integer.valueOf(refundIdStr);
+                refundId = Integer.parseInt(refundIdStr);
             }
             String actionFlagStr = request.getParameter("actionFlag");
             int actionFlag = 0;
@@ -573,7 +573,7 @@ public class RefundController {
                 json.setMessage("获取操作状态失败,请重试");
                 return json;
             } else {
-                actionFlag = Integer.valueOf(actionFlagStr);
+                actionFlag = Integer.parseInt(actionFlagStr);
             }
 
             String userIdStr = request.getParameter("userId");
@@ -583,7 +583,7 @@ public class RefundController {
                 json.setMessage("获取客户ID失败,请重试");
                 return json;
             } else {
-                userId = Integer.valueOf(userIdStr);
+                userId = Integer.parseInt(userIdStr);
             }
 
             String operatorIdStr = request.getParameter("operatorId");
@@ -593,7 +593,7 @@ public class RefundController {
                 json.setMessage("获取操作人ID失败,请重试");
                 return json;
             } else {
-                operatorId = Integer.valueOf(operatorIdStr);
+                operatorId = Integer.parseInt(operatorIdStr);
                 if (operatorId != user.getId()) {
                     json.setOk(false);
                     json.setMessage("获取非当前操作人操作");
@@ -670,7 +670,7 @@ public class RefundController {
                 json.setMessage("获取id失败,请重试");
                 return json;
             } else {
-                refundId = Integer.valueOf(refundIdStr);
+                refundId = Integer.parseInt(refundIdStr);
             }
 
 
@@ -681,7 +681,7 @@ public class RefundController {
                 json.setMessage("获取申请类型失败,请重试");
                 return json;
             } else {
-                type = Integer.valueOf(typeStr);
+                type = Integer.parseInt(typeStr);
             }
 
 
@@ -692,7 +692,7 @@ public class RefundController {
                 json.setMessage("获取操作状态失败,请重试");
                 return json;
             } else {
-                actionFlag = Integer.valueOf(actionFlagStr);
+                actionFlag = Integer.parseInt(actionFlagStr);
             }
 
             String userIdStr = request.getParameter("userId");
@@ -702,7 +702,7 @@ public class RefundController {
                 json.setMessage("获取客户ID失败,请重试");
                 return json;
             } else {
-                userId = Integer.valueOf(userIdStr);
+                userId = Integer.parseInt(userIdStr);
             }
 
             String operatorIdStr = request.getParameter("operatorId");
@@ -712,7 +712,7 @@ public class RefundController {
                 json.setMessage("获取操作人ID失败,请重试");
                 return json;
             } else {
-                operatorId = Integer.valueOf(operatorIdStr);
+                operatorId = Integer.parseInt(operatorIdStr);
                 if (operatorId != user.getId()) {
                     json.setOk(false);
                     json.setMessage("获取非当前操作人操作");
@@ -798,7 +798,7 @@ public class RefundController {
             json.setOk(false);
             json.setMessage("获取用户ID失败");
         } else {
-            userId = Integer.valueOf(userIdStr);
+            userId = Integer.parseInt(userIdStr);
         }
 
         double refundAmount = 0;
@@ -868,7 +868,7 @@ public class RefundController {
             mv.addObject("message", "获取退款ID失败,请重试");
             return mv;
         } else {
-            refundId = Integer.valueOf(refundIdStr);
+            refundId = Integer.parseInt(refundIdStr);
         }
         try {
             RefundNewBean refundNewBean = refundNewService.queryRefundById(refundId);
@@ -905,7 +905,7 @@ public class RefundController {
             mv.addObject("message", "获取用户ID失败");
             return mv;
         } else {
-            userId = Integer.valueOf(userIdStr);
+            userId = Integer.parseInt(userIdStr);
         }
         String orderNo = request.getParameter("orderNo");
         if (StringUtils.isBlank(orderNo)) {
@@ -972,7 +972,7 @@ public class RefundController {
             json.setMessage("获取用户ID失败");
             return json;
         } else {
-            adminId = Integer.valueOf(adminIdStr);
+            adminId = Integer.parseInt(adminIdStr);
             if (adminId == 0 || adminId != user.getId()) {
                 json.setOk(false);
                 json.setMessage("选择用户和登录用户不一致");
@@ -1040,12 +1040,12 @@ public class RefundController {
         int limitNum = 50;
         String rowsStr = request.getParameter("rows");
         if (StringUtil.isNotBlank(rowsStr)) {
-            limitNum = Integer.valueOf(rowsStr);
+            limitNum = Integer.parseInt(rowsStr);
         }
 
         String pageStr = request.getParameter("page");
         if (!(StringUtil.isBlank(pageStr) || "0".equals(pageStr))) {
-            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+            startNum = (Integer.parseInt(pageStr) - 1) * limitNum;
         }
         String orderNo = request.getParameter("orderNo");
         if (StringUtil.isNotBlank(orderNo)) {
