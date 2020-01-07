@@ -3373,31 +3373,25 @@ public class EditorController {
 
     @RequestMapping(value = "/publicToOnline")
     @ResponseBody
-    public String publicToOnline(HttpServletRequest request, HttpServletResponse response) {
+    public String publicToOnline() {
         String rs = "0";
         try {
-            List<String> pidList = customGoodsService.queryPidListByState(5);
-            rs = "1";
-            List<String> allList = new ArrayList<>();
-            allList.addAll(pidList);
-            pidList.clear();
-            pidList = customGoodsService.queryPidListByState(3);
-            allList.addAll(pidList);
-
-            for (String pid : allList) {
-                if (StringUtils.isNotBlank(pid)) {
-                    PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0);
-                    pbThread.start();
-                    try {
-                        Thread.sleep(25000);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            List<String> pidList = customGoodsService.queryOnlineSync();
+            if (CollectionUtils.isNotEmpty(pidList)) {
+                for (String pid : pidList) {
+                    if (StringUtils.isNotBlank(pid)) {
+                        PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0);
+                        pbThread.start();
+                        try {
+                            Thread.sleep(25000);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
+                pidList.clear();
             }
-            pidList = customGoodsService.queryPidListByState(3);
-            pidList.clear();
-            allList.clear();
+            rs = "1";
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("publicToOnline 执行错误：" + e.getMessage());

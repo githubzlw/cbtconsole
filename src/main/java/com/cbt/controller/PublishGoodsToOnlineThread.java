@@ -10,6 +10,7 @@ import com.cbt.util.FtpConfig;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.GoodsInfoUtils;
 import com.cbt.website.util.UploadByOkHttp;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.ImageCompressionByNoteJs;
 import com.importExpress.utli.OKHttpUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +58,7 @@ public class PublishGoodsToOnlineThread extends Thread {
 
         List<String> imgList = new ArrayList<String>();
 
+        boolean executeSu = false;
         try {
             customGoodsService.insertIntoGoodsImgUpLog(pid, "", adminId, "test");
 
@@ -77,7 +79,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                 isKids = 1;
             }*/
             int isKids = 0;
-            if(StringUtils.isNotBlank(goods.getEninfo()) && goods.getEninfo().length() > 20){
+            if (StringUtils.isNotBlank(goods.getEninfo()) && goods.getEninfo().length() > 20) {
                 goods.setIsShowDetImgFlag(1);
             }
 
@@ -242,6 +244,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                                         if (isUpload) {
                                             System.err.println("this pid:" + pid + ",上传产品主图成功<:<:<:");
                                             isSuccess = true;
+                                            executeSu = true;
                                         } else {
                                             System.err.println("this pid:" + pid + ",上传产品主图失败");
                                             // 记录上传失败日志
@@ -278,6 +281,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                             }
                         } else {
                             isSuccess = true;
+                            executeSu = true;
                         }
                     } else {
                         // 记录上传失败日志
@@ -292,13 +296,13 @@ public class PublishGoodsToOnlineThread extends Thread {
                             // 如果kids并且下架，则执行图片上传
                             isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
                         }
-                        if(!isUp){
+                        if (!isUp) {
                             // 重试一次
-                             isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
+                            isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
                         }
-                        if(!isUp){
+                        if (!isUp) {
                             // 重试一次
-                             isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
+                            isUp = OKHttpUtils.optionGoodsInterface(goods.getPid(), 1, 45, 2);
                         }
                         if (isUp) {
                             isSuccess = true;
@@ -322,12 +326,20 @@ public class PublishGoodsToOnlineThread extends Thread {
             } else {
                 LOG.warn("PublishGoodsToOnlineThread pid:" + pid + " is uploading!");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
+            executeSu = false;
             LOG.error("PublishGoodsToOnlineThread pid:" + pid + " error:", e);
             System.err.println("PublishGoodsToOnlineThread pid:" + pid + " error:" + e.getMessage());
             customGoodsService.insertIntoGoodsImgUpLog(pid, "" + imgList.size(), adminId, "PublishGoodsToOnlineThread error:" + e.getMessage());
             customGoodsService.updateGoodsState(pid, 3);
+        }
+        if (executeSu) {
+            customGoodsService.deleteOnlineSync(pid);
+        }else{
+            customGoodsService.insertIntoOnlineSync(pid);
+            GoodsInfoUpdateOnlineUtil.setOffOnlineByPid(pid);
         }
         LOG.info("Pid : " + pid + " Execute End");
     }
