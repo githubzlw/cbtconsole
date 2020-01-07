@@ -1597,4 +1597,18 @@
     <select id="queryCatidByPath" resultType="java.lang.String">
         select category_id from 1688_category where find_in_set(#{catid},path)
     </select>
+
+    <select id="queryOnlineSync" resultType="java.lang.String">
+        select pid from pid_online_sync
+    </select>
+
+    <delete id="deleteOnlineSync">
+        delete from pid_online_sync where pid = #{pid}
+    </delete>
+
+    <insert id="insertIntoOnlineSync">
+        insert into pid_online_sync(pid,valid,goodsstate)
+        select pid,valid,goodsstate from custom_benchmark_ready where pid = #{pid}
+        and pid not in(select pid from pid_online_sync where pid = #{pid} )
+    </insert>
 </mapper>

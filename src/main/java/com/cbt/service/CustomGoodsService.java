@@ -941,4 +941,24 @@ public interface CustomGoodsService {
      * @return
      */
     int setGoodsWeightChangeFlag(GoodsWeightChange weightChange);
+
+     /**
+     * 查询需要发布的数据
+     * @return
+     */
+    List<String> queryOnlineSync();
+
+    /**
+     * 删除发布的数据
+     * @param pid
+     * @return
+     */
+    int deleteOnlineSync(String pid);
+
+    /**
+     * 插入发布的数据
+     * @param pid
+     * @return
+     */
+    int insertIntoOnlineSync(String pid);
 }

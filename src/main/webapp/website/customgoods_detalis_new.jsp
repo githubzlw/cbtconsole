@@ -2888,7 +2888,7 @@
     function beginUpdateWeight(pid, weight) {
         $.messager.prompt('提示信息', '请输入新的重量:', function (newWeight) {
             if (newWeight) {
-                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
                 if (reg.test(newWeight)) {
                     if (weight == newWeight) {
                         $.messager.alert("提醒", "新的重量和原重量相同", "info");
@@ -2925,7 +2925,7 @@
                     }
 
                 } else {
-                    showMessage('新的重量必须为正数，最多两位小数！');
+                    showMessage('新的重量必须为正数，最多三位小数！');
                 }
             } else {
                 showMessage('未输入新的重量或取消输入！');
@@ -2958,7 +2958,7 @@
     function updateVolumeWeight(pid, oldVolumeWeight) {
         $.messager.prompt('提示信息', '请输入新的体积重量:', function (newWeight) {
             if (newWeight) {
-                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
                 if (reg.test(newWeight)) {
                     if (newWeight == oldVolumeWeight) {
                         showMessage('新输入的体积重量和原来的一致！');
@@ -2987,7 +2987,7 @@
                     }
 
                 } else {
-                    showMessage('新的体积重量必须为正数，最多两位小数！');
+                    showMessage('新的体积重量必须为正数，最多三位小数！');
                 }
             } else {
                 // showMessage('未输入新的体积重量或取消输入！');
@@ -2999,11 +2999,11 @@
         if (type == 0) {
             $.messager.prompt('提示信息', '请输入新的利润率:', function (newProfit) {
                 if (newProfit) {
-                    var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                    var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
                     if (reg.test(newProfit)) {
                         editAndLockProfit(pid, type, newProfit);
                     } else {
-                        showMessage('新的利润率必须为正数，最多两位小数！');
+                        showMessage('新的利润率必须为正数，最多三位小数！');
                     }
                 } else {
                     showMessage('未输入新的利润率或取消输入！');

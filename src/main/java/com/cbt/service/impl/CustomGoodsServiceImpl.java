@@ -984,5 +984,20 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.setGoodsWeightChangeFlag(weightChange);
     }
 
+    @Override
+    public List<String> queryOnlineSync() {
+        return customGoodsMapper.queryOnlineSync();
+    }
+
+    @Override
+    public int deleteOnlineSync(String pid) {
+        return customGoodsMapper.deleteOnlineSync(pid);
+    }
+
+    @Override
+    public int insertIntoOnlineSync(String pid) {
+        return customGoodsMapper.insertIntoOnlineSync(pid);
+    }
+
 
 }
