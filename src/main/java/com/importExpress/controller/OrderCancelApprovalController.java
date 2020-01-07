@@ -84,7 +84,7 @@ public class OrderCancelApprovalController {
         String userIdStr = request.getParameter("userId");
         int userId = 0;
         if (StringUtils.isNotBlank(userIdStr)) {
-            userId = Integer.valueOf(userIdStr);
+            userId = Integer.parseInt(userIdStr);
         }
         if (userId > 0) {
             mv.addObject("userId", userId);
@@ -102,7 +102,7 @@ public class OrderCancelApprovalController {
         String typeStr = request.getParameter("type");
         int type = 0;
         if (StringUtils.isNotBlank(typeStr)) {
-            type = Integer.valueOf(typeStr);
+            type = Integer.parseInt(typeStr);
         }
         mv.addObject("type", type);
 
@@ -111,7 +111,7 @@ public class OrderCancelApprovalController {
         String dealStateStr = request.getParameter("dealState");
 
         if (StringUtils.isNotBlank(dealStateStr)) {
-            dealState = Integer.valueOf(dealStateStr);
+            dealState = Integer.parseInt(dealStateStr);
         }
         mv.addObject("dealState", dealState);
 
@@ -121,7 +121,7 @@ public class OrderCancelApprovalController {
         int page = 1;
         String pageStr = request.getParameter("page");
         if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
-            page = Integer.valueOf(pageStr);
+            page = Integer.parseInt(pageStr);
             startNum = (page - 1) * limitNum;
         }
         mv.addObject("page", page);
@@ -210,7 +210,7 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取申请id失败,请重试");
                 return json;
             } else {
-                approvalId = Integer.valueOf(approvalIdStr);
+                approvalId = Integer.parseInt(approvalIdStr);
             }
 
             String dealStateStr = request.getParameter("dealState");
@@ -220,7 +220,7 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取处理状态失败,请重试");
                 return json;
             } else {
-                dealState = Integer.valueOf(dealStateStr);
+                dealState = Integer.parseInt(dealStateStr);
             }
 
             String userIdStr = request.getParameter("userId");
@@ -230,7 +230,7 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取客户id失败,请重试");
                 return json;
             } else {
-                userId = Integer.valueOf(userIdStr);
+                userId = Integer.parseInt(userIdStr);
             }
 
             String orderNo = request.getParameter("orderNo");
@@ -254,7 +254,7 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取操作人ID失败,请重试");
                 return json;
             } else {
-                operatorId = Integer.valueOf(operatorIdStr);
+                operatorId = Integer.parseInt(operatorIdStr);
                 if (operatorId != user.getId()) {
                     json.setOk(false);
                     json.setMessage("获取非当前操作人操作");
@@ -278,7 +278,7 @@ public class OrderCancelApprovalController {
                     json.setOk(false);
                     json.setMessage("获取退款金额失败,请重试");
                     return json;
-                } else if ("1".equals(refundMethodStr) && Double.parseDouble(refundAmountStr) >= 300) {
+                } else if ("1".equals(refundMethodStr) && Double.parseDouble(refundAmountStr) >= 300 && dealState > 1) {
                     json.setOk(false);
                     json.setMessage("该退款金额超过300，请转账");
                     return json;
@@ -319,7 +319,7 @@ public class OrderCancelApprovalController {
                 approvalBean.setAgreeAmount(refundAmount);
                 approvalBean.setUserId(userId);
                 approvalBean.setAdminId(user.getId());
-                approvalBean.setRefundMethod(Integer.valueOf(refundMethodStr));
+                approvalBean.setRefundMethod(Integer.parseInt(refundMethodStr));
 
                 OrderCancelApprovalDetails approvalDetails = new OrderCancelApprovalDetails();
                 approvalDetails.setApprovalId(approvalId);
@@ -332,7 +332,7 @@ public class OrderCancelApprovalController {
                 approvalDetails.setPayPrice(refundAmount);
                 approvalDetails.setAdminId(user.getId());
                 approvalDetails.setRemark(remark);
-                approvalDetails.setRefundMethod(Integer.valueOf(refundMethodStr));
+                approvalDetails.setRefundMethod(Integer.parseInt(refundMethodStr));
 
                 if (dealState < 2) {
                     approvalService.updateOrderCancelApprovalState(approvalBean);
@@ -385,7 +385,7 @@ public class OrderCancelApprovalController {
             mv.addObject("message", "获取申请ID失败,请重试");
             return mv;
         } else {
-            approvalId = Integer.valueOf(approvalIdStr);
+            approvalId = Integer.parseInt(approvalIdStr);
         }
         try {
             OrderCancelApproval approvalBean = approvalService.queryForSingle(approvalId);
@@ -642,7 +642,7 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取申请id失败,请重试");
                 return json;
             } else {
-                approvalId = Integer.valueOf(approvalIdStr);
+                approvalId = Integer.parseInt(approvalIdStr);
             }
 
             String dealStateStr = request.getParameter("dealState");
@@ -652,7 +652,7 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取处理状态失败,请重试");
                 return json;
             } else {
-                dealState = Integer.valueOf(dealStateStr);
+                dealState = Integer.parseInt(dealStateStr);
             }
 
             String userIdStr = request.getParameter("userId");
@@ -662,7 +662,7 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取客户id失败,请重试");
                 return json;
             } else {
-                userId = Integer.valueOf(userIdStr);
+                userId = Integer.parseInt(userIdStr);
             }
 
             String orderNo = request.getParameter("orderNo");
@@ -704,7 +704,7 @@ public class OrderCancelApprovalController {
             approvalBean.setAgreeAmount(refundAmount);
             approvalBean.setUserId(userId);
             approvalBean.setAdminId(user.getId());
-            approvalBean.setRefundMethod(Integer.valueOf(refundMethodStr));
+            approvalBean.setRefundMethod(Integer.parseInt(refundMethodStr));
 
             OrderCancelApprovalDetails approvalDetails = new OrderCancelApprovalDetails();
             approvalDetails.setApprovalId(approvalId);
@@ -717,7 +717,7 @@ public class OrderCancelApprovalController {
             approvalDetails.setPayPrice(refundAmount);
             approvalDetails.setAdminId(user.getId());
             approvalDetails.setRemark(remark);
-            approvalDetails.setRefundMethod(Integer.valueOf(refundMethodStr));
+            approvalDetails.setRefundMethod(Integer.parseInt(refundMethodStr));
 
 
             OrderCancelApproval approvalOld = approvalService.queryForSingle(approvalBean.getId());
