@@ -145,7 +145,7 @@
         <c:forEach items="${goodsList}" var="gd">
             <tr>
                 <td style="width: 180px;">
-                    <a href="${pageContext.request.contextPath}/cbtconsole/editc/detalisEdit?pid=${gd.pid}">${gd.pid}</a>
+                    <a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${gd.pid}">${gd.pid}</a>
                     <br>
                     <span>类别:${gd.catid1}</span>
                     <br>
