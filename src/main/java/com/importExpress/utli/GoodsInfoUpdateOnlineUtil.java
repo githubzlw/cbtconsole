@@ -421,7 +421,7 @@ public class GoodsInfoUpdateOnlineUtil {
             }
         }
         if (!json.isOk()) {
-            setOffOnlineByPid(inputData.getPid());
+            setOffOnlineByPid(inputData.getPid(), "更新线上MongoDB失败");
         }
         return json.isOk();
     }
@@ -491,7 +491,7 @@ public class GoodsInfoUpdateOnlineUtil {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage(e.getMessage());
-            logger.error("pid:" + inputData.getPid() + ",updateOnlineAndSolr error:", e);
+            logger.error("pid:" + inputData.getPid() + ",updateLocalAndSolr error:", e);
         } finally {
             if (file != null && file.exists()) {
                 file.delete();
@@ -500,7 +500,7 @@ public class GoodsInfoUpdateOnlineUtil {
         if (json.isOk()) {
             return updateOnlineAndSolr(inputData, isSolr);
         } else {
-            setOffOnlineByPid(inputData.getPid());
+            setOffOnlineByPid(inputData.getPid(), "更新本地MongoDB失败");
         }
         return json.isOk();
     }
@@ -512,7 +512,7 @@ public class GoodsInfoUpdateOnlineUtil {
      * @param pid
      * @return
      */
-    public static boolean setOffOnlineByPid(String pid) {
+    public static boolean setOffOnlineByPid(String pid, String remark) {
         boolean isSu = false;
         try {
             InputData inputData = new InputData('u');
@@ -531,7 +531,7 @@ public class GoodsInfoUpdateOnlineUtil {
                 }
             }
             CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
-            customGoodsDao.setGoodsValid(pid, "Ling", 1, 1, 6, "更新失败");
+            customGoodsDao.setGoodsValid(pid, "Ling", 1, 1, 6, remark);
             if (!isSu) {
                 logger.error("pid:" + pid + ",setOffOnlineByPid error------");
             }

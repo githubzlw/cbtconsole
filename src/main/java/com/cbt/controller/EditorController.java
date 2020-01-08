@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
 @Controller
@@ -1161,14 +1162,29 @@ public class EditorController {
                             json.setOk(false);
                             json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
                         } else {
-                            PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id());
-                            pbThread.start();
-                            json.setMessage("更新成功,异步上传图片中，请等待");
+                            PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id());
+                            FutureTask futureTask = new FutureTask(pbCallable);
+                            Thread thread = new Thread(futureTask);
+                            thread.start();
+
+                            if(orGoods.getValid() == 0 || orGoods.getValid() == 2){
+                                json.setMessage("更新成功,正在验证图片是否存在，异步处理中，请等待");
+                            }else{
+                                json.setMessage("更新成功,异步上传图片中，请等待");
+                            }
+
                         }
                     } else {
-                        PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id());
-                        pbThread.start();
-                        json.setMessage("更新成功,异步上传图片中，请等待");
+                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id());
+                        FutureTask futureTask = new FutureTask(pbCallable);
+                        Thread thread = new Thread(futureTask);
+                        thread.start();
+
+                        if(orGoods.getValid() == 0 || orGoods.getValid() == 2){
+                            json.setMessage("更新成功,正在验证图片是否存在，异步处理中，请等待");
+                        }else{
+                            json.setMessage("更新成功,异步上传图片中，请等待");
+                        }
                     }
                 } else {
                     json.setMessage("更新成功");
@@ -3380,8 +3396,10 @@ public class EditorController {
             if (CollectionUtils.isNotEmpty(pidList)) {
                 for (String pid : pidList) {
                     if (StringUtils.isNotBlank(pid)) {
-                        PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0);
-                        pbThread.start();
+                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0);
+                        FutureTask futureTask = new FutureTask(pbCallable);
+                        Thread thread = new Thread(futureTask);
+                        thread.start();
                         try {
                             Thread.sleep(25000);
                         } catch (Exception e) {
