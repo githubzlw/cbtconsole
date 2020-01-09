@@ -22,6 +22,23 @@ public class ImgDownload {
 		System.err.println("downFromImgService:" + downFromImgService(url, fileName));
 	}
 
+	public static boolean downAndReTry(String imgUrl,String fileName){
+		int count = 0;
+		boolean isSu = false;
+		while (count < 5 && !isSu){
+			count ++;
+			isSu = downFromImgService(imgUrl,fileName);
+			if(!isSu){
+				try {
+					Thread.sleep(3000 + count * 1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return isSu;
+	}
+
 
 	public static boolean downFromImgService(String imgUrl,String fileName) {
 

@@ -912,7 +912,7 @@ public class GoodsInfoUtils {
      * @param gd
      * @return
      */
-    public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids) {
+    public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids , int isLocal) {
         List<String> changeImglist = new ArrayList<>();
         // 主图
         String orMainImg220x220 = null;
@@ -952,12 +952,16 @@ public class GoodsInfoUtils {
             changeImglist.addAll(entypeImgList);
             entypeImgList.clear();
         }
-        List<String> nwList = new ArrayList<>();
-        for (String imgL : changeImglist) {
-            nwList.add(changeRemotePathToLocal(imgL, isKids));
+        if (isLocal > 0) {
+            List<String> nwList = new ArrayList<>();
+            for (String imgL : changeImglist) {
+                nwList.add(changeRemotePathToLocal(imgL, isKids));
+            }
+            changeImglist.clear();
+            return nwList;
+        } else {
+            return changeImglist;
         }
-        changeImglist.clear();
-        return nwList;
     }
 
     public static List<String> getMainImgByPath(String remotPathImg) {

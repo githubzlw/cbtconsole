@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.util.GoodsInfoUtils;
 import okhttp3.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -293,9 +294,18 @@ public class UploadByOkHttp {
         boolean isUpload = false;
         if (!(result.contains("err") || result.contains("ERR")) && (result.contains("OK") || result.contains("ok"))) {
             isUpload = true;
-            /*try {
-                JSONObject json = JSONObject.parseObject(result);
-                String[] resultList = json.getString("result").split(";");
+            try {
+                String rs = result;
+                if ("\"".equals(rs.substring(0, 1))) {
+                    rs = rs.substring(1);
+                }
+                if (rs.endsWith("\"")) {
+                    rs = rs.substring(0, rs.length() - 1);
+                }
+                rs = rs.replace("\\", "");
+                JSONObject json = JSONObject.parseObject(rs);
+
+                String[] resultList = json.getString("result").split(",");
                 int rsCount = 0;
                 for (String tempStr : resultList) {
                     if (StringUtils.isNotBlank(tempStr) && tempStr.length() > 5) {
@@ -308,7 +318,7 @@ public class UploadByOkHttp {
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.error("result:" + result + ",fileCount:" + fileCount + ",checkResult error:", e);
-            }*/
+            }
         }
         return isUpload;
     }

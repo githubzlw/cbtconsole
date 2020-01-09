@@ -15,7 +15,7 @@ public class GoodsInfoUpdateOnlineUtilTest {
     @Test
     public void setOffOnlineByPidTest() {
         String pid = "1246359203";
-        boolean isSu = GoodsInfoUpdateOnlineUtil.setOffOnlineByPid(pid);
+        boolean isSu = GoodsInfoUpdateOnlineUtil.setOffOnlineByPid(pid, "更新MongoDB异常");
         Assert.assertTrue("更新MongoDB异常", isSu);
 
     }
