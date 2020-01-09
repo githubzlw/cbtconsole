@@ -79,58 +79,16 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
             boolean isCheckImg = false;
             if (goods.getValid() == 0 || goods.getValid() == 2) {
                 isCheckImg = checkOffLineImg(goods, isKids);
-                if (!isCheckImg) {
+                System.err.println("pid:" + goods.getPid() + ",isCheckImg:" + isCheckImg);
+                if (isCheckImg) {
+                    executeSu = doPublish(goods, localShowPath, remoteShowPath, imgList, isKids);
+                } else {
+                    executeSu = false;
+                    System.err.println("pid:" + goods.getPid() + ",图片检查异常 --下架");
                     GoodsInfoUpdateOnlineUtil.setOffOnlineByPid(pid, "图片检查异常");
-                    Thread.currentThread().interrupt();
                 }
             } else {
-                isCheckImg = true;
-            }
-            if (isCheckImg) {
-                if (StringUtils.isNotBlank(goods.getEninfo()) && goods.getEninfo().length() > 20) {
-                    goods.setIsShowDetImgFlag(1);
-                }
-                goods.setEntypeNew(ChangeEntypeUtils.getEntypeNew(goods.getEntype(), goods.getSku(), ""));
-                goods.setIsUpdateImg(isUpdateImg);
-                // 判断是否处于发布中的状态
-                if (goods.getGoodsState() != 1) {
-                    // 设置商品处于发布中的状态
-                    int updateState = customGoodsService.updateGoodsState(pid, 1);
-                    if (updateState > 0) {
-                        // Thread.sleep(35000);
-                        dealWindowImg(goods, localShowPath, remoteShowPath, imgList);
-                        dealEninfoImg(goods, localShowPath, remoteShowPath, imgList);
-
-                        boolean isSuccess = true;
-                        // 判断需要上传的图片，执行上传逻辑
-                        if (imgList.size() > 0) {
-                            isSuccess = uploadLocalImg(imgList, localShowPath, isKids);
-                        }
-                        if (isSuccess) {
-                            // isUpdateImg = 1;
-                            if (isUpdateImg > 0) {
-                                executeSu = setWindowImgToMainImg(goods, isKids);
-                            } else {
-                                isSuccess = true;
-                                executeSu = true;
-                            }
-                        } else {
-                            // 记录上传失败日志
-                            customGoodsService.insertIntoGoodsImgUpLog(pid, "批量上传失败,size:" + imgList.size(), adminId, imgList.toString());
-                            customGoodsService.updateGoodsState(pid, 3);
-                        }
-                        // 判断kids
-                        if (isSuccess) {
-                            // isSuccess = dealKidsImgService(goods);
-                        }
-                    } else {
-                        // 记录上传失败日志
-                        customGoodsService.insertIntoGoodsImgUpLog(pid, "" + imgList.size(), adminId, "update goodsState error");
-                        LOG.error("this pid:" + pid + " update goodsstate error!");
-                    }
-                } else {
-                    LOG.warn("PublishGoodsToOnlineThread pid:" + pid + " is uploading!");
-                }
+                executeSu = doPublish(goods, localShowPath, remoteShowPath, imgList, isKids);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,14 +97,68 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
             System.err.println("PublishGoodsToOnlineThread pid:" + pid + " error:" + e.getMessage());
             customGoodsService.insertIntoGoodsImgUpLog(pid, "" + imgList.size(), adminId, "PublishGoodsToOnlineThread error:" + e.getMessage());
             customGoodsService.updateGoodsState(pid, 3);
+        } finally {
+            imgList.clear();
         }
+        System.err.println("pid:" + pid + ",executeSu:" + executeSu);
         if (executeSu) {
             customGoodsService.deleteOnlineSync(pid);
         } else {
+            System.err.println("pid:" + pid + ",更新失败---");
             customGoodsService.insertIntoOnlineSync(pid);
             GoodsInfoUpdateOnlineUtil.setOffOnlineByPid(pid, "更新失败");
         }
         LOG.info("Pid : " + pid + " Execute End");
+        return executeSu;
+    }
+
+
+    private boolean doPublish(CustomGoodsPublish goods, String localShowPath, String remoteShowPath, List<String> imgList, int isKids) {
+        boolean executeSu = false;
+        if (StringUtils.isNotBlank(goods.getEninfo()) && goods.getEninfo().length() > 20) {
+            goods.setIsShowDetImgFlag(1);
+        }
+        goods.setEntypeNew(ChangeEntypeUtils.getEntypeNew(goods.getEntype(), goods.getSku(), ""));
+        goods.setIsUpdateImg(isUpdateImg);
+        // 判断是否处于发布中的状态
+        if (goods.getGoodsState() != 1) {
+            // 设置商品处于发布中的状态
+            int updateState = customGoodsService.updateGoodsState(pid, 1);
+            if (updateState > 0) {
+                // Thread.sleep(35000);
+                dealWindowImg(goods, localShowPath, remoteShowPath, imgList);
+                dealEninfoImg(goods, localShowPath, remoteShowPath, imgList);
+
+                boolean isSuccess = true;
+                // 判断需要上传的图片，执行上传逻辑
+                if (imgList.size() > 0) {
+                    isSuccess = uploadLocalImg(imgList, localShowPath, isKids);
+                }
+                if (isSuccess) {
+                    // isUpdateImg = 1;
+                    if (isUpdateImg > 0) {
+                        executeSu = setWindowImgToMainImg(goods, isKids);
+                    } else {
+                        isSuccess = true;
+                        executeSu = true;
+                    }
+                } else {
+                    // 记录上传失败日志
+                    customGoodsService.insertIntoGoodsImgUpLog(pid, "批量上传失败,size:" + imgList.size(), adminId, imgList.toString());
+                    customGoodsService.updateGoodsState(pid, 3);
+                }
+                // 判断kids
+                if (isSuccess) {
+                    // isSuccess = dealKidsImgService(goods);
+                }
+            } else {
+                // 记录上传失败日志
+                customGoodsService.insertIntoGoodsImgUpLog(pid, "" + imgList.size(), adminId, "update goodsState error");
+                LOG.error("this pid:" + pid + " update goodsstate error!");
+            }
+        } else {
+            LOG.warn("PublishGoodsToOnlineThread pid:" + pid + " is uploading!");
+        }
         return executeSu;
     }
 
@@ -176,9 +188,10 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
 
         String today = DateFormatUtil.formatDateToYearAndMonthString(LocalDateTime.now());
         String filePath = DOWN_IMG_PATH + today + "/" + pid;
-
+        int imgSize = 0;
         boolean isSu = false;
         if (CollectionUtils.isNotEmpty(allImgList)) {
+            imgSize = allImgList.size();
             for (String imgUrl : allImgList) {
                 if (imgUrl.contains("/desc")) {
                     isSu = ImgDownload.downAndReTry(imgUrl, filePath + "/desc" + imgUrl.substring(imgUrl.lastIndexOf("/")));
@@ -213,7 +226,8 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
                     }
                 }
             }
-            if (fileCount > 0 && fileCount == allImgList.size()) {
+            System.err.println("fileCount:" + fileCount + ",imgSize:" + imgSize);
+            if (fileCount > 0 && fileCount == imgSize) {
                 isSu = true;
             } else {
                 isSu = false;
