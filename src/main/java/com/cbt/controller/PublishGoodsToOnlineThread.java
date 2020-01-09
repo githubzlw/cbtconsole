@@ -101,14 +101,6 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         } finally {
             imgList.clear();
         }
-        System.err.println("pid:" + pid + ",executeSu:" + executeSu);
-        if (executeSu) {
-            customGoodsService.deleteOnlineSync(pid);
-        } else {
-            System.err.println("pid:" + pid + ",更新失败---");
-            customGoodsService.insertIntoOnlineSync(pid);
-            GoodsInfoUpdateOnlineUtil.setOffOnlineByPid(pid, "更新失败");
-        }
         LOG.info("Pid : " + pid + " Execute End");
         return executeSu;
     }
@@ -121,44 +113,46 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         }
         goods.setEntypeNew(ChangeEntypeUtils.getEntypeNew(goods.getEntype(), goods.getSku(), ""));
         goods.setIsUpdateImg(isUpdateImg);
-        // 判断是否处于发布中的状态
-        if (goods.getGoodsState() != 1) {
-            // 设置商品处于发布中的状态
-            int updateState = customGoodsService.updateGoodsState(pid, 1);
-            if (updateState > 0) {
-                // Thread.sleep(35000);
-                dealWindowImg(goods, localShowPath, remoteShowPath, imgList);
-                dealEninfoImg(goods, localShowPath, remoteShowPath, imgList);
 
-                boolean isSuccess = true;
-                // 判断需要上传的图片，执行上传逻辑
-                if (imgList.size() > 0) {
-                    isSuccess = uploadLocalImg(imgList, localShowPath, isKids);
-                }
-                if (isSuccess) {
-                    // isUpdateImg = 1;
-                    if (isUpdateImg > 0) {
-                        executeSu = setWindowImgToMainImg(goods, isKids);
-                    } else {
-                        isSuccess = true;
-                        executeSu = true;
-                    }
-                } else {
-                    // 记录上传失败日志
-                    customGoodsService.insertIntoGoodsImgUpLog(pid, "批量上传失败,size:" + imgList.size(), adminId, imgList.toString());
-                    customGoodsService.updateGoodsState(pid, 3);
-                }
-                // 判断kids
-                if (isSuccess) {
-                    // isSuccess = dealKidsImgService(goods);
-                }
+        // 设置商品处于发布中的状态
+        customGoodsService.updateGoodsState(pid, 1);
+        // Thread.sleep(35000);
+        dealWindowImg(goods, localShowPath, remoteShowPath, imgList);
+        dealEninfoImg(goods, localShowPath, remoteShowPath, imgList);
+
+        boolean isSuccess = true;
+        // 判断需要上传的图片，执行上传逻辑
+        if (imgList.size() > 0) {
+            isSuccess = uploadLocalImg(imgList, localShowPath, isKids);
+        }
+        System.err.println("uploadLocalImg size:" + imgList.size() + ",result:" + isSuccess);
+        if (isSuccess) {
+            // isUpdateImg = 1;
+            if (isUpdateImg > 0) {
+                System.err.println("pid" + pid + ",begin setWindowImgToMainImg---");
+                executeSu = setWindowImgToMainImg(goods, isKids);
             } else {
-                // 记录上传失败日志
-                customGoodsService.insertIntoGoodsImgUpLog(pid, "" + imgList.size(), adminId, "update goodsState error");
-                LOG.error("this pid:" + pid + " update goodsstate error!");
+                isSuccess = true;
+                executeSu = true;
             }
         } else {
-            LOG.warn("PublishGoodsToOnlineThread pid:" + pid + " is uploading!");
+            // 记录上传失败日志
+            customGoodsService.insertIntoGoodsImgUpLog(pid, "批量上传失败,size:" + imgList.size(), adminId, imgList.toString());
+            customGoodsService.updateGoodsState(pid, 3);
+        }
+        // 判断kids
+        if (isSuccess) {
+            // isSuccess = dealKidsImgService(goods);
+        }
+        System.err.println("pid:" + pid + ",executeSu:" + executeSu);
+        if (executeSu) {
+            customGoodsService.deleteOnlineSync(pid);
+            customGoodsService.publish(goods);
+            customGoodsService.updateGoodsState(pid, 4);
+        } else {
+            System.err.println("pid:" + pid + ",处理图片失败---");
+            customGoodsService.insertIntoOnlineSync(pid);
+            GoodsInfoUpdateOnlineUtil.setOffOnlineByPid(pid, "更新失败");
         }
         return executeSu;
     }
@@ -192,15 +186,17 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         int imgSize = 0;
         boolean isSu = false;
         if (CollectionUtils.isNotEmpty(allImgList)) {
-            imgSize = allImgList.size();
             for (String imgUrl : allImgList) {
-                if (imgUrl.contains("/desc")) {
-                    isSu = ImgDownload.downAndReTry(imgUrl, filePath + "/desc" + imgUrl.substring(imgUrl.lastIndexOf("/")));
-                } else {
-                    isSu = ImgDownload.downAndReTry(imgUrl, filePath + imgUrl.substring(imgUrl.lastIndexOf("/")));
-                }
-                if (!isSu) {
-                    break;
+                if (!imgUrl.contains("192.168")) {
+                    imgSize++;
+                    if (imgUrl.contains("/desc")) {
+                        isSu = ImgDownload.downAndReTry(imgUrl, filePath + "/desc" + imgUrl.substring(imgUrl.lastIndexOf("/")));
+                    } else {
+                        isSu = ImgDownload.downAndReTry(imgUrl, filePath + imgUrl.substring(imgUrl.lastIndexOf("/")));
+                    }
+                    if (!isSu) {
+                        break;
+                    }
                 }
             }
         }
@@ -311,6 +307,7 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
 
 
     private boolean uploadLocalImg(List<String> imgList, String localShowPath, int isKids) {
+        System.err.println("this pid:" + pid + ",localShowPath:" + localShowPath + " 确认图片是否上传");
         // 使用批量上传文件代码
         boolean isSuccess = true;
         Map<String, String> uploadMap = new HashMap<>();
@@ -360,13 +357,12 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         } else {
             downImgUrl = goods.getShowMainImage();
         }
+        System.err.println("down[" + goods.getShowMainImage() + "] to [" + localDownImg + "]");
         isSuccess = ImgDownload.downFromImgService(downImgUrl, localDownImg);
         if (!isSuccess) {
             // 重新下载一次
             isSuccess = ImgDownload.downFromImgService(downImgUrl, localDownImg);
         }
-
-        System.err.println("down[" + goods.getShowMainImage() + "] to [" + localDownImg + "]");
         if (isSuccess) {
             System.err.println("localDownImg:" + localDownImg + ",success!!");
             //压缩图片 220x200 285x285 285x380
@@ -419,6 +415,7 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
                 isSuccess = false;
             }
         } else {
+            System.err.println("this pid:" + pid + ",下载图片失败,无法设置主图");
             LOG.error("this pid:" + pid + ",下载图片失败,无法设置主图");
             customGoodsService.insertIntoGoodsImgUpLog(pid, localDownImgPre, adminId, "下载图片失败,无法设置主图");
         }
