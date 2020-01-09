@@ -531,7 +531,7 @@ public class GoodsInfoUpdateOnlineUtil {
                 }
             }
             CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
-            customGoodsDao.setGoodsValid(pid, "Ling", 1, 1, 6, remark);
+            customGoodsDao.setGoodsValid(pid, "Ling", 1, 2, 6, remark);
             if (!isSu) {
                 logger.error("pid:" + pid + ",setOffOnlineByPid error------");
             }
