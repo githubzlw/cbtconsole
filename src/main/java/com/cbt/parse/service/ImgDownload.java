@@ -101,7 +101,9 @@ public class ImgDownload {
 			}
 		}
 		isDown = checkDownFileByName(fileName);
-		System.err.println("down img [" + fileName + "],result:" + isDown);
+		if(!isDown){
+			System.err.println("down img [" + fileName + "],result:" + isDown);
+		}
 		return isDown;
 	}
 
@@ -228,7 +230,7 @@ public class ImgDownload {
         boolean isDown = false;
         File downFlie = new File(fileName);
 
-        if (downFlie.exists() && 1.0 * downFlie.length() / 1024 > 1) {
+        if (downFlie.exists() && 1.0 * downFlie.length() / 1024 > 0.1) {
             isDown = true;
         } else {
             if (downFlie.exists()) {
