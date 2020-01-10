@@ -9,7 +9,7 @@
         od.purchase_state,od.shipno as od_shipno,if(ops.tb_1688_itemid = null,ops.last_goods_p_url,ops.tb_1688_itemid) as od_pid
         from order_product_source ops inner join order_details od on ops.orderid = od.orderid and ops.od_id = od.id and od.state in(0,1)
         where od.orderid in(select order_no from orderinfo where state in(1,2,3,4) and orderpaytime between #{beginTime} and #{endTime} )
-        group by od.shipno,od_pid) aa left join (select distinct th.shipno,th.itemurl,th.itemid,sum(th.itemqty) as itemqty,th.totalprice,
+        group by od.shipno,od_pid) aa left join (select distinct th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
         th.orderdate from (select od.id as od_id,od.yourorder,od.goodsprice,od.state as od_state,od.purchase_state,od.shipno as od_shipno,
         if(ops.tb_1688_itemid = null,ops.last_goods_p_url,ops.tb_1688_itemid) as od_pid
         from order_product_source ops inner join order_details od on ops.orderid = od.orderid and ops.od_id = od.id and od.state in(0,1)
@@ -28,7 +28,7 @@
         od.purchase_state,od.shipno as od_shipno,if(ops.tb_1688_itemid = null,ops.last_goods_p_url,ops.tb_1688_itemid) as od_pid
         from order_product_source ops inner join order_details od on ops.orderid = od.orderid and ops.od_id = od.id and od.state in(0,1)
         where od.orderid in(select order_no from orderinfo where state in(1,2,3,4) and orderpaytime between #{beginTime} and #{endTime} )
-        group by od.shipno,od_pid) aa left join (select distinct th.shipno,th.itemurl,th.itemid,sum(th.itemqty) as itemqty,th.totalprice,
+        group by od.shipno,od_pid) aa left join (select distinct th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
         th.orderdate from (select od.id as od_id,od.yourorder,od.goodsprice,od.state as od_state,od.purchase_state,od.shipno as od_shipno,
         if(ops.tb_1688_itemid = null,ops.last_goods_p_url,ops.tb_1688_itemid) as od_pid
         from order_product_source ops inner join order_details od on ops.orderid = od.orderid and ops.od_id = od.id and od.state in(0,1)
