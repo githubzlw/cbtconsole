@@ -1498,39 +1498,61 @@ public class GoodsInfoUtils {
         }
 
         if (isSu) {
-            // 检查
-            File tempFile = new File(filePath);
-            int fileCount = 0;
-            File[] childFiles = null;
-            if (tempFile.exists() && tempFile.isDirectory()) {
-                childFiles = tempFile.listFiles();
-                for (File childFl : childFiles) {
-                    if (!childFl.isDirectory()) {
-                        fileCount++;
+            isSu = checkDownFile(imgSet, filePath);
+        }
+        return isSu;
+    }
+
+
+    private static boolean checkDownFile(Set<String> imgSet, String filePath) {
+        boolean isSu = false;
+        // 检查
+        File tempFile = new File(filePath);
+        int fileCount = 0;
+        File[] childFiles = null;
+        if (tempFile.exists() && tempFile.isDirectory()) {
+            childFiles = tempFile.listFiles();
+            for (File childFl : childFiles) {
+                if (!childFl.isDirectory()) {
+                    fileCount++;
+                    isSu = checkSetString(imgSet, childFl.getName());
+                    if (!isSu) {
+                        break;
                     }
                 }
+            }
+            if (isSu) {
                 tempFile = new File(filePath + "/desc");
                 if (tempFile.exists() && tempFile.isDirectory()) {
                     childFiles = tempFile.listFiles();
                     for (File childFl : childFiles) {
                         if (!childFl.isDirectory()) {
                             fileCount++;
+                            isSu = checkSetString(imgSet, childFl.getName());
+                            if (!isSu) {
+                                break;
+                            }
                         }
                     }
                 }
             }
-            System.err.println("fileCount:" + fileCount + ",imgSize:" + imgSet.size());
-            if (fileCount > 0 && fileCount == imgSet.size()) {
-                isSu = true;
-            } else {
-                isSu = false;
-            }
-            imgSet.clear();
         }
+        System.err.println("fileCount:" + fileCount + ",imgSize:" + imgSet.size() + ",checkDownFile:" + isSu);
+        imgSet.clear();
         return isSu;
-
     }
 
+
+    private static boolean checkSetString(Set<String> imgSet, String fileName) {
+        boolean isCk = false;
+        for (String img : imgSet) {
+            if (img.contains(fileName)) {
+                isCk = true;
+                break;
+            }
+        }
+        return isCk;
+    }
 
     public static void dealWindowImg(CustomGoodsPublish goods, String localShowPath, String remoteShowPath, List<String> imgList, FtpConfig ftpConfig, int isUpdateImg) {
         // 获取橱窗图的img List集合
