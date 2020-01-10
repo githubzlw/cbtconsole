@@ -5,21 +5,18 @@ import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.service.CustomGoodsService;
-import com.cbt.util.*;
+import com.cbt.util.ChangeEntypeUtils;
+import com.cbt.util.FtpConfig;
+import com.cbt.util.GetConfigureInfo;
+import com.cbt.util.GoodsInfoUtils;
 import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.ImageCompressionByNoteJs;
 import com.importExpress.utli.OKHttpUtils;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +29,7 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
     private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
     private static List<String> kidsCatidList = new ArrayList<>();
 
-    private static final String DOWN_IMG_PATH = "/usr/local/downImg/";
+
     /**
      * 图片服务器选择主图路径
      */
@@ -79,7 +76,7 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
             boolean isCheckImg = false;
             if (goods.getValid() == 0 || goods.getValid() == 2) {
                 System.err.println("pid:" + goods.getPid() + ",valid:" + goods.getValid());
-                isCheckImg = checkOffLineImg(goods, isKids);
+                isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, isKids);
                 System.err.println("pid:" + goods.getPid() + ",isCheckImg:" + isCheckImg);
                 if (isCheckImg) {
                     executeSu = doPublish(goods, localShowPath, remoteShowPath, imgList, isKids);
@@ -117,8 +114,8 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         // 设置商品处于发布中的状态
         customGoodsService.updateGoodsState(pid, 1);
         // Thread.sleep(35000);
-        dealWindowImg(goods, localShowPath, remoteShowPath, imgList);
-        dealEninfoImg(goods, localShowPath, remoteShowPath, imgList);
+        GoodsInfoUtils.dealWindowImg(goods, localShowPath, remoteShowPath, imgList, ftpConfig, isUpdateImg);
+        GoodsInfoUtils.dealEninfoImg(goods, localShowPath, remoteShowPath, imgList, ftpConfig);
 
         boolean isSuccess = true;
         // 判断需要上传的图片，执行上传逻辑
@@ -155,154 +152,6 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
             GoodsInfoUpdateOnlineUtil.setOffOnlineByPid(pid, "更新失败");
         }
         return executeSu;
-    }
-
-
-    private boolean checkOffLineImg(CustomGoodsPublish goods, int isKids) {
-        boolean isSu = false;
-        try {
-            List<String> allImgList = GoodsInfoUtils.getAllImgList(goods, isKids, 0);
-            if (CollectionUtils.isNotEmpty(allImgList)) {
-                isSu = downImgAndCheck(allImgList, goods.getPid());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOG.error("pid:" + goods.getPid() + ",checkOffLineImg error:", e);
-        }
-        return isSu;
-    }
-
-    /**
-     * 下载图片并且检查
-     *
-     * @param allImgList
-     * @param pid
-     * @return
-     */
-    private boolean downImgAndCheck(List<String> allImgList, String pid) {
-
-        String today = DateFormatUtil.formatDateToYearAndMonthString(LocalDateTime.now());
-        String filePath = DOWN_IMG_PATH + today + "/" + pid;
-        int imgSize = 0;
-        boolean isSu = false;
-        if (CollectionUtils.isNotEmpty(allImgList)) {
-            for (String imgUrl : allImgList) {
-                if (!imgUrl.contains("192.168")) {
-                    imgSize++;
-                    if (imgUrl.contains("/desc")) {
-                        isSu = ImgDownload.downAndReTry(imgUrl, filePath + "/desc" + imgUrl.substring(imgUrl.lastIndexOf("/")));
-                    } else {
-                        isSu = ImgDownload.downAndReTry(imgUrl, filePath + imgUrl.substring(imgUrl.lastIndexOf("/")));
-                    }
-                    if (!isSu) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (isSu) {
-            // 检查
-            File tempFile = new File(filePath);
-            int fileCount = 0;
-            File[] childFiles = null;
-            if (tempFile.exists() && tempFile.isDirectory()) {
-                childFiles = tempFile.listFiles();
-                for (File childFl : childFiles) {
-                    if (!childFl.isDirectory()) {
-                        fileCount++;
-                    }
-                }
-                tempFile = new File(filePath + "/desc");
-                if (tempFile.exists() && tempFile.isDirectory()) {
-                    childFiles = tempFile.listFiles();
-                    for (File childFl : childFiles) {
-                        if (!childFl.isDirectory()) {
-                            fileCount++;
-                        }
-                    }
-                }
-            }
-            System.err.println("fileCount:" + fileCount + ",imgSize:" + imgSize);
-            if (fileCount > 0 && fileCount == imgSize) {
-                isSu = true;
-            } else {
-                isSu = false;
-            }
-        }
-        return isSu;
-
-    }
-
-
-    private void dealWindowImg(CustomGoodsPublish goods, String localShowPath, String remoteShowPath, List<String> imgList) {
-        // 获取橱窗图的img List集合
-        String firstImg = "";
-        String remotepath = goods.getRemotpath();
-        List<String> windowImgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
-        // 抽取含有本地上传的图片数据
-        if (windowImgs.size() > 0) {
-            List<String> tempImgs = new ArrayList<>();
-            for (int i = 0; i < windowImgs.size(); i++) {
-                String wdImg = windowImgs.get(i);
-                if (StringUtils.isBlank(wdImg)) {
-                    continue;
-                } else if (wdImg.contains(localShowPath)) {
-                    // 判断图片是否存在，不存在删除
-                    if (checkIsExistsLocalImg(wdImg.replace(localShowPath, ftpConfig.getLocalDiskPath()))) {
-                        imgList.add(wdImg);
-                        // 上面小图60x60的，下面大图400x400的
-                        imgList.add(wdImg.replace("60x60", "400x400"));
-                        // 替换本地路径为远程路径
-                        tempImgs.add(wdImg.replace(localShowPath, remoteShowPath).replace(".400x400.", ".60x60."));
-                    } else {
-                        // 本地文件不存的，删除数据
-                        windowImgs.set(i, "");
-                    }
-                } else if (wdImg.contains("192.168.1")) {
-                    // 清空原来服务器上传的图片数据，原因：图片路劲对应服务器本地路劲已经失效，无法再同步到服务器
-                    windowImgs.set(i, "");
-                } else {
-                    tempImgs.add(wdImg.replace(".400x400.", ".60x60."));
-                }
-            }
-            // 重新生成橱窗图的数据保存bean中
-            goods.setImg(tempImgs.toString().replace(remotepath, ""));
-            // 获取第一张图片数据的大图
-            firstImg = tempImgs.get(0).replace(".60x60", ".400x400");
-            if (isUpdateImg == 1) {
-                goods.setShowMainImage(firstImg);
-            }
-        }
-    }
-
-
-    private void dealEninfoImg(CustomGoodsPublish goods, String localShowPath, String remoteShowPath, List<String> imgList) {
-        // 详情数据的获取和解析img数据
-        String remotepath = goods.getRemotpath();
-        Document nwDoc = Jsoup.parseBodyFragment(goods.getEninfo());
-        Elements imgEls = nwDoc.getElementsByTag("img");
-        if (imgEls.size() > 0) {
-            for (Element imel : imgEls) {
-                String imgUrl = imel.attr("src");
-                if (StringUtils.isBlank(imgUrl)) {
-                    continue;
-                } else if (imgUrl.contains(localShowPath)) {
-                    if (checkIsExistsLocalImg(imgUrl.replace(localShowPath, ftpConfig.getLocalDiskPath()))) {
-                        imgList.add(imgUrl);
-                        // 替换本地路径为远程路径
-                        imel.attr("src", imgUrl.replace(localShowPath, remoteShowPath));
-                    } else {
-                        // 本地文件不存在的，移除
-                        imel.remove();
-                    }
-                } else if (imgUrl.contains("192.168.1")) {
-                    // 判断本地路径非当前配置的上传图片地址，移除数据
-                    imel.remove();
-                }
-            }
-            goods.setEninfo(nwDoc.html().replace(remotepath, ""));
-        }
     }
 
 
@@ -432,11 +281,6 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         return executeSu;
     }
 
-
-    private boolean checkIsExistsLocalImg(String fileName) {
-        File file = new File(fileName);
-        return file.exists() && file.isFile();
-    }
 
     private void deleteFileChild(String fileName) {
         File file = new File(fileName);
