@@ -369,9 +369,9 @@ public class StringUtil {
         }
 //        url="https://www.import-express.com/goodsinfo/ornament-handcraft-paillette-collar-double-layers-gold-plating-chain-necklace-1525681076507.html";
         if(StringUtil.isNotBlank(url) && StringUtil.isNotBlank(car_urlMD5) && car_urlMD5.startsWith("A")){
-            return "https://www.import-express.com/goodsinfo/cbtconsole-2"+goods_pid+".html";
+            return "https://www.import-express.com/goodsinfo/cbtconsole-0-0-0-2"+goods_pid+".html";
         }else if(StringUtil.isNotBlank(goods_pid) && StringUtil.isNotBlank(car_urlMD5) && car_urlMD5.startsWith("D")){
-            return "https://www.import-express.com/goodsinfo/cbtconsole-1"+goods_pid+".html";
+            return "https://www.import-express.com/goodsinfo/cbtconsole-0-0-0-1"+goods_pid+".html";
         }else if(StringUtil.isNotBlank(url) && StringUtil.isBlank(car_urlMD5) && url.contains("aliexpress")){
             return url;
         }else if(StringUtil.isBlank(url) || !url.contains("goodsinfo/")){
@@ -380,13 +380,13 @@ public class StringUtil {
         String [] strs= url.split("goodsinfo/");
         String urls=strs[1].replace("-1-","-").replace("-2-","-");
         if(urls.contains("-1")){
-            String u=strs[0]+"goodsinfo/cbtconsole-1"+strs[1].split("-1")[1];
+            String u=strs[0]+"goodsinfo/cbtconsole-0-0-0-1"+strs[1].split("-1")[1];
             if(!u.contains(".html")){
-                u=strs[0]+"goodsinfo/cbtconsole-1"+goods_pid+".html";
+                u=strs[0]+"goodsinfo/cbtconsole-0-0-0-1"+goods_pid+".html";
             }
             return u;
         }else if(urls.contains("-2")){
-            return strs[0]+"goodsinfo/cbtconsole-2"+strs[1].split("-2")[1];
+            return strs[0]+"goodsinfo/cbtconsole-0-0-0-2"+strs[1].split("-2")[1];
         }else{
             return url;
         }
