@@ -7,7 +7,7 @@ public enum WebSiteEnum {
     /**
      * IMPORT网站
      */
-    IMPORTX(1,"https://www.import-express.com","ImportExpress"),
+    IMPORTX(1,"https://www.import-express.com","Import-Express"),
     /**
      * KIDS网站
      */
