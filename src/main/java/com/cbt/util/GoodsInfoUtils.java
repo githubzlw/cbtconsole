@@ -12,8 +12,6 @@ import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.utli.OKHttpUtils;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -800,7 +798,7 @@ public class GoodsInfoUtils {
         }
         //step v1. @author: cjc @date：2019/1/14 14:05:34  TODO 根据skuid 解析出价格
         String typePrice = "";
-        JSONArray jsonArray = JSONArray.fromObject(skuStr);
+        JSONArray jsonArray = JSONArray.parseArray(skuStr);
         for (int i = 0; i < jsonArray.size(); i++) {
             Object o = jsonArray.get(i);
             JSONObject o1 = (JSONObject) o;
@@ -1629,6 +1627,25 @@ public class GoodsInfoUtils {
             }
             goods.setEninfo(nwDoc.html().replace(remotepath, ""));
         }
+    }
+
+    public static boolean deleteByOkHttp(CustomGoodsPublish goods) {
+        boolean isSu = false;
+        if (goods != null) {
+            List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1, 0);
+            try {
+                isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                if (!isSu) {
+                    isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                }
+                if (!isSu) {
+                    LOG.error("deleteByOkHttp pid : " + goods.getPid() + " 删除图片异常");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return isSu;
     }
 
 }
