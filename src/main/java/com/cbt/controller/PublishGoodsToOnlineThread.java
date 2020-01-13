@@ -112,7 +112,7 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         goods.setIsUpdateImg(isUpdateImg);
 
         // 设置商品处于发布中的状态
-        customGoodsService.updateGoodsState(pid, 1);
+        // customGoodsService.updateGoodsState(pid, 1);
         // Thread.sleep(35000);
         GoodsInfoUtils.dealWindowImg(goods, localShowPath, remoteShowPath, imgList, ftpConfig, isUpdateImg);
         GoodsInfoUtils.dealEninfoImg(goods, localShowPath, remoteShowPath, imgList, ftpConfig);

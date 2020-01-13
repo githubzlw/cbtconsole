@@ -133,7 +133,9 @@ public class EditorController {
                 goods.setCanEdit(0);
             }
 
-            if (goods.getValid() == 0) {
+            if (goods.getGoodsState() == 1) {
+                goods.setOffReason(null);
+            }else if (goods.getValid() == 0) {
                 if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
                     goods.setOffReason(null);
                     goods.setUnsellAbleReasonDesc(null);
@@ -157,8 +159,6 @@ public class EditorController {
                     goods.setOffReason(null);
                     goods.setUnsellAbleReasonDesc(null);
                 }
-            } else if (goods.getGoodsState() == 1) {
-                goods.setOffReason(null);
             }
 
             if (goods == null) {
@@ -256,7 +256,7 @@ public class EditorController {
             }
 
             //判断是否是免邮商品(isSoldFlag > 0)，如果是则显示免邮价格显示
-            if (Integer.valueOf(goods.getIsSoldFlag()) > 0) {
+            if (Integer.parseInt(goods.getIsSoldFlag()) > 0) {
                 if (StringUtils.isNotBlank(goods.getFeeprice())) {
                     request.setAttribute("feePrice", goods.getFeeprice());
                 } else {
@@ -274,7 +274,7 @@ public class EditorController {
             //进行利润率计算,区分免邮和费免邮商品
             goods.setWeight(StrUtils.matchStr(goods.getWeight(), "(\\d+\\.*\\d*)"));
             //运费计算公式
-            double freight = 0.076 * Double.valueOf(goods.getFinalWeight()) * 1000;
+            double freight = 0.076 * Double.parseDouble(goods.getFinalWeight()) * 1000;
             //获取1688价格(1piece)
             String wholePriceStr = goods.getWholesalePrice();
             if (StringUtils.isNotBlank(wholePriceStr)) {
@@ -282,15 +282,15 @@ public class EditorController {
                 firstPrice = firstPrice.replace("]", "");
                 double wholePrice = 0;
                 if (firstPrice.contains("-")) {
-                    wholePrice = Double.valueOf(firstPrice.split("-")[1].trim());
+                    wholePrice = Double.parseDouble(firstPrice.split("-")[1].trim());
                 } else {
-                    wholePrice = Double.valueOf(firstPrice.trim());
+                    wholePrice = Double.parseDouble(firstPrice.trim());
                 }
                 //判断免邮非免邮
                 double oldProfit = 0;
                 double singlePrice = 0;
                 String singlePriceStr = "0";
-                if (Integer.valueOf(goods.getIsSoldFlag()) > 0) {
+                if (Integer.parseInt(goods.getIsSoldFlag()) > 0) {
                     //先取range_price 为空则再取feeprice
                     if (StringUtils.isNotBlank(goods.getRangePrice())) {
                         if (goods.getRangePrice().contains("-")) {
@@ -332,9 +332,9 @@ public class EditorController {
                 singlePriceStr = singlePriceStr.replace("[", "").replace("]", "");
                 //获取1piece的最高价格
                 if (singlePriceStr.contains("-")) {
-                    singlePrice = Double.valueOf(singlePriceStr.split("-")[1].trim());
+                    singlePrice = Double.parseDouble(singlePriceStr.split("-")[1].trim());
                 } else {
-                    singlePrice = Double.valueOf(singlePriceStr);
+                    singlePrice = Double.parseDouble(singlePriceStr);
                 }
                 //计算利润率
                 //oldProfit = (singlePrice * 6.6 - wholePrice) / wholePrice * 100;
@@ -351,7 +351,7 @@ public class EditorController {
                 } else {
                     aliPirce = goods.getAliGoodsPrice();
                 }
-                double priceXs = (Double.valueOf(aliPirce) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
+                double priceXs = (Double.parseDouble(aliPirce) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
                 //加价率
                 oldProfit = GoodsPriceUpdateUtil.getAddPriceJz(priceXs);
                 goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit, 2));
@@ -883,7 +883,7 @@ public class EditorController {
                         // 更新运费，逻辑：运输方式E邮宝，运费计算公式（0.08*克重+9）/6.75
                         DecimalFormat df = new DecimalFormat("######0.00");
                         // 判断重量是否是很小的值，如果是很小值则设置为1kg
-                        double weight = Double.valueOf(weightStr) < 0.000001 ? 1.00 : Double.valueOf(weightStr);
+                        double weight = Double.parseDouble(weightStr) < 0.000001 ? 1.00 : Double.parseDouble(weightStr);
                         double cFreight = (0.08 * weight * 1000 + 9) / Util.EXCHANGE_RATE;
                         cgp.setFeeprice(df.format(cFreight));
                     }
@@ -949,10 +949,10 @@ public class EditorController {
                 double maxPrice = 0;
                 if (StringUtils.isNotBlank(feePrice)) {
                     String[] priceLst = feePrice.split(",");
-                    minPrice = Double.valueOf(priceLst[0].split("@")[1]);
+                    minPrice = Double.parseDouble(priceLst[0].split("@")[1]);
                     maxPrice = minPrice;
                     for (String priceStr : priceLst) {
-                        double tempPrice = Double.valueOf(priceStr.split("@")[1]);
+                        double tempPrice = Double.parseDouble(priceStr.split("@")[1]);
                         if (tempPrice < minPrice) {
                             minPrice = tempPrice;
                         }
@@ -982,10 +982,10 @@ public class EditorController {
                         }
                     } else {
                         String[] priceLst = wprice.split(",");
-                        minPrice = Double.valueOf(priceLst[0].split("@")[1]);
+                        minPrice = Double.parseDouble(priceLst[0].split("@")[1]);
                         maxPrice = minPrice;
                         for (String priceStr : priceLst) {
-                            double tempPrice = Double.valueOf(priceStr.split("@")[1]);
+                            double tempPrice = Double.parseDouble(priceStr.split("@")[1]);
                             if (tempPrice < minPrice) {
                                 minPrice = tempPrice;
                             }
@@ -1125,13 +1125,13 @@ public class EditorController {
             // type 0 保存 1 保存并发布
             int tempId = user.getId();
             String tempName = user.getAdmName();
-            editBean.setPublish_flag(Integer.valueOf(type));
+            editBean.setPublish_flag(Integer.parseInt(type));
             editBean.setAdmin_id(tempId);
             editBean.setNew_title(cgp.getEnname());
             editBean.setOld_title(orGoods.getEnname());
             editBean.setPid(cgp.getPid());
 
-            int success = customGoodsService.saveEditDetalis(cgp, tempName, tempId, Integer.valueOf(type));
+            int success = customGoodsService.saveEditDetalis(cgp, tempName, tempId, Integer.parseInt(type));
             if (success > 0) {
 
                 if (editBean.getPriceShowFlag() > 0) {
@@ -1150,7 +1150,7 @@ public class EditorController {
                     String updateTimeStr = orGoods.getUpdateTimeAll();
                     //判断不是正式环境的，不进行搜图图片更新
                     String ip = request.getRemoteAddr();
-
+                    customGoodsService.updateGoodsState(pidStr, 1);
                     System.err.println("ip:" + ip);
                     if (cgp.getIsUpdateImg() == 0) {
                         cgp.setIsUpdateImg(1);
@@ -1367,7 +1367,7 @@ public class EditorController {
                 return json;
             }
             // type -1 下架该商品 1 检查通过
-            customGoodsService.setGoodsValid(pidStr, "", Integer.valueOf(adminId), -1, "");
+            customGoodsService.setGoodsValid(pidStr, "", Integer.parseInt(adminId), -1, "");
             json.setOk(true);
             json.setMessage("执行成功");
 
@@ -1427,7 +1427,7 @@ public class EditorController {
             String lastPrice = request.getParameter("lastPrice");
             bean.setLastPrice(lastPrice);
             lastPrice = StrUtils.isRangePrice(lastPrice) ? lastPrice : "0";
-            double minPrice = Double.valueOf(lastPrice.split("-")[0]);
+            double minPrice = Double.parseDouble(lastPrice.split("-")[0]);
             double maxPrice = minPrice;
 
             String sku = request.getParameter("sku");
@@ -1440,7 +1440,7 @@ public class EditorController {
                     // System.err.println(skuBean.toString());
                     SkuValBean skuVal = skuBean.getSkuVal();
                     String actSkuCalPrice = request.getParameter("actSkuCalPrice_" + skuBean.getSkuPropIds());
-                    double price = Double.valueOf(actSkuCalPrice);
+                    double price = Double.parseDouble(actSkuCalPrice);
                     if (price - 0.001 < minPrice) {
                         minPrice = price;
                     }
@@ -2458,49 +2458,49 @@ public class EditorController {
         String weight_flag_str = request.getParameter("weight_flag");
         int weight_flag = 0;
         if (StringUtils.isNotBlank(weight_flag_str)) {
-            weight_flag = Integer.valueOf(weight_flag_str);
+            weight_flag = Integer.parseInt(weight_flag_str);
         }
         editBean.setWeight_flag(weight_flag);
 
         String ugly_flag_str = request.getParameter("ugly_flag");
         int ugly_flag = 0;
         if (StringUtils.isNotBlank(ugly_flag_str)) {
-            ugly_flag = Integer.valueOf(ugly_flag_str);
+            ugly_flag = Integer.parseInt(ugly_flag_str);
         }
         editBean.setUgly_flag(ugly_flag);
 
         String benchmarking_flag_str = request.getParameter("benchmarking_flag");
         int benchmarking_flag = 0;
         if (StringUtils.isNotBlank(benchmarking_flag_str)) {
-            benchmarking_flag = Integer.valueOf(benchmarking_flag_str);
+            benchmarking_flag = Integer.parseInt(benchmarking_flag_str);
         }
         editBean.setBenchmarking_flag(benchmarking_flag);
 
         String describe_good_flag_str = request.getParameter("describe_good_flag");
         int describe_good_flag = 0;
         if (StringUtils.isNotBlank(describe_good_flag_str)) {
-            describe_good_flag = Integer.valueOf(describe_good_flag_str);
+            describe_good_flag = Integer.parseInt(describe_good_flag_str);
         }
         editBean.setDescribe_good_flag(describe_good_flag);
 
         String never_off_flag_str = request.getParameter("never_off_flag");
         int never_off_flag = 0;
         if (StringUtils.isNotBlank(never_off_flag_str)) {
-            never_off_flag = Integer.valueOf(never_off_flag_str);
+            never_off_flag = Integer.parseInt(never_off_flag_str);
         }
         editBean.setNever_off_flag(never_off_flag);
 
         String uniqueness_flag_str = request.getParameter("uniqueness_flag");
         int uniqueness_flag = 0;
         if (StringUtils.isNotBlank(uniqueness_flag_str)) {
-            uniqueness_flag = Integer.valueOf(uniqueness_flag_str);
+            uniqueness_flag = Integer.parseInt(uniqueness_flag_str);
         }
         editBean.setUniqueness_flag(uniqueness_flag);
 
         String promotion_flag_str = request.getParameter("promotion_flag");
         int promotion_flag = 0;
         if (StringUtils.isNotBlank(promotion_flag_str)) {
-            promotion_flag = Integer.valueOf(promotion_flag_str);
+            promotion_flag = Integer.parseInt(promotion_flag_str);
         }
         editBean.setPromotion_flag(promotion_flag);
 
@@ -2809,7 +2809,7 @@ public class EditorController {
         }
 
         try {
-            boolean is = customGoodsService.setNoBenchmarking(pid, Double.valueOf(finalWeight));
+            boolean is = customGoodsService.setNoBenchmarking(pid, Double.parseDouble(finalWeight));
             if (is) {
                 json.setOk(true);
                 json.setMessage("执行成功");
@@ -3005,7 +3005,7 @@ public class EditorController {
         }
 
         try {
-            //boolean is = customGoodsService.updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(weight), 1) > 0;
+            //boolean is = customGoodsService.updateGoodsWeightByPid(pid, Double.parseDouble(newWeight), Double.parseDouble(weight), 1) > 0;
             /*if (is) {
                 // 重新刷新价格数据
                 String ip = request.getRemoteAddr();
@@ -3108,7 +3108,7 @@ public class EditorController {
         }
 
         try {
-            boolean is = customGoodsService.editAndLockProfit(pid, Integer.valueOf(typeStr), Double.valueOf(editProfit)) > 0;
+            boolean is = customGoodsService.editAndLockProfit(pid, Integer.parseInt(typeStr), Double.parseDouble(editProfit)) > 0;
             if (is) {
                 json.setOk(true);
                 json.setMessage("执行成功");
@@ -3148,35 +3148,35 @@ public class EditorController {
 
         String adminIdStr = request.getParameter("adminId");
         if (StringUtils.isNotBlank(adminIdStr)) {
-            editBean.setAdmin_id(Integer.valueOf(adminIdStr));
+            editBean.setAdmin_id(Integer.parseInt(adminIdStr));
         }
         String weightFlagStr = request.getParameter("weightFlag");
         if (StringUtils.isNotBlank(adminIdStr)) {
-            editBean.setWeight_flag(Integer.valueOf(weightFlagStr));
+            editBean.setWeight_flag(Integer.parseInt(weightFlagStr));
         }
         String uglyFlagStr = request.getParameter("uglyFlag");
         if (StringUtils.isNotBlank(uglyFlagStr)) {
-            editBean.setUgly_flag(Integer.valueOf(uglyFlagStr));
+            editBean.setUgly_flag(Integer.parseInt(uglyFlagStr));
         }
         String repairedFlagStr = request.getParameter("repairedFlag");
         if (StringUtils.isNotBlank(repairedFlagStr)) {
-            editBean.setRepaired_flag(Integer.valueOf(repairedFlagStr));
+            editBean.setRepaired_flag(Integer.parseInt(repairedFlagStr));
         }
         String benchmarkingFlagStr = request.getParameter("benchmarkingFlag");
         if (StringUtils.isNotBlank(benchmarkingFlagStr)) {
-            editBean.setBenchmarking_flag(Integer.valueOf(benchmarkingFlagStr));
+            editBean.setBenchmarking_flag(Integer.parseInt(benchmarkingFlagStr));
         }
 
         int startNum = 0;
         int limitNum = 30;
         String limitNumStr = request.getParameter("rows");
         if (StringUtils.isNotBlank(limitNumStr)) {
-            limitNum = Integer.valueOf(limitNumStr);
+            limitNum = Integer.parseInt(limitNumStr);
         }
 
         String pageStr = request.getParameter("page");
         if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
-            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+            startNum = (Integer.parseInt(pageStr) - 1) * limitNum;
         }
         editBean.setStartNum(startNum);
         editBean.setLimitNum(limitNum);

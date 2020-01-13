@@ -12,6 +12,8 @@ import java.util.List;
  */
 public interface OrderPurchaseService {
 
+    int getCurrentOrder(OrderPurchase orderPurchase);
+
     List<OrderPurchase> queryForList(OrderPurchase orderPurchase);
 
     int queryForListCount(OrderPurchase orderPurchase);

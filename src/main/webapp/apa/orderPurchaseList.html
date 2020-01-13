@@ -17,7 +17,7 @@
     <style type="text/css">
         .but_color {
             background: #44a823;
-            width: 80px;
+            width: 100px;
             height: 30px;
             border: 1px #aaa solid;
             color: #fff;
@@ -128,7 +128,7 @@
             });
         }
 
-        function exportKopExcel() {
+        function exportKopExcelDetail() {
             var year = $("#kop_rYear").val();
             if (year == null || year == "" || year == "0" || year == "-1") {
                 showMessage('请选择年份');
@@ -140,8 +140,24 @@
                 return;
             }
             var  time = year + "-" + month + "-01";
-            window.location.href = "/cbtconsole/orderPurchase/exportListExcel?beginTime="+ time;
+            window.location.href = "/cbtconsole/orderPurchase/exportKopExcelDetail?beginTime="+ time;
         }
+
+        function exportKopExcelTotal() {
+            var year = $("#kop_rYear").val();
+            if (year == null || year == "" || year == "0" || year == "-1") {
+                showMessage('请选择年份');
+                return;
+            }
+            var month = $("#kop_rMonth").val();
+            if (month == null || month == "" || month == "0" || month == "-1") {
+                showMessage('请选择月份');
+                return;
+            }
+            var  time = year + "-" + month + "-01";
+            window.location.href = "/cbtconsole/orderPurchase/exportKopExcelTotal?beginTime="+ time;
+        }
+
 
         function formatUserId(val, row, index) {
             return '<a href="/cbtconsole/userinfo/getUserInfo.do?userId=' + val + '" target="_blank">' + val + '</a>';
@@ -232,10 +248,14 @@
             <option value="11">11</option>
             <option value="12">12</option>
         </select> <input class="but_color" type="button" value="查询"
-                         onclick="doKopQuery()"> <input class="but_color"
-                                                        type="button" value="重置" onclick="doKopReset()"> <input
-                class="but_color" type="button" value="导出Excel"
-                onclick="exportKopExcel()">
+                         onclick="doKopQuery()">
+            &nbsp;
+            <input class="but_color" type="button" value="重置" onclick="doKopReset()">
+            &nbsp;
+            <input class="but_color" type="button" value="导出Excel汇总" onclick="exportKopExcelTotal()">
+            &nbsp;
+            <input class="but_color" type="button" value="导出Excel详细" onclick="exportKopExcelDetail()">
+
         </form>
 
     </div>
@@ -250,7 +270,7 @@
         <th data-options="field:'orderpaytime',align:'center',width:'140px'">下单时间</th>
         <th data-options="field:'od_pid',align:'center',width:'120px'">订单商品PID</th>
         <th data-options="field:'yourorder',align:'center',width:'60px'">下单数量</th>
-        <th data-options="field:'goodsprice',align:'center',width:'100px'">下单价格(USD)</th>
+        <th data-options="field:'goodsprice',align:'center',width:'100px'">下单价格(RMB)</th>
         <th data-options="field:'od_state',align:'center',width:'60px',formatter:formatState">商品状态</th>
 
         <th data-options="field:'shipno',align:'center',width:'140px'">1688运单号</th>
