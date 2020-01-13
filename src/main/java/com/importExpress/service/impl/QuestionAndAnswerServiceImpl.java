@@ -116,18 +116,16 @@ public class QuestionAndAnswerServiceImpl implements QuestionAndAnswerService {
                 model.put("id",id);
                 model.put("qustion",qustion);
                 model.put("itemUrl",urlTem);
-                if ("0".equals(Website)){
-					model.put("websiteType",1);
+                model.put("websiteType",Website);
+                if ("1".equals(Website)){
 					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From ImportExpress", model, TemplateType.BUSINESS_INQUIRIES);
 				}
-                if ("1".equals(Website)){
-					model.put("websiteType",2);
+                if ("2".equals(Website)){
 					 urlTem = "https://www.kidsproductwholesale.com/goodsinfo/...-1"+url+".html";
 					model.put("itemUrl",urlTem);
 					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From kidsproductwholesale", model, TemplateType.BUSINESS_INQUIRIES_KIDS);
 				}
 				if ("3".equals(Website)){
-					model.put("websiteType",3);
 					urlTem = "https://www.petstoreinc.com/goodsinfo/...-1"+url+".html";
 					model.put("itemUrl",urlTem);
 					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From petstoreinc", model, TemplateType.BUSINESS_INQUIRIES_PET);
