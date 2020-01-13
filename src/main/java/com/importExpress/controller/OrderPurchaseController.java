@@ -197,6 +197,7 @@ public class OrderPurchaseController {
                             tempPurchase.setGoodsprice(sel.getGoodsprice() + tempPurchase.getGoodsprice());
                         });
                         tempPurchase.setShipno(ck);
+                        tempPurchase.setTb_orderid(cv.get(0).getTb_orderid());
                         tempPurchase.setItemqty(cv.get(0).getItemqty());
                         tempPurchase.setTotalprice(cv.get(0).getTotalprice());
                         tempPurchase.setOrderdate(cv.get(0).getOrderdate());
