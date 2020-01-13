@@ -480,7 +480,7 @@ public class ShopCarMarketingController {
             paramMap.put("couponCode", couponCode);
             if (StringUtils.isNotBlank(couponValue) && couponValue.contains("-")) {
                 String[] tempList = couponValue.split("-");
-                paramMap.put("couponValue", "$" + tempList[0]+ "-$" + tempList[1]);
+                paramMap.put("couponValue",  "$" + tempList[1] + " off on order over $" + tempList[0]);
             } else {
                 paramMap.put("couponValue", couponValue);
             }

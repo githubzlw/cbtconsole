@@ -454,10 +454,13 @@ public class CustomGoodsController {
                     goods.setIsUpdateImg(0);
                 }
 
-                PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(goods.getPid(),
+                PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(goods.getPid(),
                         customGoodsService, ftpConfig, goods.getIsUpdateImg(), user.getId());
 
-                pool.execute(pbThread);
+                FutureTask futureTask = new FutureTask(pbCallable);
+                Thread thread = new Thread(futureTask);
+
+                pool.execute(thread);
 
                 /*customGoodsService.publish(goods);
                 int publish = customGoodsService.updateState(4, goods.getPid(), user.getId());

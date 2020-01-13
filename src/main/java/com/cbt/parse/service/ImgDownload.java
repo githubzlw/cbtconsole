@@ -22,6 +22,23 @@ public class ImgDownload {
 		System.err.println("downFromImgService:" + downFromImgService(url, fileName));
 	}
 
+	public static boolean downAndReTry(String imgUrl,String fileName){
+		int count = 0;
+		boolean isSu = false;
+		while (count < 5 && !isSu){
+			count ++;
+			isSu = downFromImgService(imgUrl,fileName);
+			if(!isSu){
+				try {
+					Thread.sleep(3000 + count * 1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return isSu;
+	}
+
 
 	public static boolean downFromImgService(String imgUrl,String fileName) {
 
@@ -84,7 +101,9 @@ public class ImgDownload {
 			}
 		}
 		isDown = checkDownFileByName(fileName);
-		System.err.println("down img [" + fileName + "],result:" + isDown);
+		if(!isDown){
+			System.err.println("down img [" + fileName + "],result:" + isDown);
+		}
 		return isDown;
 	}
 
@@ -211,7 +230,7 @@ public class ImgDownload {
         boolean isDown = false;
         File downFlie = new File(fileName);
 
-        if (downFlie.exists() && 1.0 * downFlie.length() / 1024 > 1) {
+        if (downFlie.exists() && 1.0 * downFlie.length() / 1024 > 0.1) {
             isDown = true;
         } else {
             if (downFlie.exists()) {

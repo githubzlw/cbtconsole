@@ -168,20 +168,28 @@
 
            }*/
 
-            var arr = [];
-            var color_spc="";
+            // var arr = [];
+            // var color_spc="";
 
-            $('.col_spc input:checked').each(function(){
-                var this_val = $(this).val();
-                arr.push(this_val);
-                color_spc = arr.toString();
-                console.log(color_spc);
-            })
+            // $('.col_spc input:checked').each(function(){
+            //     var this_val = $(this).val();
+            //     arr.push(this_val);
+            //     color_spc = arr.toString();
+            //     console.log(color_spc);
+            // })
 
             var cusorder=${odls}
             var OrderMap = new Array();
             var userid=${userid}
             $('input:checkbox[name=odCount]').each(function(k) {
+                var arr = [];
+                var color_spc="";
+                $('.col_spc'+k+' input:checked').each(function(){
+                    var this_val = $(this).val();
+                    arr.push(this_val);
+                    color_spc = arr.toString();
+                    console.log(color_spc);
+                })
                 if ($(this).is(':checked')) {
                     var retunum=$("#openNum"+k).val();
                     cusorder[k].new_barcode=retunum
@@ -239,12 +247,12 @@
         <td style="font-size: 18px"><a target="_blank" target="_blank" href="https://www.import-express.com/goodsinfo/cbtconsole-1${orderd.goods_pid}.html" >${orderd.good_name}</a></td>
 <td>${orderd.can_remaining}</td>
 <td>${orderd.goodsprice}</td>
-<td class="col_spc">
+<td class="col_spc${sd.index}">
     <c:forEach items="${orderd.skuList}" var="map">
         <span ><c:out value="${map.key}:">${map.key}:</c:out>
         <c:forEach items="${map.value}" var="sk">
             <%--<span><c:out value="${sk}"></c:out></span>--%>
-            <label><input name="${map.key}" type="radio" value="${map.key}:${sk}" />${sk}</label>
+            <label><input name="${map.key}${sd.index}" type="radio" value="${map.key}:${sk}" />${sk}</label>
         </c:forEach>
             </span><br><br>
     </c:forEach>

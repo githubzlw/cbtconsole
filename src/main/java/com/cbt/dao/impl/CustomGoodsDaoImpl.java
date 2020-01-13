@@ -2194,7 +2194,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             stmt.setInt(count27++, type == 1 ? 4 : 2);
             stmt.setInt(count27++, reason);
             stmt.setInt(count27++, adminId);
-            if (type < 1) {
+            if (type != 1) {
                 stmt.setString(count27++, remark);
             }
             stmt.setString(count27++, pid);

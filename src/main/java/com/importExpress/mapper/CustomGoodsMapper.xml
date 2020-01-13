@@ -1602,6 +1602,20 @@
         select category_id from 1688_category where find_in_set(#{catid},path)
     </select>
 
+    <select id="queryOnlineSync" resultType="java.lang.String">
+        select pid from pid_online_sync
+    </select>
+
+    <delete id="deleteOnlineSync">
+        delete from pid_online_sync where pid = #{pid}
+    </delete>
+
+    <insert id="insertIntoOnlineSync">
+        insert into pid_online_sync(pid,valid,goodsstate)
+        select pid,valid,goodsstate from custom_benchmark_ready where pid = #{pid}
+        and pid not in(select pid from pid_online_sync where pid = #{pid} )
+    </insert>
+
     <select id="queryGoodsDeleteInfo" parameterType="com.cbt.bean.CustomGoodsQuery" resultMap="queryGoodsResultMap">
         select id,catid1,pid,custom_main_image,img,name,enname,eninfo,remotpath,valid,localpath,catid1,shop_id
         from custom_benchmark_ready_delete_log where delete_flag = 0
