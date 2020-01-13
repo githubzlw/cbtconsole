@@ -197,6 +197,7 @@ public class OrderPurchaseController {
                             tempPurchase.setGoodsprice(sel.getGoodsprice() + tempPurchase.getGoodsprice());
                         });
                         tempPurchase.setShipno(ck);
+                        tempPurchase.setTb_orderid(cv.get(0).getTb_orderid());
                         tempPurchase.setItemqty(cv.get(0).getItemqty());
                         tempPurchase.setTotalprice(cv.get(0).getTotalprice());
                         tempPurchase.setOrderdate(cv.get(0).getOrderdate());
@@ -264,18 +265,21 @@ public class OrderPurchaseController {
         cell.setCellValue("商品状态");
         cell.setCellStyle(style);
         cell = row.createCell(7);
-        cell.setCellValue("1688运单号");
+        cell.setCellValue("1688订单号");
         cell.setCellStyle(style);
         cell = row.createCell(8);
-        cell.setCellValue("采购商品");
+        cell.setCellValue("1688运单号");
         cell.setCellStyle(style);
         cell = row.createCell(9);
-        cell.setCellValue("采购数量");
+        cell.setCellValue("采购商品");
         cell.setCellStyle(style);
         cell = row.createCell(10);
-        cell.setCellValue("采购总价(RMB)");
+        cell.setCellValue("采购数量");
         cell.setCellStyle(style);
         cell = row.createCell(11);
+        cell.setCellValue("采购总价(RMB)");
+        cell.setCellStyle(style);
+        cell = row.createCell(12);
         cell.setCellValue("采购支付时间");
         cell.setCellStyle(style);
 
@@ -298,11 +302,12 @@ public class OrderPurchaseController {
             } else {
                 row.createCell(6).setCellValue("");
             }
-            row.createCell(7).setCellValue(bc.getShipno());
-            row.createCell(8).setCellValue(bc.getItemurl());
-            row.createCell(9).setCellValue(bc.getItemqty());
-            row.createCell(10).setCellValue(bc.getTotalprice());
-            row.createCell(11).setCellValue(bc.getOrderdate());
+            row.createCell(7).setCellValue(bc.getTb_orderid());
+            row.createCell(8).setCellValue(bc.getShipno());
+            row.createCell(9).setCellValue(bc.getItemurl());
+            row.createCell(10).setCellValue(bc.getItemqty());
+            row.createCell(11).setCellValue(bc.getTotalprice());
+            row.createCell(12).setCellValue(bc.getOrderdate());
         }
         return wb;
     }
@@ -332,15 +337,18 @@ public class OrderPurchaseController {
         cell.setCellValue("下单总格(RMB)");
         cell.setCellStyle(style);
         cell = row.createCell(5);
-        cell.setCellValue("1688运单号");
+        cell.setCellValue("1688订单号");
         cell.setCellStyle(style);
         cell = row.createCell(6);
-        cell.setCellValue("采购数量");
+        cell.setCellValue("1688运单号");
         cell.setCellStyle(style);
         cell = row.createCell(7);
-        cell.setCellValue("采购总价(RMB)");
+        cell.setCellValue("采购数量");
         cell.setCellStyle(style);
         cell = row.createCell(8);
+        cell.setCellValue("采购总价(RMB)");
+        cell.setCellStyle(style);
+        cell = row.createCell(9);
         cell.setCellValue("采购支付时间");
         cell.setCellStyle(style);
 
@@ -353,10 +361,11 @@ public class OrderPurchaseController {
             row.createCell(2).setCellValue(bc.getOrderpaytime());
             row.createCell(3).setCellValue(bc.getYourorder());
             row.createCell(4).setCellValue(bc.getGoodsprice());
-            row.createCell(5).setCellValue(bc.getShipno());
-            row.createCell(6).setCellValue(bc.getItemqty());
-            row.createCell(7).setCellValue(bc.getTotalprice());
-            row.createCell(8).setCellValue(bc.getOrderdate());
+            row.createCell(5).setCellValue(bc.getTb_orderid());
+            row.createCell(6).setCellValue(bc.getShipno());
+            row.createCell(7).setCellValue(bc.getItemqty());
+            row.createCell(8).setCellValue(bc.getTotalprice());
+            row.createCell(9).setCellValue(bc.getOrderdate());
         }
         return wb;
     }
