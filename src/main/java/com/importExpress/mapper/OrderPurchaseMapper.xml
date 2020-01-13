@@ -3,19 +3,33 @@
 <mapper namespace="com.importExpress.mapper.OrderPurchaseMapper">
 
 
-    <select id="queryForList" parameterType="com.importExpress.pojo.OrderPurchase" resultType="com.importExpress.pojo.OrderPurchase">
+    <insert id="getCurrentOrder" parameterType="com.importExpress.pojo.OrderPurchase">
+        truncate table orderinfo_curren_monthly;
+        insert into orderinfo_curren_monthly(order_no,orderpaytime)
+        select order_no,tp.createtime from orderinfo oi, tem_payment1 tp
+        where SUBSTRING(CONCAT(oi.order_no,'_'),1,locate('_',CONCAT(oi.order_no,'_'))-1) = tp.orderid
+        and tp.createtime between #{beginTime} and #{endTime} and oi.state in(1,2,3,4,5);
+    </insert>
+
+    <select id="queryForList" parameterType="com.importExpress.pojo.OrderPurchase"
+            resultType="com.importExpress.pojo.OrderPurchase">
         select aa.*,bb.*,cc.orderpaytime,cc.exchange_rate
-        from (select od.orderid,sum(od.yourorder) as yourorder,ROUND(sum(od.goodsprice),3) as goodsprice,od.state as od_state,
-        od.purchase_state,od.shipno as od_shipno,if(ops.tb_1688_itemid = null,ops.last_goods_p_url,ops.tb_1688_itemid) as od_pid
-        from order_product_source ops inner join order_details od on ops.orderid = od.orderid and ops.od_id = od.id and od.state in(0,1)
-        where od.orderid in(select order_no from orderinfo where state in(1,2,3,4) and orderpaytime between #{beginTime} and #{endTime} )
-        group by od.shipno,od_pid) aa left join (select distinct th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
-        th.orderdate from (select od.id as od_id,od.yourorder,od.goodsprice,od.state as od_state,od.purchase_state,od.shipno as od_shipno,
+        from (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,od.shipno as od_shipno,
         if(ops.tb_1688_itemid = null,ops.last_goods_p_url,ops.tb_1688_itemid) as od_pid
-        from order_product_source ops inner join order_details od on ops.orderid = od.orderid and ops.od_id = od.id and od.state in(0,1)
-        where od.orderid in(select order_no from orderinfo where state in(1,2,3,4) and orderpaytime between #{beginTime} and #{endTime})) odp
-        left join taobao_1688_order_history th on odp.od_shipno = th.shipno and odp.od_pid = th.itemid group by th.shipno,th.itemid) bb
-        on aa.od_shipno = bb.shipno and aa.od_pid = bb.itemid inner join orderinfo cc on aa.orderid = cc.order_no
+        from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
+        and od.state in(0,1) where od.orderid in(select order_no from orderinfo_curren_monthly) ) aa
+        left join
+        (select distinct th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,th.orderdate
+        from (select od.orderid,od.id as od_id,od.yourorder,od.goodsprice,od.state as od_state,
+        od.purchase_state,od.shipno as od_shipno,
+        if(ops.tb_1688_itemid = null,ops.last_goods_p_url,ops.tb_1688_itemid) as od_pid
+        from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
+        and od.state in(0,1)
+        where od.orderid in(select order_no from orderinfo_curren_monthly)) odp
+        left join taobao_1688_order_history th on odp.od_shipno = th.shipno and odp.od_pid = th.itemid
+        where th.shipno is not null group by th.shipno,th.itemid) bb
+        on aa.od_shipno = bb.shipno and aa.od_pid = bb.itemid
+        inner join orderinfo cc on aa.orderid = cc.order_no
         and cc.user_id in(select id from user where is_test = 0)
         order by aa.orderid,bb.orderdate desc
         <if test="limitNum > 0">
@@ -24,18 +38,24 @@
     </select>
 
     <select id="queryForListCount" parameterType="com.importExpress.pojo.OrderPurchase" resultType="java.lang.Integer">
-        select count(0) from (select od.orderid,sum(od.yourorder) as yourorder,ROUND(sum(od.goodsprice),3) as goodsprice,od.state as od_state,
-        od.purchase_state,od.shipno as od_shipno,if(ops.tb_1688_itemid = null,ops.last_goods_p_url,ops.tb_1688_itemid) as od_pid
-        from order_product_source ops inner join order_details od on ops.orderid = od.orderid and ops.od_id = od.id and od.state in(0,1)
-        where od.orderid in(select order_no from orderinfo where state in(1,2,3,4) and orderpaytime between #{beginTime} and #{endTime} )
-        group by od.shipno,od_pid) aa left join (select distinct th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
-        th.orderdate from (select od.id as od_id,od.yourorder,od.goodsprice,od.state as od_state,od.purchase_state,od.shipno as od_shipno,
+        select count(0) from (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,od.shipno as od_shipno,
         if(ops.tb_1688_itemid = null,ops.last_goods_p_url,ops.tb_1688_itemid) as od_pid
-        from order_product_source ops inner join order_details od on ops.orderid = od.orderid and ops.od_id = od.id and od.state in(0,1)
-        where od.orderid in(select order_no from orderinfo where state in(1,2,3,4) and orderpaytime between #{beginTime} and #{endTime})) odp
-        left join taobao_1688_order_history th on odp.od_shipno = th.shipno and odp.od_pid = th.itemid group by th.shipno,th.itemid) bb
-        on aa.od_shipno = bb.shipno and aa.od_pid = bb.itemid inner join orderinfo cc on aa.orderid = cc.order_no
+        from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
+        and od.state in(0,1) where od.orderid in(select order_no from orderinfo_curren_monthly) ) aa
+        left join
+        (select distinct th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,th.orderdate
+        from (select od.orderid,od.id as od_id,od.yourorder,od.goodsprice,od.state as od_state,
+        od.purchase_state,od.shipno as od_shipno,
+        if(ops.tb_1688_itemid = null,ops.last_goods_p_url,ops.tb_1688_itemid) as od_pid
+        from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
+        and od.state in(0,1)
+        where od.orderid in(select order_no from orderinfo_curren_monthly)) odp
+        left join taobao_1688_order_history th on odp.od_shipno = th.shipno and odp.od_pid = th.itemid
+        where th.shipno is not null group by th.shipno,th.itemid) bb
+        on aa.od_shipno = bb.shipno and aa.od_pid = bb.itemid
+        inner join orderinfo cc on aa.orderid = cc.order_no
         and cc.user_id in(select id from user where is_test = 0)
+        order by aa.orderid,bb.orderdate desc
     </select>
 
 </mapper>

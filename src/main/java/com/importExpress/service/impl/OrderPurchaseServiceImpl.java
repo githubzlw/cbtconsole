@@ -21,6 +21,11 @@ public class OrderPurchaseServiceImpl implements OrderPurchaseService {
     private OrderPurchaseMapper orderPurchaseMapper;
 
     @Override
+    public int getCurrentOrder(OrderPurchase orderPurchase) {
+        return orderPurchaseMapper.getCurrentOrder(orderPurchase);
+    }
+
+    @Override
     public List<OrderPurchase> queryForList(OrderPurchase orderPurchase) {
         return orderPurchaseMapper.queryForList(orderPurchase);
     }
