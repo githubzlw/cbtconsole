@@ -103,7 +103,7 @@ table th {
 							} else{
 								tbody += "<td>"+results[i].reply_time+"</td>";
 							}
-							tbody += "<td><a style='margin-left:35px' href=\"javascript:openReplyCustom(\'"+results[i].id+"\', \'" + results[i].site + "\')\">回复</a></td>";
+							tbody += "<td><a style='margin-left:35px' href=\"javascript:openReplyCustom(\'"+results[i].id+"\', \'" + results[i].site + "\',"+results[i].uid+")\">回复</a></td>";
 							tbody+="</tr>";
 						}
 						$("#problemTable tbody").append(tbody);
@@ -119,8 +119,9 @@ table th {
 	}
 	
 	//打开回复弹出框
-	function openReplyCustom(report_id, site){
+	function openReplyCustom(report_id, site, userId){
 		$("#report_id").val(report_id);
+		$("#report_user_id").val(userId);
 		$("#website_type").val(site);
 		var rfddd = document.getElementById("repalyDiv1");
 		rfddd.style.display = "block";
@@ -128,6 +129,7 @@ table th {
 	//回复客户反馈并发送邮件
 		function saveRepalyContent() {
 		var report_id = $("#report_id").val();
+		var userId = $("#report_user_id").val();
 		var text = $("#remark_content_").val();
 		var websiteType = $("#website_type").val();
 		$
@@ -138,6 +140,7 @@ table th {
 					data : {
 						'report_id' : report_id,
 						'text' : text,
+						'userId' : userId,
                         'websiteType' : websiteType
 					},
 					dataType : 'text',
@@ -145,6 +148,7 @@ table th {
 						if (data.length > 0) {
 							$("#report_id").val("");
 							$("#remark_content_").val("");
+							$("#report_user_id").val("0");
 							$('#repalyDiv1').hide();
 							location.reload();
 						}
@@ -283,7 +287,8 @@ table th {
 			<a href="javascript:void(0)" class="show_x"
 				onclick="$('#repalyDiv1').hide();">╳</a>
 		</div>
-		<input id="report_id" type="hidden" value=""> 
+		<input id="report_id" type="hidden" value="">
+		<input id="report_user_id" type="hidden" value="0">
 		反馈内容:
 		<textarea name="remark_content" rows="8" cols="50"
 			id="remark_content_"></textarea>
