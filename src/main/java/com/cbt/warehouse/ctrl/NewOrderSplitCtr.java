@@ -1,48 +1,14 @@
 package com.cbt.warehouse.ctrl;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.cbt.service.CustomGoodsService;
-import com.importExpress.pojo.GoodsOverSea;
-import com.importExpress.service.OverseasWarehouseStockService;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.Inventory;
-import com.cbt.util.BigDecimalUtil;
-import com.cbt.util.GetConfigureInfo;
-import com.cbt.util.OrderInfoConstantUtil;
-import com.cbt.util.OrderInfoUtil;
-import com.cbt.util.Redis;
-import com.cbt.util.Send;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.UUIDUtil;
-import com.cbt.util.Utility;
+import com.cbt.service.CustomGoodsService;
+import com.cbt.util.*;
 import com.cbt.warehouse.pojo.SampleOrderBean;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.warehouse.service.InventoryService;
@@ -61,12 +27,30 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.service.OrderSplitRecordService;
+import com.importExpress.service.OverseasWarehouseStockService;
 import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
 import com.importExpress.utli.UserInfoUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import net.sf.json.JSONArray;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/orderSplit")
@@ -592,8 +576,7 @@ public class NewOrderSplitCtr {
                 return json;
             }
 
-            JSONArray jsonArray = JSONArray.fromObject(odIds);
-            List<SplitGoodsNumBean> splitIdList = (List<SplitGoodsNumBean>) JSONArray.toCollection(jsonArray, SplitGoodsNumBean.class);
+            List<SplitGoodsNumBean> splitIdList = (List<SplitGoodsNumBean>) JSONArray.parseArray(odIds, SplitGoodsNumBean.class);
             if (splitIdList == null || splitIdList.isEmpty()) {
                 json.setOk(false);
                 json.setMessage("转换拆单数据失败");
@@ -1128,8 +1111,7 @@ public class NewOrderSplitCtr {
                 String liveChatLink = "http://chat32.live800.com/live800/chatClient/chatbox.jsp?companyID=496777&configID=70901&lan=en&jid=4818862369&enterurl=http%3A%2F%2Fwww.import-express.com%2Fcbtconsole%2Fapa%2Fcontact.html&amp;timestamp=1441622560799&amp;pagereferrer=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2F&amp;firstEnterUrl=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2Fcbtconsole%2Fapa%2Fcontact%2Ehtml&amp;pagetitle=Customer+Service";
                 model.put("here", SwitchDomainNameUtil.checkNullAndReplace(liveChatLink, MultiSiteUtil.getSiteTypeNum(orderNo)));
             }
-            net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
-            String modeStr = jsonObject.toString();
+
             try {
                 // 邮件替换头部
                 model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
@@ -1137,7 +1119,7 @@ public class NewOrderSplitCtr {
                         "Due to supply reasons, we can only send your order partially at first.", model, webType);
             } catch (Exception e) {
                 e.printStackTrace();
-                LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + modeStr + " e.message:", e);
+                LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + model + " e.message:", e);
                 message = "Failed to send mail, please contact the developer by screen, thank you！" + e.getMessage();
             }
         } catch (Exception e) {

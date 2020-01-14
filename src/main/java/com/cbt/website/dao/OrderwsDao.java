@@ -1,5 +1,6 @@
 package com.cbt.website.dao;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.auto.service.IOrderAutoService;
 import com.cbt.auto.service.PreOrderAutoService;
 import com.cbt.bean.*;
@@ -28,7 +29,6 @@ import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import net.sf.json.JSONArray;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
@@ -6114,7 +6114,7 @@ public class OrderwsDao implements IOrderwsDao {
                 bhDtl.setSite(rs.getInt("site"));
                 String carStr = rs.getString("buyForMeCarConfig");
                 if(org.apache.commons.lang3.StringUtils.isNotBlank(carStr)){
-                    List<GoodsCarActiveSimplBean> listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carStr), GoodsCarActiveSimplBean.class);
+                    List<GoodsCarActiveSimplBean> listActive = JSONArray.parseArray(carStr, GoodsCarActiveSimplBean.class);
                     bhDtl.setCarNum(listActive.size());
                     listActive.clear();
                 }

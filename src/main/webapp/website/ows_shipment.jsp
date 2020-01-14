@@ -35,6 +35,7 @@
 </style>
 </head>
 <body>
+<a href="/cbtconsole/owstock/list" target="_blank">&lt;返回</a>
 	<div class="container-fluid report">
 		<h1 class="text-center">海外仓出库管理</h1>
 		<div class="row mt20">

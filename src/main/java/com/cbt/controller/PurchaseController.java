@@ -21,6 +21,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -70,9 +72,6 @@ import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 @Controller
 @RequestMapping(value = "/purchase")
 public class PurchaseController {
@@ -117,7 +116,7 @@ public class PurchaseController {
 		map.put("goodsid", goodsid);
 		map.put("orderid", orderid);
 		List<ChangeGoodsLogPojo> list = iPurchaseService.getDetailsChangeInfo(map);
-		return JSONArray.fromObject(list).toString();
+		return JSONArray.toJSONString(list);
 	}
 
 	// 采购补货
@@ -180,7 +179,7 @@ public class PurchaseController {
 		map.put("goodsid", goodsid);
 		map.put("goods_type", "0");
 		List<Replenishment_RecordPojo> list = iPurchaseService.getIsReplenishments(map);
-		return JSONArray.fromObject(list).toString();
+		return JSONArray.toJSONString(list);
 	}
 
 	// 线下采购记录
@@ -193,7 +192,7 @@ public class PurchaseController {
 		map.put("orderid", orderid);
 		map.put("goodsid", goodsid);
 		List<OfflinePurchaseRecordsPojo> list = iPurchaseService.getIsOfflinepurchase(map);
-		return JSONArray.fromObject(list).toString();
+		return JSONArray.toJSONString(list);
 	}
 
 	/**
@@ -666,7 +665,7 @@ public class PurchaseController {
 			if (oicp.getOrdernoarray() == null || "".equals(oicp.getOrdernoarray())) {
 				oicp.setOrdernoarray("000000000");
 			}
-			return JSONObject.fromObject(oicp).toString();
+			return JSONObject.toJSONString(oicp);
 		}else if("5".equals(state)){
 			Map<String, Object> map1 = new HashMap<String, Object>();
 			map1.put("admin",admuserid);
@@ -712,13 +711,13 @@ public class PurchaseController {
 			if (oicp.getOrdernoarray() == null || "".equals(oicp.getOrdernoarray())) {
 				oicp.setOrdernoarray("000000000");
 			}
-			return JSONObject.fromObject(oicp).toString();
+			return JSONObject.toJSONString(oicp);
 		}else if("6".equals(state)){
 			//查询采购入库有问题包裹
 			Map<String, Object> map1 = new HashMap<String, Object>();
 			map1.put("name", !"1".equals(admuserid)?admuserid:null);
 			OrderInfoCountPojo oicp = iPurchaseService.getNoMatchOrderByTbShipno(map1);
-			return JSONObject.fromObject(oicp).toString();
+			return JSONObject.toJSONString(oicp);
 		}else if("7".equals(state)){
 			//采购超24H无物流信息(订单)
 			OrderInfoCountPojo oicp=new OrderInfoCountPojo();
@@ -743,7 +742,7 @@ public class PurchaseController {
 			}
 			oicp.setOrdernonum(String.valueOf(index_num));
 			oicp.setOrdernoarray(o.toString().length()>0?o.toString().substring(0,o.toString().length()-1):"");
-			return JSONObject.fromObject(oicp).toString();
+			return JSONObject.toJSONString(oicp);
 		}
 		return null;
 	}
@@ -922,9 +921,8 @@ public class PurchaseController {
 		String odid = request.getParameter("odid");
 		response.setCharacterEncoding("UTF-8");
 		OrderProductSource orderProductSource = iPurchaseService.ShowRmark(orderNo, Integer.parseInt(goodsdataid), Integer.parseInt(goodid),odid);
-		JSONObject json  =JSONObject.fromObject(orderProductSource);
 		PrintWriter out = response.getWriter();
-		out.write(json.toString());
+		out.write(JSONObject.toJSONString(orderProductSource));
 		out.flush();
 		out.close();
 	}
@@ -965,7 +963,7 @@ public class PurchaseController {
 			inputStream.close(); //关闭流
 			String result = properties.getProperty("result");
 			if(result!=null && !result.equals("")){
-				JSONArray json=JSONArray.fromObject(result);
+				JSONArray json=JSONArray.parseArray(result);
 				for(int i=0;i<json.size();i++){
 					Map map=(Map) json.get(i);
 					if(map.get(String.valueOf(admname))!=null){//如果该用户已经存在
@@ -1001,8 +999,7 @@ public class PurchaseController {
 					list.add(str[j].split(":")[0]+":"+str[j].split(":")[1]);
 				}
 				map.put(String.valueOf(admname), list);
-				JSONArray json = JSONArray.fromObject(map);
-				this.writeData("result", json.toString(), filePath);
+				this.writeData("result", JSONArray.toJSONString(map), filePath);
 			}
 		}catch (IOException e){
 			e.printStackTrace();
@@ -1216,10 +1213,10 @@ public class PurchaseController {
 			saveValueForRequest(request, user, idtypes_, userid, admid, orderno, goodid, goodname, date, days, state, pagesize, search_state, cgid, unpay, page, freightFee);
 			// 获取所有采购人员信息
 			List<com.cbt.pojo.Admuser> aublist = iOrderinfoService.getAllBuyer();
-			request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(aublist));
+			request.setAttribute("aublist", JSONArray.toJSON(aublist));
 			System.out.println("========全部结束:" + sdf1.format(new Date()) + "========");
 			List<OrderProductSource> odids = purchaseServer.getAllGoodsids(adminid);
-			request.setAttribute("odids", JSONArray.fromObject(odids).toString());
+			request.setAttribute("odids", JSONArray.toJSONString(odids));
 			// 根据订单号判断的客户下单的网站
             request.setAttribute("websiteType", MultiSiteUtil.getSiteTypeNum(orderno));
 			long end = System.currentTimeMillis();

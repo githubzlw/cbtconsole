@@ -1,6 +1,8 @@
 package com.cbt.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.TypeBean;
 import com.cbt.bean.ZoneBean;
 import com.cbt.bean.*;
@@ -25,8 +27,6 @@ import com.importExpress.pojo.*;
 import com.importExpress.service.HotManageService;
 import com.importExpress.thread.DeleteImgByMd5Thread;
 import com.importExpress.utli.*;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import okhttp3.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -198,7 +198,7 @@ public class EditorController {
             mv.addObject("shopId", goods.getShopId());
             //查询商品评论信息
             List<CustomGoodsPublish> reviewList = customGoodsService.getAllReviewByPid(pid);
-            request.setAttribute("reviewList", JSONArray.fromObject(reviewList));
+            request.setAttribute("reviewList", JSONArray.toJSON(reviewList));
             // 取出主图筛选数量
             GoodsPictureQuantity pictureQt = customGoodsService.queryPictureQuantityByPid(pid);
             pictureQt.setImgDeletedSize(pictureQt.getTypeOriginalSize() + pictureQt.getImgOriginalSize()
@@ -213,10 +213,10 @@ public class EditorController {
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
 
             // 将goods的img属性值取出来,即橱窗图
-            request.setAttribute("showimgs", JSONArray.fromObject("[]"));
+            request.setAttribute("showimgs", JSONArray.toJSON("[]"));
             List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
             if (imgs.size() > 0) {
-                request.setAttribute("showimgs", JSONArray.fromObject(imgs));
+                request.setAttribute("showimgs", JSONArray.toJSON(imgs));
                 String firstImg = imgs.get(0);
 
                 goods.setShowMainImage(firstImg.replace(".60x60.", ".400x400."));
@@ -244,7 +244,7 @@ public class EditorController {
                         return o1.getPpIds().compareTo(o2.getPpIds());
                     }
                 });
-                request.setAttribute("showSku", JSONArray.fromObject(cbSkus));
+                request.setAttribute("showSku", JSONArray.toJSON(cbSkus));
 
                 Map<String, Object> typeNames = new HashMap<String, Object>();
                 for (TypeBean tyb : typeList) {
@@ -266,9 +266,9 @@ public class EditorController {
 
 
             if (typeList.size() > 0) {
-                request.setAttribute("showtypes", JSONArray.fromObject(typeList));
+                request.setAttribute("showtypes", JSONArray.toJSON(typeList));
             } else {
-                request.setAttribute("showtypes", JSONArray.fromObject("[]"));
+                request.setAttribute("showtypes", JSONArray.toJSON("[]"));
             }
 
             //进行利润率计算,区分免邮和费免邮商品
@@ -446,8 +446,7 @@ public class EditorController {
                     // 远程访问获取ali商品信息
                     String resultJson = DownloadMain.getContentClient(ContentConfig.CRAWL_ALI_URL + aliUrl,
                             null);
-                    JSONObject goodsObj = JSONObject.fromObject(resultJson);
-                    algood = (GoodsBean) JSONObject.toBean(goodsObj, GoodsBean.class);
+                    algood = (GoodsBean) JSONObject.parseObject(resultJson, GoodsBean.class);
                 }
 
                 if (algood == null || algood.getValid() == 0) {
@@ -578,9 +577,8 @@ public class EditorController {
             // 将goods的entype属性值取出来,即规格图
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
             if (StringUtils.isNotBlank(goods.getSku())) {
-                JSONArray sku_json = JSONArray.fromObject(goods.getSku());
                 // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-                List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
+                List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku(),ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
                 for (ImportExSkuShow exSku : cbSkus) {
                     if (StringUtils.isNotBlank(exSku.getSpecId())) {
@@ -593,7 +591,7 @@ public class EditorController {
                 }
 
                 Collections.sort(cbSkus, Comparator.comparing(ImportExSkuShow::getEnType));
-                mv.addObject("showSku", JSONArray.fromObject(cbSkus));
+                mv.addObject("showSku", JSONArray.toJSON(cbSkus));
 
                 Map<String, Object> typeNames = new HashMap<String, Object>();
                 for (TypeBean tyb : typeList) {

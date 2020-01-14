@@ -1,5 +1,7 @@
 package com.cbt.parse.service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.ShippingBean;
 import com.cbt.fee.service.IZoneServer;
 import com.cbt.fee.service.ZoneServer;
@@ -14,8 +16,6 @@ import com.cbt.parse.daoimp.IGoodsDao;
 import com.cbt.parse.driver.DriverInterface;
 import com.cbt.parse.thread.GoodsThread;
 import com.cbt.util.AppConfig;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
 import org.slf4j.LoggerFactory;
@@ -837,37 +837,29 @@ public class ParseGoodsUrl {
 		GoodsBean goods = new GoodsBean();
 		if(StringUtils.isNotBlank(contentClient)){
 //			contentClient = contentClient.replaceAll("null", "");
-			JSONObject fromObject = JSONObject.fromObject(contentClient);
-			Object getpgoods = fromObject.get("getpgoods");
-			goods = (GoodsBean)JSONObject.toBean(JSONObject.fromObject(getpgoods),GoodsBean.class);
+			JSONObject fromObject = JSONObject.parseObject(contentClient);
+			goods = JSONObject.parseObject(fromObject.getString("getpgoods"),GoodsBean.class);
 			if(goods == null){
 				return goods;
 			}
-			
-			Object getpImage = fromObject.get("getpImage");
-			ArrayList<String> pImage = (ArrayList)JSONArray.toCollection(JSONArray.fromObject(getpImage),String.class);
+
+			ArrayList<String> pImage = (ArrayList<String>) JSONArray.parseArray(fromObject.getString("getpImage"),String.class);
 			goods.setpImage(pImage);
-			
-			Object getpInfo = fromObject.get("getpInfo");
-			HashMap<String, String> pInfo = (HashMap)JSONObject.toBean(JSONObject.fromObject(getpInfo),HashMap.class);
+
+			HashMap<String, String> pInfo = JSONObject.parseObject(fromObject.getString("getpInfo"), HashMap.class);
 			goods.setpInfo(pInfo);
-			
-			Object getptype = fromObject.get("getptype");
-			ArrayList<TypeBean> ptype = (ArrayList)JSONArray.toCollection(JSONArray.fromObject(getptype),TypeBean.class);
+
+			ArrayList<TypeBean> ptype = (ArrayList<TypeBean>) JSONArray.parseArray(fromObject.getString("getptype"),TypeBean.class);
 			goods.setType(ptype);
-			
-			
-			Object getpWprice = fromObject.get("getpWprice");
-			ArrayList<String> pWprice = (ArrayList)JSONArray.toCollection(JSONArray.fromObject(getptype),String.class);
+
+			ArrayList<String> pWprice = (ArrayList<String>) JSONArray.parseArray(fromObject.getString("getpWprice"),String.class);
 			goods.setpWprice(pWprice);
-			
-			
-			Object getpDetail = fromObject.get("getpDetail");
-			ArrayList<String> pDetail = (ArrayList)JSONArray.toCollection(JSONArray.fromObject(getpDetail),String.class);
+
+			ArrayList<String> pDetail = (ArrayList<String>) JSONArray.parseArray(fromObject.getString("getpDetail"),String.class);
 			goods.setpDetail(pDetail);
 			
 			String[] pimgSize = new String[2];
-			JSONArray imgSize = JSONArray.fromObject(fromObject.get("imgSize"));
+			JSONArray imgSize = JSONArray.parseArray(fromObject.getString("imgSize"));
 			if(imgSize.size() == 2){
 				for(int i=0;i<2;i++){
 					pimgSize[i] = imgSize.get(i).toString();

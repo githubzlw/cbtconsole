@@ -1,5 +1,6 @@
 package com.cbt.website.dao2;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.bean.CodeMaster;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDatailsNew;
@@ -36,7 +37,6 @@ import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import net.sf.json.JSONArray;
 
 import org.slf4j.LoggerFactory;
 
@@ -3629,7 +3629,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		String json = this
 				.getOrderMsg("http://www.yfhex.com/ServicePlatform/track?num="
 						+ yfhOrder);
-		JSONArray jsonArr = JSONArray.fromObject(json);
+		JSONArray jsonArr = JSONArray.parseArray(json);
 		String a[] = new String[jsonArr.size()];
 		String b[] = new String[jsonArr.size()];
 		for (int i = 0; i < jsonArr.size(); i++) {

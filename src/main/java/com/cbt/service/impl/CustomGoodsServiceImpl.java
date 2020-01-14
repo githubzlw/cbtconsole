@@ -1,5 +1,6 @@
 package com.cbt.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.bean.*;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.dao.CustomGoodsDao;
@@ -16,7 +17,6 @@ import com.importExpress.pojo.*;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.GoodsMongoDbLocalUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
-import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -94,9 +94,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         if (StringUtils.isNotBlank(bean.getRangePrice())) {
             //sku更新
             List<CustomBenchmarkSkuNew> insertList = new ArrayList<>();
-            JSONArray sku_json = JSONArray.fromObject(bean.getSku());
-            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-
+            List<ImportExSku> skuList = JSONArray.parseArray(bean.getSku(), ImportExSku.class);
             for (ImportExSku exSku : skuList) {
                 CustomBenchmarkSkuNew skuNew = new CustomBenchmarkSkuNew();
                 skuNew.setFinalWeight(bean.getFinalWeight());
@@ -799,8 +797,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 获取商品信息
         CustomGoodsPublish orGoods = queryGoodsDetails(weightChange.getPid(), 0);
         if (StringUtils.isNotBlank(orGoods.getSku())) {
-            JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
-            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+            List<ImportExSku> skuList = JSONArray.parseArray(orGoods.getSku(), ImportExSku.class);
             // 查找匹配的type数据
             String typeStr = weightChange.getGoodsType();
             String skuid = weightChange.getSkuid() == null ? "" : weightChange.getSkuid();
@@ -997,6 +994,42 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int insertIntoOnlineSync(String pid) {
         return customGoodsMapper.insertIntoOnlineSync(pid);
+    }
+
+    @Override
+    public List<CustomGoodsPublish> queryGoodsDeleteInfo(CustomGoodsQuery queryBean) {
+        return customGoodsMapper.queryGoodsDeleteInfo(queryBean);
+    }
+
+    @Override
+    public int queryGoodsDeleteInfoCount(CustomGoodsQuery queryBean) {
+        return customGoodsMapper.queryGoodsDeleteInfoCount(queryBean);
+    }
+
+    @Override
+    public CustomGoodsPublish queryGoodsDeleteDetails(String pid) {
+        return customGoodsMapper.queryGoodsDeleteDetails(pid);
+    }
+
+    @Override
+    public List<String> queryOrinfringementPids() {
+        return customGoodsMapper.queryOrinfringementPids();
+    }
+
+    @Override
+    public int syncDataToDeleteInfo(String pid) {
+        return customGoodsMapper.syncDataToDeleteInfo(pid);
+    }
+
+    @Override
+    public int deleteDataByPid(String pid) {
+        customGoodsDao.deleteDataByPid(pid);
+        return customGoodsMapper.deleteDataByPid(pid);
+    }
+
+    @Override
+    public int updateDeleteInfoFlag(String pid) {
+        return customGoodsMapper.updateDeleteInfoFlag(pid);
     }
 
 

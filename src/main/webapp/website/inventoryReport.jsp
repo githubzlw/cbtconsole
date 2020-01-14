@@ -8,7 +8,7 @@
 </style>
 
 
-<title>库存清单</title>
+<title>库存管理</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet"
 	href="/cbtconsole/css/bootstrap/bootstrap.min.css">
@@ -155,7 +155,7 @@ em,i{font-style: normal;}
 </head>
 <body>
 	<div class="container-fluid report">
-		<h1 class="text-center">库存清单</h1>
+		<h1 class="text-center">库存管理</h1>
 			<input type="hidden" value="${param.inid }" id="query_in_id">
 		<div class="row">
 			<div class="col-xs-1">
@@ -193,22 +193,24 @@ em,i{font-style: normal;}
 						<input type="hidden" value="${queryParam.isShowZero}" id="q_szero">
 					</label>
 				<label><button class="btn btn-info"  id="query_button">查询</button></label>
+				<label><button class="btn btn-info button_print"  id="query_button_print">导出清单</button></label>
 			</div>
 		</div>
 		<div class="row mt20 row2">
 			<div class="col-xs-1">
 				<b>库存修正</b>
 			</div>
-			<div class="col-xs-6">
+			<div class="col-xs-5">
 				<button class="btn btn-success" id="tc1">录入新产品</button>
 				<button class="btn btn-success" id="tc2">导入未匹配产品</button>
 				<!-- <button class="btn btn-success" id="tc3">增加线上产品库存</button> -->
 				<label><b>最新盘点时间：</b><span id="intentory_time">${lastCheckTime}</span></label>
 			</div>
-			<div class="col-xs-3">
+			<div class="col-xs-4">
 			<label><a href="/cbtconsole/inventory/check/list" target="_blank"><button class="btn btn-success">库存盘点</button></a></label>
-				<label><a href="/cbtconsole/inventory/loss/list" target="_blank"><button class="btn btn-success button_loss"  id="query_button_loss">库存损益</button></a></label>
-			<label><button class="btn btn-success button_print"  id="query_button_print">导出清单</button></label>
+			<label><a href="/cbtconsole/inventory/loss/list" target="_blank"><button class="btn btn-success button_loss"  id="query_button_loss">库存损益</button></a></label>
+			<label><a href="/cbtconsole/inventory/log" target="_blank"><button class="btn btn-success button_log"  id="query_button_log">库存日志</button></a></label>
+			<label><a href="/cbtconsole/inventory/barcode" target="_blank"><button class="btn btn-success button_remove"  id="query_button_remove">库存移库</button></a></label>
 			</div>
 		</div>
 		<div class="row mt20">

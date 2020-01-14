@@ -255,7 +255,7 @@ public class SwitchDomainNameUtil {
                 } else {
                     return str;
                 }
-            } else if (webSite == 3) {
+            } else if (webSite == 4) {
                 if (str.contains(IMPORT_DOMAIN_NAME_1)) {
                     return str.replace(IMPORT_DOMAIN_NAME_1, RESTAURANT_DOMAIN_NAME_1);
                 } else if (str.contains(IMPORT_DOMAIN_NAME_2)) {
