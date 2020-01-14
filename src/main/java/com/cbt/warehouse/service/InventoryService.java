@@ -11,6 +11,7 @@ import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
+import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventoryWrap;
 import com.cbt.website.bean.LossInventoryWrap;
 
@@ -262,6 +263,14 @@ public interface InventoryService {
 	 * @return
 	 */
 	int inventoryBarcodeListCount(Map<String, Object> map);
+	/**移库列表
+	 * @return
+	 */
+	List<InventoryLog> inventoryLogList(Map<String, Object> map);
+	/**移库列表数量
+	 * @return
+	 */
+	int inventoryLogListCount(Map<String, Object> map);
 	
 	/**移库
 	 * @param map

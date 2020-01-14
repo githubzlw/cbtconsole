@@ -47,6 +47,7 @@ import com.cbt.website.bean.InventoryCheckRecord;
 import com.cbt.website.bean.InventoryCheckWrap;
 import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.InventoryDetailsWrap;
+import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventoryWrap;
 import com.cbt.website.bean.LossInventoryWrap;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
@@ -70,7 +71,93 @@ public class InventoryController {
 	@Autowired
 	private GeneralReportService generalReportService;
 	IExpressTrackDao dao = new ExpressTrackDaoImpl();
+	/**导出报表
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/log/download")
+	public void logPrint(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			String enddate = request.getParameter("enddate");
+			enddate = StringUtil.isBlank(enddate) ? "" : enddate;
+			String startdate = request.getParameter("startdate");
+			startdate = StringUtil.isBlank(startdate) ? "" : startdate;
+			
+			String strtype = request.getParameter("type");
+			int type = StrUtils.isMatch(strtype, "(\\d+)") ? Integer.valueOf(strtype) : -1;
+			
+			Map<String,Object> map = new HashMap<>();
+			map.put("startdate",startdate);
+			map.put("enddate",enddate);
+			map.put("page",-1 );
+			map.put("type",type );
+			List<InventoryLog> logList = inventoryService.inventoryLogList(map);
+			HSSFWorkbook wb = generalReportService.exportInventoryLog(logList);
+			response.setContentType("application/vnd.ms-excel");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String filename = "inventory-log-" + sdf.format(new Date())+".xls";
+//			filename = StringUtils.getFileName(filename);
+			response.setHeader("Content-disposition", "attachment;filename=" + filename);
+			OutputStream ouputStream = response.getOutputStream();
+			wb.write(ouputStream);
+			ouputStream.flush();
+			ouputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
 	
+	/**
+	 * 仓库操作库存移库位
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/log")
+	protected ModelAndView logList(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		ModelAndView mv = new ModelAndView("inventorylog");
+		
+		String enddate = request.getParameter("enddate");
+		enddate = StringUtil.isBlank(enddate) ? "" : enddate;
+		String startdate = request.getParameter("startdate");
+		startdate = StringUtil.isBlank(startdate) ? "" : startdate;
+		
+		String strPage = request.getParameter("page");
+		int page = StrUtils.isNum(strPage)? Integer.parseInt(strPage) : 1;
+		
+		String strtype = request.getParameter("type");
+		int type = StrUtils.isMatch(strtype, "(\\d+)") ? Integer.valueOf(strtype) : -1;
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("startdate",startdate);
+		map.put("enddate",enddate);
+		map.put("currentPage",page );
+		map.put("page",(page-1)*20 );
+		map.put("type",type );
+		
+		try {
+			
+			int count = inventoryService.inventoryLogListCount(map);
+			if(count > 0) {
+				List<InventoryLog> logList = inventoryService.inventoryLogList(map);
+				mv.addObject("logList", logList);
+			}
+			int logListPage = count % 20 == 0 ? count / 20 : count / 20 + 1;
+			mv.addObject("logListPage", logListPage);
+			mv.addObject("logListCount", count);
+			mv.addObject("queryParam",map);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return mv;
+	}
 	/**
 	 * 仓库操作库存移库位
 	 * @param request
@@ -495,27 +582,6 @@ public class InventoryController {
 		return result;
 	}
 
-	/**
-	 * 查询库存统计报表
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws ServletException
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	@RequestMapping(value = "/searchGoodsInventoryInfo")
-	@ResponseBody
-	protected EasyUiJsonResult searchGoodsInventoryInfo(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, ParseException {
-		EasyUiJsonResult json = new EasyUiJsonResult();
-		Map<Object, Object> map = getObjectByInventory(request,false);
-		List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
-		int toryListCount = inventoryService.getIinOutInventoryCount(map);
-		json.setRows(toryList);
-		json.setTotal(toryListCount);
-		return json;
-	}
 	
 	/**
 	 * 查询库存统计报表
@@ -616,88 +682,7 @@ public class InventoryController {
 		return map;
 	}
 
-	/**
-	 * 库存盘点
-	 *
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws ServletException
-	 * @throws IOException
-	 * @throws ParseException
-	 *             whj 2017-04-25
-	 */
-	@RequestMapping(value = "/updateSources")
-	@ResponseBody
-	protected JsonResult updateSources(HttpServletRequest request, HttpServletResponse response)
-			throws Exception{
-		Map<String, Object> map = new HashMap<String, Object>();
-		JsonResult json = new JsonResult();
-		TaoBaoInfoList list = new TaoBaoInfoList();
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-		String new_barcode = request.getParameter("new_barcode");
-		String old_barcode = request.getParameter("old_barcode");
-		String new_remaining = request.getParameter("new_remaining");
-		String old_remaining = request.getParameter("old_remaining");
-		String flag = request.getParameter("flag");
-		String remark = request.getParameter("remark");
-		String pd_id = request.getParameter("pd_id");
-		if (new_barcode == null || new_barcode.equals("")) {
-			new_barcode = old_barcode;
-		}
-		// 判断新的库位是否存在
-		int isExit = inventoryService.isExitBarcode(new_barcode);
-		Inventory i = inventoryService.queryInById(pd_id);
-		double goods_p_price=0.00;
-		if (isExit > 0 && new_remaining != null && !new_remaining.equals("") && i!=null) {
-			String price = i.getGoods_p_price();
-			double new_inventory_amount = 0.00;
-			if (price.indexOf(",") > -1) {
-				String prices[] = price.split(",");
-				goods_p_price=Utility.getMaxPrice(prices);
-				new_inventory_amount = goods_p_price * Integer.valueOf(new_remaining);
-			} else {
-				goods_p_price=Double.valueOf(price);
-				new_inventory_amount = goods_p_price * Integer.valueOf(new_remaining);
-			}
-			remark=StringUtil.isBlank(remark)?"":remark;
-			isExit = inventoryService.updateSources(flag, StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), i.getCar_urlMD5(), new_barcode, old_barcode,
-					Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark, new_inventory_amount);
-			if (isExit > 0) {
-				if(Integer.valueOf(new_remaining)<=0){
-					//如果库存为0则更改库存标识
-					inventoryService.updateIsStockFlag(i.getGoods_pid());
-//
-//					SendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+i.getGoods_pid()+"'"));
-//
-					GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(i.getGoods_pid(),"0");
-				}
-				// 记录更改货源记录日志
-				inventoryService.updateSourcesLog(i.getId(), adm.getAdmName(),StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), new_barcode,
-						old_barcode, Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark);
-				inventoryService.insertChangeBarcode(i.getId(), old_barcode, new_barcode);
-				if(Integer.valueOf(new_remaining)<Integer.valueOf(old_remaining)){
-					//记录损耗的库存记录
-					map.put("new_remaining", new_remaining);
-					map.put("old_remaining", old_remaining);
-					map.put("new_barcode", new_barcode);
-					map.put("old_barcode", old_barcode);
-					map.put("in_id", i.getId());
-					double loss_amount=goods_p_price*(Integer.valueOf(new_remaining)-Integer.valueOf(old_remaining));
-					BigDecimal bg = new BigDecimal(loss_amount);
-					double f1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-					map.put("loss_amount",f1);//损耗金额
-					map.put("loss_price", goods_p_price);
-					map.put("admName", adm.getAdmName());
-					inventoryService.recordLossInventory(map);
-				}
-			}
-		}
-		list.setAllCount(isExit);
-		json.setData(list);
-		return json;
-	}
+	
 
 	
 	
@@ -1234,7 +1219,7 @@ public class InventoryController {
 	
 	
 	
-	
+/*********************************************************************************************************************************/	
 	
 	
 	
@@ -1626,6 +1611,109 @@ public class InventoryController {
 				e.printStackTrace();
 			}
 		}
+	}
+	/**
+	 * 库存盘点
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 *             whj 2017-04-25
+	 */
+	@RequestMapping(value = "/updateSources")
+	@ResponseBody
+	protected JsonResult updateSources(HttpServletRequest request, HttpServletResponse response)
+			throws Exception{
+		Map<String, Object> map = new HashMap<String, Object>();
+		JsonResult json = new JsonResult();
+		TaoBaoInfoList list = new TaoBaoInfoList();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		String new_barcode = request.getParameter("new_barcode");
+		String old_barcode = request.getParameter("old_barcode");
+		String new_remaining = request.getParameter("new_remaining");
+		String old_remaining = request.getParameter("old_remaining");
+		String flag = request.getParameter("flag");
+		String remark = request.getParameter("remark");
+		String pd_id = request.getParameter("pd_id");
+		if (new_barcode == null || new_barcode.equals("")) {
+			new_barcode = old_barcode;
+		}
+		// 判断新的库位是否存在
+		int isExit = inventoryService.isExitBarcode(new_barcode);
+		Inventory i = inventoryService.queryInById(pd_id);
+		double goods_p_price=0.00;
+		if (isExit > 0 && new_remaining != null && !new_remaining.equals("") && i!=null) {
+			String price = i.getGoods_p_price();
+			double new_inventory_amount = 0.00;
+			if (price.indexOf(",") > -1) {
+				String prices[] = price.split(",");
+				goods_p_price=Utility.getMaxPrice(prices);
+				new_inventory_amount = goods_p_price * Integer.valueOf(new_remaining);
+			} else {
+				goods_p_price=Double.valueOf(price);
+				new_inventory_amount = goods_p_price * Integer.valueOf(new_remaining);
+			}
+			remark=StringUtil.isBlank(remark)?"":remark;
+			isExit = inventoryService.updateSources(flag, StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), i.getCar_urlMD5(), new_barcode, old_barcode,
+					Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark, new_inventory_amount);
+			if (isExit > 0) {
+				if(Integer.valueOf(new_remaining)<=0){
+					//如果库存为0则更改库存标识
+					inventoryService.updateIsStockFlag(i.getGoods_pid());
+//
+//					SendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+i.getGoods_pid()+"'"));
+//
+					GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(i.getGoods_pid(),"0");
+				}
+				// 记录更改货源记录日志
+				inventoryService.updateSourcesLog(i.getId(), adm.getAdmName(),StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), new_barcode,
+						old_barcode, Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark);
+				inventoryService.insertChangeBarcode(i.getId(), old_barcode, new_barcode);
+				if(Integer.valueOf(new_remaining)<Integer.valueOf(old_remaining)){
+					//记录损耗的库存记录
+					map.put("new_remaining", new_remaining);
+					map.put("old_remaining", old_remaining);
+					map.put("new_barcode", new_barcode);
+					map.put("old_barcode", old_barcode);
+					map.put("in_id", i.getId());
+					double loss_amount=goods_p_price*(Integer.valueOf(new_remaining)-Integer.valueOf(old_remaining));
+					BigDecimal bg = new BigDecimal(loss_amount);
+					double f1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+					map.put("loss_amount",f1);//损耗金额
+					map.put("loss_price", goods_p_price);
+					map.put("admName", adm.getAdmName());
+					inventoryService.recordLossInventory(map);
+				}
+			}
+		}
+		list.setAllCount(isExit);
+		json.setData(list);
+		return json;
+	}
+	/**
+	 * 查询库存统计报表
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/searchGoodsInventoryInfo")
+	@ResponseBody
+	protected EasyUiJsonResult searchGoodsInventoryInfo(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<Object, Object> map = getObjectByInventory(request,false);
+		List<InventoryData> toryList = inventoryService.getIinOutInventory(map);
+		int toryListCount = inventoryService.getIinOutInventoryCount(map);
+		json.setRows(toryList);
+		json.setTotal(toryListCount);
+		return json;
 	}
 	
 	

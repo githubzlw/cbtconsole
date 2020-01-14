@@ -1,5 +1,6 @@
 package com.cbt.userinfo.ctrl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.bean.*;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.dao.RefundDaoPlus;
@@ -35,7 +36,6 @@ import com.importExpress.pojo.UserRecommendEmail;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import com.importExpress.utli.UserInfoUtils;
-import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -475,7 +475,7 @@ public class UserController {
         List<BalanceBean> additionalList = additionalBalanceService.getBalanceByUserId(userid, page);
         int count = additionalList != null && !additionalList.isEmpty() ? additionalList.get(0).getCountTotal() : 0;
         count = count % 20 == 0 ? count / 20 : count / 20 + 1;
-        result = JSONArray.fromObject(additionalList).toString();
+        result = JSONArray.toJSONString(additionalList);
         return result;
     }
 
@@ -499,7 +499,7 @@ public class UserController {
         int userid = Integer.valueOf(strUserid);
         int page = Integer.valueOf(strPage);
         List<OrderPaymentBean> orderPayList = paymentDao.getOrderPayList(userid, page);
-        result = JSONArray.fromObject(orderPayList).toString();
+        result = JSONArray.toJSONString(orderPayList);
         return result;
     }
 
@@ -531,7 +531,7 @@ public class UserController {
         int userid = Integer.valueOf(strUserid);
         int page = Integer.valueOf(strPage);
         List<Map<String, Object>> payDetailList = paymentDao.payDetailByUserid(userid, page);
-        result = JSONArray.fromObject(payDetailList).toString();
+        result = JSONArray.toJSONString(payDetailList);
         return result;
     }
 

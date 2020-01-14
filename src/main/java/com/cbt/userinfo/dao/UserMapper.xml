@@ -145,11 +145,11 @@
     <select id="queryBusinessMembershipAuthorization" parameterType="com.cbt.website.bean.UserInfo"
             resultType="com.cbt.website.bean.UserInfo">
         select a.id as userid,a.email,DATE_FORMAT(a.createtime,'%Y-%m-%d %H:%i:%S') as creattime,b.businessinfo, d.country as zone,
-        b.productone,b.producttwo,b.requirementone,b.requirementtwo, ifnull(c.flag,0) as authFlag,a.site,ad.admin_name as adminname,
+        b.productone,b.producttwo,b.requirementone,b.requirementtwo, ifnull(c.auth_flag,0) as authFlag,a.site,ad.admin_name as adminname,
         CAST(ifnull((select sum(googs_price * googs_number) from shop_car_marketing where userid =  a.id ),0) AS DECIMAL(11, 2)) as shopCarAmount,
         CAST((select ifnull(sum(pay_price),0) from orderinfo where user_id = a.id and state in(1,2,3,4,5)) AS DECIMAL(11, 2)) as historyAmount,
         DATE_FORMAT(b.application_time,'%Y-%m-%d %H:%i:%S') as applicationTime
-        from user a inner join user_regist_info b on a.id  = b.userid left join user_checkout c on a.id = c.id
+        from user a inner join user_regist_info b on a.id  = b.userid left join user_authorization c on a.id = c.user_id
         left join zone d on a.countryId = d.id
         left join (select admuser.id as admin_id,admuser.admName as admin_name,admin_r_user.userid from admuser , admin_r_user
             where admuser.id = admin_r_user.adminid) ad on a.id  = ad.userid
@@ -164,7 +164,7 @@
             and a.countryId = #{countryId}
         </if>
         <if test="authFlag != null and authFlag > -1">
-            and c.flag = #{authFlag}
+            and c.auth_flag = #{authFlag}
         </if>
         <if test="adminId > 0">
             and ad.admin_id = #{adminId}
@@ -188,7 +188,7 @@
 
     <select id="queryBusinessMembershipAuthorizationCount" parameterType="com.cbt.website.bean.UserInfo" resultType="int">
         select count(0) from user a inner join user_regist_info b on a.id  = b.userid
-        left join user_checkout c on a.id = c.id
+        left join user_authorization c on a.id = c.user_id
         left join zone d on a.countryId = d.id
         left join (select admuser.id as admin_id,admuser.admName as admin_name,admin_r_user.userid from admuser , admin_r_user
             where admuser.id = admin_r_user.adminid) ad on a.id  = ad.userid
@@ -203,7 +203,7 @@
             and a.countryId = #{countryId}
         </if>
         <if test="authFlag != null and authFlag > -1">
-            and c.flag = #{authFlag}
+            and c.auth_flag = #{authFlag}
         </if>
         <if test="adminId > 0">
             and ad.admin_id = #{adminId}

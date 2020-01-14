@@ -1,5 +1,6 @@
 package com.importExpress.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.website.bean.GoodsCarActiveBean;
@@ -7,7 +8,6 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.GoodsCarconfigExample;
 import com.importExpress.pojo.GoodsCarconfigWithBLOBs;
 import com.importExpress.service.GoodsCarconfigService;
-import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public class GoodsCarConfigController {
             List<GoodsCarActiveBean> resultList = new ArrayList<>();
             List<GoodsCarActiveBean> listActive = new ArrayList<>();
             for (GoodsCarconfigWithBLOBs carconfigWithBLOBs : list) {
-                listActive = (List<GoodsCarActiveBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getShopcarinfo()), GoodsCarActiveBean.class);
+                listActive = JSONArray.parseArray(carconfigWithBLOBs.getShopcarinfo(), GoodsCarActiveBean.class);
                 if (listActive != null && listActive.size() > 0) {
                     resultList.addAll(listActive);
                 }

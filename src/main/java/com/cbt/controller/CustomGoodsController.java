@@ -1,5 +1,6 @@
 package com.cbt.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.bean.*;
 import com.cbt.customer.service.IShopUrlService;
 import com.cbt.parse.service.StrUtils;
@@ -18,7 +19,6 @@ import com.importExpress.pojo.ShopMd5Bean;
 import com.importExpress.utli.EasyUiTreeUtils;
 import com.importExpress.utli.GoodsMongoDbLocalUtil;
 import com.importExpress.utli.UserInfoUtils;
-import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -251,9 +251,7 @@ public class CustomGoodsController {
 
             String ennamesJsonStr = request.getParameter("ennames");
 
-            JSONArray jsonArray = JSONArray.fromObject(ennamesJsonStr);// 把String转换为json
-
-            List<CustomGoodsBean> cgLst = (List<CustomGoodsBean>) JSONArray.toCollection(jsonArray,
+            List<CustomGoodsBean> cgLst = JSONArray.parseArray(ennamesJsonStr,
                     CustomGoodsBean.class);// 这里的t是Class<T>
             if (cgLst.size() > 0) {
                 customGoodsService.batchSaveEnName(user, cgLst);
@@ -412,10 +410,8 @@ public class CustomGoodsController {
 
             String ennamesJsonStr = request.getParameter("ennames");
 
-            JSONArray jsonArray = JSONArray.fromObject(ennamesJsonStr);// 把String转换为json
-
             @SuppressWarnings("unchecked")
-            List<CustomGoodsBean> cgLst = (List<CustomGoodsBean>) JSONArray.toCollection(jsonArray,
+            List<CustomGoodsBean> cgLst = JSONArray.parseArray(ennamesJsonStr,
                     CustomGoodsBean.class);// 这里的t是Class<T>
             if (cgLst.size() > 0) {
                 customGoodsService.batchSaveEnName(user, cgLst);

@@ -395,6 +395,14 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int inventoryBarcodeListCount(Map<String, Object> map);
+	/**移库位
+	 * @return
+	 */
+	List<InventoryLog> inventoryLogList(Map<String, Object> map);
+	/**移库位
+	 * @return
+	 */
+	int inventoryLogListCount(Map<String, Object> map);
 	
 	/**订单取消进入库存的数据
 	 * @param odid

@@ -663,6 +663,10 @@
     }
 
 
+    function closeDialog() {
+        $('#offline_dlg').hide();
+    }
+
     function openDetails(approvalId, obj) {
         setChooseTr(obj);
         var url = "/cbtconsole/orderCancelApprovalCtr/queryApprovalDetails?approvalId=" + approvalId;
