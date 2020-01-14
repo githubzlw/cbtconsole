@@ -42,7 +42,11 @@ public class ImgDownload {
 
 	public static boolean downFromImgService(String imgUrl,String fileName) {
 
-		boolean isDown;
+		boolean isDown = false;
+		File file = new File(fileName);
+		if(file.exists() && !file.isDirectory() && 1.0 * file.length() / 1024 > 0.1){
+			return true;
+		}
 		InputStream inputStream = null;
 		FileOutputStream fileOutputStream = null;
 		ByteArrayOutputStream output = null;
@@ -55,7 +59,6 @@ public class ImgDownload {
 
 			inputStream = response.body().byteStream();
 
-			File file = new File(fileName);
 			if (!file.getParentFile().exists()) {
 				file.getParentFile().mkdirs();// 返回此抽象路径名父目录的抽象路径名；创建
 			}else if(file.exists() && file.isFile()){

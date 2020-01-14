@@ -34,4 +34,14 @@ public class OrderPurchaseServiceImpl implements OrderPurchaseService {
     public int queryForListCount(OrderPurchase orderPurchase) {
         return orderPurchaseMapper.queryForListCount(orderPurchase);
     }
+
+    @Override
+    public List<OrderPurchase> taobaoList(OrderPurchase orderPurchase) {
+        return orderPurchaseMapper.taobaoList(orderPurchase);
+    }
+
+    @Override
+    public int taobaoListCount(OrderPurchase orderPurchase) {
+        return orderPurchaseMapper.taobaoListCount(orderPurchase);
+    }
 }

@@ -4,6 +4,7 @@ import com.cbt.bean.CategoryBean;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
 import com.cbt.service.CustomGoodsService;
+import com.cbt.util.GoodsInfoUtils;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -19,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -178,14 +181,14 @@ public class MongoDBController {
                     if (CollectionUtils.isNotEmpty(checkList)) {
                         List<MongoGoodsBean> updateList = list.stream().filter(e -> checkList.contains(e.getPid()))
                                 .collect(Collectors.toList());
-                        if(CollectionUtils.isNotEmpty(updateList)){
+                        if (CollectionUtils.isNotEmpty(updateList)) {
                             insertTotal += mongoGoodsService.batchUpdateGoodsInfoToMongoDb(updateList);
                             updateList.clear();
                         }
 
                         List<MongoGoodsBean> insertList = list.stream().filter(e -> !checkList.contains(e.getPid()))
                                 .collect(Collectors.toList());
-                        if(CollectionUtils.isNotEmpty(insertList)){
+                        if (CollectionUtils.isNotEmpty(insertList)) {
                             insertTotal += mongoGoodsService.insertGoodsToMongoBatch(insertList);
                             insertList.clear();
                         }
@@ -245,7 +248,28 @@ public class MongoDBController {
             json.setMessage(e.getMessage());
             logger.error("pid:" + pid + ",error:", e);
         }
+        return json;
+    }
 
+
+    @GetMapping("/checkPid/{pid}")
+    @ResponseBody
+    public JsonResult checkPidImg(@PathVariable(name = "pid") String pid) {
+        JsonResult json = new JsonResult();
+        try {
+            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+            boolean isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, 0);
+            if (isCheckImg) {
+                json.setSuccess("检查成功");
+            } else {
+                json.setErrorInfo("检查异常");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+            logger.error("pid:" + pid + ",error:", e);
+        }
         return json;
     }
 }

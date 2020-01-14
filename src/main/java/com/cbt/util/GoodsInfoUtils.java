@@ -1478,6 +1478,7 @@ public class GoodsInfoUtils {
         String filePath = DOWN_IMG_PATH + today + "/" + pid;
         Set<String> imgSet = new HashSet<>();
         boolean isSu = false;
+        int count = 0;
         if (CollectionUtils.isNotEmpty(allImgList)) {
 
             for (String imgUrl : allImgList) {
@@ -1489,7 +1490,9 @@ public class GoodsInfoUtils {
                         } else {
                             isSu = ImgDownload.downAndReTry(imgUrl, filePath + imgUrl.substring(imgUrl.lastIndexOf("/")));
                         }
-                        if (!isSu) {
+                        if (isSu) {
+                            count++;
+                        } else {
                             break;
                         }
                     }
@@ -1497,9 +1500,10 @@ public class GoodsInfoUtils {
             }
         }
 
-        if (isSu) {
+        System.err.println("imgSize:" + allImgList.size() + ",down count:" + count + ",checkout:" + isSu);
+        /*if (isSu) {
             isSu = checkDownFile(imgSet, filePath);
-        }
+        }*/
         return isSu;
     }
 
@@ -1532,7 +1536,7 @@ public class GoodsInfoUtils {
                             childCount++;
                             isSu = checkSetString(imgSet, childFl.getName());
                             if (!isSu) {
-                                System.err.println("filePath:" + filePath+ "/desc" + ",no file name:" + childFl.getName());
+                                System.err.println("filePath:" + filePath + "/desc" + ",no file name:" + childFl.getName());
                                 break;
                             }
                         }
@@ -1541,7 +1545,7 @@ public class GoodsInfoUtils {
             }
         }
         System.err.println("filePath:" + filePath + ",imgSize:" + imgSet.size());
-        System.err.println("fileCount:" + fileCount + ",childCount:" + childCount +  ",checkDownFile:" + isSu);
+        System.err.println("fileCount:" + fileCount + ",childCount:" + childCount + ",checkDownFile:" + isSu);
         imgSet.clear();
         return isSu;
     }

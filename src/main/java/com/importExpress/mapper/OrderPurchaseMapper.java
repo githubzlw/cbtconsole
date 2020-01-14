@@ -17,4 +17,8 @@ public interface OrderPurchaseMapper {
     List<OrderPurchase> queryForList(OrderPurchase orderPurchase);
 
     int queryForListCount(OrderPurchase orderPurchase);
+
+    List<OrderPurchase> taobaoList(OrderPurchase orderPurchase);
+
+    int taobaoListCount(OrderPurchase orderPurchase);
 }
