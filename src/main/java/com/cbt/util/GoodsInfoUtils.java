@@ -1509,6 +1509,7 @@ public class GoodsInfoUtils {
         // 检查
         File tempFile = new File(filePath);
         int fileCount = 0;
+        int childCount = 0;
         File[] childFiles = null;
         if (tempFile.exists() && tempFile.isDirectory()) {
             childFiles = tempFile.listFiles();
@@ -1517,6 +1518,7 @@ public class GoodsInfoUtils {
                     fileCount++;
                     isSu = checkSetString(imgSet, childFl.getName());
                     if (!isSu) {
+                        System.err.println("filePath:" + filePath + ",no file name:" + childFl.getName());
                         break;
                     }
                 }
@@ -1527,9 +1529,10 @@ public class GoodsInfoUtils {
                     childFiles = tempFile.listFiles();
                     for (File childFl : childFiles) {
                         if (!childFl.isDirectory()) {
-                            fileCount++;
+                            childCount++;
                             isSu = checkSetString(imgSet, childFl.getName());
                             if (!isSu) {
+                                System.err.println("filePath:" + filePath+ "/desc" + ",no file name:" + childFl.getName());
                                 break;
                             }
                         }
@@ -1537,7 +1540,8 @@ public class GoodsInfoUtils {
                 }
             }
         }
-        System.err.println("fileCount:" + fileCount + ",imgSize:" + imgSet.size() + ",checkDownFile:" + isSu);
+        System.err.println("filePath:" + filePath + ",imgSize:" + imgSet.size());
+        System.err.println("fileCount:" + fileCount + ",childCount:" + childCount +  ",checkDownFile:" + isSu);
         imgSet.clear();
         return isSu;
     }
