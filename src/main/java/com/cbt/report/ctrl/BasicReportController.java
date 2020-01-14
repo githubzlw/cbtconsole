@@ -8,7 +8,6 @@ import com.cbt.util.DateFormatUtil;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.Util;
-import com.cbt.warehouse.ctrl.NewOrderDetailsCtr;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -34,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "/basicStatistical")
@@ -1347,6 +1347,8 @@ public class BasicReportController {
         return json;
     }
 
+
+
     @RequestMapping("/exportOrderCancelExcel")
     @ResponseBody
     public void exportOrderCancelExcel(HttpServletRequest request, HttpServletResponse response) {
@@ -1424,6 +1426,7 @@ public class BasicReportController {
         }
     }
 
+
     private HSSFWorkbook genOrderCancelExcel(List<OrderCancelBean> orderCancels, String title) {
 
         // 第一步，创建一个webbook，对应一个Excel文件
@@ -1465,6 +1468,197 @@ public class BasicReportController {
             row.createCell(3).setCellValue(ocb.getAmount());
             row.createCell(4).setCellValue(ocb.getRemarkId());
             row.createCell(5).setCellValue(ocb.getRemark());
+        }
+        return wb;
+    }
+
+    @RequestMapping(value = "/orderCancelWithIpn")
+    @ResponseBody
+    public EasyUiJsonResult orderCancelWithIpn(HttpServletRequest request) {
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        String yearStr = request.getParameter("year");
+        String monthStr = request.getParameter("month");
+
+        String pageNumStr = request.getParameter("rows");
+        int pageNum = 20;
+        if (pageNumStr == null || "".equals(pageNumStr) || "0".equals(pageNumStr)) {
+            json.setSuccess(false);
+            json.setMessage("获取分页数失败");
+            return json;
+        } else {
+            pageNum = Integer.valueOf(pageNumStr);
+        }
+
+        String stateNumStr = request.getParameter("page");
+        int stateNum = 1;
+        if (!(stateNumStr == null || "".equals(stateNumStr) || "0".equals(stateNumStr))) {
+            stateNum = Integer.parseInt(stateNumStr);
+        }
+
+        List<Map<String, String>> monthLst = Util.genQueryDate(yearStr, monthStr);
+        try {
+            String paramStr = "";
+            if (monthStr.length() == 1) {
+                paramStr = yearStr + "-0" + monthStr;
+            } else {
+                paramStr = yearStr + "-" + monthStr;
+            }
+            List<OrderCancelBean> orderCancels = basicReportService.orderCancelWithIpn(paramStr,
+                    (stateNum - 1) * pageNum, pageNum);
+            int total = basicReportService.orderCancelWithIpnCount(paramStr);
+            if (CollectionUtils.isNotEmpty(orderCancels)) {
+                for (OrderCancelBean cancelBean : orderCancels) {
+                    if (cancelBean.getPayType() > -1) {
+                        // 订单支付类型 0 paypal;1 TT;2 余额 ;5 stripe
+                        if (cancelBean.getPayType() == 0) {
+                            cancelBean.setRemark("paypal");
+                        } else if (cancelBean.getPayType() == 1) {
+                            cancelBean.setRemark("TT");
+                        } else if (cancelBean.getPayType() == 2) {
+                            cancelBean.setRemark("余额");
+                        } else if (cancelBean.getPayType() == 5) {
+                            cancelBean.setRemark("Stripe");
+                        }
+                    }
+                }
+            }
+
+            for (OrderCancelBean ocb : orderCancels) {
+                ocb.setYear(monthLst.get(0).get("year"));
+                ocb.setMonth(monthLst.get(0).get("month"));
+            }
+            json.setRows(orderCancels);
+            json.setTotal(total);
+            json.setSuccess(true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因：" + e.getMessage());
+            LOG.error("查询失败，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping("/exportOrderCancelWithIpnExcel")
+    @ResponseBody
+    public void exportOrderCancelWithIpnExcel(HttpServletRequest request, HttpServletResponse response) {
+
+        String yearStr = request.getParameter("year");
+        String monthStr = request.getParameter("month");
+
+        List<Map<String, String>> monthLst = Util.genQueryDate(yearStr, monthStr);
+        OutputStream ouputStream = null;
+        try {
+            String paramStr = "";
+            if (monthStr.length() == 1) {
+                paramStr = yearStr + "-0" + monthStr;
+            } else {
+                paramStr = yearStr + "-" + monthStr;
+            }
+            List<OrderCancelBean> orderCancels = basicReportService.orderCancelWithIpn(paramStr, 0, 0);
+            for (OrderCancelBean cancelBean : orderCancels) {
+                cancelBean.setYear(monthLst.get(0).get("year"));
+                cancelBean.setMonth(monthLst.get(0).get("month"));
+                if (cancelBean.getPayType() > -1) {
+                    // 订单支付类型 0 paypal;1 TT;2 余额 ;5 stripe
+                    if (cancelBean.getPayType() == 0) {
+                        cancelBean.setRemark("paypal");
+                    } else if (cancelBean.getPayType() == 1) {
+                        cancelBean.setRemark("TT");
+                    } else if (cancelBean.getPayType() == 2) {
+                        cancelBean.setRemark("余额");
+                    } else if (cancelBean.getPayType() == 5) {
+                        cancelBean.setRemark("Stripe");
+                    }
+                }
+            }
+
+            List<OrderCancelBean> filterList = orderCancels.stream()
+                    .filter(e-> Math.abs(e.getAmount()) == Math.abs(e.getPayAmount()) || e.getAmount() == 0 || e.getPayAmount()==0)
+                    .collect(Collectors.toList());
+            orderCancels.clear();
+            HSSFWorkbook wb = genOrderCancelWithIpnExcel(filterList, yearStr + "年" + monthStr + "IPN订单取消详情");
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-disposition",
+                    "attachment;filename=" + yearStr + "-" + monthStr + "-IpnOrderCancel.xls");
+            response.setCharacterEncoding("utf-8");
+            ouputStream = response.getOutputStream();
+            wb.write(ouputStream);
+            ouputStream.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ouputStream != null) {
+                    ouputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private HSSFWorkbook genOrderCancelWithIpnExcel(List<OrderCancelBean> orderCancels, String title) {
+
+        // 第一步，创建一个webbook，对应一个Excel文件
+        HSSFWorkbook wb = new HSSFWorkbook();
+        // 第二步，在webbook中添加一个sheet,对应Excel文件中的sheet
+        HSSFSheet sheet = wb.createSheet(title);
+        // 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制short
+        HSSFRow row = sheet.createRow((int) 0);
+        // 第四步，创建单元格，并设置值表头 设置表头居中
+        HSSFCellStyle style = wb.createCellStyle();
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+
+        HSSFCell cell = row.createCell(0);
+        cell.setCellValue("年份");
+        cell.setCellStyle(style);
+
+        cell = row.createCell(1);
+        cell.setCellValue("月份");
+        cell.setCellStyle(style);
+        cell = row.createCell(2);
+        cell.setCellValue("客户id");
+        cell.setCellStyle(style);
+        cell = row.createCell(3);
+        cell.setCellValue("订单号");
+        cell.setCellStyle(style);
+        cell = row.createCell(4);
+        cell.setCellValue("交易金额");
+        cell.setCellStyle(style);
+        cell = row.createCell(5);
+        cell.setCellValue("交易时间");
+        cell.setCellStyle(style);
+        cell = row.createCell(6);
+        cell.setCellValue("交易号");
+        cell.setCellStyle(style);
+        cell = row.createCell(7);
+        cell.setCellValue("取消订单号");
+        cell.setCellStyle(style);
+        cell = row.createCell(8);
+        cell.setCellValue("取消商品金额");
+        cell.setCellStyle(style);
+        cell = row.createCell(9);
+        cell.setCellValue("备注");
+        cell.setCellStyle(style);
+
+        for (int i = 0; i < orderCancels.size(); i++) {
+            row = sheet.createRow((int) i + 1);
+            OrderCancelBean rfi = (OrderCancelBean) orderCancels.get(i);
+            // 第四步，创建单元格，并设置值
+            row.createCell(0).setCellValue(rfi.getYear());
+            row.createCell(1).setCellValue(rfi.getMonth());
+            row.createCell(2).setCellValue(rfi.getUserId());
+            row.createCell(3).setCellValue(rfi.getIpnOrderNo());
+            row.createCell(4).setCellValue(rfi.getPayAmount());
+            row.createCell(5).setCellValue(rfi.getPayTime());
+            row.createCell(6).setCellValue(rfi.getTxnId());
+            row.createCell(7).setCellValue(rfi.getRemarkId());
+            row.createCell(8).setCellValue(rfi.getAmount());
+            row.createCell(9).setCellValue(rfi.getRemark());
         }
         return wb;
     }
@@ -2015,7 +2209,6 @@ public class BasicReportController {
                     (stateNum - 1) * pageNum, pageNum, sorting, Util.EXCHANGE_RATE);
             int total = basicReportService.queryEditedProductProfitsCount(monthLst.get(0).get("beginDate"),
                     monthLst.get(monthLst.size() - 1).get("endDate"));
-            NewOrderDetailsCtr newOrder = new NewOrderDetailsCtr();
             List<EditedProductProfitsFooter> footerLst = new ArrayList<EditedProductProfitsFooter>();
             EditedProductProfitsFooter footer = new EditedProductProfitsFooter();
             float totalProfit = 0;

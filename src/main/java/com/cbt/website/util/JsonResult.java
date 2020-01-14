@@ -47,6 +47,12 @@ public class JsonResult implements Serializable {
 	}
 
 
+	public void setSuccess(Object rows,long total){
+		this.ok = true;
+		this.rows = rows;
+		this.total = total;
+	}
+
 	public Object getAllData() {
 		return allData;
 	}

@@ -631,4 +631,5 @@ public interface CustomGoodsDao {
      */
     int updateVolumeWeight(String pid, String newWeight);
 
+    int deleteDataByPid(String pid);
 }

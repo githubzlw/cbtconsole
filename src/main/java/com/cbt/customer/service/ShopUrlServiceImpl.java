@@ -272,8 +272,8 @@ public class ShopUrlServiceImpl implements IShopUrlService {
     }
 
     @Override
-    public int reDownShopGoods(String shopId, Admuser admuser) {
-        return dao.reDownShopGoods(shopId, admuser);
+    public int reDownShopGoods(String shopId, Admuser admuser,String memberId) {
+        return dao.reDownShopGoods(shopId, admuser, memberId);
     }
 
     @Override

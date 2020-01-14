@@ -2485,6 +2485,58 @@ public class StatisticalReportController {
         return json;
     }
 
+
+    @RequestMapping(value = "/getRefundOrderDetails")
+    @ResponseBody
+    protected EasyUiJsonResult getRefundOrderDetails(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, ParseException {
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        int page = Integer.valueOf(request.getParameter("page"));
+        String times = request.getParameter("times");
+        String userName = request.getParameter("userName");
+        String startTime = "";
+        String endTime = "";
+        if (page > 0) {
+            page = (page - 1) * 20;
+        }
+        if (times.indexOf("-") > -1) {
+            startTime = times + "-01 00:00:00";
+            endTime = times + "-31 23:59:59";
+        } else {
+            startTime = "2999-01-01 00:00:00";
+            endTime = "2999-03-01 00:00:00";
+        }
+        if (org.apache.commons.lang3.StringUtils.isBlank(userName) || "请选择".equals(userName)) {
+            userName = null;
+        }
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("page", page);
+        map.put("userName", userName);
+        map.put("limitNum", 20);
+        List<TaoBaoOrderInfo> list = null;
+        int count = 0;
+        list = taoBaoOrderService.getRefundAmount(map);
+        count = taoBaoOrderService.getRefundAmountCount(map).size();
+        for (TaoBaoOrderInfo c : list) {
+            if ("0".equals(c.getTbOr1688())) {
+                c.setTbOr1688("淘宝");
+            } else if ("1".equals(c.getTbOr1688())) {
+                c.setTbOr1688("1688");
+            } else if ("3".equals(c.getTbOr1688())) {
+                c.setTbOr1688("天猫");
+            } else {
+                c.setTbOr1688("未知");
+            }
+            c.setItemname("<a target='_blank' href='" + c.getItemurl() + "'>" + c.getItemname().substring(0, c.getItemname().length() / 3) + "</a>");
+            c.setImgurl("<img src='" + c.getImgurl() + "' height='100' width='100'>");
+        }
+        json.setRows(list);
+        json.setTotal(count);
+        return json;
+    }
+
     /**
      * 预估订单运费明细
      *
@@ -3332,6 +3384,83 @@ public class StatisticalReportController {
         ouputStream.flush();
         ouputStream.close();
     }
+
+
+    /**
+     * 采购订单报表导出
+     *
+     * @param request
+     * @param reportYear
+     * @param reportMonth
+     * @return
+     * @author whj 2017-08-16
+     */
+    @RequestMapping(value = "/exportRefundOrderDetails")
+    @ResponseBody
+    protected void exportRefundOrderDetails(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, ParseException {
+        request.setCharacterEncoding("utf-8");
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        String times = request.getParameter("times");
+        String userName = request.getParameter("userName");
+        String startTime = "";
+        String endTime = "";
+        if (times.indexOf("-") > -1) {
+            startTime = times + "-01 00:00:00";
+            endTime = times + "-31 23:59:59";
+        } else {
+            startTime = "2999-01-01 00:00:00";
+            endTime = "2999-03-01 00:00:00";
+        }
+        System.err.println("-----------userName:" + userName);
+        if (org.apache.commons.lang3.StringUtils.isBlank(userName) || "请选择".equals(userName)) {
+            userName = null;
+        }
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("userName", userName);
+        map.put("limitNum", 0);
+        HSSFWorkbook wb = null;
+        List<TaoBaoOrderInfo> list = null;
+        response.setContentType("application/vnd.ms-excel");
+        Date date = new Date(System.currentTimeMillis());
+        int year = date.getYear() + 1900;
+        int month = date.getMonth();
+        String filename = "";
+        System.err.println("------------map :" + map.toString());
+        list = taoBaoOrderService.getRefundAmount(map);
+        // filename = "抓取正常采购订单明细报表" + times;
+        filename = "captureTheNormalPurchaseOrderRefundDetails" + times;
+        for (TaoBaoOrderInfo c : list) {
+            if ("0".equals(c.getTbOr1688())) {
+                c.setTbOr1688("淘宝");
+            } else if ("1".equals(c.getTbOr1688())) {
+                c.setTbOr1688("1688");
+            } else if ("3".equals(c.getTbOr1688())) {
+                c.setTbOr1688("天猫");
+            } else {
+                c.setTbOr1688("未知");
+            }
+        }
+
+        map.clear();
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("year", !"0".equals(year) ? year : null);
+        map.put("month", month < 10 ? "0" + month : month);
+        List<BuyReconciliationPojo> buyReconciliationPojoList = taoBaoOrderService.buyReconciliationReport(map, "0");
+        System.err.println("------------list :" + list.toString());
+        wb = generalReportService.exportBuyOrderDetails(list, "5", buyReconciliationPojoList.get(0));
+        // filename = StringUtils.getFileName(filename);
+        // filename = new String(filename.getBytes("ISO8859-1"), "utf-8");
+        buyReconciliationPojoList.clear();
+        response.setHeader("Content-disposition", "attachment;filename=" + filename + ".xls");
+        OutputStream ouputStream = response.getOutputStream();
+        wb.write(ouputStream);
+        ouputStream.flush();
+        ouputStream.close();
+    }
+
 
     /**
      * 月采购对账报表结果导出excel

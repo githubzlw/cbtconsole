@@ -137,6 +137,19 @@ public class CustomGoodsPublish extends CustomGoodsBean {
      */
     private int searchable;
 
+    /**
+     * 详情图片数据
+     */
+    private List<String> infoList;
+
+    public List<String> getInfoList() {
+        return infoList;
+    }
+
+    public void setInfoList(List<String> infoList) {
+        this.infoList = infoList;
+    }
+
     public int getSearchable() {
         return searchable;
     }

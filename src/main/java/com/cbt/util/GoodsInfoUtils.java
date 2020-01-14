@@ -9,8 +9,10 @@ import com.cbt.bean.TypeBean;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.utli.OKHttpUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +42,8 @@ public class GoodsInfoUtils {
     public static final String SERVICE_SHOW_KIDS_URL_2 = "http://img1.kidsproductwholesale.com";
     public static final String SERVICE_SHOW_KIDS_URL_3 = "https://img.kidsproductwholesale.com";
     public static final String SERVICE_SHOW_KIDS_URL_4 = "https://img1.kidsproductwholesale.com";
+
+    private static final String DOWN_IMG_PATH = "/usr/local/downImg/";
 
 
     private static String chineseChar = "([\\一-\\龥]+)";
@@ -600,6 +605,49 @@ public class GoodsInfoUtils {
     }
 
 
+    public static String genOnlineUrlByParam(String pid, String pathCatid, String enName) {
+
+        String itemid = pid;
+        String dataType = "1";
+        String type = "D";
+        String catid1 = "0";
+        String catid2 = "0";
+
+        if (StringUtils.isNotBlank(pathCatid) && pathCatid.indexOf(",") > -1) {
+            String[] catidList = pathCatid.split(",");
+            catid1 = catidList[0];
+            catid2 = catidList[1];
+        }
+
+        enName = enName.toLowerCase().replaceAll("[^a-zA-Z0-9]", " ").trim();
+
+        //去除静态页名字中一些不需要的词
+        enName = removeGoodsNameWords(enName);
+        String[] nameArr = enName.split("\\s+");
+        StringBuffer goodNameNew = new StringBuffer();
+        if (nameArr.length > 10) {
+            for (int i = 0; i < 10; i++) {
+                if (StringUtils.isNotBlank(nameArr[i])) {
+                    goodNameNew.append(nameArr[i] + "-");
+                }
+            }
+        } else {
+            goodNameNew.append(enName.replaceAll("(\\s+)", "-"));
+        }
+        String url = "";
+        if (StringUtils.isNotBlank(goodNameNew.toString())) {
+            if (StringUtils.isBlank(catid1) || StringUtils.isBlank(catid2)) {
+                url = "https://www.import-express.com/goodsinfo/" + goodNameNew.deleteCharAt(goodNameNew.length() - 1) + "-" + dataType + itemid + ".html";
+            } else {
+                url = "https://www.import-express.com/goodsinfo/" + goodNameNew.deleteCharAt(goodNameNew.length() - 1) + "-" + catid1 + "-" + catid2 + "-" + dataType + itemid + ".html";
+            }
+        } else {
+            url = "https://www.import-express.com/spider/getSpider?item=" + itemid + "&source=" + itemIDToUUID(itemid, type);
+        }
+        return url;
+    }
+
+
     public static String itemIDToUUID(String itemId, String type) {
         if (StringUtils.isBlank(itemId)) {
             return "";
@@ -867,7 +915,7 @@ public class GoodsInfoUtils {
      * @param gd
      * @return
      */
-    public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids) {
+    public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids, int isLocal) {
         List<String> changeImglist = new ArrayList<>();
         // 主图
         String orMainImg220x220 = null;
@@ -907,12 +955,16 @@ public class GoodsInfoUtils {
             changeImglist.addAll(entypeImgList);
             entypeImgList.clear();
         }
-        List<String> nwList = new ArrayList<>();
-        for (String imgL : changeImglist) {
-            nwList.add(changeRemotePathToLocal(imgL, isKids));
+        if (isLocal > 0) {
+            List<String> nwList = new ArrayList<>();
+            for (String imgL : changeImglist) {
+                nwList.add(changeRemotePathToLocal(imgL, isKids));
+            }
+            changeImglist.clear();
+            return nwList;
+        } else {
+            return changeImglist;
         }
-        changeImglist.clear();
-        return nwList;
     }
 
     public static List<String> getMainImgByPath(String remotPathImg) {
@@ -1396,6 +1448,204 @@ public class GoodsInfoUtils {
     public static String makeFileName(String filename) { // 2.jpg
         // 为防止文件覆盖的现象发生，要为上传文件产生一个唯一的文件名
         return UUID.randomUUID().toString() + "_" + filename;
+    }
+
+
+    public static boolean checkOffLineImg(CustomGoodsPublish goods, int isKids) {
+        boolean isSu = false;
+        try {
+            List<String> allImgList = GoodsInfoUtils.getAllImgList(goods, isKids, 0);
+            if (CollectionUtils.isNotEmpty(allImgList)) {
+                isSu = downImgAndCheck(allImgList, goods.getPid());
+            }
+            allImgList.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("pid:" + goods.getPid() + ",checkOffLineImg error:", e);
+        }
+        return isSu;
+    }
+
+    /**
+     * 下载图片并且检查
+     *
+     * @param allImgList
+     * @param pid
+     * @return
+     */
+    private static boolean downImgAndCheck(List<String> allImgList, String pid) {
+
+        String today = DateFormatUtil.formatDateToYearAndMonthString(LocalDateTime.now());
+        String filePath = DOWN_IMG_PATH + today + "/" + pid;
+        Set<String> imgSet = new HashSet<>();
+        boolean isSu = false;
+        if (CollectionUtils.isNotEmpty(allImgList)) {
+
+            for (String imgUrl : allImgList) {
+                if (!imgUrl.contains("192.168")) {
+                    if (!imgSet.contains(imgUrl)) {
+                        imgSet.add(imgUrl);
+                        if (imgUrl.contains("/desc")) {
+                            isSu = ImgDownload.downAndReTry(imgUrl, filePath + "/desc" + imgUrl.substring(imgUrl.lastIndexOf("/")));
+                        } else {
+                            isSu = ImgDownload.downAndReTry(imgUrl, filePath + imgUrl.substring(imgUrl.lastIndexOf("/")));
+                        }
+                        if (!isSu) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isSu) {
+            isSu = checkDownFile(imgSet, filePath);
+        }
+        return isSu;
+    }
+
+
+    private static boolean checkDownFile(Set<String> imgSet, String filePath) {
+        boolean isSu = false;
+        // 检查
+        File tempFile = new File(filePath);
+        int fileCount = 0;
+        File[] childFiles = null;
+        if (tempFile.exists() && tempFile.isDirectory()) {
+            childFiles = tempFile.listFiles();
+            for (File childFl : childFiles) {
+                if (!childFl.isDirectory()) {
+                    fileCount++;
+                    isSu = checkSetString(imgSet, childFl.getName());
+                    if (!isSu) {
+                        break;
+                    }
+                }
+            }
+            if (isSu) {
+                tempFile = new File(filePath + "/desc");
+                if (tempFile.exists() && tempFile.isDirectory()) {
+                    childFiles = tempFile.listFiles();
+                    for (File childFl : childFiles) {
+                        if (!childFl.isDirectory()) {
+                            fileCount++;
+                            isSu = checkSetString(imgSet, childFl.getName());
+                            if (!isSu) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        System.err.println("fileCount:" + fileCount + ",imgSize:" + imgSet.size() + ",checkDownFile:" + isSu);
+        imgSet.clear();
+        return isSu;
+    }
+
+
+    private static boolean checkSetString(Set<String> imgSet, String fileName) {
+        boolean isCk = false;
+        for (String img : imgSet) {
+            if (img.contains(fileName)) {
+                isCk = true;
+                break;
+            }
+        }
+        return isCk;
+    }
+
+    public static void dealWindowImg(CustomGoodsPublish goods, String localShowPath, String remoteShowPath, List<String> imgList, FtpConfig ftpConfig, int isUpdateImg) {
+        // 获取橱窗图的img List集合
+        String firstImg = "";
+        String remotepath = goods.getRemotpath();
+        List<String> windowImgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
+        // 抽取含有本地上传的图片数据
+        if (windowImgs.size() > 0) {
+            List<String> tempImgs = new ArrayList<>();
+            for (int i = 0; i < windowImgs.size(); i++) {
+                String wdImg = windowImgs.get(i);
+                if (StringUtils.isBlank(wdImg)) {
+                    continue;
+                } else if (wdImg.contains(localShowPath)) {
+                    // 判断图片是否存在，不存在删除
+                    if (checkIsExistsLocalImg(wdImg.replace(localShowPath, ftpConfig.getLocalDiskPath()))) {
+                        imgList.add(wdImg);
+                        // 上面小图60x60的，下面大图400x400的
+                        imgList.add(wdImg.replace("60x60", "400x400"));
+                        // 替换本地路径为远程路径
+                        tempImgs.add(wdImg.replace(localShowPath, remoteShowPath).replace(".400x400.", ".60x60."));
+                    } else {
+                        // 本地文件不存的，删除数据
+                        windowImgs.set(i, "");
+                    }
+                } else if (wdImg.contains("192.168.1")) {
+                    // 清空原来服务器上传的图片数据，原因：图片路劲对应服务器本地路劲已经失效，无法再同步到服务器
+                    windowImgs.set(i, "");
+                } else {
+                    tempImgs.add(wdImg.replace(".400x400.", ".60x60."));
+                }
+            }
+            // 重新生成橱窗图的数据保存bean中
+            goods.setImg(tempImgs.toString().replace(remotepath, ""));
+            // 获取第一张图片数据的大图
+            firstImg = tempImgs.get(0).replace(".60x60", ".400x400");
+            if (isUpdateImg == 1) {
+                goods.setShowMainImage(firstImg);
+            }
+        }
+    }
+
+    private static boolean checkIsExistsLocalImg(String fileName) {
+        File file = new File(fileName);
+        return file.exists() && file.isFile();
+    }
+
+    public static void dealEninfoImg(CustomGoodsPublish goods, String localShowPath, String remoteShowPath, List<String> imgList, FtpConfig ftpConfig) {
+        // 详情数据的获取和解析img数据
+        String remotepath = goods.getRemotpath();
+        Document nwDoc = Jsoup.parseBodyFragment(goods.getEninfo());
+        Elements imgEls = nwDoc.getElementsByTag("img");
+        if (imgEls.size() > 0) {
+            for (Element imel : imgEls) {
+                String imgUrl = imel.attr("src");
+                if (StringUtils.isBlank(imgUrl)) {
+                    continue;
+                } else if (imgUrl.contains(localShowPath)) {
+                    if (checkIsExistsLocalImg(imgUrl.replace(localShowPath, ftpConfig.getLocalDiskPath()))) {
+                        imgList.add(imgUrl);
+                        // 替换本地路径为远程路径
+                        imel.attr("src", imgUrl.replace(localShowPath, remoteShowPath));
+                    } else {
+                        // 本地文件不存在的，移除
+                        imel.remove();
+                    }
+                } else if (imgUrl.contains("192.168.1")) {
+                    // 判断本地路径非当前配置的上传图片地址，移除数据
+                    imel.remove();
+                }
+            }
+            goods.setEninfo(nwDoc.html().replace(remotepath, ""));
+        }
+    }
+
+    public static boolean deleteByOkHttp(CustomGoodsPublish goods) {
+        boolean isSu = false;
+        if (goods != null) {
+            List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1, 0);
+            try {
+                isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                if (!isSu) {
+                    isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
+                }
+                if (!isSu) {
+                    LOG.error("deleteByOkHttp pid : " + goods.getPid() + " 删除图片异常");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return isSu;
     }
 
 }

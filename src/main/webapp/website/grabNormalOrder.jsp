@@ -188,6 +188,7 @@ function doReset(){
 				<input type="hidden" id="type" value="2" name="type"/>
 				 <input class="but_color" type="button" value="查询" onclick="doQuery(1)"> 
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
+				<a target="_blank" href="/cbtconsole/website/grabNormalOrderRefund.jsp?times=${param.times}">查看退款数据</a>
 			</form>
 		</div>
 		<a href="javascript:exportdata();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">导出</a>

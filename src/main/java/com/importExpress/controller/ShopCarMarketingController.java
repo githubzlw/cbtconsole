@@ -478,7 +478,13 @@ public class ShopCarMarketingController {
             paramMap.put("type", type);
             paramMap.put("websiteType", websiteType);
             paramMap.put("couponCode", couponCode);
-            paramMap.put("couponValue", couponValue);
+            if (StringUtils.isNotBlank(couponValue) && couponValue.contains("-")) {
+                String[] tempList = couponValue.split("-");
+                paramMap.put("couponValue",  "$" + tempList[1] + " off on order over $" + tempList[0]);
+            } else {
+                paramMap.put("couponValue", couponValue);
+            }
+
             if (genHtmlEamil(userId, paramMap)) {
                 //4.更新跟进信息
                 shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), paramMap.toString());

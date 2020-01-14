@@ -147,6 +147,21 @@
 	function formatUserId(val, row, index) {
         return  '<a href="/cbtconsole/userinfo/getUserInfo.do?userId='+val+'" target="_blank">'+val+'</a>';
     }
+
+    function orderCancelWithIPN() {
+		var year = $("#ocb_rYear").val();
+		if (year == null || year == "" || year == "0" || year == "-1") {
+			showMessage('请选择年份');
+			return;
+		}
+		var month = $("#ocb_rMonth").val();
+		if (month == null || month == "" || month == "0" || month == "-1") {
+			showMessage('请选择月份');
+			return;
+		}
+		var url = "/cbtconsole/apa/orderCancelWithIPN.html?year=" + year + "&month=" + month;
+		window.open(url);
+	}
 </script>
 
 </head>
@@ -179,6 +194,7 @@
 					type="button" value="重置" onclick="doOcbReset()"> <input
 					class="but_color" type="button" value="导出Excel"
 					onclick="exportOcbExcel()">
+				<a href="#" onclick="orderCancelWithIPN()">IPN取消详情</a>
 			</form>
 
 		</div>

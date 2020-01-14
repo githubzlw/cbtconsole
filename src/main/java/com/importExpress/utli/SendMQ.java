@@ -47,6 +47,11 @@ public class SendMQ {
      */
     private final static String EXCHANGE_USER_AUTH_NAME = "usersauth";
 
+    /**
+     * 退款RPC
+     */
+    public final static String REFUND_RPC = "refund_rpc";
+
     static {
         log.info("host:" + SysParamUtil.getParam("rabbitmq.host"));
         log.info("port:" + SysParamUtil.getParam("rabbitmq.port"));
@@ -181,6 +186,7 @@ public class SendMQ {
     private static void sendAuthorizationFlagStr(Channel channel,String json) throws Exception {
         channel.exchangeDeclare(EXCHANGE_USER_AUTH_NAME, "fanout", true);
         channel.basicPublish(EXCHANGE_USER_AUTH_NAME, "", null, json.getBytes("UTF-8"));
+        System.err.println(EXCHANGE_USER_AUTH_NAME + ":" + json);
     }
 
 
@@ -274,6 +280,28 @@ public class SendMQ {
      */
     public static void sendMsg(JSONObject model, int website) throws Exception {
         sendMessageStr(model.toString(), website);
+    }
+
+
+    /**
+     * 通过RPC方式调用MQ，进行退款（有返回值）
+     * 不需要关闭mq连接（mq执行完成后自动释放资源）
+     *
+     * @param jsonParam
+     * @return
+     */
+    public static String sendRefundByRPC(com.alibaba.fastjson.JSONObject jsonParam) {
+        try (RPCClient rpcClient = new RPCClient()) {
+
+            log.info(" [x] Sent [{}]", jsonParam);
+            System.err.println("[x] Sent" + jsonParam);
+            String response = rpcClient.refundCall(jsonParam.toString());
+            log.info(" [x] response [{}]", response);
+            return response;
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            log.error("sendMsgByRPC", e);
+            return null;
+        }
     }
 
 }

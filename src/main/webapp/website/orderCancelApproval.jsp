@@ -68,6 +68,16 @@
         box-shadow: 1px 10px 15px #e2e2e2;
     }
 
+    #offline_dlg {
+        display: none;
+        position: fixed;
+        top: 25%;
+        background: #8cdab6;
+        padding: 50px;
+        left: 40%;
+        box-shadow: 1px 10px 15px #e2e2e2;
+    }
+
 </style>
 <script>
     $(document).ready(function () {
@@ -98,6 +108,10 @@
         $("#approval_table tbody").find("tr").each(function () {
             $(this).removeClass("is_tr");
         });
+    }
+
+    function closeDialog() {
+        $("#offline_dlg").hide();
     }
 
 </script>
@@ -226,6 +240,9 @@
                             <br>
                             <input type="button" value="驳回" class="refuse_sty"
                                    onclick="beforeAddRemark(${aproval.refundMethod},${aproval.id},4,${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},-1,this)"/>
+                            <br>
+                            <input type="button" value="线下转账" class="btn_sty"
+                                   onclick="beforeOffLineRefund(${aproval.id},${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},this)"/><br>
                         </c:if>
                     </c:if>
                     <c:if test="${aproval.dealState >= 3}">
@@ -330,10 +347,48 @@
         </tr>
     </table>
 </div>
+<div id="offline_dlg">
+
+    <table>
+        <caption>线下退款确认</caption>
+        <tr style="display: none;">
+            <input type="hidden" id="offline_refund_id" value="">
+            <input type="hidden" id="offline_operator_id" value="">
+        </tr>
+        <tr>
+            <td>客户ID:</td>
+            <td><input id="offline_user_id" value="" disabled="disabled" style="width: 290px;"></td>
+        </tr>
+        <tr>
+            <td>订单号:</td>
+            <td><input id="offline_order_no" value="" disabled="disabled" style="width: 290px;"></td>
+        </tr>
+        <tr>
+            <td>退款金额:</td>
+            <td><input id="offline_amount" value="" style="width: 290px;"/></td>
+        </tr>
+        <tr>
+            <td>交易号:</td>
+            <td><input id="offline_txn_id" value="" style="width: 290px;"/></td>
+        </tr>
+        <tr>
+            <td>备注:</td>
+            <td><textarea name="offlineRemark" id="offline_remark"
+                          style="width: 290px;height: 75px;"></textarea></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: center"><a href="javascript:void(0)" class="easyui-linkbutton"
+                                                          onclick="offLineRefund()" style="width: 80px">保存</a> <a
+                    href="javascript:void(0)" class="easyui-linkbutton"
+                    onclick="closeDialog()" style="width: 80px">关闭</a></td>
+        </tr>
+    </table>
+</div>
+
 </body>
 <script>
 
-    function beforeAddRemark(refundMethod ,approvalId, dealState, userId, amount, orderNo, operatorId, actionFlag, obj) {
+    function beforeAddRemark(refundMethod, approvalId, dealState, userId, amount, orderNo, operatorId, actionFlag, obj) {
         //背景色变色
         setChooseTr(obj);
 
@@ -342,7 +397,7 @@
             //拒绝退款
             var str = prompt('是否驳回？请输入备注:', '');
             if (str) {
-                rejectApproval(approvalId, 4, userId, orderNo, operatorId,str, refundMethod);
+                rejectApproval(approvalId, 4, userId, orderNo, operatorId, str, refundMethod);
             }
         } else if (dealState < 2) {
             if (dealState == 0) {
@@ -429,7 +484,7 @@
                     "refundAmount": refundAmount,
                     "remark": remark,
                     "secvlidPwd": secvlidPwd,
-                    "refundMethod":refundMethod
+                    "refundMethod": refundMethod
                 },
                 success: function (data) {
                     //$.messager.progress('close');
@@ -516,7 +571,7 @@
         $("#approval_order_no").val(orderNo);
         $("#select_op_id").val(operatorId);
         $("#option_admin_id").val(operatorId);
-        if(refundMethod > 0){
+        if (refundMethod > 0) {
             $("#refund_method").val(refundMethod);
         }
         $("#div_secvlid").show();
@@ -540,6 +595,77 @@
         $("#show_notice").hide();
     }
 
+
+    function beforeOffLineRefund(approvalId, userId, amount, orderNo, operatorId, obj) {
+        //背景色变色
+        setChooseTr(obj);
+        $("#offline_refund_id").val(approvalId);
+        $("#offline_user_id").val(userId);
+        $("#offline_order_no").val(orderNo);
+        $("#offline_operator_id").val(operatorId);
+        $("#offline_amount").val('');
+        $("#offline_txn_id").val('');
+        $("#offline_remark").val('');
+
+        $('#offline_dlg').show();
+    }
+
+    /**
+     * 已经线下转账
+     * @param refundId
+     * @param userId
+     * @param operatorId
+     * @param orderNo
+     */
+    function offLineRefund() {
+        var approvalId = $("#offline_refund_id").val();
+        var userId = $("#offline_user_id").val();
+        var orderNo = $("#offline_order_no").val();
+        var operatorId = $("#offline_operator_id").val();
+        var amount = $("#offline_amount").val();
+        var txnId = $("#offline_txn_id").val();
+        var remark = $("#offline_remark").val();
+
+        if (approvalId > 0 && userId > 0 && operatorId > 0 && amount > 0 && txnId && remark) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/orderCancelApprovalCtr/offLineRefund',
+                data: {
+                    "approvalId": approvalId,
+                    "txnId": txnId,
+                    "dealState": 3,
+                    "userId": userId,
+                    "orderNo": orderNo,
+                    "operatorId": operatorId,
+                    "refundAmount": amount,
+                    "remark": remark,
+                    "refundMethod": 1
+                },
+                success: function (data) {
+                    $.messager.progress('close');
+                    var json = eval("(" + data + ")");
+                    if (json.ok) {
+                        //alert("执行成功");
+                        window.location.reload();
+                    } else {
+                        alert(json.message);
+                    }
+                },
+                error: function () {
+                    $.messager.progress('close');
+                    alert("执行失败,请联系管理员");
+                }
+            });
+        } else {
+            $.messager.alert("请输入全部数据");
+        }
+    }
+
+
+    function closeDialog() {
+        $('#offline_dlg').hide();
+    }
 
     function openDetails(approvalId, obj) {
         setChooseTr(obj);

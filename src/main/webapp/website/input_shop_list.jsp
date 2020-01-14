@@ -235,6 +235,10 @@
         <label>店铺Id:</label><!--<input name="shopId" id="detailShopId"
 				style="width: 300px">  --><span id="detailShopId"></span>
     </div>
+    <div style="margin-bottom: 10px;">
+        <label>抓取店铺Id:</label><input name="member_id" id="member_id"
+                                   style="width: 290px">
+    </div>
 
     <div style="margin-bottom: 10px;">
         <label>销量阀值:</label><input name="salesVolume" id="salesVolume"
@@ -908,6 +912,7 @@
         }
         $('#detailShopUrl').val('');
         $('#detailShopId').text('');
+        $('#member_id').val('');
         $('#salesVolume').val('');
         $('#downloadNum').val('');
         $('#shopQualityScore').html('');
@@ -938,6 +943,7 @@
                         $('#inputShopEnName').val(data.data.inputShopEnName ? data.data.inputShopEnName : "");
                         $('#inputShopBrand').val(data.data.inputShopBrand ? data.data.inputShopBrand : "");
                         $('#detailShopId').text(data.data.shopId ? data.data.shopId : "");
+                        $('#member_id').val(data.data.memberId ? data.data.memberId : "");
                         $('#salesVolume').val(data.data.salesVolume ? data.data.salesVolume : 0);
                         $('#downloadNum').val(data.data.downloadNum ? data.data.downloadNum : 0);
                         $('#isValid').val(data.data.isValid ? data.data.isValid : 0);
@@ -976,6 +982,7 @@
         $('#detailShopUrl').val('');
         $('#detailShopId').text('');
         $('#salesVolume').val('');
+        $('#member_id').val('');
         $('#downloadNum').val('');
         $('#shopQualityScore').html('');
         $('#shopServiceScore').html('');
@@ -1002,6 +1009,7 @@
         var inputShopEnName = $('#inputShopEnName').val();
         var inputShopBrand = $('#inputShopBrand').val();
         var isTrade = $('#is_trade').val();
+        var member_id = $('#member_id').val();
         /*
          if(detailShopUrl==null||detailShopUrl==""){
              $.messager.alert('提示','请输入店铺url');
@@ -1022,6 +1030,7 @@
             "id": id,
             "shopUrl": detailShopUrl,
             "shopId": detailShopId,
+            "memberId":member_id,
             "salesVolume": salesVolume,
             "downloadNum": downloadNum,
             "isValid": isValid,
@@ -1045,7 +1054,7 @@
                     if(data.total > 0){
                         $.messager.confirm("提示", "已经存在此店铺，需要重新抓取数据吗？", function (rs) {
                             if (rs) {
-                                reDownShopGoods(data.data);
+                                reDownShopGoods(data.data,member_id);
                             }
                         });
                     }else{
@@ -1062,11 +1071,11 @@
         });
     }
 
-    function reDownShopGoods(shopId) {
+    function reDownShopGoods(shopId,member_id) {
         $.ajax({
             url: '/cbtconsole/ShopUrlC/reDownShopGoods.do',
             type: "post",
-            data: {"shopId":shopId},
+            data: {"shopId":shopId,memberId:member_id},
             success: function (data) {
                 if (data.ok) {
                     $('#dlg').dialog('close');

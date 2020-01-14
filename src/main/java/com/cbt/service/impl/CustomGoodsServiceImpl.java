@@ -94,8 +94,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         if (StringUtils.isNotBlank(bean.getRangePrice())) {
             //sku更新
             List<CustomBenchmarkSkuNew> insertList = new ArrayList<>();
-            List<ImportExSku> skuList = JSONArray.parseArray(bean.getSku(),ImportExSku.class);
-
+            List<ImportExSku> skuList = JSONArray.parseArray(bean.getSku(), ImportExSku.class);
             for (ImportExSku exSku : skuList) {
                 CustomBenchmarkSkuNew skuNew = new CustomBenchmarkSkuNew();
                 skuNew.setFinalWeight(bean.getFinalWeight());
@@ -975,6 +974,62 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int updateGoodsOverSeaInfo(GoodsOverSea goodsOverSea) {
         return customGoodsMapper.updateGoodsOverSeaInfo(goodsOverSea);
+    }
+
+    @Override
+    public int setGoodsWeightChangeFlag(GoodsWeightChange weightChange) {
+        return customGoodsMapper.setGoodsWeightChangeFlag(weightChange);
+    }
+
+    @Override
+    public List<String> queryOnlineSync() {
+        return customGoodsMapper.queryOnlineSync();
+    }
+
+    @Override
+    public int deleteOnlineSync(String pid) {
+        return customGoodsMapper.deleteOnlineSync(pid);
+    }
+
+    @Override
+    public int insertIntoOnlineSync(String pid) {
+        return customGoodsMapper.insertIntoOnlineSync(pid);
+    }
+
+    @Override
+    public List<CustomGoodsPublish> queryGoodsDeleteInfo(CustomGoodsQuery queryBean) {
+        return customGoodsMapper.queryGoodsDeleteInfo(queryBean);
+    }
+
+    @Override
+    public int queryGoodsDeleteInfoCount(CustomGoodsQuery queryBean) {
+        return customGoodsMapper.queryGoodsDeleteInfoCount(queryBean);
+    }
+
+    @Override
+    public CustomGoodsPublish queryGoodsDeleteDetails(String pid) {
+        return customGoodsMapper.queryGoodsDeleteDetails(pid);
+    }
+
+    @Override
+    public List<String> queryOrinfringementPids() {
+        return customGoodsMapper.queryOrinfringementPids();
+    }
+
+    @Override
+    public int syncDataToDeleteInfo(String pid) {
+        return customGoodsMapper.syncDataToDeleteInfo(pid);
+    }
+
+    @Override
+    public int deleteDataByPid(String pid) {
+        customGoodsDao.deleteDataByPid(pid);
+        return customGoodsMapper.deleteDataByPid(pid);
+    }
+
+    @Override
+    public int updateDeleteInfoFlag(String pid) {
+        return customGoodsMapper.updateDeleteInfoFlag(pid);
     }
 
 

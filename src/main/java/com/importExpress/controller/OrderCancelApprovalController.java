@@ -1,6 +1,8 @@
 package com.importExpress.controller;
 
+import com.cbt.bean.BalanceBean;
 import com.cbt.paypal.service.PayPalService;
+import com.cbt.service.AdditionalBalanceService;
 import com.cbt.systemcode.service.SecondaryValidationService;
 import com.cbt.util.BigDecimalUtil;
 import com.cbt.util.Redis;
@@ -51,6 +53,8 @@ public class OrderCancelApprovalController {
     private PayPalService ppApiService;
     private static DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    @Autowired
+    private AdditionalBalanceService additionalBalanceService;
 
 
     @RequestMapping("/queryForList")
@@ -80,7 +84,7 @@ public class OrderCancelApprovalController {
         String userIdStr = request.getParameter("userId");
         int userId = 0;
         if (StringUtils.isNotBlank(userIdStr)) {
-            userId = Integer.valueOf(userIdStr);
+            userId = Integer.parseInt(userIdStr);
         }
         if (userId > 0) {
             mv.addObject("userId", userId);
@@ -98,7 +102,7 @@ public class OrderCancelApprovalController {
         String typeStr = request.getParameter("type");
         int type = 0;
         if (StringUtils.isNotBlank(typeStr)) {
-            type = Integer.valueOf(typeStr);
+            type = Integer.parseInt(typeStr);
         }
         mv.addObject("type", type);
 
@@ -107,7 +111,7 @@ public class OrderCancelApprovalController {
         String dealStateStr = request.getParameter("dealState");
 
         if (StringUtils.isNotBlank(dealStateStr)) {
-            dealState = Integer.valueOf(dealStateStr);
+            dealState = Integer.parseInt(dealStateStr);
         }
         mv.addObject("dealState", dealState);
 
@@ -117,7 +121,7 @@ public class OrderCancelApprovalController {
         int page = 1;
         String pageStr = request.getParameter("page");
         if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
-            page = Integer.valueOf(pageStr);
+            page = Integer.parseInt(pageStr);
             startNum = (page - 1) * limitNum;
         }
         mv.addObject("page", page);
@@ -206,7 +210,7 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取申请id失败,请重试");
                 return json;
             } else {
-                approvalId = Integer.valueOf(approvalIdStr);
+                approvalId = Integer.parseInt(approvalIdStr);
             }
 
             String dealStateStr = request.getParameter("dealState");
@@ -216,7 +220,7 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取处理状态失败,请重试");
                 return json;
             } else {
-                dealState = Integer.valueOf(dealStateStr);
+                dealState = Integer.parseInt(dealStateStr);
             }
 
             String userIdStr = request.getParameter("userId");
@@ -226,7 +230,7 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取客户id失败,请重试");
                 return json;
             } else {
-                userId = Integer.valueOf(userIdStr);
+                userId = Integer.parseInt(userIdStr);
             }
 
             String orderNo = request.getParameter("orderNo");
@@ -250,12 +254,19 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取操作人ID失败,请重试");
                 return json;
             } else {
-                operatorId = Integer.valueOf(operatorIdStr);
+                operatorId = Integer.parseInt(operatorIdStr);
                 if (operatorId != user.getId()) {
                     json.setOk(false);
                     json.setMessage("获取非当前操作人操作");
                     return json;
                 }
+            }
+
+            String refundMethodStr = request.getParameter("refundMethod");
+            if (StringUtils.isBlank(refundMethodStr) || Integer.parseInt(refundMethodStr) == 0) {
+                json.setOk(false);
+                json.setMessage("获取退款方式失败,请重试");
+                return json;
             }
 
             String refundAmountStr = request.getParameter("refundAmount");
@@ -267,17 +278,16 @@ public class OrderCancelApprovalController {
                     json.setOk(false);
                     json.setMessage("获取退款金额失败,请重试");
                     return json;
+                } else if ("1".equals(refundMethodStr) && Double.parseDouble(refundAmountStr) >= 300 && dealState > 1) {
+                    json.setOk(false);
+                    json.setMessage("该退款金额超过300，请转账");
+                    return json;
                 } else {
-                    refundAmount = Double.valueOf(refundAmountStr);
+                    refundAmount = Double.parseDouble(refundAmountStr);
                 }
             }
 
-            String refundMethodStr = request.getParameter("refundMethod");
-            if (StringUtils.isBlank(refundMethodStr) || Integer.valueOf(refundMethodStr) == 0) {
-                json.setOk(false);
-                json.setMessage("获取退款方式失败,请重试");
-                return json;
-            }
+
 
 
             String remark = request.getParameter("remark");
@@ -309,7 +319,7 @@ public class OrderCancelApprovalController {
                 approvalBean.setAgreeAmount(refundAmount);
                 approvalBean.setUserId(userId);
                 approvalBean.setAdminId(user.getId());
-                approvalBean.setRefundMethod(Integer.valueOf(refundMethodStr));
+                approvalBean.setRefundMethod(Integer.parseInt(refundMethodStr));
 
                 OrderCancelApprovalDetails approvalDetails = new OrderCancelApprovalDetails();
                 approvalDetails.setApprovalId(approvalId);
@@ -322,7 +332,7 @@ public class OrderCancelApprovalController {
                 approvalDetails.setPayPrice(refundAmount);
                 approvalDetails.setAdminId(user.getId());
                 approvalDetails.setRemark(remark);
-                approvalDetails.setRefundMethod(Integer.valueOf(refundMethodStr));
+                approvalDetails.setRefundMethod(Integer.parseInt(refundMethodStr));
 
                 if (dealState < 2) {
                     approvalService.updateOrderCancelApprovalState(approvalBean);
@@ -375,7 +385,7 @@ public class OrderCancelApprovalController {
             mv.addObject("message", "获取申请ID失败,请重试");
             return mv;
         } else {
-            approvalId = Integer.valueOf(approvalIdStr);
+            approvalId = Integer.parseInt(approvalIdStr);
         }
         try {
             OrderCancelApproval approvalBean = approvalService.queryForSingle(approvalId);
@@ -429,6 +439,12 @@ public class OrderCancelApprovalController {
             }
             list.clear();
 
+            /*if(orderPay > 300){
+                json.setOk(false);
+                json.setMessage("该订单总支付金额:" + orderPay + "超过300，请转账");
+                return json;
+            }*/
+
             OrderCancelApproval approvalOld = approvalService.queryForSingle(approvalBean.getId());
             if (approvalBean.getRefundMethod() == 1) {
                 // PayPal或者Stripe退款
@@ -443,9 +459,9 @@ public class OrderCancelApprovalController {
                     // 优先PayPal TT stripe支付值退款
                     if (orderPay > 0) {
                         if (orderPay - approvalBean.getAgreeAmount() >= -0.01) {
-                            json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(approvalBean.getAgreeAmount()));
+                            json = ppApiService.refundByMq(refundOrderNo, decimalFormat.format(approvalBean.getAgreeAmount()));
                         } else {
-                            json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(orderPay));
+                            json = ppApiService.refundByMq(refundOrderNo, decimalFormat.format(orderPay));
                             approvalBean.setRemainAmount(approvalBean.getAgreeAmount() - orderPay);
                         }
                     } else {
@@ -595,5 +611,146 @@ public class OrderCancelApprovalController {
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
+
+    /**
+     * 已经线下退款
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/offLineRefund", method = RequestMethod.POST)
+    @ResponseBody
+    public JsonResult offLineRefund(HttpServletRequest request, HttpServletResponse response) {
+
+        JsonResult json = new JsonResult();
+        try {
+            //获取登录用户信息
+            String sessionId = request.getSession().getId();
+            String userJson = Redis.hget(sessionId, "admuser");
+            Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+            if (user == null) {
+                json.setOk(false);
+                json.setMessage("登录过期,请重新登录");
+                return json;
+            }
+            //获取申诉id
+            String approvalIdStr = request.getParameter("approvalId");
+            int approvalId = 0;
+            if (StringUtils.isBlank(approvalIdStr)) {
+                json.setOk(false);
+                json.setMessage("获取申请id失败,请重试");
+                return json;
+            } else {
+                approvalId = Integer.parseInt(approvalIdStr);
+            }
+
+            String dealStateStr = request.getParameter("dealState");
+            int dealState = 0;
+            if (StringUtils.isBlank(dealStateStr)) {
+                json.setOk(false);
+                json.setMessage("获取处理状态失败,请重试");
+                return json;
+            } else {
+                dealState = Integer.parseInt(dealStateStr);
+            }
+
+            String userIdStr = request.getParameter("userId");
+            int userId = 0;
+            if (StringUtils.isBlank(userIdStr) || "0".equals(userIdStr)) {
+                json.setOk(false);
+                json.setMessage("获取客户id失败,请重试");
+                return json;
+            } else {
+                userId = Integer.parseInt(userIdStr);
+            }
+
+            String orderNo = request.getParameter("orderNo");
+            String operatorIdStr = request.getParameter("operatorId");
+            int operatorId = 0;
+            if (StringUtils.isBlank(operatorIdStr) || "0".equals(operatorIdStr)) {
+                json.setOk(false);
+                json.setMessage("获取操作人ID失败,请重试");
+                return json;
+            }
+
+            String txnId = request.getParameter("txnId");
+            if (StringUtils.isBlank(txnId)) {
+                json.setOk(false);
+                json.setMessage("获取退款交易号失败,请重试");
+                return json;
+            }
+            String refundMethodStr = request.getParameter("refundMethod");
+            if (StringUtils.isBlank(refundMethodStr) || Integer.parseInt(refundMethodStr) == 0) {
+                json.setOk(false);
+                json.setMessage("获取退款方式失败,请重试");
+                return json;
+            }
+
+            String refundAmountStr = request.getParameter("refundAmount");
+            double refundAmount = Double.parseDouble(refundAmountStr);
+
+            String remark = request.getParameter("remark");
+            if (StringUtils.isBlank(remark)) {
+                json.setOk(false);
+                json.setMessage("获取备注信息失败,请重试");
+                return json;
+            }
+
+            OrderCancelApproval approvalBean = new OrderCancelApproval();
+            approvalBean.setId(approvalId);
+            approvalBean.setOrderNo(orderNo);
+            approvalBean.setDealState(dealState);
+            approvalBean.setAgreeAmount(refundAmount);
+            approvalBean.setUserId(userId);
+            approvalBean.setAdminId(user.getId());
+            approvalBean.setRefundMethod(Integer.parseInt(refundMethodStr));
+
+            OrderCancelApprovalDetails approvalDetails = new OrderCancelApprovalDetails();
+            approvalDetails.setApprovalId(approvalId);
+            if (dealState < 4) {
+                approvalDetails.setDealState(dealState);
+            } else {
+                approvalDetails.setDealState(4);
+            }
+            approvalDetails.setOrderNo(orderNo);
+            approvalDetails.setPayPrice(refundAmount);
+            approvalDetails.setAdminId(user.getId());
+            approvalDetails.setRemark(remark);
+            approvalDetails.setRefundMethod(Integer.parseInt(refundMethodStr));
+
+
+            OrderCancelApproval approvalOld = approvalService.queryForSingle(approvalBean.getId());
+            OrderCancelApprovalAmount approvalAmount = new OrderCancelApprovalAmount();
+            approvalAmount.setApprovalId(approvalBean.getId());
+            approvalAmount.setOrderNo(approvalBean.getOrderNo());
+            approvalAmount.setPayAmount(approvalBean.getAgreeAmount());
+            approvalAmount.setPayType(2);
+            if (approvalOld.getDealState() == 1 || approvalOld.getDealState() == 2) {
+                approvalBean.setDealState(2);
+                approvalService.updateOrderCancelApprovalState(approvalBean);
+                approvalDetails.setDealState(2);
+                approvalService.insertIntoApprovalDetails(approvalDetails);
+            }
+            approvalBean.setDealState(3);
+            approvalDetails.setDealState(3);
+            approvalDetails.setRemark(approvalDetails.getRemark() + ",执行“线下转账”成功！(交易号:" +txnId + "," +
+                    BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) + ")");
+            approvalService.updateOrderCancelApprovalState(approvalBean);
+            approvalService.insertIntoApprovalDetails(approvalDetails);
+            //使用MQ更新线上状态
+            updateOnlineDealState(approvalBean);
+            // 添加一笔负的到账
+            approvalService.insertIntoPaymentByApproval(approvalBean.getUserId(), approvalBean.getOrderNo());
+
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("offLineRefund error,reason: " + e.getMessage());
+            json.setOk(false);
+            json.setMessage("执行失败,原因：" + e.getMessage());
+        }
+        return json;
+    }
 
 }

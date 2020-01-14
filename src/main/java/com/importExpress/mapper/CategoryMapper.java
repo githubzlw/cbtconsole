@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.cbt.bean.CategoryAllBean;
 import com.cbt.bean.CategoryBean;
+import com.cbt.bean.CustomGoodsPublish;
 import org.apache.ibatis.annotations.Param;
 
 import com.cbt.bean.Category1688Bean;
@@ -94,5 +95,32 @@ public interface CategoryMapper {
      * @return
      */
     int updateChangeAllBeanInfo(CategoryAllBean categoryBean);
+
+    /**
+     * 获取1688_category表最大ID
+     * @return
+     */
+    int queryMaxIdByCatidInfo();
+
+     /**
+     * 插入新的类别
+     * @param categoryBean
+     * @return
+     */
+    int insertIntoCatidInfo(CategoryAllBean categoryBean);
+
+    /**
+     * 修改产品为新的类别
+     * @param good
+     * @return
+     */
+    int changePidToNewCatid(CustomGoodsPublish good);
+
+    /**
+     * 插入类别日志
+     * @param good
+     * @return
+     */
+    int insertIntoCatidChangeLog(CustomGoodsPublish good);
 
 }

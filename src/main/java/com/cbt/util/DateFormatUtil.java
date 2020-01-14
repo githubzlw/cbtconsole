@@ -27,6 +27,10 @@ public class DateFormatUtil {
     }
 
 
+    public static String formatDateToYearAndMonthAndDayString(LocalDateTime dateTime) {
+        return format(dateTime, "yyyy-MM-dd");
+    }
+
     /**
      * 根据规格格式化日式为字符串
      * @param dateTime

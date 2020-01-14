@@ -1063,7 +1063,8 @@
 		update order_details set state=1 where orderid=#{orderid} and id=#{odid}
 	</update>
     <select id="getDtailsState" resultType="INTEGER">
-		SELECT DISTINCT COUNT(b.id)-SUM(b.state) as counts FROM order_details o INNER JOIN order_details b ON o.dropshipid=b.dropshipid WHERE o.orderid=#{orderid} AND o.id=#{odid} and b.state&lt;2
+		SELECT DISTINCT ifnull(COUNT(b.id)-SUM(b.state),0) as counts FROM order_details o INNER JOIN order_details b
+		ON o.dropshipid=b.dropshipid WHERE o.orderid=#{orderid} AND o.id=#{odid} and b.state&lt;2
 	</select>
     <update id="updateDropshiporder">
 		update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid=#{orderid} and id=#{odid})
@@ -1574,4 +1575,10 @@
 		update order_details set orderid = #{newOrderNo} where orderid = #{oldOrderNo};
 		update payment set orderid = #{newOrderNo} where orderid = #{oldOrderNo};
     </update>
+    
+    <insert id="insertInventoryIdRelationtable">
+        insert into id_relationtable(orderid,odid,goodid,goodstatus,itemid,itemqty,is_replenishment)
+        select orderid,id,goodsid,1 as goodstatus,goods_pid,yourorder,1 as is_replenishment from order_details
+        where orderid=#{orderid} and id = #{odid}
+    </insert>
 </mapper>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>客户订单采购</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+    <style type="text/css">
+        .but_color {
+            background: #44a823;
+            width: 100px;
+            height: 30px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+
+        #kop_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #kop_rYear, #kop_rMonth, .but_color {
+            padding: 5px;
+            font-size: 14px
+        }
+
+        #kop_rYear, #kop_rMonth {
+            margin-right: 18px
+        }
+
+        #kop_top_toolbar {
+            padding: 20px 28px !important;
+        }
+
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            genYearSelect();
+            setDatagrid();
+            var opts = $("#kop_main-datagrid").datagrid("options");
+            opts.url = "/cbtconsole/orderPurchase/list";
+        });
+
+        function genYearSelect() {
+            var mydate = new Date();
+            var rYear = mydate.getFullYear();
+            $("#kop_rYear").empty();
+            var content = "";
+            for (var yr = 2016; yr <= rYear; yr++) {
+                if (yr == rYear) {
+                    content += "<option selected='selected' value='" + yr + "'>" + yr + "</option>";
+                } else {
+                    content += "<option value='" + yr + "'>" + yr + "</option>";
+                }
+            }
+            $("#kop_rYear").append(content);
+        }
+
+        function setDatagrid() {
+            $('#kop_main-datagrid').datagrid({
+                title: '客户订单采购',
+                width: "100%",
+                height: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#kop_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                pageSize: 50,//默认选择的分页是每页50行数据
+                pageList: [20, 50, 100],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        showMessage(data.message);
+                    }
+                }
+            });
+        }
+
+        function showMessage(message) {
+            $.messager.show({
+                title: '提醒',
+                msg: message,
+                timeout: 2000,
+                showType: 'slide',
+                style: {
+                    right: '',
+                    top: ($(window).height() * 0.15),
+                    bottom: ''
+                }
+            });
+        }
+
+        function doKopQuery() {
+            var year = $("#kop_rYear").val();
+            if (year == null || year == "" || year == "0" || year == "-1") {
+                showMessage('请选择年份');
+                return;
+            }
+            var month = $("#kop_rMonth").val();
+            if (month == null || month == "" || month == "0" || month == "-1") {
+                showMessage('请选择月份');
+                return;
+            }
+            $("#kop_main-datagrid").datagrid("load", {
+                "beginTime": year + "-" + month + "-01"
+            });
+        }
+
+        function exportKopExcelDetail() {
+            var year = $("#kop_rYear").val();
+            if (year == null || year == "" || year == "0" || year == "-1") {
+                showMessage('请选择年份');
+                return;
+            }
+            var month = $("#kop_rMonth").val();
+            if (month == null || month == "" || month == "0" || month == "-1") {
+                showMessage('请选择月份');
+                return;
+            }
+            var  time = year + "-" + month + "-01";
+            window.location.href = "/cbtconsole/orderPurchase/exportKopExcelDetail?beginTime="+ time;
+        }
+
+        function exportKopExcelTotal() {
+            var year = $("#kop_rYear").val();
+            if (year == null || year == "" || year == "0" || year == "-1") {
+                showMessage('请选择年份');
+                return;
+            }
+            var month = $("#kop_rMonth").val();
+            if (month == null || month == "" || month == "0" || month == "-1") {
+                showMessage('请选择月份');
+                return;
+            }
+            var  time = year + "-" + month + "-01";
+            window.location.href = "/cbtconsole/orderPurchase/exportKopExcelTotal?beginTime="+ time;
+        }
+
+
+        function formatUserId(val, row, index) {
+            return '<a href="/cbtconsole/userinfo/getUserInfo.do?userId=' + val + '" target="_blank">' + val + '</a>';
+        }
+
+        function formatState(val, row, index) {
+            if (val == 0) {
+                return '待采购';
+            } else if (val == 1) {
+                return '入库';
+            } else if (val == 2 || val == -1) {
+                return '取消';
+            } else {
+                return '';
+            }
+        }
+
+        function formatUrl(val, row, index) {
+            return '<a href="' + row.itemurl + '" target="_blank">' + val + '</a>';
+        }
+
+        function doKopSelectChange() {
+            var mydate = new Date();
+            var rYear = mydate.getFullYear();
+            var rMonth = mydate.getMonth();
+            var monthop = "";
+            $('#kop_rMonth').empty();
+            var selectYear = $('#kop_rYear').val();
+            if (selectYear == rYear) {
+                for (var i = 1; i <= rMonth + 1; i++) {
+                    if (i < 10) {
+                        monthop += "<option value='0" + i + "'>0" + i + "</oiption>";
+                    } else {
+                        monthop += "<option value='" + i + "'>" + i + "</oiption>";
+                    }
+                }
+                $('#kop_rMonth').append(monthop);
+            } else if (selectYear < rYear) {
+                for (var i = 1; i <= 12; i++) {
+                    if (i < 10) {
+                        monthop += "<option value='0" + i + "'>0" + i + "</oiption>";
+                    } else {
+                        monthop += "<option value='" + i + "'>" + i + "</oiption>";
+                    }
+                }
+                $('#kop_rMonth').append(monthop);
+            } else if (selectYear > rYear) {
+                $('#kop_rYear').val(rYear);
+                for (var i = 1; i <= rMonth + 1; i++) {
+                    if (i < 10) {
+                        monthop += "<option value='0" + i + "'>0" + i + "</oiption>";
+                    } else {
+                        monthop += "<option value='" + i + "'>" + i + "</oiption>";
+                    }
+                }
+                $('#kop_rMonth').append(monthop);
+            }
+        }
+
+        function doKopReset() {
+            $("#kop_query_form")[0].reset();
+        }
+    </script>
+
+</head>
+<body>
+
+<div id="kop_top_toolbar" style="padding: 5px; height: auto">
+    <div>
+        <form id="kop_query_form" action="#" onsubmit="return false;">
+            <label for="kop_rYear">年份选择<font color="red">*</font>：
+            </label> <select name="year" id="kop_rYear" onchange="doKopSelectChange()">
+            <option value='2016'>2016</option>
+            <option value='2017'>2017</option>
+            <option value='2018'>2018</option>
+        </select><label for="kop_rMonth">月份选择<font color="red">*</font>：
+        </label> <select name="month" id="kop_rMonth">
+            <option value="01">01</option>
+            <option value="02">02</option>
+            <option value="03">03</option>
+            <option value="04">04</option>
+            <option value="05">05</option>
+            <option value="06">06</option>
+            <option value="07">07</option>
+            <option value="08">08</option>
+            <option value="09">09</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+        </select> <input class="but_color" type="button" value="查询"
+                         onclick="doKopQuery()">
+            &nbsp;
+            <input class="but_color" type="button" value="重置" onclick="doKopReset()">
+            &nbsp;
+            <input class="but_color" type="button" value="导出Excel汇总" onclick="exportKopExcelTotal()">
+            &nbsp;
+            <input class="but_color" type="button" value="导出Excel详细" onclick="exportKopExcelDetail()">
+
+        </form>
+
+    </div>
+</div>
+<table id="kop_main-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'year',align:'center',width:'70px'">年月份</th>
+        <!--        <th data-options="field:'orderid',align:'center',width:'120px',formatter:formatUserId">orderid</th>-->
+        <th data-options="field:'orderid',align:'center',width:'120px'">订单号</th>
+        <th data-options="field:'orderpaytime',align:'center',width:'140px'">下单时间</th>
+        <th data-options="field:'od_pid',align:'center',width:'120px'">订单商品PID</th>
+        <th data-options="field:'yourorder',align:'center',width:'60px'">下单数量</th>
+        <th data-options="field:'goodsprice',align:'center',width:'100px'">下单价格(RMB)</th>
+        <th data-options="field:'od_state',align:'center',width:'60px',formatter:formatState">商品状态</th>
+
+        <th data-options="field:'shipno',align:'center',width:'140px'">1688运单号</th>
+        <th data-options="field:'itemid',align:'center',width:'120px',formatter:formatUrl">采购商品</th>
+        <th data-options="field:'itemqty',align:'center',width:'60px'">采购数量</th>
+        <th data-options="field:'totalprice',align:'center',width:'100px'">采购总价(RMB)</th>
+        <th data-options="field:'orderdate',align:'center',width:'150px'">采购支付时间</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+<script type="text/javascript">
+    window.onload = function () {
+        var url = document.location.href;
+        var begin = url.indexOf("?");
+        if (begin != -1) {
+            var paramsStr = url.substring(begin + 1, url.length);
+            var paramLst = paramsStr.split("&");
+            if (paramLst.length > 0) {
+                var year = "";
+                var month = "";
+                for (var i = 0; i < paramLst.length; i++) {
+                    var sgParam = paramLst[i];
+                    sgParamLst = sgParam.split("=");
+                    if (sgParamLst.length == 2) {
+                        if (sgParamLst[0] == "year") {
+                            year = sgParamLst[1];
+                            if (!(year == null || year == "")) {
+                                $("#kop_rYear").val(sgParamLst[1]);
+                            }
+                            continue;
+                        } else if (sgParamLst[0] == "month") {
+                            month = sgParamLst[1];
+                            if (!(month == null || month == "")) {
+                                $("#kop_rMonth").val(sgParamLst[1]);
+                            }
+                            continue;
+                        }
+                    }
+                }
+                if (!(year == null || year == "" || year == "-1"
+                    || month == null || month == "" || month == "-1")) {
+                    doKopQuery();
+                }
+            }
+        }
+    }
+</script>
+</html>

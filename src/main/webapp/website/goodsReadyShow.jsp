@@ -453,7 +453,16 @@
 							</div>
 							<br>
 							<div style="margin-bottom: 2px;">
-								<span style="color:${goods.valid == 1 ? 'green':'red'};">数据清洗:${goods.valid == 1 ? '有效数据' : '无效数据'}</span>
+								<c:if test="${goods.valid == 1}">
+									<span style="color:${goods.valid == 1 ? 'green':'red'};">数据清洗:有效数据</span>
+								</c:if>
+								<c:if test="${goods.valid == 2}">
+									<span style="color:${goods.valid == 1 ? 'green':'red'};">数据清洗:图片处理异常</span>
+								</c:if>
+								<c:if test="${goods.valid == 0}">
+									<span style="color:${goods.valid == 1 ? 'green':'red'};">数据清洗:无效数据</span>
+								</c:if>
+
                                 <c:if test="${goods.noSold > 0}">
                                     <em style="color: red;">(不过滤销量)</em>
                                 </c:if>

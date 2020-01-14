@@ -1,6 +1,8 @@
 package com.importExpress.utli;
 
 import com.cbt.bean.CustomGoodsPublish;
+import com.cbt.dao.CustomGoodsDao;
+import com.cbt.dao.impl.CustomGoodsDaoImpl;
 import com.cbt.util.DateFormatUtil;
 import com.cbt.util.FirstLetterUtitl;
 import com.cbt.util.StrUtils;
@@ -65,7 +67,7 @@ public class GoodsInfoUpdateOnlineUtil {
      * 前台上传店铺推荐文件路径
      */
 //    public static final String ONLINE_SHOP_RECOMMEND_URL = "https://www.import-express.com/popProducts/postShopRecommendFile";
-     public static final String ONLINE_SHOP_RECOMMEND_URL = "http://127.0.0.1:8087/popProducts/postShopRecommendFile";
+    public static final String ONLINE_SHOP_RECOMMEND_URL = "http://127.0.0.1:8087/popProducts/postShopRecommendFile";
 
     // test
 //    private static final String LOCAL_JSON_PATH = "E:/data/cbtconsole/product/";
@@ -363,13 +365,14 @@ public class GoodsInfoUpdateOnlineUtil {
     public static boolean updateOnlineAndSolr(InputData inputData, int isSolr) {
         JsonResult json = new JsonResult();
         File file = null;
+        Long currentTime = System.currentTimeMillis();
         try {
-            file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "on004.json", JsonUtils.objectToJsonNotNull(inputData));
+            file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "_on_" + currentTime + "_004.json", JsonUtils.objectToJsonNotNull(inputData));
             if (file != null) {
                 String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL_ONLINE, file);
                 System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",product online:["
                         + result.replace("\n", "") + "]");
-                if (StringUtils.isBlank(result) || result.contains("NG") || result.contains("FAILED")) {
+                if (StringUtils.isBlank(result) || result.contains("FAILED")) {
                     json.setOk(false);
                     json.setMessage("online执行调用mongodb更新产品接口失败");
                     System.err.println(inputData.getPid() + ",online执行调用mongodb更新产品接口失败");
@@ -379,12 +382,12 @@ public class GoodsInfoUpdateOnlineUtil {
                     json.setOk(true);
                     json.setData(result);
                     if (isSolr > 0 && result.contains("true")) {
-                        file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "on006.json", result);
+                        file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "_on_" + currentTime + "_006.json", result);
                         if (file != null) {
                             result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_SOLR_URL_ONLINE, file);
                             System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",solr online:["
                                     + result.replace("\n", "") + "]");
-                            if (StringUtils.isBlank(result) || result.contains("NG") || result.contains("FAILED")) {
+                            if (StringUtils.isBlank(result) || result.contains("FAILED")) {
                                 json.setOk(false);
                                 json.setMessage("online执行调用mongodb更新solr接口失败");
                                 System.err.println(inputData.getPid() + ",online执行调用mongodb更新solr接口失败");
@@ -417,6 +420,9 @@ public class GoodsInfoUpdateOnlineUtil {
                 file.delete();
             }
         }
+        if (!json.isOk()) {
+            setOffOnlineByPid(inputData.getPid(), "更新线上MongoDB失败");
+        }
         return json.isOk();
     }
 
@@ -431,18 +437,19 @@ public class GoodsInfoUpdateOnlineUtil {
     public static boolean updateLocalAndSolr(InputData inputData, int isSolr) {
         JsonResult json = new JsonResult();
         File file = null;
+        Long currentTime = System.currentTimeMillis();
         try {
             if (inputData != null) {
                 inputData.setFinalName(StrUtils.removeChineseCode(checkAndReplaceQuotes(inputData.getFinalName())));
                 inputData.setEnname(StrUtils.removeChineseCode(checkAndReplaceQuotes(inputData.getEnname())));
                 inputData.setWprice(StrUtils.removeSpecialCodeForWprice(inputData.getWprice()));
             }
-            file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "lc004.json", JsonUtils.objectToJsonNotNull(inputData));
+            file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "_lc_" + currentTime + "_004.json", JsonUtils.objectToJsonNotNull(inputData));
             if (file != null) {
                 String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL_LOCAL, file);
                 System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",product local:["
                         + result.replace("\n", "") + "]");
-                if (StringUtils.isBlank(result) || result.contains("NG") || result.contains("FAILED")) {
+                if (StringUtils.isBlank(result) || result.contains("FAILED")) {
                     json.setOk(false);
                     json.setMessage("local执行调用mongodb更新产品接口失败");
                     System.err.println(inputData.getPid() + ",local执行调用mongodb更新产品接口失败");
@@ -452,12 +459,12 @@ public class GoodsInfoUpdateOnlineUtil {
                     json.setOk(true);
                     json.setData(result);
                     if (isSolr > 0 && result.contains("true")) {
-                        file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "lc006.json", result);
+                        file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "_lc_" + currentTime + "_006.json", result);
                         if (file != null) {
                             result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_SOLR_URL_LOCAL, file);
                             System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",solr local:["
                                     + result.replace("\n", "") + "]");
-                            if (StringUtils.isBlank(result) || result.contains("NG") || result.contains("FAILED")) {
+                            if (StringUtils.isBlank(result) || result.contains("FAILED")) {
                                 json.setOk(false);
                                 json.setMessage("local执行调用mongodb更新solr接口失败");
                                 System.err.println(inputData.getPid() + ",local执行调用mongodb更新solr接口失败");
@@ -484,7 +491,7 @@ public class GoodsInfoUpdateOnlineUtil {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage(e.getMessage());
-            logger.error("pid:" + inputData.getPid() + ",updateOnlineAndSolr error:", e);
+            logger.error("pid:" + inputData.getPid() + ",updateLocalAndSolr error:", e);
         } finally {
             if (file != null && file.exists()) {
                 file.delete();
@@ -492,8 +499,47 @@ public class GoodsInfoUpdateOnlineUtil {
         }
         if (json.isOk()) {
             return updateOnlineAndSolr(inputData, isSolr);
+        } else {
+            setOffOnlineByPid(inputData.getPid(), "更新本地MongoDB失败");
         }
         return json.isOk();
+    }
+
+
+    /**
+     * 下架商品
+     *
+     * @param pid
+     * @return
+     */
+    public static boolean setOffOnlineByPid(String pid, String remark) {
+        boolean isSu = false;
+        try {
+            InputData inputData = new InputData('u');
+            inputData.setPid(pid);
+            inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+            inputData.setValid("0");
+            int count = 0;
+            while (count < 5 && !isSu) {
+                isSu = updateLocalAndSolr(inputData, 1);
+                count++;
+                try {
+                    Thread.sleep(5000 + count * 1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("pid:" + pid + ",setOffOnlineByPid error", e);
+                }
+            }
+            CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
+            customGoodsDao.setGoodsValid(pid, "Ling", 1, -1, 6, remark);
+            if (!isSu) {
+                logger.error("pid:" + pid + ",setOffOnlineByPid error------");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("pid:" + pid + ",setOffOnlineByPid error", e);
+        }
+        return isSu;
     }
 
 
@@ -547,7 +593,7 @@ public class GoodsInfoUpdateOnlineUtil {
         List<String> upList = new ArrayList<>();
         try {
             upList = genBatchUpdatePidList(pidList, flag, objVal);
-            file = writeLinesToLocal(LOCAL_JSON_PATH + "/" +shopName + "lc004.json", upList);
+            file = writeLinesToLocal(LOCAL_JSON_PATH + "/" + shopName + "lc004.json", upList);
 
             if (file != null) {
                 String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL_LOCAL, file);
@@ -613,7 +659,7 @@ public class GoodsInfoUpdateOnlineUtil {
         boolean isSuccess = false;
         File file = null;
         try {
-            file = writeLinesToLocal(LOCAL_JSON_PATH + "/" +shopName + "on004.json", upList);
+            file = writeLinesToLocal(LOCAL_JSON_PATH + "/" + shopName + "on004.json", upList);
             if (file != null) {
                 String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL_ONLINE, file);
                 System.err.println("shopName:" + shopName + ",pid size:" + upList.size() + ",product online:[ " + String.valueOf(objVal) + ":"
@@ -673,11 +719,12 @@ public class GoodsInfoUpdateOnlineUtil {
 
     /**
      * 更新mongodb的体积重量数据
+     *
      * @param pid
      * @param newWeight
      * @return
      */
-    public static boolean updateVolumeWeight(String pid, String newWeight){
+    public static boolean updateVolumeWeight(String pid, String newWeight) {
         InputData inputData = new InputData('u');
         inputData.setVolume_weight(newWeight);
         inputData.setPid(pid);
@@ -687,6 +734,7 @@ public class GoodsInfoUpdateOnlineUtil {
 
     /**
      * 写入mongodb数据大本地
+     *
      * @param fileName
      * @param json
      * @return
@@ -714,15 +762,16 @@ public class GoodsInfoUpdateOnlineUtil {
 
     /**
      * 写入数据到本地
+     *
      * @param fileName
      * @param json
      * @return
      * @throws Exception
      */
     public static File writeDataToLocal(String fileName, String json) throws Exception {
-        String timeStr = String.valueOf(System.currentTimeMillis()) + "_" ;
+        String timeStr = String.valueOf(System.currentTimeMillis()) + "_";
         File parentfile = new File(LOCAL_SHOP_RECOMMEND_PATH);
-        if(!(parentfile.exists() && parentfile.isDirectory())){
+        if (!(parentfile.exists() && parentfile.isDirectory())) {
             parentfile.mkdirs();
         }
         FileUtils.write(new File(LOCAL_SHOP_RECOMMEND_PATH + "/" + timeStr + fileName), json, "utf-8");
@@ -736,6 +785,7 @@ public class GoodsInfoUpdateOnlineUtil {
 
     /**
      * 写入List集合数据到本地
+     *
      * @param fileName
      * @param list
      * @return

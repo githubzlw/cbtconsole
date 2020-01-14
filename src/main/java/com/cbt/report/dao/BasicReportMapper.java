@@ -402,4 +402,8 @@ public interface BasicReportMapper {
 
     int queryStripPayInfoCount(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
 
+    List<OrderCancelBean> orderCancelWithIpn(@Param("beginDate") String beginDate, @Param("start") int start, @Param("rows") int rows);
+
+	int orderCancelWithIpnCount(@Param("beginDate") String beginDate);
+
 }

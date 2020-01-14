@@ -62,6 +62,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 su.setInputShopEnName(rs.getString("shop_enname"));
                 su.setInputShopBrand(rs.getString("shop_brand"));
                 su.setOnlineStatus(rs.getInt("online_status"));
+                su.setMemberId(rs.getString("member_id"));
 
                 stmt = conn.prepareStatement(sql1);
                 stmt.setString(1, su.getShopId());
@@ -553,11 +554,11 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         PreparedStatement stmt = null;
         String sql = "";
         if (su.getId() != null) {
-            sql = "update shop_url_bak set shop_id=?,shop_url=?,is_valid=?,sales_volume_threshold=?,download_num=?,admuser=?,admin_id=?,url_type=?,input_shop_name=?, flag =?,updatetime=?,input_shop_description=?,shop_enname=?,shop_brand=? where id=?";
+            sql = "update shop_url_bak set shop_id=?,shop_url=?,is_valid=?,sales_volume_threshold=?,download_num=?,admuser=?,admin_id=?,url_type=?,input_shop_name=?, flag =?,updatetime=?,input_shop_description=?,shop_enname=?,shop_brand=?,member_id=? where id=?";
         } else {
             sql = "insert into shop_url_bak(shop_id,shop_url,is_valid,sales_volume_threshold,download_num,admuser,admin_id,url_type,"
-                    + "input_shop_name,createtime,updatetime,input_shop_description,shop_enname,shop_brand,is_trade) " +
-                    "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    + "input_shop_name,createtime,updatetime,input_shop_description,shop_enname,shop_brand,member_id,is_trade) " +
+                    "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         }
 
         conn = DBHelper.getInstance().getConnection5();
@@ -583,6 +584,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 stmt.setString(i++, su.getInputShopDescription());
                 stmt.setString(i++, su.getInputShopEnName());
                 stmt.setString(i++, su.getInputShopBrand());
+                stmt.setString(i++, su.getMemberId());
                 stmt.setInt(i++, su.getId());
                 id = su.getId();
 
@@ -602,6 +604,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 stmt.setString(i++, su.getInputShopDescription());
                 stmt.setString(i++, su.getInputShopEnName());
                 stmt.setString(i++, su.getInputShopBrand());
+                stmt.setString(i++, su.getMemberId());
                 stmt.setInt(i++, su.getIsTrade());
             }
             result = stmt.executeUpdate();
@@ -3384,12 +3387,12 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     }
 
     @Override
-    public int reDownShopGoods(String shopId, Admuser admuser) {
+    public int reDownShopGoods(String shopId, Admuser admuser, String memberId) {
         Connection conn = DBHelper.getInstance().getConnection5();
         Statement stmt = null;
         String upShopSql = "update shop_url_bak set flag=0,is_valid=0,online_status=0,is_auto = 0," +
                 "spider_goods_flag = 0,service_ip='',admin_id = " + admuser.getId() + ",admuser='" + admuser.getAdmName() + "'"
-                + ",createtime = now(),is_shop_flag =1,"
+                + ",createtime = now(),is_shop_flag =1,member_id='"+memberId+"',"
                 + "sales_volume_threshold = 0,download_num = 1000  where shop_id = '" + shopId + "' ";
         String clearSql = "update shop_clear_state set online_state = 0,shop_state = 0 where shop_id = '" + shopId + "'";
         int count = 0;

@@ -47,9 +47,9 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
     		int orderStock = Integer.parseInt(StrUtils.object2NumStr(m.get("yourorder")));
     		orderno =  StrUtils.object2Str(m.get("orderid"));
     		
-    		remark = remark.replace("orderno", orderno);
-    		remark = remark.replace("odid", StrUtils.object2NumStr(m.get("odid")));
-    		remark = remark.replace("orderStock", StrUtils.object2NumStr(m.get("yourorder")));
+    		String remarkn = remark.replace("orderno", orderno);
+    		remarkn = remarkn.replace("odid", StrUtils.object2NumStr(m.get("odid")));
+    		remarkn = remarkn.replace("orderStock", StrUtils.object2NumStr(m.get("yourorder")));
     		
     		String ows_id = StrUtils.object2NumStr(m.get("ows_id"));
     		String code = StrUtils.object2Str(m.get("code"));
@@ -58,16 +58,17 @@ public class OverseasWarehouseStockServiceImpl implements OverseasWarehouseStock
     				.append(orderStock).append(",available_stock=available_stock+")
     				.append(orderStock).append(" where code_n='").append(coden).append("'").toString();
     		//mq操作更新线上数据表
-    		reduceOrderStock += Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
-    		if(reduceOrderStock > 0) {
+    		int res = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
+    		reduceOrderStock += res;
+    		if(res > 0) {
     			runSql = new StringBuilder("insert into overseas_warehouse_stock_log (ows_id,code, change_stock,od_id,orderno,change_type,remark,code_n,create_time,occupy)" )
     					.append("values (" )
     					.append(ows_id).append(",'")
-    					.append(code).append(",'")
+    					.append(code).append("',")
     					.append(orderStock).append(", ")
     					.append(odid).append(",'")
     					.append(orderno).append("', 1,'")
-    					.append(remark).append("','")
+    					.append(remarkn).append("','")
     					.append(coden).append("',now(),0)")
     					.toString();
     			SendMQ.sendMsg(new RunSqlModel(runSql));

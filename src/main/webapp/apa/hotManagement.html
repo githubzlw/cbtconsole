@@ -464,10 +464,9 @@
 		    $("#gen_show_notice").text("选择分组失败，不刷新！");
 		    return;
         }
-        if(window.location.href.indexOf("127.0.0.1") > -1){
-
+        if(window.location.href.indexOf("127.0.0.1") > -1 || window.location.href.indexOf("localhost") > -1){
+            url =  "http://192.168.1.153:8088/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         }
-        url =  "http://192.168.1.153:8088/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
         if(hotType > 0){
             url += "&hotClassId="+hotType;
         }
@@ -582,7 +581,7 @@
                             </select>
                         </span>
             <input class="refresh_color" type="button" value="刷新最新热卖商品到线上（原json）" onclick="refreshOnlineGoodsJson()" style="cursor:pointer"/>
-            <input class="refresh_color" type="button" value="刷新最新热卖商品到线上（新html）" onclick="refreshOnlineGoodsHtml()" style="cursor:pointer"/>
+            <!--<input class="refresh_color" type="button" value="刷新最新热卖商品到线上（新html）" onclick="refreshOnlineGoodsHtml()" style="cursor:pointer"/>-->
             <span id="gen_show_notice" style="color: red; display: none;">正在执行中...</span>
     </form>
 </div>

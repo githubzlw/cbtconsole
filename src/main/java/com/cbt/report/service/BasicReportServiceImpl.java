@@ -247,4 +247,14 @@ public class BasicReportServiceImpl implements BasicReportService {
 		return reportMapper.queryStripPayInfoCount(beginDate, endDate);
 	}
 
+	@Override
+	public List<OrderCancelBean> orderCancelWithIpn(String beginDate, int start, int rows) {
+		return reportMapper.orderCancelWithIpn(beginDate, start, rows);
+	}
+
+	@Override
+	public int orderCancelWithIpnCount(String beginDate) {
+		return reportMapper.orderCancelWithIpnCount(beginDate);
+	}
+
 }

@@ -3,6 +3,7 @@ package com.cbt.service;
 import com.cbt.bean.Category1688Bean;
 import com.cbt.bean.CategoryAllBean;
 import com.cbt.bean.CategoryBean;
+import com.cbt.bean.CustomGoodsPublish;
 
 import java.util.List;
 import java.util.Map;
@@ -95,5 +96,19 @@ public interface CategoryService {
      * @return
      */
     int updateChangeAllBeanInfo(CategoryAllBean categoryBean);
+
+    /**
+     * 插入新的类别
+     * @param categoryBean
+     * @return
+     */
+    int insertIntoCatidInfo(CategoryAllBean categoryBean);
+
+    /**
+     * 修改产品为新的类别
+     * @param good
+     * @return
+     */
+    int changePidToNewCatid(CustomGoodsPublish good);
     
 }

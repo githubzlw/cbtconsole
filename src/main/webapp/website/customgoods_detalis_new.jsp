@@ -54,6 +54,8 @@
             closeMultiFileDialog();
             closeGoodsDescDialog();
             closeOverSeaDialog();
+            $('#catid-dlg').dialog('close');
+            createComboTree();
         });
 
         function relieveDisabled(obj) {
@@ -1182,6 +1184,13 @@
             });
         }
 
+        function setNewCatid(pid, catid1) {
+            $("#catid_pid").val(pid);
+            $("#catid_old").val(catid1);
+            $('#catid-dlg').dialog('open');
+        }
+
+
         function addKeyWordWeight(shopId, catid, pid) {
             $("#add_shop_id").val(shopId);
             $("#add_shop_catid").val(catid);
@@ -1673,6 +1682,13 @@
                 }
             });
         }
+
+        function createComboTree() {
+            $('#select_catid').combotree({
+                url: '/cbtconsole/category/queryCategoryTree',
+                required: true
+            });
+        }
     </script>
 </head>
 
@@ -1694,6 +1710,35 @@
 <c:if test="${uid > 0}">
 
     <div class="mask"></div>
+
+
+    <div id="catid-dlg" class="easyui-dialog" style="width:500px;height:250px;padding:10px 30px;"
+         title="设置新的类别">
+        <table>
+            <tr>
+                <td>PID:</td>
+                <td><input type="text" id="catid_pid" name="pid" style="width:250px;height: 30px;"/></td>
+            </tr>
+            <tr>
+                <td>原类别:</td>
+                <td><input type="text" id="catid_old" name="oldCatid" style="width:250px;height: 30px;"/></td>
+            </tr>
+            <tr>
+                <td>修改类别:</td>
+                <td><select id="select_catid" class="easyui-combotree" name="newCatid" style="width:250px;height: 36px;"></select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;">
+                    <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="savePidNewCatidInfo()">保存</a>
+                    &nbsp;&nbsp;<a href="#" class="easyui-linkbutton" iconCls="icon-cancel"
+                       onclick="javascript:$('#catid-dlg').dialog('close')">取消</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
 
     <div id="set_over_sea_div" class="easyui-dialog" title="设置海外仓"
          data-options="modal:true"
@@ -2564,6 +2609,7 @@
                     <br><span class="s_btn"
                               onclick="beforeSetAliInfo('${goods.pid}',${goods.isBenchmark},${goods.bmFlag},'${goods.aliGoodsPid}')">重新录入对标</span>
                     &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
+                    <span class="s_btn" onclick="setNewCatid('${goods.pid}','${goods.catid1}')">设置新类别</span>
                     <br>
                     <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>
                     &nbsp;&nbsp;&nbsp;
@@ -2842,7 +2888,7 @@
     function beginUpdateWeight(pid, weight) {
         $.messager.prompt('提示信息', '请输入新的重量:', function (newWeight) {
             if (newWeight) {
-                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
                 if (reg.test(newWeight)) {
                     if (weight == newWeight) {
                         $.messager.alert("提醒", "新的重量和原重量相同", "info");
@@ -2879,7 +2925,7 @@
                     }
 
                 } else {
-                    showMessage('新的重量必须为正数，最多两位小数！');
+                    showMessage('新的重量必须为正数，最多三位小数！');
                 }
             } else {
                 showMessage('未输入新的重量或取消输入！');
@@ -2912,7 +2958,7 @@
     function updateVolumeWeight(pid, oldVolumeWeight) {
         $.messager.prompt('提示信息', '请输入新的体积重量:', function (newWeight) {
             if (newWeight) {
-                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
                 if (reg.test(newWeight)) {
                     if (newWeight == oldVolumeWeight) {
                         showMessage('新输入的体积重量和原来的一致！');
@@ -2941,7 +2987,7 @@
                     }
 
                 } else {
-                    showMessage('新的体积重量必须为正数，最多两位小数！');
+                    showMessage('新的体积重量必须为正数，最多三位小数！');
                 }
             } else {
                 // showMessage('未输入新的体积重量或取消输入！');
@@ -2953,11 +2999,11 @@
         if (type == 0) {
             $.messager.prompt('提示信息', '请输入新的利润率:', function (newProfit) {
                 if (newProfit) {
-                    var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                    var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
                     if (reg.test(newProfit)) {
                         editAndLockProfit(pid, type, newProfit);
                     } else {
-                        showMessage('新的利润率必须为正数，最多两位小数！');
+                        showMessage('新的利润率必须为正数，最多三位小数！');
                     }
                 } else {
                     showMessage('未输入新的利润率或取消输入！');
@@ -3006,5 +3052,39 @@
         var param = "height=660,width=900,top=160,left=550,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open("/cbtconsole/editc/querySkuByPid?pid=" + pid, "windows", param);
     }
+    
+    function savePidNewCatidInfo() {
+            var pid = $("#catid_pid").val();
+            var oldCatid = $("#catid_old").val();
+            var node = $("#select_catid").combotree('tree').tree('getSelected');
+            var newCatid = node.id;
+            if (pid && oldCatid && newCatid) {
+                $.messager.progress({
+                    title: '正在保存',
+                    msg: '请等待...'
+                });
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/editc/changePidToNewCatid",
+                    data: {pid: pid, oldCatid: oldCatid, newCatid: newCatid},
+                    success: function (data) {
+                        // $("#notice_id").hide();
+                        $.messager.progress('close');
+                        if (data.ok) {
+                            $('#catid-dlg').dialog('close');
+                        } else {
+                            $.messager.alert("提示信息", data.message, "error");
+                        }
+                    },
+                    error: function (res) {
+                        // $("#notice_id").hide();
+                        $.messager.progress('close');
+                        $.messager.alert("提示信息", "网络连接错误", "error");
+                    }
+                });
+            } else {
+                $.messager.alert("提示信息", "请填写完整信息", "info");
+            }
+        }
 </script>
 </html>
