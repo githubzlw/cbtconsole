@@ -214,9 +214,115 @@ public class OrderPurchaseController {
             noPurchaseList.clear();
 
             HSSFWorkbook wb = genOrderPurchaseListExcelTotal(resultList, timeBegin.getYear() + "年" + timeBegin.getMonthValue() + "月1688采购汇总");
+            resultList.clear();
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition",
                     "attachment;filename=" + timeBegin.getYear() + "-" + timeBegin.getMonthValue() + "-ourOrderWith1688PurchaseTotal.xls");
+            response.setCharacterEncoding("utf-8");
+            ouputStream = response.getOutputStream();
+            wb.write(ouputStream);
+            ouputStream.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ouputStream != null) {
+                    ouputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    @RequestMapping("/taobaoList")
+    @ResponseBody
+    public EasyUiJsonResult taobaoList(HttpServletRequest request,
+                                       @RequestParam(name = "rows", defaultValue = "40") Integer rows,
+                                       @RequestParam(name = "page", defaultValue = "1") Integer page,
+                                       @RequestParam(name = "beginTime", required = true) String beginTime) {
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtil.isBlank(admuserJson)) {
+            json.setSuccess(false);
+            json.setMessage("用户未登陆");
+            return json;
+        }
+        try {
+            int startNum = (page - 1) * rows;
+            OrderPurchase orderPurchase = new OrderPurchase();
+            orderPurchase.setStartNum(startNum);
+            orderPurchase.setLimitNum(rows);
+
+            LocalDateTime timeBegin = DateFormatUtil.getTimeWithStr(beginTime + " 00:00:00");
+
+            LocalDateTime timeEnd = timeBegin.plusMonths(1);
+            orderPurchase.setBeginTime(beginTime);
+            orderPurchase.setEndTime(DateFormatUtil.formatDateToYearAndMonthAndDayString(timeEnd));
+
+            orderPurchaseService.getCurrentOrder(orderPurchase);
+
+            List<OrderPurchase> orderPurchaseList = orderPurchaseService.taobaoList(orderPurchase);
+            if (CollectionUtils.isNotEmpty(orderPurchaseList)) {
+                orderPurchaseList.forEach(e -> {
+                    if (StringUtils.isNotBlank(e.getOd_shipno())) {
+                        e.setYear(timeBegin.getYear() + "-" + timeBegin.getMonthValue());
+                        if (e.getExchange_rate() < 6) {
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * EXCHANGE_RATE, 2));
+                        } else {
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getExchange_rate(), 2));
+                        }
+                    }
+                });
+            }
+
+            int count = orderPurchaseService.taobaoListCount(orderPurchase);
+            json.setSuccess(orderPurchaseList, count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("taobaoList error:", e);
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping("/taobaoListExcel")
+    @ResponseBody
+    public void taobaoListExcel(HttpServletRequest request, HttpServletResponse response,
+                                @RequestParam(name = "beginTime", required = true) String beginTime) {
+        OutputStream ouputStream = null;
+        try {
+            OrderPurchase orderPurchase = new OrderPurchase();
+            LocalDateTime timeBegin = DateFormatUtil.getTimeWithStr(beginTime + " 00:00:00");
+
+            LocalDateTime timeEnd = timeBegin.plusMonths(1);
+            orderPurchase.setBeginTime(beginTime);
+            orderPurchase.setEndTime(DateFormatUtil.formatDateToYearAndMonthAndDayString(timeEnd));
+
+            orderPurchaseService.getCurrentOrder(orderPurchase);
+
+            List<OrderPurchase> orderPurchaseList = orderPurchaseService.taobaoList(orderPurchase);
+            if (CollectionUtils.isNotEmpty(orderPurchaseList)) {
+                orderPurchaseList.forEach(e -> {
+                    e.setYear(timeBegin.getYear() + "-" + timeBegin.getMonthValue());
+                    if (StringUtils.isNotBlank(e.getOrderid())) {
+                        if (e.getExchange_rate() < 6) {
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder() * EXCHANGE_RATE, 2));
+                        } else {
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder() * e.getExchange_rate(), 2));
+                        }
+                    }
+                });
+            }
+
+            HSSFWorkbook wb = genOrderPurchaseListExcelDetail(orderPurchaseList, timeBegin.getYear() + "年" + timeBegin.getMonthValue() + "月1688采购对应我司订单");
+            orderPurchaseList.clear();
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-disposition",
+                    "attachment;filename=" + timeBegin.getYear() + "-" + timeBegin.getMonthValue() + "-1688PurchaseForOurOrder.xls");
             response.setCharacterEncoding("utf-8");
             ouputStream = response.getOutputStream();
             wb.write(ouputStream);
