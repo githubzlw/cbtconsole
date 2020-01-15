@@ -4050,7 +4050,7 @@ public class WarehouseCtrl {
 			// 合并的订单是否一致
 			for (int i = 0; i < orderAddresslList.size(); i++) {
 				LOG.info(orderids[i] + "收货地址" + orderAddresslList.get(i));
-				if (!orderAddressStr.equals(orderAddresslList.get(i))) {
+				if (!orderAddressStr.equalsIgnoreCase(orderAddresslList.get(i))) {
 					return "0";
 				}
 			}
