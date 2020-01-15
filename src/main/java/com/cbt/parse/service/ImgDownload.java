@@ -1,8 +1,10 @@
 package com.cbt.parse.service;
 
+import com.importExpress.utli.ColorRGBUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -10,6 +12,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 public class ImgDownload {
+	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(ImgDownload.class);
 
 	/**
 	 * 测试
@@ -44,7 +47,7 @@ public class ImgDownload {
 
 		boolean isDown = false;
 		File file = new File(fileName);
-		if(file.exists() && !file.isDirectory() && 1.0 * file.length() / 1024 > 0.1){
+		if(checkDownFileByName(fileName)){
 			return true;
 		}
 		InputStream inputStream = null;
@@ -229,13 +232,26 @@ public class ImgDownload {
 		return outStream.toByteArray();
 	}
 
-	public static boolean checkDownFileByName(String fileName){
+	public static boolean checkDownFileByName(String fileName) {
         boolean isDown = false;
         File downFlie = new File(fileName);
 
-        if (downFlie.exists() && 1.0 * downFlie.length() / 1024 > 0.1) {
-            isDown = true;
-        } else {
+        if (downFlie.exists() && downFlie.length() > 512) {
+			try {
+				if (ColorRGBUtil.getInstance().checkImage(fileName)) {
+					System.err.println("fileName:" + fileName + " gray img");
+					logger.error("fileName:" + fileName + " gray img");
+					// 灰图检测
+					isDown = false;
+					downFlie.delete();
+				} else {
+					isDown = true;
+				}
+			} catch (Exception e) {
+				isDown = false;
+				e.printStackTrace();
+			}
+		} else {
             if (downFlie.exists()) {
                 downFlie.delete();
             }
