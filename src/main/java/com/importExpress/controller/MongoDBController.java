@@ -23,6 +23,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -247,7 +251,28 @@ public class MongoDBController {
             json.setMessage(e.getMessage());
             logger.error("pid:" + pid + ",error:", e);
         }
+        return json;
+    }
 
+
+    @GetMapping("/checkPid/{pid}")
+    @ResponseBody
+    public JsonResult checkPidImg(@PathVariable(name = "pid") String pid) {
+        JsonResult json = new JsonResult();
+        try {
+            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+            boolean isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, 0);
+            if (isCheckImg) {
+                json.setSuccess("检查成功");
+            } else {
+                json.setErrorInfo("检查异常");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+            logger.error("pid:" + pid + ",error:", e);
+        }
         return json;
     }
 

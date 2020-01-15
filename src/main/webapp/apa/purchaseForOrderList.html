@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>客户订单采购</title>
+    <title>1688采购对应我司订单</title>
     <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
     <script type="text/javascript"
             src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
@@ -23,7 +23,7 @@
             color: #fff;
         }
 
-        #kop_query_form {
+        #pfo_query_form {
             font-size: 18px;
         }
 
@@ -33,16 +33,16 @@
             font-size: 24px;
         }
 
-        #kop_rYear, #kop_rMonth, .but_color {
+        #pfo_rYear, #pfo_rMonth, .but_color {
             padding: 5px;
             font-size: 14px
         }
 
-        #kop_rYear, #kop_rMonth {
+        #pfo_rYear, #pfo_rMonth {
             margin-right: 18px
         }
 
-        #kop_top_toolbar {
+        #pfo_top_toolbar {
             padding: 20px 28px !important;
         }
 
@@ -51,14 +51,14 @@
         $(function () {
             genYearSelect();
             setDatagrid();
-            var opts = $("#kop_main-datagrid").datagrid("options");
-            opts.url = "/cbtconsole/orderPurchase/list";
+            var opts = $("#pfo_main-datagrid").datagrid("options");
+            opts.url = "/cbtconsole/orderPurchase/taobaoList";
         });
 
         function genYearSelect() {
             var mydate = new Date();
             var rYear = mydate.getFullYear();
-            $("#kop_rYear").empty();
+            $("#pfo_rYear").empty();
             var content = "";
             for (var yr = 2016; yr <= rYear; yr++) {
                 if (yr == rYear) {
@@ -67,18 +67,18 @@
                     content += "<option value='" + yr + "'>" + yr + "</option>";
                 }
             }
-            $("#kop_rYear").append(content);
+            $("#pfo_rYear").append(content);
         }
 
         function setDatagrid() {
-            $('#kop_main-datagrid').datagrid({
-                title: '客户订单采购',
+            $('#pfo_main-datagrid').datagrid({
+                title: '1688采购对应我司订单',
                 width: "100%",
                 height: "100%",
                 fit: true,//自动补全
                 striped: true,//设置为true将交替显示行背景。
                 collapsible: true,//显示可折叠按钮
-                toolbar: "#kop_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                toolbar: "#pfo_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
                 url: '',//url调用Action方法
                 loadMsg: '数据装载中......',
                 singleSelect: true,//为true时只能选择单行
@@ -113,51 +113,35 @@
         }
 
         function doKopQuery() {
-            var year = $("#kop_rYear").val();
+            var year = $("#pfo_rYear").val();
             if (year == null || year == "" || year == "0" || year == "-1") {
                 showMessage('请选择年份');
                 return;
             }
-            var month = $("#kop_rMonth").val();
+            var month = $("#pfo_rMonth").val();
             if (month == null || month == "" || month == "0" || month == "-1") {
                 showMessage('请选择月份');
                 return;
             }
-            $("#kop_main-datagrid").datagrid("load", {
+            $("#pfo_main-datagrid").datagrid("load", {
                 "beginTime": year + "-" + month + "-01"
             });
         }
 
         function exportKopExcelDetail() {
-            var year = $("#kop_rYear").val();
+            var year = $("#pfo_rYear").val();
             if (year == null || year == "" || year == "0" || year == "-1") {
                 showMessage('请选择年份');
                 return;
             }
-            var month = $("#kop_rMonth").val();
+            var month = $("#pfo_rMonth").val();
             if (month == null || month == "" || month == "0" || month == "-1") {
                 showMessage('请选择月份');
                 return;
             }
-            var  time = year + "-" + month + "-01";
-            window.location.href = "/cbtconsole/orderPurchase/exportKopExcelDetail?beginTime="+ time;
+            var time = year + "-" + month + "-01";
+            window.location.href = "/cbtconsole/orderPurchase/taobaoListExcel?beginTime=" + time;
         }
-
-        function exportKopExcelTotal() {
-            var year = $("#kop_rYear").val();
-            if (year == null || year == "" || year == "0" || year == "-1") {
-                showMessage('请选择年份');
-                return;
-            }
-            var month = $("#kop_rMonth").val();
-            if (month == null || month == "" || month == "0" || month == "-1") {
-                showMessage('请选择月份');
-                return;
-            }
-            var  time = year + "-" + month + "-01";
-            window.location.href = "/cbtconsole/orderPurchase/exportKopExcelTotal?beginTime="+ time;
-        }
-
 
         function formatUserId(val, row, index) {
             return '<a href="/cbtconsole/userinfo/getUserInfo.do?userId=' + val + '" target="_blank">' + val + '</a>';
@@ -184,8 +168,8 @@
             var rYear = mydate.getFullYear();
             var rMonth = mydate.getMonth();
             var monthop = "";
-            $('#kop_rMonth').empty();
-            var selectYear = $('#kop_rYear').val();
+            $('#pfo_rMonth').empty();
+            var selectYear = $('#pfo_rYear').val();
             if (selectYear == rYear) {
                 for (var i = 1; i <= rMonth + 1; i++) {
                     if (i < 10) {
@@ -194,7 +178,7 @@
                         monthop += "<option value='" + i + "'>" + i + "</oiption>";
                     }
                 }
-                $('#kop_rMonth').append(monthop);
+                $('#pfo_rMonth').append(monthop);
             } else if (selectYear < rYear) {
                 for (var i = 1; i <= 12; i++) {
                     if (i < 10) {
@@ -203,9 +187,9 @@
                         monthop += "<option value='" + i + "'>" + i + "</oiption>";
                     }
                 }
-                $('#kop_rMonth').append(monthop);
+                $('#pfo_rMonth').append(monthop);
             } else if (selectYear > rYear) {
-                $('#kop_rYear').val(rYear);
+                $('#pfo_rYear').val(rYear);
                 for (var i = 1; i <= rMonth + 1; i++) {
                     if (i < 10) {
                         monthop += "<option value='0" + i + "'>0" + i + "</oiption>";
@@ -213,28 +197,28 @@
                         monthop += "<option value='" + i + "'>" + i + "</oiption>";
                     }
                 }
-                $('#kop_rMonth').append(monthop);
+                $('#pfo_rMonth').append(monthop);
             }
         }
 
         function doKopReset() {
-            $("#kop_query_form")[0].reset();
+            $("#pfo_query_form")[0].reset();
         }
     </script>
 
 </head>
 <body>
 
-<div id="kop_top_toolbar" style="padding: 5px; height: auto">
+<div id="pfo_top_toolbar" style="padding: 5px; height: auto">
     <div>
-        <form id="kop_query_form" action="#" onsubmit="return false;">
-            <label for="kop_rYear">年份选择<font color="red">*</font>：
-            </label> <select name="year" id="kop_rYear" onchange="doKopSelectChange()">
+        <form id="pfo_query_form" action="#" onsubmit="return false;">
+            <label for="pfo_rYear">年份选择<font color="red">*</font>：
+            </label> <select name="year" id="pfo_rYear" onchange="doKopSelectChange()">
             <option value='2016'>2016</option>
             <option value='2017'>2017</option>
             <option value='2018'>2018</option>
-        </select><label for="kop_rMonth">月份选择<font color="red">*</font>：
-        </label> <select name="month" id="kop_rMonth">
+        </select><label for="pfo_rMonth">月份选择<font color="red">*</font>：
+        </label> <select name="month" id="pfo_rMonth">
             <option value="01">01</option>
             <option value="02">02</option>
             <option value="03">03</option>
@@ -252,15 +236,13 @@
             &nbsp;
             <input class="but_color" type="button" value="重置" onclick="doKopReset()">
             &nbsp;
-            <input class="but_color" type="button" value="导出Excel汇总" onclick="exportKopExcelTotal()">
-            &nbsp;
             <input class="but_color" type="button" value="导出Excel详细" onclick="exportKopExcelDetail()">
 
         </form>
 
     </div>
 </div>
-<table id="kop_main-datagrid" style="width: 100%; height: 100%;"
+<table id="pfo_main-datagrid" style="width: 100%; height: 100%;"
        class="easyui-datagrid">
     <thead>
     <tr>
@@ -303,13 +285,13 @@
                         if (sgParamLst[0] == "year") {
                             year = sgParamLst[1];
                             if (!(year == null || year == "")) {
-                                $("#kop_rYear").val(sgParamLst[1]);
+                                $("#pfo_rYear").val(sgParamLst[1]);
                             }
                             continue;
                         } else if (sgParamLst[0] == "month") {
                             month = sgParamLst[1];
                             if (!(month == null || month == "")) {
-                                $("#kop_rMonth").val(sgParamLst[1]);
+                                $("#pfo_rMonth").val(sgParamLst[1]);
                             }
                             continue;
                         }

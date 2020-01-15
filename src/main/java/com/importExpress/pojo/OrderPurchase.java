@@ -29,6 +29,7 @@ public class OrderPurchase {
     private String itemqty;
     private String totalprice;
     private String orderdate;
+    private String tb_orderid;
 
     private String year;
     private String month;

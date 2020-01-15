@@ -14,12 +14,12 @@
     <select id="queryForList" parameterType="com.importExpress.pojo.OrderPurchase"
             resultType="com.importExpress.pojo.OrderPurchase">
         select aa.*,bb.*,cc.orderpaytime,cc.exchange_rate
-        from (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,od.shipno as od_shipno,
+        from (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,ifnull(od.re_shipnos,od.shipno) as od_shipno,
         ifnull(ops.last_tb_1688_itemid,ops.tb_1688_itemid) as od_pid
         from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
         and od.state in(0,1) where od.orderid in(select order_no from orderinfo_curren_monthly) ) aa
         left join
-        (select distinct th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,th.orderdate
+        (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,th.orderdate
         from (select od.orderid,od.id as od_id,od.yourorder,od.goodsprice,od.state as od_state,
         od.purchase_state,od.shipno as od_shipno,
         ifnull(ops.last_tb_1688_itemid,ops.tb_1688_itemid) as od_pid
@@ -38,7 +38,8 @@
     </select>
 
     <select id="queryForListCount" parameterType="com.importExpress.pojo.OrderPurchase" resultType="java.lang.Integer">
-        select count(0) from (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,od.shipno as od_shipno,
+        select count(0) from
+        (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,ifnull(od.re_shipnos,od.shipno) as od_shipno,
         ifnull(ops.last_tb_1688_itemid,ops.tb_1688_itemid) as od_pid
         from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
         and od.state in(0,1) where od.orderid in(select order_no from orderinfo_curren_monthly) ) aa
@@ -56,6 +57,39 @@
         inner join orderinfo cc on aa.orderid = cc.order_no
         and cc.user_id in(select id from user where is_test = 0)
         order by aa.orderid,bb.orderdate desc
+    </select>
+
+    <select id="taobaoList" parameterType="com.importExpress.pojo.OrderPurchase"
+            resultType="com.importExpress.pojo.OrderPurchase">
+        select aa.*,bb.*
+        from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
+        th.paydata as orderdate
+        from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and th.tbOr1688 between 0 and 3
+        group by th.shipno,th.itemid) bb
+		left join (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,ifnull(od.re_shipnos,od.shipno) as od_shipno,
+        ifnull(ops.last_tb_1688_itemid,ops.tb_1688_itemid) as od_pid,oi.orderpaytime,oi.exchange_rate
+        from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
+        and od.state in(0,1) inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
+        where od.orderid in(select order_no from orderinfo_curren_monthly)  ) aa
+        on aa.od_shipno = bb.shipno and aa.od_pid = bb.itemid
+        order by bb.orderdate desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="taobaoListCount" parameterType="com.importExpress.pojo.OrderPurchase" resultType="java.lang.Integer">
+        select count(0)
+        from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
+        th.paydata as orderdate
+        from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and th.tbOr1688 between 0 and 3
+        group by th.shipno,th.itemid) bb
+		left join (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,ifnull(od.re_shipnos,od.shipno) as od_shipno,
+        ifnull(ops.last_tb_1688_itemid,ops.tb_1688_itemid) as od_pid,oi.orderpaytime,oi.exchange_rate
+        from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
+        and od.state in(0,1) inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
+        where od.orderid in(select order_no from orderinfo_curren_monthly)  ) aa
+        on aa.od_shipno = bb.shipno and aa.od_pid = bb.itemid
     </select>
 
 </mapper>
