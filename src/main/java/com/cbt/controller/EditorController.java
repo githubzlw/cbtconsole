@@ -135,6 +135,7 @@ public class EditorController {
 
             if (goods.getGoodsState() == 1) {
                 goods.setOffReason(null);
+                goods.setUnsellAbleReasonDesc(null);
             }else if (goods.getValid() == 0) {
                 if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
                     goods.setOffReason(null);
@@ -268,7 +269,7 @@ public class EditorController {
             if (typeList.size() > 0) {
                 request.setAttribute("showtypes", JSONArray.toJSON(typeList));
             } else {
-                request.setAttribute("showtypes", JSONArray.toJSON("[]"));
+                request.setAttribute("showtypes", "");
             }
 
             //进行利润率计算,区分免邮和费免邮商品
