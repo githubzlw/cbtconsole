@@ -16,6 +16,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
@@ -69,4 +70,34 @@ public class PublishGoodsToOnlineThreadTest {
         Assert.assertTrue("检查图片异常", isCheckImg);
     }
 
+
+    @Test
+    public void setWindowImgToMainImgTest() {
+        String pid = "529566549703";
+        CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+        // 新的主图名称
+        if(!goods.getShowMainImage().contains("http")){
+            goods.setShowMainImage(goods.getRemotpath() + goods.getShowMainImage());
+        }
+        String downImgUrl = goods.getShowMainImage().replace(".220x220", ".400x400");
+        String downImgName = downImgUrl.substring(downImgUrl.lastIndexOf("/"));
+
+        // 图片下载本地路径名称
+        String localDownImgPre = ftpConfig.getLocalDiskPath() + pid + "/edit";
+        String localDownImg = localDownImgPre + downImgName.replace(".220x220", ".400x400");
+        deleteFileChild(localDownImgPre);
+
+        System.err.println("down[" + downImgUrl + "] to [" + localDownImg + "]");
+    }
+
+    private void deleteFileChild(String fileName) {
+        File file = new File(fileName);
+        if (file.exists() && file.isDirectory()) {
+            File[] childList = file.listFiles();
+            for (File child : childList) {
+                child.delete();
+            }
+            childList = null;
+        }
+    }
 }
