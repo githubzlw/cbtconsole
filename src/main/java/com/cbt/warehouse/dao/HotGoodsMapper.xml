@@ -163,12 +163,7 @@
 		where a.hot_selling_id = #{hotCategoryId} and a.goods_pid = b.pid and b.valid =1) as aa
 		left join hot_goods_discount bb on aa.goods_pid =bb.goods_pid and aa.hot_selling_id =bb.hot_id
 		left join hot_goods_evaluation cc on aa.goods_pid =cc.goods_pid
-		<if test=" hotType == 2">
-			order by is_on desc,discount_sort desc
-		</if>
-		<if test=" hotType != 2">
-			order by is_on desc,profit_margin desc
-		</if>
+		order by aa.id desc
 	</select>
 
 	<insert id="insertHotSellingGoods" parameterType="com.cbt.warehouse.pojo.HotSellingGoods">
