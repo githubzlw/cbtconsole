@@ -124,6 +124,9 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         }
         System.err.println("uploadLocalImg size:" + imgList.size() + ",result:" + isSuccess);
         if (isSuccess) {
+            // 保存本地数据
+
+
             // isUpdateImg = 1;
             if (isUpdateImg > 0) {
                 System.err.println("pid" + pid + ",begin setWindowImgToMainImg---");
@@ -193,20 +196,18 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         boolean isSuccess = false;
         // 下载需要的图片到本地
         // 新的主图名称
-        String downImgName = goods.getShowMainImage().substring(goods.getShowMainImage().lastIndexOf("/"));
+        if(!goods.getShowMainImage().contains("http")){
+            goods.setShowMainImage(goods.getRemotpath() + goods.getShowMainImage());
+        }
+        String downImgUrl = goods.getShowMainImage().replace(".220x220", ".400x400");
+        String downImgName = downImgUrl.substring(downImgUrl.lastIndexOf("/"));
 
         // 图片下载本地路径名称
         String localDownImgPre = ftpConfig.getLocalDiskPath() + pid + "/edit";
         String localDownImg = localDownImgPre + downImgName.replace(".220x220", ".400x400");
         deleteFileChild(localDownImgPre);
 
-        String downImgUrl;
-        if (isUpdateImg == 2) {
-            downImgUrl = goods.getShowMainImage().replace(".220x220", ".400x400");
-        } else {
-            downImgUrl = goods.getShowMainImage();
-        }
-        System.err.println("down[" + goods.getShowMainImage() + "] to [" + localDownImg + "]");
+        System.err.println("down[" + downImgUrl + "] to [" + localDownImg + "]");
         isSuccess = ImgDownload.downFromImgService(downImgUrl, localDownImg);
         if (!isSuccess) {
             // 重新下载一次

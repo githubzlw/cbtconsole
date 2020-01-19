@@ -136,7 +136,7 @@ public class GoodsInfoUtils {
      */
     public static List<TypeBean> deal1688GoodsType(CustomGoodsPublish cgbean, boolean isRemote) {// 规格
         List<TypeBean> typeList = new ArrayList<TypeBean>();
-        if (!(cgbean.getEntype() == null || "".equals(cgbean.getEntype()))) {
+        if (StringUtils.isNotBlank(cgbean.getEntype()) && cgbean.getEntype().length() > 5) {
             Map<String, List<TypeBean>> typeMap = new HashMap<String, List<TypeBean>>();
             String types = cgbean.getEntype();
             String remotPath = cgbean.getRemotpath();

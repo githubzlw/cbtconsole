@@ -1452,12 +1452,13 @@ public class HotManageController {
     private void updateCategoryOnline(HotCategory param) {
         String show_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getShowName());
         String category_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getCategoryName());
+        String viewMoreUrl = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getViewMoreUrl());
         String sql = "update hot_category set" +
                 " category_name='" + category_name + "',show_name='" + show_name + "',show_img='" + param.getShowImg()
                 + "',is_on=" + param.getIsOn()
                 + ",sorting=" + param.getSorting() + ",hot_type=" + param.getHotType() + ",update_admin_id=" + param.getAdminId()
                 + ",web_site=" + param.getWebSite()
-                + ",view_more_url='" + param.getViewMoreUrl() + "'"
+                + ",view_more_url='" + viewMoreUrl + "'"
                 + " where id = " + param.getId();
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
