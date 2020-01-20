@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.google.gson.Gson;
+import com.importExpress.pojo.ResultBean;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.FormBody;
@@ -325,4 +327,29 @@ public class FreightUtlity {
 		System.out.println(freightByWeight);
 		
 	}
+
+
+    public static int changeUserNotFree(int userId,int state) {
+        int result = 0;
+        OkHttpClient okHttpClient = new OkHttpClient();
+        /*Request request = new Request.Builder().url(getFreightCostUrl).post(formBody).build();*/
+        String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","goodsCar/"+userId+"/"+state);
+        Request request = new Request.Builder().addHeader("Accept","*/*")
+                .addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+                .url(url).get().build();
+        try {
+            Response response = okHttpClient.newCall(request).execute();
+            String resultStr = response.body().string();
+            ResultBean resultBean = new Gson().fromJson(resultStr, ResultBean.class);
+            if (resultBean.getCode()==0) {
+                Object data1 = resultBean.getData();
+                result = (int)data1;
+            } else {
+                logger.warn("getFreightByOrderno error :<:<:<");
+            }
+        } catch (Exception e) {
+            logger.warn("getFreightByOrderno error,userId:[{}],state:[{}]",userId,state);
+        }
+        return result;
+    }
 }

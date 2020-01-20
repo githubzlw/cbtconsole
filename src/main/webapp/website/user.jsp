@@ -865,4 +865,23 @@ tr .td_class{width:230px;}
 		</thead>
 	</table>
 </body>
+<script type="text/javascript">
+	function changeNotFree(userId,state) {
+		$.ajax({
+			type: "POST",
+			url: "/cbtconsole/warehouse/changeNotFree",
+			data: {
+				userId:userId,
+				state:state
+			},
+			dataType:"json",
+			success: function(res){
+				if (res) {
+					$.messager.alert('提示', res.message);
+				}
+
+			}
+		});
+	}
+</script>
 </html>
