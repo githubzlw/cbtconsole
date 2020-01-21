@@ -261,7 +261,7 @@ public class MongoDBController {
         JsonResult json = new JsonResult();
         try {
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-            boolean isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, 0);
+            boolean isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, 0,1);
             if (isCheckImg) {
                 json.setSuccess("检查成功");
             } else {
