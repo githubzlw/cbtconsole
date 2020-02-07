@@ -76,6 +76,7 @@
 		<result column="wprice" property="wprice" />
 		<result column="isNewCloud" property="isNewCloud" />
 		<result column="max_price" property="maxPrice" />
+		<result column="salable" property="salable" />
 	</resultMap>
 
 	<sql id="hotSellingCategoryColumn">
@@ -321,7 +322,7 @@
 
 	<select id="queryFor1688Goods" resultMap="CustomGoodsBeanResultMap">
 		select
-		cbr.*,ifnull(c8g.name,'') as name from
+		cbr.*,ifnull(c8g.name,'') as name,ifnull(cgs.salable,0) as salable from
 		(
 		select
 		id,catid,catid1,pid,custom_main_image as img,
@@ -330,8 +331,8 @@
 		custom_benchmark_ready where pid =#{pid,jdbcType=VARCHAR} and valid = 1
 		) cbr left join (select pid,name from custom_1688_goods where
 		pid
-		=#{pid,jdbcType=VARCHAR}) c8g
-		on cbr.pid = c8g.pid
+		=#{pid,jdbcType=VARCHAR}) c8g on cbr.pid = c8g.pid
+		left join custom_goods_salable cgs on cbr.pid = cgs.pid and cgs.salable = 1
 	</select>
 
 	<select id="queryExistsGoodsCount" resultType="java.lang.Integer">
