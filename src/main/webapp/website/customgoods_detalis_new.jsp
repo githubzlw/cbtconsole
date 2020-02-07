@@ -1523,6 +1523,41 @@
             });
         }
 
+        function setSalable(pid, flag) {
+            var content = '是否确认设置取消美加可售卖标识';
+            if(flag > 0){
+                content = '是否确认设置美加可售卖标识';
+            }
+            $.messager.confirm('提示', content, function (rs) {
+                if (rs) {
+                    $.ajax({
+                        type: 'POST',
+                        sync: true,
+                        dataType: 'json',
+                        url: '/cbtconsole/editc/setSalable',
+                        data: {
+                            "pid":pid,
+                            "flag": flag
+                        },
+                        success: function (data) {
+                            if (data.ok) {
+                                showMessage("执行成功");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
+                            } else {
+                                $.messager.alert("提醒", data.message, "error");
+                            }
+                        },
+                        error: function (XMLResponse) {
+                            $.messager.alert("提醒", "网络错误,请重试", "error");
+                        }
+                    });
+                }
+            });
+        }
+
+
         function uploadMultiFile() {
             $.messager.progress({
                 title: '上传本地图片',
@@ -2105,6 +2140,13 @@
                 <span class="s_btn" onclick="setSearchable('${goods.pid}', 0)">设置不可搜索</span>
             </c:if>
 
+            <c:if test="${salable == 0}">
+                <span class="s_btn" onclick="setSalable('${goods.pid}', 1)">设置美加可售卖</span>
+            </c:if>
+            <c:if test="${salable > 0}">
+                <span class="s_btn" onclick="setSalable('${goods.pid}', 0)">取消美加可售卖</span>
+            </c:if>
+
         </div>
         <div class="all_s">
             <input type="hidden" id="delete_type_ids" value=""/>
@@ -2466,7 +2508,11 @@
                     <c:if test="${not empty describeGoodFlagStr}">
                         <b style="font-size: 16px;color: red;">描述很精彩:(${describeGoodFlagStr})</b>
                     </c:if>
-                </c:if><c:if test="${not empty goodsOverSeaList && fn:length(goodsOverSeaList) > 0}">
+                </c:if>
+                    <c:if test="${salable > 0}">
+                        <br><b style="font-size: 16px;color: red;">美加可售卖标记</b>
+                    </c:if>
+                    <c:if test="${not empty goodsOverSeaList && fn:length(goodsOverSeaList) > 0}">
                     <br>
                     <div style="font-size: 20px;background-color: #a2f387" >
                         <table border="1">

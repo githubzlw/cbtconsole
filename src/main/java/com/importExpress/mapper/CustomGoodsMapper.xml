@@ -1666,4 +1666,13 @@ select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feepri
         update custom_benchmark_ready_delete_log set delete_flag= 1 where pid =  #{pid}
     </update>
 
+    <select id="querySalableByPid" resultType="java.lang.Integer">
+        select count(0) from custom_goods_salable where pid = #{pid} and salable = 1
+    </select>
+
+    <insert id="setSalable">
+        insert into custom_goods_salable(pid,salable,admin_id) values(#{pid},#{flag},#{adminId})
+        ON DUPLICATE KEY UPDATE salable= #{flag},admin_id=#{adminId}
+    </insert>
+
 </mapper>
