@@ -2132,7 +2132,6 @@
 
             </c:if>
             <span class="s_btn" onclick="openOverSeaDialog(${goods.overSeaFlag})">设置海外仓</span>
-
             <c:if test="${goods.searchable == 0}">
                 <span class="s_btn" onclick="setSearchable('${goods.pid}', 1)">设置可搜索</span>
             </c:if>
