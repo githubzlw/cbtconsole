@@ -45,6 +45,16 @@ public class CustomGoodsBean {
     private String updateTimeAll;
     private String customMainImage;
     private String maxPrice;
+    private int salable;
+
+
+    public int getSalable() {
+        return salable;
+    }
+
+    public void setSalable(int salable) {
+        this.salable = salable;
+    }
 
     public String getMaxPrice() {
         return maxPrice;

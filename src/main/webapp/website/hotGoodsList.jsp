@@ -404,6 +404,11 @@
                         $("#nw_goods_goodsname").text(json.name);
                         $("#nw_goods_showname").text(json.enname);
                         $("#nw_goods_goodsurl").text(json.url);
+                        if(json.salable > 0){
+                            $("#nw_goods_salable").text("美加可售卖");
+                        }else{
+                            $("#nw_goods_salable").text("美加不可售卖");
+                        }
                         $("#nw_goods_goodsimg").attr("src",
                             json.remotpath + json.img);
                         $("#nw_goods_goodsprice").text(json.price);
@@ -444,6 +449,7 @@
             $("#nw_goods_showname").text("");
             $("#nw_goods_goodsname").text("");
             $("#nw_goods_goodsurl").text("");
+            $("#nw_goods_salable").text("");
             $("#nw_goods_goodsimg").attr("src", "#");
             $("#nw_goods_goodsprice").text("0.00");
             $("#nw_goods_amazon_price").val("0.00");
@@ -738,8 +744,12 @@
                 <c:if test="${goods.unsellableReason == 26}">
                     <br><b style="color:red;">1688货源异常</b>
                 </c:if>
-                <br><br>
+                <br>
+                <c:if test="${goods.salable > 0}">
+                    <b style="color:green;">美加可售</b><br>
+                </c:if>
                 <c:if test="${hotType == 2}">
+                    <br>
                     <c:if test="${goods.discountId>0}">
                         <div style="background-color: #9ecdef">
                             <span>折扣开始时间:[${goods.discountBeginTime}]<br>折扣结束时间:[${goods.discountEndTime}]</span><br>
@@ -865,7 +875,10 @@
                 <td>商品PID：</td>
                 <td><span id="nw_goods_goodsPid"></span></td>
             </tr>
-
+            <tr>
+                <td>美加可售卖：</td>
+                <td><span id="nw_goods_salable"></span></td>
+            </tr>
             <tr>
                 <td>显示名称：</td>
                 <td><span id="nw_goods_showname"></span></td>

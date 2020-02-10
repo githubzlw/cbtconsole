@@ -1032,5 +1032,15 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.updateDeleteInfoFlag(pid);
     }
 
+    @Override
+    public int querySalableByPid(String pid) {
+        return customGoodsMapper.querySalableByPid(pid);
+    }
+
+    @Override
+    public int setSalable(String pid, int flag, int adminId) {
+        return customGoodsMapper.setSalable(pid, flag, adminId);
+    }
+
 
 }
