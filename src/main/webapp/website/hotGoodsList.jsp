@@ -744,8 +744,12 @@
                 <c:if test="${goods.unsellableReason == 26}">
                     <br><b style="color:red;">1688货源异常</b>
                 </c:if>
-                <br><br>
+                <br>
+                <c:if test="${goods.salable > 0}">
+                    <b style="color:green;">美加可售</b><br>
+                </c:if>
                 <c:if test="${hotType == 2}">
+                    <br>
                     <c:if test="${goods.discountId>0}">
                         <div style="background-color: #9ecdef">
                             <span>折扣开始时间:[${goods.discountBeginTime}]<br>折扣结束时间:[${goods.discountEndTime}]</span><br>
