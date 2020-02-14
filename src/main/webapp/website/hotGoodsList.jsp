@@ -405,9 +405,9 @@
                         $("#nw_goods_showname").text(json.enname);
                         $("#nw_goods_goodsurl").text(json.url);
                         if(json.salable > 0){
-                            $("#nw_goods_salable").text("美加可售卖");
-                        }else{
                             $("#nw_goods_salable").text("美加不可售卖");
+                        }else{
+                            $("#nw_goods_salable").text("美加可售卖");
                         }
                         $("#nw_goods_goodsimg").attr("src",
                             json.remotpath + json.img);
@@ -746,7 +746,7 @@
                 </c:if>
                 <br>
                 <c:if test="${goods.salable > 0}">
-                    <b style="color:green;">美加可售</b><br>
+                    <b style="color:red;">美加不可售</b><br>
                 </c:if>
                 <c:if test="${hotType == 2}">
                     <br>
