@@ -1524,9 +1524,9 @@
         }
 
         function setSalable(pid, flag) {
-            var content = '是否确认设置取消美加可售卖标识';
+            var content = '是否确认设置取消美加不可售卖标识';
             if(flag > 0){
-                content = '是否确认设置美加可售卖标识';
+                content = '是否确认设置美加不可售卖标识';
             }
             $.messager.confirm('提示', content, function (rs) {
                 if (rs) {
@@ -2140,10 +2140,10 @@
             </c:if>
 
             <c:if test="${salable == 0}">
-                <span class="s_btn" onclick="setSalable('${goods.pid}', 1)">设置美加可售卖</span>
+                <span class="s_btn" onclick="setSalable('${goods.pid}', 1)">设置美加不可售卖</span>
             </c:if>
             <c:if test="${salable > 0}">
-                <span class="s_btn" onclick="setSalable('${goods.pid}', 0)">取消美加可售卖</span>
+                <span class="s_btn" onclick="setSalable('${goods.pid}', 0)">取消美加不可售卖</span>
             </c:if>
 
         </div>
@@ -2509,7 +2509,7 @@
                     </c:if>
                 </c:if>
                     <c:if test="${salable > 0}">
-                        <br><b style="font-size: 16px;color: red;">美加可售卖标记</b>
+                        <br><b style="font-size: 16px;color: red;">美加不可售卖标记</b>
                     </c:if>
                     <c:if test="${not empty goodsOverSeaList && fn:length(goodsOverSeaList) > 0}">
                     <br>
