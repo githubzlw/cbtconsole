@@ -14,7 +14,6 @@ import com.importExpress.service.QuestionAndAnswerService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import com.importExpress.utli.WebSiteEnum;
-import org.apache.commons.lang.StringUtils;
 import com.importExpress.utli.UserMessageUtil;
 import org.apache.commons.lang3.StringUtils;
 
