@@ -1,5 +1,6 @@
 package com.importExpress.service;
 
+import com.importExpress.pojo.UserMessage;
 import com.importExpress.pojo.UserOtherInfoBean;
 
 import java.util.List;
@@ -36,4 +37,18 @@ public interface UserOtherInfoService {
      * @return
      */
     int insertFollowInfoByAdminId(UserOtherInfoBean userOtherInfo);
+
+    /**
+     * 查询客户消息
+     * @param userMessage
+     * @return
+     */
+    List<UserMessage> queryUserMessageForList(UserMessage userMessage);
+
+    /**
+     * 插入客户消息
+     * @param userMessage
+     * @return
+     */
+    int insertIntoUserMessage(UserMessage userMessage);
 }

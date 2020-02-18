@@ -1,6 +1,7 @@
 package com.importExpress.service.impl;
 
 import com.importExpress.mapper.UserOtherInfoMapper;
+import com.importExpress.pojo.UserMessage;
 import com.importExpress.pojo.UserOtherInfoBean;
 import com.importExpress.service.UserOtherInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,5 +35,15 @@ public class UserOtherInfoServiceImpl implements UserOtherInfoService {
     @Override
     public int insertFollowInfoByAdminId(UserOtherInfoBean userOtherInfo) {
         return userOtherInfoMapper.insertFollowInfoByAdminId(userOtherInfo);
+    }
+
+    @Override
+    public List<UserMessage> queryUserMessageForList(UserMessage userMessage) {
+        return userOtherInfoMapper.queryUserMessageForList(userMessage);
+    }
+
+    @Override
+    public int insertIntoUserMessage(UserMessage userMessage) {
+        return userOtherInfoMapper.insertIntoUserMessage(userMessage);
     }
 }
