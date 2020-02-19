@@ -24,6 +24,7 @@ import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.UserInfoUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -75,6 +76,8 @@ public class ShopUrlController {
     private static final String SHOP_GOODS_LOCAL_PATH_K = "K:/shopimages";
     private static final String SHOP_GOODS_SHOW_URL_J = "http://192.168.1.28:8399";
     private static final String SHOP_GOODS_LOCAL_PATH_J = "J:/shopimages";//J:/shopimages
+    private static final String REMOTE_WEB_SITE = "http://112.64.174.34";// 外网
+    private static final String LOCAL_WEB_SITE = "http://192.168.1.28";// 内网
     private FtpConfig ftpConfig;
     private static List<ConfirmUserInfo> allAdminList = UserInfoUtils.queryAllAdminList();
     private static List<String> allShopBlackList = new ArrayList<>();
@@ -1154,6 +1157,14 @@ public class ShopUrlController {
                 mv.addObject("show", 0);
                 mv.addObject("goodsNum", 0);
             } else {
+                String ip = request.getRemoteAddr();
+                if(ip.contains("27.115.38.42")){
+                    goodsList.forEach(e->{
+                        e.setImgUrl(e.getImgUrl().replace(LOCAL_WEB_SITE,REMOTE_WEB_SITE));
+                        e.setRemotePath(e.getRemotePath().replace(LOCAL_WEB_SITE,REMOTE_WEB_SITE));
+                    });
+                }
+
                 // 获取上线状态和编辑状态
                 List<CustomGoodsPublish> gdList = shopUrlService.queryOnlineGoodsByShopId(shopId);
                 List<ShopGoodsInfo> newList = new ArrayList<ShopGoodsInfo>();
@@ -1656,6 +1667,12 @@ public class ShopUrlController {
                 }
                 if (newImgsList.size() > 0) {
                     // 选中排列第一
+                    String ip = request.getRemoteAddr();
+                    if(ip.contains("27.115.38.42")){
+                        newImgsList.forEach(e->{
+                            e.setImgUrl(e.getImgUrl().replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE));
+                        });
+                    }
                     newImgsList.sort(Comparator.comparingInt(ShopGoodsPublicImg::getTotalNum).reversed());
                 }
                 imgsList.clear();
@@ -2049,11 +2066,23 @@ public class ShopUrlController {
             // 将goods的img属性值取出来,即橱窗图
             request.setAttribute("showimgs", JSONArray.toJSON("[]"));
             List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getLocalpath());
-            goods.setShowImages(imgs);
-            if (imgs.size() > 0) {
-                String firstImg = imgs.get(0);
+            String ip = request.getRemoteAddr();
+            if (ip.contains("27.115.38.42")) {
+                if (CollectionUtils.isNotEmpty(imgs)) {
+                    List<String> tempImgs = new ArrayList<>(imgs.size());
+                    imgs.forEach(e -> {
+                        tempImgs.add(e.replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE));
+                    });
+                    goods.setShowImages(tempImgs);
+                }
+            } else {
+                goods.setShowImages(imgs);
+            }
+
+            if (CollectionUtils.isNotEmpty(goods.getShowImages())) {
+                String firstImg = goods.getShowImages().get(0);
                 goods.setShowMainImage(firstImg.replace(".60x60.", ".400x400."));
-                request.setAttribute("showimgs", JSONArray.toJSON(imgs));
+                request.setAttribute("showimgs", JSONArray.toJSON(goods.getShowImages()));
             }
 
             HashMap<String, String> pInfo = deal1688Sku(goods);
@@ -2088,6 +2117,13 @@ public class ShopUrlController {
             }
 
             if (typeList.size() > 0) {
+                if (ip.contains("27.115.38.42")) {
+                    typeList.forEach(e->{
+                        if(StringUtils.isNotBlank(e.getImg())){
+                            e.setImg(e.getImg().replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE));
+                        }
+                    });
+                }
                 request.setAttribute("showtypes", JSONArray.toJSON(typeList));
             } else {
                 request.setAttribute("showtypes", JSONArray.toJSON("[]"));
@@ -2140,6 +2176,10 @@ public class ShopUrlController {
 
                 String text = textBf.toString();
 
+                //
+                if (ip.contains("27.115.38.42")) {
+                    text = text.replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE);
+                }
                 // 返回待编辑数据到编辑页面
                 mv.addObject("text", text);
             }
