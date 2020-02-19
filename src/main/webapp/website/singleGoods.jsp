@@ -312,7 +312,7 @@
                 content += '<br>'
                     + '<a href="/cbtconsole/editc/detalisEdit?pid='
                     + row.goodsPid
-                    + '" target="_blank">编辑详情</a><br><br><a href="https://www.import-express.com/goodsinfo/expressgoods-1'
+                    + '" target="_blank">编辑详情</a><br><br><a href="https://www.import-express.com/goodsinfo/ep-0-0-1'
                     + row.goodsPid + '.html" target="_blank">线上预览</a><br>';
             }
             return content;
