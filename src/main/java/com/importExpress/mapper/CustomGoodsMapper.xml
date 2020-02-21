@@ -190,6 +190,7 @@
         <result column="eninfo" property="enInfo"/>
         <result column="remotpath" property="remotePath"/>
         <result column="catid1" property="catid1"/>
+        <result column="valid" property="valid"/>
     </resultMap>
 
 
@@ -939,7 +940,7 @@
         review_flag=#{map.update_flag},updatetime=now() where id = #{map.id}
     </update>
     <select id="queryCustomGoodsByLimit" resultMap="goodsParseResultMap">
-        select pid,ali_pid,ali_price,weight,wholesale_price,ali_weight,enInfo,remotpath,catid1
+        select pid,ali_pid,ali_price,weight,wholesale_price,ali_weight,enInfo,remotpath,catid1,valid
         from custom_benchmark_ready
         where id &gt; #{minId} and id &lt;= #{maxId}
     </select>
