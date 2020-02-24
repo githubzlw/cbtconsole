@@ -1158,7 +1158,8 @@ public class ShopUrlController {
                 mv.addObject("goodsNum", 0);
             } else {
                 String ip = request.getRemoteAddr();
-                if(ip.contains("27.115.38.42")){
+                System.err.println("ip:" + ip);
+                if(ip.contains("27.115.38.42") || ip.contains("192.168.1.27")){
                     goodsList.forEach(e->{
                         e.setImgUrl(e.getImgUrl().replace(LOCAL_WEB_SITE,REMOTE_WEB_SITE));
                         e.setRemotePath(e.getRemotePath().replace(LOCAL_WEB_SITE,REMOTE_WEB_SITE));
@@ -1668,7 +1669,8 @@ public class ShopUrlController {
                 if (newImgsList.size() > 0) {
                     // 选中排列第一
                     String ip = request.getRemoteAddr();
-                    if(ip.contains("27.115.38.42")){
+                    System.err.println("ip:" + ip);
+                    if(ip.contains("27.115.38.42") || ip.contains("192.168.1.27")){
                         newImgsList.forEach(e->{
                             e.setImgUrl(e.getImgUrl().replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE));
                         });
@@ -2067,7 +2069,8 @@ public class ShopUrlController {
             request.setAttribute("showimgs", JSONArray.toJSON("[]"));
             List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getLocalpath());
             String ip = request.getRemoteAddr();
-            if (ip.contains("27.115.38.42")) {
+            System.err.println("ip:" + ip);
+            if (ip.contains("27.115.38.42") || ip.contains("192.168.1.27")) {
                 if (CollectionUtils.isNotEmpty(imgs)) {
                     List<String> tempImgs = new ArrayList<>(imgs.size());
                     imgs.forEach(e -> {
@@ -2117,7 +2120,7 @@ public class ShopUrlController {
             }
 
             if (typeList.size() > 0) {
-                if (ip.contains("27.115.38.42")) {
+                if (ip.contains("27.115.38.42") || ip.contains("192.168.1.27")) {
                     typeList.forEach(e->{
                         if(StringUtils.isNotBlank(e.getImg())){
                             e.setImg(e.getImg().replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE));
@@ -2177,7 +2180,7 @@ public class ShopUrlController {
                 String text = textBf.toString();
 
                 //
-                if (ip.contains("27.115.38.42")) {
+                if (ip.contains("27.115.38.42") || ip.contains("192.168.1.27")) {
                     text = text.replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE);
                 }
                 // 返回待编辑数据到编辑页面
