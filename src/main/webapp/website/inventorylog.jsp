@@ -57,6 +57,9 @@ em,i{font-style: normal;}
 .query_state{width: 100px;}
 .btn-cancel{margin-top: 10px;}
 .datagrid-cell-c2-goodsSku{width: 350px;}
+.title-tab{background-color:#337ab75c}
+.change-num{background-color: #f2dede}
+.mt20 .table-log td{border: 1px solid #337ab75c}
 </style>
 </head>
 <body>
@@ -81,16 +84,13 @@ em,i{font-style: normal;}
 				<label>类型：
 				<input type="hidden" id="i_state" value="${queryParam.type}">
 				<select class="form-control query_state" id="query_state" >
-				<!-- 0  损坏 1 遗失  3 添加 4 补货  5 漏发 7 其他原因 -->
+				<!-- 0：默认 1：增加  2：减少，3：盘点  4占用 5-取消占用 -->
 						<option value="-1">全部</option>
-						<option value="0">损坏</option>
-						<option value="1">遗失</option>
-						<option value="3">添加</option>
-						<option value="4">补货</option>
-						<option value="5">漏发</option>
-						<option value="8">送样</option>
-						<option value="7">其他</option>
-						
+						<option value="1">入库</option>
+						<option value="2">出库</option>
+						<option value="3">盘点</option>
+						<option value="4">库存占用</option>
+						<option value="5">库存释放</option>
 				</select>
 				
 				</label>
@@ -99,9 +99,9 @@ em,i{font-style: normal;}
 			</div>
 		</div>
 		<div class="row mt20">
-			<table class="table table-bordered"  >
+			<table class="table table-bordered table-log"  >
 				<thead>
-					<tr>
+					<tr class="title-tab">
 						<th>产品ID</th>
 						<th>产品名称</th>
 						<th>产品Sku</th>
@@ -121,7 +121,7 @@ em,i{font-style: normal;}
 					<td style="width:500px;">${l.sku}<br>${l.skuid }<br>${l.specid }</td>
 					<td>${l.createtime }</td>
 					<td>${l.beforeRemaining }</td>
-					<td>${l.remaining }</td>
+					<td class="change-num">${l.remaining }</td>
 					<td>${l.afterRemaining }</td>
 					<td>
 					<!-- 0：默认 1：增加  2：减少，3：盘点  4占用 5-取消占用 -->

@@ -1493,6 +1493,11 @@ public class InventoryServiceImpl implements  InventoryService{
 		if(inventoryLogList == null || inventoryLogList.isEmpty()) {
 			return Lists.newArrayList();
 		}
+		for(InventoryLog i:inventoryLogList) {
+			if(i.getChangeType() == 3) {
+				i.setRemaining(i.getAfterRemaining() - i.getBeforeRemaining());
+			}
+		}
 		return inventoryLogList;
 	}
 	@Override
