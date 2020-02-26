@@ -65,7 +65,7 @@
         from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
         th.paydata as orderdate
         from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and th.tbOr1688 between 0 and 3
-        group by th.shipno,th.itemid) bb
+        group by th.orderid,th.shipno,th.itemid) bb
 		left join (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,ifnull(od.re_shipnos,od.shipno) as od_shipno,
         ifnull(ops.last_tb_1688_itemid,ops.tb_1688_itemid) as od_pid,oi.orderpaytime,oi.exchange_rate
         from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
@@ -83,7 +83,7 @@
         from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
         th.paydata as orderdate
         from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and th.tbOr1688 between 0 and 3
-        group by th.shipno,th.itemid) bb
+        group by th.orderid,th.shipno,th.itemid) bb
 		left join (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,ifnull(od.re_shipnos,od.shipno) as od_shipno,
         ifnull(ops.last_tb_1688_itemid,ops.tb_1688_itemid) as od_pid,oi.orderpaytime,oi.exchange_rate
         from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
