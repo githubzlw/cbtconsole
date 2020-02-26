@@ -76,7 +76,7 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
             boolean isCheckImg = false;
             if (goods.getValid() == 0 || goods.getValid() == 2) {
                 System.err.println("pid:" + goods.getPid() + ",valid:" + goods.getValid());
-                isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, isKids);
+                isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, isKids, isUpdateImg);
                 System.err.println("pid:" + goods.getPid() + ",isCheckImg:" + isCheckImg);
                 if (isCheckImg) {
                     executeSu = doPublish(goods, localShowPath, remoteShowPath, imgList, isKids);

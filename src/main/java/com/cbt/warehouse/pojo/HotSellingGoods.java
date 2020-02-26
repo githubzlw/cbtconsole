@@ -67,6 +67,19 @@ public class HotSellingGoods implements Serializable {
 	 */
 	private int unsellableReason ;
 
+	/**
+	 * 美加可售卖标识
+	 */
+	private int salable;
+
+	public int getSalable() {
+		return salable;
+	}
+
+	public void setSalable(int salable) {
+		this.salable = salable;
+	}
+
 	public int getUnsellableReason() {
 		return unsellableReason;
 	}

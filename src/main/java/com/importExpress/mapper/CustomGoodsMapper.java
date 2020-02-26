@@ -670,4 +670,20 @@ public interface CustomGoodsMapper {
     int deleteDataByPid(String pid);
 
     int updateDeleteInfoFlag(String pid);
+
+    /**
+     * 查询美加可售标识
+     * @param pid
+     * @return
+     */
+    int querySalableByPid(String pid);
+
+    /**
+     * 添加日志
+     * @param pid
+     * @param flag
+     * @param adminId
+     * @return
+     */
+    int setSalable(@Param("pid") String pid, @Param("flag") int flag, @Param("adminId") int adminId);
 }

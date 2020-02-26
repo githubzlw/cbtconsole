@@ -135,6 +135,14 @@
                 return "关闭";
             }
         }
+
+        function formatUserId(val, row, index) {
+            if (val > 0) {
+                return '/cbtconsole/userinfo/getUserInfo.do?userId=' + val;
+            } else {
+                return '';
+            }
+        }
     </script>
 
 </head>
@@ -157,7 +165,7 @@
        class="easyui-datagrid">
     <thead>
     <tr>
-        <th data-options="field:'userId',align:'center',width:'120px'">客户ID</th>
+        <th data-options="field:'userId',align:'center',width:'120px',formatter:formatUserId">客户ID</th>
         <th data-options="field:'orderNo',align:'center',width:'185px'">最近一次订单ID</th>
         <th data-options="field:'lastOrderPayTime',align:'center',width:'200px'">最近一次订单时间</th>
         <th data-options="field:'salesName',align:'center',width:'120px'">销售</th>

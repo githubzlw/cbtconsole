@@ -990,4 +990,21 @@ public interface CustomGoodsService {
     int deleteDataByPid(String pid);
 
     int updateDeleteInfoFlag(String pid);
+
+    /**
+     * 查询美加可售标识
+     * @param pid
+     * @return
+     */
+    int querySalableByPid(String pid);
+
+    /**
+     * 设置可搜索
+     *
+     * @param pid
+     * @param flag
+     * @param adminId
+     * @return
+     */
+    int setSalable(String pid, int flag, int adminId);
 }

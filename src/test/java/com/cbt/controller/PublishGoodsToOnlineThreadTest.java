@@ -66,7 +66,7 @@ public class PublishGoodsToOnlineThreadTest {
     public void checkImgTest() {
         String pid = "549573989998";
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-        boolean isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, 0);
+        boolean isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, 0, 1);
         Assert.assertTrue("检查图片异常", isCheckImg);
     }
 

@@ -55,39 +55,46 @@ public class MongoDBController {
     public ModelAndView queryListByParam(HttpServletRequest request) throws Exception {
         ModelAndView mv = new ModelAndView("customGoodsList");
 
-        String sessionId = request.getSession().getId();
-        String userJson = Redis.hget(sessionId, "admuser");
-        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
-        if (user == null || user.getId() == 0) {
-            return mv;
-        } else {
-            String roletype = user.getRoletype();
-            int uid = user.getId();
-            String admName = user.getAdmName();
-            mv.addObject("admName", admName);
-            mv.addObject("roletype", roletype);
-            mv.addObject("uid", uid);
+        try {
+            String sessionId = request.getSession().getId();
+            String userJson = Redis.hget(sessionId, "admuser");
+            Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+            if (user == null || user.getId() == 0) {
+                return mv;
+            } else {
+                String roletype = user.getRoletype();
+                int uid = user.getId();
+                String admName = user.getAdmName();
+                mv.addObject("admName", admName);
+                mv.addObject("roletype", roletype);
+                mv.addObject("uid", uid);
+            }
+
+            CustomGoodsQuery queryBean = GoodsBeanUtil.genQueryBean(request);
+            List<CustomGoodsPublish> goodsList = mongoGoodsService.queryListByParam(queryBean);
+            if(CollectionUtils.isNotEmpty(goodsList)) {
+                goodsList.stream().forEach(c -> {
+                    String complainId = c.getComplainId();
+                    complainId = StringUtils.endsWith(complainId, ",") ? complainId.substring(0, complainId.length() - 1) : complainId;
+                    if (StringUtils.isNotBlank(complainId)) {
+                        c.setComplain(Arrays.asList(complainId.split(",")));
+                    }
+                });
+            }
+
+            long count = mongoGoodsService.queryListByParamCount(queryBean);
+            long amount = (count % 50 == 0 ? count / 50 : count / 50 + 1);
+            mv.addObject("catid", queryBean.getCatid());
+            mv.addObject("goodsList", goodsList);
+            mv.addObject("totalpage", amount);
+            mv.addObject("totalNum", count);
+            mv.addObject("currentpage", queryBean.getCurrPage());
+            mv.addObject("pagingNum", 50);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("queryListByParam error:", e);
         }
 
-
-        CustomGoodsQuery queryBean = GoodsBeanUtil.genQueryBean(request);
-        List<CustomGoodsPublish> goodsList = mongoGoodsService.queryListByParam(queryBean);
-        goodsList.stream().forEach(c -> {
-            String complainId = c.getComplainId();
-            complainId = StringUtils.endsWith(complainId, ",") ? complainId.substring(0, complainId.length() - 1) : complainId;
-            if (StringUtils.isNotBlank(complainId)) {
-                c.setComplain(Arrays.asList(complainId.split(",")));
-            }
-        });
-
-        long count = mongoGoodsService.queryListByParamCount(queryBean);
-        long amount = (count % 50 == 0 ? count / 50 : count / 50 + 1);
-        mv.addObject("catid", queryBean.getCatid());
-        mv.addObject("goodsList", goodsList);
-        mv.addObject("totalpage", amount);
-        mv.addObject("totalNum", count);
-        mv.addObject("currentpage", queryBean.getCurrPage());
-        mv.addObject("pagingNum", 50);
         return mv;
     }
 
@@ -147,10 +154,11 @@ public class MongoDBController {
             Map<String, Integer> cidMap = new HashMap<>();
 
             for (int i = 1; i <= fc; i++) {
-                list = mongoGoodsService.queryBeanByLimit((i - 1) * limitNum, i * limitNum);
-                System.err.println("-- " + i + "/" + fc);
-                queryTotal += list.size();
-                if (CollectionUtils.isNotEmpty(list)) {
+                try {
+                    list = mongoGoodsService.queryBeanByLimit((i - 1) * limitNum, i * limitNum);
+                    System.err.println("-- " + i + "/" + fc);
+                    queryTotal += list.size();
+                    if (CollectionUtils.isNotEmpty(list)) {
 
                     /*for(MongoGoodsBean bean : list) {
                         try {
@@ -169,38 +177,42 @@ public class MongoDBController {
                     }*/
 
 
-                    List<String> tempList = new ArrayList<>();
-                    for (MongoGoodsBean bean : list) {
-                        if (cidMap.containsKey(bean.getCatid1())) {
-                            cidMap.put(bean.getCatid1(), cidMap.get(bean.getCatid1()) + 1);
+                        List<String> tempList = new ArrayList<>();
+                        for (MongoGoodsBean bean : list) {
+                            if (cidMap.containsKey(bean.getCatid1())) {
+                                cidMap.put(bean.getCatid1(), cidMap.get(bean.getCatid1()) + 1);
+                            } else {
+                                cidMap.put(bean.getCatid1(), 1);
+                            }
+                            tempList.add(bean.getPid());
+                        }
+
+                        List<String> checkList = mongoGoodsService.checkIsMongoByList(tempList);
+                        tempList.clear();
+                        if (CollectionUtils.isNotEmpty(checkList)) {
+                            List<MongoGoodsBean> updateList = list.stream().filter(e -> checkList.contains(e.getPid()))
+                                    .collect(Collectors.toList());
+                            if (CollectionUtils.isNotEmpty(updateList)) {
+                                insertTotal += mongoGoodsService.batchUpdateGoodsInfoToMongoDb(updateList);
+                                updateList.clear();
+                            }
+
+                            List<MongoGoodsBean> insertList = list.stream().filter(e -> !checkList.contains(e.getPid()))
+                                    .collect(Collectors.toList());
+                            if (CollectionUtils.isNotEmpty(insertList)) {
+                                insertTotal += mongoGoodsService.insertGoodsToMongoBatch(insertList);
+                                insertList.clear();
+                            }
                         } else {
-                            cidMap.put(bean.getCatid1(), 1);
+                            insertTotal += mongoGoodsService.insertGoodsToMongoBatch(list);
                         }
-                        tempList.add(bean.getPid());
+                        checkList.clear();
                     }
-
-                    List<String> checkList = mongoGoodsService.checkIsMongoByList(tempList);
-                    tempList.clear();
-                    if (CollectionUtils.isNotEmpty(checkList)) {
-                        List<MongoGoodsBean> updateList = list.stream().filter(e -> checkList.contains(e.getPid()))
-                                .collect(Collectors.toList());
-                        if (CollectionUtils.isNotEmpty(updateList)) {
-                            insertTotal += mongoGoodsService.batchUpdateGoodsInfoToMongoDb(updateList);
-                            updateList.clear();
-                        }
-
-                        List<MongoGoodsBean> insertList = list.stream().filter(e -> !checkList.contains(e.getPid()))
-                                .collect(Collectors.toList());
-                        if (CollectionUtils.isNotEmpty(insertList)) {
-                            insertTotal += mongoGoodsService.insertGoodsToMongoBatch(insertList);
-                            insertList.clear();
-                        }
-                    } else {
-                        insertTotal += mongoGoodsService.insertGoodsToMongoBatch(list);
-                    }
-                    checkList.clear();
+                    list.clear();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                list.clear();
+
             }
 
             // mongoGoodsService.insertIntoPidCatidNum(cidMap);
@@ -261,7 +273,7 @@ public class MongoDBController {
         JsonResult json = new JsonResult();
         try {
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-            boolean isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, 0);
+            boolean isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, 0,1);
             if (isCheckImg) {
                 json.setSuccess("检查成功");
             } else {

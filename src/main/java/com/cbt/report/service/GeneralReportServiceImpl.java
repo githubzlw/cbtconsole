@@ -91,7 +91,7 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	String[] excelTota25 = { "序号","类别","商品ID","商品名称","商品sku","商品图片","上次盘点数量","库存数量","库位","盘点数量"};
 	String[] excelTota26 = { "序号","时间","odid","商品ID","商品名称","商品sku","库存数量","库位","价格","盘点数量"};
 	String[] excelTota27 = { "序号","时间","商品ID","skuid","类型","数量","备注"};
-	String[] excelTota28 = { "序号","时间","商品ID","产品名称","产品Sku","变更前库存","变更数量","变更后库存","变更类型","备注"};
+	String[] excelTota28 = { "序号","时间","商品ID","skuid","产品名称","产品Sku","变更前库存","变更数量","变更后库存","变更类型","备注"};
 	
 	@Override
 	public HSSFWorkbook exportUserProfitByMonth(List<OrderSalesAmountPojo> list) {
@@ -1304,23 +1304,30 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 				row.createCell(0).setCellValue((i+1));
 				row.createCell(1).setCellValue(bg.getCreatetime());
 				row.createCell(2).setCellValue(bg.getGoodsPid());
-				row.createCell(3).setCellValue(bg.getGoodsName());
-				row.createCell(4).setCellValue(bg.getSku()+"\n"+bg.getSkuid()+"\n"+bg.getSpecid());
-				row.createCell(5).setCellValue(bg.getBeforeRemaining());
-				row.createCell(6).setCellValue(bg.getRemaining());
-				row.createCell(7).setCellValue(bg.getAfterRemaining());
+				row.createCell(3).setCellValue(bg.getSkuid());
+				row.createCell(4).setCellValue(bg.getGoodsName());
+				row.createCell(5).setCellValue(bg.getSku()+"\n"+"\n"+bg.getSpecid());
+				row.createCell(6).setCellValue(bg.getBeforeRemaining());
+				/*if(bg.getChangeType() == 3) {
+					row.createCell(7).setCellValue(
+							bg.getAfterRemaining()>bg.getBeforeRemaining() ? 
+							""+bg.getRemaining(): "-" +bg.getRemaining());
+				}else {
+				}*/
+				row.createCell(7).setCellValue(bg.getRemaining());
+				row.createCell(8).setCellValue(bg.getAfterRemaining());
 				if(bg.getChangeType() == 1) {
-					row.createCell(8).setCellValue("入库");
+					row.createCell(9).setCellValue("入库");
 				}else if(bg.getChangeType() == 2) {
-					row.createCell(8).setCellValue("出库");
+					row.createCell(9).setCellValue("出库");
 				}else if(bg.getChangeType() == 3) {
-					row.createCell(8).setCellValue("盘点");
+					row.createCell(9).setCellValue("盘点");
 				}else if(bg.getChangeType() == 4) {
-					row.createCell(8).setCellValue("占用");
+					row.createCell(9).setCellValue("占用");
 				}else if(bg.getChangeType() == 5) {
-					row.createCell(8).setCellValue("取消占用");
+					row.createCell(9).setCellValue("取消占用");
 				}
-				row.createCell(9).setCellValue(bg.getRemark());
+				row.createCell(10).setCellValue(bg.getRemark());
 			}
 		}catch(Exception e){
 			e.printStackTrace();

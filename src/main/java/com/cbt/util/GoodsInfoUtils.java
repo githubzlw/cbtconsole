@@ -910,33 +910,37 @@ public class GoodsInfoUtils {
     }
 
     /**
-     * 全部图片数据
      *
      * @param gd
+     * @param isKids : 是否是kids的服务器
+     * @param isLocal : 是否转换远程本地
+     * @param isMainImg : 是否包含主图 220和285
      * @return
      */
-    public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids, int isLocal) {
+    public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids, int isLocal, boolean isMainImg) {
         List<String> changeImglist = new ArrayList<>();
-        // 主图
-        String orMainImg220x220 = null;
-        if (StringUtils.isNotBlank(gd.getShowMainImage())) {
-            if (gd.getShowMainImage().contains("http://") || gd.getShowMainImage().contains("https://")) {
-                orMainImg220x220 = gd.getShowMainImage().trim();
-            } else {
-                orMainImg220x220 = gd.getRemotpath().trim() + gd.getShowMainImage().trim();
+        if(isMainImg) {
+            // 主图
+            String orMainImg220x220 = null;
+            if (StringUtils.isNotBlank(gd.getShowMainImage())) {
+                if (gd.getShowMainImage().contains("http://") || gd.getShowMainImage().contains("https://")) {
+                    orMainImg220x220 = gd.getShowMainImage().trim();
+                } else {
+                    orMainImg220x220 = gd.getRemotpath().trim() + gd.getShowMainImage().trim();
+                }
+            } else if (StringUtils.isNotBlank(gd.getCustomMainImage())) {
+                if (gd.getCustomMainImage().contains("http://") || gd.getCustomMainImage().contains("https://")) {
+                    orMainImg220x220 = gd.getCustomMainImage().trim();
+                } else {
+                    orMainImg220x220 = gd.getRemotpath().trim() + gd.getCustomMainImage().trim();
+                }
             }
-        } else if (StringUtils.isNotBlank(gd.getCustomMainImage())) {
-            if (gd.getCustomMainImage().contains("http://") || gd.getCustomMainImage().contains("https://")) {
-                orMainImg220x220 = gd.getCustomMainImage().trim();
-            } else {
-                orMainImg220x220 = gd.getRemotpath().trim() + gd.getCustomMainImage().trim();
-            }
-        }
 
-        if (StringUtils.isNotBlank(orMainImg220x220)) {
-            List<String> mainImgList = getMainImgByPath(orMainImg220x220);
-            changeImglist.addAll(mainImgList);
-            mainImgList.clear();
+            if (StringUtils.isNotBlank(orMainImg220x220)) {
+                List<String> mainImgList = getMainImgByPath(orMainImg220x220);
+                changeImglist.addAll(mainImgList);
+                mainImgList.clear();
+            }
         }
 
         // 橱窗图
@@ -1451,10 +1455,10 @@ public class GoodsInfoUtils {
     }
 
 
-    public static boolean checkOffLineImg(CustomGoodsPublish goods, int isKids) {
+    public static boolean checkOffLineImg(CustomGoodsPublish goods, int isKids, int isUpdateImg) {
         boolean isSu = false;
         try {
-            List<String> allImgList = GoodsInfoUtils.getAllImgList(goods, isKids, 0);
+            List<String> allImgList = GoodsInfoUtils.getAllImgList(goods, isKids, 0, isUpdateImg == 0);
             if (CollectionUtils.isNotEmpty(allImgList)) {
                 isSu = downImgAndCheck(allImgList, goods.getPid());
             }
@@ -1640,7 +1644,7 @@ public class GoodsInfoUtils {
     public static boolean deleteByOkHttp(CustomGoodsPublish goods) {
         boolean isSu = false;
         if (goods != null) {
-            List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1, 0);
+            List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1, 0, true);
             try {
                 isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
                 if (!isSu) {

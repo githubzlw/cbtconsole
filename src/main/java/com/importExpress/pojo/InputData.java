@@ -103,6 +103,16 @@ public class InputData {
 
     private String searchable;
 
+    private String salable;
+
+    public String getSalable() {
+        return salable;
+    }
+
+    public void setSalable(String salable) {
+        this.salable = salable;
+    }
+
     public String getSearchable() {
         return searchable;
     }
