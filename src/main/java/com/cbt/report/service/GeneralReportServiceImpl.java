@@ -88,8 +88,8 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	String[] excelTota22 = { "序号","盘点前库存","盘点后库存","盘点前库位","盘点后库位","商品规格","损耗单价","损耗库存金额","损耗时间","损耗人","损耗原因"};
 	String[] excelTota23 = { "序号","支付月份","用户ID","用户邮箱","VIP等级","订单数量","实际重量（kg）","预估重量(kg)","实际支付金额(RMB)","实际采购金额(RMB)","实际运费(RMB)","客户付的运费(RMB)","用户利润(RMB)","用户利润率(%)","预计运费(RMB)","用户利润预估(RMB)","用户预估利润率(%)"};
 	String[] excelTota24 = { "序号","商品ID","产品名","skuid","specid","sku","盘点前库存","盘点后库存","差异值","库位","时间"};
-	String[] excelTota25 = { "序号","类别","商品ID","商品名称","商品sku","商品图片","上次盘点数量","库存数量","库位","盘点数量"};
-	String[] excelTota26 = { "序号","时间","odid","商品ID","商品名称","商品sku","库存数量","库位","价格","盘点数量"};
+	String[] excelTota25 = { "序号","类别","商品ID","skuid","商品名称","商品sku","商品图片","上次盘点数量","库存数量","库位","盘点数量"};
+	String[] excelTota26 = { "序号","时间","odid","商品ID","skuid","商品名称","商品sku","库存数量","库位","价格","盘点数量"};
 	String[] excelTota27 = { "序号","时间","商品ID","skuid","类型","数量","备注"};
 	String[] excelTota28 = { "序号","时间","商品ID","skuid","产品名称","产品Sku","变更前库存","变更数量","变更后库存","变更类型","备注"};
 	
@@ -1202,7 +1202,7 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	}
 	@Override
 	public HSSFWorkbook exportInventoryExcel(List<InventoryCheckWrap> list) {
-		String sheetName = "库存报表"; //报表页名
+		String sheetName = "库存盘点报表"; //报表页名
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet(sheetName);
 		int rows =0;  //记录行数
@@ -1210,7 +1210,7 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 		HSSFCellStyle style = wb.createCellStyle();
 		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 		HSSFCell hcell = row.createCell(0); //添加标题
-		hcell.setCellValue("库存列表");
+		hcell.setCellValue("库存盘点列表");
 		row = sheet.createRow(rows++);  //到下一行添加数据
 		for (int i = 0; i < excelTota25.length; i++) {
 			HSSFCell cell = row.createCell(i);
@@ -1226,13 +1226,14 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 				row.createCell(0).setCellValue((i+1));
 				row.createCell(1).setCellValue(bg.getCategoryName());
 				row.createCell(2).setCellValue(bg.getGoodsPid());
-				row.createCell(3).setCellValue(bg.getGoodsName());
-				row.createCell(4).setCellValue(bg.getGoodsSku()+"\n"+bg.getGoodsSpecid()+"\n"+bg.getGoodsSkuid());
-				row.createCell(5).setCellValue(bg.getGoodsImg());
-				row.createCell(6).setCellValue(bg.getLastCheckRemaining());
-				row.createCell(7).setCellValue(bg.getRemaining());
-				row.createCell(8).setCellValue(bg.getBarcode());
-				row.createCell(9).setCellValue("");
+				row.createCell(3).setCellValue(bg.getGoodsSkuid());
+				row.createCell(4).setCellValue(bg.getGoodsName());
+				row.createCell(5).setCellValue(bg.getGoodsSku()+"\n"+bg.getGoodsSpecid()+"\n"+bg.getGoodsSkuid());
+				row.createCell(6).setCellValue(bg.getGoodsImg());
+				row.createCell(7).setCellValue(bg.getLastCheckRemaining());
+				row.createCell(8).setCellValue(bg.getRemaining());
+				row.createCell(9).setCellValue(bg.getBarcode());
+				row.createCell(10).setCellValue("");
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -1266,12 +1267,13 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 				row.createCell(1).setCellValue(bg.getTime());
 				row.createCell(2).setCellValue(bg.getOdid());
 				row.createCell(3).setCellValue(bg.getGoodsPid());
-				row.createCell(4).setCellValue(bg.getGoodsName());
-				row.createCell(5).setCellValue(bg.getGoodsSku()+"\n"+bg.getGoodsSpecid()+"\n"+bg.getGoodsSkuid());
-				row.createCell(6).setCellValue(bg.getRemaining());
-				row.createCell(7).setCellValue(bg.getBarcode());
-				row.createCell(8).setCellValue(bg.getGoodsPrice());
-				row.createCell(9).setCellValue("");
+				row.createCell(4).setCellValue(bg.getGoodsSkuid());
+				row.createCell(5).setCellValue(bg.getGoodsName());
+				row.createCell(6).setCellValue(bg.getGoodsSku()+"\n"+bg.getGoodsSpecid()+"\n"+bg.getGoodsSkuid());
+				row.createCell(7).setCellValue(bg.getRemaining());
+				row.createCell(8).setCellValue(bg.getBarcode());
+				row.createCell(9).setCellValue(bg.getGoodsPrice());
+				row.createCell(10).setCellValue("");
 			}
 		}catch(Exception e){
 			e.printStackTrace();
