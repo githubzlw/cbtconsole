@@ -26,7 +26,7 @@ public class UserMessageUtil {
      * @param type
      * @return
      */
-    public boolean sendMessage(int userId, String orderNo, int type, String content, String jumpUrl,String question,String answer) {
+    public boolean sendMessage(int userId, String orderNo, int type, String content, String jumpUrl,String question,String answer, Character siteType) {
 
         if (userId == 0 && StringUtils.isBlank(orderNo)) {
             return false;
@@ -45,6 +45,7 @@ public class UserMessageUtil {
         userMessage.setJumpUrl(jumpUrl);
         userMessage.setQuestion(question);
         userMessage.setAnswer(answer);
+        userMessage.setSiteType(siteType);
         paraseType(userMessage);
 
         sendByMq(userMessage);
@@ -115,14 +116,15 @@ public class UserMessageUtil {
         } else {
             answer = "";
         }
-        StringBuffer sb = new StringBuffer("insert into user_message(user_id,order_no,content,type,jump_url,question,answer) values(");
+        StringBuffer sb = new StringBuffer("insert into user_message(user_id,order_no,content,type,jump_url,question,answer,site_type) values(");
         sb.append(userMessage.getUserId() + ",")
                 .append("\'" + userMessage.getOrderNo() + "\',")
                 .append("\'" + content + "\',")
                 .append(+userMessage.getType() + ",")
                 .append("\'" + jumpUrl + "\',")
                 .append("\'" + question + "\',")
-                .append("\'" + answer + "\')");
+                .append("\'" + answer + "\',")
+                .append("\'" + userMessage.getSiteType() + "\')");
         NotifyToCustomerUtil.sendSqlByMq(sb.toString());
     }
 }
