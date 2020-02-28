@@ -690,8 +690,9 @@
 
     function formatShopNum(val, row, index) {
         var content = '<div style="font-size: 13px;">';
+        // totalDataNum
         content += '<b>在线商品数:<a href="/cbtconsole/website/shop_goods_list.jsp?shop_id=' + row.shopId
-            + '" target="_blank"><b style="color: red;"> ' + val + '</b>(view)</a></b>';
+            + '" target="_blank"><b style="color: red;"> ' + val + '/'+row.totalDataNum+'</b>(在线/总数view)</a></b>';
         content += '<br><b style="color: #101010;font-size: 14px;background-color: #baf1cdf2;">售卖金额($):'+row.shopPrice+'</b>';
         content += '<br><b style="color: #44a823;font-size: 14px;">状态:'+row.onlineStatusView+'</b>';
         content += '</div>';
