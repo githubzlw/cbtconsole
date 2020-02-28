@@ -38,6 +38,15 @@ public class ShopUrl {
 	private int isAuto;
 
 	private String memberId;
+	private int totalDataNum;
+
+	public int getTotalDataNum() {
+		return totalDataNum;
+	}
+
+	public void setTotalDataNum(int totalDataNum) {
+		this.totalDataNum = totalDataNum;
+	}
 
 	public String getMemberId() {
 		return memberId;
