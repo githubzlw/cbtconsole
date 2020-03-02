@@ -125,8 +125,8 @@
 
 
     <insert id="insertIntoUserMessage" parameterType="com.importExpress.pojo.UserMessage">
-        insert into user_message(user_id,order_no,content,type,jump_url,question,answer)
-        values(#{userId},#{orderNo},#{content},#{type},#{jumpUrl},#{question},#{answer})
+        insert into user_message(user_id,order_no,content,type,jump_url,question,answer,site_type)
+        values(#{userId},#{orderNo},#{content},#{type},#{jumpUrl},#{question},#{answer},#{siteType})
     </insert>
 
 </mapper>

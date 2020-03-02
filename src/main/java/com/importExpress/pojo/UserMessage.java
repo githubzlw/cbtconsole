@@ -25,5 +25,6 @@ public class UserMessage {
     private int limitNum;
     private String question;
     private String answer;
+    private Character siteType;  // 网站类型
 
 }

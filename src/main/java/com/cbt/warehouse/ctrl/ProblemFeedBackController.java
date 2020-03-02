@@ -94,20 +94,22 @@ public class ProblemFeedBackController {
 					modelM.put("reply_content",text);
 					modelM.put("websiteType", websiteType);
 					String jumpUrl = "";
+					Character siteType = null;
 					if (websiteType == 1) {
+						siteType = 'I';
 						jumpUrl = "https://www.import-express.com/Goods/getShopCar";
-
                     } else if (websiteType == 2){
+						siteType = 'K';
                         jumpUrl = "https://www.kidsproductwholesale.com/Goods/getShopCar";
                     } else if (websiteType == 3){
+						siteType = 'P';
                         jumpUrl = "https://www.petstoreinc.com/Goods/getShopCar";
                     }
 					modelM.put("toHref", jumpUrl);
 					// sendMailFactory.sendMail(String.valueOf(modelM.get("first_name")), null, "Shopping Question Reply", modelM, TemplateType.SHOPPING_REPLY);
 
 					// 发送消息给客户
-					userMessageUtil.sendMessage(Integer.parseInt(userIdStr), report_id, 1, list.get(0).getQustion(),
-							jumpUrl, list.get(0).getQustion(), text);
+					userMessageUtil.sendMessage(Integer.parseInt(userIdStr), report_id, 1, list.get(0).getQustion(), jumpUrl, list.get(0).getQustion(), text, siteType);
 
 					json.setOk(true);
 				}else{

@@ -303,9 +303,12 @@ public class QueAnsController {
 		}
 		AtomicReference<String> website= new AtomicReference<>("1");
 
+		AtomicReference<Character> siteType= new AtomicReference<>(null);
+
 		Arrays.stream(WebSiteEnum.values()).forEach(e->{
 			if(purl.contains(e.getName().toLowerCase())){
 				website.set(String.valueOf(e.getCode()));
+				siteType.set(e.getSiteType());
 			}
 		});
 
@@ -317,7 +320,7 @@ public class QueAnsController {
 
 		// 发送消息给客户
 		userMessageUtil.sendMessage(Integer.parseInt(userId), pid, 2, q.getQuestion_content(), purl,
-				q.getQuestion_content(), replyContent);
+				q.getQuestion_content(), replyContent, siteType.get());
 		return updateReplyContent;
 	}
 	@RequestMapping("/remark")
