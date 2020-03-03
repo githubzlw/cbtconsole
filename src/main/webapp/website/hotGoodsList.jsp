@@ -732,6 +732,8 @@
                 <span>亚马逊价格:$&nbsp;${goods.amazonPrice}</span><br>
                 <span>ASIN码:${goods.asinCode}</span><br>
                 <span>利润率:${goods.profitMargin}</span><em>%</em><br>
+                <span>创建时间:${goods.productCreateTime}</span><br>
+                <span>编辑时间:${goods.productPublishTime}</span><br>
                 <b style="color:${goods.isOn > 0 ? 'green':'red'};">状态:${goods.isOn > 0 ? '开启':'关闭'}</b>&nbsp;&nbsp;
                 <a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${goods.goodsPid}">编辑商品详情</a>
                 <c:if test="${goods.isSoldFlag > 1}">
