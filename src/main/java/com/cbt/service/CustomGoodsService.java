@@ -1007,4 +1007,12 @@ public interface CustomGoodsService {
      * @return
      */
     int setSalable(String pid, int flag, int adminId);
+
+    /**
+     * 获取全部产品数据的map
+     * @param minId
+     * @param maxId
+     * @return
+     */
+    List<Map<String, Object>> getProductInfoByLimit(int minId, int maxId);
 }

@@ -13,9 +13,7 @@ import com.importExpress.listener.ContextListener;
 import com.importExpress.pojo.InputData;
 import com.importExpress.pojo.MongoGoodsBean;
 import com.importExpress.service.MongoGoodsService;
-import com.importExpress.utli.EasyUiTreeUtils;
-import com.importExpress.utli.GoodsBeanUtil;
-import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -23,14 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,7 +67,7 @@ public class MongoDBController {
 
             CustomGoodsQuery queryBean = GoodsBeanUtil.genQueryBean(request);
             List<CustomGoodsPublish> goodsList = mongoGoodsService.queryListByParam(queryBean);
-            if(CollectionUtils.isNotEmpty(goodsList)) {
+            if (CollectionUtils.isNotEmpty(goodsList)) {
                 goodsList.stream().forEach(c -> {
                     String complainId = c.getComplainId();
                     complainId = StringUtils.endsWith(complainId, ",") ? complainId.substring(0, complainId.length() - 1) : complainId;
@@ -238,6 +233,225 @@ public class MongoDBController {
     }
 
 
+    @RequestMapping("/batch004")
+    @ResponseBody
+    public JsonResult batch004() {
+        JsonResult json = new JsonResult();
+        List<String> errorList = new ArrayList<>();
+        try {
+
+            int limitNum = 100;
+            int maxId = customGoodsService.queryMaxIdFromCustomGoods();
+            int fc = maxId / limitNum;
+            if (maxId % limitNum > 0) {
+                fc++;
+            }
+
+            int queryTotal = 0;
+            File tempFile;
+            for (int i = 1; i <= fc; i++) {
+                String jsonName = GoodsInfoUpdateOnlineUtil.LOCAL_JSON_PATH + "/00" + i + "_004.json";
+                try {
+                    List<Map<String, Object>> infoList = customGoodsService.getProductInfoByLimit((i - 1) * limitNum, i * limitNum);
+
+                    System.err.println(i + "/" + fc + ":" + infoList.size());
+                    mongoGoodsService.insertGoodsToMongoMapBatch(infoList);
+                    infoList.clear();
+
+                    /*if (CollectionUtils.isNotEmpty(infoList)) {
+                        List<InputData> inputDataList = genInputDataList(infoList);
+                        for (InputData inputData : inputDataList) {
+                            GoodsInfoUpdateOnlineUtil.batchWriteToFile(jsonName, JsonUtils.objectToJsonNotNull(inputData));
+                        }
+                        infoList.clear();
+                    }
+                    tempFile = new File(jsonName);
+                    if (tempFile.exists() && !tempFile.isDirectory()) {
+                        boolean isSu = GoodsInfoUpdateOnlineUtil.mongo004(tempFile);
+                        if (!isSu) {
+                            isSu = GoodsInfoUpdateOnlineUtil.mongo004(tempFile);
+                        }
+                    }*/
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    File deleteFile = new File(jsonName);
+                    if (deleteFile.exists()) {
+                        deleteFile.delete();
+                    }
+                }
+            }
+            System.err.println("query total:" + queryTotal);
+            json.setOk(true);
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+            e.printStackTrace();
+            logger.error("batch004 error:", e);
+        }
+        for (String pid : errorList) {
+            System.err.println(pid);
+        }
+        return json;
+    }
+
+
+    private List<InputData> genInputDataList(List<Map<String, String>> infoList) {
+        List<InputData> inputDataList = new ArrayList<>();
+        try {
+            for (Map<String, String> infoMap : infoList) {
+                // InputData inputData = MapAndBeanUtil.map2bean(infoMap, InputData.class);
+                // inputData.setCrud('u');//u表示更新；c表示创建，d表示删除
+                InputData inputData = new InputData('u');
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setPath_catid(infoMap.get("path_catid"));
+                inputData.setPid(infoMap.get("pid"));
+                inputData.setPrice(infoMap.get("price"));
+                inputData.setWprice(infoMap.get("wprice"));
+                inputData.setCustom_main_image(infoMap.get("custom_main_image"));
+                inputData.setImg(infoMap.get("img"));
+                inputData.setWeight(infoMap.get("weight"));
+
+                inputData.setFeeprice(infoMap.get("feeprice"));
+                inputData.setFprice(infoMap.get("fprice"));
+                inputData.setName(infoMap.get("name"));
+                inputData.setEnname(infoMap.get("enname"));
+                inputData.setMorder(infoMap.get("morder"));
+                inputData.setEntype(infoMap.get("entype"));
+                inputData.setSku(infoMap.get("sku"));
+                inputData.setEndetail(infoMap.get("endetail"));
+                inputData.setEninfo(infoMap.get("eninfo"));
+                inputData.setAli_sold(infoMap.get("ali_sold"));
+                inputData.setAli_pid(infoMap.get("ali_pid"));
+                inputData.setAli_price(infoMap.get("ali_price"));
+                inputData.setAli_weight(infoMap.get("ali_weight"));
+                inputData.setAli_freight(infoMap.get("ali_freight"));
+                inputData.setAli_sellunit(infoMap.get("ali_sellunit"));
+                inputData.setAli_morder(infoMap.get("ali_morder"));
+                inputData.setAli_unit(infoMap.get("ali_unit"));
+                inputData.setAli_name(infoMap.get("ali_name"));
+
+                inputData.setRemotpath(infoMap.get("remotpath"));
+                inputData.setValid(infoMap.get("valid"));
+                inputData.setLocalpath(infoMap.get("localpath"));
+                inputData.setCreatetime(infoMap.get("createtime"));
+                inputData.setCatid(infoMap.get("catid"));
+                inputData.setCatidparenta(infoMap.get("catidparenta"));
+                inputData.setCatidparentb(infoMap.get("catidparentb"));
+                inputData.setKeyword(infoMap.get("keyword"));
+                inputData.setSold(infoMap.get("sold"));
+                inputData.setCatidb(infoMap.get("catidb"));
+                inputData.setCatpath(infoMap.get("catpath"));
+                inputData.setOriginalcatid(infoMap.get("originalcatid"));
+                inputData.setOriginalcatpath(infoMap.get("catid1"));
+                inputData.setAli_img(infoMap.get("catid1"));
+                inputData.setImg_check(infoMap.get("catid1"));
+                inputData.setRevise_weight(infoMap.get("catid1"));
+                inputData.setFinal_weight(infoMap.get("catid1"));
+                inputData.setRange_price(infoMap.get("catid1"));
+                inputData.setShop_id(infoMap.get("catid1"));
+                inputData.setWholesale_price(infoMap.get("catid1"));
+                inputData.setFprice_str(infoMap.get("catid1"));
+                inputData.setPvids(infoMap.get("catid1"));
+                inputData.setInfoReviseFlag(infoMap.get("catid1"));
+                inputData.setPriceReviseFlag(infoMap.get("catid1"));
+                inputData.setIsBenchmark(infoMap.get("catid1"));
+                inputData.setIsNewCloud(infoMap.get("catid1"));
+                inputData.setFinalName(infoMap.get("catid1"));
+                inputData.setSellunit(infoMap.get("catid1"));
+                inputData.setCur_time(infoMap.get("catid1"));
+                inputData.setBm_flag(infoMap.get("catid1"));
+                inputData.setSource_pro_flag(infoMap.get("catid1"));
+                inputData.setIs_sold_flag(infoMap.get("catid1"));
+                inputData.setPriority_flag(infoMap.get("catid1"));
+                inputData.setIs_add_car_flag(infoMap.get("catid1"));
+                inputData.setSource_used_flag(infoMap.get("catid1"));
+                inputData.setOcr_match_flag(infoMap.get("catid1"));
+                inputData.setIs_show_det_img_flag(infoMap.get("catid1"));
+                inputData.setIs_show_det_table_flag(infoMap.get("catid1"));
+                inputData.setFlag(infoMap.get("catid1"));
+                inputData.setGoodsstate(infoMap.get("catid1"));
+                inputData.setBeforesku(infoMap.get("catid1"));
+                inputData.setIs_stock_flag(infoMap.get("catid1"));
+                inputData.setUnsellableReason(infoMap.get("catid1"));
+                inputData.setSamplingStatus(infoMap.get("catid1"));
+                inputData.setSendFrom(infoMap.get("catid1"));
+                inputData.setMatchSource(infoMap.get("catid1"));
+                inputData.setUpdateDate(infoMap.get("catid1"));
+                inputData.setValidationDate(infoMap.get("catid1"));
+                inputData.setBest_match(infoMap.get("catid1"));
+                inputData.setOcean_price(infoMap.get("catid1"));
+                inputData.setValidationDealDate(infoMap.get("catid1"));
+                inputData.setVideo_url(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+                inputData.setCatid1(infoMap.get("catid1"));
+
+
+                inputDataList.add(inputData);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return inputDataList;
+    }
+
+
     @RequestMapping("/insertOrUpdateMongodb")
     @ResponseBody
     public JsonResult insertOrUpdateMongodb(String pid) {
@@ -273,7 +487,7 @@ public class MongoDBController {
         JsonResult json = new JsonResult();
         try {
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-            boolean isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, 0,1);
+            boolean isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, 0, 1);
             if (isCheckImg) {
                 json.setSuccess("检查成功");
             } else {

@@ -54,6 +54,7 @@ public enum MongoDBHelp {
     private MongoClient mongoClient3 = null;
     private MongoDatabase mongoDatabase3 = null;
 
+
     private void getConnection() {
         List<ServerAddress> seeds = new ArrayList<>();
         ServerAddress addr = new ServerAddress(MONGODB_HOST, Integer.valueOf(MONGODB_PORT));
@@ -256,6 +257,26 @@ public enum MongoDBHelp {
         }
         this.closeConnection();
         return result;
+    }
+
+    /**
+     *
+     * @param collectionName
+     * @param list
+     * @return
+     */
+    public int insertBatch2(String collectionName, List<WriteModel<Document>> list) {
+        this.getConnection();
+
+        BulkWriteResult result = null;
+        if (mongoDatabase2 != null) {
+            result = mongoDatabase2.getCollection(collectionName).bulkWrite(list);
+        } else {
+            logger.error("mongoDatabase2 is null");
+        }
+
+        this.closeConnection();
+        return result == null ? 0 : result.getModifiedCount();
     }
 
 

@@ -686,4 +686,12 @@ public interface CustomGoodsMapper {
      * @return
      */
     int setSalable(@Param("pid") String pid, @Param("flag") int flag, @Param("adminId") int adminId);
+
+    /**
+     * 获取全部产品数据的map
+     * @param minId
+     * @param maxId
+     * @return
+     */
+    List<Map<String, Object>> getProductInfoByLimit(@Param("minId") int minId, @Param("maxId") int maxId);
 }
