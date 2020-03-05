@@ -1675,4 +1675,9 @@ select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feepri
         ON DUPLICATE KEY UPDATE salable= #{flag},admin_id=#{adminId}
     </insert>
 
+    <select id="getProductInfoByLimit" resultType="java.util.Map">
+        select * from custom_benchmark_ready
+        where id > #{minId} and #{maxId} >= id
+    </select>
+
 </mapper>

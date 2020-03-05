@@ -1042,5 +1042,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.setSalable(pid, flag, adminId);
     }
 
+    @Override
+    public List<Map<String, Object>> getProductInfoByLimit(int minId, int maxId) {
+        return customGoodsMapper.getProductInfoByLimit(minId, maxId);
+    }
+
 
 }

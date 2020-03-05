@@ -27,25 +27,25 @@ public class GoodsInfoUpdateOnlineUtil {
     /**
      * 刷新产品表数据
      */
-    private static final String MONGODB_UPDATE_GOODS_URL_LOCAL = "http://192.168.1.153:8001/invokejob/b004";
+    public static final String MONGODB_UPDATE_GOODS_URL_LOCAL = "http://192.168.1.153:8001/invokejob/b004";
 
     /**
      * 刷新solr的
      */
-    private static final String MONGODB_UPDATE_SOLR_URL_LOCAL = "http://192.168.1.153:8001/invokejob/b006";
+    public static final String MONGODB_UPDATE_SOLR_URL_LOCAL = "http://192.168.1.153:8001/invokejob/b006";
 
     /**
      * online
      */
-    private static final String LOCAL_JSON_PATH = "/data/cbtconsole/product/";
+    public static final String LOCAL_JSON_PATH = "/data/cbtconsole/product/";
     /**
      * 刷新产品表数据
      */
-    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://52.34.56.133:18001/invokejob/b004";
+    public static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://52.34.56.133:18001/invokejob/b004";
     /**
      * 刷新solr的
      */
-    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://52.34.56.133:18001/invokejob/b006";
+    public static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://52.34.56.133:18001/invokejob/b006";
 
     /**
      * 生成events文件路径
@@ -732,6 +732,25 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
+    public static boolean batchWriteToFile(String fileName, String json) {
+        boolean isSu = true;
+        String tempJson = json;
+        if (tempJson.contains("\\\\\\")) {
+            tempJson = tempJson.replace("\\\\\\", "\\");
+        }
+        if (tempJson.contains("\\\\'")) {
+            tempJson = tempJson.replace("\\\\'", "'");
+        }
+        try {
+            FileUtils.write(new File(fileName), tempJson + "\r\n", "utf-8", true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            isSu = false;
+        }
+        return isSu;
+    }
+
+
     /**
      * 写入mongodb数据大本地
      *
@@ -781,6 +800,24 @@ public class GoodsInfoUpdateOnlineUtil {
         } else {
             throw new Exception("生成文件异常");
         }
+    }
+
+
+    public static boolean mongo004(File file) {
+        boolean isSu = false;
+        try {
+            String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL_LOCAL, file);
+            System.err.println("product local:[" + result.replace("\n", "") + "]");
+            if (StringUtils.isBlank(result) || result.contains("FAILED")) {
+                isSu = false;
+            } else {
+                isSu = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return isSu;
     }
 
     /**
