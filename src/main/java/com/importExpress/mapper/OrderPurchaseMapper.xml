@@ -63,15 +63,17 @@
             resultType="com.importExpress.pojo.OrderPurchase">
         select aa.*,bb.*
         from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
-        th.paydata as orderdate
-        from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and th.tbOr1688 between 0 and 3
+        th.paydata as orderdate,specid,skuid
+        from taobao_1688_order_history th where th.paydata between '2019-12-01' and '2020-01-01' and th.tbOr1688 between 0 and 3
         group by th.orderid,th.shipno,th.itemid) bb
-		left join (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,ifnull(od.re_shipnos,od.shipno) as od_shipno,
-        ifnull(ops.last_tb_1688_itemid,ops.tb_1688_itemid) as od_pid,oi.orderpaytime,oi.exchange_rate
-        from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
-        and od.state in(0,1) inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
+		left join (select ir.tborderid,ir.orderid,ir.shipno as od_shipno,ir.itemid as od_pid,ir.specid as tb_specid,ir.skuid as tb_skuid,
+				od.yourorder,od.goodsprice,od.state,od.purchase_state,oi.orderpaytime,oi.exchange_rate
+				from
+				id_relationtable ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
+				inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
         where od.orderid in(select order_no from orderinfo_curren_monthly)  ) aa
-        on aa.od_shipno = bb.shipno and aa.od_pid = bb.itemid
+        on bb.tb_orderid = aa.tborderid and bb.itemid = aa.od_pid
+        <!--and bb.specid = aa.tb_specid and bb.skuid = aa.tb_skuid-->
         order by bb.orderdate desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
@@ -81,15 +83,17 @@
     <select id="taobaoListCount" parameterType="com.importExpress.pojo.OrderPurchase" resultType="java.lang.Integer">
         select count(0)
         from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
-        th.paydata as orderdate
-        from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and th.tbOr1688 between 0 and 3
+        th.paydata as orderdate,specid,skuid
+        from taobao_1688_order_history th where th.paydata between '2019-12-01' and '2020-01-01' and th.tbOr1688 between 0 and 3
         group by th.orderid,th.shipno,th.itemid) bb
-		left join (select od.orderid,od.yourorder,od.goodsprice,od.state,od.purchase_state,ifnull(od.re_shipnos,od.shipno) as od_shipno,
-        ifnull(ops.last_tb_1688_itemid,ops.tb_1688_itemid) as od_pid,oi.orderpaytime,oi.exchange_rate
-        from order_details od left join order_product_source ops on ops.orderid = od.orderid and ops.od_id = od.id
-        and od.state in(0,1) inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
+		left join (select ir.tborderid,ir.orderid,ir.shipno as od_shipno,ir.itemid as od_pid,ir.specid as tb_specid,ir.skuid as tb_skuid,
+				od.yourorder,od.goodsprice,od.state,od.purchase_state,oi.orderpaytime,oi.exchange_rate
+				from
+				id_relationtable ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
+				inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
         where od.orderid in(select order_no from orderinfo_curren_monthly)  ) aa
-        on aa.od_shipno = bb.shipno and aa.od_pid = bb.itemid
+        on bb.tb_orderid = aa.tborderid and bb.itemid = aa.od_pid
+        <!--and bb.specid = aa.tb_specid and bb.skuid = aa.tb_skuid-->
     </select>
 
 </mapper>
