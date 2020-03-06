@@ -64,7 +64,7 @@
         select aa.*,bb.*
         from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
         th.paydata as orderdate,specid,skuid
-        from taobao_1688_order_history th where th.paydata between '2019-12-01' and '2020-01-01' and th.tbOr1688 between 0 and 3
+        from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and th.tbOr1688 between 0 and 3
         group by th.orderid,th.shipno,th.itemid) bb
 		left join (select ir.tborderid,ir.orderid,ir.shipno as od_shipno,ir.itemid as od_pid,ir.specid as tb_specid,ir.skuid as tb_skuid,
 				od.yourorder,od.goodsprice,od.state,od.purchase_state,oi.orderpaytime,oi.exchange_rate
@@ -84,7 +84,7 @@
         select count(0)
         from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
         th.paydata as orderdate,specid,skuid
-        from taobao_1688_order_history th where th.paydata between '2019-12-01' and '2020-01-01' and th.tbOr1688 between 0 and 3
+        from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and th.tbOr1688 between 0 and 3
         group by th.orderid,th.shipno,th.itemid) bb
 		left join (select ir.tborderid,ir.orderid,ir.shipno as od_shipno,ir.itemid as od_pid,ir.specid as tb_specid,ir.skuid as tb_skuid,
 				od.yourorder,od.goodsprice,od.state,od.purchase_state,oi.orderpaytime,oi.exchange_rate
