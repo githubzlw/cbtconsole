@@ -1164,6 +1164,7 @@
                     <td>货源/沟通</td>
                     <td>采购员</td>
                     <td style="width:500px;">订单操作</td>
+                    <td style="width:500px;">替代产品</td>
                 </tr>
                 </tbody>
                 <c:forEach items="${orderDetail}" var="orderd" varStatus="sd">
@@ -1596,6 +1597,7 @@
                                   <span>拆样，数量</span>
                             <input type="text" style="width: 20px" id="Split_openNum${orderd.id}" onchange="getNum(${orderd.yourorder},this)" value="1"><span>优先发货</span>
                         </td>
+                        <td>${orderd.replacement_product}</td>
                     </tr>
                 </c:forEach>
             </table>
