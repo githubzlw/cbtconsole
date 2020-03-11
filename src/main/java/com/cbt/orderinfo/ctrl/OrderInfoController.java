@@ -260,7 +260,8 @@ public class OrderInfoController{
 		try{
 			String expresstrackid = request.getParameter("expresstrackid");
 			String checked = request.getParameter("checked");
-			list = iOrderinfoService.getOrder(expresstrackid, checked);
+			String selectType = request.getParameter("selectType");
+			list = iOrderinfoService.getOrder(expresstrackid, checked, selectType);
 		}catch (Exception e){
 			e.printStackTrace();
 		}

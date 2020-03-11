@@ -436,7 +436,7 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
-	public List<SearchResultInfo> getOrder(String shipno, String checked) {
+	public List<SearchResultInfo> getOrder(String shipno, String checked, String selectType) {
 		List<SearchResultInfo> info = new ArrayList<SearchResultInfo>();
 		List<SearchTaobaoInfo> taobaoinfoList = new ArrayList<SearchTaobaoInfo>();
 		int adminid = 520;
@@ -451,7 +451,11 @@ public class OrderinfoService implements IOrderinfoService {
 				resultList=orderinfoMapper.getOrderDataOne(shipno);
 			}else{
 				//入库
-				resultList=orderinfoMapper.getOrderData(shipno,adminid);
+				if("1".equals(selectType)){
+					resultList=orderinfoMapper.getOrderDataPrecise(shipno,adminid);
+				} else {
+					resultList=orderinfoMapper.getOrderData(shipno,adminid);
+				}
 			}
 			Set set=new HashSet();
 			for(Map<String,Object> map:resultList){

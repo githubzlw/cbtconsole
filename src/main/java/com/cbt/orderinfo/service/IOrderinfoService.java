@@ -238,7 +238,7 @@ public interface IOrderinfoService {
 	 * @param checked
 	 * @return
 	 */
-	public List<SearchResultInfo> getOrder(String shipno, String checked);
+	public List<SearchResultInfo> getOrder(String shipno, String checked, String selectType);
 
 	/**
 	 * 获取采购人
