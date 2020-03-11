@@ -131,6 +131,38 @@
         #div_clothing input, #ss_div input, #dz_div input {
             background-color: #eee;
         }
+        /* 定义keyframe动画，命名为blink */
+        @keyframes blink{
+            0%{opacity: 1;}
+            100%{opacity: 0;}
+        }
+        /* 添加兼容性前缀 */
+        @-webkit-keyframes blink {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        @-moz-keyframes blink {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        @-ms-keyframes blink {
+            0% {opacity: 1; }
+            100% { opacity: 0;}
+        }
+        @-o-keyframes blink {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        /* 定义blink类*/
+        /*.blink{
+            color: #dd4814;
+            animation: blink 1s linear infinite;
+            !* 其它浏览器兼容性前缀 *!
+            -webkit-animation: blink 1s linear infinite;
+            -moz-animation: blink 1s linear infinite;
+            -ms-animation: blink 1s linear infinite;
+            -o-animation: blink 1s linear infinite;
+        }*/
     </style>
 
     <script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.js"></script>
@@ -1164,7 +1196,6 @@
                     <td>货源/沟通</td>
                     <td>采购员</td>
                     <td style="width:500px;">订单操作</td>
-                    <td style="width:500px;">替代产品</td>
                 </tr>
                 </tbody>
                 <c:forEach items="${orderDetail}" var="orderd" varStatus="sd">
@@ -1250,6 +1281,8 @@
                                     新交期：${orderd.change_delivery}
                                 </c:if>
                             </em><br>
+                            <span  class="blink">替代产品:</span><br>
+                            <span class="basic-r" style="display: inline-block;overflow: hidden;width: 70px;word-break: keep-all;white-space: nowrap;text-overflow: ellipsis;line-height: 28px;float: left;"  title="${orderd.replacement_product}" >${orderd.replacement_product}</span></td>
                         </td>
                         <td><input type="hidden"
                                    value="${orderd.state},${order.state},${orderd.orsstate},${orderd.od_state},${orderd.checked}">
@@ -1597,7 +1630,6 @@
                                   <span>拆样，数量</span>
                             <input type="text" style="width: 20px" id="Split_openNum${orderd.id}" onchange="getNum(${orderd.yourorder},this)" value="1"><span>优先发货</span>
                         </td>
-                        <td>${orderd.replacement_product}</td>
                     </tr>
                 </c:forEach>
             </table>
@@ -1990,6 +2022,12 @@
     if (admid != 40) {
         $(".shield").hide();
     }
+    function blink(){
+        var color="#f00|#0f0|#00f|#880|#808|#088|yellow|green|blue|gray";
+        color=color.split("|");
+        $(".blink").css('color',color[parseInt(Math.random()*color.length)]);
+    }
+    setInterval("blink()",1000);
 </script>
 </html>
 <!-- 采购页面跳转使用 -->
