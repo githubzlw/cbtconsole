@@ -131,38 +131,6 @@
         #div_clothing input, #ss_div input, #dz_div input {
             background-color: #eee;
         }
-        /* 定义keyframe动画，命名为blink */
-        @keyframes blink{
-            0%{opacity: 1;}
-            100%{opacity: 0;}
-        }
-        /* 添加兼容性前缀 */
-        @-webkit-keyframes blink {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-        @-moz-keyframes blink {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-        @-ms-keyframes blink {
-            0% {opacity: 1; }
-            100% { opacity: 0;}
-        }
-        @-o-keyframes blink {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-        /* 定义blink类*/
-        /*.blink{
-            color: #dd4814;
-            animation: blink 1s linear infinite;
-            !* 其它浏览器兼容性前缀 *!
-            -webkit-animation: blink 1s linear infinite;
-            -moz-animation: blink 1s linear infinite;
-            -ms-animation: blink 1s linear infinite;
-            -o-animation: blink 1s linear infinite;
-        }*/
     </style>
 
     <script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.js"></script>
