@@ -36,6 +36,8 @@
         var tempJson = {};
         var typeJson = {};
         var editorObj = {};
+        var skuJson = {};
+        var skuInfo = {};
 
         $(document).ready(function () {
             initDialog();
@@ -486,6 +488,7 @@
                 //获取需要删除的规格ids数据
                 var typeDeleteIds = getTypeDeleteIdsData();
                 var typeRepalceIds = getTypeReplaceIdsData();
+                var skuCount = Object.keys(skuJson).length;
                 $('.mask').show().text('正在执行，请等待...');
                 $.ajax({
                     type: 'POST',
@@ -509,7 +512,8 @@
                         "typeRepalceIds": typeRepalceIds.substring(1),
                         "typeDeleteIds": typeDeleteIds.substring(1),
                         "wordSizeInfo": wordSizeInfo,
-                        "mainImg": mainImg
+                        "mainImg": mainImg,
+                        "skuCount":skuCount
                     },
                     success: function (data) {
                         $('.mask').hide();
@@ -2456,10 +2460,9 @@
                                         <tr>
                                             <c:forEach var="item" items="${showattribute}"
                                                        varStatus="itemIndex">
-                                            <td width="32%"><input type="text" class="inp_style"
-                                                                   title="单击可进行编辑" id="sku_id_${item.key}"
-                                                                   name="sku_key_val"
-                                                                   value="${item.value}"/></td>
+                                            <td width="32%"><input type="text" class="inp_style" title="单击可进行编辑"
+                                               id="sku_id_${item.key}" name="sku_key_val" value="${item.value}" onchange="addSkuLog('sku_id_${item.key}')"/>
+                                            </td>
                                             <c:if
                                                     test="${(itemIndex.index+1) % 3 == 0 || itemIndex.index == itemLength-1}">
                                         </tr>
@@ -2906,6 +2909,14 @@
                 }
             });
         }
+    }
+
+    
+    function onSkuclick() {
+
+    }
+    function addSkuLog(skuId) {
+        skuJson[skuId] = 1;
     }
 
     function addGoodsAttribute() {

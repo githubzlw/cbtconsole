@@ -104,6 +104,15 @@ public class InputData {
     private String searchable;
 
     private String salable;
+    private String is_simplify;
+
+    public String getIs_simplify() {
+        return is_simplify;
+    }
+
+    public void setIs_simplify(String is_simplify) {
+        this.is_simplify = is_simplify;
+    }
 
     public String getSalable() {
         return salable;

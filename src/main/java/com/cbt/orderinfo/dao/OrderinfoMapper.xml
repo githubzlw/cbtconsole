@@ -1181,6 +1181,9 @@
     <select id="getOrderData" resultType="java.util.Map">
 		{call getOrderData(#{shipno},${adminid})}
 	</select>
+    <select id="getOrderDataPrecise" resultType="java.util.Map">
+		{call getOrderDataPrecise(#{shipno},${adminid})}
+	</select>
     <select id="getAllCancelDetails" resultType="com.cbt.bean.OrderDetailsBean">
         select orderid,goodsid,id from order_details where checked=0 and shipno=#{shipno}
     </select>

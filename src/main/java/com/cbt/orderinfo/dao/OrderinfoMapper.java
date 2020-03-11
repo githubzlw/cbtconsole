@@ -244,6 +244,7 @@ public interface OrderinfoMapper {
 	 */
 	public String getShopId(@Param("goodsPid") String goodsPid);
 	public List<Map<String,Object>> getOrderData(@Param("shipno") String shipno, @Param("adminid") int adminid);
+	List<Map<String,Object>> getOrderDataPrecise(@Param("shipno") String shipno, @Param("adminid") int adminid);
 	public List<OrderDetailsBean> getAllCancelDetails(Map<String, String> map);
 	public String getShopCustomId(@Param("goodsPid") String goodsPid);
 	/**
