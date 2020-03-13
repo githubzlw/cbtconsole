@@ -105,6 +105,15 @@ public class InputData {
 
     private String salable;
     private String is_simplify;
+    private String top_sort;
+
+    public String getTop_sort() {
+        return top_sort;
+    }
+
+    public void setTop_sort(String top_sort) {
+        this.top_sort = top_sort;
+    }
 
     public String getIs_simplify() {
         return is_simplify;

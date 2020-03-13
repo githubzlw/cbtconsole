@@ -44,7 +44,7 @@ input[type="search"]::-webkit-search-cancel-button,input[type="search"]::-webkit
 html,body{width:100%;height:100%;overflow-x:hidden;overflow-y: auto;background: #fff;min-width: 1200px;}
 .allMain{width:98%;height:100%;margin:0 auto;}
 .s_top{width:100%;height:80px;}
-.s_btn{display: inline-block;width:120px;height:28px;background:#169bd4;margin:8px 1px;border-radius: 10px;line-height: 28px;text-align: center;color:#fff;cursor: pointer;font-size: 14px;}
+.s_btn{display: inline-block;width:124px;height:28px;background:#169bd4;margin:8px 1px;border-radius: 10px;line-height: 28px;text-align: center;color:#fff;cursor: pointer;font-size: 14px;}
 .s_btn_2{display: inline-block;width:120px;height:40px;background:#169bd4;margin:20px 0px 0px 30px;border-radius: 10px;line-height: 40px;text-align: center;color:#fff;cursor: pointer;font-size: 14px;}
 .s_last{width:30%;text-align: left;margin-left:0px;cursor: default;color:red;background: #fff;}
 .s_last2{display:inline-block;margin-left:10px;}

@@ -957,6 +957,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
+    public int setTopSort(String pid, int newSort, int adminId) {
+        customGoodsMapper.setTopSortLog(pid, newSort, adminId);
+        mongoDbLocalUtil.updatePid(pid);
+        return customGoodsMapper.setTopSort(pid, newSort);
+    }
+
+    @Override
     public int saveGoodsWeightChange(GoodsWeightChange weightChange) {
         return customGoodsMapper.saveGoodsWeightChange(weightChange);
     }

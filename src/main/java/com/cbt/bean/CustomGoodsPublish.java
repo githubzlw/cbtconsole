@@ -144,6 +144,16 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private int skuCount = -1;
 
+    private int topSort = -1;
+
+    public int getTopSort() {
+        return topSort;
+    }
+
+    public void setTopSort(int topSort) {
+        this.topSort = topSort;
+    }
+
     public int getSkuCount() {
         return skuCount;
     }

@@ -552,6 +552,10 @@ public interface CustomGoodsMapper {
      */
     int insertSearchableLog(@Param("pid") String pid, @Param("flag") int flag, @Param("adminId") int adminId);
 
+    int setTopSort(@Param("pid") String pid, @Param("newSort") int newSort);
+
+    int setTopSortLog(@Param("pid") String pid, @Param("newSort") int newSort, @Param("adminId") int adminId);
+
     /**
      * 保存重量改动信息
      * @param weightChange

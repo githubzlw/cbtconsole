@@ -1527,6 +1527,59 @@
             });
         }
 
+        function setTopSort(pid, num) {
+            var content = '是否确认设置搜索排序(请选择1-59999之间数值,数值越小越排在前面)';
+            if (num > 0) {
+                content = '是否确认设置搜索排序(请选择1-59999之间数值,数值越小越排在前面,当前值:' + num + ')';
+            }
+            $.messager.prompt('提示信息', content, function (newSort) {
+                if (newSort) {
+                    var reg = /(^[1-9]\d*$)/;
+                    if (reg.test(newSort) && 1<=newSort && newSort < 60000) {
+                        if (num == newSort) {
+                            $.messager.alert("提醒", "新的数值和原数值相同", "info");
+                        } else {
+                            $.messager.progress({
+                                title: '正在更新',
+                                msg: '请等待...'
+                            });
+                            $.ajax({
+                                type: 'POST',
+                                dataType: 'json',
+                                url: '/cbtconsole/editc/setTopSort',
+                                data: {
+                                    "pid": pid,
+                                    "newSort": newSort,
+                                    "num": num
+                                },
+                                success: function (json) {
+                                    $.messager.progress('close');
+                                    if (json.ok) {
+                                        $.messager.alert("提醒", "执行成功，页面即将刷新", "info");
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        }, 500);
+                                    } else {
+                                        $.messager.alert("提醒", json.message, "error");
+                                    }
+                                },
+                                error: function () {
+                                    $.messager.progress('close');
+                                    $.messager.alert("提醒", "执行失败，请重试", "error");
+                                }
+                            });
+                        }
+
+                    } else {
+                        showMessage('新的数值必须为正数,且在范围内！');
+                    }
+                } else {
+                    showMessage('未输入新的数值或取消输入！');
+                }
+            });
+
+        }
+
         function setSalable(pid, flag) {
             var content = '是否确认设置取消美加不可售卖标识';
             if(flag > 0){
@@ -2115,7 +2168,7 @@
 
             <span class="s_btn" onclick="doSaveDetalis('${goods.pid}',1,${isSoldFlag})">保存并发布</span>
             <span class="s_btn" onclick="setGoodsValid('${goods.pid}',-1)">下架该商品</span>
-            <span class="s_btn" title="无需修改时点击检查通过" onclick="setGoodsValid('${goods.pid}',1)">检查通过</span>
+
 
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <%--<span class="s_btn" >保存并发布</span>
@@ -2123,7 +2176,7 @@
                 <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>--%>
             <c:if test="${goods.describeGoodFlag == 0}">
                 <%--<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>--%>
-                <span class="s_btn" onclick="setGoodsDescWithHotType('${goods.pid}')">设置描述很精彩</span>
+                <span class="s_btn" onclick="setGoodsDescWithHotType('${goods.pid}')">描述很精彩</span>
             </c:if>
                 <%--<span class="s_last">*点击后数据直接更新线上</span>--%>
             <span class="s_btn" onclick="setNoBenchmarking('${goods.pid}',${goods.finalWeight})">标识非对标商品</span>
@@ -2135,12 +2188,12 @@
             <c:if test="${goods.overSeaFlag == 0}">
 
             </c:if>
-            <span class="s_btn" onclick="openOverSeaDialog(${goods.overSeaFlag})">设置海外仓</span>
+            <span class="s_btn" onclick="openOverSeaDialog(${goods.overSeaFlag})">海外仓</span>
             <c:if test="${goods.searchable == 0}">
-                <span class="s_btn" onclick="setSearchable('${goods.pid}', 1)">设置可搜索</span>
+                <span class="s_btn" onclick="setSearchable('${goods.pid}', 1)">可搜索</span>
             </c:if>
             <c:if test="${goods.searchable > 0}">
-                <span class="s_btn" onclick="setSearchable('${goods.pid}', 0)">设置不可搜索</span>
+                <span class="s_btn" onclick="setSearchable('${goods.pid}', 0)">不可搜索</span>
             </c:if>
 
             <c:if test="${salable == 0}">
@@ -2149,6 +2202,14 @@
             <c:if test="${salable > 0}">
                 <span class="s_btn" onclick="setSalable('${goods.pid}', 0)">取消美加不可售卖</span>
             </c:if>
+
+            <c:if test="${goods.topSort > 0}">
+                <span class="s_btn" onclick="setTopSort('${goods.pid}', ${goods.topSort})">搜索排序(值:${goods.topSort})</span>
+            </c:if>
+            <c:if test="${goods.topSort < 1}">
+                <span class="s_btn" onclick="setTopSort('${goods.pid}', -1)">搜索排序</span>
+            </c:if>
+
 
         </div>
         <div class="all_s">
@@ -2660,6 +2721,8 @@
                     <span class="s_btn" onclick="setNewCatid('${goods.pid}','${goods.catid1}')">设置新类别</span>
                     <br>
                     <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <span class="s_btn" title="无需修改时点击检查通过" onclick="setGoodsValid('${goods.pid}',1)">检查通过</span>
                     &nbsp;&nbsp;&nbsp;
                     <a target="_blank"
                        href="http://192.168.1.29:8280/cbtconsole/customerServlet?action=findAllTaoBaoInfo&className=PictureComparisonServlet&aliPid=${goods.aliGoodsPid}&ylbbPid=${goods.pid}"
