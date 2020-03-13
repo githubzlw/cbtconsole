@@ -906,6 +906,16 @@ public interface CustomGoodsService {
      */
     int setSearchable(String pid, int flag, int adminId);
 
+    /**
+     * 设置可搜索
+     *
+     * @param pid
+     * @param newSort
+     * @param adminId
+     * @return
+     */
+    int setTopSort(String pid, int newSort, int adminId);
+
 
     /**
      * 保存重量改动信息

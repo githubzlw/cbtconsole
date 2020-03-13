@@ -920,11 +920,13 @@
         ifnull(cge.is_edited,0) as is_edited,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.edit_profit,0) as edit_profit,
         ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason,ifnull(cge.weight_flag,0) as weight_flag,
         ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num,
-        ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag
+        ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag,
+        ifnull(pts.sort,-1) as topSort
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
         left join needfindsizechart cbn on cbn.pid=cbu.pid
+        left join pid_top_sort pts on cbu.pid = pts.pid
         where cbu.pid = #{pid}
     </select>
     <select id="getAllReviewByPid" resultType="com.cbt.bean.CustomGoodsPublish">
@@ -1481,6 +1483,15 @@
     <insert id="insertSearchableLog">
         insert into custom_goods_searchable(pid,flag,admin_id)
         values(#{pid},#{flag},#{adminId})
+    </insert>
+
+    <insert id="setTopSort">
+        replace into pid_top_sort(pid,sort) values(#{pid},#{newSort})
+    </insert>
+
+    <insert id="setTopSortLog">
+        insert into pid_top_sort_log(pid,sort,admin_id)
+        values(#{pid},#{newSort},#{adminId})
     </insert>
 
     <insert id="saveGoodsWeightChange" parameterType="com.importExpress.pojo.GoodsWeightChange">
