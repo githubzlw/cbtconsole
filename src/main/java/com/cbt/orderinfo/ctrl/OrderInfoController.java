@@ -1240,7 +1240,7 @@ public class OrderInfoController{
 						InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
 						inputData.setPid(pid);
 						inputData.setEninfo(nwDoc.html());
-						GoodsInfoUpdateOnlineUtil.updateOnlineAndSolr(inputData, 0);
+						GoodsInfoUpdateOnlineUtil.updateOnlineAndSolr(inputData, 0, 0);
 						result_list.add(id+"@"+pid);
 						up_ids.add(Integer.parseInt(id));
                         /**********远程发送MQ，更新mongodb eninfo字段 end*****/

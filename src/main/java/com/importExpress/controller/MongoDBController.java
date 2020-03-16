@@ -677,7 +677,7 @@ public class MongoDBController {
             // 删除MongoDB
             InputData inputData = new InputData('d');
             inputData.setPid(pid);
-            isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
             if (isSu) {
                 // 删除图片
                 CustomGoodsPublish goods = customGoodsService.queryGoodsDeleteDetails(pid);

@@ -2536,7 +2536,7 @@ public class EditorController {
                 inputData.setPid(pid);
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setDescribe_good_flag(String.valueOf(describe_good_flag));
-                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData,1);
+                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData,1, 0);
                 // 记录日志
                 customGoodsService.insertIntoDescribeLog(pid,user.getId());
             }
@@ -2604,10 +2604,7 @@ public class EditorController {
                 inputData.setPid(pid);
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setDescribe_good_flag("1");
-                boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
-                if(!isSu){
-                    isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
-                }
+                boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
                 if(!isSu){
                     LOG.error("saveGoodsDescInfo update mongodb error,pid:" + pid + ",hotTypeId:" + hotTypeId);
                 }
@@ -3898,7 +3895,7 @@ public class EditorController {
             inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
             inputData.setPid(pid);
             inputData.setSearchable(String.valueOf(flag));
-            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
             if(isSu){
                 customGoodsService.setSearchable(pid, flag, admuser.getId());
                 json.setOk(true);
@@ -3940,7 +3937,7 @@ public class EditorController {
             inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
             inputData.setPid(pid);
             inputData.setTop_sort(String.valueOf(newSort));
-            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
             // boolean isSu = true;
             if(isSu){
                 customGoodsService.setTopSort(pid, newSort, admuser.getId());
@@ -3983,7 +3980,7 @@ public class EditorController {
             inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
             inputData.setPid(pid);
             inputData.setSalable(String.valueOf(flag));
-            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
             // boolean isSu = true;
             if(isSu){
                 customGoodsService.setSalable(pid, flag, admuser.getId());
@@ -4049,7 +4046,7 @@ public class EditorController {
                 inputData.setCatid1(good.getCatid1());
                 inputData.setPath_catid(good.getPathCatid());
 
-                boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+                boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
                 if (isSu) {
                     good.setAdminId(admuser.getId());
                     good.setCatid(oldCatid);
