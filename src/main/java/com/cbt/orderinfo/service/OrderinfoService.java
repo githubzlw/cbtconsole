@@ -52,6 +52,7 @@ import com.cbt.website.bean.SearchTaobaoInfo;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
+import com.google.common.collect.Maps;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.utli.NotifyToCustomerUtil;
@@ -256,6 +257,24 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
+	public Map<String,Integer> getTbShip(String shipno) {
+		Map<String,Integer> result = Maps.newHashMap();
+		List<Map<String,Object>> list = orderinfoMapper.getTbShip(shipno);
+		if(list == null) {
+			return result;
+		}
+		list.stream().forEach(l->{
+			String skuid = com.cbt.util.StrUtils.object2Str(l.get("skuID"));
+			String itemid = com.cbt.util.StrUtils.object2Str(l.get("itemid"));
+			String itemqty = com.cbt.util.StrUtils.object2NumStr(l.get("itemqty"));
+			Integer count = result.get(itemid+"_"+skuid);
+			count = count == null ? Integer.parseInt(itemqty) : count + Integer.parseInt(itemqty);
+			result.put(itemid+"_"+skuid, count);
+		});
+		
+		return result;
+	}
+	@Override
 	public List<Map<String,Object>> allTrack(Map<String, String> map) {
 		int adminid=orderinfoMapper.getAdmNameByShipno(map);
 		List<Map<String,Object>> list=orderinfoMapper.getOrderData((String)map.get("shipno"),adminid);
@@ -451,7 +470,7 @@ public class OrderinfoService implements IOrderinfoService {
 				resultList=orderinfoMapper.getOrderDataOne(shipno);
 			}else{
 				//入库
-				if("1".equals(selectType)){
+				if("1".equals(selectType)){//商品规格精确匹配
 					resultList=orderinfoMapper.getOrderDataPrecise(shipno,adminid);
 				} else {
 					resultList=orderinfoMapper.getOrderData(shipno,adminid);
