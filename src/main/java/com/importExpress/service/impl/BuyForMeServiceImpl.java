@@ -47,7 +47,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 			List<DetailsSku> list = detailsIdSku.get(bfDetailsId);
 			list = list == null ? Lists.newArrayList() : list;
 			DetailsSku detailsSku = DetailsSku.builder().num(o.getNum()).skuid(o.getSkuid())
-			.price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).build();
+			.price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).id(o.getId()).build();
 			list.add(detailsSku);
 			detailsIdSku.put(bfDetailsId, list);
 		});
@@ -71,7 +71,14 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		}else {
 			result = buyForMemapper.updateOrderDetailsSku(detailSku);
 		}
+		buyForMemapper.updateOrdersDetailsState(detailSku.getBfDetailsId(),1);
+		buyForMemapper.updateOrdersState(detailSku.getBfId(),1);
+		
 		return result;
+	}
+	@Override
+	public int finshOrder(int id) {
+		return buyForMemapper.updateOrdersState(id,2);
 	}
 
 }

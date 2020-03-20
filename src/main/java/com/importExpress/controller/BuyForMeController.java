@@ -48,7 +48,7 @@ public class BuyForMeController {
         map.put("page", (current_page - 1)*30);
         map.put("state", Integer.valueOf(strState));
         map.put("orderNo", orderno);
-        map.put("userId", userId);
+        map.put("userId", StringUtils.isBlank(userId) ? null : userId);
         
         
         int ordersCount = buyForMeService.getOrdersCount(map);
@@ -93,11 +93,23 @@ public class BuyForMeController {
     	detailSku.setPrice(request.getParameter("price"));
     	detailSku.setProductUrl(request.getParameter("url"));
     	detailSku.setSku(request.getParameter("sku"));
-    	detailSku.setSkuid(request.getParameter("num"));
+    	String skuid = "";
+    	detailSku.setSkuid(skuid);
     	detailSku.setState(0);
 		int addOrderDetailsSku = buyForMeService.addOrderDetailsSku(detailSku );
     	
+		mv.put("state", addOrderDetailsSku > 0 ? 200 : 500);
     	mv.put("orderDetails", addOrderDetailsSku);
+    	return mv;
+    }
+    @RequestMapping("/finsh")
+    @ResponseBody
+    public Map<String,Object> finsh(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	String bfId = request.getParameter("bfid");
+    	bfId = StrUtils.isNum(bfId) ? bfId : "0";
+    	int addOrderDetailsSku = buyForMeService.finshOrder(Integer.parseInt(bfId));
+    	mv.put("state", addOrderDetailsSku > 0 ? 200 : 500);
     	return mv;
     }
     

@@ -35,5 +35,10 @@ public interface BuyForMeService {
 	 * @return
 	 */
 	int addOrderDetailsSku(BFOrderDetailSku detailSku);
+	/**
+	 * @param detailSku
+	 * @return
+	 */
+	int finshOrder(int bfId);
 	
 }

@@ -67,17 +67,24 @@
   </select>
   
   <select id="getOrderDetailsSku" resultMap="skuResultMap">
-  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url from buyforme_details_sku where bf_id= #{bfId}
+  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku from buyforme_details_sku where bf_id= #{bfId}
   </select>
   
   <insert id="addOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
-  insert into buyforme_details_sku(bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url) 
-  values(#{bfId},#{bfDetailsId},#{numIid},#{skuid},#{price},#{num},#{remark},#{state},#{productUrl})
+  insert into buyforme_details_sku(bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku) 
+  values(#{bfId},#{bfDetailsId},#{numIid},#{skuid},#{price},#{num},#{remark},#{state},#{productUrl},#{sku})
   </insert>
   
   <update id="updateOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
-  update buyforme_details_sku set skuid=#{skuid},product_url=#{productUrl},num=#{num},price=#{price}
+  update buyforme_details_sku set sku=#{sku},product_url=#{productUrl},num=#{num},price=#{price}
   where id=#{id}
+  </update>
+  
+  <update id="updateOrdersDetailsState">
+  update buyforme_details set state=#{state} where id=#{id}
+  </update>
+  <update id="updateOrdersState">
+  update buyforme_orderinfo set state=#{state} where id=#{id}
   </update>
   
 

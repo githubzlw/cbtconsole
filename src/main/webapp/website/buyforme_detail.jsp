@@ -58,11 +58,8 @@ padding: 20px;max-height: 800px;}
 			<table class="table table-bordered">
 				<thead>
 					<tr>
-						<th>产品名称</th>
-						<th>产品ID</th>
-						<th>产品图片</th>
-						<th>产品价格</th>
-						<th>申请数量</th>
+						<th>ID</th>
+						<th>产品详情</th>
 						<th>状态</th>
 						<th>备注</th>
 						<!-- <th>时间</th> -->
@@ -71,17 +68,21 @@ padding: 20px;max-height: 800px;}
 				</thead>
 				<tbody>
 				<c:forEach items="${orderDetails }" var="detail" varStatus="index">
-					<tr>
-					 <td>${detail.title }</td>
-					 <td>${detail.numIid }</td>
-					 <td><img src="${detail.picUrl }" class="img-responsive"></td>
-					 <td>${detail.price }</td>
-					 <td>${detail.num }</td>
+					<tr class="de-td">
+					 <td >
+					 <span class="bfdid">${detail.id}</span>
+					 </td>
+					 <td>
+					 ITEMID:<span class="td-numiid">${detail.numIid }</span><br>
+					 NAME:<span>${detail.title }</span><br>
+					 <img src="/cbtconsole/img/beforeLoad.gif" data-original="${detail.picUrl }" class="img-responsive img-lazy"><br>
+					 No.:<span>${detail.num }</span><br>
+					 PRICE:<span class="td-price">${detail.price }</span><br>
+					 </td>
 					 <td>${detail.state }</td>
 					 <td>${detail.remark}</td>
 					 <%-- <td>${detail.createTime}</td> --%>
 					 <td class="s-bf">
-					 <input type="hidden" value="${detail.id}" class="bfdid">
 					 <table class="table table-bordered table-primary">
 					<thead>
 						<tr>
@@ -90,14 +91,17 @@ padding: 20px;max-height: 800px;}
 					</thead>
 					<tbody id="lu_tr">
 					 <c:forEach items="${detail.skus }" var="sku">
-					 <tr>
-							<td><input type="text" class="form-control lu_skuid" value="${sku.skuid}"></td>
+					 <tr class="sku-u-td">
+							
+							<td>
+							<input type="hidden" class="form-control lu_id" value="${sku.id}">
+							<input type="text" class="form-control lu_sku" value="${sku.sku}"></td>
 							<td><input type="text" class="form-control lu_count" value="${sku.num}"></td>
 							<td><input type="text" class="lu_url" value="${sku.url}"><button class="btn btn-success btn-update">修改</button></td>
 						</tr>
 					 </c:forEach>
-						<tr>
-							<td><input type="text" class="form-control lu_skuid" value=""></td>
+						<tr class="sku-td">
+							<td><input type="text" class="form-control lu_sku" value=""></td>
 							<td><input type="text" class="form-control lu_count" value="0"></td>
 							<td><input type="text" class="lu_url"><button class="btn btn-success btn-add">录入</button></td>
 						</tr>
@@ -111,7 +115,7 @@ padding: 20px;max-height: 800px;}
 					</c:forEach>
 				</tbody>
 			</table>
-				
+		<button class="btn btn-success btn-finsh">确认处理</button>		
 		</div>
 		
 	</div>

@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class DetailsSku {
+	private int id;
 	private String skuid;
 	private String sku;
 	private String url;

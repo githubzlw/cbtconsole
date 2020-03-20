@@ -3,11 +3,23 @@ package com.importExpress.mapper;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
 
 public interface BuyForMeMapper {
+	/**更新order状态
+	 * @param id
+	 * @return
+	 */
+	int updateOrdersState(@Param("id")int id,@Param("state")int state);
+	/**更新details状态
+	 * @param id
+	 * @return
+	 */
+	int updateOrdersDetailsState(@Param("id")int id,@Param("state")int state);
 	
 	/**申请单列表
 	 * @return
