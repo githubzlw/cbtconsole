@@ -1584,4 +1584,5 @@
         select orderid,id,goodsid,1 as goodstatus,goods_pid,yourorder,1 as is_replenishment from order_details
         where orderid=#{orderid} and id = #{odid}
     </insert>
+    <select id="getTbShip" resultType="java.util.Map">select  itemid,itemqty ,skuID from taobao_1688_order_history where shipno=#{shipno}</select>
 </mapper>

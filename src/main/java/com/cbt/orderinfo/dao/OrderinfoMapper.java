@@ -806,4 +806,5 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	int insertInventoryIdRelationtable(Map<String, String> map);
+	List<Map<String,Object>> getTbShip(String shipno);
 }
