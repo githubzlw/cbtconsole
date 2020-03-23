@@ -18,7 +18,7 @@
   </resultMap>
   <resultMap id="detailResultMap" type="com.importExpress.pojo.BFOrderDetail" >
     <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="buyforme_id" property="bfId" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
     <result column="state" property="state" jdbcType="INTEGER" />
     <result column="num" property="num" jdbcType="INTEGER" />
     <result column="title" property="title" jdbcType="VARCHAR" />
@@ -41,6 +41,9 @@
     <result column="sku" property="sku" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="price" property="price" jdbcType="VARCHAR" />
+    <result column="price_buy" property="priceBuy" jdbcType="VARCHAR" />
+    <result column="price_buy_c" property="priceBuyc" jdbcType="VARCHAR" />
+    <result column="ship_feight" property="shipFeight" jdbcType="VARCHAR" />
     <result column="product_url" property="productUrl" jdbcType="VARCHAR" />
   </resultMap>
   
@@ -62,30 +65,40 @@
   </select>
   
   <select id="getOrderDetails" resultMap="detailResultMap">
-  select id,buyforme_id,title,pic_url,price,num_iid,num,detail_url,state,remark,create_time 
-  from buyforme_details where buyforme_id=#{bfId}
+  select id,order_no,title,pic_url,price,num_iid,num,detail_url,state,remark,create_time 
+  from buyforme_details where order_no=#{orderNo}
   </select>
   
   <select id="getOrderDetailsSku" resultMap="skuResultMap">
-  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku from buyforme_details_sku where bf_id= #{bfId}
+  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,ship_feight 
+  from buyforme_details_sku where bf_id= #{bfId}
   </select>
   
   <insert id="addOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
-  insert into buyforme_details_sku(bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku) 
-  values(#{bfId},#{bfDetailsId},#{numIid},#{skuid},#{price},#{num},#{remark},#{state},#{productUrl},#{sku})
+  insert into buyforme_details_sku(bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,ship_feight) 
+  values(#{bfId},#{bfDetailsId},#{numIid},#{skuid},#{price},#{num},#{remark},#{state},#{productUrl},#{sku},#{priceBuy},#{priceBuyc},#{shipFeight})
   </insert>
   
   <update id="updateOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
-  update buyforme_details_sku set sku=#{sku},product_url=#{productUrl},num=#{num},price=#{price}
+  update buyforme_details_sku set sku=#{sku},product_url=#{productUrl},num=#{num},price=#{price},
+  ship_feight=#{shipFright},price_buy=#{priceBuy},price_buy_c=#{priceBuyc}
   where id=#{id}
   </update>
   
+  <update id="updateOrderDetailsSkuState">
+  update buyforme_details_sku set state=#{state} where id=#{id}
+  </update>
   <update id="updateOrdersDetailsState">
   update buyforme_details set state=#{state} where id=#{id}
   </update>
   <update id="updateOrdersState">
   update buyforme_orderinfo set state=#{state} where id=#{id}
   </update>
+  
+  <select id="getOrder" resultType="Map">
+  select  a.create_time,a.order_no,a.user_id,b.name,b.email,a.state 
+  from buyforme_orderinfo a left join user b on a.user_id=b.id where a.order_no=#{orderNo}
+  </select>
   
 
 </mapper>

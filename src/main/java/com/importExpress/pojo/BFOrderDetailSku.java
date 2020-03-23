@@ -15,4 +15,7 @@ public class BFOrderDetailSku {
 	private String remark;
 	private String price;
 	private String productUrl;
+	private String priceBuy;
+	private String priceBuyc;
+	private String shipFeight;
 }

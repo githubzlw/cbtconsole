@@ -20,6 +20,11 @@ public interface BuyForMeMapper {
 	 * @return
 	 */
 	int updateOrdersDetailsState(@Param("id")int id,@Param("state")int state);
+	/**更新details sku状态
+	 * @param id
+	 * @return
+	 */
+	int updateOrderDetailsSkuState(@Param("id")int id,@Param("state")int state);
 	
 	/**申请单列表
 	 * @return
@@ -34,7 +39,7 @@ public interface BuyForMeMapper {
 	/**
 	 * @return
 	 */
-	List<BFOrderDetail> getOrderDetails(String bfId);
+	List<BFOrderDetail> getOrderDetails(String orderNo);
 	
 	
 	/**
@@ -54,5 +59,7 @@ public interface BuyForMeMapper {
 	 * @return
 	 */
 	int updateOrderDetailsSku(BFOrderDetailSku detailSku);
+	
+	Map<String,Object> getOrder(String orderNo);
     
 }

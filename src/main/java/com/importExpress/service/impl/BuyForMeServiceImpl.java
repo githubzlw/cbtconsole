@@ -32,8 +32,8 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 	}
 
 	@Override
-	public List<BFOrderDetail> getOrderDetails(String bfId) {
-		List<BFOrderDetail> orderDetails = buyForMemapper.getOrderDetails(bfId);
+	public List<BFOrderDetail> getOrderDetails(String orderNo,String bfId) {
+		List<BFOrderDetail> orderDetails = buyForMemapper.getOrderDetails(orderNo);
 		if(orderDetails == null || orderDetails.isEmpty()) {
 			return Lists.newArrayList();
 		}
@@ -47,7 +47,9 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 			List<DetailsSku> list = detailsIdSku.get(bfDetailsId);
 			list = list == null ? Lists.newArrayList() : list;
 			DetailsSku detailsSku = DetailsSku.builder().num(o.getNum()).skuid(o.getSkuid())
-			.price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).id(o.getId()).build();
+			.price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).id(o.getId())
+			.priceBuy(o.getPriceBuy()).priceBuyc(o.getPriceBuyc()).shipFeight(o.getShipFeight())
+			.build();
 			list.add(detailsSku);
 			detailsIdSku.put(bfDetailsId, list);
 		});
@@ -77,8 +79,17 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		return result;
 	}
 	@Override
+	public int deleteOrderDetailsSku(int id) {
+		return buyForMemapper.updateOrderDetailsSkuState(id, -1);
+	}
+	@Override
 	public int finshOrder(int id) {
 		return buyForMemapper.updateOrdersState(id,2);
+	}
+
+	@Override
+	public Map<String, Object> getOrder(String orderNo) {
+		return buyForMemapper.getOrder(orderNo);
 	}
 
 }

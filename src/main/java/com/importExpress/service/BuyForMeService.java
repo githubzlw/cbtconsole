@@ -21,7 +21,9 @@ public interface BuyForMeService {
 	/**
 	 * @return
 	 */
-	List<BFOrderDetail> getOrderDetails(String bfId);
+	List<BFOrderDetail> getOrderDetails(String orderNo,String bfId);
+	
+	Map<String,Object> getOrder(String orderNo);
 	
 	
 	/**
@@ -35,6 +37,11 @@ public interface BuyForMeService {
 	 * @return
 	 */
 	int addOrderDetailsSku(BFOrderDetailSku detailSku);
+	/**删除sku
+	 * @param id
+	 * @return
+	 */
+	int deleteOrderDetailsSku(int id);
 	/**
 	 * @param detailSku
 	 * @return

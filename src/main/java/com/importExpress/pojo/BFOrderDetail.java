@@ -20,6 +20,7 @@ public class BFOrderDetail {
 	private String state;
 	private String createTime;
 	private String remark;
+	private String orderNo;
 	/**
 	 * 产品ID
 	 */

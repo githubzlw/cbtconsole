@@ -12,4 +12,7 @@ public class DetailsSku {
 	private String url;
 	private String price;
 	private int num;
+	private String priceBuy;
+	private String shipFeight;
+	private String priceBuyc;
 }

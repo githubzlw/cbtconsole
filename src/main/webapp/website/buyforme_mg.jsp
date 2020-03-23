@@ -70,7 +70,7 @@
 				<c:forEach items="${orders }" var="order" varStatus="index">
 					<tr>
 					 <td >${order.id}</td>
-						<td ><a href="/cbtconsole/bf/detail?bfid=${order.id}">${order.orderNo}</a></td>
+						<td ><a href="/cbtconsole/bf/detail?no=${order.orderNo}&bfid=${order.id}">${order.orderNo}</a></td>
 						<td >${order.userId}</td>
 						<td >${order.state}</td>
 						<td >${order.payPrice}</td>
