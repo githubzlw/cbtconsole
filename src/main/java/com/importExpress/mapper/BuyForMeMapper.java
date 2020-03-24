@@ -61,5 +61,7 @@ public interface BuyForMeMapper {
 	int updateOrderDetailsSku(BFOrderDetailSku detailSku);
 	
 	Map<String,Object> getOrder(String orderNo);
+	
+	int updateOrderDetailsSkuWeight(@Param("weight")String weight,@Param("bfdid")int bfdid);
     
 }

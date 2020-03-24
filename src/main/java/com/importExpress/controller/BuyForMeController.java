@@ -105,70 +105,114 @@ public class BuyForMeController {
     @ResponseBody
     public Map<String,Object> addDetailSku(HttpServletRequest request, HttpServletResponse response) {
     	Map<String,Object> mv = Maps.newHashMap();
-    	String bfId = request.getParameter("bfid");
-    	String id = request.getParameter("id");
-    	String delete = request.getParameter("delete");
-    	int addOrderDetailsSku = 0;
-    	if(StringUtils.isNotBlank(delete) && "1".equals(delete)) {
-    		addOrderDetailsSku = buyForMeService.deleteOrderDetailsSku(StringUtils.isNotBlank(id)?Integer.parseInt(id) : 0);
-    	}else {
-    		String bfDetailsId = request.getParameter("bfdid");
-    		String num = request.getParameter("num");
-    		BFOrderDetailSku detailSku = new BFOrderDetailSku();
-    		detailSku.setBfDetailsId(Integer.parseInt(bfDetailsId));
-    		detailSku.setBfId(Integer.parseInt(bfId));
-    		detailSku.setId(StringUtils.isNotBlank(id)?Integer.parseInt(id) : 0);
-    		detailSku.setNum(Integer.parseInt(num));
-    		detailSku.setNumIid(request.getParameter("numiid"));
-    		detailSku.setPrice(request.getParameter("price"));
-    		detailSku.setPriceBuy(request.getParameter("priceBuy"));
-    		detailSku.setPriceBuyc(request.getParameter("priceBuyc"));
-    		detailSku.setShipFeight(request.getParameter("shipFeight"));
-    		detailSku.setProductUrl(request.getParameter("url"));
-    		detailSku.setSku(request.getParameter("sku"));
-    		String skuid = "";
-    		detailSku.setSkuid(skuid);
-    		detailSku.setState(0);
-    		addOrderDetailsSku = buyForMeService.addOrderDetailsSku(detailSku );
-    	}
-		mv.put("state", addOrderDetailsSku > 0 ? 200 : 500);
-    	mv.put("orderDetails", addOrderDetailsSku);
+    	try {
+    		String bfId = request.getParameter("bfid");
+        	String id = request.getParameter("id");
+        	String delete = request.getParameter("delete");
+        	int addOrderDetailsSku = 0;
+        	if(StringUtils.isNotBlank(delete) && "1".equals(delete)) {
+        		addOrderDetailsSku = buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id)?Integer.parseInt(id) : 0,-1);
+        	}else {
+        		String bfDetailsId = request.getParameter("bfdid");
+        		String num = request.getParameter("num");
+        		BFOrderDetailSku detailSku = new BFOrderDetailSku();
+        		detailSku.setBfDetailsId(Integer.parseInt(bfDetailsId));
+        		detailSku.setBfId(Integer.parseInt(bfId));
+        		detailSku.setId(StringUtils.isNotBlank(id)?Integer.parseInt(id) : 0);
+        		detailSku.setNum(Integer.parseInt(num));
+        		detailSku.setNumIid(request.getParameter("numiid"));
+        		detailSku.setPrice(request.getParameter("price"));
+        		detailSku.setPriceBuy(request.getParameter("priceBuy"));
+        		detailSku.setPriceBuyc(request.getParameter("priceBuyc"));
+        		detailSku.setShipFeight(request.getParameter("shipFeight"));
+        		detailSku.setProductUrl(request.getParameter("url"));
+        		detailSku.setSku(request.getParameter("sku"));
+        		detailSku.setWeight(request.getParameter("weight"));
+        		String skuid = "";
+        		detailSku.setSkuid(skuid);
+        		detailSku.setState(1);
+        		addOrderDetailsSku = buyForMeService.addOrderDetailsSku(detailSku );
+        	}
+    		mv.put("state", addOrderDetailsSku > 0 ? 200 : 500);
+        	mv.put("orderDetails", addOrderDetailsSku);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     	return mv;
     }
+    @RequestMapping("/invalid")
+    @ResponseBody
+    public Map<String,Object> invalidDetailSku(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	try {
+			
+    		String id = request.getParameter("id");
+    		int updateOrderDetailsSkuState = 
+    				buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id)?Integer.parseInt(id) : 0,0);
+    		
+    		mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return mv;
+    }
+    
+    @RequestMapping("/weight")
+    @ResponseBody
+    public Map<String,Object> weightDetailSku(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	try {
+    		String weight = request.getParameter("weight");
+        	String sbfdid = request.getParameter("bfdid");
+        	int bfdid = StrUtils.isNum(sbfdid) ? Integer.valueOf(sbfdid) : 0;
+        	int updateOrderDetailsSkuState = 
+        			buyForMeService.updateOrderDetailsSkuWeight(weight, bfdid);
+        	
+    		mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return mv;
+    }
+    
     @RequestMapping("/finsh")
     @ResponseBody
     public Map<String,Object> finsh(HttpServletRequest request, HttpServletResponse response) {
     	Map<String,Object> mv = Maps.newHashMap();
-    	String bfId = request.getParameter("bfid");
-    	bfId = StrUtils.isNum(bfId) ? bfId : "0";
-    	int addOrderDetailsSku = buyForMeService.finshOrder(Integer.parseInt(bfId));
-    	mv.put("state", addOrderDetailsSku > 0 ? 200 : 500);
-    	
-    	List<BFOrderDetailSku> orderDetailsSku = buyForMeService.getOrderDetailsSku(bfId);
-    	String sql1 = " update buyforme_details_sku set sku=?,product_url=?,num=?,price=?  where id=?";
-    	String sql2 = "insert into buyforme_details_sku(sku,product_url,num,price,id,bf_id,bf_details_id,num_iid,skuid,remark,state)" + 
-    			"  values(?,?,?,?,?,?,?,?,?,?)";
-    	List<String> lstValues = Lists.newArrayList();
-    	for(BFOrderDetailSku o : orderDetailsSku) {
-    		lstValues.clear();
-    		lstValues.add(o.getSku());
-    		lstValues.add(o.getProductUrl());
-    		lstValues.add(String.valueOf(o.getNum()));
-    		lstValues.add(o.getPrice());
-    		lstValues.add(String.valueOf(o.getId()));
-    		String covertToSQL = DBHelper.covertToSQL(sql1,lstValues);
-    		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(covertToSQL));
-    		if(Integer.parseInt(sendMsgByRPC) < 1) {
-    			lstValues.add(String.valueOf(o.getBfId()));
-    			lstValues.add(String.valueOf(o.getBfDetailsId()));
-    			lstValues.add(o.getNumIid());
-    			lstValues.add(o.getSkuid());
-    			lstValues.add(o.getRemark());
-    			lstValues.add(String.valueOf(o.getState()));
-    			covertToSQL = DBHelper.covertToSQL(sql2,lstValues);
-    			sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(covertToSQL));
-    		}
-    	}
+    	try {
+    		String bfId = request.getParameter("bfid");
+        	bfId = StrUtils.isNum(bfId) ? bfId : "0";
+        	int addOrderDetailsSku = buyForMeService.finshOrder(Integer.parseInt(bfId));
+        	mv.put("state", addOrderDetailsSku > 0 ? 200 : 500);
+        	
+        	List<BFOrderDetailSku> orderDetailsSku = buyForMeService.getOrderDetailsSku(bfId);
+        	String sql1 = " update buyforme_details_sku set sku=?,product_url=?,num=?,price=?  where id=?";
+        	String sql2 = "insert into buyforme_details_sku(sku,product_url,num,price,id,bf_id,bf_details_id,num_iid,skuid,remark,state)" + 
+        			"  values(?,?,?,?,?,?,?,?,?,?)";
+        	List<String> lstValues = Lists.newArrayList();
+        	for(BFOrderDetailSku o : orderDetailsSku) {
+        		lstValues.clear();
+        		lstValues.add(o.getSku());
+        		lstValues.add(o.getProductUrl());
+        		lstValues.add(String.valueOf(o.getNum()));
+        		lstValues.add(o.getPrice());
+        		lstValues.add(String.valueOf(o.getId()));
+        		String covertToSQL = DBHelper.covertToSQL(sql1,lstValues);
+        		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(covertToSQL));
+        		if(Integer.parseInt(sendMsgByRPC) < 1) {
+        			lstValues.add(String.valueOf(o.getBfId()));
+        			lstValues.add(String.valueOf(o.getBfDetailsId()));
+        			lstValues.add(o.getNumIid());
+        			lstValues.add(o.getSkuid());
+        			lstValues.add(o.getRemark());
+        			lstValues.add(String.valueOf(o.getState()));
+        			covertToSQL = DBHelper.covertToSQL(sql2,lstValues);
+        			sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(covertToSQL));
+        		}
+        	}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     	return mv;
     }
     

@@ -12,7 +12,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet"
 	href="/cbtconsole/css/bootstrap/bootstrap.min.css">
-
 <style type="text/css">
 /* 主页 */
 .b-add{width: 141px;height: 100px; background: #d9edf7; border-radius: 54px;}
@@ -49,26 +48,35 @@ padding: 20px;max-height: 800px;}
 .tc1_table,.tc2_table{max-height:500px;height:auto;overflow-y:auto;}
 .img-responsive{max-width: 137px;max-height: 135px;margin-top: 11px;}
 .w350{width: 350px;}
-.btn-re-n{margin-bottom: 3px;    margin-left: 17px;}
+.btn-re-n{margin-bottom: 3px;margin-left: 17px;}
 .remark-dn{width: 350px;height:105px;margin-top: 5px;}
 .h50{height: 50px;}
-.input-w1{width: 50px;    border: 1px solid #ccc;
-    border-radius: 4px;}
-.input-w4{width: 100px;    border: 1px solid #ccc;
-    border-radius: 4px;}
+.input-w1{width: 64px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
+.input-w4{width: 100px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
 .w99{width: 99%;margin-top: 50px;border: 1px solid #ddd;min-height: 150px;}
-.wt35{    margin-left: 2px; height: 35px;margin-top: 10px;}
+.wt35{ margin-left: 2px; height: 35px;margin-top: 10px;}
 .sku-td{margin-top: 5px;}
 .sku-u-td{margin-top: 5px;}
 .table-sku{width:100%;}
-.rowweight{    margin-top: 11px;
-    margin-left: -2px;}
-    .w120{width:115px;}
-.input-w5{width: 250px;border: 1px solid #ccc; border-radius: 4px;}
-.input-w8{width: 198px;border: 1px solid #ccc; border-radius: 4px;}
-.input-w6{width: 50px;border: 1px solid #ccc; border-radius: 4px;}
-.w89{width: 89%;}
-.w11{width: 11%;}
+.rowweight{ margin-left: -2px;}
+.w120{width:115px;}
+.input-w5{width: 380px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+.input-w3{width: 50px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+.input-w25{width: 50px;border: 1px solid #ccc; border-radius: 4px;height: 25px;}
+.input-w8{width: 96%;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+.input-w6{width: 60px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+.btn-weight{cursor: pointer;}
+.btn-update{cursor: pointer;}
+.btn-invalid{cursor: pointer;}
+.rb-add{margin-left: 1px;margin-top: 10px;}
+.b-add{cursor: pointer;}
+.w89{width: 80%;}
+.w11{width: 20%;}
+.detail-div{width: 90.333333%;}
+.td-in-valid{text-decoration:line-through;}
+.th-font{font-size: 14px;color: #ca5252;font-weight: initial;}
+.remark-row{margin-top: 10px;}
+.td-font-new{font-size: 14px;color: #ca5252;font-weight:bold;margin-left: 5px;}
 </style>
 </head>
 <body>
@@ -87,11 +95,6 @@ padding: 20px;max-height: 800px;}
 			<div class="col-xs-4">邮箱地址:<span>${order.email }</span></div>
 			<div class="col-xs-4">下单时间:<span>${order.create_time}</span></div>
 			</div>
-			<!-- <div class="row">
-			<div class="col-xs-4"></div>
-			<div class="col-xs-4"></div>
-			<div class="col-xs-4"></div>
-			</div> -->
 	
 	</div>		
 	<div class="row w90">
@@ -101,59 +104,71 @@ padding: 20px;max-height: 800px;}
 		
 		<div class="row mt20">
 		<c:forEach items="${orderDetails }" var="detail" varStatus="index">
-		<div class="row w99">
+		<div class="row w99 de-td">
+		<input value="${detail.id}" class="bfdid" type="hidden">
 		<div class="col-xs-1">
-		<img src="/cbtconsole/img/beforeLoad.gif" data-original="${detail.picUrl }" class="img-responsive img-lazy"><br>
-		<a href="${detail.detailUrl }">商品原始链接</a>
+		<img src="/cbtconsole/img/beforeLoad.gif" data-original="${detail.picUrl }" class="img-responsive img-lazy">
+		<a href="${detail.detailUrl }" target="_blank">商品原始链接</a>
 		</div>
-		<div class="col-xs-10">
-		<div class="row wt35"><span>商品名称:</span>${detail.title }<span>商品ID:</span><span class="td-numiid">${detail.numIid }</span></div>
+		<div class="col-xs-10 detail-div">
+		<div class="row wt35"><span class="th-font">商品名称:</span>${detail.title }(<span class="td-numiid">${detail.numIid }</span>)</div>
 		<div class="row">
 				<div class="col-xs-11 w89">
 				<table class="table-sku">
 				<thead>
 					<tr>
-						<th width="147px;">下单规格:</th>
-						<th width="160px;">货源价格:</th>
-						<th width="210px;">售卖价格(免邮价):</th>
-						<th width="70px;">商品数量:</th>
+						<th width="128px;" class="th-font">下单规格:</th>
+						<th width="140px;" class="th-font">货源价格:</th>
+						<th width="170px;" class="th-font">售卖价格(免邮价):</th>
+						<th width="60px;" class="th-font">商品数量:</th>
 						<!-- <th>时间</th> -->
-						<th width="250px;">货源:</th>
+						<th width="320px;" class="th-font">货源:</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tbody id="lu_tr">
 					 <c:forEach items="${detail.skus }" var="sku">
 					 <tr class="sku-u-td">
+						<c:if test="${sku.state == 1}">
 						<td>
 						<input type="hidden" class="lu_id" value="${sku.id}">
 						<input type="text" class="input-w8 lu_sku" value="${sku.sku}"></td>
-						<td>USD:${sku.priceBuy }<span></span>(CNY:<input type="text" value="${sku.priceBuyc }" class="lu-price-buy-c input-w1">)</td>
+						<td class="td-price">USD:<span class="lu-price-buy">${sku.priceBuy }</span>(CNY:<input type="text" value="${sku.priceBuyc }" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>
 						<td>USD:<input type="text" value="${sku.price }" class="lu-price-sale input-w1">(含运费<input type="text" value="${sku.shipFeight }" class="lu-ship-feight input-w1">)</td>
 						<td><input type="text" class="input-w6 lu_count" value="${sku.num}"></td>
 						<td><input type="text" class="input-w5 lu_url" value="${sku.url}">
-						<button class="btn btn-success btn-update">修改</button>
-						<!-- <button class="btn btn-success btn-delete">删除</button> --></td>
+						<button class="btn btn-info btn-update">修改</button>
+						 <button class="btn btn-info btn-invalid">无效</button>
+						</td></c:if>
+						<c:if test="${sku.state != 1}">
+						<td class="td-in-valid">${sku.sku}</td>
+						<td>USD:<span class="td-in-valid">${sku.priceBuy }</span>(CNY:<span class="td-in-valid">${sku.priceBuyc }</span>)</td>
+						<td class="td-in-valid">USD:${sku.price }(含运费${sku.shipFeight })</td>
+						<td class="td-in-valid">${sku.num}</td>
+						<td class="td-in-valid">${sku.url}></td>
+						</c:if>
 						</tr>
 					 </c:forEach>
+					 <c:if test="${detail.skuCount == 0}">
 						<tr class="sku-td">
 							<td><input type="text" class="input-w8 lu_sku" value=""></td>
-							<td>USD:<input type="text" value="" class="lu-price-buy input-w1" disabled="disabled">(CNY:<input type="text" value="" class="lu-price-buy-c input-w1">)</td>
+							<td class="td-price">USD:<span class="lu-price-buy"></span>(CNY:<input type="text" value="" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>
 						<td>USD:<input type="text" value="" class="lu-price-sale input-w1">(含运费<input type="text" value="" class="lu-ship-feight input-w1">)</td>
 							<td><input type="text" class="input-w6 lu_count" value="0"></td>
-							<td><input type="text" class="input-w5 lu_url">
-							<button class="btn btn-success btn-add">录入</button><i class="b-add">+</i></td>
+							<td><input type="text" class="input-w5 lu_url"><button class="btn btn-info btn-add">录入</button></td>
 						</tr>
+					 </c:if>
 					</tbody>
 				
 				</table>
 				</div>
 				<div class="col-xs-1 w11">
-				<div class="row">用户备注:</div>
-				<div class="row">${detail.remark}</div>
+				<div class="row th-font">用户备注:</div>
+				<div class="row remark-row">Q:<span class="th-font-l">${detail.remark}</span><i class="td-font-new">New!</i></div>
 				</div>
 		</div>
-		<div class="row rowweight">重量:<input type="text" value="" class="lu-weight input-w3">KG<button class="btn btn-info btn-weight">修改</button></div>
+		<div class="row rb-add"><i class="b-add">+</i></div>
+		<div class="row rowweight">重量:<input type="text" value="${detail.weight}" class="lu-weight input-w25">kg<i class="btn-weight">修改</i></div>
 		
 		</div>
 		

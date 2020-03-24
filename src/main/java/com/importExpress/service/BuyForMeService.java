@@ -37,15 +37,17 @@ public interface BuyForMeService {
 	 * @return
 	 */
 	int addOrderDetailsSku(BFOrderDetailSku detailSku);
-	/**删除sku
+	/**更新sku
 	 * @param id
 	 * @return
 	 */
-	int deleteOrderDetailsSku(int id);
+	int updateOrderDetailsSkuState(int id,int state);
 	/**
 	 * @param detailSku
 	 * @return
 	 */
 	int finshOrder(int bfId);
+	
+	int updateOrderDetailsSkuWeight(String weight,int bfdid);
 	
 }

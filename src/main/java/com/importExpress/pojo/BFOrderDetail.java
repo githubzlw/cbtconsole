@@ -21,6 +21,7 @@ public class BFOrderDetail {
 	private String createTime;
 	private String remark;
 	private String orderNo;
+	private String weight;
 	/**
 	 * 产品ID
 	 */
@@ -28,5 +29,6 @@ public class BFOrderDetail {
 	private int num;
 	
 	private List<DetailsSku> skus = Lists.newArrayList();
+	private int skuCount;
 
 }

@@ -15,4 +15,6 @@ public class DetailsSku {
 	private String priceBuy;
 	private String shipFeight;
 	private String priceBuyc;
+	private String weight;
+	private int state;
 }

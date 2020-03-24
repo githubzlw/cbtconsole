@@ -3,6 +3,7 @@ package com.importExpress.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,12 +50,19 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 			DetailsSku detailsSku = DetailsSku.builder().num(o.getNum()).skuid(o.getSkuid())
 			.price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).id(o.getId())
 			.priceBuy(o.getPriceBuy()).priceBuyc(o.getPriceBuyc()).shipFeight(o.getShipFeight())
+			.weight(o.getWeight())
+			.state(o.getState())
 			.build();
 			list.add(detailsSku);
 			detailsIdSku.put(bfDetailsId, list);
 		});
 		orderDetails.stream().forEach(o->{
-			o.setSkus(detailsIdSku.get(o.getId()));
+			List<DetailsSku> list = detailsIdSku.get(o.getId());
+			o.setSkus(list);
+			if(list != null && !list.isEmpty()) {
+				o.setSkuCount(list.size());
+				o.setWeight(list.get(0).getWeight());
+			}
 		});
 		
 		return orderDetails;
@@ -79,8 +87,8 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		return result;
 	}
 	@Override
-	public int deleteOrderDetailsSku(int id) {
-		return buyForMemapper.updateOrderDetailsSkuState(id, -1);
+	public int updateOrderDetailsSkuState(int id,int state) {
+		return buyForMemapper.updateOrderDetailsSkuState(id, state);
 	}
 	@Override
 	public int finshOrder(int id) {
@@ -90,6 +98,10 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 	@Override
 	public Map<String, Object> getOrder(String orderNo) {
 		return buyForMemapper.getOrder(orderNo);
+	}
+	@Override
+	public int updateOrderDetailsSkuWeight(String weight,int bfdid) {
+		return buyForMemapper.updateOrderDetailsSkuWeight(weight,bfdid);
 	}
 
 }
