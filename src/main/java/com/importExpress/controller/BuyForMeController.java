@@ -186,9 +186,9 @@ public class BuyForMeController {
         	mv.put("state", addOrderDetailsSku > 0 ? 200 : 500);
         	
         	List<BFOrderDetailSku> orderDetailsSku = buyForMeService.getOrderDetailsSku(bfId);
-        	String sql1 = " update buyforme_details_sku set sku=?,product_url=?,num=?,price=?  where id=?";
-        	String sql2 = "insert into buyforme_details_sku(sku,product_url,num,price,id,bf_id,bf_details_id,num_iid,skuid,remark,state)" + 
-        			"  values(?,?,?,?,?,?,?,?,?,?)";
+        	String sql1 = " update buyforme_details_sku set sku=?,product_url=?,num=?,price=?,price_buy=?,price_buy_c=?,ship_feight=?,weight=?  where id=?";
+        	String sql2 = "insert into buyforme_details_sku(sku,product_url,num,price,price_buy,price_buy_c,ship_feight,weight,id,bf_id,bf_details_id,num_iid,skuid,remark,state)" + 
+        			"  values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         	List<String> lstValues = Lists.newArrayList();
         	for(BFOrderDetailSku o : orderDetailsSku) {
         		lstValues.clear();
@@ -196,6 +196,10 @@ public class BuyForMeController {
         		lstValues.add(o.getProductUrl());
         		lstValues.add(String.valueOf(o.getNum()));
         		lstValues.add(o.getPrice());
+        		lstValues.add(o.getPriceBuy());
+        		lstValues.add(o.getPriceBuyc());
+        		lstValues.add(o.getShipFeight());
+        		lstValues.add(o.getWeight());
         		lstValues.add(String.valueOf(o.getId()));
         		String covertToSQL = DBHelper.covertToSQL(sql1,lstValues);
         		String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(covertToSQL));
