@@ -12,7 +12,7 @@ $(function(){
 	$(".b-add").click(function(){
 		var html = '<tr class="sku-td">'+
 			'<td><input type="text" class="input-w8 lu_sku" value=""></td>'+
-			'<td>USD:<span class="lu-price-buy"></span>(CNY:<input type="text" value="" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>'+
+			'<td class="td-price">USD:<span class="lu-price-buy"></span>(CNY:<input type="text" value="" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>'+
 		'<td>USD:<input type="text" value="" class="lu-price-sale input-w1">(含运费<input type="text" value="" class="lu-ship-feight input-w1">)</td>'+
 			'<td><input type="text" class="input-w6 lu_count" value="0"></td>'+
 			'<td><input type="text" class="input-w5 lu_url">'+

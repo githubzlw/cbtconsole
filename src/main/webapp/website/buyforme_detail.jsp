@@ -28,7 +28,7 @@
 .report .w350 {width: 350px;}
 .report .w160 {width: 160px;}
 .report .w800 {width: 800px;}
-.report .w90 {width: 99%;margin-top: 50px;border: 1px solid #ddd;height: 120px;}
+.report .w90 {width: 101.75%;margin-top: 50px;border: 1px solid #ddd;height: 120px;    margin-left: -30px;}
 .mt5 {margin-top: 5px;}
 .tc, .trnasparent {width: 100%;height: 100%;background-color: rgba(0, 0, 0, .5);position: fixed;z-index: 1;display: none;text-align: center;}
 .tc {background-color: rgba(0, 0, 0, 0);top: 0;left: 0;}
@@ -53,7 +53,7 @@ padding: 20px;max-height: 800px;}
 .h50{height: 50px;}
 .input-w1{width: 64px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
 .input-w4{width: 100px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
-.w99{width: 99%;margin-top: 50px;border: 1px solid #ddd;min-height: 150px;}
+.w99{width: 100%;margin-top: 50px;border: 1px solid #ddd;min-height: 150px;}
 .wt35{ margin-left: 2px; height: 35px;margin-top: 10px;}
 .sku-td{margin-top: 5px;}
 .sku-u-td{margin-top: 5px;}
@@ -77,16 +77,16 @@ padding: 20px;max-height: 800px;}
 .th-font{font-size: 14px;color: #ca5252;font-weight: initial;}
 .remark-row{margin-top: 10px;}
 .td-font-new{font-size: 14px;color: #ca5252;font-weight:bold;margin-left: 5px;}
+.ormnum{border: 1px dashed #f90;padding: 2px;margin-left: 5px;font-size: 17px;}
 </style>
 </head>
 <body>
 	<div class="container-fluid report">
 		<h1 class="text-center">采购申请单详情</h1>
 			<input type="hidden" value="${param.bfid }" id="query_bf_id">
-			
 	<div  class="row w800">
 			<div class="row h50">
-			<div class="col-xs-4">采购单号:<span>${order.order_no}</span></div>
+			<div class="col-xs-4">采购单号:<span class="ormnum">${order.order_no}</span></div>
 			<div class="col-xs-4">${order.stateContent }</div>
 			<div class="col-xs-4">关联订单号:<span></span></div>
 			</div>
