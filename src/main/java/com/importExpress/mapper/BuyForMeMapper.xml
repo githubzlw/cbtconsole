@@ -110,11 +110,12 @@
   from buyforme_orderinfo a left join user b on a.user_id=b.id 
   left join buyforme_address c on a.address_id=c.id 
   left join zone d on c.country=d.id
-  
   where a.order_no=#{orderNo}
   </select>
   
   <update id="updateDeliveryTime">update buyforme_orderinfo set delivery_time = #{time} where order_no=#{orderNo}</update>
+  <insert id="insertRemark">insert into buyforme_remark (remark,order_no,create_time) values (#{remark},#{orderNo},now())</insert>
   
+  <select id="getRemark" resultType="java.util.Map">select remark,create_time from buyforme_remark where order_no=#{orderNo}</select>
 
 </mapper>

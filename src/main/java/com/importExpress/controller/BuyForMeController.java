@@ -93,6 +93,8 @@ public class BuyForMeController {
     			order.put("stateContent", strState);
     			
     		}
+    		List<Map<String,String>> remark = buyForMeService.getRemark(orderNo);
+    		mv.addObject("remark", remark);
     		mv.addObject("order", order);
     		
 		} catch (Exception e) {
@@ -169,6 +171,20 @@ public class BuyForMeController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+    	return mv;
+    }
+    @RequestMapping("/remark")
+    @ResponseBody
+    public Map<String,Object> remark(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	try {
+    		String orderNo = request.getParameter("orderNo");
+    		String remark = request.getParameter("remark");
+    		int update = buyForMeService.insertRemark(orderNo,remark);
+    		mv.put("state", update > 0 ? 200 : 500);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
     	return mv;
     }
     

@@ -117,5 +117,15 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 	public int updateDeliveryTime(String orderNo,String time) {
 		return buyForMemapper.updateDeliveryTime(orderNo,time);
 	}
+	@Override
+	public int insertRemark(String orderNo,String remark) {
+		return buyForMemapper.insertRemark(orderNo,remark);
+	}
+
+	@Override
+	public List<Map<String,String>> getRemark(String orderNo) {
+		return buyForMemapper.getRemark(orderNo);
+	}
+	
 
 }

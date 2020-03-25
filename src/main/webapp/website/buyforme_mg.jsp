@@ -32,7 +32,7 @@
 .w350{width: 350px;}
 </style>
 </head>
-<body>
+<body style="background-color: #dff0d8;">
 	<div class="container-fluid report">
 		<h1 class="text-center">Buy For Me 申请单</h1>
 			

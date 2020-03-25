@@ -67,6 +67,32 @@ $(function(){
 		
 		
 	})
+	$(".btn-re-n").click(function(){
+		var orderNo = $(".ormnum").text();
+		var remark = $(".remark-dn").val();
+		if(remark == ''){
+			return ;
+		}
+		jQuery.ajax({
+			url:"/cbtconsole/bf/remark",
+			data:{
+				"orderNo":orderNo,
+				"remark":remark
+			},
+			type:"post",
+			success:function(data){
+				if(data.state == 200){
+					$.MsgBox.Alert("提示", "成功");
+					window.location.reload();
+				}
+			},
+			error:function(e){
+				$.MsgBox.Alert("提示", "失败");
+			}
+		});
+		
+		
+	})
 	bindClick();
 	$(".btn-update").click(function(){
 		var bfid = $("#query_bf_id").val();
