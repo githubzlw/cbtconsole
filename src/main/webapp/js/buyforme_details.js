@@ -57,6 +57,7 @@ $(function(){
 			success:function(data){
 				if(data.state == 200){
 					$.MsgBox.Alert("提示", "成功");
+					window.location.reload();
 				}
 			},
 			error:function(e){
@@ -104,6 +105,7 @@ $(function(){
 			success:function(data){
 				if(data.state == 200){
 					$.MsgBox.Alert("提示", "成功");
+					window.location.reload();
 				}
 			},
 			error:function(e){
@@ -127,6 +129,7 @@ $(function(){
 			success:function(data){
 				if(data.state == 200){
 					$.MsgBox.Alert("提示", "成功");
+					window.location.reload();
 				}
 			},
 			error:function(e){
@@ -147,6 +150,7 @@ $(function(){
 			success:function(data){
 				if(data.state == 200){
 					$.MsgBox.Alert("提示", "成功");
+					window.location.reload();
 				}
 			},
 			error:function(e){
@@ -169,6 +173,7 @@ $(function(){
 			success:function(data){
 				if(data.state == 200){
 					$.MsgBox.Alert("提示", "成功");
+					window.location.reload();
 				}
 			},
 			error:function(e){
