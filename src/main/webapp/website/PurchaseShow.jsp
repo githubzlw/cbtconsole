@@ -1808,6 +1808,43 @@
         document.getElementById("TbOdid").value=odid;
     }
 
+    function checkTaoBaoOr1688() {
+    	$("#on_notice").hide();
+		var shipno = $.trim(document.getElementById("shipno").value);
+		var taobao_id = $("#taobao_id").val();
+		var selectType=$("#select_type").val();
+		if(selectType == 1){
+			if(!taobao_id){
+				$("#on_notice").show().text("*请输入淘宝采购订单号");
+			}
+		} else if(shipno || taobao_id){
+			getTaobaoInfo(shipno, taobao_id);
+		} else {
+			$("#on_notice").show().text("*请输入1688采购订单号或者运单号");
+			return;
+		}
+	}
+
+	function getTaobaoInfo(shipno, taobao_id) {
+		$.ajax({
+            type : 'POST',
+            url : '/cbtconsole/purchase/getTaobaoInfo',
+            dataType : 'text',
+            data : {
+                shipno : shipno,
+				taobao_id : taobao_id
+            },
+            success : function(data) {
+            	var json = eval("(" + data + ")");
+            	if(json.ok){
+            		$("#taobao_id").val(json.rows.orderid);
+            		$("#shipno").val(json.rows.shipno);
+				}else{
+            		$("#on_notice").show().text("*请输入有效的1688采购订单号或者运单号");
+				}
+            }
+        });
+	}
 
     function insertSources(){
         var admName = '${admid}';
@@ -1850,12 +1887,26 @@
         }else if(admName == 61){
             admName="策融test";
         }
+        var taobao_id = $("#taobao_id").val();
+        var selectType=$("#select_type").val();
+		if(selectType == 1){
+			if(!taobao_id){
+				alert("请输入淘宝采购订单号");
+				return;
+			}
+		} else if(!shipno && !taobao_id){
+			alert("请输入1688采购订单号或者运单号");
+		}
+		var orderno = "${param.orderno}";
         $.ajax({
             type : 'POST',
             url : '/cbtconsole/purchase/insertSources',
             dataType : 'text',
             data : {
+            	orderno : orderno,
                 shipno : shipno,
+				taobao_id : taobao_id,
+				selectType:selectType,
                 taobaoPrice : taobaoPrice,
                 taobaoFeight : taobaoFeight,
                 goodsQty : goodsQty,
@@ -2695,52 +2746,79 @@
 
 
 <div class="mod_pay3" style="display: none;" id="insertOrderInfo">
-	<center>
-		<h3 class="show_h3">线下采购</h3>
-		<div>
-			快递单号：<input type="text" name="shipno" id="shipno" class="remark" style="width: 250px;"/>
-			<label><input type="radio" name="radio" value="0"/>无支付宝支出（或公账支出）</label>
-			<label><input type="radio" name="radio" value="1"/>有支付宝支出</label>
-		</div>
-		<div>
-			<input type="hidden" name="taobaoPrice" id="taobaoPrice"
-				   class="remark" />
-			<input type="hidden" name="taobao_odid" id="taobao_odid"
-				   class="remark" />
-		</div>
-		<div>
-			<input type="hidden" name="taobaoFeight" id="taobaoFeight"
-				   class="remark" />
-		</div>
-		<div>
-			<input type="hidden" name="goodsQty" id="goodsQty" class="remark" />
-		</div>
-		<div>
-			<input type="hidden" name="paydate" id="paydate" class="remark" />
-		</div>
-		<div>
-			<input type="hidden" name="delivary_date" id="delivary_date"
-				   class="remark" />
-		</div>
-		<div>
-			<input type="hidden" name="taobao_url" id="taobao_url"
-				   class="remark" />
-		</div>
-		<div>
-			<input type="hidden" name="goods_sku" id="goods_sku" class="remark" />
-		</div>
-		<div>
-			<input type="hidden" name="taobao_name" id="taobao_name"
-				   class="remark" />
-		</div>
-		<input type="hidden" id="goods_imgs"> <input type="hidden"
-													 id="TbOrderid"> <input type="hidden" id="TbGoodsid"><input type="hidden" id="TbOdid">
-		<input type="button" id="idAddResource" value="提交"
-			   onclick="insertSources();"
-			   style="width: 90px; height: 40px; margin-top: 20px;" /> <input
-			type="button" value="取消" onclick="FncloseInsert();"
-			style="width: 90px; height: 40px;" />
-	</center>
+	<table>
+		<caption><h3 class="show_h3">线下采购</h3></caption>
+		<tr>
+			<td>采购订单号:</td>
+			<td><input type="text" name="taobao_id" id="taobao_id" class="remark" style="width: 250px;"
+					   onblur="checkTaoBaoOr1688()"/></td>
+		</tr>
+		<tr>
+			<td>快递单号:</td>
+			<td><input type="text" name="shipno" id="shipno" class="remark" style="width: 250px;"
+					   onblur="checkTaoBaoOr1688()"/>
+				<span id="on_notice" style="display: none;color: #ebef0f;font-size: 20px;">*请输入有效订单号或者运单号</span></td>
+		</tr>
+		<tr>
+			<td>采购网站:</td>
+			<td><select id="select_type">
+				<option value="0">1688采购</option>
+				<option value="1">淘宝采购</option>
+			</select></td>
+		</tr>
+		<tr>
+			<td>支出:</td>
+			<td><label><input type="radio" name="radio" value="0"/>无支付宝支出（或公账支出）</label>
+				<label><input type="radio" name="radio" value="1"/>有支付宝支出</label></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<div>
+					<input type="hidden" name="taobaoPrice" id="taobaoPrice"
+						   class="remark"/>
+					<input type="hidden" name="taobao_odid" id="taobao_odid"
+						   class="remark"/>
+				</div>
+				<div>
+					<input type="hidden" name="taobaoFeight" id="taobaoFeight"
+						   class="remark"/>
+				</div>
+				<div>
+					<input type="hidden" name="goodsQty" id="goodsQty" class="remark"/>
+				</div>
+				<div>
+					<input type="hidden" name="paydate" id="paydate" class="remark"/>
+				</div>
+				<div>
+					<input type="hidden" name="delivary_date" id="delivary_date"
+						   class="remark"/>
+				</div>
+				<div>
+					<input type="hidden" name="taobao_url" id="taobao_url"
+						   class="remark"/>
+				</div>
+				<div>
+					<input type="hidden" name="goods_sku" id="goods_sku" class="remark"/>
+				</div>
+				<div>
+					<input type="hidden" name="taobao_name" id="taobao_name"
+						   class="remark"/>
+				</div>
+				<input type="hidden" id="goods_imgs">
+				<input type="hidden" id="TbOrderid">
+				<input type="hidden" id="TbGoodsid">
+				<input type="hidden" id="TbOdid">
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2"><input type="button" id="idAddResource" value="提交"
+					   onclick="insertSources();"
+					   style="width: 90px; height: 40px; margin-top: 20px;"/>
+				&nbsp;&nbsp;<input
+					type="button" value="取消" onclick="FncloseInsert();"
+					style="width: 90px; height: 40px;"/></td>
+		</tr>
+	</table>
 </div>
 
 

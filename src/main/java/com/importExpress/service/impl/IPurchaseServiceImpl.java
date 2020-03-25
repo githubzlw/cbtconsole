@@ -661,6 +661,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		int row = 0;
 		StringBuffer orderid = new StringBuffer();
 		try{
+			pruchaseMapper.insertIntoOffPurchase(map);
 			String itemid = Util.getItemid(map.get("taobao_url"));
 			if (itemid == null || "".equals(itemid)) {
 				itemid = "0000";
@@ -2248,5 +2249,15 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		int addIdRelationTable = inventoryMapper.addIdRelationTable(map);
 		
 		return addIdRelationTable;
+	}
+
+	@Override
+	public Map<String, String> getTaobaoInfo(String shipno, String taobao_id) {
+		return pruchaseMapper.getTaobaoInfo(shipno, taobao_id);
+	}
+
+	@Override
+	public List<Map<String, String>> getOfflineInfoByShipno(String shipno){
+		return pruchaseMapper.getOfflineInfoByShipno(shipno);
 	}
 }

@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.cbt.common.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,7 +39,6 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.bean.ShippingBean;
 import com.cbt.bean.badGoods;
-import com.cbt.common.StringUtils;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.TaoBaoOrderInfo;
@@ -330,14 +330,43 @@ public class PurchaseController {
 		String username = getInsertSourceString(request, map, adminid, shipno, taobaoPrice, taobaoFeight, delivary_date, goodsQty,odid);
 		double prices = Integer.parseInt(goodsQty) * Double.parseDouble(taobaoPrice) + Double.parseDouble(taobaoFeight);
 		map.put("totalprice", String.valueOf(prices));
+
 		int row=0;
 		if(StringUtil.isNotBlank(username)){
+			map.put("orderno", request.getParameter("orderno"));
+			map.put("taobao_id", request.getParameter("taobao_id"));
 			row = iPurchaseService.insertSources(map);
+
 		}
 		PrintWriter out = response.getWriter();
 		out.print(row + "");
 		out.flush();
 		out.close();
+	}
+
+
+	@RequestMapping("/getTaobaoInfo")
+	@ResponseBody
+	public JsonResult getTaobaoInfo(String shipno, String taobao_id) {
+		JsonResult json = new JsonResult();
+		try {
+			if (StringUtils.isStrNull(shipno) && StringUtils.isStrNull(taobao_id)) {
+				json.setErrorInfo("订单号或者运单号都为空");
+			} else {
+				if(StringUtils.isStrNull(shipno)){
+					shipno = null;
+				}
+				if(StringUtils.isStrNull(taobao_id)){
+					taobao_id = null;
+				}
+				Map<String, String> taobaoInfo = iPurchaseService.getTaobaoInfo(shipno, taobao_id);
+				json.setSuccess(taobaoInfo, 1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.setErrorInfo(e.getMessage());
+		}
+		return json;
 	}
 
 	private String getInsertSourceString(HttpServletRequest request, Map<String, String> map, int adminid, String shipno, String taobaoPrice, String taobaoFeight, String delivary_date, String goodsQty, String odid) {

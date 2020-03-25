@@ -563,4 +563,10 @@ public interface IPurchaseMapper {
     void changeBuyerByPid(@Param("odid") String odid, @Param("admid") String admid, @Param("orderNo") String orderNo,@Param("pid")String pid);
     @Select("SELECT goods_pid FROM goods_distribution WHERE odid=#{odid}")
 	String FindPidByOdid(@Param("odid") String odid);
+
+    Map<String, String> getTaobaoInfo(@Param("shipno") String shipno, @Param("taobao_id") String taobao_id);
+
+    int insertIntoOffPurchase(Map<String, String> map);
+
+    List<Map<String, String>> getOfflineInfoByShipno(String shipno);
 }

@@ -897,4 +897,24 @@ where a.path_catid like #{catid} and cu.valid=1 and a.flag=0 group by a.catid
         goodsid as goodsId,usecount as useCount,buycount as buyCount,purchase_state as purchaseState
         from order_product_source where orderid = #{orderNo} and confirm_userid > 0
     </select>
+
+    <select id="getTaobaoInfo" resultType="java.util.Map">
+        select * from taobao_1688_order_history where 1=1
+        <if test="shipno != null">
+            and shipno = #{shipno}
+        </if>
+        <if test="taobao_id != null">
+            and orderid = #{taobao_id}
+        </if>
+        limit 1
+    </select>
+
+    <insert id="insertIntoOffPurchase" parameterType="java.util.Map">
+        insert into purchase_offonline_log(order_no,od_id,taobao_id,ship_no,admin_id)
+        values(#{orderno},#{odid},#{taobao_id},#{shipno},#{adminid})
+    </insert>
+
+    <select id="getOfflineInfoByShipno" resultType="java.util.Map">
+        select * from offline_purchase_records where shipno = #{shipno}
+    </select>
 </mapper>
