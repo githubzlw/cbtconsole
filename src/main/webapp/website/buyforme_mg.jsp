@@ -64,7 +64,8 @@
 		<div class="row mt20">
 			<table class="table table-bordered">
 				<thead>
-					<tr><th>申请ID</th><th>订单号</th><th>用户ID</th><th>状态</th><th>支付金额</th><th>交期时间</th><th>时间</th><th>备注</th></tr>
+					<tr><th width="7%">申请ID</th><th width="10%">订单号</th><th width="10%">用户ID</th><th width="10%">状态</th>
+					<th width="10%">支付金额</th><th width="6%">交期时间</th><th width="12%">时间</th><th>备注</th></tr>
 				</thead>
 				<tbody>
 				<c:forEach items="${orders }" var="order" varStatus="index">
