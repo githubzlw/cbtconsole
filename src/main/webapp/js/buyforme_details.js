@@ -1,4 +1,27 @@
 $(function(){
+	$(".btn-delivery-time").click(function(){
+		var ormnum = $(".ormnum").text();
+		var time = $(".delivery-time").val();
+		if(time == ''){
+			return ;
+		}
+		jQuery.ajax({
+			url:"/cbtconsole/bf/time",
+			data:{
+				"orderNo":ormnum,
+				"time":time
+			},
+			type:"post",
+			success:function(data){
+				if(data.state == 200){
+					$.MsgBox.Alert("提示", "交期确认成功");
+				}
+			},
+			error:function(e){
+				$.MsgBox.Alert("提示", "失败");
+			}
+		});
+	})
 	$(".btn-lu").click(function(){
 		$('.tc,.trnasparent,.tc1').show();
 	})
@@ -18,8 +41,8 @@ $(function(){
 			'<td><input type="text" class="input-w5 lu_url">'+
 			'&nbsp;<button class="btn btn-success btn-add">录入</button></td>'+
 		'</tr>';
-		$("#lu_tr").append(html);
-		
+		$(this).parents(".detail-div").find(".lu_tr").append(html);
+		bindClick();
 	})
 	
 	$(".btn-finsh").click(function(){
@@ -42,48 +65,7 @@ $(function(){
 		
 		
 	})
-	$(".btn-add").click(function(){
-		var bfid = $("#query_bf_id").val();
-		var trp = $(this).parents(".sku-td");
-		var trdp = $(this).parents(".de-td");
-		var bfdid = trdp.find(".bfdid").val();
-		var num = trp.find(".lu_count").val();
-		var numiid = trdp.find(".td-numiid").text();
-		var price = trp.find(".lu-price-sale").val();
-		var priceBuy = trp.find(".lu-price-buy").text();
-		var priceBuyc = trp.find(".lu-price-buy-c").val();
-		var shipFeight = trp.find(".lu-ship-feight").val();
-		var url = trp.find(".lu_url").val();
-		var sku = trp.find(".lu_sku").val();
-		var weight = $(this).parents(".detail-div").find(".lu-weight").val();
-	    jQuery.ajax({
-		       url:"/cbtconsole/bf/add",
-		       data:{
-		    	   "bfid":bfid,
-		    	   "bfdid":bfdid,
-		    	   "num":num,
-		    	   "numiid":numiid,
-		    	   "price":price,
-		    	   "priceBuy":priceBuy,
-		    	   "priceBuyc":priceBuyc,
-		    	   "shipFeight":shipFeight,
-		    	   "url":url,
-		    	   "weight":weight,
-		    	   "sku":sku
-		    		   },
-		       type:"post",
-		       success:function(data){
-		    	   if(data.state == 200){
-						$.MsgBox.Alert("提示", "成功");
-					}
-		       },
-		   	error:function(e){
-		   		$.MsgBox.Alert("提示", "失败");
-		   	}
-		   });
-		
-		
-	})
+	bindClick();
 	$(".btn-update").click(function(){
 		var bfid = $("#query_bf_id").val();
 		var trp = $(this).parents(".sku-u-td");
@@ -193,6 +175,51 @@ $(function(){
 	})
 	$('.img-lazy').lazyload({effect: "fadeIn"});
 })
+function bindClick(){
+	$(".btn-add").click(function(){
+		var bfid = $("#query_bf_id").val();
+		var trp = $(this).parents(".sku-td");
+		var trdp = $(this).parents(".de-td");
+		var bfdid = trdp.find(".bfdid").val();
+		var num = trp.find(".lu_count").val();
+		var numiid = trdp.find(".td-numiid").text();
+		var price = trp.find(".lu-price-sale").val();
+		var priceBuy = trp.find(".lu-price-buy").text();
+		var priceBuyc = trp.find(".lu-price-buy-c").val();
+		var shipFeight = trp.find(".lu-ship-feight").val();
+		var url = trp.find(".lu_url").val();
+		var sku = trp.find(".lu_sku").val();
+		var weight = $(this).parents(".detail-div").find(".lu-weight").val();
+	    jQuery.ajax({
+		       url:"/cbtconsole/bf/add",
+		       data:{
+		    	   "bfid":bfid,
+		    	   "bfdid":bfdid,
+		    	   "num":num,
+		    	   "numiid":numiid,
+		    	   "price":price,
+		    	   "priceBuy":priceBuy,
+		    	   "priceBuyc":priceBuyc,
+		    	   "shipFeight":shipFeight,
+		    	   "url":url,
+		    	   "weight":weight,
+		    	   "sku":sku
+		    		   },
+		       type:"post",
+		       success:function(data){
+		    	   if(data.state == 200){
+						$.MsgBox.Alert("提示", "成功");
+						window.location.reload();
+					}
+		       },
+		   	error:function(e){
+		   		$.MsgBox.Alert("提示", "失败");
+		   	}
+		   });
+		
+		
+	})
+}
 
 function changePrice(t){
 	var cny = parseFloat($(t).val());

@@ -27,7 +27,7 @@
 .report .w200 {width: 200px;}
 .report .w350 {width: 350px;}
 .report .w160 {width: 160px;}
-.report .w800 {width: 800px;}
+.report .w800 {width: 1100px;}
 .report .w90 {width: 101.75%;margin-top: 50px;border: 1px solid #ddd;height: 120px;    margin-left: -30px;}
 .mt5 {margin-top: 5px;}
 .tc, .trnasparent {width: 100%;height: 100%;background-color: rgba(0, 0, 0, .5);position: fixed;z-index: 1;display: none;text-align: center;}
@@ -49,7 +49,7 @@ padding: 20px;max-height: 800px;}
 .img-responsive{max-width: 137px;max-height: 135px;margin-top: 11px;}
 .w350{width: 350px;}
 .btn-re-n{margin-bottom: 3px;margin-left: 17px;}
-.remark-dn{width: 350px;height:105px;margin-top: 5px;}
+.remark-dn{width: 350px;height:105px;margin-top: 5px;border: 1px solid #ccc;border-radius: 4px;}
 .h50{height: 50px;}
 .input-w1{width: 64px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
 .input-w4{width: 100px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
@@ -78,6 +78,10 @@ padding: 20px;max-height: 800px;}
 .remark-row{margin-top: 10px;}
 .td-font-new{font-size: 14px;color: #ca5252;font-weight:bold;margin-left: 5px;}
 .ormnum{border: 1px dashed #f90;padding: 2px;margin-left: 5px;font-size: 17px;}
+.address-d span{margin-left:5px; }
+.mar-l{margin-left: 10px;margin-top: 15px;width: 90%;}
+.btn-delivery-time{margin-left: 250px;}
+.delivery-time{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 </style>
 </head>
 <body>
@@ -86,19 +90,42 @@ padding: 20px;max-height: 800px;}
 			<input type="hidden" value="${param.bfid }" id="query_bf_id">
 	<div  class="row w800">
 			<div class="row h50">
-			<div class="col-xs-4">采购单号:<span class="ormnum">${order.order_no}</span></div>
+			<div class="col-xs-4"><span class="th-font">采购单号:</span><span class="ormnum">${order.order_no}</span></div>
 			<div class="col-xs-4">${order.stateContent }</div>
-			<div class="col-xs-4">关联订单号:<span></span></div>
+			<div class="col-xs-4"><span class="th-font">关联订单号:</span><span></span></div>
 			</div>
 			<div class="row h50">
-			<div class="col-xs-4">用户名:<span>${order.name }</span>(<span>${order.user_id }</span>)</div>
-			<div class="col-xs-4">邮箱地址:<span>${order.email }</span></div>
-			<div class="col-xs-4">下单时间:<span>${order.create_time}</span></div>
+			<div class="col-xs-4"><span class="th-font">用户名:</span><span>${order.name }</span>(<span>${order.user_id }</span>)</div>
+			<div class="col-xs-4"><span class="th-font">邮箱地址:</span><span>${order.email }</span></div>
+			<div class="col-xs-4"><span class="th-font">下单时间:</span><span>${order.create_time}</span></div>
 			</div>
+			<div class="row h50">
+			<div class="col-xs-8 address-d"><span class="th-font">地址:</span>${order.country }
+			<span>${order.statename }</span><span>${order.address }</span>
+			<span>${order.address2 }</span>(ZIPCODE:<span>${order.zip_code }</span>)</div>
+			<div class="col-xs-4"><span class="th-font">电话:</span><span>${order.phone_number }</span></div>
+			</div>
+			
 	
-	</div>		
+	</div>
+	<%-- <div class="row w90">
+	<div class="row mar-l">
+	<div class="col-xs-3"><span>Country:<input type="text" value="${order.country }" id="" disabled="disabled"></span></div>
+	<div class="col-xs-3"><span>State:<input type="text" value="${order.statename }" id="" disabled="disabled"></span></div>
+	<div class="col-xs-3"><span>City:<input type="text" value="${order.address }" id="" disabled="disabled"></span></div>
+	<div class="col-xs-3"><span>Street:<input type="text" value="" id="" disabled="disabled"></span></div>
+	</div>
+	<div class="row mar-l">
+	<div class="col-xs-3"><span>Address:<input type="text" value="${order.address2 }" id="" disabled="disabled"></span></div>
+	<div class="col-xs-3"><span>Phone:<input type="text" value="${order.phone_number }" id="" disabled="disabled"></span></div>
+	<div class="col-xs-3"><span>ZipCode:<input type="text" value="${order.zip_code }" id="" disabled="disabled"></span></div>
+	<div class="col-xs-3"><span>交期:<input type="text" value="" id=""></span></div>
+	</div>
+	</div> --%>
+	
 	<div class="row w90">
 	<button class="btn btn-info btn-re-n">添加备注内容(对内)</button> <span class="remark-title">备注内容:</span><input type="text" class="remark-dn">
+	<button class="btn btn-info btn-delivery-time">确认交期</button><input type="text" value="${order.delivery_time}" class="delivery-time">
 	</div>
 			
 		
@@ -118,7 +145,7 @@ padding: 20px;max-height: 800px;}
 				<thead>
 					<tr>
 						<th width="128px;" class="th-font">下单规格:</th>
-						<th width="140px;" class="th-font">货源价格:</th>
+						<th width="165px;" class="th-font">货源价格:</th>
 						<th width="170px;" class="th-font">售卖价格(免邮价):</th>
 						<th width="60px;" class="th-font">商品数量:</th>
 						<!-- <th>时间</th> -->
@@ -126,7 +153,7 @@ padding: 20px;max-height: 800px;}
 					</tr>
 				</thead>
 				<tbody>
-					<tbody id="lu_tr">
+					<tbody class="lu_tr">
 					 <c:forEach items="${detail.skus }" var="sku">
 					 <tr class="sku-u-td">
 						<c:if test="${sku.state == 1}">

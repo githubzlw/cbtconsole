@@ -102,9 +102,16 @@
   </update>
   
   <select id="getOrder" resultType="Map">
-  select  a.create_time,a.order_no,a.user_id,b.name,b.email,a.state 
-  from buyforme_orderinfo a left join user b on a.user_id=b.id where a.order_no=#{orderNo}
+  select  a.create_time,a.order_no,a.user_id,b.name,b.email,a.state,c.address,a.delivery_time,
+   c.address2,c.phone_number,c.zip_code,c.statename,c.street,c.address_email,d.country
+  from buyforme_orderinfo a left join user b on a.user_id=b.id 
+  left join buyforme_address c on a.address_id=c.id 
+  left join zone d on c.country=d.id
+  
+  where a.order_no=#{orderNo}
   </select>
+  
+  <update id="updateDeliveryTime">update buyforme_orderinfo set delivery_time = #{time} where order_no=#{orderNo}</update>
   
 
 </mapper>

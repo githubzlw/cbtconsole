@@ -50,4 +50,6 @@ public interface BuyForMeService {
 	
 	int updateOrderDetailsSkuWeight(String weight,int bfdid);
 	
+	int updateDeliveryTime(String orderNo,String time);
+	
 }

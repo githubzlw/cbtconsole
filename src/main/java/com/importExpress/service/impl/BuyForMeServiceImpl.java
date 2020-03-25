@@ -103,5 +103,9 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 	public int updateOrderDetailsSkuWeight(String weight,int bfdid) {
 		return buyForMemapper.updateOrderDetailsSkuWeight(weight,bfdid);
 	}
+	@Override
+	public int updateDeliveryTime(String orderNo,String time) {
+		return buyForMemapper.updateDeliveryTime(orderNo,time);
+	}
 
 }

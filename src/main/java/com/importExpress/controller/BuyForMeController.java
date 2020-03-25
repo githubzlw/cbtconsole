@@ -156,6 +156,20 @@ public class BuyForMeController {
 		}
     	return mv;
     }
+    @RequestMapping("/time")
+    @ResponseBody
+    public Map<String,Object> deliveryTime(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	try {
+    		String orderNo = request.getParameter("orderNo");
+    		String time = request.getParameter("time");
+    		int update = buyForMeService.updateDeliveryTime(orderNo,time);
+    		mv.put("state", update > 0 ? 200 : 500);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return mv;
+    }
     
     @RequestMapping("/weight")
     @ResponseBody
