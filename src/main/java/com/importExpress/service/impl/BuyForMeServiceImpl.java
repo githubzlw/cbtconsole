@@ -3,7 +3,6 @@ package com.importExpress.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +61,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 			.priceBuy(o.getPriceBuy()).priceBuyc(o.getPriceBuyc()).shipFeight(o.getShipFeight())
 			.weight(o.getWeight())
 			.state(o.getState())
+			.unit(o.getUnit())
 			.build();
 			list.add(detailsSku);
 			detailsIdSku.put(bfDetailsId, list);

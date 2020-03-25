@@ -46,6 +46,7 @@
     <result column="ship_feight" property="shipFeight" jdbcType="VARCHAR" />
     <result column="product_url" property="productUrl" jdbcType="VARCHAR" />
     <result column="weight" property="weight" jdbcType="VARCHAR" />
+    <result column="unit" property="unit" jdbcType="VARCHAR" />
   </resultMap>
   
   <select id="getOrders" resultMap="infoResultMap">
@@ -71,18 +72,20 @@
   </select>
   
   <select id="getOrderDetailsSku" resultMap="skuResultMap">
-  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,ship_feight,weight
+  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,ship_feight,weight,unit
   from buyforme_details_sku where bf_id= #{bfId}
   </select>
   
   <insert id="addOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
-  insert into buyforme_details_sku(bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,ship_feight,weight) 
-  values(#{bfId},#{bfDetailsId},#{numIid},#{skuid},#{price},#{num},#{remark},#{state},#{productUrl},#{sku},#{priceBuy},#{priceBuyc},#{shipFeight},#{weight})
+  insert into buyforme_details_sku(bf_id,bf_details_id,num_iid,skuid,price,num,remark,
+  state,product_url,sku,price_buy,price_buy_c,ship_feight,weight,unit) 
+  values(#{bfId},#{bfDetailsId},#{numIid},#{skuid},#{price},#{num},#{remark},#{state},
+  #{productUrl},#{sku},#{priceBuy},#{priceBuyc},#{shipFeight},#{weight},#{unit})
   </insert>
   
   <update id="updateOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
   update buyforme_details_sku set sku=#{sku},product_url=#{productUrl},num=#{num},price=#{price},
-  ship_feight=#{shipFeight},price_buy=#{priceBuy},price_buy_c=#{priceBuyc},weight=#{weight} 
+  ship_feight=#{shipFeight},price_buy=#{priceBuy},price_buy_c=#{priceBuyc},weight=#{weight},unit=#{unit} 
   where id=#{id}
   </update>
   

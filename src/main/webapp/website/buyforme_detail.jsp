@@ -49,7 +49,7 @@ padding: 20px;max-height: 800px;}
 .img-responsive{max-width: 137px;max-height: 135px;margin-top: 11px;}
 .w350{width: 350px;}
 .btn-re-n{margin-bottom: 3px;margin-left: 17px;}
-.remark-dn{width: 350px;height:105px;margin-top: 5px;border: 1px solid #ccc;border-radius: 4px;}
+.remark-dn{width: 30%;height:105px;margin-top: 5px;border: 1px solid #ccc;border-radius: 4px;}
 .h50{height: 50px;}
 .input-w1{width: 64px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
 .input-w4{width: 100px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
@@ -60,18 +60,18 @@ padding: 20px;max-height: 800px;}
 .table-sku{width:100%;}
 .rowweight{ margin-left: -2px;}
 .w120{width:115px;}
-.input-w5{width: 380px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+.input-w5{width: 74%;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .input-w3{width: 50px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
-.input-w25{width: 50px;border: 1px solid #ccc; border-radius: 4px;height: 25px;}
+.input-w25{width: 2.5%;border: 1px solid #ccc; border-radius: 4px;height: 25px;}
 .input-w8{width: 96%;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
-.input-w6{width: 60px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+.input-w6{width: 92%;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .btn-weight{cursor: pointer;}
 .btn-update{cursor: pointer;}
 .btn-invalid{cursor: pointer;}
 .rb-add{margin-left: 1px;margin-top: 10px;}
 .b-add{cursor: pointer;}
-.w89{width: 80%;}
-.w11{width: 20%;}
+.w89{width: 90%;}
+.w11{width: 10%;}
 .detail-div{width: 90.333333%;}
 .td-in-valid{text-decoration:line-through;}
 .th-font{font-size: 14px;color: #ca5252;font-weight: initial;}
@@ -82,6 +82,7 @@ padding: 20px;max-height: 800px;}
 .mar-l{margin-left: 10px;margin-top: 15px;width: 90%;}
 .btn-delivery-time{margin-left: 250px;}
 .delivery-time{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
+.img-dv{width: 10%;}
 </style>
 </head>
 <body>
@@ -133,7 +134,7 @@ padding: 20px;max-height: 800px;}
 		<c:forEach items="${orderDetails }" var="detail" varStatus="index">
 		<div class="row w99 de-td">
 		<input value="${detail.id}" class="bfdid" type="hidden">
-		<div class="col-xs-1">
+		<div class="col-xs-1 ">
 		<img src="/cbtconsole/img/beforeLoad.gif" data-original="${detail.picUrl }" class="img-responsive img-lazy">
 		<a href="${detail.detailUrl }" target="_blank">商品原始链接</a>
 		</div>
@@ -144,12 +145,13 @@ padding: 20px;max-height: 800px;}
 				<table class="table-sku">
 				<thead>
 					<tr>
-						<th width="128px;" class="th-font">下单规格:</th>
-						<th width="165px;" class="th-font">货源价格:</th>
-						<th width="170px;" class="th-font">售卖价格(免邮价):</th>
-						<th width="60px;" class="th-font">商品数量:</th>
+						<th width="18%" class="th-font">下单规格:</th>
+						<th width="16%" class="th-font">货源价格:</th>
+						<th width="19%" class="th-font">售卖价格(免邮价):</th>
+						<th width="4%" class="th-font">数量:</th>
+						<th width="6%" class="th-font">单位:</th>
 						<!-- <th>时间</th> -->
-						<th width="320px;" class="th-font">货源:</th>
+						<th width="41%" class="th-font">货源:</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -163,6 +165,7 @@ padding: 20px;max-height: 800px;}
 						<td class="td-price">USD:<span class="lu-price-buy">${sku.priceBuy }</span>(CNY:<input type="text" value="${sku.priceBuyc }" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>
 						<td>USD:<input type="text" value="${sku.price }" class="lu-price-sale input-w1">(含运费<input type="text" value="${sku.shipFeight }" class="lu-ship-feight input-w1">)</td>
 						<td><input type="text" class="input-w6 lu_count" value="${sku.num}"></td>
+						<td><input type="text" class="input-w5 lu_unit" value="${sku.unit}"></td>
 						<td><input type="text" class="input-w5 lu_url" value="${sku.url}">
 						<button class="btn btn-info btn-update">修改</button>
 						 <button class="btn btn-info btn-invalid">无效</button>
@@ -172,6 +175,7 @@ padding: 20px;max-height: 800px;}
 						<td>USD:<span class="td-in-valid">${sku.priceBuy }</span>(CNY:<span class="td-in-valid">${sku.priceBuyc }</span>)</td>
 						<td class="td-in-valid">USD:${sku.price }(含运费${sku.shipFeight })</td>
 						<td class="td-in-valid">${sku.num}</td>
+						<td class="td-in-valid">${sku.unit}</td>
 						<td class="td-in-valid">${sku.url}></td>
 						</c:if>
 						</tr>
@@ -182,6 +186,7 @@ padding: 20px;max-height: 800px;}
 							<td class="td-price">USD:<span class="lu-price-buy"></span>(CNY:<input type="text" value="" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>
 						<td>USD:<input type="text" value="" class="lu-price-sale input-w1">(含运费<input type="text" value="" class="lu-ship-feight input-w1">)</td>
 							<td><input type="text" class="input-w6 lu_count" value="0"></td>
+							<td><input type="text" class="input-w5 lu_unit"></td>
 							<td><input type="text" class="input-w5 lu_url"><button class="btn btn-info btn-add">录入</button></td>
 						</tr>
 					 </c:if>

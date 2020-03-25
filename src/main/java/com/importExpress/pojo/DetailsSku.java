@@ -17,4 +17,5 @@ public class DetailsSku {
 	private String priceBuyc;
 	private String weight;
 	private int state;
+	private String unit;
 }
