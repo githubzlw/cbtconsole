@@ -17,4 +17,5 @@ public class BFOrderInfo {
 	private String ip;
 	private String remark;
 	private int adminId;
+	private String stateContent;
 }

@@ -72,7 +72,7 @@
 					 <td >${order.id}</td>
 						<td ><a href="/cbtconsole/bf/detail?no=${order.orderNo}&bfid=${order.id}">${order.orderNo}</a></td>
 						<td >${order.userId}</td>
-						<td >${order.state}</td>
+						<td >${order.stateContent}</td>
 						<td >${order.payPrice}</td>
 						<td >${order.deliveryTime}</td>
 						<td >${order.createTime}</td>
