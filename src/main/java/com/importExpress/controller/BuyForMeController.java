@@ -108,13 +108,13 @@ public class BuyForMeController {
     public Map<String,Object> addDetailSku(HttpServletRequest request, HttpServletResponse response) {
     	Map<String,Object> mv = Maps.newHashMap();
     	try {
-    		String bfId = request.getParameter("bfid");
         	String id = request.getParameter("id");
         	String delete = request.getParameter("delete");
         	int addOrderDetailsSku = 0;
         	if(StringUtils.isNotBlank(delete) && "1".equals(delete)) {
         		addOrderDetailsSku = buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id)?Integer.parseInt(id) : 0,-1);
         	}else {
+        		String bfId = request.getParameter("bfid");
         		String bfDetailsId = request.getParameter("bfdid");
         		String num = request.getParameter("num");
         		BFOrderDetailSku detailSku = new BFOrderDetailSku();

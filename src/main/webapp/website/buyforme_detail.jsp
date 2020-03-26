@@ -87,7 +87,7 @@ padding: 20px;max-height: 800px;}
 <body style="background-color:#eaf5e5;">
 	<div class="container-fluid report">
 		<h1 class="text-center">采购申请单详情</h1>
-			<input type="hidden" value="${param.bfid }" id="query_bf_id">
+			<input type="hidden" value="${order.bf_id }" id="query_bf_id">
 	<div  class="row w800">
 			<div class="row h50">
 			<div class="col-xs-4"><span class="th-font">采购单号:</span><span class="ormnum">${order.order_no}</span></div>
