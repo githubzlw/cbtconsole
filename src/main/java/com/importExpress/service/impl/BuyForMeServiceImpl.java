@@ -13,6 +13,7 @@ import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
 import com.importExpress.pojo.DetailsSku;
+import com.importExpress.pojo.TransportMethod;
 import com.importExpress.service.BuyForMeService;
 
 @Service
@@ -125,6 +126,23 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 	@Override
 	public List<Map<String,String>> getRemark(String orderNo) {
 		return buyForMemapper.getRemark(orderNo);
+	}
+	@Override
+	public List<TransportMethod> getTransport() {
+		Map<String,List<String>> result = Maps.newHashMap();
+		List<Map<String,String>> transport = buyForMemapper.getTransport();
+		transport.stream().forEach(t->{
+			String key = t.get("shipping_time");
+			List<String> value = result.get(key);
+			value = value == null ? Lists.newArrayList() : value;
+			value.add(t.get("transport_mode"));
+			result.put(key, value);
+		});
+		List<TransportMethod> list =  Lists.newArrayList();
+		result.entrySet().forEach(r->{
+			list.add(TransportMethod.builder().time(r.getKey()).method(r.getValue()).build());
+		});
+		return list;
 	}
 	
 

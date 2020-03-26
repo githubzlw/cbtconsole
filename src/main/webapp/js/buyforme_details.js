@@ -2,6 +2,8 @@ $(function(){
 	$(".btn-delivery-time").click(function(){
 		var ormnum = $(".ormnum").text();
 		var time = $(".delivery-time").val();
+		var feight = $(".delivery-feight").val();
+		var method = $(".delivery-method").val();
 		if(time == ''){
 			return ;
 		}
@@ -9,6 +11,8 @@ $(function(){
 			url:"/cbtconsole/bf/time",
 			data:{
 				"orderNo":ormnum,
+				"feight":feight,
+				"method":method,
 				"time":time
 			},
 			type:"post",
@@ -207,8 +211,45 @@ $(function(){
 			}
 		});
 	})
+	
+	$(".delivery-time").change(function(){
+		var time = $(this).val();
+		jQuery.ajax({
+		       url:"/cbtconsole/bf/transport",
+		       data:{},
+		       type:"post",
+		       success:function(data){
+		    	   if(data.state == 200){
+		    		   for(var i=0;i<data.methodList.length;i++){
+		    				if(time == data.methodList[i].time){
+		    					var op = '';
+		    					 for(var j=0;j<data.methodList[i].method.length;j++){
+		    						 op +='<option value="'+data.methodList[i].method[j]+'">'+data.methodList[i].method[j]+'</option>';
+		    					 }
+		    					$(".delivery-method").html(op);
+		    				}
+		    		   }
+					}
+		       },
+		   	error:function(e){
+		   		$.MsgBox.Alert("提示", "失败");
+		   	}
+		   });
+	})
+	
 	$('.img-lazy').lazyload({effect: "fadeIn"});
 })
+
+function fntransport(){
+	if(tsport ==''){
+		
+	}
+	return tsport;
+	
+}
+
+
+
 function bindClick(){
 	$(".btn-add").click(function(){
 		var bfid = $("#query_bf_id").val();

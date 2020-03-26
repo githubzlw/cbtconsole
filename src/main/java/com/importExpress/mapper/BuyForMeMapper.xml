@@ -106,6 +106,7 @@
   
   <select id="getOrder" resultType="Map">
   select  a.id as bf_id,a.create_time,a.order_no,a.user_id,b.name,b.email,a.state,c.address,a.delivery_time,
+  a.delivery_method,a.ship_feight,
    c.address2,c.phone_number,c.zip_code,c.statename,c.street,c.address_email,d.country
   from buyforme_orderinfo a left join user b on a.user_id=b.id 
   left join buyforme_address c on a.address_id=c.id 
@@ -117,5 +118,7 @@
   <insert id="insertRemark">insert into buyforme_remark (remark,order_no,create_time) values (#{remark},#{orderNo},now())</insert>
   
   <select id="getRemark" resultType="java.util.Map">select remark,create_time from buyforme_remark where order_no=#{orderNo}</select>
+  
+  <select id="getTransport" resultType="java.util.Map">SELECT  transport_mode,shipping_time from tab_transit_freightinfo_unite_new GROUP BY transport_mode,shipping_time</select>
 
 </mapper>

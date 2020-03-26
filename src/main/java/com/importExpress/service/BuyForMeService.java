@@ -6,6 +6,7 @@ import java.util.Map;
 import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
+import com.importExpress.pojo.TransportMethod;
 
 public interface BuyForMeService {
 	/**申请单列表
@@ -76,5 +77,7 @@ public interface BuyForMeService {
 	 * @return
 	 */
 	List<Map<String,String>> getRemark(String orderNo);
+	
+	List<TransportMethod>  getTransport();
 	
 }

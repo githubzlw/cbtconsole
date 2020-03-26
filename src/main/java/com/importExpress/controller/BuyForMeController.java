@@ -17,9 +17,11 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.util.StrUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
+import com.importExpress.pojo.TransportMethod;
 import com.importExpress.service.BuyForMeService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -91,12 +93,30 @@ public class BuyForMeController {
     			int state = Integer.parseInt(StrUtils.object2NumStr(order.get("state")));
     			String strState = state == -1?"申请已取消":state==0?"申请待处理":state==1?"申请处理中":state==2?"销售处理完成":"已支付";
     			order.put("stateContent", strState);
-    			
+    			String delivery_method = StrUtils.object2Str(order.get("delivery_method"));
+    			order.put("delivery_method", delivery_method);
     		}
     		List<Map<String,String>> remark = buyForMeService.getRemark(orderNo);
     		mv.addObject("remark", remark);
     		mv.addObject("order", order);
     		
+//    		Map<String, List<String>> transport = buyForMeService.getTransport();
+//    		mv.addObject("transport", transport);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return mv;
+    }
+    
+    @RequestMapping("/transport")
+    @ResponseBody
+    public Map<String,Object> transport(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	try {
+			
+    		List<TransportMethod> transport = buyForMeService.getTransport();
+    		mv.put("methodList", transport);
+    		mv.put("state", transport.size() > 0 ? 200 : 500);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

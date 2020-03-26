@@ -79,8 +79,10 @@ padding: 20px;max-height: 800px;}
 .td-font-new{font-size: 14px;color: #ca5252;font-weight:bold;margin-left: 5px;}
 .ormnum{border: 1px dashed #f90;padding: 2px;margin-left: 5px;font-size: 17px;}
 .mar-l{margin-left: 10px;margin-top: 15px;width: 90%;}
-.btn-delivery-time{margin-left: 250px;}
+.btn-delivery-time{margin-left: 2px;}
 .delivery-time{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
+.delivery-method{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
+.delivery-feight{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 .img-dv{width: 10%;}
 </style>
 </head>
@@ -125,9 +127,70 @@ padding: 20px;max-height: 800px;}
 	
 	<div class="row w90">
 	<button class="btn btn-info btn-re-n">添加备注内容(对内)</button> <span class="remark-title">备注内容:</span><input type="text" class="remark-dn">
-	<button class="btn btn-info btn-delivery-time">确认交期</button><input type="text" value="${order.delivery_time}" class="delivery-time">
+	运费:<input type="text" value="${order.delivery_feight}" class="delivery-feight">
+	交期:<select class="delivery-time">
+	<option value=""></option>
+	<option value="19-35" ${order.delivery_time=='19-35' ? 'selected="selected"':''}>19-35</option>
+	<option value="15-25" ${order.delivery_time=='15-25' ? 'selected="selected"':''}>15-25</option>
+	<option value="13-19" ${order.delivery_time=='13-19' ? 'selected="selected"':''}>13-19</option>
+	<option value="12-25" ${order.delivery_time=='12-25' ? 'selected="selected"':''}>12-25</option>
+	<option value="12-20" ${order.delivery_time=='12-20' ? 'selected="selected"':''}>12-20</option>
+	<option value="10-20" ${order.delivery_time=='10-20' ? 'selected="selected"':''}>10-20</option>
+	<option value="10-17" ${order.delivery_time=='10-17' ? 'selected="selected"':''}>10-17</option>
+	<option value="9-19" ${order.delivery_time=='9-19' ? 'selected="selected"':''}>9-19</option>
+	<option value="9-15" ${order.delivery_time=='9-15' ? 'selected="selected"':''}>9-15</option>
+	<option value="9-12" ${order.delivery_time=='9-12' ? 'selected="selected"':''}>9-12</option>
+	<option value="7-17" ${order.delivery_time=='7-17' ? 'selected="selected"':''}>7-17</option>
+	<option value="7-15" ${order.delivery_time=='7-15' ? 'selected="selected"':''}>7-15</option>
+	<option value="7-12" ${order.delivery_time=='7-12' ? 'selected="selected"':''}>7-12</option>
+	<option value="7-10" ${order.delivery_time=='7-10' ? 'selected="selected"':''}>7-10</option>
+	<option value="6-10" ${order.delivery_time=='6-10' ? 'selected="selected"':''}>6-10</option>
+	<option value="5-12" ${order.delivery_time=='5-12' ? 'selected="selected"':''}>5-12</option>
+	<option value="5-10" ${order.delivery_time=='5-10' ? 'selected="selected"':''}>5-10</option>
+	<option value="5-9" ${order.delivery_time=='5-9' ? 'selected="selected"':''}>5-9</option>
+	<option value="4-12" ${order.delivery_time=='4-12' ? 'selected="selected"':''}>4-12</option>
+	<option value="4-7" ${order.delivery_time=='4-7' ? 'selected="selected"':''}>4-7</option>
+	<option value="3-7" ${order.delivery_time=='3-7' ? 'selected="selected"':''}>3-7</option>
+	<option value="3" ${order.delivery_time=='3' ? 'selected="selected"':''}>3</option>
+	<option value="2-5" ${order.delivery_time=='2-5' ? 'selected="selected"':''}>2-5</option>
+	<option value="2-4" ${order.delivery_time=='2-4' ? 'selected="selected"':''}>2-4</option>
+	<option value="2-3" ${order.delivery_time=='2-3' ? 'selected="selected"':''}>2-3</option>
+	</select>
+	运输方式:
+	<select class="delivery-method">
+	<c:if test="${order.delivery_method != ''}">
+	<option value="${order.delivery_method}">${order.delivery_method}</option>
+	</c:if>
+	<c:if test="${order.delivery_method == ''}">
+	<option value=""></option>
+	<option>Bulk Air Freight</option>
+	<option>China Post Packet(no tracking,unstable)</option>
+	<option>China Post Register Air Mail(with tracking)</option>
+	<option>CNE</option>
+	<option>CNE(DHL packet)</option>
+	<option>CNE(DPEX)</option>
+	<option>CNE(ups ground)</option>
+	<option>DHL</option>
+	<option>EMS</option>
+	<option>EPACKET</option>
+	<option>EPACKET (Canada Post)</option>
+	<option>EPACKET (Royal Mail or YODAL)</option>
+	<option>EPACKET (USPS)</option>
+	<option>EU PARCEL</option>
+	<option>FEDEX</option>
+	<option>FEDEX IE</option>
+	<option>JCEX</option>
+	<option>Ship Within China</option>
+	<option>Shipping with VAT/Duty Paid</option>
+	<option>SWENDEN POST</option>
+	<option>TNT</option>
+	<option>TNT Cargo Shipping (DDP)</option>
+	<option>TNT EXPRESS</option>
+	<option>UPS</option>
+	</c:if>
+	</select>
+	<button class="btn btn-info btn-delivery-time">确认交期</button>
 	</div>
-			
 		
 		<div class="row mt20">
 		<c:forEach items="${orderDetails }" var="detail" varStatus="index">
