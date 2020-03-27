@@ -52,6 +52,25 @@ $(function(){
 	})
 	
 	$(".btn-finsh").click(function(){
+		var valid = 0;
+		var time = $(".delivery-time").val();
+		var method = $(".delivery-method").val();
+		var feight = $(".delivery-feight").val();
+		if(time=='' || feight==''||method==''){
+			valid = 1;
+		}else{
+			$(".lu-weight").each(function(){
+				var v = $(this).val();
+				if(valid == 0 && v == ''){
+					valid=1;
+				}
+			});
+		}
+		if(valid == 1){
+			$.MsgBox.Alert("提示", "请确认交期时间、交期方式、重量信息是否准确");
+			return ;
+		}
+		
 		var bfid = $("#query_bf_id").val();
 		jQuery.ajax({
 			url:"/cbtconsole/bf/finsh",
