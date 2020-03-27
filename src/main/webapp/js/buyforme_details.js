@@ -146,15 +146,14 @@ $(function(){
 		
 		
 	})
-	$(".btn-delete").click(function(){
-		var bfdid = $(this).parents("").find(".bfdid").val();
-		var id = $(this).parents("").find(".lu_id").val();
+	$(".btn-replay").click(function(){
+		var bfdid = $(this).parents(".de-td").find(".bfdid").val();
+		var remark = $(this).parents(".remark-replay-row").find(".remark-replay").val();
 		jQuery.ajax({
-			url:"/cbtconsole/bf/add",
+			url:"/cbtconsole/bf/deremark",
 			data:{
-				"id":id,
-				"bfid":bfid,
-				"delete":1
+				"remark":remark,
+				"bfdid":bfdid
 			},
 			type:"post",
 			success:function(data){

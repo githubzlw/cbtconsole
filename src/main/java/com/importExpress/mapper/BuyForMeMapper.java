@@ -20,6 +20,12 @@ public interface BuyForMeMapper {
 	 * @return
 	 */
 	int updateOrdersDetailsState(@Param("id")int id,@Param("state")int state);
+	/**回复备注
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int updateOrdersDetailsRemark(@Param("id")int id,@Param("remark")String remark);
 	/**更新details sku状态
 	 * @param id
 	 * @return

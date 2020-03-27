@@ -158,6 +158,20 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		});
 		return list;
 	}
+
+	@Override
+	public int updateOrdersDetailsRemark(int id, String remark) {
+		int update = buyForMemapper.updateOrdersDetailsRemark(id, remark);
+		if(update > 0) {
+			String sql = "update buyforme_details set remark_replay=? where id=?";
+			List<String> lstValue = Lists.newArrayList();
+			lstValue.add(remark);
+			lstValue.add(String.valueOf(id));
+			String covertToSQL = DBHelper.covertToSQL(sql, lstValue);
+			SendMQ.sendMsg(new RunSqlModel(covertToSQL));
+		}
+		return update;
+	}
 	
 
 }

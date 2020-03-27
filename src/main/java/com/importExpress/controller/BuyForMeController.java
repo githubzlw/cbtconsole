@@ -76,6 +76,11 @@ public class BuyForMeController {
 		}
         return mv;
     }
+    /**申请单详情
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("/detail")
     @ResponseBody
     public ModelAndView orderDetail(HttpServletRequest request, HttpServletResponse response) {
@@ -108,6 +113,11 @@ public class BuyForMeController {
     	return mv;
     }
     
+    /**获取交期方式
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("/transport")
     @ResponseBody
     public Map<String,Object> transport(HttpServletRequest request, HttpServletResponse response) {
@@ -123,6 +133,11 @@ public class BuyForMeController {
     	return mv;
     }
 
+    /**录入、修改规格
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("/add")
     @ResponseBody
     public Map<String,Object> addDetailSku(HttpServletRequest request, HttpServletResponse response) {
@@ -163,6 +178,11 @@ public class BuyForMeController {
 		}
     	return mv;
     }
+    /**无效规格
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("/invalid")
     @ResponseBody
     public Map<String,Object> invalidDetailSku(HttpServletRequest request, HttpServletResponse response) {
@@ -179,6 +199,11 @@ public class BuyForMeController {
 		}
     	return mv;
     }
+    /**确认交期时间
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("/time")
     @ResponseBody
     public Map<String,Object> deliveryTime(HttpServletRequest request, HttpServletResponse response) {
@@ -195,6 +220,11 @@ public class BuyForMeController {
 		}
     	return mv;
     }
+    /**内部回复
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("/remark")
     @ResponseBody
     public Map<String,Object> remark(HttpServletRequest request, HttpServletResponse response) {
@@ -210,6 +240,11 @@ public class BuyForMeController {
     	return mv;
     }
     
+    /**修改重量
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("/weight")
     @ResponseBody
     public Map<String,Object> weightDetailSku(HttpServletRequest request, HttpServletResponse response) {
@@ -227,7 +262,34 @@ public class BuyForMeController {
 		}
     	return mv;
     }
+    /**回复客户备注
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/deremark")
+    @ResponseBody
+    public Map<String,Object> replayRemark(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	try {
+    		String remark = request.getParameter("remark");
+    		String sbfdid = request.getParameter("bfdid");
+    		int bfdid = StrUtils.isNum(sbfdid) ? Integer.valueOf(sbfdid) : 0;
+    		int updateOrderDetailsSkuState = 
+    				buyForMeService.updateOrdersDetailsRemark(bfdid, remark);
+    		
+    		mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	return mv;
+    }
     
+    /**确认
+     * @param request
+     * @param response
+     * @return
+     */
     @RequestMapping("/finsh")
     @ResponseBody
     public Map<String,Object> finsh(HttpServletRequest request, HttpServletResponse response) {

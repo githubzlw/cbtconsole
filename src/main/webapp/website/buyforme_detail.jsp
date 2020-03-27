@@ -70,8 +70,8 @@ padding: 20px;max-height: 800px;}
 .btn-invalid{cursor: pointer;}
 .rb-add{margin-left: 1px;margin-top: 10px;}
 .b-add{cursor: pointer;}
-.w89{width: 90%;}
-.w11{width: 10%;}
+.w89{width: 99%;margin-left: 1%;margin-top: 12px;}
+.w11{width: 99%;margin-left: 1%;}
 .detail-div{width: 90.333333%;}
 .td-in-valid{text-decoration:line-through;}
 .th-font{font-size: 14px;color: #ca5252;font-weight: initial;}
@@ -85,6 +85,7 @@ padding: 20px;max-height: 800px;}
 .delivery-feight{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 .img-dv{width: 10%;}
 .btn-finsh{margin-left: 94.45%;}
+.remark-replay{border: 1px solid #ccc;border-radius: 4px;height: 34px;width:30%;}
 </style>
 </head>
 <body style="background-color:#eaf5e5;">
@@ -203,8 +204,14 @@ padding: 20px;max-height: 800px;}
 		</div>
 		<div class="col-xs-10 detail-div">
 		<div class="row wt35"><span class="th-font">商品名称:</span>${detail.title }(<span class="td-numiid">${detail.numIid }</span>)</div>
+		<div class="row w11">
+		<div class="row th-font">用户备注:</div>
+		<div class="row remark-row">Q:<span class="th-font-l">${detail.remark}</span><i class="td-font-new">New!</i></div>
+		<div class="row remark-replay-row">A:<input value="${detail.remarkReplay}" class="remark-replay"><button class="btn btn-info btn-replay">回复</button></div>
+		</div>
+				
 		<div class="row">
-				<div class="col-xs-11 w89">
+				<div class="w89">
 				<table class="table-sku">
 				<thead>
 					<tr>
@@ -256,10 +263,6 @@ padding: 20px;max-height: 800px;}
 					</tbody>
 				
 				</table>
-				</div>
-				<div class="col-xs-1 w11">
-				<div class="row th-font">用户备注:</div>
-				<div class="row remark-row">Q:<span class="th-font-l">${detail.remark}</span><i class="td-font-new">New!</i></div>
 				</div>
 		</div>
 		<div class="row rb-add"><i class="b-add">+</i></div>

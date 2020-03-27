@@ -3,6 +3,8 @@ package com.importExpress.service;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
@@ -79,5 +81,11 @@ public interface BuyForMeService {
 	List<Map<String,String>> getRemark(String orderNo);
 	
 	List<TransportMethod>  getTransport();
+	/**回复备注
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int updateOrdersDetailsRemark(int id,String remark);
 	
 }

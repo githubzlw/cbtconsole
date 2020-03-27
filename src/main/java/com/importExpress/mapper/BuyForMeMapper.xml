@@ -29,6 +29,7 @@
     <result column="price" property="price" jdbcType="VARCHAR" />
     <result column="detail_url" property="detailUrl" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="remark_replay" property="remarkReplay" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="VARCHAR" />
   </resultMap>
   
@@ -70,7 +71,7 @@
   </select>
   
   <select id="getOrderDetails" resultMap="detailResultMap">
-  select id,order_no,title,pic_url,price,num_iid,num,detail_url,state,remark,create_time 
+  select id,order_no,title,pic_url,price,num_iid,num,detail_url,state,remark,create_time,remark_replay 
   from buyforme_details where order_no=#{orderNo}
   </select>
   
@@ -105,6 +106,10 @@
   </update>
   <update id="updateOrdersState">
   update buyforme_orderinfo set state=#{state} where id=#{id}
+  </update>
+  
+    <update id="updateOrdersDetailsRemark">
+  update buyforme_details set remark_replay=#{remark} where id=#{id}
   </update>
   
   <select id="getOrder" resultType="Map">
