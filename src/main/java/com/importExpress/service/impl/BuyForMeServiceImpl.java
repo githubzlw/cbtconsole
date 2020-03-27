@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cbt.jdbc.DBHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.mapper.BuyForMeMapper;
@@ -15,6 +16,8 @@ import com.importExpress.pojo.BFOrderInfo;
 import com.importExpress.pojo.DetailsSku;
 import com.importExpress.pojo.TransportMethod;
 import com.importExpress.service.BuyForMeService;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 @Service
 public class BuyForMeServiceImpl implements BuyForMeService {
@@ -115,8 +118,19 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		return buyForMemapper.updateOrderDetailsSkuWeight(weight,bfdid);
 	}
 	@Override
-	public int updateDeliveryTime(String orderNo,String time) {
-		return buyForMemapper.updateDeliveryTime(orderNo,time);
+	public int updateDeliveryTime(String orderNo,String time,String feight,String method){
+		int updateDeliveryTime = buyForMemapper.updateDeliveryTime(orderNo,time,feight,method);
+		if(updateDeliveryTime > 0) {
+			String sql = "update buyforme_orderinfo set delivery_time =?,ship_feight=?,delivery_method=? where order_no=?";
+			List<String> lstValue = Lists.newArrayList();
+			lstValue.add(time);
+			lstValue.add(feight);
+			lstValue.add(method);
+			lstValue.add(orderNo);
+			String covertToSQL = DBHelper.covertToSQL(sql, lstValue);
+			SendMQ.sendMsg(new RunSqlModel(covertToSQL));
+		}
+		return updateDeliveryTime;
 	}
 	@Override
 	public int insertRemark(String orderNo,String remark) {

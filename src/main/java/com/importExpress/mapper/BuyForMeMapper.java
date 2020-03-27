@@ -64,7 +64,7 @@ public interface BuyForMeMapper {
 	
 	int updateOrderDetailsSkuWeight(@Param("weight")String weight,@Param("bfdid")int bfdid);
 	
-	int updateDeliveryTime(@Param("orderNo")String orderNo,@Param("time")String time);
+	int updateDeliveryTime(@Param("orderNo")String orderNo,@Param("time")String time,@Param("feight")String feight,@Param("method")String method);
 	int insertRemark(@Param("orderNo")String orderNo,@Param("remark")String remark);
 	List<Map<String,String>> getRemark(String orderNo);
 	

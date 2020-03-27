@@ -65,7 +65,7 @@
 			<table class="table table-bordered">
 				<thead>
 					<tr><th width="7%">申请ID</th><th width="10%">订单号</th><th width="10%">用户ID</th><th width="10%">状态</th>
-					<th width="10%">支付金额</th><th width="6%">交期时间</th><th width="12%">时间</th><th>备注</th></tr>
+					<th width="10%">支付金额</th><th width="6%">交期/运费</th><th width="12%">时间</th><th>备注</th></tr>
 				</thead>
 				<tbody>
 				<c:forEach items="${orders }" var="order" varStatus="index">
@@ -75,7 +75,7 @@
 						<td >${order.userId}</td>
 						<td >${order.stateContent}</td>
 						<td >${order.payPrice}</td>
-						<td >${order.deliveryTime}</td>
+						<td >${order.deliveryTime}/${order.method}/${order.feight}</td>
 						<td >${order.createTime}</td>
 						<td >${order.remark}</td>
 					</tr>

@@ -84,6 +84,7 @@ padding: 20px;max-height: 800px;}
 .delivery-method{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 .delivery-feight{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 .img-dv{width: 10%;}
+.btn-finsh{margin-left: 94.45%;}
 </style>
 </head>
 <body style="background-color:#eaf5e5;">
@@ -127,7 +128,7 @@ padding: 20px;max-height: 800px;}
 	
 	<div class="row w90">
 	<button class="btn btn-info btn-re-n">添加备注内容(对内)</button> <span class="remark-title">备注内容:</span><input type="text" class="remark-dn">
-	运费:<input type="text" value="${order.delivery_feight}" class="delivery-feight">
+	运费:<input type="text" value="${order.ship_feight}" class="delivery-feight">
 	交期:<select class="delivery-time">
 	<option value=""></option>
 	<option value="19-35" ${order.delivery_time=='19-35' ? 'selected="selected"':''}>19-35</option>
@@ -270,12 +271,9 @@ padding: 20px;max-height: 800px;}
 		
 		</c:forEach>
 		<br>
-		<br>
-		<br>
-			
 		<button class="btn btn-success btn-finsh">确认处理</button>		
 		</div>
-		
+		<br><br><br>
 	</div>
 <!-- <div class="tc">
 	<div class="trnasparent"></div>

@@ -18,4 +18,6 @@ public class BFOrderInfo {
 	private String remark;
 	private int adminId;
 	private String stateContent;
+	private String method;
+	private String feight;
 }

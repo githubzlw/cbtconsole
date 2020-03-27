@@ -65,7 +65,7 @@ public interface BuyForMeService {
 	 * @param time
 	 * @return
 	 */
-	int updateDeliveryTime(String orderNo,String time);
+	int updateDeliveryTime(String orderNo,String time,String feight,String method);
 	/**对内备注
 	 * @param orderNo
 	 * @param remark

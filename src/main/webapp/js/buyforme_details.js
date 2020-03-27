@@ -4,7 +4,8 @@ $(function(){
 		var time = $(".delivery-time").val();
 		var feight = $(".delivery-feight").val();
 		var method = $(".delivery-method").val();
-		if(time == ''){
+		if(time == '' || time == '' || method==''){
+			$.MsgBox.Alert("提示", "请确认运费、交期是否准确!");
 			return ;
 		}
 		jQuery.ajax({
@@ -239,15 +240,6 @@ $(function(){
 	
 	$('.img-lazy').lazyload({effect: "fadeIn"});
 })
-
-function fntransport(){
-	if(tsport ==''){
-		
-	}
-	return tsport;
-	
-}
-
 
 
 function bindClick(){

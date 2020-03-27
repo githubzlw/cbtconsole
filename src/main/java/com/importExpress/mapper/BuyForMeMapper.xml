@@ -11,6 +11,8 @@
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
     <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="delivery_method" property="method" jdbcType="VARCHAR" />
+    <result column="ship_feight" property="feight" jdbcType="VARCHAR" />
     <result column="user_id" property="userId" jdbcType="INTEGER" />
     <result column="state" property="state" jdbcType="INTEGER" />
     <result column="address_id" property="addressId" jdbcType="INTEGER" />
@@ -50,7 +52,8 @@
   </resultMap>
   
   <select id="getOrders" resultMap="infoResultMap">
-  select id,order_no,user_id,state,pay_price,product_cost,delivery_time,address_id,create_time,update_time,admin_id,ip,remark 
+  select id,order_no,user_id,state,pay_price,product_cost,delivery_time,
+  address_id,create_time,update_time,admin_id,ip,remark,ship_feight,delivery_method
   from buyforme_orderinfo where 1=1
   <if test="state !=-2">and state=#{state}</if>
   <if test="orderNo !=null">and order_no=#{orderNo}</if>
@@ -114,7 +117,7 @@
   where a.order_no=#{orderNo}
   </select>
   
-  <update id="updateDeliveryTime">update buyforme_orderinfo set delivery_time = #{time} where order_no=#{orderNo}</update>
+  <update id="updateDeliveryTime">update buyforme_orderinfo set delivery_time = #{time},ship_feight=#{feight},delivery_method=#{method} where order_no=#{orderNo}</update>
   <insert id="insertRemark">insert into buyforme_remark (remark,order_no,create_time) values (#{remark},#{orderNo},now())</insert>
   
   <select id="getRemark" resultType="java.util.Map">select remark,create_time from buyforme_remark where order_no=#{orderNo}</select>
