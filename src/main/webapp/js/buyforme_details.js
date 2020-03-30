@@ -1,4 +1,5 @@
 $(function(){
+	initXheditor();
 	$(".btn-delivery-time").click(function(){
 		var ormnum = $(".ormnum").text();
 		var time = $(".delivery-time").val();
@@ -27,7 +28,18 @@ $(function(){
 			}
 		});
 	})
-	$(".btn-lu").click(function(){
+	$(".td-font-view").click(function(){
+		var parentsdiv = $(this).parents(".de-td");
+		var title = parentsdiv.find(".name-title").text();
+		$("#tc_name").html(title);
+		var img = parentsdiv.find(".img-de-v").attr("src");
+		$(".img-product").attr("src",img);
+		var bfdid = parentsdiv.find(".bfdid").val();
+		$("#tc_bfdid").val(bfdid);
+		var remark = parentsdiv.find(".de-remarl-q").text();
+		$("#tc_remark").text(remark);
+		var replay = parentsdiv.find(".remark-replay").val();
+		$("#remark-replay-content").val(replay);
 		$('.tc,.trnasparent,.tc1').show();
 	})
 	
@@ -134,6 +146,10 @@ $(function(){
 		var sku = trp.find(".lu_sku").val();
 		var id = trp.find(".lu_id").val();
 		var weight = $(this).parents(".detail-div").find(".lu-weight").val();
+		if(num == '' || parseInt(num) < 1 || price == '' || priceBuy==''||priceBuyc==''||url==''||sku==''||unit==''||shipFeight==''){
+			$.MsgBox.Alert("提示", "请确认所填信息是否准确!");
+			return ;
+		}
 		jQuery.ajax({
 			url:"/cbtconsole/bf/add",
 			data:{
@@ -166,8 +182,8 @@ $(function(){
 		
 	})
 	$(".btn-replay").click(function(){
-		var bfdid = $(this).parents(".de-td").find(".bfdid").val();
-		var remark = $(this).parents(".remark-replay-row").find(".remark-replay").val();
+		var bfdid = $("#tc_bfdid").val();
+		var remark = $("#remark-replay-content").val();
 		jQuery.ajax({
 			url:"/cbtconsole/bf/deremark",
 			data:{
@@ -276,6 +292,10 @@ function bindClick(){
 		var unit = trp.find(".lu_unit").val();
 		var sku = trp.find(".lu_sku").val();
 		var weight = $(this).parents(".detail-div").find(".lu-weight").val();
+		if(num == '' || parseInt(num) < 1 || price == '' || priceBuy==''||priceBuyc==''||url==''||sku==''||unit==''||shipFeight==''){
+			$.MsgBox.Alert("提示", "请确认所填信息是否准确!");
+			return ;
+		}
 	    jQuery.ajax({
 		       url:"/cbtconsole/bf/add",
 		       data:{
@@ -307,7 +327,17 @@ function bindClick(){
 		
 	})
 }
-
+//初始化xheditor
+function initXheditor() {
+    editorObj = $('#remark-replay-content').xheditor({
+        tools: "full",
+        html5Upload: false,
+        upBtnText: "上传",
+        upMultiple: 1,
+        upImgUrl: "/cbtconsole/editc/xheditorUploads?pid=${goods.pid}",
+        upImgExt: "jpg,jpeg,gif,png"
+    });
+}
 function changePrice(t){
 	var cny = parseFloat($(t).val());
 	var price = parseFloat(cny/7.0832).toFixed(2);

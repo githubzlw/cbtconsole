@@ -75,7 +75,7 @@ padding: 20px;max-height: 800px;}
 .detail-div{width: 90.333333%;}
 .td-in-valid{text-decoration:line-through;}
 .th-font{font-size: 14px;color: #ca5252;font-weight: initial;}
-.remark-row{margin-top: 10px;}
+.remark-row{margin-top: 10px;    width: 85%;}
 .td-font-new{font-size: 14px;color: #ca5252;font-weight:bold;margin-left: 5px;}
 .ormnum{border: 1px dashed #f90;padding: 2px;margin-left: 5px;font-size: 17px;}
 .mar-l{margin-left: 10px;margin-top: 15px;width: 90%;}
@@ -86,6 +86,10 @@ padding: 20px;max-height: 800px;}
 .img-dv{width: 10%;}
 .btn-finsh{margin-left: 94.45%;}
 .remark-replay{border: 1px solid #ccc;border-radius: 4px;height: 34px;width:30%;}
+.td-font-view{margin-left: 2%;cursor: pointer;}
+.text-al{text-align: left;}
+.tc-al-name{font-size: 18px;font-weight: bold;}
+.tc1{border: 3px solid #ccc;border-radius: 21px;}
 </style>
 </head>
 <body style="background-color:#eaf5e5;">
@@ -109,6 +113,7 @@ padding: 20px;max-height: 800px;}
 			<span>${order.address2 }</span>(ZIPCODE:<span>${order.zip_code }</span>)</div>
 			<div class="col-xs-4"><span class="th-font">电话:</span><span>${order.phone_number }</span></div>
 			</div>
+			<div class="row"><span class="sy-content"><c:if test="${order.sample_flag ==1 }">送样</c:if></span></div>
 			
 	
 	</div>
@@ -128,7 +133,7 @@ padding: 20px;max-height: 800px;}
 	</div> --%>
 	
 	<div class="row w90">
-	<button class="btn btn-info btn-re-n">添加备注内容(对内)</button> <span class="remark-title">备注内容:</span><input type="text" class="remark-dn">
+	<button class="btn btn-info btn-re-n">添加备注内容(对内)</button> <span class="remark-title">备注内容:</span><input type="text" class="remark-dn" value="">
 	运费:<input type="text" value="${order.ship_feight}" class="delivery-feight">
 	交期:<select class="delivery-time">
 	<option value=""></option>
@@ -199,15 +204,16 @@ padding: 20px;max-height: 800px;}
 		<div class="row w99 de-td">
 		<input value="${detail.id}" class="bfdid" type="hidden">
 		<div class="col-xs-1 ">
-		<img src="/cbtconsole/img/beforeLoad.gif" data-original="${detail.picUrl }" class="img-responsive img-lazy">
+		<img src="/cbtconsole/img/beforeLoad.gif" data-original="${detail.picUrl }" class="img-responsive img-lazy img-de-v">
 		<a href="${detail.detailUrl }" target="_blank">商品原始链接</a>
 		</div>
 		<div class="col-xs-10 detail-div">
-		<div class="row wt35"><span class="th-font">商品名称:</span>${detail.title }(<span class="td-numiid">${detail.numIid }</span>)</div>
+		<div class="row wt35"><span class="th-font">商品名称:</span><span class="name-title">${detail.title }</span>(<span class="td-numiid">${detail.numIid }</span>)</div>
 		<div class="row w11">
 		<div class="row th-font">用户备注:</div>
-		<div class="row remark-row">Q:<span class="th-font-l">${detail.remark}</span><i class="td-font-new">New!</i></div>
-		<div class="row remark-replay-row">A:<input value="${detail.remarkReplay}" class="remark-replay"><button class="btn btn-info btn-replay">回复</button></div>
+		<div class="row remark-row">Q:<span class="th-font-l de-remarl-q">${detail.remark}</span><i class="td-font-new">New!</i> <i class="td-font-view">View</i></div>
+		<%-- <div class="row remark-replay-row">A:<button class="btn btn-info btn-replay">回复</button></div> --%>
+		<input value="${detail.remarkReplay}" class="remark-replay" type="hidden">
 		</div>
 				
 		<div class="row">
@@ -278,47 +284,28 @@ padding: 20px;max-height: 800px;}
 		</div>
 		<br><br><br>
 	</div>
-<!-- <div class="tc">
+<div class="tc">
 	<div class="trnasparent"></div>
 	<div class="container tc1">
-	<input type="hidden"  id="lu_bfid" value="">
-	<input type="hidden"  id="lu_bfdid" value="">
+	<input type="hidden"  id="tc_bfdid" value="">
 		<div class="wrap row">
-			<div class="col-xs-9">
-				<div class="form-horizontal">
-					<div class="form-group">
-						<label class="col-xs-2 control-label text-left">产品ID:</label>
-						<div class="col-xs-10">
-							<input type="text" class="form-control" id="lu_pid" value="" disabled="disabled">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-xs-2 control-label text-left">产品名称:</label>
-						<div class="col-xs-10">
-							<span id="lu_name">产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称产品名称</span>
-						</div>
-					</div>
-				</div>
-				<div class="tc1_table">
-				<table class="table table-bordered table-primary">
-					<thead>
-						<tr>
-							<th>skuid</th><th>录入数量</th><th>价格</th><th>产品链接</th>
-						</tr>
-					</thead>
-					<tbody id="lu_tr">
-						<tr>
-							<td><input type="text" class="form-control lu_skuid" value=""></td>
-							<td><input type="text" class="form-control lu_count" value="0"></td>
-							<td><input type="text" class="lu_price"></td>
-							<td><input type="text" class="lu_url"></td>
-						</tr>
-					</tbody>
-				</table>
-						<i class="b-add">+</i>
-				</div>
-			</div>
-			
+		<div class="col-xs-2"><img src="/cbtconsole/img/beforeLoad.gif" class="img-responsive img-product"></div>
+		<div class="col-xs-10">
+		<div class="row text-al tc-al-name"><span id="tc_name"></span>
+		</div>
+		<div class="row text-al"><span>Request:</span><span id="tc_remark"></span></div>
+		<div class="row"> 
+           <div class="b_left">
+               <input type="hidden" id="goods_savePath" value="${savePath}" name="savePath">
+               <input type="hidden" id="goods_localpath" value="${localpath}" name="localpath">
+               <input type="hidden" id="goods_remotepath" value="${goods.remotpath}" name="remotepath">
+               <textarea id="remark-replay-content" rows="100" style="width: 100%;"></textarea>
+               <button class="btn btn-info btn-replay">更新</button>
+           </div>
+            </div>
+		
+		
+		</div>
 		</div>
 		
 	</div>
@@ -326,12 +313,18 @@ padding: 20px;max-height: 800px;}
 	
 
 </div>
- --></body>
+</body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/msg-confirm.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/buyforme_details.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.min.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript"
+            src="/cbtconsole/js/xheditor-1.2.2.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/xheditor_lang/zh-cn.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/js/xheditor_skin/vista/iframe.css"/>
 </html>
 
 
