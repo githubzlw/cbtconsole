@@ -115,7 +115,7 @@
   <select id="getOrder" resultType="Map">
   select  a.id as bf_id,a.create_time,a.order_no,a.user_id,b.name,b.email,a.state,c.address,a.delivery_time,
   a.delivery_method,a.ship_feight,a.sample_flag,
-   c.address2,c.phone_number,c.zip_code,c.statename,c.street,c.address_email,d.country
+   c.address2,c.phone_number,c.zip_code,c.statename,c.street,c.address_email,d.country,c.country as countryId
   from buyforme_orderinfo a left join user b on a.user_id=b.id 
   left join buyforme_address c on a.address_id=c.id 
   left join zone d on c.country=d.id

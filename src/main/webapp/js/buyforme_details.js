@@ -1,6 +1,18 @@
+var costList;
 $(function(){
+	getShippingCost();
 	initXheditor();
 	$(".btn-delivery-time").click(function(){
+		var isvalid = 1;
+		$(".lu-weight").each(function(){
+			var luweight = $(this).val();
+			if(isvalid == 1 && (luweight == '' || parseFloat(luweight) < 0.00001)){
+				isvalid = 0;
+			}
+		})
+		if(isvalid == 0){
+			$.MsgBox.Alert("提示", "请录入正确的产品重量!");
+		}
 		var ormnum = $(".ormnum").text();
 		var time = $(".delivery-time").val();
 		var feight = $(".delivery-feight").val();
@@ -247,29 +259,16 @@ $(function(){
 		});
 	})
 	
-	$(".delivery-time").change(function(){
-		var time = $(this).val();
-		jQuery.ajax({
-		       url:"/cbtconsole/bf/transport",
-		       data:{},
-		       type:"post",
-		       success:function(data){
-		    	   if(data.state == 200){
-		    		   for(var i=0;i<data.methodList.length;i++){
-		    				if(time == data.methodList[i].time){
-		    					var op = '';
-		    					 for(var j=0;j<data.methodList[i].method.length;j++){
-		    						 op +='<option value="'+data.methodList[i].method[j]+'">'+data.methodList[i].method[j]+'</option>';
-		    					 }
-		    					$(".delivery-method").html(op);
-		    				}
-		    		   }
-					}
-		       },
-		   	error:function(e){
-		   		$.MsgBox.Alert("提示", "失败");
-		   	}
-		   });
+	$(".delivery-method").change(function(){
+		var method = $(this).val();
+		for(var i=0;i<costList.length;i++){
+			if(costList[i].shippingmethod.toLowerCase() == method.toLowerCase()){
+				$(".delivery-feight").val(costList[i].shippingCost);
+				$(".delivery-time").val(costList[i].delivery_time);
+				break;
+			}
+		}
+		
 	})
 	
 	$('.img-lazy').lazyload({effect: "fadeIn"});
@@ -327,6 +326,51 @@ function bindClick(){
 		
 	})
 }
+
+function getShippingCost(){
+	var countryId = $("#in-country-id").val();
+	var weight = 0;
+	$(".lu-weight").each(function(){
+		var luweight = $(this).val();
+		if(luweight != '' && parseFloat(luweight)>0.000001){
+			var lucount = parseInt($(this).parents(".de-td").find(".lucount").val());
+			if(lucount == 0){
+				weight = weight + parseFloat(luweight);
+			}else{
+				weight = weight + parseFloat(luweight)*lucount;
+			}
+		}
+	})
+	 jQuery.ajax({
+		       url:"http://localhost:10004/shippingCost/getShippingCost",
+		       data:{
+		    	   "countryId":countryId,
+		    	   "free":0,
+		    	   "weight":weight
+		    		   },
+		       type:"get",
+		       success:function(res){
+		    	   if(res.code == 200){
+		    		   var gmethod = $("#h-delivery-method").val();
+						costList = res.data.transitPricecostList
+						var method = '';
+		    		   for(var i=0;i<costList.length;i++){
+		    			   if(gmethod!='' && costList[i].shippingmethod.toLowerCase() == gmethod.toLowerCase()){
+		    				   method +='<option selected="selected" value="'+costList[i].shippingmethod+'">'+costList[i].shippingmethod+'</option>';
+		    			   }else{
+		    				   method +='<option value="'+costList[i].shippingmethod+'">'+costList[i].shippingmethod+'</option>';
+		    			   }
+		    		   }
+		    		   $(".delivery-method").html(method);
+					}
+		       },
+		   	error:function(e){
+		   		$.MsgBox.Alert("提示", "获取运费交期失败");
+		   	}
+		   });
+}
+
+
 //初始化xheditor
 function initXheditor() {
     editorObj = $('#remark-replay-content').xheditor({

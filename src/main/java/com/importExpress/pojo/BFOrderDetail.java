@@ -31,5 +31,10 @@ public class BFOrderDetail {
 	
 	private List<DetailsSku> skus = Lists.newArrayList();
 	private int skuCount;
+	
+	/**
+	 * 所有sku加起来产品数量
+	 */
+	private int count;
 
 }
