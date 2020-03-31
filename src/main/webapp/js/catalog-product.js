@@ -346,7 +346,7 @@ function searchFromRemote(){
 	var page = $("#current-page").val();
 	totalpage = 0;
 	$.ajax({
-		url:requestHost+'/catalog/product',
+		url:'/cbtconsole/catalog/search',
 		data:{
 			"keyword" : keyword,
 			"catid" : catid,
