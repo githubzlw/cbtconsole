@@ -355,7 +355,7 @@ function searchFromRemote(){
 		},
 		type:"post",
 		success:function(data){
-			var size = data.recordCount;//parseInt(data.goodsSize);
+			var size = data.recordCount;
 			var goodslist = data.goodslist
 			if(size < 1 || !goodslist){
 				$(".product-list").html("");
