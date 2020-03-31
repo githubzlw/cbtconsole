@@ -260,7 +260,8 @@ public class OrderInfoController{
 		try{
 			String expresstrackid = request.getParameter("expresstrackid");
 			String checked = request.getParameter("checked");
-			list = iOrderinfoService.getOrder(expresstrackid, checked);
+			String selectType = request.getParameter("selectType");
+			list = iOrderinfoService.getOrder(expresstrackid, checked, selectType);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -560,20 +561,32 @@ public class OrderInfoController{
 			map.put("status", "1");
 			map.put("repState", "1");
 			if("1".equals(type)){
-				List<Map<String,Object>> allList=iOrderinfoService.allTrack(map);
-				for(Map<String,Object> allMap:allList){
-					String orderid = String.valueOf(allMap.get("orderid"));
-					String goodid =String.valueOf(allMap.get("goodsid"));
-					String goodurl = String.valueOf(allMap.get("goods_url"));
-					String odid = String.valueOf(allMap.get("odid"));
-					map.put("odid",odid);
-					map.put("goodurl",goodurl);
-					map.put("goodid", goodid);
-					map.put("orderid", orderid);
-					map.put("count","0");
-					map.put("itemid", String.valueOf(allMap.get("tb_1688_itemid")));
-					iOrderinfoService.updateGoodStatus(map);
+				//运单产品信息
+				Map<String,Integer> shipMap = iOrderinfoService.getTbShip(shipno);
+				if(shipMap != null && !shipMap.isEmpty()) {
+					List<Map<String,Object>> allList=iOrderinfoService.allTrack(map);
+					for(Map<String,Object> allMap:allList){
+						String orderid = String.valueOf(allMap.get("orderid"));
+						String goodid =String.valueOf(allMap.get("goodsid"));
+						String goodurl = String.valueOf(allMap.get("goods_url"));
+						String odid = String.valueOf(allMap.get("odid"));
+						String skuid = String.valueOf(allMap.get("skuid"));
+						String itemid = String.valueOf(allMap.get("tb_1688_itemid"));
+						String usecount = String.valueOf(allMap.get("usecount"));
+						map.put("odid",odid);
+						map.put("goodurl",goodurl);
+						map.put("goodid", goodid);
+						map.put("orderid", orderid);
+						map.put("count","0");
+						map.put("itemid", itemid);
+						
+						Integer count = shipMap.get(itemid+"_"+skuid);
+						if(count != null && count+1 > Integer.parseInt(usecount)) {
+							iOrderinfoService.updateGoodStatus(map);
+						}
+					}
 				}
+				
 			}else if("0".equals(type)){
 				List<OrderDetailsBean> oList=iOrderinfoService.getAllCancelDetails(map);
 				for(OrderDetailsBean o:oList){
@@ -1239,7 +1252,7 @@ public class OrderInfoController{
 						InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
 						inputData.setPid(pid);
 						inputData.setEninfo(nwDoc.html());
-						GoodsInfoUpdateOnlineUtil.updateOnlineAndSolr(inputData, 0);
+						GoodsInfoUpdateOnlineUtil.updateOnlineAndSolr(inputData, 0, 0);
 						result_list.add(id+"@"+pid);
 						up_ids.add(Integer.parseInt(id));
                         /**********远程发送MQ，更新mongodb eninfo字段 end*****/

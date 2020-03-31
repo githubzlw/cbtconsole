@@ -504,6 +504,11 @@ public class EditorController {
                 }
             }
 
+            // 获取美加可售标识
+
+            int salable = customGoodsService.querySalableByPid(pid);
+            mv.addObject("salable",salable);
+
         } catch (Exception e) {
             e.printStackTrace();
             mv.addObject("uid", 0);
@@ -1105,6 +1110,13 @@ public class EditorController {
                 cgp.setSizeInfoEn("");
             }
 
+            String skuCount = request.getParameter("skuCount");
+            if (StringUtils.isBlank(skuCount)) {
+                json.setOk(false);
+                json.setMessage("属性数据获取异常！");
+                return json;
+            }
+
             // 设置主图数据 mainImg
             String mainImg = request.getParameter("mainImg");
             if (StringUtils.isNotBlank(mainImg)) {
@@ -1161,7 +1173,7 @@ public class EditorController {
                             json.setOk(false);
                             json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
                         } else {
-                            PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id());
+                            PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
                             FutureTask futureTask = new FutureTask(pbCallable);
                             Thread thread = new Thread(futureTask);
                             thread.start();
@@ -1174,7 +1186,7 @@ public class EditorController {
 
                         }
                     } else {
-                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id());
+                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
                         FutureTask futureTask = new FutureTask(pbCallable);
                         Thread thread = new Thread(futureTask);
                         thread.start();
@@ -2524,7 +2536,7 @@ public class EditorController {
                 inputData.setPid(pid);
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setDescribe_good_flag(String.valueOf(describe_good_flag));
-                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData,1);
+                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData,1, 0);
                 // 记录日志
                 customGoodsService.insertIntoDescribeLog(pid,user.getId());
             }
@@ -2592,10 +2604,7 @@ public class EditorController {
                 inputData.setPid(pid);
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setDescribe_good_flag("1");
-                boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
-                if(!isSu){
-                    isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
-                }
+                boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
                 if(!isSu){
                     LOG.error("saveGoodsDescInfo update mongodb error,pid:" + pid + ",hotTypeId:" + hotTypeId);
                 }
@@ -3395,7 +3404,7 @@ public class EditorController {
             if (CollectionUtils.isNotEmpty(pidList)) {
                 for (String pid : pidList) {
                     if (StringUtils.isNotBlank(pid)) {
-                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0);
+                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0, 0);
                         FutureTask futureTask = new FutureTask(pbCallable);
                         Thread thread = new Thread(futureTask);
                         thread.start();
@@ -3886,7 +3895,7 @@ public class EditorController {
             inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
             inputData.setPid(pid);
             inputData.setSearchable(String.valueOf(flag));
-            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
             if(isSu){
                 customGoodsService.setSearchable(pid, flag, admuser.getId());
                 json.setOk(true);
@@ -3901,6 +3910,93 @@ public class EditorController {
         }
         return json;
     }
+
+
+    @RequestMapping(value = "/setTopSort")
+    @ResponseBody
+    public JsonResult setTopSort(HttpServletRequest request, String pid, Integer newSort) {
+        JsonResult json = new JsonResult();
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null || admuser.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+        if (newSort == null || newSort < 0) {
+            json.setOk(false);
+            json.setMessage("获取标识失败");
+            return json;
+        }
+        try {
+            InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+            inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+            inputData.setPid(pid);
+            inputData.setTop_sort(String.valueOf(newSort));
+            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
+            // boolean isSu = true;
+            if(isSu){
+                customGoodsService.setTopSort(pid, newSort, admuser.getId());
+                json.setOk(true);
+            } else{
+                json.setOk(false);
+                json.setMessage("更新mongodb失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/setSalable")
+    @ResponseBody
+    public JsonResult setSalable(HttpServletRequest request, String pid, Integer flag) {
+        JsonResult json = new JsonResult();
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null || admuser.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+        if (flag == null || flag < 0) {
+            json.setOk(false);
+            json.setMessage("获取标识失败");
+            return json;
+        }
+        try {
+            InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+            inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+            inputData.setPid(pid);
+            inputData.setSalable(String.valueOf(flag));
+            boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
+            // boolean isSu = true;
+            if(isSu){
+                customGoodsService.setSalable(pid, flag, admuser.getId());
+                json.setOk(true);
+            } else{
+                json.setOk(false);
+                json.setMessage("更新mongodb失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
 
 
     @RequestMapping(value = "/testOkHttp")
@@ -3950,7 +4046,7 @@ public class EditorController {
                 inputData.setCatid1(good.getCatid1());
                 inputData.setPath_catid(good.getPathCatid());
 
-                boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1);
+                boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
                 if (isSu) {
                     good.setAdminId(admuser.getId());
                     good.setCatid(oldCatid);

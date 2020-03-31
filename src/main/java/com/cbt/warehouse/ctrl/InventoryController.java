@@ -71,7 +71,7 @@ public class InventoryController {
 	@Autowired
 	private GeneralReportService generalReportService;
 	IExpressTrackDao dao = new ExpressTrackDaoImpl();
-	/**导出报表
+	/**导出库存变更报表
 	 * @param request
 	 * @param response
 	 * @return
@@ -110,7 +110,7 @@ public class InventoryController {
 	}
 	
 	/**
-	 * 仓库操作库存移库位
+	 * 库存变更记录表
 	 * @param request
 	 * @param response
 	 * @return

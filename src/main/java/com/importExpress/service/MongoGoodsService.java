@@ -69,6 +69,13 @@ public interface MongoGoodsService {
     int insertGoodsToMongoBatch(List<MongoGoodsBean> list) throws Exception;
 
     /**
+     * 读取数据并且出入
+     * @return
+     * @throws Exception
+     */
+    int insertGoodsToMongoMapBatch(List<Map<String, Object>> list) throws Exception;
+
+    /**
      * 单个插入
      * @param goodsBean
      * @return

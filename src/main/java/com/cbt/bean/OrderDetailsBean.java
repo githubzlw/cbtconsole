@@ -149,7 +149,7 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private int downSample;//拆样数量
 	private int overSeaFlag;// 海外仓标识
 	private int isOverseasWarehouseProduct;//是否是海外仓商品
-
+	private String replacement_product;
 	public int getIsOverseasWarehouseProduct() {
 		return isOverseasWarehouseProduct;
 	}
@@ -1199,4 +1199,12 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	}
 	public double getPd_profit_price() { return pd_profit_price; }
 	public void setPd_profit_price(double pd_profit_price) { this.pd_profit_price = pd_profit_price; }
+
+	public String getReplacement_product() {
+		return replacement_product;
+	}
+
+	public void setReplacement_product(String replacement_product) {
+		this.replacement_product = replacement_product;
+	}
 }

@@ -920,11 +920,13 @@
         ifnull(cge.is_edited,0) as is_edited,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.edit_profit,0) as edit_profit,
         ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason,ifnull(cge.weight_flag,0) as weight_flag,
         ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num,
-        ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag
+        ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag,
+        ifnull(pts.sort,-1) as topSort
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
         left join needfindsizechart cbn on cbn.pid=cbu.pid
+        left join pid_top_sort pts on cbu.pid = pts.pid
         where cbu.pid = #{pid}
     </select>
     <select id="getAllReviewByPid" resultType="com.cbt.bean.CustomGoodsPublish">
@@ -1483,6 +1485,15 @@
         values(#{pid},#{flag},#{adminId})
     </insert>
 
+    <insert id="setTopSort">
+        replace into pid_top_sort(pid,sort) values(#{pid},#{newSort})
+    </insert>
+
+    <insert id="setTopSortLog">
+        insert into pid_top_sort_log(pid,sort,admin_id)
+        values(#{pid},#{newSort},#{adminId})
+    </insert>
+
     <insert id="saveGoodsWeightChange" parameterType="com.importExpress.pojo.GoodsWeightChange">
         insert into goods_weight_change(pid,goods_type,weight,volume_weight,admin_id,skuid)
         values(#{pid},#{goodsType},#{weight},#{volumeWeight},#{adminId},#{skuid})
@@ -1665,5 +1676,19 @@ select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feepri
     <update id="updateDeleteInfoFlag">
         update custom_benchmark_ready_delete_log set delete_flag= 1 where pid =  #{pid}
     </update>
+
+    <select id="querySalableByPid" resultType="java.lang.Integer">
+        select count(0) from custom_goods_salable where pid = #{pid} and salable = 1
+    </select>
+
+    <insert id="setSalable">
+        insert into custom_goods_salable(pid,salable,admin_id) values(#{pid},#{flag},#{adminId})
+        ON DUPLICATE KEY UPDATE salable= #{flag},admin_id=#{adminId}
+    </insert>
+
+    <select id="getProductInfoByLimit" resultType="java.util.Map">
+        select * from custom_benchmark_ready
+        where id > #{minId} and #{maxId} >= id
+    </select>
 
 </mapper>

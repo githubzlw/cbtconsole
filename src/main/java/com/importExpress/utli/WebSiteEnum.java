@@ -7,15 +7,15 @@ public enum WebSiteEnum {
     /**
      * IMPORT网站
      */
-    IMPORTX(1,"https://www.import-express.com","Import-Express"),
+    IMPORTX(1,"https://www.import-express.com","Import-Express", 'I'),
     /**
      * KIDS网站
      */
-    KIDS(2,"https://www.kidsproductwholesale.com","KidsProductWholesale"),
+    KIDS(2,"https://www.kidsproductwholesale.com","KidsProductWholesale", 'K'),
     /**
      * PETS网站
      */
-    PETS(3,"https://www.petstoreinc.com","PetStoreInc");
+    PETS(3,"https://www.petstoreinc.com","PetStoreInc",'P');
     /**
      * RESTAURANT网站
      */
@@ -41,6 +41,8 @@ public enum WebSiteEnum {
     private String name;
 
 
+    private Character siteType;
+
     WebSiteEnum(int code) {
         this.code = code;
     }
@@ -53,6 +55,13 @@ public enum WebSiteEnum {
         this.code = code;
         this.url = url;
         this.name = name;
+    }
+
+    WebSiteEnum(int code, String url,String name, Character siteType) {
+        this.code = code;
+        this.url = url;
+        this.name = name;
+        this.siteType = siteType;
     }
 
     public String getUrl() {
@@ -77,6 +86,14 @@ public enum WebSiteEnum {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Character getSiteType() {
+        return siteType;
+    }
+
+    public void setSiteType(Character siteType) {
+        this.siteType = siteType;
     }
 
     public static void main(String[] args) {

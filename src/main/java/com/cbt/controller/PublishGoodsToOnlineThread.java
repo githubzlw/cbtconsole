@@ -41,15 +41,18 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
     private FtpConfig ftpConfig;
     private int isUpdateImg;
     private int adminId;
+    private int skuCount;
 
     // private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
-    public PublishGoodsToOnlineThread(String pid, CustomGoodsService customGoodsService, FtpConfig ftpConfig, int isUpdateImg, int adminId) {
+    public PublishGoodsToOnlineThread(String pid, CustomGoodsService customGoodsService, FtpConfig ftpConfig, int isUpdateImg,
+                                      int adminId, int skuCount) {
         super();
         this.pid = pid;
         this.customGoodsService = customGoodsService;
         this.ftpConfig = ftpConfig;
         this.isUpdateImg = isUpdateImg;
         this.adminId = adminId;
+        this.skuCount = skuCount;
     }
 
     public Boolean call() throws Exception {
@@ -76,7 +79,7 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
             boolean isCheckImg = false;
             if (goods.getValid() == 0 || goods.getValid() == 2) {
                 System.err.println("pid:" + goods.getPid() + ",valid:" + goods.getValid());
-                isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, isKids);
+                isCheckImg = GoodsInfoUtils.checkOffLineImg(goods, isKids, isUpdateImg);
                 System.err.println("pid:" + goods.getPid() + ",isCheckImg:" + isCheckImg);
                 if (isCheckImg) {
                     executeSu = doPublish(goods, localShowPath, remoteShowPath, imgList, isKids);
@@ -146,7 +149,9 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         }
         System.err.println("pid:" + pid + ",executeSu:" + executeSu);
         if (executeSu) {
+            System.err.println("pid:" + pid + ",skuCount:" + skuCount);
             customGoodsService.deleteOnlineSync(pid);
+            goods.setSkuCount(skuCount);
             customGoodsService.publish(goods);
             customGoodsService.updateGoodsState(pid, 4);
         } else {

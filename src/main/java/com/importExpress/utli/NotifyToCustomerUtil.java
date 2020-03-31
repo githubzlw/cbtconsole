@@ -22,7 +22,7 @@ public class NotifyToCustomerUtil {
      */
     public static boolean confimOrderPayment(int userId, String orderNo) {
 
-        boolean isSuccess;
+        /*boolean isSuccess;
         StringBuffer sqlBf = new StringBuffer("insert into user_message(user_id,order_no,content,type,jump_url) values(");
         sqlBf.append("" + userId + "");
         sqlBf.append(",'" + orderNo + "'");
@@ -38,7 +38,9 @@ public class NotifyToCustomerUtil {
             e.printStackTrace();
             LOG.error("confimOrderPayment[" + sqlBf.toString() + "],error:" + e.getMessage());
         }
-        return isSuccess;
+        return isSuccess;*/
+
+        return true;
     }
 
 
@@ -53,7 +55,7 @@ public class NotifyToCustomerUtil {
      */
     public static boolean updateOrderState(int userId, String orderNo, int oldState, int newState) {
 
-        boolean isSuccess;
+        /*boolean isSuccess;
         StringBuffer sqlBf = new StringBuffer("insert into user_message(user_id,order_no,content,type,jump_url) values(");
         sqlBf.append("" + userId + "");
         sqlBf.append(",'" + orderNo + "'");
@@ -69,7 +71,9 @@ public class NotifyToCustomerUtil {
             e.printStackTrace();
             LOG.error("updateOrderState[" + sqlBf.toString() + "],error:" + e.getMessage());
         }
-        return isSuccess;
+        return isSuccess;*/
+
+        return true;
     }
 
 
@@ -82,7 +86,7 @@ public class NotifyToCustomerUtil {
      */
     public static boolean updateOrderGoodsPrice(int userId, String orderNo) {
 
-        boolean isSuccess;
+        /*boolean isSuccess;
         StringBuffer sqlBf = new StringBuffer("insert into user_message(user_id,order_no,content,type,jump_url) values(");
         sqlBf.append("" + userId + "");
         sqlBf.append(",'" + orderNo + "'");
@@ -98,7 +102,9 @@ public class NotifyToCustomerUtil {
             e.printStackTrace();
             LOG.error("updateOrderGoodsPrice[" + sqlBf.toString() + "],error:" + e.getMessage());
         }
-        return isSuccess;
+        return isSuccess;*/
+
+        return true;
     }
 
 
@@ -111,7 +117,7 @@ public class NotifyToCustomerUtil {
      */
     public static boolean confimOrRefuseRefund(int userId, String orderNo) {
 
-        boolean isSuccess;
+        /*boolean isSuccess;
         StringBuffer sqlBf = new StringBuffer("insert into user_message(user_id,order_no,content,type,jump_url) values(");
         sqlBf.append("" + userId + "");
         sqlBf.append(",'" + orderNo + "'");
@@ -127,7 +133,9 @@ public class NotifyToCustomerUtil {
             e.printStackTrace();
             LOG.error("confimOrRefuseRefund[" + sqlBf.toString() + "],error:" + e.getMessage());
         }
-        return isSuccess;
+        return isSuccess;*/
+
+        return true;
     }
 
 

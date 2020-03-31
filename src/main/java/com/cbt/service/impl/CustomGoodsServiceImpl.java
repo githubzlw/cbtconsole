@@ -103,12 +103,12 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 skuNew.setSkuAttr(exSku.getSkuAttr());
                 skuNew.setPid(bean.getPid());
                 SkuValPO skuValPO = new SkuValPO();
-                skuValPO.setActSkuCalPrice(Double.valueOf(exSku.getSkuVal().getActSkuCalPrice()));
-                skuValPO.setActSkuMultiCurrencyCalPrice(Double.valueOf(exSku.getSkuVal().getActSkuMultiCurrencyCalPrice()));
-                skuValPO.setActSkuMultiCurrencyDisplayPrice(Double.valueOf(exSku.getSkuVal().getActSkuMultiCurrencyDisplayPrice()));
-                skuValPO.setSkuMultiCurrencyCalPrice(Double.valueOf(exSku.getSkuVal().getSkuMultiCurrencyCalPrice()));
-                skuValPO.setSkuMultiCurrencyDisplayPrice(Double.valueOf(exSku.getSkuVal().getSkuMultiCurrencyDisplayPrice()));
-                skuValPO.setSkuCalPrice(Double.valueOf(exSku.getSkuVal().getSkuCalPrice()));
+                skuValPO.setActSkuCalPrice((double) exSku.getSkuVal().getActSkuCalPrice());
+                skuValPO.setActSkuMultiCurrencyCalPrice((double) exSku.getSkuVal().getActSkuMultiCurrencyCalPrice());
+                skuValPO.setActSkuMultiCurrencyDisplayPrice((double) exSku.getSkuVal().getActSkuMultiCurrencyDisplayPrice());
+                skuValPO.setSkuMultiCurrencyCalPrice((double) exSku.getSkuVal().getSkuMultiCurrencyCalPrice());
+                skuValPO.setSkuMultiCurrencyDisplayPrice((double) exSku.getSkuVal().getSkuMultiCurrencyDisplayPrice());
+                skuValPO.setSkuCalPrice((double) exSku.getSkuVal().getSkuCalPrice());
                 skuNew.setSkuVal(skuValPO);
                 insertList.add(skuNew);
 
@@ -957,6 +957,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
+    public int setTopSort(String pid, int newSort, int adminId) {
+        customGoodsMapper.setTopSortLog(pid, newSort, adminId);
+        mongoDbLocalUtil.updatePid(pid);
+        return customGoodsMapper.setTopSort(pid, newSort);
+    }
+
+    @Override
     public int saveGoodsWeightChange(GoodsWeightChange weightChange) {
         return customGoodsMapper.saveGoodsWeightChange(weightChange);
     }
@@ -1030,6 +1037,21 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int updateDeleteInfoFlag(String pid) {
         return customGoodsMapper.updateDeleteInfoFlag(pid);
+    }
+
+    @Override
+    public int querySalableByPid(String pid) {
+        return customGoodsMapper.querySalableByPid(pid);
+    }
+
+    @Override
+    public int setSalable(String pid, int flag, int adminId) {
+        return customGoodsMapper.setSalable(pid, flag, adminId);
+    }
+
+    @Override
+    public List<Map<String, Object>> getProductInfoByLimit(int minId, int maxId) {
+        return customGoodsMapper.getProductInfoByLimit(minId, maxId);
     }
 
 

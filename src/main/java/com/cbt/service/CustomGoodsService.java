@@ -906,6 +906,16 @@ public interface CustomGoodsService {
      */
     int setSearchable(String pid, int flag, int adminId);
 
+    /**
+     * 设置可搜索
+     *
+     * @param pid
+     * @param newSort
+     * @param adminId
+     * @return
+     */
+    int setTopSort(String pid, int newSort, int adminId);
+
 
     /**
      * 保存重量改动信息
@@ -990,4 +1000,29 @@ public interface CustomGoodsService {
     int deleteDataByPid(String pid);
 
     int updateDeleteInfoFlag(String pid);
+
+    /**
+     * 查询美加可售标识
+     * @param pid
+     * @return
+     */
+    int querySalableByPid(String pid);
+
+    /**
+     * 设置可搜索
+     *
+     * @param pid
+     * @param flag
+     * @param adminId
+     * @return
+     */
+    int setSalable(String pid, int flag, int adminId);
+
+    /**
+     * 获取全部产品数据的map
+     * @param minId
+     * @param maxId
+     * @return
+     */
+    List<Map<String, Object>> getProductInfoByLimit(int minId, int maxId);
 }

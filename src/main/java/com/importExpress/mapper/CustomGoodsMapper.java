@@ -552,6 +552,10 @@ public interface CustomGoodsMapper {
      */
     int insertSearchableLog(@Param("pid") String pid, @Param("flag") int flag, @Param("adminId") int adminId);
 
+    int setTopSort(@Param("pid") String pid, @Param("newSort") int newSort);
+
+    int setTopSortLog(@Param("pid") String pid, @Param("newSort") int newSort, @Param("adminId") int adminId);
+
     /**
      * 保存重量改动信息
      * @param weightChange
@@ -670,4 +674,28 @@ public interface CustomGoodsMapper {
     int deleteDataByPid(String pid);
 
     int updateDeleteInfoFlag(String pid);
+
+    /**
+     * 查询美加可售标识
+     * @param pid
+     * @return
+     */
+    int querySalableByPid(String pid);
+
+    /**
+     * 添加日志
+     * @param pid
+     * @param flag
+     * @param adminId
+     * @return
+     */
+    int setSalable(@Param("pid") String pid, @Param("flag") int flag, @Param("adminId") int adminId);
+
+    /**
+     * 获取全部产品数据的map
+     * @param minId
+     * @param maxId
+     * @return
+     */
+    List<Map<String, Object>> getProductInfoByLimit(@Param("minId") int minId, @Param("maxId") int maxId);
 }
