@@ -50,7 +50,7 @@ $(function(){
 		$("#tc_bfdid").val(bfdid);
 		var remark = parentsdiv.find(".de-remarl-q").text();
 		$("#tc_remark").text(remark);
-		var replay = parentsdiv.find(".remark-replay").val();
+		var replay = parentsdiv.find(".remark-replay").html();
 		$("#remark-replay-content").val(replay);
 		$('.tc,.trnasparent,.tc1').show();
 	})
@@ -378,7 +378,7 @@ function initXheditor() {
         html5Upload: false,
         upBtnText: "上传",
         upMultiple: 1,
-        upImgUrl: "/cbtconsole/editc/xheditorUploads?pid=${goods.pid}",
+        upImgUrl: "/cbtconsole/bf/xheditorUploads",
         upImgExt: "jpg,jpeg,gif,png"
     });
 }

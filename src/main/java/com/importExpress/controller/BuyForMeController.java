@@ -1,7 +1,10 @@
 package com.importExpress.controller;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,11 +13,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.cbt.jdbc.DBHelper;
+import com.cbt.parse.service.ImgDownload;
+import com.cbt.util.FtpConfig;
+import com.cbt.util.GetConfigureInfo;
+import com.cbt.util.GoodsInfoUtils;
+import com.cbt.util.ImageCompression;
 import com.cbt.util.StrUtils;
+import com.cbt.website.util.JsonResult;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -27,7 +39,7 @@ import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 
 import lombok.extern.slf4j.Slf4j;
-
+@Slf4j
 @Controller
 @RequestMapping("/bf")
 public class BuyForMeController {
@@ -341,8 +353,94 @@ public class BuyForMeController {
 		}
     	return mv;
     }
-    
-   
+    private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
+    /**
+             * 接受上传文件
+     *
+     * @param request
+     * @param response
+     * @return
+     * @date 2016年12月16日
+     * @author abc
+     */
+    @RequestMapping(value = "/xheditorUploads", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public Map<String, Object> xheditorUploads(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        String msg = "";
+        String err = "";
+        try {
+            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+            // 获取文件域
+            List<MultipartFile> fileList = multipartRequest.getFiles("filedata");
+            Random random = new Random();
+            // 获取配置文件信息
+            if (ftpConfig == null) {
+                ftpConfig = GetConfigureInfo.getFtpConfig();
+            }
+            // 检查配置文件信息是否正常读取
+            JsonResult json = new JsonResult();
+            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
+            if (json.isOk()) {
+            	String localDiskPath = ftpConfig.getLocalDiskPath();
+                for (MultipartFile mf : fileList) {
+                    if (!mf.isEmpty()) {
+                        // 得到文件保存的名称mf.getOriginalFilename()
+                        String originalName = mf.getOriginalFilename();
+                        // 文件的后缀取出来
+                        String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
+                        String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
+                        // 本地服务器磁盘全路径
+                        String localFilePath = "buyforme/remark/" + saveFilename + fileSuffix;
+                        // 文件流输出到本地服务器指定路径
+                        ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
+                        File file = new File(localDiskPath + localFilePath);
+                        if (file.exists()) {
+                        	msg = ftpConfig.getLocalShowPath() + localFilePath;
+                        }
+                        // 检查图片分辨率
+                       /* boolean is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 100, 100);
+                        if (is) {
+                            is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
+                            if (is) {
+                                String newLocalPath = "buyforme/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
+                                is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
+                                        localDiskPath + newLocalPath);
+                                if (is) {
+                                    msg = ftpConfig.getLocalShowPath() + newLocalPath;
+                                } else {
+                                    json.setOk(false);
+                                    json.setMessage("压缩图片到700*700失败，终止执行");
+                                    break;
+                                }
+                            } else {
+                                msg = ftpConfig.getLocalShowPath() + localFilePath;
+                            }
+                        } else {
+                            // 判断分辨率不通过删除图片
+                            File file = new File(localFilePath);
+                            if (file.exists()) {
+                                file.delete();
+                            }
+                            msg = "";
+                            err = "图片分辨率小于100";
+                        }*/
+                    }
+                }
+            } else {
+                msg = "";
+                err = json.getMessage();
+            }
+        } catch (Exception e) {
+            msg = "";
+            err = "上传错误";
+            e.printStackTrace();
+            log.error("上传错误：" + e.getMessage());
+        }
+        map.put("err", err);
+        map.put("msg", msg);
+        return map;
+    }
 
 
 }

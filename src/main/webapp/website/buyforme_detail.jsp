@@ -163,7 +163,7 @@ body{min-height:100%;}
 		<div class="row th-font">用户备注:</div>
 		<div class="row remark-row">Q:<span class="th-font-l de-remarl-q">${detail.remark}</span><i class="td-font-new">New!</i> <i class="td-font-view">View</i></div>
 		<%-- <div class="row remark-replay-row">A:<button class="btn btn-info btn-replay">回复</button></div> --%>
-		<input value="${detail.remarkReplay}" class="remark-replay" type="hidden">
+		<div class="remark-replay" style="display:none;">${detail.remarkReplay}</div>
 		</div>
 				
 		<div class="row">
