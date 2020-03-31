@@ -341,8 +341,12 @@ function getShippingCost(){
 			}
 		}
 	})
+	if(weight < 0.00001){
+		$.MsgBox.Alert("提示", "重量为0获取运费交期失败");
+		return ;
+	}
 	 jQuery.ajax({
-		       url:"http://localhost:10004/shippingCost/getShippingCost",
+		       url:"https://www.import-express.com/shippingCost/getShippingCost",
 		       data:{
 		    	   "countryId":countryId,
 		    	   "free":0,

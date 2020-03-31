@@ -92,6 +92,7 @@ padding: 20px;max-height: 800px;}
 .tc1{border: 3px solid #ccc;border-radius: 21px;}
 .sy-content{    margin-left: 1%;font-size: 20px;font-weight: bold;color: #ef110c;}
 body{min-height:100%;}
+.num-span{margin-left: 2%;}
 </style>
 </head>
 <body>
@@ -158,7 +159,10 @@ body{min-height:100%;}
 		<a href="${detail.detailUrl }" target="_blank">商品原始链接</a>
 		</div>
 		<div class="col-xs-10 detail-div">
-		<div class="row wt35"><span class="th-font">商品名称:</span><span class="name-title">${detail.title }</span>(<span class="td-numiid">${detail.numIid }</span>)</div>
+		<div class="row wt35">
+		<span class="th-font">商品名称:</span><span class="name-title">${detail.title }</span>(<span class="td-numiid">${detail.numIid }</span>)
+		<span class="th-font num-span">数量:</span><span>${detail.num}</span>
+		</div>
 		<div class="row w11">
 		<div class="row th-font">用户备注:</div>
 		<div class="row remark-row">Q:<span class="th-font-l de-remarl-q">${detail.remark}</span><i class="td-font-new">New!</i> <i class="td-font-view">View</i></div>
