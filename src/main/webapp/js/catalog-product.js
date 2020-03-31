@@ -355,8 +355,9 @@ function searchFromRemote(){
 		},
 		type:"post",
 		success:function(data){
-			var size = data.goodsList.length;//parseInt(data.goodsSize);
-			if(size < 1){
+			var size = data.recordCount;//parseInt(data.goodsSize);
+			var goodslist = data.goodslist
+			if(size < 1 || !goodslist){
 				$(".product-list").html("");
 				return ;
 			}
@@ -366,10 +367,9 @@ function searchFromRemote(){
 			$("#current-page").val(paramv.currentPage);
 			$("#param-catid").val(paramv.catid);
 			var qcatid = paramv.catid;
-			var goodslist = data.goodsList
 			var productHtml = $(".product-list").html();
-			for(var i=0;i<size;i++){
-				if(productArray.includes(goodslist[i].goods_pid)){
+			for(var i=0;i<goodslist.length;i++){
+				if(productArray.includes(goodslist[i].id)){
 					continue;
 				}
 				productHtml = productHtml +'<div class="col-xs-2 product"><div class="product_in">';//src="https://www.import-express.com/newindex/img/dot.gif" data-
@@ -377,7 +377,7 @@ function searchFromRemote(){
 				productHtml = productHtml +'<input type="checkbox" class="is_boutique_check" name="is_selected" value="'+goodslist[i].id+'" onclick="checkClick(this)">';
 				productHtml = productHtml +'<div class="info-product">';
 				productHtml = productHtml +'<div class="product-name">'+goodslist[i].name+'</div>';
-				productHtml = productHtml +'<div class="product-price">Price:$'+goodslist[i].price+' /'+goodslist[i].goodsPriceUnit+'</div>';
+				productHtml = productHtml +'<div class="product-price">Price:$'+goodslist[i].price+' /'+goodslist[i].priceUnit+'</div>';
 				productHtml = productHtml +'<div class="product-sold">Sols:'+goodslist[i].sold+'</div>';
 				productHtml = productHtml +'</div></div></div>';
 			}
@@ -393,7 +393,7 @@ function searchFromRemote(){
 					var childens = rootTree[i].childen;
 					for(var j=0;j<childens.length;j++){
 						categoryHtml = categoryHtml +'<div class="category-lev2';
-						if(qcatid==childen[j].id){
+						if(qcatid==childens[j].id){
 							categoryHtml = categoryHtml +' category-lev2-select';
 						}
 						categoryHtml = categoryHtml +'"><span name="'+childens[j].id+'" onclick="categorysearch(this)">'+childens[j].name+'</span>';
