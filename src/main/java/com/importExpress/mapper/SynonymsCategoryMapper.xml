@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.SynonymsCategoryMapper">
+
+
+    <resultMap id="synonymsCategoryResultMap" type="com.importExpress.pojo.SynonymsCategoryWrap">
+        <id column="id" property="id"/>
+        <result column="category" property="category"/>
+        <result column="catid" property="catid"/>
+        <result column="synonyms_category" property="synonymsCategory"/>
+        <result column="valid" property="valid"/>
+    </resultMap>
+    
+    <select id="categoryListCount" resultType="Integer" parameterType="String">
+    select count(*) from synonyms_category where valid=1 
+    <if test="catid!=null"> and catid=#{catid}</if>
+    </select>
+    
+    <select id="getCategoryList" resultMap="synonymsCategoryResultMap">
+    select id,category,catid,synonyms_category,valid from synonyms_category
+    where valid=1 
+    <if test="catid !=null"> and catid=#{catid}</if>
+    order by id desc 
+    limit #{page},20
+    </select>
+
+
+
+</mapper>

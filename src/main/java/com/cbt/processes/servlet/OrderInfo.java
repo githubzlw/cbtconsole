@@ -1,5 +1,6 @@
 package com.cbt.processes.servlet;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.bean.*;
 import com.cbt.pay.dao.IPaymentDao;
 import com.cbt.pay.dao.PaymentDao;
@@ -12,7 +13,6 @@ import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
-import net.sf.json.JSONArray;
 
 import org.slf4j.LoggerFactory;
 
@@ -763,7 +763,7 @@ public class OrderInfo extends HttpServlet {
 			int resultCount = os.updatePriceReductionOffer(userId, goodsDataId,goodsCarId);
 			Map<String, String> map=new HashMap<String, String>();
 			map.put("flag", resultCount+"");
-			out.println(JSONArray.fromObject(map).toString());
+			out.println(JSONArray.toJSONString(map));
 		}
 		out.flush();
 		out.close();
@@ -791,7 +791,7 @@ public class OrderInfo extends HttpServlet {
 			
 			
 			map.put("flag", resultCount+"");
-			out.println(JSONArray.fromObject(map).toString());
+			out.println(JSONArray.toJSONString(map));
 		}
 		out.flush();
 		out.close();

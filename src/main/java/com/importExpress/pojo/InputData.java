@@ -103,6 +103,34 @@ public class InputData {
 
     private String searchable;
 
+    private String salable;
+    private String is_simplify;
+    private String top_sort;
+
+    public String getTop_sort() {
+        return top_sort;
+    }
+
+    public void setTop_sort(String top_sort) {
+        this.top_sort = top_sort;
+    }
+
+    public String getIs_simplify() {
+        return is_simplify;
+    }
+
+    public void setIs_simplify(String is_simplify) {
+        this.is_simplify = is_simplify;
+    }
+
+    public String getSalable() {
+        return salable;
+    }
+
+    public void setSalable(String salable) {
+        this.salable = salable;
+    }
+
     public String getSearchable() {
         return searchable;
     }

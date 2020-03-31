@@ -578,11 +578,17 @@
 	<div id="scanning_frame">
 		<span id="jsp_name" style="background-color:red;font-size:30px;">入库扫描页面--不可做验货操作</span><br><h3 style="color:bisque;padding:10px 20px;background:#f5f5f5;color:#f40">扫描框</h3><br>
 		请输入快递跟踪号：
-		<input type="text" id="search" onFocus="celsearch()"  onkeypress="if (event.keyCode == 13) search()" >
+		<%--<input type="text" id="search" onFocus="celsearch()"  onkeypress="if (event.keyCode == 13) search()" >--%>
+		<input type="text" id="search"  onkeypress="if (event.keyCode == 13) search()" >
 
 		库位条形码：
 		<input type="text" id="kwhid" onFocus="celkwhid()" readonly="readonly" onkeypress="if (event.keyCode == 13) getPosition()"/>
 
+		<select id="select_count" style="height: 32px;">
+			<option value="1">商品规格精确匹配</option>
+			<option value="0">商品规格模糊匹配</option>
+		</select>
+		<button style="width: 60px;height: 27px;" onclick="search()">查询</button>
 		<a href="../website/purchase_order_details.jsp"  target="_Blank">未按时入库订单列表</a>
 
         <a href="javascript:show()" style="color: red; font-size:30px;">验货取消</a>

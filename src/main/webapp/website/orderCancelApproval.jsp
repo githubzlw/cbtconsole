@@ -110,6 +110,10 @@
         });
     }
 
+    function closeDialog() {
+        $("#offline_dlg").hide();
+    }
+
 </script>
 <body style="overflow-y: hidden;">
 
@@ -658,6 +662,10 @@
         }
     }
 
+
+    function closeDialog() {
+        $('#offline_dlg').hide();
+    }
 
     function openDetails(approvalId, obj) {
         setChooseTr(obj);

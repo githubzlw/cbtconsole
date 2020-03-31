@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -371,6 +372,24 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
 
 
         return MongoDBHelp.INSTANCE.insertBatch3(GOODS_COLLECTION_NAME, writeModelList);
+    }
+
+    @Override
+    public int insertGoodsToMongoMapBatch(List<Map<String, Object>> list) throws Exception {
+        List<WriteModel<Document>> writeModelList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (Map<String, Object> map : list) {
+                Map<String , Object> tempMap = new HashMap<>();
+                map.forEach((k,v)->{
+                    tempMap.put(k, v.toString());
+                });
+                tempMap.put("pid", Long.parseLong(map.get("pid").toString()));
+                Document insertDocument = new Document(tempMap);
+                InsertOneModel<Document> insertOneModel = new InsertOneModel<>(insertDocument);
+                writeModelList.add(insertOneModel);
+            }
+        }
+        return MongoDBHelp.INSTANCE.insertBatch2(GOODS_COLLECTION_NAME, writeModelList);
     }
 
     @Override

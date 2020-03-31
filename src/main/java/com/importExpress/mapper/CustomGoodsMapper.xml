@@ -465,6 +465,9 @@
         <if test="state == 6">
             and cbu.valid = 2
         </if>
+        <if test="valid != -1">
+            and cbu.valid = #{valid}
+        </if>
         <if test="adminId > 0">
             and cge.admin_id = #{adminId}
         </if>
@@ -598,8 +601,9 @@
         <if test="isSort == 4">
             order by cbu.catid1
         </if>
-
-        limit #{page},50
+        <if test="limitNum > 0">
+            limit #{page},#{limitNum}
+        </if>
     </select>
 
     <select id="queryForListByParamCount" parameterType="com.cbt.bean.CustomGoodsQuery" resultType="java.lang.Integer">
@@ -916,11 +920,13 @@
         ifnull(cge.is_edited,0) as is_edited,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.edit_profit,0) as edit_profit,
         ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason,ifnull(cge.weight_flag,0) as weight_flag,
         ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num,
-        ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag
+        ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag,
+        ifnull(pts.sort,-1) as topSort
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
         left join needfindsizechart cbn on cbn.pid=cbu.pid
+        left join pid_top_sort pts on cbu.pid = pts.pid
         where cbu.pid = #{pid}
     </select>
     <select id="getAllReviewByPid" resultType="com.cbt.bean.CustomGoodsPublish">
@@ -1479,6 +1485,15 @@
         values(#{pid},#{flag},#{adminId})
     </insert>
 
+    <insert id="setTopSort">
+        replace into pid_top_sort(pid,sort) values(#{pid},#{newSort})
+    </insert>
+
+    <insert id="setTopSortLog">
+        insert into pid_top_sort_log(pid,sort,admin_id)
+        values(#{pid},#{newSort},#{adminId})
+    </insert>
+
     <insert id="saveGoodsWeightChange" parameterType="com.importExpress.pojo.GoodsWeightChange">
         insert into goods_weight_change(pid,goods_type,weight,volume_weight,admin_id,skuid)
         values(#{pid},#{goodsType},#{weight},#{volumeWeight},#{adminId},#{skuid})
@@ -1597,4 +1612,83 @@
     <select id="queryCatidByPath" resultType="java.lang.String">
         select category_id from 1688_category where find_in_set(#{catid},path)
     </select>
+
+    <select id="queryOnlineSync" resultType="java.lang.String">
+        select pid from pid_online_sync
+    </select>
+
+    <delete id="deleteOnlineSync">
+        delete from pid_online_sync where pid = #{pid}
+    </delete>
+
+    <insert id="insertIntoOnlineSync">
+        insert into pid_online_sync(pid,valid,goodsstate)
+        select pid,valid,goodsstate from custom_benchmark_ready where pid = #{pid}
+        and pid not in(select pid from pid_online_sync where pid = #{pid} )
+    </insert>
+
+    <select id="queryGoodsDeleteInfo" parameterType="com.cbt.bean.CustomGoodsQuery" resultMap="queryGoodsResultMap">
+        select id,catid1,pid,custom_main_image,img,name,enname,eninfo,remotpath,valid,localpath,catid1,shop_id
+        from custom_benchmark_ready_delete_log where delete_flag = 0
+        <if test="catid != null">
+            and catid1 = #{catid}
+        </if>
+        <if test="shopId != null">
+            and shop_id = #{shopId}
+        </if>
+        <if test="limitNum > 0">
+            limit #{page},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryGoodsDeleteInfoCount" parameterType="com.cbt.bean.CustomGoodsQuery" resultType="java.lang.Integer">
+        select count(0)
+        from custom_benchmark_ready_delete_log where delete_flag = 0
+        <if test="catid != null">
+            and catid1 = #{catid}
+        </if>
+        <if test="shopId != null">
+            and shop_id = #{shopId}
+        </if>
+    </select>
+
+    <select id="queryGoodsDeleteDetails"  resultMap="queryGoodsResultMap">
+        select id,catid1,pid,custom_main_image,img,name,enname,eninfo,remotpath,valid,localpath,catid1,shop_id
+        from custom_benchmark_ready_delete_log where delete_flag = 0 and pid = #{pid}
+    </select>
+
+    <select id="queryOrinfringementPids" resultType="java.lang.String">
+        select pid from custom_benchmark_ready where unsellableReason in(10,11)
+        union
+        select pid from custom_goods_edit where off_reason like '%侵权%'
+    </select>
+
+    <insert id="syncDataToDeleteInfo">
+        insert into custom_benchmark_ready_delete_log(id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feeprice,fprice,name,enname,morder,entype,sku,endetail,eninfo,ali_sold,ali_pid,ali_price,ali_weight,ali_freight,ali_sellunit,ali_morder,ali_unit,ali_name,remotpath,valid,localpath,createtime,catid,catidparenta,catidparentb,keyword,sold,catidb,catpath,originalcatid,originalcatpath,ali_img,img_check,revise_weight,final_weight,range_price,shop_id,wholesale_price,fprice_str,pvids,infoReviseFlag,priceReviseFlag,isBenchmark,isNewCloud,finalName,sellunit,cur_time,bm_flag,source_pro_flag,is_sold_flag,priority_flag,is_add_car_flag,source_used_flag,ocr_match_flag,is_show_det_img_flag,is_show_det_table_flag,flag,goodsstate,beforesku,is_stock_flag,unsellableReason,samplingStatus,sendFrom,matchSource,updateDate,validationDate,best_match,ocean_price,validationDealDate,video_url,average_deliver_time,core_flag,score,updatetime,is_edited,admin_id,promotion_flag,size_info_en,sold_flag,from_flag,rw_keyword,new_arrival_date,max_price,description_en,add_price_lv,weight_flag,category_name,volume_weight,import_score,weight_sort_flag,brand_id,brand_name,shop_enname,entype_new,wholesale_price_new,feight_price_rate,searchable,range_price_free)
+select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feeprice,fprice,name,enname,morder,entype,sku,endetail,eninfo,ali_sold,ali_pid,ali_price,ali_weight,ali_freight,ali_sellunit,ali_morder,ali_unit,ali_name,remotpath,valid,localpath,createtime,catid,catidparenta,catidparentb,keyword,sold,catidb,catpath,originalcatid,originalcatpath,ali_img,img_check,revise_weight,final_weight,range_price,shop_id,wholesale_price,fprice_str,pvids,infoReviseFlag,priceReviseFlag,isBenchmark,isNewCloud,finalName,sellunit,cur_time,bm_flag,source_pro_flag,is_sold_flag,priority_flag,is_add_car_flag,source_used_flag,ocr_match_flag,is_show_det_img_flag,is_show_det_table_flag,flag,goodsstate,beforesku,is_stock_flag,unsellableReason,samplingStatus,sendFrom,matchSource,updateDate,validationDate,best_match,ocean_price,validationDealDate,video_url,average_deliver_time,core_flag,score,updatetime,is_edited,admin_id,promotion_flag,size_info_en,sold_flag,from_flag,rw_keyword,new_arrival_date,max_price,description_en,add_price_lv,weight_flag,category_name,volume_weight,import_score,weight_sort_flag,brand_id,brand_name,shop_enname,entype_new,wholesale_price_new,feight_price_rate,searchable,range_price_free from custom_benchmark_ready where pid = #{pid}
+    </insert>
+
+    <delete id="deleteDataByPid">
+        delete from custom_benchmark_ready where pid = #{pid};
+        delete from custom_goods_edit where pid = #{pid};
+    </delete>
+
+    <update id="updateDeleteInfoFlag">
+        update custom_benchmark_ready_delete_log set delete_flag= 1 where pid =  #{pid}
+    </update>
+
+    <select id="querySalableByPid" resultType="java.lang.Integer">
+        select count(0) from custom_goods_salable where pid = #{pid} and salable = 1
+    </select>
+
+    <insert id="setSalable">
+        insert into custom_goods_salable(pid,salable,admin_id) values(#{pid},#{flag},#{adminId})
+        ON DUPLICATE KEY UPDATE salable= #{flag},admin_id=#{adminId}
+    </insert>
+
+    <select id="getProductInfoByLimit" resultType="java.util.Map">
+        select * from custom_benchmark_ready
+        where id > #{minId} and #{maxId} >= id
+    </select>
+
 </mapper>

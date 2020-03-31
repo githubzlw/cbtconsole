@@ -8,7 +8,7 @@
 </style>
 
 
-<title>海外仓库存清单</title>
+<title>海外仓库存管理</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet"
 	href="/cbtconsole/css/bootstrap/bootstrap.min.css">
@@ -27,19 +27,24 @@
 </head>
 <body>
 	<div class="container-fluid report">
-		<h1 class="text-center">海外仓库存清单</h1>
+		<h1 class="text-center">海外仓库存管理</h1>
 		<div class="row mt20">
 			<div class="col-xs-1">
 				<b>产品检索</b>
 			</div>
-			<div class="col-xs-11">
+			<div class="col-xs-9">
 				<!-- <label>产品名称：<input type="text" class="form-control" id="query_goods_name"></label> -->
 				<label>产品ID：<input type="text" class="form-control" id="query_goods_pid" value="${stockParamter.goodsPid }"></label>
 				<label>SKUID：<input type="text" class="form-control" id="query_goods_skuid" value="${stockParamter.skuid }"></label>
 				<label><button class="btn btn-info query_button"  id="query_button">查询</button></label>
-				<label><button class="btn btn-warning btn-check-stock">核对库存</button></label>
-				<label><a href="/cbtconsole/owstock/log"><button class="btn btn-warning btn-log">库存记录</button></a></label>
+				<label><button class="btn btn-info btn-check-stock">核对库存</button></label>
+				
 			</div>
+		<div class="col-xs-2">
+				<label><a href="/cbtconsole/owstock/log" target="_blank"><button class="btn btn-warning btn-log">库存记录</button></a></label>
+				<label><a href="/cbtconsole/warehouse/ows.do" target="_blank"><button class="btn btn-warning btn-ship">出库管理</button></a></label>
+		
+		</div>
 		</div>
 		<div class="row mt20 row2">
 			<div class="col-xs-12">

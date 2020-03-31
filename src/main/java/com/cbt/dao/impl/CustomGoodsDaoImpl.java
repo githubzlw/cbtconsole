@@ -1,5 +1,6 @@
 package com.cbt.dao.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.*;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.jdbc.DBHelper;
@@ -15,7 +16,6 @@ import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import com.importExpress.utli.UpdateTblModel;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -2194,7 +2194,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             stmt.setInt(count27++, type == 1 ? 4 : 2);
             stmt.setInt(count27++, reason);
             stmt.setInt(count27++, adminId);
-            if (type < 1) {
+            if (type != 1) {
                 stmt.setString(count27++, remark);
             }
             stmt.setString(count27++, pid);
@@ -3186,7 +3186,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             conn28.setAutoCommit(false);
             stmt28 = conn28.prepareStatement(insertSqlString);
             stmt28.setString(1, pid);
-            stmt28.setString(2, JSONObject.fromObject(model).toString());
+            stmt28.setString(2, JSONObject.toJSONString(model));
             rs = stmt28.executeUpdate();
             if (rs >= 0) {
                 rs = 0;
@@ -3409,7 +3409,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             if (rs > 0) {
                 stmt = conn.prepareStatement(insertSqlLog);
                 stmt.setString(1, bean.getId());
-                stmt.setString(2, JSONObject.fromObject(model).toString());
+                stmt.setString(2, JSONObject.toJSONString(model));
                 rs = stmt.executeUpdate();
                 if (rs > 0) {
                     conn.commit();
@@ -4145,6 +4145,28 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             e.printStackTrace();
             System.out.println("pid:" + pid + ",updateVolumeWeight error :" + e.getMessage());
             LOG.error("pid:" + pid + ",updateVolumeWeight error",e);
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+        }
+        return count;
+    }
+
+    @Override
+    public int deleteDataByPid(String pid) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        PreparedStatement stmt28 = null;
+
+        String updateSql = "delete from custom_benchmark_ready_newest where pid = ?";
+        int count = 0;
+        try {
+            stmt28 = conn28.prepareStatement(updateSql);
+            stmt28.setString(1, pid);
+            count = stmt28.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",deleteDataByPid error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",deleteDataByPid error",e);
         } finally {
             DBHelper.getInstance().closePreparedStatement(stmt28);
             DBHelper.getInstance().closeConnection(conn28);

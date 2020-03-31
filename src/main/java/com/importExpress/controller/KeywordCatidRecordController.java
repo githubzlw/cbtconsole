@@ -48,18 +48,18 @@ public class KeywordCatidRecordController {
 		if (!(stateNumStr == null || "".equals(stateNumStr) || "0".equals(stateNumStr))) {
 			currentPage = Integer.valueOf(stateNumStr);
 		}
-		try{
-			String keyword = request.getParameter("keyword");
+		String keyword = request.getParameter("keyword");
+		Map<String,Object> map = keywordCatidRecordService.getList(keyword, currentPage, pageSize);
+		json.setSuccess(true);
+		json.setRows(map.get("list"));
+		json.setTotal((Integer)map.get("count"));
+		/*try{
 			DataSourceSelector.set("dataSource127hop");
-			Map<String,Object> map = keywordCatidRecordService.getList(keyword, currentPage, pageSize);
-			json.setSuccess(true);
-			json.setRows(map.get("list"));
-			json.setTotal((Integer)map.get("count"));
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {
 			DataSourceSelector.restore();
-		}
+		}*/
 		return json;
 	}
 	
@@ -120,7 +120,7 @@ public class KeywordCatidRecordController {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		try{
-			DataSourceSelector.set("dataSource127hop");
+//			DataSourceSelector.set("dataSource127hop");
 			String id = request.getParameter("id");
 			KeywordCatidRecordBean bean = keywordCatidRecordService.getDetail(Integer.parseInt(id));
 			PrintWriter out = response.getWriter();
@@ -130,7 +130,7 @@ public class KeywordCatidRecordController {
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {
-			DataSourceSelector.restore();
+//			DataSourceSelector.restore();
 		}
 	}
 	

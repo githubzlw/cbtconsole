@@ -1,6 +1,8 @@
 
 package com.cbt.report.ctrl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.*;
 import com.cbt.bean.TypeBean;
 import com.cbt.customer.service.IShopUrlService;
@@ -22,8 +24,7 @@ import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.UserInfoUtils;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -75,6 +76,8 @@ public class ShopUrlController {
     private static final String SHOP_GOODS_LOCAL_PATH_K = "K:/shopimages";
     private static final String SHOP_GOODS_SHOW_URL_J = "http://192.168.1.28:8399";
     private static final String SHOP_GOODS_LOCAL_PATH_J = "J:/shopimages";//J:/shopimages
+    private static final String REMOTE_WEB_SITE = "http://112.64.174.34";// 外网
+    private static final String LOCAL_WEB_SITE = "http://192.168.1.28";// 内网
     private FtpConfig ftpConfig;
     private static List<ConfirmUserInfo> allAdminList = UserInfoUtils.queryAllAdminList();
     private static List<String> allShopBlackList = new ArrayList<>();
@@ -1011,9 +1014,7 @@ public class ShopUrlController {
             return json;
         }
         try {
-
-            JSONArray jsonArray = JSONArray.fromObject(infos);// 把String转换为json
-            List<ShopInfoBean> shopInfos = (List<ShopInfoBean>) JSONArray.toCollection(jsonArray, ShopInfoBean.class);
+            List<ShopInfoBean> shopInfos = JSONArray.parseArray(infos, ShopInfoBean.class);
 
             List<ShopCatidWeight> cidWtList = new ArrayList<ShopCatidWeight>();
 
@@ -1156,6 +1157,15 @@ public class ShopUrlController {
                 mv.addObject("show", 0);
                 mv.addObject("goodsNum", 0);
             } else {
+                String ip = request.getRemoteAddr();
+                System.err.println("ip:" + ip);
+                if(ip.contains("27.115.38.42") || ip.contains("192.168.1.27")){
+                    goodsList.forEach(e->{
+                        e.setImgUrl(e.getImgUrl().replace(LOCAL_WEB_SITE,REMOTE_WEB_SITE));
+                        e.setRemotePath(e.getRemotePath().replace(LOCAL_WEB_SITE,REMOTE_WEB_SITE));
+                    });
+                }
+
                 // 获取上线状态和编辑状态
                 List<CustomGoodsPublish> gdList = shopUrlService.queryOnlineGoodsByShopId(shopId);
                 List<ShopGoodsInfo> newList = new ArrayList<ShopGoodsInfo>();
@@ -1658,6 +1668,13 @@ public class ShopUrlController {
                 }
                 if (newImgsList.size() > 0) {
                     // 选中排列第一
+                    String ip = request.getRemoteAddr();
+                    System.err.println("ip:" + ip);
+                    if(ip.contains("27.115.38.42") || ip.contains("192.168.1.27")){
+                        newImgsList.forEach(e->{
+                            e.setImgUrl(e.getImgUrl().replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE));
+                        });
+                    }
                     newImgsList.sort(Comparator.comparingInt(ShopGoodsPublicImg::getTotalNum).reversed());
                 }
                 imgsList.clear();
@@ -1723,10 +1740,9 @@ public class ShopUrlController {
         //}
         if (StringUtils.isNotBlank(resultStr)) {
             try {
-                JSONObject myJson = JSONObject.fromObject(resultStr);
-                Map<String, List<String>> pidMd5Map = myJson;
+                JSONObject myJson = JSONObject.parseObject(resultStr);
                 if (!myJson.isEmpty()) {
-                    List<String> md5List = (List<String>) myJson.get("files");
+                    List<String> md5List = JSONArray.parseArray(myJson.getString("files"), String.class);
                     if (!(md5List == null || md5List.isEmpty())) {
                         for (String md5 : md5List) {
                             String[] imgMd5Arr = md5.split(":");
@@ -1801,7 +1817,7 @@ public class ShopUrlController {
             json.setMessage("获取图片识别标识失败");
             return json;
         } else {
-            useHm = Integer.valueOf(useHmStr);
+            useHm = Integer.parseInt(useHmStr);
         }
 
         String imgs = request.getParameter("imgs");
@@ -1811,9 +1827,7 @@ public class ShopUrlController {
             return json;
         }
         try {
-            JSONArray jsonArray = JSONArray.fromObject(imgs);// 把String转换为json
-            List<ShopGoodsPublicImg> gdImgList = (List<ShopGoodsPublicImg>) JSONArray.toCollection(jsonArray,
-                    ShopGoodsPublicImg.class);
+            List<ShopGoodsPublicImg> gdImgList = JSONArray.parseArray(imgs, ShopGoodsPublicImg.class);
 
             if (gdImgList == null || gdImgList.size() == 0) {
                 json.setOk(false);
@@ -2052,13 +2066,26 @@ public class ShopUrlController {
             List<TypeBean> typeList = deal1688GoodsType(goods);
 
             // 将goods的img属性值取出来,即橱窗图
-            request.setAttribute("showimgs", JSONArray.fromObject("[]"));
+            request.setAttribute("showimgs", JSONArray.toJSON("[]"));
             List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getLocalpath());
-            goods.setShowImages(imgs);
-            if (imgs.size() > 0) {
-                String firstImg = imgs.get(0);
+            String ip = request.getRemoteAddr();
+            System.err.println("ip:" + ip);
+            if (ip.contains("27.115.38.42") || ip.contains("192.168.1.27")) {
+                if (CollectionUtils.isNotEmpty(imgs)) {
+                    List<String> tempImgs = new ArrayList<>(imgs.size());
+                    imgs.forEach(e -> {
+                        tempImgs.add(e.replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE));
+                    });
+                    goods.setShowImages(tempImgs);
+                }
+            } else {
+                goods.setShowImages(imgs);
+            }
+
+            if (CollectionUtils.isNotEmpty(goods.getShowImages())) {
+                String firstImg = goods.getShowImages().get(0);
                 goods.setShowMainImage(firstImg.replace(".60x60.", ".400x400."));
-                request.setAttribute("showimgs", JSONArray.fromObject(imgs));
+                request.setAttribute("showimgs", JSONArray.toJSON(goods.getShowImages()));
             }
 
             HashMap<String, String> pInfo = deal1688Sku(goods);
@@ -2072,8 +2099,7 @@ public class ShopUrlController {
                 // request.setAttribute("showSku", JSONArray.fromObject("[]"));
             } else {
                 List<ImportExSku> skuList = new ArrayList<ImportExSku>();
-                JSONArray sku_json = JSONArray.fromObject(goods.getSku());
-                skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                skuList = (List<ImportExSku>) JSONArray.parseArray(goods.getSku(), ImportExSku.class);
                 // 规格标题名称集合
                 List<ImportExSkuShow> cbSkus = combineSkuList(typeList, skuList);
                 // 集合排序
@@ -2082,7 +2108,7 @@ public class ShopUrlController {
                         return o1.getPpIds().compareTo(o2.getPpIds());
                     }
                 });
-                request.setAttribute("showSku", JSONArray.fromObject(cbSkus));
+                request.setAttribute("showSku", JSONArray.toJSON(cbSkus));
 
                 Map<String, Object> typeNames = new HashMap<String, Object>();
                 for (TypeBean tyb : typeList) {
@@ -2094,9 +2120,16 @@ public class ShopUrlController {
             }
 
             if (typeList.size() > 0) {
-                request.setAttribute("showtypes", JSONArray.fromObject(typeList));
+                if (ip.contains("27.115.38.42") || ip.contains("192.168.1.27")) {
+                    typeList.forEach(e->{
+                        if(StringUtils.isNotBlank(e.getImg())){
+                            e.setImg(e.getImg().replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE));
+                        }
+                    });
+                }
+                request.setAttribute("showtypes", JSONArray.toJSON(typeList));
             } else {
-                request.setAttribute("showtypes", JSONArray.fromObject("[]"));
+                request.setAttribute("showtypes", JSONArray.toJSON("[]"));
             }
 
             // 直接使用远程路径
@@ -2146,6 +2179,10 @@ public class ShopUrlController {
 
                 String text = textBf.toString();
 
+                //
+                if (ip.contains("27.115.38.42") || ip.contains("192.168.1.27")) {
+                    text = text.replace(LOCAL_WEB_SITE, REMOTE_WEB_SITE);
+                }
                 // 返回待编辑数据到编辑页面
                 mv.addObject("text", text);
             }
@@ -2785,8 +2822,7 @@ public class ShopUrlController {
                     json.setMessage("获取单规格价数据失败");
                     return json;
                 } else {
-                    JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
-                    List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                    List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.parseArray(orGoods.getSku(), ImportExSku.class);
                     boolean isSuccess = dealSkuByParam(skuList, sku, cgp);
                     if (!isSuccess) {
                         json.setOk(false);
@@ -2805,7 +2841,7 @@ public class ShopUrlController {
                             + "&sourceTable=shop_goods_ready&database=28";
                     String resultJson = DownloadMain.getContentClient(url, null);
                     System.err.println("pid=" + cgp.getPid() + ",result:[" + resultJson + "]");
-                    JSONObject jsonJt = JSONObject.fromObject(resultJson);
+                    JSONObject jsonJt = JSONObject.parseObject(resultJson);
                     System.out.println(json.toString());
                     if (!jsonJt.getBoolean("ok")) {
                         json.setOk(false);
@@ -3271,9 +3307,7 @@ public class ShopUrlController {
         }
 
         try {
-            JSONArray jsonArray = JSONArray.fromObject(infos);// 把String转换为json
-            List<GoodsOfferBean> goodsErrInfos = (List<GoodsOfferBean>) JSONArray.toCollection(jsonArray,
-                    GoodsOfferBean.class);
+            List<GoodsOfferBean> goodsErrInfos = JSONArray.parseArray(infos, GoodsOfferBean.class);
             if (goodsErrInfos == null || goodsErrInfos.size() == 0) {
                 json.setOk(false);
                 json.setMessage("生成数据失败，无法保存，请重试");

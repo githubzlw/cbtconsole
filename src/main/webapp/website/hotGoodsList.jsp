@@ -404,8 +404,17 @@
                         $("#nw_goods_goodsname").text(json.name);
                         $("#nw_goods_showname").text(json.enname);
                         $("#nw_goods_goodsurl").text(json.url);
-                        $("#nw_goods_goodsimg").attr("src",
-                            json.remotpath + json.img);
+                        if(json.salable > 0){
+                            $("#nw_goods_salable").text("美加不可售卖");
+                        }else{
+                            $("#nw_goods_salable").text("美加可售卖");
+                        }
+                        var img = json.img;
+                        if(img.indexOf("http:") > -1 || img.indexOf("https:") > -1){
+                            $("#nw_goods_goodsimg").attr("src", img);
+                        }else{
+                            $("#nw_goods_goodsimg").attr("src", json.remotpath + img);
+                        }
                         $("#nw_goods_goodsprice").text(json.price);
                     } else {
                         $.messager.alert("提醒", data.message, "error");
@@ -444,6 +453,7 @@
             $("#nw_goods_showname").text("");
             $("#nw_goods_goodsname").text("");
             $("#nw_goods_goodsurl").text("");
+            $("#nw_goods_salable").text("");
             $("#nw_goods_goodsimg").attr("src", "#");
             $("#nw_goods_goodsprice").text("0.00");
             $("#nw_goods_amazon_price").val("0.00");
@@ -726,6 +736,8 @@
                 <span>亚马逊价格:$&nbsp;${goods.amazonPrice}</span><br>
                 <span>ASIN码:${goods.asinCode}</span><br>
                 <span>利润率:${goods.profitMargin}</span><em>%</em><br>
+                <span>创建时间:${goods.productCreateTime}</span><br>
+                <span>编辑时间:${goods.productPublishTime}</span><br>
                 <b style="color:${goods.isOn > 0 ? 'green':'red'};">状态:${goods.isOn > 0 ? '开启':'关闭'}</b>&nbsp;&nbsp;
                 <a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${goods.goodsPid}">编辑商品详情</a>
                 <c:if test="${goods.isSoldFlag > 1}">
@@ -738,8 +750,12 @@
                 <c:if test="${goods.unsellableReason == 26}">
                     <br><b style="color:red;">1688货源异常</b>
                 </c:if>
-                <br><br>
+                <br>
+                <c:if test="${goods.salable > 0}">
+                    <b style="color:red;">美加不可售</b><br>
+                </c:if>
                 <c:if test="${hotType == 2}">
+                    <br>
                     <c:if test="${goods.discountId>0}">
                         <div style="background-color: #9ecdef">
                             <span>折扣开始时间:[${goods.discountBeginTime}]<br>折扣结束时间:[${goods.discountEndTime}]</span><br>
@@ -865,7 +881,10 @@
                 <td>商品PID：</td>
                 <td><span id="nw_goods_goodsPid"></span></td>
             </tr>
-
+            <tr>
+                <td>美加可售卖：</td>
+                <td><span id="nw_goods_salable"></span></td>
+            </tr>
             <tr>
                 <td>显示名称：</td>
                 <td><span id="nw_goods_showname"></span></td>

@@ -137,6 +137,39 @@ public class CustomGoodsPublish extends CustomGoodsBean {
      */
     private int searchable;
 
+    /**
+     * 详情图片数据
+     */
+    private List<String> infoList;
+
+    private int skuCount = -1;
+
+    private int topSort = -1;
+
+    public int getTopSort() {
+        return topSort;
+    }
+
+    public void setTopSort(int topSort) {
+        this.topSort = topSort;
+    }
+
+    public int getSkuCount() {
+        return skuCount;
+    }
+
+    public void setSkuCount(int skuCount) {
+        this.skuCount = skuCount;
+    }
+
+    public List<String> getInfoList() {
+        return infoList;
+    }
+
+    public void setInfoList(List<String> infoList) {
+        this.infoList = infoList;
+    }
+
     public int getSearchable() {
         return searchable;
     }

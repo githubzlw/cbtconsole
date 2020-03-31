@@ -715,6 +715,7 @@ function search() {
     var remarkUserId = "";
     var buyUrl = "";
     var jsonObj = "";
+    var selectType = $("#select_count").val();
     $.post("/cbtconsole/order/getGoodsData", {expresstrackid: expresstrackid},
         function (res) {
             jsonObj = JSON.parse(res);
@@ -776,7 +777,7 @@ function search() {
     if (expresstrackid != '') {
         var barcode_info = "";
         // $.post("/cbtconsole/WebsiteServlet?action=getResultInfo&className=ExpressTrackServlet",{expresstrackid : expresstrackid,checked:checked},
-        $.post("/cbtconsole/order/getResultInfo", {expresstrackid: expresstrackid, checked: checked},
+        $.post("/cbtconsole/order/getResultInfo", {expresstrackid: expresstrackid, checked: checked, selectType:selectType},
             function (res) {
                 if (res == "[]") {
                     $("#ydid").html("查询的运单号为:" + expresstrackid);

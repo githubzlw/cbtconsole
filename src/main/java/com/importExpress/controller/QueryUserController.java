@@ -843,7 +843,7 @@ public class QueryUserController {
                     count++;
                     if (count % 5 == 0) {
                         try {
-                            Thread.sleep(2);
+                            Thread.sleep(2000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -882,7 +882,7 @@ public class QueryUserController {
                     count++;
                     if (count % 5 == 0) {
                         try {
-                            Thread.sleep(2);
+                            Thread.sleep(2000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

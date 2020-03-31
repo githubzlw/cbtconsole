@@ -4,6 +4,7 @@ import com.cbt.bean.ComplainChat;
 import com.cbt.bean.ComplainFile;
 import com.cbt.dao.IComplainChatDao;
 import com.cbt.jdbc.DBHelper;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import com.mysql.jdbc.Statement;
@@ -38,7 +39,7 @@ public class ComplianChatDaoImpl implements IComplainChatDao {
 
 			List<String> lstValues = new ArrayList<String>();
 			lstValues.add(String.valueOf(t.getComplainid()));
-			lstValues.add(t.getChatText());
+			lstValues.add(GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(t.getChatText()));
 			lstValues.add(t.getChatAdmin());
 			lstValues.add(String.valueOf(t.getChatAdminid()));
 			lstValues.add(t.getUuid());

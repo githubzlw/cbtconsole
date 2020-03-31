@@ -1,5 +1,6 @@
 package com.cbt.website.servlet;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.*;
 import com.cbt.change.util.ChangeRecordsDao;
@@ -35,7 +36,6 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.service.OverseasWarehouseStockService;
 import com.importExpress.service.impl.OverseasWarehouseStockServiceImpl;
 
-import net.minidev.json.JSONArray;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -51,7 +51,6 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-//import net.sf.json.JSONObject;
 
 /**
  * @author ylm 后台订单操作
@@ -240,7 +239,7 @@ public class OrderwsServlet extends HttpServlet {
 		if (list != null && !list.isEmpty()) {
 			count = list.get(0).getTotal();
 		}
-		request.setAttribute("orderws", net.sf.json.JSONArray.fromObject(list));
+		request.setAttribute("orderws", JSONArray.toJSON(list));
 		UserDao dao = new UserDaoImpl();
 		List<ConfirmUserInfo> listAdm = null;
 		String action = request.getParameter("action");
@@ -254,7 +253,7 @@ public class OrderwsServlet extends HttpServlet {
 		} else {
 			listAdm = dao.getAll();
 		}
-		request.setAttribute("listAdm", JSONArray.toJSONString(listAdm));
+		request.setAttribute("listAdm", JSONArray.toJSON(listAdm));
 		request.setAttribute("count", count);
 		request.setAttribute("page", page);
 		request.setAttribute("admuserid", strname);
@@ -285,7 +284,7 @@ public class OrderwsServlet extends HttpServlet {
 		IGoodsServer server = new GoodsServerImpl();
 		List<SpiderBean> list = server.getSpiderBeans(Integer.parseInt(userID_req), email);
 		PrintWriter out = response.getWriter();
-		out.print(net.sf.json.JSONArray.fromObject(list));
+		out.print(JSONArray.toJSON(list));
 		out.flush();
 		out.close();
 	}
@@ -1557,8 +1556,7 @@ public class OrderwsServlet extends HttpServlet {
 				String[] s = odb.getActual_volume().split("\\*");
 				Object[] arr = new Object[] { odb.getActual_freight(), odb.getActual_weight(), odb.getActual_price(),
 						s[0], s[1], s[2] };
-				net.sf.json.JSONArray jsonObject = net.sf.json.JSONArray.fromObject(arr);
-				out.print(jsonObject.toString());
+				out.print(JSONArray.toJSONString(arr));
 				out.flush();
 				out.close();
 			} else {
@@ -1976,7 +1974,7 @@ public class OrderwsServlet extends HttpServlet {
 		Object[] objects = { count, page };
 		res.add(objects);
 		PrintWriter out = response.getWriter();
-		out.print(net.sf.json.JSONArray.fromObject(res));
+		out.print(JSONArray.toJSONString(res));
 		out.flush();
 		out.close();
 	}
@@ -2246,10 +2244,9 @@ public class OrderwsServlet extends HttpServlet {
 		int uid = Integer.parseInt(request.getParameter("userid"));
 		IOrderwsServer server = new OrderwsServer();
 		List<Integer> list_uid = server.getRepeatUserid(uid);
-		net.sf.json.JSONArray json = net.sf.json.JSONArray.fromObject(list_uid);
 		response.setContentType("text/json;charset=utf-8");
 		PrintWriter out = response.getWriter();
-		out.write(json.toString());
+		out.write(JSONArray.toJSONString(list_uid));
 		out.close();
 	}
 
@@ -2319,10 +2316,9 @@ public class OrderwsServlet extends HttpServlet {
 		String orderNo = request.getParameter("orderNo");
 		IOrderwsServer server = new OrderwsServer();
 		List<Map<String, String>> list = server.getCustCountry(orderNo);
-		net.sf.json.JSONArray json = net.sf.json.JSONArray.fromObject(list);
 		response.setContentType("text/json;charset=utf-8");
 		PrintWriter out = response.getWriter();
-		out.write(json.toString());
+		out.write(JSONArray.toJSONString(list));
 		out.close();
 	}
 
@@ -2334,20 +2330,18 @@ public class OrderwsServlet extends HttpServlet {
 		// 拼接的字符串
 		IOrderwsServer server = new OrderwsServer();
 		List<Map<String, String>> list = server.getBuyerByOrderNo(orderno);
-		net.sf.json.JSONArray json = net.sf.json.JSONArray.fromObject(list);
 		response.setContentType("text/json;charset=utf-8");
 		PrintWriter out = response.getWriter();
-		out.write(json.toString());
+		out.write(JSONArray.toJSONString(list));
 		out.close();
 	}
 
 	public void queryprocurement(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		IOrderwsServer server = new OrderwsServer();
 		List<com.cbt.pojo.Admuser> list = server.getAllBuyer();
-		net.sf.json.JSONArray json = net.sf.json.JSONArray.fromObject(list);
 		response.setContentType("text/json;charset=utf-8");
 		PrintWriter out = response.getWriter();
-		out.write(json.toString());
+		out.write(JSONArray.toJSONString(list));
 		LOG.info("====================" + list.size());
 		out.close();
 	}

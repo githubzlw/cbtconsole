@@ -1,6 +1,9 @@
 package com.cbt.warehouse.ctrl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.Admuser;
 import com.cbt.util.Redis;
@@ -16,9 +19,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
@@ -179,10 +179,10 @@ public class TrackingController {
     	String url = "http://api.kuaidi100.com/api?id=f97a462b9c6cc71f&com=jcex&nu=984902833&show=0&muti=1&order=desc";
         String jsons = loadJson(url);
         try {
-	        JSONObject json= new JSONObject(jsons);  
-	        JSONArray jsonArray=json.getJSONArray("data");  
+	        JSONObject json= JSONObject.parseObject(jsons);
+	        JSONArray jsonArray=json.getJSONArray("data");
 	        
-	        for(int i=0;i<jsonArray.length();i++){  
+	        for(int i=0;i<jsonArray.size();i++){
 	            JSONObject jObject=(JSONObject) jsonArray.get(i);  
 	            String time=(String) jObject.get("time");
 	            String context=(String) jObject.get("context");
@@ -192,6 +192,7 @@ public class TrackingController {
 	            }
 	        }
 		} catch (JSONException e) {
+        	e.printStackTrace();
 		}
 	}
     
@@ -378,8 +379,8 @@ public class TrackingController {
 					
 					System.out.println(retStr);
 	
-					net.sf.json.JSONArray jsonArray = net.sf.json.JSONArray
-							.fromObject(retStr);
+					JSONArray jsonArray = JSONArray
+							.parseArray(retStr);
 	
 					List<Map<String, String>> mapListJson = (List) jsonArray;
 					
@@ -653,11 +654,10 @@ public class TrackingController {
 					      //获取指定网址的页面内容  shunfeng
 						  Response res = Jsoup.connect("https://m.kuaidi100.com/query?type=shunfeng&postid="+row.getExpressno()+"&id=1&valicode=&temp=0.8255025921389461").timeout(50000).execute();
 						  String body = res.body();
-						  net.sf.json.JSONObject jsonObjct = net.sf.json.JSONObject.fromObject(body);
+						  JSONObject jsonObjct = JSONObject.parseObject(body);
 						  String data = jsonObjct.getString("data");
 						  System.out.println(data);
-						  net.sf.json.JSONArray jsonArray = net.sf.json.JSONArray
-									.fromObject(data);
+						  JSONArray jsonArray = JSONArray.parseArray(data);
 						  List<Map<String, String>> mapListJson = (List) jsonArray;
 						  String time  ="";
 						  String context ="";
@@ -840,8 +840,8 @@ public class TrackingController {
 						String retStr = json.toString();
 						retStr = retStr.substring(retStr.indexOf("statusdetail")+14,retStr.length()-3).trim();
 						System.out.println(retStr);
-						net.sf.json.JSONArray jsonArray = net.sf.json.JSONArray
-								.fromObject(retStr);
+						JSONArray jsonArray = JSONArray
+								.parseArray(retStr);
 						
 						List<Map<String, String>> mapListJson = (List) jsonArray;
 						for(int i = mapListJson.size()-1; i>=0;i--){
@@ -888,8 +888,8 @@ public class TrackingController {
 					try {
 						String retStr = json.toString();
 
-						net.sf.json.JSONArray jsonArray = net.sf.json.JSONArray
-								.fromObject(retStr);
+						JSONArray jsonArray = JSONArray
+								.parseArray(retStr);
 
 						List<Map<String, String>> mapListJson = (List) jsonArray;
 						for (int i =0;i<mapListJson.size(); i++) {
@@ -971,11 +971,11 @@ public class TrackingController {
 					  Response res = Jsoup.connect("https://m.kuaidi100.com/query?type=shunfeng&postid="+expressno+"&id=1&valicode=&temp=0.8255025921389461").timeout(50000).execute();
 					  String body = res.body();
 					 
-					  net.sf.json.JSONObject jsonObjct = net.sf.json.JSONObject.fromObject(body);
+					  JSONObject jsonObjct = JSONObject.parseObject(body);
 					  String data = jsonObjct.getString("data");
 					  System.out.println(data);
-					  net.sf.json.JSONArray jsonArray = net.sf.json.JSONArray
-								.fromObject(data);
+					  JSONArray jsonArray = JSONArray
+								.parseArray(data);
 					  List<Map<String, String>> mapListJson = (List) jsonArray;
 					  for(int i=0; i<mapListJson.size(); i++){
 						  String time = mapListJson.get(i).get("time");
@@ -1127,8 +1127,8 @@ public class TrackingController {
 				
 				System.out.println(retStr);
 
-				net.sf.json.JSONArray jsonArray = net.sf.json.JSONArray
-						.fromObject(retStr);
+				JSONArray jsonArray = JSONArray
+						.parseArray(retStr);
 
 				List<Map<String, String>> mapListJson = (List) jsonArray;
 				
@@ -1298,11 +1298,10 @@ public class TrackingController {
 			      //获取指定网址的页面内容  shunfeng
 				  Response res = Jsoup.connect("https://m.kuaidi100.com/query?type=shunfeng&postid="+bean.getExpressno()+"&id=1&valicode=&temp=0.8255025921389461").timeout(50000).execute();
 				  String body = res.body();
-				  net.sf.json.JSONObject jsonObjct = net.sf.json.JSONObject.fromObject(body);
+				  JSONObject jsonObjct = JSONObject.parseObject(body);
 				  String data = jsonObjct.getString("data");
 				  System.out.println(data);
-				  net.sf.json.JSONArray jsonArray = net.sf.json.JSONArray
-							.fromObject(data);
+				  JSONArray jsonArray = JSONArray.parseArray(data);
 				  List<Map<String, String>> mapListJson = (List) jsonArray;
 				  String time  ="";
 				  String context ="";

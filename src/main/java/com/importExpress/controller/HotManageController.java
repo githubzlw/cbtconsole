@@ -1,5 +1,6 @@
 package com.importExpress.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.BigDecimalUtil;
 import com.cbt.util.Redis;
@@ -18,7 +19,6 @@ import com.importExpress.pojo.HotSellGoods;
 import com.importExpress.pojo.HotSellGoodsShow;
 import com.importExpress.service.HotManageService;
 import com.importExpress.utli.*;
-import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1339,7 +1339,7 @@ public class HotManageController {
 			fw = new FileWriter(HOT_FILE_LOCAL_PATH + "/" + fileName, false);
 			out = new PrintWriter(fw);
 			//JSONObject dataJson = JSONObject.fromObject(resultList);
-			out.write(JSONArray.fromObject(resultList).toString());
+			out.write(JSONArray.toJSONString(resultList));
 			out.println();
 
 		} catch (Exception e) {
@@ -1452,12 +1452,13 @@ public class HotManageController {
     private void updateCategoryOnline(HotCategory param) {
         String show_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getShowName());
         String category_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getCategoryName());
+        String viewMoreUrl = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getViewMoreUrl());
         String sql = "update hot_category set" +
                 " category_name='" + category_name + "',show_name='" + show_name + "',show_img='" + param.getShowImg()
                 + "',is_on=" + param.getIsOn()
                 + ",sorting=" + param.getSorting() + ",hot_type=" + param.getHotType() + ",update_admin_id=" + param.getAdminId()
                 + ",web_site=" + param.getWebSite()
-                + ",view_more_url='" + param.getViewMoreUrl() + "'"
+                + ",view_more_url='" + viewMoreUrl + "'"
                 + " where id = " + param.getId();
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }

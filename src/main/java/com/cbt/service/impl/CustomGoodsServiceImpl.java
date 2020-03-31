@@ -1,5 +1,6 @@
 package com.cbt.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.cbt.bean.*;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.dao.CustomGoodsDao;
@@ -16,7 +17,6 @@ import com.importExpress.pojo.*;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.GoodsMongoDbLocalUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
-import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -94,9 +94,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         if (StringUtils.isNotBlank(bean.getRangePrice())) {
             //sku更新
             List<CustomBenchmarkSkuNew> insertList = new ArrayList<>();
-            JSONArray sku_json = JSONArray.fromObject(bean.getSku());
-            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-
+            List<ImportExSku> skuList = JSONArray.parseArray(bean.getSku(), ImportExSku.class);
             for (ImportExSku exSku : skuList) {
                 CustomBenchmarkSkuNew skuNew = new CustomBenchmarkSkuNew();
                 skuNew.setFinalWeight(bean.getFinalWeight());
@@ -105,12 +103,12 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 skuNew.setSkuAttr(exSku.getSkuAttr());
                 skuNew.setPid(bean.getPid());
                 SkuValPO skuValPO = new SkuValPO();
-                skuValPO.setActSkuCalPrice(Double.valueOf(exSku.getSkuVal().getActSkuCalPrice()));
-                skuValPO.setActSkuMultiCurrencyCalPrice(Double.valueOf(exSku.getSkuVal().getActSkuMultiCurrencyCalPrice()));
-                skuValPO.setActSkuMultiCurrencyDisplayPrice(Double.valueOf(exSku.getSkuVal().getActSkuMultiCurrencyDisplayPrice()));
-                skuValPO.setSkuMultiCurrencyCalPrice(Double.valueOf(exSku.getSkuVal().getSkuMultiCurrencyCalPrice()));
-                skuValPO.setSkuMultiCurrencyDisplayPrice(Double.valueOf(exSku.getSkuVal().getSkuMultiCurrencyDisplayPrice()));
-                skuValPO.setSkuCalPrice(Double.valueOf(exSku.getSkuVal().getSkuCalPrice()));
+                skuValPO.setActSkuCalPrice((double) exSku.getSkuVal().getActSkuCalPrice());
+                skuValPO.setActSkuMultiCurrencyCalPrice((double) exSku.getSkuVal().getActSkuMultiCurrencyCalPrice());
+                skuValPO.setActSkuMultiCurrencyDisplayPrice((double) exSku.getSkuVal().getActSkuMultiCurrencyDisplayPrice());
+                skuValPO.setSkuMultiCurrencyCalPrice((double) exSku.getSkuVal().getSkuMultiCurrencyCalPrice());
+                skuValPO.setSkuMultiCurrencyDisplayPrice((double) exSku.getSkuVal().getSkuMultiCurrencyDisplayPrice());
+                skuValPO.setSkuCalPrice((double) exSku.getSkuVal().getSkuCalPrice());
                 skuNew.setSkuVal(skuValPO);
                 insertList.add(skuNew);
 
@@ -799,8 +797,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 获取商品信息
         CustomGoodsPublish orGoods = queryGoodsDetails(weightChange.getPid(), 0);
         if (StringUtils.isNotBlank(orGoods.getSku())) {
-            JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
-            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+            List<ImportExSku> skuList = JSONArray.parseArray(orGoods.getSku(), ImportExSku.class);
             // 查找匹配的type数据
             String typeStr = weightChange.getGoodsType();
             String skuid = weightChange.getSkuid() == null ? "" : weightChange.getSkuid();
@@ -960,6 +957,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
+    public int setTopSort(String pid, int newSort, int adminId) {
+        customGoodsMapper.setTopSortLog(pid, newSort, adminId);
+        mongoDbLocalUtil.updatePid(pid);
+        return customGoodsMapper.setTopSort(pid, newSort);
+    }
+
+    @Override
     public int saveGoodsWeightChange(GoodsWeightChange weightChange) {
         return customGoodsMapper.saveGoodsWeightChange(weightChange);
     }
@@ -982,6 +986,72 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int setGoodsWeightChangeFlag(GoodsWeightChange weightChange) {
         return customGoodsMapper.setGoodsWeightChangeFlag(weightChange);
+    }
+
+    @Override
+    public List<String> queryOnlineSync() {
+        return customGoodsMapper.queryOnlineSync();
+    }
+
+    @Override
+    public int deleteOnlineSync(String pid) {
+        return customGoodsMapper.deleteOnlineSync(pid);
+    }
+
+    @Override
+    public int insertIntoOnlineSync(String pid) {
+        return customGoodsMapper.insertIntoOnlineSync(pid);
+    }
+
+    @Override
+    public List<CustomGoodsPublish> queryGoodsDeleteInfo(CustomGoodsQuery queryBean) {
+        return customGoodsMapper.queryGoodsDeleteInfo(queryBean);
+    }
+
+    @Override
+    public int queryGoodsDeleteInfoCount(CustomGoodsQuery queryBean) {
+        return customGoodsMapper.queryGoodsDeleteInfoCount(queryBean);
+    }
+
+    @Override
+    public CustomGoodsPublish queryGoodsDeleteDetails(String pid) {
+        return customGoodsMapper.queryGoodsDeleteDetails(pid);
+    }
+
+    @Override
+    public List<String> queryOrinfringementPids() {
+        return customGoodsMapper.queryOrinfringementPids();
+    }
+
+    @Override
+    public int syncDataToDeleteInfo(String pid) {
+        return customGoodsMapper.syncDataToDeleteInfo(pid);
+    }
+
+    @Override
+    public int deleteDataByPid(String pid) {
+        customGoodsDao.deleteDataByPid(pid);
+        return customGoodsMapper.deleteDataByPid(pid);
+    }
+
+    @Override
+    public int updateDeleteInfoFlag(String pid) {
+        return customGoodsMapper.updateDeleteInfoFlag(pid);
+    }
+
+    @Override
+    public int querySalableByPid(String pid) {
+        return customGoodsMapper.querySalableByPid(pid);
+    }
+
+    @Override
+    public int setSalable(String pid, int flag, int adminId) {
+        return customGoodsMapper.setSalable(pid, flag, adminId);
+    }
+
+    @Override
+    public List<Map<String, Object>> getProductInfoByLimit(int minId, int maxId) {
+        return customGoodsMapper.getProductInfoByLimit(minId, maxId);
     }
 
 

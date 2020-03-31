@@ -67,6 +67,46 @@ public class HotSellingGoods implements Serializable {
 	 */
 	private int unsellableReason ;
 
+	/**
+	 * 美加可售卖标识
+	 */
+	private int salable;
+
+	/**
+	 * 商品创建时间
+	 */
+	private String productCreateTime;
+
+	/**
+	 * 商品发布时间
+	 * @return
+	 */
+	private String productPublishTime;
+
+	public String getProductCreateTime() {
+		return productCreateTime;
+	}
+
+	public void setProductCreateTime(String productCreateTime) {
+		this.productCreateTime = productCreateTime;
+	}
+
+	public String getProductPublishTime() {
+		return productPublishTime;
+	}
+
+	public void setProductPublishTime(String productPublishTime) {
+		this.productPublishTime = productPublishTime;
+	}
+
+	public int getSalable() {
+		return salable;
+	}
+
+	public void setSalable(int salable) {
+		this.salable = salable;
+	}
+
 	public int getUnsellableReason() {
 		return unsellableReason;
 	}

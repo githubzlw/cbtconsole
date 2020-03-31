@@ -19,6 +19,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSONArray;
+import com.cbt.website.dao.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -54,12 +56,6 @@ import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.bean.SearchResultInfo;
-import com.cbt.website.dao.ChangUserBalanceDao;
-import com.cbt.website.dao.ChangUserBalanceDaoImpl;
-import com.cbt.website.dao.PaymentDao;
-import com.cbt.website.dao.PaymentDaoImp;
-import com.cbt.website.dao.UserDao;
-import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.dao2.IWebsiteOrderDetailDao;
 import com.cbt.website.dao2.WebsiteOrderDetailDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -77,7 +73,6 @@ import com.importExpress.utli.SendMQ;
 
 import ceRong.tools.bean.SearchLog;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
 import sun.misc.BASE64Decoder;
 
 @Controller
@@ -265,7 +260,8 @@ public class OrderInfoController{
 		try{
 			String expresstrackid = request.getParameter("expresstrackid");
 			String checked = request.getParameter("checked");
-			list = iOrderinfoService.getOrder(expresstrackid, checked);
+			String selectType = request.getParameter("selectType");
+			list = iOrderinfoService.getOrder(expresstrackid, checked, selectType);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -302,7 +298,7 @@ public class OrderInfoController{
 				}
 			}
 		}
-		out.print(net.minidev.json.JSONArray.toJSONString(list));
+		out.print(JSONArray.toJSONString(list));
 		out.flush();
 		out.close();
 	}
@@ -565,20 +561,32 @@ public class OrderInfoController{
 			map.put("status", "1");
 			map.put("repState", "1");
 			if("1".equals(type)){
-				List<Map<String,Object>> allList=iOrderinfoService.allTrack(map);
-				for(Map<String,Object> allMap:allList){
-					String orderid = String.valueOf(allMap.get("orderid"));
-					String goodid =String.valueOf(allMap.get("goodsid"));
-					String goodurl = String.valueOf(allMap.get("goods_url"));
-					String odid = String.valueOf(allMap.get("odid"));
-					map.put("odid",odid);
-					map.put("goodurl",goodurl);
-					map.put("goodid", goodid);
-					map.put("orderid", orderid);
-					map.put("count","0");
-					map.put("itemid", String.valueOf(allMap.get("tb_1688_itemid")));
-					iOrderinfoService.updateGoodStatus(map);
+				//运单产品信息
+				Map<String,Integer> shipMap = iOrderinfoService.getTbShip(shipno);
+				if(shipMap != null && !shipMap.isEmpty()) {
+					List<Map<String,Object>> allList=iOrderinfoService.allTrack(map);
+					for(Map<String,Object> allMap:allList){
+						String orderid = String.valueOf(allMap.get("orderid"));
+						String goodid =String.valueOf(allMap.get("goodsid"));
+						String goodurl = String.valueOf(allMap.get("goods_url"));
+						String odid = String.valueOf(allMap.get("odid"));
+						String skuid = String.valueOf(allMap.get("skuid"));
+						String itemid = String.valueOf(allMap.get("tb_1688_itemid"));
+						String usecount = String.valueOf(allMap.get("usecount"));
+						map.put("odid",odid);
+						map.put("goodurl",goodurl);
+						map.put("goodid", goodid);
+						map.put("orderid", orderid);
+						map.put("count","0");
+						map.put("itemid", itemid);
+						
+						Integer count = shipMap.get(itemid+"_"+skuid);
+						if(count != null && count+1 > Integer.parseInt(usecount)) {
+							iOrderinfoService.updateGoodStatus(map);
+						}
+					}
 				}
+				
 			}else if("0".equals(type)){
 				List<OrderDetailsBean> oList=iOrderinfoService.getAllCancelDetails(map);
 				for(OrderDetailsBean o:oList){
@@ -849,7 +857,7 @@ public class OrderInfoController{
 			}
 			request.setAttribute("ordernolist", sb.toString().substring(0,sb.length()-1));
 		}
-		request.setAttribute("orderws", net.sf.json.JSONArray.fromObject(list));
+		request.setAttribute("orderws", JSONArray.toJSON(list));
 		UserDao dao=new UserDaoImpl();
 		//获取纯销售和采销一体账户信息
 		List<ConfirmUserInfo> sellAdm =iOrderinfoService.getAllSalesAndBuyer();
@@ -891,7 +899,7 @@ public class OrderInfoController{
 
 	@RequestMapping(value = "/getOrderStates")
 	@ResponseBody
-	public net.sf.json.JSONArray getOrderStates(HttpServletRequest request, Model model) throws ParseException {
+	public List<Map<String, Integer>> getOrderStates(HttpServletRequest request, Model model) throws ParseException {
 		//订单列表的统计
 		try {
 			String admuserid_str = request.getParameter("admuserid");
@@ -902,7 +910,7 @@ public class OrderInfoController{
 				admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
 			}
 			List<Map<String, Integer>> maps =  iOrderinfoService.getOrdersState(admuserid);
-			return net.sf.json.JSONArray.fromObject(maps);
+			return maps;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1244,7 +1252,7 @@ public class OrderInfoController{
 						InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
 						inputData.setPid(pid);
 						inputData.setEninfo(nwDoc.html());
-						GoodsInfoUpdateOnlineUtil.updateOnlineAndSolr(inputData, 0);
+						GoodsInfoUpdateOnlineUtil.updateOnlineAndSolr(inputData, 0, 0);
 						result_list.add(id+"@"+pid);
 						up_ids.add(Integer.parseInt(id));
                         /**********远程发送MQ，更新mongodb eninfo字段 end*****/

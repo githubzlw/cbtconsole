@@ -36,6 +36,8 @@
         var tempJson = {};
         var typeJson = {};
         var editorObj = {};
+        var skuJson = {};
+        var skuInfo = {};
 
         $(document).ready(function () {
             initDialog();
@@ -54,6 +56,8 @@
             closeMultiFileDialog();
             closeGoodsDescDialog();
             closeOverSeaDialog();
+            $('#catid-dlg').dialog('close');
+            createComboTree();
         });
 
         function relieveDisabled(obj) {
@@ -484,6 +488,7 @@
                 //获取需要删除的规格ids数据
                 var typeDeleteIds = getTypeDeleteIdsData();
                 var typeRepalceIds = getTypeReplaceIdsData();
+                var skuCount = Object.keys(skuJson).length;
                 $('.mask').show().text('正在执行，请等待...');
                 $.ajax({
                     type: 'POST',
@@ -507,7 +512,8 @@
                         "typeRepalceIds": typeRepalceIds.substring(1),
                         "typeDeleteIds": typeDeleteIds.substring(1),
                         "wordSizeInfo": wordSizeInfo,
-                        "mainImg": mainImg
+                        "mainImg": mainImg,
+                        "skuCount":skuCount
                     },
                     success: function (data) {
                         $('.mask').hide();
@@ -1182,6 +1188,13 @@
             });
         }
 
+        function setNewCatid(pid, catid1) {
+            $("#catid_pid").val(pid);
+            $("#catid_old").val(catid1);
+            $('#catid-dlg').dialog('open');
+        }
+
+
         function addKeyWordWeight(shopId, catid, pid) {
             $("#add_shop_id").val(shopId);
             $("#add_shop_catid").val(catid);
@@ -1514,6 +1527,94 @@
             });
         }
 
+        function setTopSort(pid, num) {
+            var content = '是否确认设置搜索排序(请选择1-59999之间数值,数值越小越排在前面)';
+            if (num > 0) {
+                content = '是否确认设置搜索排序(请选择1-59999之间数值,数值越小越排在前面,当前值:' + num + ')';
+            }
+            $.messager.prompt('提示信息', content, function (newSort) {
+                if (newSort) {
+                    var reg = /(^[1-9]\d*$)/;
+                    if (reg.test(newSort) && 1<=newSort && newSort < 60000) {
+                        if (num == newSort) {
+                            $.messager.alert("提醒", "新的数值和原数值相同", "info");
+                        } else {
+                            $.messager.progress({
+                                title: '正在更新',
+                                msg: '请等待...'
+                            });
+                            $.ajax({
+                                type: 'POST',
+                                dataType: 'json',
+                                url: '/cbtconsole/editc/setTopSort',
+                                data: {
+                                    "pid": pid,
+                                    "newSort": newSort,
+                                    "num": num
+                                },
+                                success: function (json) {
+                                    $.messager.progress('close');
+                                    if (json.ok) {
+                                        $.messager.alert("提醒", "执行成功，页面即将刷新", "info");
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        }, 500);
+                                    } else {
+                                        $.messager.alert("提醒", json.message, "error");
+                                    }
+                                },
+                                error: function () {
+                                    $.messager.progress('close');
+                                    $.messager.alert("提醒", "执行失败，请重试", "error");
+                                }
+                            });
+                        }
+
+                    } else {
+                        showMessage('新的数值必须为正数,且在范围内！');
+                    }
+                } else {
+                    showMessage('未输入新的数值或取消输入！');
+                }
+            });
+
+        }
+
+        function setSalable(pid, flag) {
+            var content = '是否确认设置取消美加不可售卖标识';
+            if(flag > 0){
+                content = '是否确认设置美加不可售卖标识';
+            }
+            $.messager.confirm('提示', content, function (rs) {
+                if (rs) {
+                    $.ajax({
+                        type: 'POST',
+                        sync: true,
+                        dataType: 'json',
+                        url: '/cbtconsole/editc/setSalable',
+                        data: {
+                            "pid":pid,
+                            "flag": flag
+                        },
+                        success: function (data) {
+                            if (data.ok) {
+                                showMessage("执行成功");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
+                            } else {
+                                $.messager.alert("提醒", data.message, "error");
+                            }
+                        },
+                        error: function (XMLResponse) {
+                            $.messager.alert("提醒", "网络错误,请重试", "error");
+                        }
+                    });
+                }
+            });
+        }
+
+
         function uploadMultiFile() {
             $.messager.progress({
                 title: '上传本地图片',
@@ -1673,6 +1774,13 @@
                 }
             });
         }
+
+        function createComboTree() {
+            $('#select_catid').combotree({
+                url: '/cbtconsole/category/queryCategoryTree',
+                required: true
+            });
+        }
     </script>
 </head>
 
@@ -1694,6 +1802,35 @@
 <c:if test="${uid > 0}">
 
     <div class="mask"></div>
+
+
+    <div id="catid-dlg" class="easyui-dialog" style="width:500px;height:250px;padding:10px 30px;"
+         title="设置新的类别">
+        <table>
+            <tr>
+                <td>PID:</td>
+                <td><input type="text" id="catid_pid" name="pid" style="width:250px;height: 30px;"/></td>
+            </tr>
+            <tr>
+                <td>原类别:</td>
+                <td><input type="text" id="catid_old" name="oldCatid" style="width:250px;height: 30px;"/></td>
+            </tr>
+            <tr>
+                <td>修改类别:</td>
+                <td><select id="select_catid" class="easyui-combotree" name="newCatid" style="width:250px;height: 36px;"></select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;">
+                    <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="savePidNewCatidInfo()">保存</a>
+                    &nbsp;&nbsp;<a href="#" class="easyui-linkbutton" iconCls="icon-cancel"
+                       onclick="javascript:$('#catid-dlg').dialog('close')">取消</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
 
     <div id="set_over_sea_div" class="easyui-dialog" title="设置海外仓"
          data-options="modal:true"
@@ -2031,7 +2168,7 @@
 
             <span class="s_btn" onclick="doSaveDetalis('${goods.pid}',1,${isSoldFlag})">保存并发布</span>
             <span class="s_btn" onclick="setGoodsValid('${goods.pid}',-1)">下架该商品</span>
-            <span class="s_btn" title="无需修改时点击检查通过" onclick="setGoodsValid('${goods.pid}',1)">检查通过</span>
+
 
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <%--<span class="s_btn" >保存并发布</span>
@@ -2039,7 +2176,7 @@
                 <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>--%>
             <c:if test="${goods.describeGoodFlag == 0}">
                 <%--<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>--%>
-                <span class="s_btn" onclick="setGoodsDescWithHotType('${goods.pid}')">设置描述很精彩</span>
+                <span class="s_btn" onclick="setGoodsDescWithHotType('${goods.pid}')">描述很精彩</span>
             </c:if>
                 <%--<span class="s_last">*点击后数据直接更新线上</span>--%>
             <span class="s_btn" onclick="setNoBenchmarking('${goods.pid}',${goods.finalWeight})">标识非对标商品</span>
@@ -2051,14 +2188,28 @@
             <c:if test="${goods.overSeaFlag == 0}">
 
             </c:if>
-            <span class="s_btn" onclick="openOverSeaDialog(${goods.overSeaFlag})">设置海外仓</span>
-
+            <span class="s_btn" onclick="openOverSeaDialog(${goods.overSeaFlag})">海外仓</span>
             <c:if test="${goods.searchable == 0}">
-                <span class="s_btn" onclick="setSearchable('${goods.pid}', 1)">设置可搜索</span>
+                <span class="s_btn" onclick="setSearchable('${goods.pid}', 1)">可搜索</span>
             </c:if>
             <c:if test="${goods.searchable > 0}">
-                <span class="s_btn" onclick="setSearchable('${goods.pid}', 0)">设置不可搜索</span>
+                <span class="s_btn" onclick="setSearchable('${goods.pid}', 0)">不可搜索</span>
             </c:if>
+
+            <c:if test="${salable == 0}">
+                <span class="s_btn" onclick="setSalable('${goods.pid}', 1)">设置美加不可售卖</span>
+            </c:if>
+            <c:if test="${salable > 0}">
+                <span class="s_btn" onclick="setSalable('${goods.pid}', 0)">取消美加不可售卖</span>
+            </c:if>
+
+            <c:if test="${goods.topSort > 0}">
+                <span class="s_btn" onclick="setTopSort('${goods.pid}', ${goods.topSort})">搜索排序(值:${goods.topSort})</span>
+            </c:if>
+            <c:if test="${goods.topSort < 1}">
+                <span class="s_btn" onclick="setTopSort('${goods.pid}', -1)">搜索排序</span>
+            </c:if>
+
 
         </div>
         <div class="all_s">
@@ -2370,10 +2521,9 @@
                                         <tr>
                                             <c:forEach var="item" items="${showattribute}"
                                                        varStatus="itemIndex">
-                                            <td width="32%"><input type="text" class="inp_style"
-                                                                   title="单击可进行编辑" id="sku_id_${item.key}"
-                                                                   name="sku_key_val"
-                                                                   value="${item.value}"/></td>
+                                            <td width="32%"><input type="text" class="inp_style" title="单击可进行编辑"
+                                               id="sku_id_${item.key}" name="sku_key_val" value="${item.value}" onchange="addSkuLog('sku_id_${item.key}')"/>
+                                            </td>
                                             <c:if
                                                     test="${(itemIndex.index+1) % 3 == 0 || itemIndex.index == itemLength-1}">
                                         </tr>
@@ -2421,7 +2571,11 @@
                     <c:if test="${not empty describeGoodFlagStr}">
                         <b style="font-size: 16px;color: red;">描述很精彩:(${describeGoodFlagStr})</b>
                     </c:if>
-                </c:if><c:if test="${not empty goodsOverSeaList && fn:length(goodsOverSeaList) > 0}">
+                </c:if>
+                    <c:if test="${salable > 0}">
+                        <br><b style="font-size: 16px;color: red;">美加不可售卖标记</b>
+                    </c:if>
+                    <c:if test="${not empty goodsOverSeaList && fn:length(goodsOverSeaList) > 0}">
                     <br>
                     <div style="font-size: 20px;background-color: #a2f387" >
                         <table border="1">
@@ -2564,8 +2718,11 @@
                     <br><span class="s_btn"
                               onclick="beforeSetAliInfo('${goods.pid}',${goods.isBenchmark},${goods.bmFlag},'${goods.aliGoodsPid}')">重新录入对标</span>
                     &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
+                    <span class="s_btn" onclick="setNewCatid('${goods.pid}','${goods.catid1}')">设置新类别</span>
                     <br>
                     <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <span class="s_btn" title="无需修改时点击检查通过" onclick="setGoodsValid('${goods.pid}',1)">检查通过</span>
                     &nbsp;&nbsp;&nbsp;
                     <a target="_blank"
                        href="http://192.168.1.29:8280/cbtconsole/customerServlet?action=findAllTaoBaoInfo&className=PictureComparisonServlet&aliPid=${goods.aliGoodsPid}&ylbbPid=${goods.pid}"
@@ -2817,6 +2974,14 @@
         }
     }
 
+    
+    function onSkuclick() {
+
+    }
+    function addSkuLog(skuId) {
+        skuJson[skuId] = 1;
+    }
+
     function addGoodsAttribute() {
         var len = $("#attribute_table tbody tr:last").find('td').length;
         var tdStr = "";
@@ -2842,7 +3007,7 @@
     function beginUpdateWeight(pid, weight) {
         $.messager.prompt('提示信息', '请输入新的重量:', function (newWeight) {
             if (newWeight) {
-                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
                 if (reg.test(newWeight)) {
                     if (weight == newWeight) {
                         $.messager.alert("提醒", "新的重量和原重量相同", "info");
@@ -2879,7 +3044,7 @@
                     }
 
                 } else {
-                    showMessage('新的重量必须为正数，最多两位小数！');
+                    showMessage('新的重量必须为正数，最多三位小数！');
                 }
             } else {
                 showMessage('未输入新的重量或取消输入！');
@@ -2912,7 +3077,7 @@
     function updateVolumeWeight(pid, oldVolumeWeight) {
         $.messager.prompt('提示信息', '请输入新的体积重量:', function (newWeight) {
             if (newWeight) {
-                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
                 if (reg.test(newWeight)) {
                     if (newWeight == oldVolumeWeight) {
                         showMessage('新输入的体积重量和原来的一致！');
@@ -2941,7 +3106,7 @@
                     }
 
                 } else {
-                    showMessage('新的体积重量必须为正数，最多两位小数！');
+                    showMessage('新的体积重量必须为正数，最多三位小数！');
                 }
             } else {
                 // showMessage('未输入新的体积重量或取消输入！');
@@ -2953,11 +3118,11 @@
         if (type == 0) {
             $.messager.prompt('提示信息', '请输入新的利润率:', function (newProfit) {
                 if (newProfit) {
-                    var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                    var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
                     if (reg.test(newProfit)) {
                         editAndLockProfit(pid, type, newProfit);
                     } else {
-                        showMessage('新的利润率必须为正数，最多两位小数！');
+                        showMessage('新的利润率必须为正数，最多三位小数！');
                     }
                 } else {
                     showMessage('未输入新的利润率或取消输入！');
@@ -3006,5 +3171,39 @@
         var param = "height=660,width=900,top=160,left=550,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open("/cbtconsole/editc/querySkuByPid?pid=" + pid, "windows", param);
     }
+    
+    function savePidNewCatidInfo() {
+            var pid = $("#catid_pid").val();
+            var oldCatid = $("#catid_old").val();
+            var node = $("#select_catid").combotree('tree').tree('getSelected');
+            var newCatid = node.id;
+            if (pid && oldCatid && newCatid) {
+                $.messager.progress({
+                    title: '正在保存',
+                    msg: '请等待...'
+                });
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/editc/changePidToNewCatid",
+                    data: {pid: pid, oldCatid: oldCatid, newCatid: newCatid},
+                    success: function (data) {
+                        // $("#notice_id").hide();
+                        $.messager.progress('close');
+                        if (data.ok) {
+                            $('#catid-dlg').dialog('close');
+                        } else {
+                            $.messager.alert("提示信息", data.message, "error");
+                        }
+                    },
+                    error: function (res) {
+                        // $("#notice_id").hide();
+                        $.messager.progress('close');
+                        $.messager.alert("提示信息", "网络连接错误", "error");
+                    }
+                });
+            } else {
+                $.messager.alert("提示信息", "请填写完整信息", "info");
+            }
+        }
 </script>
 </html>
