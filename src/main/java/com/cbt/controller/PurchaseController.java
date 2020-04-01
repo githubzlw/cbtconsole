@@ -791,7 +791,7 @@ public class PurchaseController {
 		String orderNo=request.getParameter("orderNo");
 		String admid=request.getParameter("admid");
         Integer websiteType = org.apache.commons.lang3.StringUtils.isBlank(request.getParameter("websiteType"))?1:Integer.parseInt(request.getParameter("websiteType"));
-		String datas=iPurchaseService.allcgqrQrNew(orderNo,Integer.valueOf(admid),websiteType);
+		String datas=iPurchaseService.allcgqrQrNew(orderNo,Integer.parseInt(admid),websiteType);
 		PrintWriter out = response.getWriter();
 		out.print(datas);
 		out.flush();

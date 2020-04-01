@@ -1792,8 +1792,21 @@
         document.getElementById("taobao_name").value="";
         document.getElementById("paydate").value="";
         document.getElementById("goods_imgs").value="";
+        $("#taobao_id").val("");
+        $("#shipno").val("");
         $("input[name='radio']").removeAttr('checked');
+        fireDisable(false);
     }
+    
+    function fireDisable(isShow) {
+		$("#idAddResourceOffline").prop("disabled", isShow);
+		$("#bh_submit").prop("disabled", isShow);
+		if(isShow){
+			$("#on_notice").show();
+		} else {
+			$("#on_notice").hide();
+		}
+	}
 
     function AddinsertSources(goods_url,goods_num,goods_type,goods_img,price,orderid,goodsid,odid){
         var rfddd = document.getElementById("insertOrderInfo");
@@ -1818,14 +1831,22 @@
 				$("#on_notice").show().text("*请输入淘宝采购订单号");
 			}
 		} else if(shipno || taobao_id){
-			getTaobaoInfo(shipno, taobao_id);
+			// getTaobaoInfo(shipno, taobao_id);
+			$("#on_notice").show().text("*请同时输入1688采购订单号和运单号");
+			return;
 		} else {
-			$("#on_notice").show().text("*请输入1688采购订单号或者运单号");
+			$("#on_notice").show().text("*请同时输入1688采购订单号和运单号");
 			return;
 		}
 	}
 
+	function checkTaobaoInfo() {
+		var taobao_id = $("#bh_1688_orderno").val();
+		getTaobaoInfo('',taobao_id);
+	}
+
 	function getTaobaoInfo(shipno, taobao_id) {
+    	fireDisable(true);
 		$.ajax({
             type : 'POST',
             url : '/cbtconsole/purchase/getTaobaoInfo',
@@ -1837,8 +1858,13 @@
             success : function(data) {
             	var json = eval("(" + data + ")");
             	if(json.ok){
-            		$("#taobao_id").val(json.rows.orderid);
-            		$("#shipno").val(json.rows.shipno);
+            		if(json.rows){
+            			fireDisable(false);
+            			$("#taobao_id").val(json.rows.orderid);
+            			$("#shipno").val(json.rows.shipno);
+					} else{
+            			$("#on_notice").show().text("*请输入有效的1688采购订单号或者运单号");
+					}
 				}else{
             		$("#on_notice").show().text("*请输入有效的1688采购订单号或者运单号");
 				}
@@ -1895,7 +1921,7 @@
 				return;
 			}
 		} else if(!shipno && !taobao_id){
-			alert("请输入1688采购订单号或者运单号");
+			alert("请同时输入1688采购订单号和运单号");
 		}
 		var orderno = "${param.orderno}";
         $.ajax({
@@ -2713,19 +2739,19 @@
 		<h3 class="show_h3">采购备注：</h3>
 		<div>
 			<span id="otherReason0">砍价情况：</span><input type="text"
-													   name="otherReason" id="otherReason" class="remark" /><br> <span
+													   name="otherReason" id="otherReason0" class="remark" /><br> <span
 				id="otherReason1">交期偏长：</span><input type="text" name="otherReason"
-													 id="otherReason" class="remark" /><br> <span
+													 id="otherReason1" class="remark" /><br> <span
 				id="otherReason2">颜色替换：</span><input type="text" name="otherReason"
-													 id="otherReason" class="remark" /><br> <span
+													 id="otherReason2" class="remark" /><br> <span
 				id="otherReason3">尺寸替换：</span><input type="text" name="otherReason"
-													 id="otherReason" class="remark" /><br> <span
+													 id="otherReason3" class="remark" /><br> <span
 				id="otherReason4">订量问题：</span><input type="text" name="otherReason"
-													 id="otherReason" class="remark" /><br> <span
+													 id="otherReason4" class="remark" /><br> <span
 				id="otherReason5">有疑问备注:</span><input type="text"
-													  name="otherReason" id="otherReason" class="remark" /><br> <span
-				id="otherReason5">无疑问备注:</span><input type="text"
-													  name="otherReason" id="otherReason" class="remark" /><br>
+													  name="otherReason" id="otherReason5" class="remark" /><br> <span
+				id="otherReason6">无疑问备注:</span><input type="text"
+													  name="otherReason" id="otherReason6" class="remark" /><br>
 		</div>
 		<input type="button" id="idAddResource" value="提交"
 			   onclick="AddResource(1);"
@@ -2761,7 +2787,7 @@
 		</tr>
 		<tr>
 			<td>采购网站:</td>
-			<td><select id="select_type">
+			<td><select id="select_type" onchange="fireDisable(false)">
 				<option value="0">1688采购</option>
 				<option value="1">淘宝采购</option>
 			</select></td>
@@ -2811,7 +2837,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td colspan="2"><input type="button" id="idAddResource" value="提交"
+			<td colspan="2"><input type="button" id="idAddResourceOffline" value="提交"
 					   onclick="insertSources();"
 					   style="width: 90px; height: 40px; margin-top: 20px;"/>
 				&nbsp;&nbsp;<input
@@ -2878,37 +2904,41 @@
 </div>
 
 <div class="mod_pay3" style="display: none;" id="apbhdiv">
-	<center>
-		<h3 class="show_h3">补货</h3>
-
-		<h1 style="color: red;" id="hmsgid"></h1>
-		<div>
-			<a href="javascript:void(0)" class="show_x"
-			   onclick="$('#apbhdiv').hide();">╳</a>
-		</div>
-		<div>
-			采购补货<input type="radio" name="bh_rep_type" value="1" />替换弥补<input
-				type="radio" name="bh_rep_type" value="2" />
-		</div>
-		<div>
-			数量：<input type="text" id="bh_buycount" class="remark" />
-		</div>
-		<div>
-			价格：<input type="text" id="bh_goods_price" class="remark"  onblur="judgePurchase();" />
-		</div>
-		<div>
-			货源：
-			<textarea style="width: 470px" id="bh_goods_p_url" class="remarktwo"></textarea>
-		</div>
-		<div>
-			备注：
-			<textarea style="width: 470px" id="bh_remark" class="remarktwo"></textarea>
-		</div>
-		<input type="button" value="提交" onclick="insertOrderReplenishment();"
+	<table style="text-align: center;">
+		<caption><h1 style="text-align: center">补货</h1></caption>
+		<tr>
+			<td colspan="2">采购补货<input type="radio" name="bh_rep_type" value="1" />替换弥补<input
+				type="radio" name="bh_rep_type" value="2" /></td>
+		</tr>
+		<tr>
+			<td>数量:</td>
+			<td><input type="text" id="bh_buycount" class="remark" /></td>
+		</tr>
+		<tr>
+			<td>1688订单号:</td>
+			<td><input type="text" id="bh_1688_orderno" class="remark" onblur="checkTaobaoInfo()"/></td>
+		</tr>
+		<tr>
+			<td>价格:</td>
+			<td><input type="text" id="bh_goods_price" class="remark"  onblur="judgePurchase();" /></td>
+		</tr>
+		<tr>
+			<td>货源:</td>
+			<td><textarea style="width: 470px" id="bh_goods_p_url" class="remarktwo"></textarea></td>
+		</tr>
+		<tr>
+			<td>备注:</td>
+			<td><textarea style="width: 470px" id="bh_remark" class="remarktwo"></textarea></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type="button" value="提交" onclick="insertOrderReplenishment();" id="bh_submit" disabled="disabled"
 			   style="width: 90px; height: 40px; margin-top: 20px;" /> <input
 			type="button" value="取消" onclick="$('#apbhdiv').hide();"
 			style="width: 90px; height: 40px;" />
-	</center>
+			</td>
+		</tr>
+	</table>
 </div>
 <!-- 评论end -->
 <div class="mod_pay3" style="display: none; background-color: #FFFFFF;"

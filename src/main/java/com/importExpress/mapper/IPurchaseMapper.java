@@ -215,6 +215,8 @@ public interface IPurchaseMapper {
 
 	public int insertTaoBaoOrder(Map<String, String> map);
 
+	int insertTaoBaoOrderOffline(Map<String, String> map);
+
 	public int updateSourceState(Map<String, String> map);
 
 	public int insertRecords(Map<String, String> map);

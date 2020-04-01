@@ -480,9 +480,11 @@ public class OrderinfoService implements IOrderinfoService {
 
 			List<Map<String, String>> offlineInfos = pruchaseMapper.getOfflineInfoByShipno(shipno);
 			List<String> goodsidList = new ArrayList<>();
-			if(CollectionUtils.isNotEmpty(offlineInfos)){
-				goodsidList = offlineInfos.stream().map(e -> e.get("goodsid")).collect(Collectors.toList());
-			}
+			/*if(CollectionUtils.isNotEmpty(offlineInfos)){
+				for (Map<String, String> map : offlineInfos){
+					goodsidList.add(map.get("goodsid"));
+				}
+			}*/
 			Set set=new HashSet();
 			List<Map<String,Object>> resultFinalList = new ArrayList<>();
 			for(Map<String,Object> map:resultList){

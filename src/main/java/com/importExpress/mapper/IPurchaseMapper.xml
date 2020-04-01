@@ -373,6 +373,13 @@
         (#{TbGoodsid},#{TbOrderid},2,#{orderid},#{totalprice},#{taobao_name},#{itemid},#{taobaoPrice},#{goodsQty},#{goods_sku},#{shipno},
         #{taobao_url},#{username},#{preferential},now(),#{goods_imgs},'无','等待买家确认收货',now(),now(),'等待买家确认收货',now(),#{odid})
     </insert>
+
+    <insert id="insertTaoBaoOrderOffline">
+        insert into taobao_1688_order_history_offline(importGoodsid,importOrderid,tbOr1688,orderid,totalprice,itemname,itemid,itemprice,
+        itemqty,sku,shipno,itemurl,username,preferential,paydata,imgurl,shipper,shipstatus,creattime,delivery_date,orderstatus,orderdate,odid) values
+        (#{TbGoodsid},#{TbOrderid},2,#{orderid},#{totalprice},#{taobao_name},#{itemid},#{taobaoPrice},#{goodsQty},#{goods_sku},#{shipno},
+        #{taobao_url},#{username},#{preferential},now(),#{goods_imgs},'无','等待买家确认收货',now(),now(),'等待买家确认收货',now(),#{odid})
+    </insert>
     <update id="updateLockInventory">
         update lock_inventory set is_use=1 where od_id=#{od_id}
     </update>
