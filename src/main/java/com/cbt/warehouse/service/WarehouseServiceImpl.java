@@ -1043,13 +1043,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
             // @author: cjc @date：2020/1/19 10:47 上午   Description :  获取用户当前的免邮状态
             boolean userNotFreeState = getUserNotFreeState(userInfo.getUserid());
             String string = "切换为非免邮";
-            int state = 1;
+            int state = 0;
             if(userNotFreeState){
                 // @author: cjc @date：2020/1/20 2:35 下午   Description : 目前已经是非免邮了
                 string = "切换为免邮";
-                state = 0;
+                state = 1;
             }
-            String changeNotFreeButton = "<button onclick=\"changeNotFree(\'" + userInfo.getUserid() + "\', \'" +state + "\')\">"+string+"</button>" + userInfo.getBusinessName();
+            String changeNotFreeButton = "<button id='free' onclick=\"changeNotFree(\'" + userInfo.getUserid() + "\', \'" +state + "\')\">"+string+"</button>" + userInfo.getBusinessName();
             userInfo.setBusinessName(changeNotFreeButton);
             admuser.append("<select "+("0".equals(map.get("roleType"))?"":"disabled='disabled'")+" id='admuser_" + userInfo.getUserid()
                     + "'><option value='0'>未分配</option>");
@@ -3209,14 +3209,14 @@ public class WarehouseServiceImpl implements IWarehouseService {
         boolean b = redisUtil.hasKey(key);
         if(!b){
             List<UserFreeNotFree> userFreeNotFrees = userFreeNotFreeService.selectAll();
-            int v = Integer.parseInt(String.valueOf(Math.ceil(userFreeNotFrees.size() * 1.3)));
-            Map<String,Object> map = new HashMap<>(v);
-            userFreeNotFrees.stream().forEach(userFreeNotFree -> {
-                map.put(String.valueOf(userFreeNotFree.getUserid()),1);
-            });
-            redisUtil.hmsetObj(key,map);
+            if(userFreeNotFrees.size() > 0){
+                Map<String,Object> map = new HashMap<>();
+                userFreeNotFrees.stream().forEach(userFreeNotFree -> {
+                    redisUtil.sSet(key, String.valueOf(userId));
+                });
+            }
         }
-        boolean member = redisUtil.isMember(key, userId);
+        boolean member = redisUtil.isMember(key, String.valueOf(userId));
         return  member;
     }
 }

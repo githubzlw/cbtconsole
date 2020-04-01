@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.common.cache.RedisUtil;
+import com.importExpress.pojo.CommonResult;
 import com.importExpress.pojo.ResultBean;
 import com.importExpress.service.UserFreeNotFreeService;
 import com.importExpress.utli.*;
@@ -9643,17 +9644,17 @@ public class WarehouseCtrl {
 		}
 		String key = "AUTH:USER_NOTFREE";
 		// @author: cjc @date：2020/1/20 2:56 下午   Description : 请求线上接口
-		int i = FreightUtlity.changeUserNotFree(userId, state);
+		CommonResult commonResult = FreightUtlity.changeUserNotFree(userId, state);
 		resultBean.setMsg("请求线上失败");
 		boolean b = false;
-		if(i > 0){
-			if(state == 0){
+		if(commonResult.getCode() == 200){
+			if(state == 1){
 				// @author: cjc @date：2020/1/20 2:51 下午   Description : 切换为免邮
-				redisUtil.setRemove(key, userId);
+				redisUtil.setRemove(key, String.valueOf(userId));
 			}else {
 				Map<String,Object> map = new HashMap<>(2);
 				map.put(String.valueOf(userId),1);
-				redisUtil.hmsetObj(key, map);
+				redisUtil.sSet(key, String.valueOf(userId));
 			}
 			resultBean.setCode(0);
 			resultBean.setMsg("success");

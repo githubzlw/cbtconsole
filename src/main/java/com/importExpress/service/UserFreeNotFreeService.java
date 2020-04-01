@@ -17,7 +17,7 @@ public interface UserFreeNotFreeService {
     @Async
     int insert(int userId,int state,int admId);
     @Async
-    int insertSelective(int userId,int state,int admId);
+    void insertSelective(int userId,int state,int admId);
 
     List<UserFreeNotFree> selectByExample(UserFreeNotFreeExample example);
 

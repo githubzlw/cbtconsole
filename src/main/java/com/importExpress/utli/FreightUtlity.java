@@ -1,5 +1,6 @@
 package com.importExpress.utli;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,8 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.cbt.common.UrlUtil;
 import com.google.gson.Gson;
+import com.importExpress.pojo.CommonResult;
 import com.importExpress.pojo.ResultBean;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.FormBody;
@@ -44,11 +48,13 @@ import com.importExpress.mail.TemplateType;
  * ******************************************************************************************
  */
 @Service
+@Slf4j
 public class FreightUtlity {
     private static final Logger logger = LoggerFactory.getLogger(FreightUtlity.class);
     private static final String getFreightCostUrl = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
     @Autowired
     private SendMailFactory sendMailFactory;
+    private static UrlUtil instance = UrlUtil.getInstance();
     public static double getFreightByOrderno(String orderNo) {
         double freight = 0;
         OkHttpClient okHttpClient = new OkHttpClient();
@@ -329,27 +335,21 @@ public class FreightUtlity {
 	}
 
 
-    public static int changeUserNotFree(int userId,int state) {
+    public static CommonResult changeUserNotFree(int userId,int state) {
+        CommonResult commonResult = new CommonResult();
         int result = 0;
         OkHttpClient okHttpClient = new OkHttpClient();
         /*Request request = new Request.Builder().url(getFreightCostUrl).post(formBody).build();*/
         String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","goodsCar/"+userId+"/"+state);
-        Request request = new Request.Builder().addHeader("Accept","*/*")
-                .addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
-                .url(url).get().build();
+
+        com.alibaba.fastjson.JSONObject jsonObject;
         try {
-            Response response = okHttpClient.newCall(request).execute();
-            String resultStr = response.body().string();
-            ResultBean resultBean = new Gson().fromJson(resultStr, ResultBean.class);
-            if (resultBean.getCode()==0) {
-                Object data1 = resultBean.getData();
-                result = (int)data1;
-            } else {
-                logger.warn("getFreightByOrderno error :<:<:<");
-            }
-        } catch (Exception e) {
-            logger.warn("getFreightByOrderno error,userId:[{}],state:[{}]",userId,state);
+            String requestUrl = url;
+            jsonObject = instance.doGet(requestUrl);
+            commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+        } catch (IOException e) {
+            log.error("CartController refresh ",e);
         }
-        return result;
+        return commonResult;
     }
 }

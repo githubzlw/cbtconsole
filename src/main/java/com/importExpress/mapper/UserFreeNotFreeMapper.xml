@@ -243,8 +243,8 @@
   <select id="selectAll" resultMap="BaseResultMap">
     select userId from (
     select  userId,free from (
-    select userId,free,createtime from user_free_notfree order by createtime limit 10000
+    select userId,free,createtime from user_free_notfree order by createtime desc limit 10000
     )b group by userId
-    )a where free = 1;
+    )a where free = 0;
   </select>
 </mapper>

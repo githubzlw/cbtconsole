@@ -55,12 +55,12 @@ public class UserFreeNotFreeServiceImpl implements UserFreeNotFreeService {
     }
     @Async
     @Override
-    public int insertSelective(int userId,int state,int admId) {
+    public void insertSelective(int userId,int state,int admId) {
         UserFreeNotFree userFreeNotFree= new UserFreeNotFree();
         userFreeNotFree.setAdminid(admId);
         userFreeNotFree.setUserid(userId);
         userFreeNotFree.setFree(state);
-        return userFreeNotFreeMapper.insertSelective(userFreeNotFree);
+        userFreeNotFreeMapper.insertSelective(userFreeNotFree);
     }
 
     @Override

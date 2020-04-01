@@ -34,6 +34,9 @@
 	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
 	<script type="text/javascript"
 			src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
+
+	<script type="text/javascript"
+			src="/cbtconsole/js/lhgdialog/lhgdialog.min.js?self=true&skin=discuz"></script>
 <title>用户信息管理</title>
 <style type="text/css">
 .but_color {
@@ -867,6 +870,8 @@ tr .td_class{width:230px;}
 </body>
 <script type="text/javascript">
 	function changeNotFree(userId,state) {
+		//$.messager.alert('提示', "提示");
+
 		$.ajax({
 			type: "POST",
 			url: "/cbtconsole/warehouse/changeNotFree",
@@ -877,7 +882,22 @@ tr .td_class{width:230px;}
 			dataType:"json",
 			success: function(res){
 				if (res) {
-					$.messager.alert('提示', res.message);
+					var content = '<div></div><span style="color: orange">'+res.msg+'</span><br>';
+					$.dialog({
+						title : '切换结果！',
+						content : content,
+						max : false,
+						min : false,
+						lock : true,
+						drag : false,
+						fixed : true,
+						ok : function() {
+							$("#free").html(res.msg);
+						},
+						cancel : function() {
+							$("#free").html(res.msg);
+						}
+					});
 				}
 
 			}
