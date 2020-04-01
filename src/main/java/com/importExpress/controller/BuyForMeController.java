@@ -9,6 +9,7 @@ import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.cbt.website.util.UploadByOkHttp;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -370,66 +371,58 @@ public class BuyForMeController {
         String msg = "";
         String err = "";
         try {
-            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-            // 获取文件域
-            List<MultipartFile> fileList = multipartRequest.getFiles("filedata");
-            Random random = new Random();
-            // 获取配置文件信息
-            if (ftpConfig == null) {
-                ftpConfig = GetConfigureInfo.getFtpConfig();
-            }
-            // 检查配置文件信息是否正常读取
-            JsonResult json = new JsonResult();
-            GetConfigureInfo.checkFtpConfig(ftpConfig, json);
-            if (json.isOk()) {
-            	String localDiskPath = ftpConfig.getLocalDiskPath();
-                for (MultipartFile mf : fileList) {
-                    if (!mf.isEmpty()) {
-                        // 得到文件保存的名称mf.getOriginalFilename()
-                        String originalName = mf.getOriginalFilename();
-                        // 文件的后缀取出来
-                        String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
-                        String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
-                        // 本地服务器磁盘全路径
-                        String localFilePath = "buyforme/remark/" + saveFilename + fileSuffix;
-                        // 文件流输出到本地服务器指定路径
-                        ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
-                        File file = new File(localDiskPath + localFilePath);
-                        if (file.exists()) {
-                        	msg = ftpConfig.getLocalShowPath() + localFilePath;
-                        }
-                        // 检查图片分辨率
-                       /* boolean is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 100, 100);
-                        if (is) {
-                            is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
-                            if (is) {
-                                String newLocalPath = "buyforme/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
-                                is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
-                                        localDiskPath + newLocalPath);
-                                if (is) {
-                                    msg = ftpConfig.getLocalShowPath() + newLocalPath;
-                                } else {
-                                    json.setOk(false);
-                                    json.setMessage("压缩图片到700*700失败，终止执行");
-                                    break;
-                                }
-                            } else {
-                                msg = ftpConfig.getLocalShowPath() + localFilePath;
-                            }
-                        } else {
-                            // 判断分辨率不通过删除图片
-                            File file = new File(localFilePath);
-                            if (file.exists()) {
-                                file.delete();
-                            }
-                            msg = "";
-                            err = "图片分辨率小于100";
-                        }*/
-                    }
-                }
-            } else {
+            String orderNo = request.getParameter("orderNo");
+            if (StringUtils.isBlank(orderNo)) {
                 msg = "";
-                err = json.getMessage();
+                err = "获取PID失败";
+            } else {
+                MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+                // 获取文件域
+                List<MultipartFile> fileList = multipartRequest.getFiles("filedata");
+                Random random = new Random();
+                // 获取配置文件信息
+                if (ftpConfig == null) {
+                    ftpConfig = GetConfigureInfo.getFtpConfig();
+                }
+                // 检查配置文件信息是否正常读取
+                JsonResult json = new JsonResult();
+                GetConfigureInfo.checkFtpConfig(ftpConfig, json);
+                if (json.isOk()) {
+                    String localDiskPath = ftpConfig.getLocalDiskPath();
+                    for (MultipartFile mf : fileList) {
+                        if (!mf.isEmpty()) {
+                            // 得到文件保存的名称mf.getOriginalFilename()
+                            String originalName = mf.getOriginalFilename();
+                            // 文件的后缀取出来
+                            String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
+                            String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
+                            // 本地服务器磁盘全路径
+                            String localFilePath = "buyforme/remark/" + saveFilename + fileSuffix;
+                            // 文件流输出到本地服务器指定路径
+                            ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
+                            File file = new File(localDiskPath + localFilePath);
+                            if (file.exists()) {
+                                // msg = ftpConfig.getLocalShowPath() + localFilePath;
+                                String remotePath = "/usr/local/goodsimg/importcsvimg/buyforme/" + orderNo;
+                                boolean isSuccess = UploadByOkHttp.uploadFile(file, remotePath, 0);
+                                if (!isSuccess) {
+                                    isSuccess = UploadByOkHttp.uploadFile(file, remotePath, 0);
+                                }
+                                if (isSuccess) {
+                                    //返回新的链接
+                                    msg = ftpConfig.getRemoteShowPath() + "buyforme/" + orderNo + "/" + file.getName();
+                                    json.setOk(true);
+                                } else {
+                                    msg = "";
+                                    err = "上传错误";
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    msg = "";
+                    err = json.getMessage();
+                }
             }
         } catch (Exception e) {
             msg = "";
