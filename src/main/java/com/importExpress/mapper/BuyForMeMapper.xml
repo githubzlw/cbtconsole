@@ -59,7 +59,7 @@
   <if test="state !=-2">and state=#{state}</if>
   <if test="orderNo !=null">and order_no=#{orderNo}</if>
   <if test="userId !=null">and user_id=#{userId}</if>
-  
+  order by create_time desc
   limit #{page},30
   </select>
   
