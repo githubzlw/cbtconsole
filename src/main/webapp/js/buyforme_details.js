@@ -404,8 +404,9 @@ function getShippingCost(){
 		$.MsgBox.Alert("提示", "重量为0获取运费交期失败");
 		return ;
 	}
+	// url:"https://www.import-express.com/shippingCost/getShippingCost",
 	 jQuery.ajax({
-		       url:"https://www.import-express.com/shippingCost/getShippingCost",
+		       url:"http://192.168.1.66:8087/shippingCost/getShippingCost",
 		       data:{
 		    	   "countryId":countryId,
 		    	   "free":0,
@@ -436,12 +437,13 @@ function getShippingCost(){
 
 //初始化xheditor
 function initXheditor() {
+var orderNo = $(".ormnum").text();
     editorObj = $('#remark-replay-content').xheditor({
         tools: "full",
         html5Upload: false,
         upBtnText: "上传",
         upMultiple: 1,
-        upImgUrl: "/cbtconsole/bf/xheditorUploads",
+        upImgUrl: "/cbtconsole/bf/xheditorUploads?orderNo=" + orderNo",
         upImgExt: "jpg,jpeg,gif,png"
     });
 }
