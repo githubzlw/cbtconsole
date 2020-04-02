@@ -270,7 +270,6 @@ body{min-height:100%;}
 		</div>
 		
 		</div>
-		
 		</c:forEach>
 		<br>
 		<button class="btn btn-success btn-finsh">确认处理</button>		
