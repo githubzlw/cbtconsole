@@ -122,12 +122,6 @@ body{min-height:100%;}
 			<div class="col-xs-4"><span class="th-font">邮箱地址:</span><span>${order.email }</span></div>
 			<div class="col-xs-4"><span class="th-font">下单时间:</span><span>${order.create_time}</span></div>
 			</div>
-			<%-- <div class="row h50">
-			<div class="col-xs-8 address-d"><span class="th-font">地址:</span>${order.country }
-			<span>${order.statename }</span><span>${order.address }</span>
-			<span>${order.address2 }</span>(ZIPCODE:<span>${order.zip_code }</span>)</div>
-			<div class="col-xs-4"><span class="th-font">电话:</span><span>${order.phone_number }</span></div>
-			</div> --%>
 			<div class="row"><span class="sy-content"><c:if test="${order.sample_flag ==1 }">送样</c:if></span></div>
 	
 	</div>
