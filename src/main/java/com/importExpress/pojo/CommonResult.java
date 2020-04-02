@@ -3,13 +3,9 @@ package com.importExpress.pojo;
 import lombok.Data;
 import lombok.NonNull;
 
-/**
- * 通用返回对象
- */
 @Data
 public class CommonResult {
-
-    /**
+	 /**
      *成功
      */
     public static final int SUCCESS = 200;
@@ -57,7 +53,7 @@ public class CommonResult {
     /**
      * 普通成功返回
      */
-    public static CommonResult success(String message, Object data) {
+    public static CommonResult success(String message,Object data) {
         CommonResult commonResult = new CommonResult(SUCCESS);
         commonResult.message = message;
         commonResult.data = data;
@@ -91,4 +87,3 @@ public class CommonResult {
         this.code = code;
     }
 }
-
