@@ -16,6 +16,7 @@ import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
 import com.importExpress.pojo.DetailsSku;
 import com.importExpress.pojo.TransportMethod;
+import com.importExpress.pojo.ZoneBean;
 import com.importExpress.service.BuyForMeService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -210,6 +211,11 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 			SendMQ.sendMsg(new RunSqlModel(sql));
 		}
 		return deleteProduct;
+	}
+
+	@Override
+	public List<ZoneBean> lstCountry() {
+		return buyForMemapper.lstCountry();
 	}
 	
 

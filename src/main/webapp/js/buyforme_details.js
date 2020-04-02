@@ -27,6 +27,7 @@ $(function(){
 		var address2 = $("#in-address").val();
 		var phone = $("#in-phone").val();
 		var code = $("#in-code").val();
+		var recipients = $("#in-recipients").val();
 		jQuery.ajax({
 			url:"/cbtconsole/bf/finsh",
 			data:{
@@ -37,6 +38,7 @@ $(function(){
 				"street":street,
 				"address2":address2,
 				"phone":phone,
+				"recipients":recipients,
 				"code":code
 			},
 			type:"post",
@@ -137,7 +139,7 @@ $(function(){
 		var time = $(".delivery-time").val();
 		var method = $(".delivery-method").val();
 		var feight = $(".delivery-feight").val();
-		if(time=='' || feight==''||method==''){
+		if(time=='' || feight==''||!method || method==''){
 			valid = 1;
 		}else{
 			$(".lu-weight").each(function(){
@@ -148,7 +150,7 @@ $(function(){
 			});
 		}
 		if(valid == 1){
-			$.MsgBox.Alert("提示", "请确认交期时间、交期方式、重量信息是否准确");
+			$.MsgBox.Alert("提示", "请确认交期、快递、运费、重量信息是否准确");
 			return ;
 		}
 		
@@ -445,6 +447,10 @@ function initXheditor() {
 }
 function changePrice(t){
 	var cny = parseFloat($(t).val());
+	if(!cny || cny < 0.001){
+		$(t).val('');
+		return ;
+	}
 	var price = parseFloat(cny/7.0832).toFixed(2);
 	$(t).parents(".td-price").find(".lu-price-buy").text(price);
 	

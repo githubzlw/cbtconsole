@@ -33,6 +33,7 @@ import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
 import com.importExpress.pojo.TransportMethod;
+import com.importExpress.pojo.ZoneBean;
 import com.importExpress.service.BuyForMeService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -118,6 +119,9 @@ public class BuyForMeController {
     		List<Map<String,String>> remark = buyForMeService.getRemark(orderNo);
     		mv.addObject("remark", remark);
     		mv.addObject("order", order);
+    		
+    		List<ZoneBean> lstCountry = buyForMeService.lstCountry();
+    		mv.addObject("countrys", lstCountry);
     		
 //    		Map<String, List<String>> transport = buyForMeService.getTransport();
 //    		mv.addObject("transport", transport);
@@ -364,6 +368,7 @@ public class BuyForMeController {
     		String address2 = request.getParameter("address2");
     		String phone = request.getParameter("phone");
     		String code = request.getParameter("code");
+    		String recipients = request.getParameter("recipients");
     		Map<String,String> map = Maps.newHashMap();
     		map.put("address",address);
 			map.put("address2",address2);
@@ -372,6 +377,7 @@ public class BuyForMeController {
 			map.put("code",code);
 			map.put("statename",statename);
 			map.put("street",street);
+			map.put("recipients",recipients);
 			map.put("id",id);
     		int update = 
     				buyForMeService.updateOrdersAddress(map);

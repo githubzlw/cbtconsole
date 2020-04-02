@@ -10,6 +10,7 @@ import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
 import com.importExpress.pojo.TransportMethod;
+import com.importExpress.pojo.ZoneBean;
 
 public interface BuyForMeService {
 	/**申请单列表
@@ -102,5 +103,8 @@ public interface BuyForMeService {
 	int deleteProduct(int bfdid);
 	
 	List<Admuser> lstAdms();
-	
+	/**国家列表
+	 * @return
+	 */
+	List<ZoneBean> lstCountry();
 }

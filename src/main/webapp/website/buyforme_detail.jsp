@@ -19,7 +19,7 @@
 .report .form-control-i {display: inline-block;width: 30%;}
 .report .form-control-i200 {display: inline-block;width: 50%;}
 .report select.form-control {width: 48%;}
-.report {font-size: 16px;color: #333;width: 90%;}
+.report {font-size: 16px;color: #333;width: 1700px;}
 .report label {margin-right: 10px;}
 .report .mt20 {margin-top: 20px;}
 .report .row2 button {margin-right: 10px;}
@@ -49,7 +49,7 @@ padding: 20px;max-height: 800px;}
 .img-responsive{max-width: 135px;max-height: 135px;margin-top: 11px;}
 .w350{width: 350px;}
 .btn-re-n{margin-bottom: 3px;margin-left: 17px;}
-.remark-dn{width: 30%;height:105px;margin-top: 5px;border: 1px solid #ccc;border-radius: 4px;}
+.remark-dn{width: 20%;height:105px;margin-top: 5px;border: 1px solid #ccc;border-radius: 4px;}
 .h50{height: 50px;}
 .input-w1{width: 64px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
 .input-w4{width: 100px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
@@ -95,17 +95,26 @@ body{min-height:100%;}
 .num-span{margin-left: 2%;}
 .btn-update-address{display: none;}
 .delete-all{font-weight: bold;font-size: 15px;color: #ef0e09;}
+#in-state{margin-left: 7%;}
+#in-city{margin-left: 5.2%;}
+#in-address{margin-left: 3.2%;}
+#in-country{width: 67%;height: 27px;}
+#in-phone{margin-left: 4.5%;}
+.adm-state-content{font-size: 20px;color:#1181e0;font-weight: bold;}
+.w22{width: 326px;}
+.w10{width:85px;}
+.delivery-method{width: 380px;}
 </style>
 </head>
 <body>
-<div style="background-color:#eaf5e5;min-height:100%,width:100%;">
+<div style="background-color:#eaf5e5;min-height:100%,width:2000px;">
 	<div class="container-fluid report">
 		<h1 class="text-center">采购申请单详情</h1>
 			<input type="hidden" value="${order.bf_id }" id="query_bf_id">
 	<div  class="row w800">
 			<div class="row h50">
 			<div class="col-xs-4"><span class="th-font">采购单号:</span><span class="ormnum">${order.order_no}</span></div>
-			<div class="col-xs-4">${order.stateContent }</div>
+			<div class="col-xs-4 adm-state-content">${order.stateContent }</div>
 			<div class="col-xs-4"><span class="th-font">关联订单号:</span><span></span></div>
 			</div>
 			<div class="row h50">
@@ -120,25 +129,34 @@ body{min-height:100%;}
 			<div class="col-xs-4"><span class="th-font">电话:</span><span>${order.phone_number }</span></div>
 			</div> --%>
 			<div class="row"><span class="sy-content"><c:if test="${order.sample_flag ==1 }">送样</c:if></span></div>
-			
 	
 	</div>
 	<div class="row w90">
 	<div class="row mar-l">
-	<div class="col-xs-3"><span>Country:<input type="text" value="${order.country }" id="in-country" disabled="disabled" class="disable-in-l"></span></div>
-	<div class="col-xs-3"><span>State:<input type="text" value="${order.statename }" id="in-state" disabled="disabled" class="disable-in-l"></span></div>
-	<div class="col-xs-3"><span>City:<input type="text" value="${order.address }" id="in-city" disabled="disabled" class="disable-in-l"></span></div>
-	<div class="col-xs-3"><span>Street:<input type="text" value="${order.street }" id="in-street" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-2 w22"><span>Country:</span>
+	<select id="in-country" disabled="disabled" class="disable-in-l">
+	<c:forEach items="${countrys }" var="lst">
+	<option value="${lst.id }" ${lst.id== order.countryId?"selected='selected'":""}>${lst.country }</option>
+	</c:forEach>
+	
+	</select>
+	
+	</div>
+	<div class="col-xs-2 w22"><span>City:<input type="text" value="${order.address }" id="in-city" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-2 w22"><span>Address:<input type="text" value="${order.address2 }" id="in-address" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-2 w22"><span>Phone:<input type="text" value="${order.phone_number }" id="in-phone" disabled="disabled" class="disable-in-l"></span></div>
 	</div>
 	<div class="row mar-l">
 	<input type="hidden" value="${order.address_id }" id="address_id">
-	<div class="col-xs-3"><span>Address:<input type="text" value="${order.address2 }" id="in-address" disabled="disabled" class="disable-in-l"></span></div>
-	<div class="col-xs-3"><span>Phone:<input type="text" value="${order.phone_number }" id="in-phone" disabled="disabled" class="disable-in-l"></span></div>
-	<div class="col-xs-3"><span>ZipCode:<input type="text" value="${order.zip_code }" id="in-code" disabled="disabled" class="disable-in-l"></span></div>
-	<div class="col-xs-3"><button class="btn btn-info btn-address">修改地址</button>
+	<div class="col-xs-2 w22"><span>State:<input type="text" value="${order.statename }" id="in-state" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-2 w22"><span>Street:<input type="text" value="${order.street }" id="in-street" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-2 w22"><span>recipients:<input type="text" value="${order.recipients }" id="in-recipients" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-2 w22"><span>ZipCode:<input type="text" value="${order.zip_code }" id="in-code" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-2 w10"><button class="btn btn-info btn-address">修改地址</button>
 	<button class="btn btn-info btn-update-address">更新地址</button></div>
 	</div>
 	</div>
+	
 	
 	<div class="row w90">
 	<button class="btn btn-info btn-re-n">添加备注内容(对内)</button> <span class="remark-title">备注内容:</span><input type="text" class="remark-dn" value="">
