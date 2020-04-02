@@ -1,5 +1,60 @@
 var costList;
 $(function(){
+	$(".btn-delete-p-all").click(function(){
+		var id = $(this).parents(".de-td").find(".bfdid").val();
+		jQuery.ajax({
+			url:"/cbtconsole/bf/invalidproduct",
+			data:{
+				"bfdid":id
+			},
+			type:"post",
+			success:function(data){
+				if(data.state == 200){
+					window.location.reload();
+				}
+			},
+			error:function(e){
+				$.MsgBox.Alert("提示", "删除商品失败");
+			}
+		});
+	})
+	$(".btn-update-address").click(function(){
+		var id = $("#address_id").val();
+		var country = $("#in-country").val();
+		var statename = $("#in-state").val();
+		var address = $("#in-city").val();
+		var street = $("#in-street").val();
+		var address2 = $("#in-address").val();
+		var phone = $("#in-phone").val();
+		var code = $("#in-code").val();
+		jQuery.ajax({
+			url:"/cbtconsole/bf/finsh",
+			data:{
+				"id":id,
+				"country":country,
+				"statename":statename,
+				"address":address,
+				"street":street,
+				"address2":address2,
+				"phone":phone,
+				"code":code
+			},
+			type:"post",
+			success:function(data){
+				if(data.state == 200){
+					window.location.reload();
+				}
+			},
+			error:function(e){
+				$.MsgBox.Alert("提示", "更新地址失败");
+			}
+		});
+	})
+	$(".btn-address").click(function(){
+		$(".disable-in-l").removeAttr("disabled");
+		$(".btn-update-address").show();
+		$(this).hide();
+	})
 	getShippingCost();
 	initXheditor();
 	$(".btn-delivery-time").click(function(){
@@ -62,11 +117,13 @@ $(function(){
 		$('.transparent,.transparent-bg').hide();
 	})
 	$(".b-add").click(function(){
+		var price = $(this).parents(".de-td").find(".price-ss").val();
 		var html = '<tr class="sku-td">'+
 			'<td><input type="text" class="input-w8 lu_sku" value=""></td>'+
 			'<td class="td-price">USD:<span class="lu-price-buy"></span>(CNY:<input type="text" value="" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>'+
+			'<td>'+price+'</td>'+
 		'<td>USD:<input type="text" value="" class="lu-price-sale input-w1">(含运费<input type="text" value="" class="lu-ship-feight input-w1">)</td>'+
-			'<td><input type="text" class="input-w6 lu_count" value="0"></td>'+
+		'<td><input type="text" class="input-w6 lu_count" value="0"></td>'+
 			'<td><input type="text" class="input-w5 lu_unit"></td>'+
 			'<td><input type="text" class="input-w5 lu_url">'+
 			'&nbsp;<button class="btn btn-success btn-add">录入</button></td>'+

@@ -17,6 +17,7 @@
     <result column="state" property="state" jdbcType="INTEGER" />
     <result column="address_id" property="addressId" jdbcType="INTEGER" />
     <result column="admin_id" property="adminId" jdbcType="INTEGER" />
+    <result column="admName" property="adminName" jdbcType="VARCHAR" />
   </resultMap>
   <resultMap id="detailResultMap" type="com.importExpress.pojo.BFOrderDetail" >
     <id column="id" property="id" jdbcType="INTEGER" />
@@ -52,13 +53,21 @@
     <result column="unit" property="unit" jdbcType="VARCHAR" />
   </resultMap>
   
+  <resultMap id="admMap" type="com.cbt.pojo.Admuser" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="admName" property="admname" jdbcType="VARCHAR" />
+  </resultMap>
+  
   <select id="getOrders" resultMap="infoResultMap">
-  select id,order_no,user_id,state,pay_price,product_cost,delivery_time,
-  address_id,create_time,update_time,admin_id,ip,remark,ship_feight,delivery_method
-  from buyforme_orderinfo where 1=1
-  <if test="state !=-2">and state=#{state}</if>
-  <if test="orderNo !=null">and order_no=#{orderNo}</if>
-  <if test="userId !=null">and user_id=#{userId}</if>
+  select a.id,a.order_no,a.user_id,a.state,a.pay_price,a.product_cost,a.delivery_time,
+  a.address_id,a.create_time,a.update_time,a.admin_id,a.ip,a.remark,a.ship_feight,a.delivery_method,b.admName
+  from buyforme_orderinfo a left join admin_r_user b on a.admin_id=b.adminid
+  
+  where 1=1
+  <if test="state !=-2">and a.state=#{state}</if>
+  <if test="orderNo !=null">and a.order_no=#{orderNo}</if>
+  <if test="userId !=null">and a.user_id=#{userId}</if>
+  <if test="admid !='0'">and a.admin_id=#{admid}</if>
   
   limit #{page},30
   </select>
@@ -114,7 +123,7 @@
   
   <select id="getOrder" resultType="Map">
   select  a.id as bf_id,a.create_time,a.order_no,a.user_id,b.name,b.email,a.state,c.address,a.delivery_time,
-  a.delivery_method,a.ship_feight,a.sample_flag,
+  a.delivery_method,a.ship_feight,a.sample_flag,a.address_id,
    c.address2,c.phone_number,c.zip_code,c.statename,c.street,c.address_email,d.country,c.country as countryId
   from buyforme_orderinfo a left join user b on a.user_id=b.id 
   left join buyforme_address c on a.address_id=c.id 
@@ -128,5 +137,19 @@
   <select id="getRemark" resultType="java.util.Map">select remark,create_time from buyforme_remark where order_no=#{orderNo}</select>
   
   <select id="getTransport" resultType="java.util.Map">SELECT  transport_mode,shipping_time from tab_transit_freightinfo_unite_new GROUP BY transport_mode,shipping_time</select>
+
+<update id="updateOrdersAddress">
+update buyforme_address set address=#{address},address2=#{address2},
+country=#{country},phone_number=#{phone},zip_code=#{code},
+statename=#{statename},street=#{street}  where id=#{id}
+</update>
+
+<select id="lstAdms" resultMap="admMap">select  id,admName from  admuser where roleType=4 and status=1</select>
+
+<update id="deleteProduct"> 
+update buyforme_details a left join  buyforme_details_sku b on a.id=b.bf_details_id 
+set a.state=-1,b.state=-1 where a.id=#{bfdid}
+
+</update>
 
 </mapper>

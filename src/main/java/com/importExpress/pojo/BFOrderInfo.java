@@ -20,4 +20,5 @@ public class BFOrderInfo {
 	private String stateContent;
 	private String method;
 	private String feight;
+	private String adminName;
 }

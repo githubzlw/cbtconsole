@@ -1,4 +1,5 @@
 $(function(){
+	
 	$("#query_button_check").click(function(){
 		doQuery();
 	})
@@ -32,19 +33,16 @@ $(function(){
 		doQuery();
 	})
 	
-	
-	
-	
-	
 })
 
 function doQuery(){
 	var oderno = $("#query_oderno").val();
 	var userid = $("#query_user_id").val();
+	var admid = $("#query_admin").val();
 	var sttime = $("#query_sttime").val();
 	var edtime = $("#query_edtime").val();
 	var state = $("#query_state").val();
 	var page = $("#current_page").val();
 	window.open("/cbtconsole/bf/orders?page="+page+"&userid="+userid+"&oderno="+oderno
-			+"&state="+state+"&sttime="+sttime+"&edtime="+edtime, "_self");
+			+"&state="+state+"&sttime="+sttime+"&edtime="+edtime+"&admid="+admid, "_self");
 }

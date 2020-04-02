@@ -93,6 +93,8 @@ padding: 20px;max-height: 800px;}
 .sy-content{    margin-left: 1%;font-size: 20px;font-weight: bold;color: #ef110c;}
 body{min-height:100%;}
 .num-span{margin-left: 2%;}
+.btn-update-address{display: none;}
+.delete-all{font-weight: bold;font-size: 15px;color: #ef0e09;}
 </style>
 </head>
 <body>
@@ -111,30 +113,32 @@ body{min-height:100%;}
 			<div class="col-xs-4"><span class="th-font">邮箱地址:</span><span>${order.email }</span></div>
 			<div class="col-xs-4"><span class="th-font">下单时间:</span><span>${order.create_time}</span></div>
 			</div>
-			<div class="row h50">
+			<%-- <div class="row h50">
 			<div class="col-xs-8 address-d"><span class="th-font">地址:</span>${order.country }
 			<span>${order.statename }</span><span>${order.address }</span>
 			<span>${order.address2 }</span>(ZIPCODE:<span>${order.zip_code }</span>)</div>
 			<div class="col-xs-4"><span class="th-font">电话:</span><span>${order.phone_number }</span></div>
-			</div>
+			</div> --%>
 			<div class="row"><span class="sy-content"><c:if test="${order.sample_flag ==1 }">送样</c:if></span></div>
 			
 	
 	</div>
-	<%-- <div class="row w90">
+	<div class="row w90">
 	<div class="row mar-l">
-	<div class="col-xs-3"><span>Country:<input type="text" value="${order.country }" id="" disabled="disabled"></span></div>
-	<div class="col-xs-3"><span>State:<input type="text" value="${order.statename }" id="" disabled="disabled"></span></div>
-	<div class="col-xs-3"><span>City:<input type="text" value="${order.address }" id="" disabled="disabled"></span></div>
-	<div class="col-xs-3"><span>Street:<input type="text" value="" id="" disabled="disabled"></span></div>
+	<div class="col-xs-3"><span>Country:<input type="text" value="${order.country }" id="in-country" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-3"><span>State:<input type="text" value="${order.statename }" id="in-state" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-3"><span>City:<input type="text" value="${order.address }" id="in-city" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-3"><span>Street:<input type="text" value="${order.street }" id="in-street" disabled="disabled" class="disable-in-l"></span></div>
 	</div>
 	<div class="row mar-l">
-	<div class="col-xs-3"><span>Address:<input type="text" value="${order.address2 }" id="" disabled="disabled"></span></div>
-	<div class="col-xs-3"><span>Phone:<input type="text" value="${order.phone_number }" id="" disabled="disabled"></span></div>
-	<div class="col-xs-3"><span>ZipCode:<input type="text" value="${order.zip_code }" id="" disabled="disabled"></span></div>
-	<div class="col-xs-3"><span>交期:<input type="text" value="" id=""></span></div>
+	<input type="hidden" value="${order.address_id }" id="address_id">
+	<div class="col-xs-3"><span>Address:<input type="text" value="${order.address2 }" id="in-address" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-3"><span>Phone:<input type="text" value="${order.phone_number }" id="in-phone" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-3"><span>ZipCode:<input type="text" value="${order.zip_code }" id="in-code" disabled="disabled" class="disable-in-l"></span></div>
+	<div class="col-xs-3"><button class="btn btn-info btn-address">修改地址</button>
+	<button class="btn btn-info btn-update-address">更新地址</button></div>
 	</div>
-	</div> --%>
+	</div>
 	
 	<div class="row w90">
 	<button class="btn btn-info btn-re-n">添加备注内容(对内)</button> <span class="remark-title">备注内容:</span><input type="text" class="remark-dn" value="">
@@ -154,9 +158,18 @@ body{min-height:100%;}
 		<div class="row w99 de-td">
 		<input value="${detail.count}" class="lucount" type="hidden">
 		<input value="${detail.id}" class="bfdid" type="hidden">
+		<input value="${detail.price}" class="price-ss" type="hidden">
 		<div class="col-xs-1 ">
 		<img src="/cbtconsole/img/beforeLoad.gif" data-original="${detail.picUrl }" class="img-responsive img-lazy img-de-v">
 		<a href="${detail.detailUrl }" target="_blank">商品原始链接</a>
+		<div>
+		<c:if test="${detail.state !=-1}">
+		<button class="btn btn-info btn-delete-p-all">取消商品</button>
+		</c:if>
+		<c:if test="${detail.state ==-1}">
+		<span class="delete-all">商品已取消</span>
+		</c:if>
+		</div>
 		</div>
 		<div class="col-xs-10 detail-div">
 		<div class="row wt35">
@@ -175,13 +188,14 @@ body{min-height:100%;}
 				<table class="table-sku">
 				<thead>
 					<tr>
-						<th width="18%" class="th-font">下单规格:</th>
-						<th width="16%" class="th-font">货源价格:</th>
-						<th width="19%" class="th-font">售卖价格(免邮价):</th>
+						<th width="16%" class="th-font">下单规格:</th>
+						<th width="14%" class="th-font">货源价格:</th>
+						<th width="5%" class="th-font">搜索价格:</th>
+						<th width="15%" class="th-font">售卖价格(免邮价):</th>
 						<th width="4%" class="th-font">数量:</th>
 						<th width="6%" class="th-font">单位:</th>
 						<!-- <th>时间</th> -->
-						<th width="41%" class="th-font">货源:</th>
+						<th width="31%" class="th-font">货源:</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -193,6 +207,7 @@ body{min-height:100%;}
 						<input type="hidden" class="lu_id" value="${sku.id}">
 						<input type="text" class="input-w8 lu_sku" value="${sku.sku}"></td>
 						<td class="td-price">USD:<span class="lu-price-buy">${sku.priceBuy }</span>(CNY:<input type="text" value="${sku.priceBuyc }" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>
+						<td>${detail.price }</td>
 						<td>USD:<input type="text" value="${sku.price }" class="lu-price-sale input-w1">(含运费<input type="text" value="${sku.shipFeight }" class="lu-ship-feight input-w1">)</td>
 						<td><input type="text" class="input-w6 lu_count" value="${sku.num}"></td>
 						<td><input type="text" class="input-w5 lu_unit" value="${sku.unit}"></td>
@@ -203,6 +218,7 @@ body{min-height:100%;}
 						<c:if test="${sku.state != 1}">
 						<td class="td-in-valid">${sku.sku}</td>
 						<td>USD:<span class="td-in-valid">${sku.priceBuy }</span>(CNY:<span class="td-in-valid">${sku.priceBuyc }</span>)</td>
+						<td class="td-in-valid">${detail.price }</td>
 						<td class="td-in-valid">USD:${sku.price }(含运费${sku.shipFeight })</td>
 						<td class="td-in-valid">${sku.num}</td>
 						<td class="td-in-valid">${sku.unit}</td>
@@ -214,7 +230,8 @@ body{min-height:100%;}
 						<tr class="sku-td">
 							<td><input type="text" class="input-w8 lu_sku" value=""></td>
 							<td class="td-price">USD:<span class="lu-price-buy"></span>(CNY:<input type="text" value="" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>
-						<td>USD:<input type="text" value="" class="lu-price-sale input-w1">(含运费<input type="text" value="" class="lu-ship-feight input-w1">)</td>
+							<td>${detail.price }</td>
+							<td>USD:<input type="text" value="" class="lu-price-sale input-w1">(含运费<input type="text" value="" class="lu-ship-feight input-w1">)</td>
 							<td><input type="text" class="input-w6 lu_count" value="0"></td>
 							<td><input type="text" class="input-w5 lu_unit"></td>
 							<td><input type="text" class="input-w5 lu_url"><button class="btn btn-info btn-add">录入</button></td>

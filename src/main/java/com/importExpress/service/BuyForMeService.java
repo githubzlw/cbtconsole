@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.cbt.pojo.Admuser;
 import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
@@ -87,5 +88,19 @@ public interface BuyForMeService {
 	 * @return
 	 */
 	int updateOrdersDetailsRemark(int id,String remark);
+	/**修改地址
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int updateOrdersAddress(Map<String,String> map);
+	/**删除商品
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int deleteProduct(int bfdid);
+	
+	List<Admuser> lstAdms();
 	
 }

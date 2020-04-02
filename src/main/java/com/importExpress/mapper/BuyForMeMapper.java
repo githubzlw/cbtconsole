@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.cbt.pojo.Admuser;
 import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
@@ -68,6 +69,8 @@ public interface BuyForMeMapper {
 	
 	Map<String,Object> getOrder(String orderNo);
 	
+	List<Admuser> lstAdms();
+	
 	int updateOrderDetailsSkuWeight(@Param("weight")String weight,@Param("bfdid")int bfdid);
 	
 	int updateDeliveryTime(@Param("orderNo")String orderNo,@Param("time")String time,@Param("feight")String feight,@Param("method")String method);
@@ -75,5 +78,17 @@ public interface BuyForMeMapper {
 	List<Map<String,String>> getRemark(String orderNo);
 	
 	List<Map<String,String>> getTransport();
+	/**修改地址
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int updateOrdersAddress(Map<String,String> map);
     
+	/**删除商品
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int deleteProduct(int bfdid);
 }

@@ -21,15 +21,14 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.cbt.jdbc.DBHelper;
 import com.cbt.parse.service.ImgDownload;
+import com.cbt.pojo.Admuser;
 import com.cbt.util.FtpConfig;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.GoodsInfoUtils;
-import com.cbt.util.ImageCompression;
 import com.cbt.util.StrUtils;
 import com.cbt.website.util.JsonResult;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
@@ -64,20 +63,23 @@ public class BuyForMeController {
     		String userId = request.getParameter("userid");
     		String orderno = request.getParameter("orderno");
     		
+    		String admid = request.getParameter("admid");
+    		
     		int current_page = Integer.parseInt(strPage);
     		map.put("current_page", current_page);
     		map.put("page", (current_page - 1)*30);
     		map.put("state", Integer.valueOf(strState));
     		map.put("orderNo", orderno);
     		map.put("userId", StringUtils.isBlank(userId) ? null : userId);
-    		
+    		map.put("admid", StringUtils.isBlank(admid) ? "0" : admid);
     		
     		int ordersCount = buyForMeService.getOrdersCount(map);
     		if(ordersCount > 0) {
     			List<BFOrderInfo> orders = buyForMeService.getOrders(map);
     			mv.addObject("orders", orders);
     		}
-    		
+    		List<Admuser> lstAdms = buyForMeService.lstAdms();
+    		mv.addObject("lstAdms", lstAdms);
     		
     		int totalPage = ordersCount % 30 == 0 ? ordersCount / 30 : ordersCount / 30 + 1;
     		mv.addObject("listCount", ordersCount);
@@ -140,6 +142,7 @@ public class BuyForMeController {
     		mv.put("methodList", transport);
     		mv.put("state", transport.size() > 0 ? 200 : 500);
 		} catch (Exception e) {
+			mv.put("state", 500);
 			e.printStackTrace();
 		}
     	return mv;
@@ -186,6 +189,7 @@ public class BuyForMeController {
     		mv.put("state", addOrderDetailsSku > 0 ? 200 : 500);
         	mv.put("orderDetails", addOrderDetailsSku);
 		} catch (Exception e) {
+			mv.put("state", 500);
 			e.printStackTrace();
 		}
     	return mv;
@@ -207,6 +211,29 @@ public class BuyForMeController {
     		
     		mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
 		} catch (Exception e) {
+			mv.put("state", 500);
+			e.printStackTrace();
+		}
+    	return mv;
+    }
+    /**无效规格
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/invalidproduct")
+    @ResponseBody
+    public Map<String,Object> invalidProduct(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	try {
+			
+    		String bfdid = request.getParameter("bfdid");
+    		int update = 
+    				buyForMeService.deleteProduct(StringUtils.isNotBlank(bfdid)?Integer.parseInt(bfdid) : 0);
+    		
+    		mv.put("state", update > 0 ? 200 : 500);
+		} catch (Exception e) {
+			mv.put("state", 500);
 			e.printStackTrace();
 		}
     	return mv;
@@ -228,6 +255,7 @@ public class BuyForMeController {
     		int update = buyForMeService.updateDeliveryTime(orderNo,time,feight,method);
     		mv.put("state", update > 0 ? 200 : 500);
 		} catch (Exception e) {
+			mv.put("state", 500);
 			e.printStackTrace();
 		}
     	return mv;
@@ -247,6 +275,7 @@ public class BuyForMeController {
     		int update = buyForMeService.insertRemark(orderNo,remark);
     		mv.put("state", update > 0 ? 200 : 500);
     	} catch (Exception e) {
+    		mv.put("state", 500);
     		e.printStackTrace();
     	}
     	return mv;
@@ -270,6 +299,7 @@ public class BuyForMeController {
         	
     		mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
 		} catch (Exception e) {
+			mv.put("state", 500);
 			e.printStackTrace();
 		}
     	return mv;
@@ -292,11 +322,67 @@ public class BuyForMeController {
     		
     		mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
     	} catch (Exception e) {
+    		mv.put("state", 500);
     		e.printStackTrace();
     	}
     	return mv;
     }
-    
+    /**回复客户备注
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/adms")
+    @ResponseBody
+    public Map<String,Object> lstAdms(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	try {
+    		List<Admuser> lstAdms = buyForMeService.lstAdms();
+    		mv.put("state", 200);
+    		mv.put("lstAdms", lstAdms);
+    	} catch (Exception e) {
+    		mv.put("state", 500);
+    		e.printStackTrace();
+    	}
+    	return mv;
+    }
+    /**修改地址
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/address")
+    @ResponseBody
+    public Map<String,Object> address(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	try {
+    		String id = request.getParameter("id");
+    		String country = request.getParameter("country");
+    		String statename = request.getParameter("statename");
+    		String address = request.getParameter("address");
+    		String street = request.getParameter("street");
+    		String address2 = request.getParameter("address2");
+    		String phone = request.getParameter("phone");
+    		String code = request.getParameter("code");
+    		Map<String,String> map = Maps.newHashMap();
+    		map.put("address",address);
+			map.put("address2",address2);
+			map.put("country",country);
+			map.put("phone",phone);
+			map.put("code",code);
+			map.put("statename",statename);
+			map.put("street",street);
+			map.put("id",id);
+    		int update = 
+    				buyForMeService.updateOrdersAddress(map);
+    		
+    		mv.put("state", update > 0 ? 200 : 500);
+    	} catch (Exception e) {
+    		mv.put("state", 500);
+    		e.printStackTrace();
+    	}
+    	return mv;
+    }
     /**确认
      * @param request
      * @param response
@@ -349,6 +435,7 @@ public class BuyForMeController {
         		}
         	}
 		} catch (Exception e) {
+			mv.put("state", 500);
 			e.printStackTrace();
 		}
     	return mv;

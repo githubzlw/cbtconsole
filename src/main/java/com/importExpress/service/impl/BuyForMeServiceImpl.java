@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cbt.jdbc.DBHelper;
+import com.cbt.pojo.Admuser;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.mapper.BuyForMeMapper;
@@ -172,6 +173,43 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 			SendMQ.sendMsg(new RunSqlModel(covertToSQL));
 		}
 		return update;
+	}
+
+	@Override
+	public int updateOrdersAddress(Map<String, String> map) {
+		int update = buyForMemapper.updateOrdersAddress(map);
+		if(update > 0) {
+			String sql = "update buyforme_address set address=?,address2=?," + 
+					"country=?,phone_number=?,zip_code=?,statename=?,street=?  where id=?";
+			List<String> lstValue = Lists.newArrayList();
+			lstValue.add(map.get("address"));
+			lstValue.add(map.get("address2"));
+			lstValue.add(map.get("country"));
+			lstValue.add(map.get("phone"));
+			lstValue.add(map.get("code"));
+			lstValue.add(map.get("statename"));
+			lstValue.add(map.get("street"));
+			lstValue.add(map.get("id"));
+			String covertToSQL = DBHelper.covertToSQL(sql, lstValue);
+			SendMQ.sendMsg(new RunSqlModel(covertToSQL));
+		}
+		return update;
+	}
+
+	@Override
+	public List<Admuser> lstAdms() {
+		return buyForMemapper.lstAdms();
+	}
+
+	@Override
+	public int deleteProduct(int bfdid) {
+		int deleteProduct = buyForMemapper.deleteProduct(bfdid);
+		if(deleteProduct > 0) {
+			String sql = "update buyforme_details a left join  buyforme_details_sku b on a.id=b.bf_details_id " + 
+					"set a.state=-1,b.state=-1 where a.id="+bfdid;
+			SendMQ.sendMsg(new RunSqlModel(sql));
+		}
+		return deleteProduct;
 	}
 	
 
