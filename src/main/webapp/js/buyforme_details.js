@@ -126,7 +126,7 @@ $(function(){
 			'<td>'+price+'</td>'+
 		'<td>USD:<input type="text" value="" class="lu-price-sale input-w1">(含运费<input type="text" value="" class="lu-ship-feight input-w1">)</td>'+
 		'<td><input type="text" class="input-w6 lu_count" value="0"></td>'+
-			'<td><input type="text" class="input-w5 lu_unit"></td>'+
+			'<td><input type="text" class="input-w75 lu_unit"></td>'+
 			'<td><input type="text" class="input-w5 lu_url">'+
 			'&nbsp;<button class="btn btn-success btn-add">录入</button></td>'+
 		'</tr>';
@@ -443,7 +443,7 @@ var orderNo = $(".ormnum").text();
         html5Upload: false,
         upBtnText: "上传",
         upMultiple: 1,
-        upImgUrl: "/cbtconsole/bf/xheditorUploads?orderNo=" + orderNo",
+        upImgUrl: "/cbtconsole/bf/xheditorUploads?orderNo=" + orderNo,
         upImgExt: "jpg,jpeg,gif,png"
     });
 }

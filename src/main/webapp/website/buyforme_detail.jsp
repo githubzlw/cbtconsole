@@ -28,7 +28,7 @@
 .report .w350 {width: 350px;}
 .report .w160 {width: 160px;}
 .report .w800 {width: 1100px;}
-.report .w90 {width: 101.75%;margin-top: 50px;border: 1px solid #8a6d3b;height: 120px;    margin-left: -30px;}
+.report .w90 {width: 1699px;margin-top: 50px;border: 1px solid #8a6d3b;height: 120px;    margin-left: -30px;}
 .mt5 {margin-top: 5px;}
 .tc, .trnasparent {width: 100%;height: 100%;background-color: rgba(0, 0, 0, .5);position: fixed;z-index: 1;display: none;text-align: center;}
 .tc {background-color: rgba(0, 0, 0, 0);top: 0;left: 0;}
@@ -49,21 +49,21 @@ padding: 20px;max-height: 800px;}
 .img-responsive{max-width: 135px;max-height: 135px;margin-top: 11px;}
 .w350{width: 350px;}
 .btn-re-n{margin-bottom: 3px;margin-left: 17px;}
-.remark-dn{width: 20%;height:105px;margin-top: 5px;border: 1px solid #ccc;border-radius: 4px;}
+.remark-dn{width: 360px;height:105px;margin-top: 5px;border: 1px solid #ccc;border-radius: 4px;}
 .h50{height: 50px;}
 .input-w1{width: 64px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
 .input-w4{width: 100px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
-.w99{width: 100%;margin-top: 15px;border: 1px solid #8a6d3b;min-height: 150px;}
+.w99{width:1700px;margin-top: 15px;border: 1px solid #8a6d3b;min-height: 150px;}
 .wt35{ margin-left: 2px; height: 35px;margin-top: 10px;}
 .sku-td{margin-top: 5px;}
 .sku-u-td{margin-top: 5px;}
 .table-sku{width:100%;}
 .rowweight{ margin-left: -2px;}
 .w120{width:115px;}
-.input-w5{width: 74%;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+.input-w5{width: 378px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .input-w3{width: 50px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
-.input-w25{width: 2.5%;border: 1px solid #ccc; border-radius: 4px;height: 25px;}
-.input-w8{width: 96%;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+.input-w25{width: 38px;border: 1px solid #ccc; border-radius: 4px;height: 25px;}
+.input-w8{width: 254px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .input-w6{width: 92%;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .btn-weight{cursor: pointer;}
 .btn-update{cursor: pointer;}
@@ -72,7 +72,7 @@ padding: 20px;max-height: 800px;}
 .b-add{cursor: pointer;}
 .w89{width: 99%;margin-left: 1%;margin-top: 12px;}
 .w11{width: 99%;margin-left: 1%;}
-.detail-div{width: 90.333333%;}
+.detail-div{width:1520px;}
 .td-in-valid{text-decoration:line-through;}
 .th-font{font-size: 14px;color: #ca5252;font-weight: initial;}
 .remark-row{margin-top: 10px;    width: 85%;}
@@ -95,17 +95,22 @@ body{min-height:100%;}
 .num-span{margin-left: 2%;}
 .btn-update-address{display: none;}
 .delete-all{font-weight: bold;font-size: 15px;color: #ef0e09;}
-#in-state{margin-left: 7%;}
-#in-city{margin-left: 5.2%;}
-#in-address{margin-left: 3.2%;}
-#in-country{width: 67%;height: 27px;}
-#in-phone{margin-left: 4.5%;}
+#in-state{margin-left: 22px;width:266px;}
+#in-city{margin-left: 15px;width: 260px;}
+#in-street{width: 260px;}
+#in-recipients{width: 256px;}
+#in-address{margin-left: 10px;width: 256px;}
+#in-country{width: 265px;height: 27px;}
+#in-phone{margin-left: 10px;}
 .adm-state-content{font-size: 20px;color:#1181e0;font-weight: bold;}
-.w22{width: 326px;}
+.w22{width: 360px;}
 .w10{width:85px;}
 .delivery-method{width: 380px;}
+.de-w1{width:170px;}
+.input-w75{width: 75px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 </style>
 </head>
+
 <body>
 <div style="background-color:#eaf5e5;min-height:100%,width:2000px;">
 	<div class="container-fluid report">
@@ -171,7 +176,7 @@ body{min-height:100%;}
 		<input value="${detail.count}" class="lucount" type="hidden">
 		<input value="${detail.id}" class="bfdid" type="hidden">
 		<input value="${detail.price}" class="price-ss" type="hidden">
-		<div class="col-xs-1 ">
+		<div class="col-xs-1 de-w1">
 		<img src="/cbtconsole/img/beforeLoad.gif" data-original="${detail.picUrl }" class="img-responsive img-lazy img-de-v">
 		<a href="${detail.detailUrl }" target="_blank">商品原始链接</a>
 		<div>
@@ -222,7 +227,7 @@ body{min-height:100%;}
 						<td>${detail.price }</td>
 						<td>USD:<input type="text" value="${sku.price }" class="lu-price-sale input-w1">(含运费<input type="text" value="${sku.shipFeight }" class="lu-ship-feight input-w1">)</td>
 						<td><input type="text" class="input-w6 lu_count" value="${sku.num}"></td>
-						<td><input type="text" class="input-w5 lu_unit" value="${sku.unit}"></td>
+						<td><input type="text" class="input-w75 lu_unit" value="${sku.unit}"></td>
 						<td><input type="text" class="input-w5 lu_url" value="${sku.url}">
 						<button class="btn btn-info btn-update">修改</button>
 						 <button class="btn btn-info btn-invalid">无效</button>
@@ -245,7 +250,7 @@ body{min-height:100%;}
 							<td>${detail.price }</td>
 							<td>USD:<input type="text" value="" class="lu-price-sale input-w1">(含运费<input type="text" value="" class="lu-ship-feight input-w1">)</td>
 							<td><input type="text" class="input-w6 lu_count" value="0"></td>
-							<td><input type="text" class="input-w5 lu_unit"></td>
+							<td><input type="text" class="input-w75 lu_unit"></td>
 							<td><input type="text" class="input-w5 lu_url"><button class="btn btn-info btn-add">录入</button></td>
 						</tr>
 					 </c:if>
