@@ -104,7 +104,7 @@ body{min-height:100%;}
 #in-phone{margin-left: 10px;}
 .adm-state-content{font-size: 20px;color:#1181e0;font-weight: bold;}
 .w22{width: 360px;}
-.w10{width:85px;}
+.w10{width:85px;margin-top: -24px;}
 .delivery-method{width: 380px;}
 .de-w1{width:170px;}
 .input-w75{width: 75px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
@@ -255,13 +255,18 @@ body{min-height:100%;}
 						</tr>
 					 </c:if>
 					</tbody>
-				
 				</table>
 				</div>
 		</div>
 		<div class="row rb-add"><i class="b-add">+</i></div>
-		<div class="row rowweight">重量:<input type="text" value="${detail.weight}" class="lu-weight input-w25">kg<i class="btn-weight">修改</i></div>
-		
+		<div class="row rowweight">重量:
+		<c:if test="${detail.state ==-1}">
+		${detail.weight}
+		</c:if>
+		<c:if test="${detail.state !=-1}">
+		<input type="text" value="${detail.weight}" class="lu-weight input-w25">kg<button class="btn btn-info btn-weight">修改</button>
+		</c:if>
+		</div>
 		</div>
 		
 		</div>
