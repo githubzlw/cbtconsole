@@ -49,6 +49,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.cbt.common.cache.RedisUtil;
+import com.importExpress.pojo.CommonResult;
+import com.importExpress.pojo.ResultBean;
+import com.importExpress.service.UserFreeNotFreeService;
 import com.importExpress.utli.*;
 import okhttp3.*;
 import org.apache.commons.collections.map.HashedMap;
@@ -276,6 +280,10 @@ public class WarehouseCtrl {
 	private TabCouponService tabCouponService;
 	@Autowired
 	private OverseasWarehouseStockService owsService;
+	@Autowired
+	private UserFreeNotFreeService userFreeNotFreeService;
+	@Autowired
+	RedisUtil redisUtil;
 	/**
 	 *
 	 * @Title getAllBuyer
@@ -9610,7 +9618,51 @@ public class WarehouseCtrl {
 		}
 		return result;
 	}
-	
-	
+	/**
+	 *
+	 * changeNotFree :
+	 *
+	 * @title: changeNotFree
+	 * @author cjc
+	 * @version v1.0
+	 * @despricetion:
+	 * @date: 2020/1/20 2:50 下午
+	 * @param userId
+	 * @param state  0:切换为免邮，删除redis 信息就行 1：切换为免邮记录到redis
+	 * @return java.util.Map<java.lang.String,java.lang.Object>
+	 */
+	@RequestMapping("/changeNotFree")
+	@ResponseBody
+	public ResultBean changeNotFree(HttpServletRequest request, int userId, int state){
+		ResultBean resultBean = new ResultBean();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
+		resultBean.setCode(0);
+		if (adm == null) {
+			resultBean.setMsg("未登录！");
+			return new ResultBean(1,"fail!");
+		}
+		String key = "AUTH:USER_NOTFREE";
+		// @author: cjc @date：2020/1/20 2:56 下午   Description : 请求线上接口
+		CommonResult commonResult = FreightUtlity.changeUserNotFree(userId, state);
+		resultBean.setMsg("请求线上失败");
+		boolean b = false;
+		if(commonResult.getCode() == 200){
+			if(state == 1){
+				// @author: cjc @date：2020/1/20 2:51 下午   Description : 切换为免邮
+				redisUtil.setRemove(key, String.valueOf(userId));
+			}else {
+				Map<String,Object> map = new HashMap<>(2);
+				map.put(String.valueOf(userId),1);
+				redisUtil.sSet(key, String.valueOf(userId));
+			}
+			resultBean.setCode(0);
+			resultBean.setMsg("success");
+			// @author: cjc @date：2020/1/20 3:21 下午   Description : 如果成功记录落库
+			userFreeNotFreeService.insertSelective(userId,state,adm.getId());
+		}
+		return resultBean;
+	}
+
 	
 }
