@@ -181,7 +181,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		int update = buyForMemapper.updateOrdersAddress(map);
 		if(update > 0) {
 			String sql = "update buyforme_address set address=?,address2=?," + 
-					"country=?,phone_number=?,zip_code=?,statename=?,street=?  where id=?";
+					"country=?,phone_number=?,zip_code=?,statename=?,street=?,recipients=?  where id=?";
 			List<String> lstValue = Lists.newArrayList();
 			lstValue.add(map.get("address"));
 			lstValue.add(map.get("address2"));
@@ -190,6 +190,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 			lstValue.add(map.get("code"));
 			lstValue.add(map.get("statename"));
 			lstValue.add(map.get("street"));
+			lstValue.add(map.get("recipients"));
 			lstValue.add(map.get("id"));
 			String covertToSQL = DBHelper.covertToSQL(sql, lstValue);
 			SendMQ.sendMsg(new RunSqlModel(covertToSQL));

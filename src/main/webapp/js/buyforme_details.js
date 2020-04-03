@@ -11,6 +11,8 @@ $(function(){
 			success:function(data){
 				if(data.state == 200){
 					window.location.reload();
+				}else{
+					$.MsgBox.Alert("提示", "删除商品失败!");
 				}
 			},
 			error:function(e){
@@ -45,6 +47,8 @@ $(function(){
 			success:function(data){
 				if(data.state == 200){
 					window.location.reload();
+				}else{
+					$.MsgBox.Alert("提示", "更新地址失败!");
 				}
 			},
 			error:function(e){
@@ -90,10 +94,12 @@ $(function(){
 			success:function(data){
 				if(data.state == 200){
 					$.MsgBox.Alert("提示", "交期确认成功");
+				}else{
+					$.MsgBox.Alert("提示", "交期确认失败!");
 				}
 			},
 			error:function(e){
-				$.MsgBox.Alert("提示", "失败");
+				$.MsgBox.Alert("提示", "交期确认失败");
 			}
 		});
 	})
@@ -163,12 +169,13 @@ $(function(){
 			type:"post",
 			success:function(data){
 				if(data.state == 200){
-					$.MsgBox.Alert("提示", "成功");
 					window.location.reload();
+				}else{
+					$.MsgBox.Alert("提示", "确认失败!");
 				}
 			},
 			error:function(e){
-				$.MsgBox.Alert("提示", "失败");
+				$.MsgBox.Alert("提示", "确认失败");
 			}
 		});
 		
@@ -189,12 +196,13 @@ $(function(){
 			type:"post",
 			success:function(data){
 				if(data.state == 200){
-					$.MsgBox.Alert("提示", "成功");
 					window.location.reload();
+				}else{
+					$.MsgBox.Alert("提示", "回复失败!");
 				}
 			},
 			error:function(e){
-				$.MsgBox.Alert("提示", "失败");
+				$.MsgBox.Alert("提示", "回复失败");
 			}
 		});
 		
@@ -241,12 +249,13 @@ $(function(){
 			type:"post",
 			success:function(data){
 				if(data.state == 200){
-					$.MsgBox.Alert("提示", "成功");
 					window.location.reload();
+				}else{
+					$.MsgBox.Alert("提示", "修改规格失败!");
 				}
 			},
 			error:function(e){
-				$.MsgBox.Alert("提示", "失败");
+				$.MsgBox.Alert("提示", "修改规格失败");
 			}
 		});
 		
@@ -264,12 +273,13 @@ $(function(){
 			type:"post",
 			success:function(data){
 				if(data.state == 200){
-					$.MsgBox.Alert("提示", "成功");
 					window.location.reload();
+				}else{
+					$.MsgBox.Alert("提示", "回复失败1!");
 				}
 			},
 			error:function(e){
-				$.MsgBox.Alert("提示", "失败");
+				$.MsgBox.Alert("提示", "回复失败1");
 			}
 		});
 		
@@ -285,12 +295,13 @@ $(function(){
 			type:"post",
 			success:function(data){
 				if(data.state == 200){
-					$.MsgBox.Alert("提示", "成功");
 					window.location.reload();
+				}else{
+					$.MsgBox.Alert("提示", "规格取消失败!");
 				}
 			},
 			error:function(e){
-				$.MsgBox.Alert("提示", "失败");
+				$.MsgBox.Alert("提示", "规格取消失败");
 			}
 		});
 		
@@ -308,12 +319,13 @@ $(function(){
 			type:"post",
 			success:function(data){
 				if(data.state == 200){
-					$.MsgBox.Alert("提示", "成功");
 					window.location.reload();
+				}else{
+					$.MsgBox.Alert("提示", "重量修改失败!");
 				}
 			},
 			error:function(e){
-				$.MsgBox.Alert("提示", "失败");
+				$.MsgBox.Alert("提示", "重量修改失败");
 			}
 		});
 	})
@@ -373,12 +385,13 @@ function bindClick(){
 		       type:"post",
 		       success:function(data){
 		    	   if(data.state == 200){
-						$.MsgBox.Alert("提示", "成功");
 						window.location.reload();
+		    	   }else{
+						$.MsgBox.Alert("提示", "录入规格失败!");
 					}
 		       },
 		   	error:function(e){
-		   		$.MsgBox.Alert("提示", "失败");
+		   		$.MsgBox.Alert("提示", "录入规格失败");
 		   	}
 		   });
 		
@@ -426,6 +439,8 @@ function getShippingCost(){
 		    			   }
 		    		   }
 		    		   $(".delivery-method").html(method);
+					}else{
+						$.MsgBox.Alert("提示", "获取运费交期失败!");
 					}
 		       },
 		   	error:function(e){
