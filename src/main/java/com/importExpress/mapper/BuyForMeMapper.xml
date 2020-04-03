@@ -145,8 +145,9 @@
 
 <update id="updateOrdersAddress">
 update buyforme_address set address=#{address},address2=#{address2},
-country=#{country},phone_number=#{phone},zip_code=#{code},recipients=#{recipients},
-statename=#{statename},street=#{street}  where id=#{id}
+country=#{country},phone_number=#{phone},zip_code=#{code},
+recipients=#{recipients},statename=#{statename},street=#{street}  
+where id=#{id}
 </update>
 
 <select id="lstAdms" resultMap="admMap">select  id,admName from  admuser where roleType=4 and status=1</select>
