@@ -32,7 +32,6 @@ $(function(){
 	$(".btn_page_qu").click(function(){
 		doQuery();
 	})
-	
 })
 
 function doQuery(){
@@ -43,6 +42,6 @@ function doQuery(){
 	var edtime = $("#query_edtime").val();
 	var state = $("#query_state").val();
 	var page = $("#current_page").val();
-	window.open("/cbtconsole/bf/orders?page="+page+"&userid="+userid+"&oderno="+oderno
+	window.open("/cbtconsole/bf/orders?page="+page+"&userid="+userid+"&orderno="+oderno
 			+"&state="+state+"&sttime="+sttime+"&edtime="+edtime+"&admid="+admid, "_self");
 }
