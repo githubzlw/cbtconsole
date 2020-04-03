@@ -145,7 +145,7 @@
 
 <update id="updateOrdersAddress">
 update buyforme_address set address=#{address},address2=#{address2},
-country=#{country},phone_number=#{phone},zip_code=#{code},recipients=#{recipients}
+country=#{country},phone_number=#{phone},zip_code=#{code},recipients=#{recipients},
 statename=#{statename},street=#{street}  where id=#{id}
 </update>
 

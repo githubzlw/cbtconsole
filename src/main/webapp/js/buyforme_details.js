@@ -29,7 +29,7 @@ $(function(){
 		var code = $("#in-code").val();
 		var recipients = $("#in-recipients").val();
 		jQuery.ajax({
-			url:"/cbtconsole/bf/finsh",
+			url:"/cbtconsole/bf/address",
 			data:{
 				"id":id,
 				"country":country,
