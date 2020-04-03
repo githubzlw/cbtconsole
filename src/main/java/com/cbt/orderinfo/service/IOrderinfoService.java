@@ -159,6 +159,12 @@ public interface IOrderinfoService {
 	 * @param map
 	 * @return
 	 */
+	public Map<String,Integer> getTbShip(String shipno);
+	/**
+	 * 一键确认或取消入库
+	 * @param map
+	 * @return
+	 */
 	public List<Map<String,Object>> allTrack(Map<String, String> map);
 
 	/**
