@@ -415,7 +415,7 @@ public class BuyForMeController {
         	
         	List<BFOrderDetailSku> orderDetailsSku = buyForMeService.getOrderDetailsSku(bfId);
         	String sql1 = " update buyforme_details_sku set sku=?,product_url=?,num=?,price=?,price_buy=?,price_buy_c=?,ship_feight=?,weight=?,unit=? ,state=? where id=?";
-        	String sql2 = "insert into buyforme_details_sku(sku,product_url,num,price,price_buy,price_buy_c,ship_feight,weight,unit,id,bf_id,bf_details_id,num_iid,skuid,remark,state)" +
+        	String sql2 = "insert into buyforme_details_sku(sku,product_url,num,price,price_buy,price_buy_c,ship_feight,weight,unit,state,id,bf_id,bf_details_id,num_iid,skuid,remark)" +
         			"  values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         	lstValues.clear();
         	for(BFOrderDetailSku o : orderDetailsSku) {
