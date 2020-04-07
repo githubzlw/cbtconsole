@@ -3,14 +3,10 @@ package com.importExpress.service;
 import java.util.List;
 import java.util.Map;
 
+import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
 import com.cbt.pojo.Admuser;
-import com.importExpress.pojo.BFOrderDetail;
-import com.importExpress.pojo.BFOrderDetailSku;
-import com.importExpress.pojo.BFOrderInfo;
-import com.importExpress.pojo.TransportMethod;
-import com.importExpress.pojo.ZoneBean;
 
 public interface BuyForMeService {
 	/**申请单列表
@@ -107,4 +103,13 @@ public interface BuyForMeService {
 	 * @return
 	 */
 	List<ZoneBean> lstCountry();
+
+	/**
+	 * 商品聊天
+	 * @param bfChat
+	 * @return
+	 */
+	int insertBFChat(BFChat bfChat);
+
+	List<BFChat> queryBFChatList(BFChat bfChat);
 }
