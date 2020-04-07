@@ -3,13 +3,10 @@ package com.importExpress.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
 import com.cbt.pojo.Admuser;
-import com.importExpress.pojo.BFOrderDetail;
-import com.importExpress.pojo.BFOrderDetailSku;
-import com.importExpress.pojo.BFOrderInfo;
-import com.importExpress.pojo.ZoneBean;
 
 public interface BuyForMeMapper {
 	/**更新order状态
@@ -99,4 +96,8 @@ public interface BuyForMeMapper {
 	List<ZoneBean> lstCountry();
 	
 	int updateOrderAllState(int id);
+
+	int insertBFChat(BFChat bfChat);
+
+	List<BFChat> queryBFChatList(BFChat bfChat);
 }

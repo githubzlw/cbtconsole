@@ -33,7 +33,7 @@
     <result column="remark_replay" property="remarkReplay" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="VARCHAR" />
   </resultMap>
-  
+
   <resultMap id="skuResultMap" type="com.importExpress.pojo.BFOrderDetailSku" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="bf_id" property="bfId" jdbcType="INTEGER" />
@@ -52,7 +52,7 @@
     <result column="weight" property="weight" jdbcType="VARCHAR" />
     <result column="unit" property="unit" jdbcType="VARCHAR" />
   </resultMap>
-  
+
   <resultMap id="admMap" type="com.cbt.pojo.Admuser" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="admName" property="admname" jdbcType="VARCHAR" />
@@ -61,12 +61,12 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="country" property="country" jdbcType="VARCHAR" />
   </resultMap>
-  
+
   <select id="getOrders" resultMap="infoResultMap">
   select a.id,a.order_no,a.user_id,a.state,a.pay_price,a.product_cost,a.delivery_time,
   a.address_id,a.create_time,a.update_time,a.admin_id,a.ip,a.remark,a.ship_feight,a.delivery_method,b.admName
   from buyforme_orderinfo a left join admin_r_user b on a.admin_id=b.adminid
-  
+
   where 1=1
   <if test="state !=-2">and a.state=#{state}</if>
   <if test="orderNo !=null">and a.order_no=#{orderNo}</if>
@@ -75,7 +75,7 @@
   order by a.create_time desc
   limit #{page},30
   </select>
-  
+
   <select id="getOrdersCount" resultType="Integer">
   select  count(*) from buyforme_orderinfo where 1=1
   <if test="state !=-2">and state=#{state}</if>
@@ -83,12 +83,12 @@
   <if test="userId !=null">and user_id=#{userId}</if>
   <if test="admid !=0">and admin_id=#{admid}</if>
   </select>
-  
+
   <select id="getOrderDetails" resultMap="detailResultMap">
   select id,order_no,title,pic_url,price,num_iid,num,detail_url,state,remark,create_time,remark_replay 
   from buyforme_details where order_no=#{orderNo}
   </select>
-  
+
   <select id="getOrderDetailsSku" resultMap="skuResultMap">
   select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,ship_feight,weight,unit
   from buyforme_details_sku where bf_id= #{bfId}
@@ -158,6 +158,15 @@ set a.state=-1,b.state=-1 where a.id=#{bfdid}
 </update>
 
 <select id="lstCountry" resultMap="zoneBeanMap">select id,country from zone </select>
+  <insert id="insertBFChat" parameterType="com.importExpress.pojo.BFChat">
+    insert into buyforme_pid_chat(pid,bd_id,content)
+    values(#{pid},#{bd_id},#{content})
+  </insert>
+
+  <select id="queryBFChatList" parameterType="com.importExpress.pojo.BFChat" resultType="com.importExpress.pojo.BFChat">
+    select id,pid,bd_id,content,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time
+    where bd_id = #{bd_id}
+  </select>
 
 <update id="updateOrderAllState">
 update  buyforme_orderinfo a left join 

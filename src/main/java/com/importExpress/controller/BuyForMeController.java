@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.cbt.website.util.UploadByOkHttp;
+import com.importExpress.pojo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,11 +31,6 @@ import com.cbt.util.StrUtils;
 import com.cbt.website.util.JsonResult;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.importExpress.pojo.BFOrderDetail;
-import com.importExpress.pojo.BFOrderDetailSku;
-import com.importExpress.pojo.BFOrderInfo;
-import com.importExpress.pojo.TransportMethod;
-import com.importExpress.pojo.ZoneBean;
 import com.importExpress.service.BuyForMeService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -319,14 +315,30 @@ public class BuyForMeController {
     public Map<String,Object> replayRemark(HttpServletRequest request, HttpServletResponse response) {
     	Map<String,Object> mv = Maps.newHashMap();
     	try {
-    		String remark = request.getParameter("remark");
-    		String sbfdid = request.getParameter("bfdid");
-    		int bfdid = StrUtils.isNum(sbfdid) ? Integer.valueOf(sbfdid) : 0;
-    		int updateOrderDetailsSkuState = 
-    				buyForMeService.updateOrdersDetailsRemark(bfdid, remark);
-    		
-    		mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
-    	} catch (Exception e) {
+			String remark = request.getParameter("remark");
+			String sbfdid = request.getParameter("bfdid");
+			String pid = request.getParameter("pid");
+			int bfdid = StrUtils.isNum(sbfdid) ? Integer.valueOf(sbfdid) : 0;
+
+			List<String> lstValues = Lists.newArrayList();
+			String sql = "buyforme_pid_chat(pid,bd_id,content) values(?,?,?)";
+
+			lstValues.add(pid);
+			lstValues.add(String.valueOf(bfdid));
+			lstValues.add(remark);
+			String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(DBHelper.covertToSQL(sql, lstValues)));
+
+			int updateOrderDetailsSkuState = 0;
+			if (StringUtils.isNotBlank(sendMsgByRPC) && Integer.parseInt(sendMsgByRPC) > 0) {
+				buyForMeService.updateOrdersDetailsRemark(bfdid, remark);
+				BFChat bfChat = new BFChat();
+				bfChat.setBd_id(bfdid);
+				bfChat.setPid(pid);
+				bfChat.setContent(remark);
+				updateOrderDetailsSkuState = buyForMeService.insertBFChat(bfChat);
+			}
+			mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
+		} catch (Exception e) {
     		mv.put("state", 500);
     		e.printStackTrace();
     	}

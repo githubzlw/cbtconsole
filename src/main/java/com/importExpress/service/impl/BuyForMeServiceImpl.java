@@ -11,12 +11,7 @@ import com.cbt.pojo.Admuser;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.mapper.BuyForMeMapper;
-import com.importExpress.pojo.BFOrderDetail;
-import com.importExpress.pojo.BFOrderDetailSku;
-import com.importExpress.pojo.BFOrderInfo;
-import com.importExpress.pojo.DetailsSku;
-import com.importExpress.pojo.TransportMethod;
-import com.importExpress.pojo.ZoneBean;
+import com.importExpress.pojo.*;
 import com.importExpress.service.BuyForMeService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -219,6 +214,16 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		return buyForMemapper.lstCountry();
 	}
 
+	@Override
+	public int insertBFChat(BFChat bfChat) {
+		return buyForMemapper.insertBFChat(bfChat);
+	}
+
+	@Override
+	public List<BFChat> queryBFChatList(BFChat bfChat) {
+		return buyForMemapper.queryBFChatList(bfChat);
+	}
+	
 	@Override
 	public int cancelOrders(int id) {
 		int update = buyForMemapper.updateOrderAllState(id);
