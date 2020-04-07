@@ -16,6 +16,7 @@ import com.cbt.website.bean.InventoryDetails;
 import com.cbt.website.bean.InventoryLock;
 import com.cbt.website.bean.InventoryLog;
 import com.cbt.website.bean.InventorySku;
+import com.cbt.website.bean.InventoryTemporary;
 import com.cbt.website.bean.InventoryWrap;
 import com.cbt.website.bean.LossInventoryRecord;
 import com.cbt.website.bean.LossInventoryWrap;
@@ -465,4 +466,21 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int  updateBarcode(Map<String,Object> map);
+	
+	
+	int addInventoryTemporary(InventoryTemporary tem);
+	
+	
+	Map<String, String> getInventoryTemporary(int id);
+	
+	int updateInventoryTemporary(@Param("id")int id,@Param("state")int state);
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
