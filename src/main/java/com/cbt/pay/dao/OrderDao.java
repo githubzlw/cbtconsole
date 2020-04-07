@@ -110,7 +110,8 @@ public class OrderDao implements IOrderDao{
 		// TODO Auto-generated method stub
 		String sql = "insert order_details(goodsid,orderid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,"
 				+ "yourorder,userid,goodsname,goodsprice,goodsfreight,goodsdata_id,remark,goods_class,extra_freight,car_url,"
-				+ "car_img,car_type,freight_free,od_bulk_volume,od_total_weight) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+				+ "car_img,car_type,freight_free,od_bulk_volume,od_total_weight,goods_pid) values" +
+				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		PreparedStatement stmt = null;
 		int re = 0;
 		try {
@@ -140,6 +141,7 @@ public class OrderDao implements IOrderDao{
 				lstValues.add(String.valueOf(freight_free));
 				lstValues.add(orderdetails.get(i).getOd_bulk_volume());
 				lstValues.add(String.valueOf(orderdetails.get(i).getOd_total_weight()));
+				lstValues.add(orderdetails.get(i).getGoods_pid());
 				String runSql = DBHelper.covertToSQL(sql, lstValues);
 				re = Integer.parseInt(SendMQ.sendMsgByRPC(new RunSqlModel(runSql)));
 				
