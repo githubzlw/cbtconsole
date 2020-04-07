@@ -13,6 +13,11 @@ import com.importExpress.pojo.TransportMethod;
 import com.importExpress.pojo.ZoneBean;
 
 public interface BuyForMeService {
+	/**更新order状态
+	 * @param id
+	 * @return
+	 */
+	int cancelOrders(int id);
 	/**申请单列表
 	 * @return
 	 */

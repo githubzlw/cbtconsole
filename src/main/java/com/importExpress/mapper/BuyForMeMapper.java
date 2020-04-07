@@ -97,4 +97,6 @@ public interface BuyForMeMapper {
 	 * @return
 	 */
 	List<ZoneBean> lstCountry();
+	
+	int updateOrderAllState(int id);
 }

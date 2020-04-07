@@ -159,4 +159,11 @@ set a.state=-1,b.state=-1 where a.id=#{bfdid}
 
 <select id="lstCountry" resultMap="zoneBeanMap">select id,country from zone </select>
 
+<update id="updateOrderAllState">
+update  buyforme_orderinfo a left join 
+ buyforme_details_sku b on a.id=b.bf_id 
+ left join  buyforme_details c on c.order_no=a.order_no
+set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
+</update>
+
 </mapper>

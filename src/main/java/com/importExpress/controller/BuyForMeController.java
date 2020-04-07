@@ -71,7 +71,7 @@ public class BuyForMeController {
     		map.put("current_page", current_page);
     		map.put("page", (current_page - 1)*30);
     		map.put("state", Integer.valueOf(strState));
-    		map.put("orderNo", orderno);
+    		map.put("orderNo", StringUtils.isBlank(orderno) ? null : orderno);
     		map.put("userId", StringUtils.isBlank(userId) ? null : userId);
     		map.put("admid", StringUtils.isBlank(admid) ? "0" : admid);
     		
@@ -345,6 +345,26 @@ public class BuyForMeController {
     		List<Admuser> lstAdms = buyForMeService.lstAdms();
     		mv.put("state", 200);
     		mv.put("lstAdms", lstAdms);
+    	} catch (Exception e) {
+    		mv.put("state", 500);
+    		e.printStackTrace();
+    	}
+    	return mv;
+    }
+    /**回复客户备注
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/cancel/order")
+    @ResponseBody
+    public Map<String,Object> cancelOrder(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> mv = Maps.newHashMap();
+    	try {
+    		String strid = request.getParameter("bfid");
+    		strid = StrUtils.isNum(strid) ? strid : "0";
+    		int update = buyForMeService.cancelOrders(Integer.parseInt(strid));
+    		mv.put("state", update > 0 ? 200 : 500);
     	} catch (Exception e) {
     		mv.put("state", 500);
     		e.printStackTrace();

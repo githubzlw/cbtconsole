@@ -84,7 +84,7 @@ padding: 20px;max-height: 800px;}
 .delivery-method{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 .delivery-feight{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 .img-dv{width: 10%;}
-.btn-finsh{margin-left: 94.45%;}
+.btn-finsh{margin-left: 1445px;}
 .remark-replay{border: 1px solid #ccc;border-radius: 4px;height: 34px;width:30%;}
 .td-font-view{margin-left: 2%;cursor: pointer;}
 .text-al{text-align: left;}
@@ -272,7 +272,13 @@ body{min-height:100%;}
 		</div>
 		</c:forEach>
 		<br>
-		<button class="btn btn-success btn-finsh">确认处理</button>		
+		<c:if test="${order.state==0 ||  order.state==1}">
+		<button class="btn btn-success btn-finsh">确认订单</button>
+		</c:if>
+		<c:if test="${order.state==0 ||  order.state==1 || order.state==2}">
+		<button class="btn btn-warning btn-can-not-buy">不能采购</button>		
+		</c:if>
+		
 		</div>
 		<br><br><br>
 	</div>

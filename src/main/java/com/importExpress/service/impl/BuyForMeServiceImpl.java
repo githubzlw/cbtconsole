@@ -218,6 +218,19 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 	public List<ZoneBean> lstCountry() {
 		return buyForMemapper.lstCountry();
 	}
+
+	@Override
+	public int cancelOrders(int id) {
+		int update = buyForMemapper.updateOrderAllState(id);
+		if(update > 0) {
+			String sql = "update  buyforme_orderinfo a left join " + 
+					" buyforme_details_sku b on a.id=b.bf_id " + 
+					" left join  buyforme_details c on c.order_no=a.order_no " + 
+					"set a.state=-1,b.state=-1,c.state=-1  where a.id="+id;
+			SendMQ.sendMsg(new RunSqlModel(sql));
+		}
+		return update;
+	}
 	
 
 }

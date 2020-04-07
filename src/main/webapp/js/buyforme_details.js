@@ -1,5 +1,27 @@
 var costList;
 $(function(){
+	$(".btn-can-not-buy").click(function(){
+		var bfid = $("#query_bf_id").val();
+		jQuery.ajax({
+			url:"/cbtconsole/bf/cancel/order",
+			data:{
+				"bfid":bfid
+			},
+			type:"post",
+			success:function(data){
+				if(data.state == 200){
+					window.location.reload();
+				}else{
+					$.MsgBox.Alert("提示", "订单取消失败!");
+				}
+			},
+			error:function(e){
+				$.MsgBox.Alert("提示", "订单取消失败");
+			}
+		});
+		
+		
+	})
 	$(".btn-delete-p-all").click(function(){
 		var id = $(this).parents(".de-td").find(".bfdid").val();
 		jQuery.ajax({
