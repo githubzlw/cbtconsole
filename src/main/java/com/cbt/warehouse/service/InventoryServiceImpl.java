@@ -1348,22 +1348,21 @@ public class InventoryServiceImpl implements  InventoryService{
 			if(inventoryCount != 0) {
 				int odId = Integer.parseInt(StrUtils.object2NumStr(c.get("od_id")));
 				Map<String, Object> addInventory = inventoryMapper.getAddInventory(odId);
-				if(addInventory != null) {
-					//插入库位移库数据
-					InventoryBarcodeRecord record = new InventoryBarcodeRecord();
-					record.setAdmid(admId);
-					record.setInventoryBarcode(StrUtils.object2Str(addInventory.get("barcode")));
-					record.setTemId(tem_id);
-					int inid = Integer.parseInt(StrUtils.object2NumStr(addInventory.get("id")));
-					record.setInventoryId(inid == 0 ? 0 : inid);
-					record.setLockId(0);
-					record.setState(1);
-					record.setRemark(StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"订单取消商品");
-					record.setOrderBarcode(StrUtils.object2Str(c.get("barcode")));
-					record.setOdId(odId);
-					record.setChangeNum(inventoryCount);
-					inventoryMapper.insertInventoryBarcodeRecord(record );
-				}
+				
+				//插入库位移库数据
+				InventoryBarcodeRecord record = new InventoryBarcodeRecord();
+				record.setAdmid(admId);
+				record.setInventoryBarcode(addInventory!=null?StrUtils.object2Str(addInventory.get("barcode")):"SHCR001001003");
+				record.setTemId(tem_id);
+				int inid = Integer.parseInt(addInventory!=null?StrUtils.object2NumStr(addInventory.get("in_id")):"0");
+				record.setInventoryId(inid == 0 ? 0 : inid);
+				record.setLockId(0);
+				record.setState(1);
+				record.setRemark(StrUtils.object2Str(c.get("orderid"))+"/"+StrUtils.object2Str(c.get("od_id"))+"订单取消商品");
+				record.setOrderBarcode(StrUtils.object2Str(c.get("barcode")));
+				record.setOdId(odId);
+				record.setChangeNum(inventoryCount);
+				inventoryMapper.insertInventoryBarcodeRecord(record );
 			}
 		}
 		return checkedOrderDetails.size();
