@@ -36,6 +36,14 @@
             display: none;
         }
 
+        .content_line {
+            width: 100%;
+            height: auto;
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow: hidden;
+            color: red;
+        }
         .show_h3 {
             height: 20px;
             text-align: left;
@@ -1240,8 +1248,7 @@
                                 <span><br/><a target="_blank" href="${orderd.alipid }">ali产品链接</a></span>
                             </c:if>
                             <br/>
-                            <span
-                                    style="color: red;">备注:</span> ${orderd.remark} <c:if
+                            <span class="content_line">备注:${orderd.remark}</span>  <c:if
                                 test="${orderd.extra_freight != 0}">&nbsp;额外运费:${orderd.extra_freight}</c:if>
                             <em id="change_delivery_${sd.index}" style="color: red;">
                                 <c:if test="${not empty orderd.change_delivery }">
