@@ -19,8 +19,8 @@ $(function(){
 				$.MsgBox.Alert("提示", "订单取消失败");
 			}
 		});
-		
-		
+
+
 	})
 	$(".btn-delete-p-all").click(function(){
 		var id = $(this).parents(".de-td").find(".bfdid").val();
@@ -170,7 +170,7 @@ $(function(){
 			}
 		});
 	}
-	
+
 	$('.trnasparent').click(function(){
 		$('.tc,.trnasparent,.tc1').hide();
 	});
@@ -192,7 +192,7 @@ $(function(){
 		$(this).parents(".detail-div").find(".lu_tr").append(html);
 		bindClick();
 	})
-	
+
 	$(".btn-finsh").click(function(){
 		var valid = 0;
 		var time = $(".delivery-time").val();
@@ -212,7 +212,7 @@ $(function(){
 			$.MsgBox.Alert("提示", "请确认交期、快递、运费、重量信息是否准确");
 			return ;
 		}
-		
+
 		var bfid = $("#query_bf_id").val();
 		jQuery.ajax({
 			url:"/cbtconsole/bf/finsh",
@@ -231,8 +231,8 @@ $(function(){
 				$.MsgBox.Alert("提示", "确认失败");
 			}
 		});
-		
-		
+
+
 	})
 	$(".btn-re-n").click(function(){
 		var orderNo = $(".ormnum").text();
@@ -258,8 +258,8 @@ $(function(){
 				$.MsgBox.Alert("提示", "回复失败");
 			}
 		});
-		
-		
+
+
 	})
 	bindClick();
 	$(".btn-update").click(function(){
@@ -311,8 +311,8 @@ $(function(){
 				$.MsgBox.Alert("提示", "修改规格失败");
 			}
 		});
-		
-		
+
+
 	})
 	$(".btn-replay").click(function(){
 		var bfdid = $("#tc_bfdid").val();
@@ -339,8 +339,8 @@ $(function(){
 				$.MsgBox.Alert("提示", "回复失败1");
 			}
 		});
-		
-		
+
+
 	})
 	$(".btn-invalid").click(function(){
 		var id = $(this).parents(".sku-u-td").find(".lu_id").val();
@@ -361,8 +361,8 @@ $(function(){
 				$.MsgBox.Alert("提示", "规格取消失败");
 			}
 		});
-		
-		
+
+
 	})
 	$(".btn-weight").click(function(){
 		var bfdid = $(this).parents(".de-td").find(".bfdid").val();
@@ -386,7 +386,7 @@ $(function(){
 			}
 		});
 	})
-	
+
 	$(".delivery-method").change(function(){
 		var method = $(this).val();
 		for(var i=0;i<costList.length;i++){
@@ -396,9 +396,9 @@ $(function(){
 				break;
 			}
 		}
-		
+
 	})
-	
+
 	$('.img-lazy').lazyload({effect: "fadeIn"});
 })
 
@@ -451,8 +451,8 @@ function bindClick(){
 		   		$.MsgBox.Alert("提示", "录入规格失败");
 		   	}
 		   });
-		
-		
+
+
 	})
 }
 
@@ -474,9 +474,15 @@ function getShippingCost(){
 		$.MsgBox.Alert("提示", "重量为0获取运费交期失败");
 		return ;
 	}
-	// url:"https://www.import-express.com/shippingCost/getShippingCost",
+	var localHost = window.location.href;
+	var  url = "";
+	if(localHost.indexOf("1.9") || localHost.indexOf("1.27") || localHost.indexOf("27.115")){
+	    url = "https://www.import-express.com/shippingCost/getShippingCost";
+    } else {
+	    url = "http://192.168.1.66:8087/shippingCost/getShippingCost";
+    }
 	 jQuery.ajax({
-		       url:"http://192.168.1.66:8087/shippingCost/getShippingCost",
+		       url:url,
 		       data:{
 		    	   "countryId":countryId,
 		    	   "free":0,
@@ -527,6 +533,6 @@ function changePrice(t){
 	}
 	var price = parseFloat(cny/7.0832).toFixed(2);
 	$(t).parents(".td-price").find(".lu-price-buy").text(price);
-	
+
 }
 
