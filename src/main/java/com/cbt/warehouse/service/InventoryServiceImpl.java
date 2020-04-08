@@ -1649,30 +1649,32 @@ public class InventoryServiceImpl implements  InventoryService{
 		}else {
 		  int temid = (int)mapParam.get("temid");
 		  inventoryMapper.updateInventoryTemporary(temid, -1);
-			//库存数量要改变
-		 /*isku.setRemaining(Math.max(remaining-changeNum, 0));
-			isku.setCanRemaining(Math.max(canRemaining-changeNum, 0));
-			inventoryMapper.updateInventory(isku );
-			
-			//库存明细 #{inventory_count},#{od_id} #{admid},#{type} #{inventory_sku_id}
-			Map<String, String> inventory = new HashMap<>();
-			inventory.put("inventory_count", String.valueOf(changeNum));
-			inventory.put("od_id", String.valueOf(wrap.getOdid()));
-			inventory.put("admid", StrUtils.object2NumStr(mapParam.get("admid")));
-			//0 入库  1 出库 2 报损 4盘点  5-入库完成 6-出库完成 7-移库取消
-			inventory.put("type", "7");
-			inventory.put("inventory_sku_id",String.valueOf(wrap.getInid()) );
-			inventory.put("sku_details_remark","商品退货仓库拒绝商品进入库存的请求，取消库存,可用库存数量减少");
-			inventoryMapper.addInventoryDetailsSku(inventory );
-			
-			//库存日志#{inventory_count},#{before_remaining},#{after_remaining}, #{log_remark},#{change_type},#{inventory_sku_id}
-			inventory.put("before_remaining", String.valueOf(remaining));
-			inventory.put("after_remaining", String.valueOf(Math.max(remaining-changeNum, 0)));
-			
-			//0：默认 1：增加  2：减少，3：盘点  4占用 5-取消占用
-			inventory.put("change_type", "5");
-			inventory.put("log_remark","商品退货仓库拒绝商品进入库存的请求，取消库存,可用库存数量减少");
-			inventoryMapper.addInventoryLogByInventoryid(inventory);*/
+		 /* if(temid == 0) {
+			  //库存数量要改变
+			  isku.setRemaining(Math.max(remaining-changeNum, 0));
+			  isku.setCanRemaining(Math.max(canRemaining-changeNum, 0));
+			  inventoryMapper.updateInventory(isku );
+			  
+			  //库存明细 #{inventory_count},#{od_id} #{admid},#{type} #{inventory_sku_id}
+			  Map<String, String> inventory = new HashMap<>();
+			  inventory.put("inventory_count", String.valueOf(changeNum));
+			  inventory.put("od_id", String.valueOf(wrap.getOdid()));
+			  inventory.put("admid", StrUtils.object2NumStr(mapParam.get("admid")));
+			  //0 入库  1 出库 2 报损 4盘点  5-入库完成 6-出库完成 7-移库取消
+			  inventory.put("type", "7");
+			  inventory.put("inventory_sku_id",String.valueOf(wrap.getInid()) );
+			  inventory.put("sku_details_remark","商品退货仓库拒绝商品进入库存的请求，取消库存,可用库存数量减少");
+			  inventoryMapper.addInventoryDetailsSku(inventory );
+			  
+			  //库存日志#{inventory_count},#{before_remaining},#{after_remaining}, #{log_remark},#{change_type},#{inventory_sku_id}
+			  inventory.put("before_remaining", String.valueOf(remaining));
+			  inventory.put("after_remaining", String.valueOf(Math.max(remaining-changeNum, 0)));
+			  
+			  //0：默认 1：增加  2：减少，3：盘点  4占用 5-取消占用
+			  inventory.put("change_type", "5");
+			  inventory.put("log_remark","商品退货仓库拒绝商品进入库存的请求，取消库存,可用库存数量减少");
+			  inventoryMapper.addInventoryLogByInventoryid(inventory);
+		  }*/
 		}
 		return inventoryMapper.updateRemark(mapParam);
 	}
