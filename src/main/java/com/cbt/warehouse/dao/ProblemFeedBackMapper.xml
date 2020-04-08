@@ -28,7 +28,7 @@
             ,ifnull(problem_report.business,'') as business,ifnull(problem_report.tellBusiness,'') as tellBusiness,
             problem_report.site_type
 			from problem_report
-            LEFT JOIN admin_r_user ON problem_report.email = admin_r_user.useremail
+            LEFT JOIN admin_r_user ON problem_report.uid = admin_r_user.userid
             <where>
                 <if test="type!=0">
                     type = #{type}
