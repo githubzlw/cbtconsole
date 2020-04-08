@@ -14,6 +14,7 @@ import com.importExpress.pojo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -318,24 +319,32 @@ public class BuyForMeController {
 			String remark = request.getParameter("remark");
 			String sbfdid = request.getParameter("bfdid");
 			String pid = request.getParameter("pid");
+			String order_no = request.getParameter("order_no");
 			int bfdid = StrUtils.isNum(sbfdid) ? Integer.valueOf(sbfdid) : 0;
 
+			if(StringUtils.isBlank(sbfdid) || StringUtils.isBlank(pid) || StringUtils.isBlank(order_no)){
+			    mv.put("state", 500);
+			    mv.put("message", "param error");
+			    return mv;
+            }
+
 			List<String> lstValues = Lists.newArrayList();
-			String sql = "buyforme_pid_chat(pid,bd_id,content) values(?,?,?)";
+			String sql = "insert into buyforme_pid_chat(pid,bd_id,content,order_no) values(?,?,?,?)";
 
 			lstValues.add(pid);
 			lstValues.add(String.valueOf(bfdid));
 			lstValues.add(remark);
+			lstValues.add(order_no);
 			String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(DBHelper.covertToSQL(sql, lstValues)));
 
 			int updateOrderDetailsSkuState = 0;
 			if (StringUtils.isNotBlank(sendMsgByRPC) && Integer.parseInt(sendMsgByRPC) > 0) {
-				buyForMeService.updateOrdersDetailsRemark(bfdid, remark);
-				BFChat bfChat = new BFChat();
+			    updateOrderDetailsSkuState = buyForMeService.updateOrdersDetailsRemark(bfdid, remark);
+				/*BFChat bfChat = new BFChat();
 				bfChat.setBd_id(bfdid);
 				bfChat.setPid(pid);
 				bfChat.setContent(remark);
-				updateOrderDetailsSkuState = buyForMeService.insertBFChat(bfChat);
+				updateOrderDetailsSkuState = buyForMeService.insertBFChat(bfChat);*/
 			}
 			mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
 		} catch (Exception e) {
@@ -561,5 +570,24 @@ public class BuyForMeController {
         return map;
     }
 
+    /**确认
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/queryBFChatList")
+    @ResponseBody
+    public JsonResult queryBFChatList(HttpServletRequest request, HttpServletResponse response, BFChat bfChat) {
+    	try {
+            Assert.notNull(bfChat, "bfChat null");
+            Assert.notNull(bfChat.getBd_id(), "bd_id null");
+            List<BFChat> bfChatList = buyForMeService.queryBFChatList(bfChat);
+            return JsonResult.success(bfChatList);
+        } catch (Exception e) {
+    	    e.printStackTrace();
+    	    log.error("queryBFChatList,bfChat[{}],error", bfChat, e);
+    	    return  JsonResult.error(e.getMessage());
+		}
+    }
 
 }

@@ -133,12 +133,43 @@ $(function(){
 		$(".img-product").attr("src",img);
 		var bfdid = parentsdiv.find(".bfdid").val();
 		$("#tc_bfdid").val(bfdid);
+		var pid = parentsdiv.find(".bfpid").val();
+		$("#tc_pid").val(pid);
 		var remark = parentsdiv.find(".de-remarl-q").text();
 		$("#tc_remark").text(remark);
 		var replay = parentsdiv.find(".remark-replay").html();
 		$("#remark-replay-content").val(replay);
+		getChatList(bfdid);
 		$('.tc,.trnasparent,.tc1').show();
 	})
+
+
+	function getChatList(bfdid) {
+		jQuery.ajax({
+			url: "/cbtconsole/bf/queryBFChatList",
+			data: {
+				"bd_id": bfdid
+			},
+			type: "get",
+			success: function (data) {
+				if (data.ok) {
+					$("#chat_history").empty();
+					var json = data.data;
+					var content = '<div class="link-top"></div><h3>历史交流</h3>';
+					for (var i = 0; i < json.length; i++) {
+						content += '<div class="link-top"></div><p><span>'
+							+ json[i].createTime + ':</span><span>' + json[i].content + '</span></p>';
+					}
+					$("#chat_history").append(content);
+				} else {
+					$.MsgBox.Alert("提示", "获取聊天记录失败!");
+				}
+			},
+			error: function (e) {
+				$.MsgBox.Alert("提示", "ajax失败");
+			}
+		});
+	}
 	
 	$('.trnasparent').click(function(){
 		$('.tc,.trnasparent,.tc1').hide();
@@ -285,12 +316,16 @@ $(function(){
 	})
 	$(".btn-replay").click(function(){
 		var bfdid = $("#tc_bfdid").val();
+		var pid = $("#tc_pid").val();
 		var remark = $("#remark-replay-content").val();
+		var orderNo =$("#buy_order_no").text();
 		jQuery.ajax({
 			url:"/cbtconsole/bf/deremark",
 			data:{
 				"remark":remark,
-				"bfdid":bfdid
+				"bfdid":bfdid,
+				"order_no":orderNo,
+				"pid":pid
 			},
 			type:"post",
 			success:function(data){

@@ -43,10 +43,11 @@
 .tc1 .container{margin-top:50px;}
 .tc1 table td:last-child{text-align: center;}
 .tc1 table input[type="radio"]{width:20px;height:20px;}
-.tc1,.tc2,.tc3,.tc4{position:absolute;z-index:10;display:none;top:100px;left:50%;margin-left:-600px;background-color:#fff;
+.tc1,.tc2,.tc3,.tc4{position:absolute;z-index:10;display:none;top:100px;left:34%;margin-left:-300px;background-color:#fff;
 padding: 20px;max-height: 800px;}
 .tc1_table,.tc2_table{max-height:500px;height:auto;overflow-y:auto;}
-.img-responsive{max-width: 135px;max-height: 135px;margin-top: 11px;}
+#chat_history{width: 100%;height: 600px;overflow-y: auto;}
+.img-responsive, #chat_history img{max-width: 135px;max-height: 135px;margin-top: 11px;}
 .w350{width: 350px;}
 .btn-re-n{margin-bottom: 3px;margin-left: 17px;}
 .remark-dn{width: 360px;height:105px;margin-top: 5px;border: 1px solid #ccc;border-radius: 4px;}
@@ -89,7 +90,7 @@ padding: 20px;max-height: 800px;}
 .td-font-view{margin-left: 2%;cursor: pointer;}
 .text-al{text-align: left;}
 .tc-al-name{font-size: 18px;font-weight: bold;}
-.tc1{border: 3px solid #ccc;border-radius: 21px;}
+.tc1{width: 1400px;border: 3px solid #ccc;border-radius: 21px;}
 .sy-content{    margin-left: 1%;font-size: 20px;font-weight: bold;color: #ef110c;}
 body{min-height:100%;}
 .num-span{margin-left: 2%;}
@@ -108,6 +109,12 @@ body{min-height:100%;}
 .delivery-method{width: 380px;}
 .de-w1{width:170px;}
 .input-w75{width: 75px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+#xhe0_iframe{min-height: 440px;}
+	.link-top {
+            width: 100%;
+            height: 1px;
+            border-top: solid #ACC0D8 1px;
+        }
 </style>
 </head>
 
@@ -118,7 +125,7 @@ body{min-height:100%;}
 			<input type="hidden" value="${order.bf_id }" id="query_bf_id">
 	<div  class="row w800">
 			<div class="row h50">
-			<div class="col-xs-4"><span class="th-font">采购单号:</span><span class="ormnum">${order.order_no}</span></div>
+			<div class="col-xs-4"><span class="th-font">采购单号:</span><span class="ormnum" id="buy_order_no">${order.order_no}</span></div>
 			<div class="col-xs-4 adm-state-content">${order.stateContent }</div>
 			<div class="col-xs-4"><span class="th-font">关联订单号:</span><span></span></div>
 			</div>
@@ -175,6 +182,7 @@ body{min-height:100%;}
 		<div class="row w99 de-td">
 		<input value="${detail.count}" class="lucount" type="hidden">
 		<input value="${detail.id}" class="bfdid" type="hidden">
+		<input value="${detail.numIid}" class="bfpid" type="hidden">
 		<input value="${detail.price}" class="price-ss" type="hidden">
 		<div class="col-xs-1 de-w1">
 		<img src="/cbtconsole/img/beforeLoad.gif" data-original="${detail.picUrl }" class="img-responsive img-lazy img-de-v">
@@ -286,8 +294,13 @@ body{min-height:100%;}
 	<div class="trnasparent"></div>
 	<div class="container tc1">
 	<input type="hidden"  id="tc_bfdid" value="">
+		<input type="hidden"  id="tc_pid" value="">
 		<div class="wrap row">
-		<div class="col-xs-2"><img src="/cbtconsole/img/beforeLoad.gif" class="img-responsive img-product"></div>
+		<div class="col-xs-2">
+			<img src="/cbtconsole/img/beforeLoad.gif" class="img-responsive img-product">
+			<div id="chat_history">
+			</div>
+		</div>
 		<div class="col-xs-10">
 		<div class="row text-al tc-al-name"><span id="tc_name"></span>
 		</div>
@@ -297,7 +310,7 @@ body{min-height:100%;}
                <input type="hidden" id="goods_savePath" value="${savePath}" name="savePath">
                <input type="hidden" id="goods_localpath" value="${localpath}" name="localpath">
                <input type="hidden" id="goods_remotepath" value="${goods.remotpath}" name="remotepath">
-               <textarea id="remark-replay-content" rows="100" style="width: 100%;"></textarea>
+               <textarea id="remark-replay-content" rows="300" style="width: 100%;min-height: 400px;"></textarea>
                <button class="btn btn-info btn-replay">更新</button>
            </div>
             </div>
