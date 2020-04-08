@@ -157,8 +157,8 @@ $(function(){
 					var json = data.data;
 					var content = '<div class="link-top"></div><h3>历史交流</h3>';
 					for (var i = 0; i < json.length; i++) {
-						content += '<div class="link-top"></div><p><span>'
-							+ json[i].createTime + ':</span><span>' + json[i].content + '</span></p>';
+						content += '<div class="link-top"></div><p><span class="span_sty">'
+							+ json[i].createTime + '</span>:<span>' + json[i].content + '</span></p>';
 					}
 					$("#chat_history").append(content);
 				} else {
