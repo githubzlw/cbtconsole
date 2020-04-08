@@ -215,6 +215,7 @@ public class AutoOrderController {
 			List<OrderDetailsBean> orderdetails = new ArrayList<OrderDetailsBean>();
 			OrderDetailsBean detailBean = new OrderDetailsBean();
 			detailBean.setOrderid(orderNo);
+			detailBean.setGoods_pid("110110");
 			detailBean.setDelivery_time("15");
 			detailBean.setUserid(userId);
 			detailBean.setGoodsname("China Wholesale Product");

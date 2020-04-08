@@ -165,9 +165,9 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setEndetail(checkAndReplaceQuotes(bean.getEndetail()));
         inputData.setRevise_weight(bean.getReviseWeight());
         inputData.setFinal_weight(bean.getFinalWeight());
-        inputData.setPrice(bean.getPrice());
-        inputData.setWprice(bean.getWprice());
-        inputData.setRange_price(bean.getRangePrice());
+        // inputData.setPrice(bean.getPrice());
+        // inputData.setWprice(bean.getWprice());
+        // inputData.setRange_price(bean.getRangePrice());
         // inputData.setSku(bean.getSku());
         inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
         inputData.setBm_flag("1");
@@ -180,7 +180,7 @@ public class GoodsInfoUpdateOnlineUtil {
             inputData.setPriceReviseFlag("1");
         }
         if (StringUtils.isNotBlank(bean.getFeeprice())) {
-            inputData.setFeeprice(bean.getFeeprice());
+            // inputData.setFeeprice(bean.getFeeprice());
         }
         if (bean.getEninfo() == null || "".equals(bean.getEninfo()) || bean.getEninfo().length() < 10) {
             inputData.setIs_show_det_img_flag("0");
