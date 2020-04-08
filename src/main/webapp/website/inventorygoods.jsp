@@ -246,9 +246,9 @@ em,i{font-style: normal;}
 					<c:if test="${b.returnOrderNum>0 }">
 					<a href="/cbtconsole/website/ReturnDisplay.jsp?skuid=${b.iskSkuid}" target="_blank" class="warring-a">该库存可能有退货，请去退货管理页面人为确认后再继续操作</a>
 					</c:if>
-					<button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },1)">移入库存</button>
+					<button class="btn btn-success" onclick="inoutInventory(${index.index},${b.ibid},${b.liid },1,${b.ibTemId })">移入库存</button>
 					</c:if>
-					<c:if test="${b.ibState== 0 || b.ibState== 1}"><br><br><button class="btn btn-info btn-cancel" onclick="cancelInOut(${index.index},${b.ibid},${b.liid },${b.ibState})"> 取消操作 </button></c:if>
+					<c:if test="${b.ibState== 0 || b.ibState== 1}"><br><br><button class="btn btn-info btn-cancel" onclick="cancelInOut(${index.index},${b.ibid},${b.liid },${b.ibState},${b.ibTemId })"> 取消操作 </button></c:if>
 					</td>
 					</tr>
 					</c:forEach>
@@ -278,6 +278,7 @@ em,i{font-style: normal;}
 		<input type="hidden" value="" id="tc_ibState">
 		<input type="hidden" value="" id="tc_in_barcode">
 		<input type="hidden" value="" id="tc_order_barcode">
+		<input type="hidden" value="" id="tc_tem_id">
 		
 		<br>
 		<button class="btn btn-success" onclick="cancelMove()">确定</button>
@@ -309,6 +310,7 @@ function cancelMove(){
 	var ibid = $("#tc_ibid").val();
 	var ibState = $("#tc_ibState").val();
 	var inbarcode = $("#tc_in_barcode").val();
+	var temid = $("#tc_tem_id").val();
 	var orderbarcode = $("#tc_order_barcode").val();
 	var remark = $("#tc_remark").val();
 	
@@ -338,10 +340,11 @@ function cancelMove(){
 	
 }
 
-function cancelInOut(index,ibid,liid,ibState){
+function cancelInOut(index,ibid,liid,ibState,temid){
 	$("#tc_liid").val(liid);
 	$("#tc_ibid").val(ibid);
 	$("#tc_ibState").val(ibState);
+	$("#tc_tem_id").val(temid);
 	var inbarcode = "";
 	var orderbarcode = "";
 	if(ibState == 0){
@@ -389,7 +392,7 @@ function doNextPage(){
 	doQuery();
 }
 
-function inoutInventory(index,ibid,liid,inorout){
+function inoutInventory(index,ibid,liid,inorout,temid){
 	//移出库存库位
 	var inbarcode = "";
 	var orderbarcode = "";
@@ -407,6 +410,7 @@ function inoutInventory(index,ibid,liid,inorout){
 	    	   "liid":liid,
 	    	   "inbarcode":inbarcode,
 	    	   "orderbarcode":orderbarcode,
+	    	   "temid":temid,
 	    	   "inorout":inorout
 	    	   
 	       },

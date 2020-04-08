@@ -263,6 +263,9 @@ public class InventoryController {
 			String stribid = request.getParameter("ibid");
 			stribid = StrUtils.isNum(stribid) ? stribid : "0";
 			
+			String temid = request.getParameter("temid");
+			temid = StrUtils.isNum(temid) ? temid : "0";
+			
 			String strliid = request.getParameter("liid");
 			strliid = StrUtils.isNum(strliid) ? strliid : "0";
 			
@@ -275,6 +278,7 @@ public class InventoryController {
 			inbarcode = StringUtil.isBlank(inbarcode) ? inbarcode : inbarcode.trim();
 			Map<String,Object> map = new HashMap<>();
 			map.put("ibid", Integer.parseInt(stribid));
+			map.put("temid", Integer.parseInt(temid));
 			map.put("liid", Integer.parseInt(strliid));
 			map.put("inorout", Integer.parseInt(strinorout));
 			map.put("inbarcode", inbarcode);
@@ -314,6 +318,8 @@ public class InventoryController {
 			result.put("status", 200);
 			String stribid = request.getParameter("ibid");
 			stribid = StrUtils.isNum(stribid) ? stribid : "0";
+			String strtemid = request.getParameter("temid");
+			strtemid = StrUtils.isNum(strtemid) ? strtemid : "0";
 			
 			String strliid = request.getParameter("liid");
 			strliid = StrUtils.isNum(strliid) ? strliid : "0";
@@ -337,6 +343,7 @@ public class InventoryController {
 			map.put("orderbarcode", orderbarcode);
 			map.put("admid",adm!=null? adm.getId() : 0);
 			map.put("remark", remark);
+			map.put("temid", Integer.parseInt(strtemid));
 			if(ibState == 0) {
 				map.put("state", 4);
 			}else if(ibState == 1){

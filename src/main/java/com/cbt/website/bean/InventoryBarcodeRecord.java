@@ -24,6 +24,11 @@ public class InventoryBarcodeRecord {
 	 * order_details id
 	 */
 	private int  odId;
+	
+	/**
+	 * inventory_sku_temporary  id
+	 */
+	private int temId;
 	/**
 	 * 
 	 */
