@@ -22,15 +22,25 @@ import com.cbt.service.CategoryService;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.google.common.collect.Maps;
 import com.importExpress.pojo.CatalogProduct;
 import com.importExpress.pojo.CatalogProductWrap;
+import com.importExpress.pojo.Currency;
+import com.importExpress.pojo.PageWrap;
 import com.importExpress.pojo.RecommendCatalog;
+import com.importExpress.pojo.SearchParam;
+import com.importExpress.pojo.SearchResultWrap;
 import com.importExpress.service.RecommendCatalogService;
+import com.importExpress.utli.CloudHelp;
 import com.importExpress.utli.UserInfoUtils;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Controller
 @RequestMapping("/catalog")
 public class RecommendCatalogController {
+	@Autowired
+    private CloudHelp cloudHelp;
 	@Autowired
 	private RecommendCatalogService recommendCatalogService;
 	@Autowired
@@ -431,4 +441,54 @@ public class RecommendCatalogController {
 		}
 		return "";
 	}
+	
+	 /**ajax请求版搜索入口
+     * @param req
+     * @param resp
+     * @return
+     * @throws IOException
+     * @data 2019年11月25日
+     * @author user4
+     */
+    @RequestMapping("/search")
+    @ResponseBody
+    public Map<String,Object> goodsListForHtml(HttpServletRequest req, HttpServletResponse resp) {
+        Map<String, Object> map_ = Maps.newHashMap();
+        try {
+            SearchParam param = new SearchParam();
+			String strSite = req.getParameter("site");
+			strSite = StrUtils.isNum(strSite) ? strSite : "1";
+			String strPage = req.getParameter("page");
+			strPage = StrUtils.isNum(strPage) ? strPage : "1";
+			
+			param.setKeyword(req.getParameter("keyword"));
+            param.setSite(Integer.parseInt(strSite));
+            param.setCatid(req.getParameter("catid"));
+            param.setFactPvid(false);
+            param.setPage(Integer.parseInt(strPage));
+            param.setUserType(1);
+            param.setMobile(false);
+            param.setUserType(1);
+            param.setCurrency(new Currency());
+            param.setSalable(false);
+            param.setFactCategory(true);
+            param.setSort("default");
+            param.setPageSize(60);
+            param.setFreeShipping(2);
+            param.setImportType(0);
+
+            SearchResultWrap searchResultWrap = cloudHelp.searchProducts(param);
+//            //搜索页显示 try  search
+            PageWrap page_ = searchResultWrap.getPage();
+            long recordCount = page_== null ? 0 : page_.getRecordCount();
+            map_.put("recordCount",recordCount);
+            map_.put("param",searchResultWrap.getParam());
+            map_.put("goodslist",searchResultWrap.getProducts());
+            map_.put("pagemap",searchResultWrap.getPage());
+            map_.put("rootTree",searchResultWrap.getCategorys());
+        } catch (Exception e) {
+            log.error("打开搜索页报错：keyword:" + req.getParameter("keyword"), e);
+        }
+        return  map_;
+    }
 }

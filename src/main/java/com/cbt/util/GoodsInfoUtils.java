@@ -1484,9 +1484,8 @@ public class GoodsInfoUtils {
         Set<String> imgSet = new HashSet<>();
         boolean isSu = false;
         int count = 0;
-        int localCount = 0;
+        int localNum = 0;
         if (CollectionUtils.isNotEmpty(allImgList)) {
-
             for (String imgUrl : allImgList) {
                 if (!imgUrl.contains("192.168")) {
                     if (!imgSet.contains(imgUrl)) {
@@ -1502,21 +1501,17 @@ public class GoodsInfoUtils {
                             break;
                         }
                     }
-                } else {
-                    localCount ++;
+                }else{
+                    localNum ++;
                 }
             }
         }
 
-        System.err.println("imgSize:" + allImgList.size() + ",localCount: " + localCount
-                + ",down count:" + count + ",checkout:" + isSu);
+        System.err.println("imgSize:" + allImgList.size() + ",localNum: " + localNum + ",down count:" + count + ",checkout:" + isSu);
         /*if (isSu) {
             isSu = checkDownFile(imgSet, filePath);
         }*/
-        if(allImgList.size() == localCount){
-            isSu = true;
-        }
-        return isSu;
+        return localNum == allImgList.size() ? true : isSu;
     }
 
 
