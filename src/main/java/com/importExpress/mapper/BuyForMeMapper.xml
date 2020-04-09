@@ -64,8 +64,9 @@
 
   <select id="getOrders" resultMap="infoResultMap">
   select a.id,a.order_no,a.user_id,a.state,a.pay_price,a.product_cost,a.delivery_time,
-  a.address_id,a.create_time,a.update_time,a.admin_id,a.ip,a.remark,a.ship_feight,a.delivery_method,b.admName
-  from buyforme_orderinfo a left join admin_r_user b on a.admin_id=b.adminid
+  a.address_id,a.create_time,a.update_time,a.admin_id,a.ip,a.remark,a.ship_feight,a.delivery_method,
+  (select admName from admin_r_user where userid=a.user_id limit 1) admName
+  from buyforme_orderinfo a 
 
   where 1=1
   <if test="state !=-2">and a.state=#{state}</if>
