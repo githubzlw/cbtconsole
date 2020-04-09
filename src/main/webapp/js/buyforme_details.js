@@ -476,7 +476,7 @@ function getShippingCost(){
 	}
 	var localHost = window.location.href;
 	var  url = "";
-	if(localHost.indexOf("1.9") || localHost.indexOf("1.27") || localHost.indexOf("27.115")){
+	if(localHost.indexOf("1.9") > -1 || localHost.indexOf("1.27") > -1 || localHost.indexOf("27.115") > -1){
 	    url = "https://www.import-express.com/shippingCost/getShippingCost";
     } else {
 	    url = "http://192.168.1.66:8087/shippingCost/getShippingCost";
