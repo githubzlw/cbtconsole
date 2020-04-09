@@ -109,17 +109,15 @@ body{min-height:100%;}
 .delivery-method{width: 380px;}
 .de-w1{width:170px;}
 .input-w75{width: 75px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
-#xhe0_iframe{min-height: 440px;}
-	.link-top {
-            width: 100%;
-            height: 1px;
-            border-top: solid #ACC0D8 1px;
-        }
+
+#xhe0_iframe {min-height: 440px;}
+.link-top {width: 100%;height: 1px;border-top: solid #ACC0D8 1px;}
+.span_sty {background-color: #c1f3b7;}
 </style>
 </head>
 
 <body>
-<div style="background-color:#eaf5e5;min-height:100%,width:2000px;">
+<div style="background-color:#eaf5e5;min-height:100%;width:2000px;">
 	<div class="container-fluid report">
 		<h1 class="text-center">采购申请单详情</h1>
 			<input type="hidden" value="${order.bf_id }" id="query_bf_id">
