@@ -315,8 +315,6 @@ body{min-height:100%;}
                <button class="btn btn-info btn-replay">更新</button>
            </div>
             </div>
-		
-		
 		</div>
 		</div>
 		
