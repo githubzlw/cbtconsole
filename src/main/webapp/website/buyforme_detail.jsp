@@ -85,7 +85,7 @@ padding: 20px;max-height: 800px;}
 .delivery-method{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 .delivery-feight{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 .img-dv{width: 10%;}
-.btn-finsh{margin-left: 1445px;}
+/* .btn-finsh{margin-left: 1445px;} */
 .remark-replay{border: 1px solid #ccc;border-radius: 4px;height: 34px;width:30%;}
 .td-font-view{margin-left: 2%;cursor: pointer;}
 .text-al{text-align: left;}
@@ -113,6 +113,7 @@ body{min-height:100%;}
 #xhe0_iframe {min-height: 440px;}
 .link-top {width: 100%;height: 1px;border-top: solid #ACC0D8 1px;}
 .span_sty {background-color: #c1f3b7;}
+.btn-div{    margin-left: 1445px; width: 200px;}
 </style>
 </head>
 
@@ -278,12 +279,14 @@ body{min-height:100%;}
 		</div>
 		</c:forEach>
 		<br>
+		<div class="row btn-div">
 		<c:if test="${order.state==0 ||  order.state==1}">
 		<button class="btn btn-success btn-finsh">确认订单</button>
 		</c:if>
 		<c:if test="${order.state==0 ||  order.state==1 || order.state==2}">
 		<button class="btn btn-warning btn-can-not-buy">不能采购</button>		
 		</c:if>
+		</div>
 		
 		</div>
 		<br><br><br>
