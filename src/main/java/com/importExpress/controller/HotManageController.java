@@ -1363,6 +1363,8 @@ public class HotManageController {
                 url = STATIC_UTL_REMOTE;
                 isOnline = true;
             } else {
+                // 192.168.1.153:8088
+                // url = STATIC_UTL_LOCAL.replace("192.168.1.153:8088","192.168.1.67:8383");
                 url = STATIC_UTL_LOCAL;
             }
             int totalNum = 0;
