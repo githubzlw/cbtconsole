@@ -94,11 +94,15 @@ $(function(){
 	
 	$(".btn-flush").click(function(){
 		$.ajax({
-			url:'https://www.import-express.com/app/flush/synonyms/category',
+			url:'/cbtconsole/init/flush/synonyms/category',
 			data:{},
 			type:"post",
 			success:function(data){
-				$.MsgBox.Alert("提示", "刷新成功");
+				if(data.code==200){
+					$.MsgBox.Alert("提示", "刷新成功");
+				}else{
+					$.MsgBox.Alert("提示", "刷新失败");
+				}
 			},
 			error:function(e){
 				$.MsgBox.Alert("提示", "请求错误");
