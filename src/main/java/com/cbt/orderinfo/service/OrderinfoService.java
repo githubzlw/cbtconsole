@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.cbt.warehouse.pojo.OrderDetailsBeans;
 import com.cbt.warehouse.pojo.SampleOrderBean;
@@ -455,7 +456,7 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
-	public List<SearchResultInfo> getOrder(String shipno, String checked, String selectType) {
+	public List<SearchResultInfo> getOrder(String shipno, String checked, String selectType, String offlineType) {
 		List<SearchResultInfo> info = new ArrayList<SearchResultInfo>();
 		List<SearchTaobaoInfo> taobaoinfoList = new ArrayList<SearchTaobaoInfo>();
 		int adminid = 520;
@@ -476,8 +477,22 @@ public class OrderinfoService implements IOrderinfoService {
 					resultList=orderinfoMapper.getOrderData(shipno,adminid);
 				}
 			}
+
+			List<Map<String, String>> offlineInfos = pruchaseMapper.getOfflineInfoByShipno(shipno);
+			List<String> goodsidList = new ArrayList<>();
+			/*if(CollectionUtils.isNotEmpty(offlineInfos)){
+				for (Map<String, String> map : offlineInfos){
+					goodsidList.add(map.get("goodsid"));
+				}
+			}*/
 			Set set=new HashSet();
+			List<Map<String,Object>> resultFinalList = new ArrayList<>();
 			for(Map<String,Object> map:resultList){
+				if(!"1".equals(offlineType) && goodsidList.contains(map.get("goodsid"))){
+					continue;
+				} else if("1".equals(offlineType) && !goodsidList.contains(map.get("goodsid"))){
+					continue;
+				}
 				SearchResultInfo searchresultinfo = new SearchResultInfo();
 				String resultTaobaoItemId = null;
 				resultTaobaoItemId = (String)map.get("tb_1688_itemid");
@@ -618,8 +633,11 @@ public class OrderinfoService implements IOrderinfoService {
 				}
 
 				info.add(searchresultinfo);
+				resultFinalList.add(map);
 			}
 			//一个1688包裹对应的采购订单数量
+			resultList.clear();
+			resultFinalList.clear();
 			if(info.size()>0){
 				info.get(0).setOrder_num(set.size());
 			}

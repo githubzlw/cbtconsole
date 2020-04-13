@@ -261,7 +261,8 @@ public class OrderInfoController{
 			String expresstrackid = request.getParameter("expresstrackid");
 			String checked = request.getParameter("checked");
 			String selectType = request.getParameter("selectType");
-			list = iOrderinfoService.getOrder(expresstrackid, checked, selectType);
+			String offlineType = request.getParameter("offlineType");
+			list = iOrderinfoService.getOrder(expresstrackid, checked, selectType, offlineType);
 		}catch (Exception e){
 			e.printStackTrace();
 		}

@@ -7352,7 +7352,7 @@ public class PurchaseDaoImpl implements PurchaseDao {
 						+ "' and importGoodsid='" + map.get("TbGoodsid") + "'";
 				row = 1;
 			} else {
-				sql = "insert into taobao_1688_order_history (importGoodsid,importOrderid,tbOr1688,orderid,totalprice,itemname,itemid,itemprice,itemqty,sku,shipno,itemurl,username,preferential,paydata,imgurl,shipper,shipstatus,creattime,delivery_date,orderstatus,orderdate) values"
+				sql = "insert into taobao_1688_order_history_offline (importGoodsid,importOrderid,tbOr1688,orderid,totalprice,itemname,itemid,itemprice,itemqty,sku,shipno,itemurl,username,preferential,paydata,imgurl,shipper,shipstatus,creattime,delivery_date,orderstatus,orderdate) values"
 						+ "('"
 						+ map.get("TbGoodsid")
 						+ "','"

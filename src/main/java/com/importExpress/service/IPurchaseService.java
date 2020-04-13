@@ -308,4 +308,8 @@ public interface IPurchaseService {
 	 * @return
 	 */
 	public int addIdRelationTable(Map<String, String> map);
+
+	Map<String, String> getTaobaoInfo(String shipno, String taobao_id);
+
+	List<Map<String, String>> getOfflineInfoByShipno(String shipno);
 }
