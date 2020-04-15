@@ -187,16 +187,20 @@ public class InventoryController {
 		map.put("orderid", orderid);
 		map.put("inid", inid);
 		
-		int count = inventoryService.inventoryBarcodeListCount(map);
-		if(count > 0) {
-			List<InventoryWrap> barcodeList = inventoryService.inventoryBarcodeList(map);
-			mv.addObject("barcodeList", barcodeList);
+		try {
+			int count = inventoryService.inventoryBarcodeListCount(map);
+			if(count > 0) {
+				List<InventoryWrap> barcodeList = inventoryService.inventoryBarcodeList(map);
+				mv.addObject("barcodeList", barcodeList);
+			}
+			mv.addObject("barcodeCount", count);
+			
+			int barcodeListPage = count % 20 == 0 ? count / 20 : count / 20 + 1;
+			mv.addObject("barcodeListPage", barcodeListPage);
+			mv.addObject("queryParam",map);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		mv.addObject("barcodeCount", count);
-		
-		int barcodeListPage = count % 20 == 0 ? count / 20 : count / 20 + 1;
-		mv.addObject("barcodeListPage", barcodeListPage);
-		mv.addObject("queryParam",map);
 		
 		return mv;
 	}

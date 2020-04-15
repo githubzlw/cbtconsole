@@ -108,7 +108,7 @@ public class BuyForMeController {
     		
     		Map<String, Object> order = buyForMeService.getOrder(orderNo);
     		if(order != null) {
-    			int state = Integer.parseInt(StrUtils.object2NumStr(order.get("state")));
+    			int state = Integer.parseInt(StrUtils.object2Str(order.get("state")));
     			String strState = state == -1?"申请已取消":state==0?"申请待处理":state==1?"申请处理中":state==2?"销售处理完成":"已支付";
     			order.put("stateContent", strState);
     			String delivery_method = StrUtils.object2Str(order.get("delivery_method"));

@@ -43,8 +43,8 @@
 .tc1 .container{margin-top:50px;}
 .tc1 table td:last-child{text-align: center;}
 .tc1 table input[type="radio"]{width:20px;height:20px;}
-.tc1,.tc2,.tc3,.tc4{position:absolute;z-index:10;display:none;top:100px;left:34%;margin-left:-300px;background-color:#fff;
-padding: 20px;max-height: 800px;}
+.tc1{position:absolute;z-index:10;display:none;top:100px;left:44%;margin-left:-300px;background-color:#fff;
+padding: 20px;max-height: 715px;}
 .tc1_table,.tc2_table{max-height:500px;height:auto;overflow-y:auto;}
 #chat_history{width: 100%;height: 600px;overflow-y: auto;}
 .img-responsive, #chat_history img{max-width: 135px;max-height: 135px;margin-top: 11px;}
@@ -88,9 +88,9 @@ padding: 20px;max-height: 800px;}
 /* .btn-finsh{margin-left: 1445px;} */
 .remark-replay{border: 1px solid #ccc;border-radius: 4px;height: 34px;width:30%;}
 .td-font-view{margin-left: 2%;cursor: pointer;}
-.text-al{text-align: left;}
+.text-al{text-align: left;    margin-top: 22px; height: 46px;}
 .tc-al-name{font-size: 18px;font-weight: bold;}
-.tc1{width: 1400px;border: 3px solid #ccc;border-radius: 21px;}
+.tc1{width: 800px;border: 3px solid #ccc;border-radius: 21px;}
 .sy-content{    margin-left: 1%;font-size: 20px;font-weight: bold;color: #ef110c;}
 body{min-height:100%;}
 .num-span{margin-left: 2%;}
@@ -297,12 +297,12 @@ body{min-height:100%;}
 	<input type="hidden"  id="tc_bfdid" value="">
 		<input type="hidden"  id="tc_pid" value="">
 		<div class="wrap row">
-		<div class="col-xs-2">
+		<div class="col-xs-4">
 			<img src="/cbtconsole/img/beforeLoad.gif" class="img-responsive img-product">
 			<div id="chat_history">
 			</div>
 		</div>
-		<div class="col-xs-10">
+		<div class="col-xs-8">
 		<div class="row text-al tc-al-name"><span id="tc_name"></span>
 		</div>
 		<div class="row text-al"><span>Request:</span><span id="tc_remark"></span></div>
@@ -324,6 +324,7 @@ body{min-height:100%;}
 
 </div>
 </div>
+<input type="hidden" value="0" id="method-change">
 </body>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/msg-confirm.js"></script>
