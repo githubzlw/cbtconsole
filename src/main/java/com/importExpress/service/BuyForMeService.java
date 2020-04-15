@@ -4,13 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cbt.pojo.Admuser;
-import com.importExpress.pojo.BFChat;
-import com.importExpress.pojo.BFOrderDetail;
-import com.importExpress.pojo.BFOrderDetailSku;
-import com.importExpress.pojo.BFOrderInfo;
-import com.importExpress.pojo.TransportMethod;
-import com.importExpress.pojo.ZoneBean;
-import com.importExpress.pojo.BuyForMeSearchLog;
+import com.importExpress.pojo.*;
 
 public interface BuyForMeService {
 	/**更新order状态
@@ -28,21 +22,25 @@ public interface BuyForMeService {
 	 */
 	int getOrdersCount(Map<String,Object> map);
 	
-	/**
+	/**订单明细
 	 * @return
 	 */
 	List<BFOrderDetail> getOrderDetails(String orderNo,String bfId);
 	
+	/**获取订单
+	 * @param orderNo
+	 * @return
+	 */
 	Map<String,Object> getOrder(String orderNo);
 	
 	
-	/**
+	/**获取sku
 	 * @return
 	 */
 	List<BFOrderDetailSku> getOrderDetailsSku(String bfId);
 	
 
-	/**
+	/**增加sku
 	 * @param detailSku
 	 * @return
 	 */
@@ -64,11 +62,7 @@ public interface BuyForMeService {
 	 * @return
 	 */
 	int updateOrderDetailsSkuWeight(String weight,int bfdid);
-
-	List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
-
-	int querySearchListCount(BuyForMeSearchLog searchLog);
-
+	
 	/**更新交期
 	 * @param orderNo
 	 * @param time
@@ -86,7 +80,7 @@ public interface BuyForMeService {
 	 * @return
 	 */
 	List<Map<String,String>> getRemark(String orderNo);
-
+	
 	List<TransportMethod>  getTransport();
 	/**回复备注
 	 * @param id
@@ -106,13 +100,13 @@ public interface BuyForMeService {
 	 * @return
 	 */
 	int deleteProduct(int bfdid);
-
+	
 	List<Admuser> lstAdms();
 	/**国家列表
 	 * @return
 	 */
 	List<ZoneBean> lstCountry();
-
+	
 	/**
 	 * 商品聊天
 	 * @param bfChat
@@ -121,4 +115,9 @@ public interface BuyForMeService {
 	int insertBFChat(BFChat bfChat);
 
 	List<BFChat> queryBFChatList(BFChat bfChat);
+
+	List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
+
+	int querySearchListCount(BuyForMeSearchLog searchLog);
+
 }
