@@ -83,7 +83,7 @@ $(function(){
 		$(".btn-update-address").show();
 		$(this).hide();
 	})
-	getShippingCost();
+	getShippingCost(1);
 	initXheditor();
 	$(".btn-delivery-time").click(function(){
 		var isvalid = 1;
@@ -116,6 +116,7 @@ $(function(){
 			success:function(data){
 				if(data.state == 200){
 					$.MsgBox.Alert("提示", "交期确认成功");
+					$("#method-change").val(2);
 				}else{
 					$.MsgBox.Alert("提示", "交期确认失败!");
 				}
@@ -198,6 +199,7 @@ $(function(){
 		var time = $(".delivery-time").val();
 		var method = $(".delivery-method").val();
 		var feight = $(".delivery-feight").val();
+		var changeState = $("#method-change").val();
 		if(time=='' || feight==''||!method || method==''){
 			valid = 1;
 		}else{
@@ -207,6 +209,10 @@ $(function(){
 					valid=1;
 				}
 			});
+		}
+		if(changeState == '1'){
+			$.MsgBox.Alert("提示", "您更改了交期,请先确认交期");
+			return ;
 		}
 		if(valid == 1){
 			$.MsgBox.Alert("提示", "请确认交期、快递、运费、重量信息是否准确");
@@ -393,6 +399,7 @@ $(function(){
 			if(costList[i].shippingmethod.toLowerCase() == method.toLowerCase()){
 				$(".delivery-feight").val(costList[i].shippingCost);
 				$(".delivery-time").val(costList[i].delivery_time);
+				$("#method-change").val(1);
 				break;
 			}
 		}
@@ -456,7 +463,7 @@ function bindClick(){
 	})
 }
 
-function getShippingCost(){
+function getShippingCost(state){
 	var countryId = $("#in-country-id").val();
 	var weight = 0;
 	$(".lu-weight").each(function(){
@@ -471,7 +478,11 @@ function getShippingCost(){
 		}
 	})
 	if(weight < 0.00001){
-		$.MsgBox.Alert("提示", "重量为0获取运费交期失败");
+		if(state == 1){
+			
+		}else{
+			$.MsgBox.Alert("提示", "重量为0获取运费交期失败");
+		}
 		return ;
 	}
 	var localHost = window.location.href;
