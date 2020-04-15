@@ -73,7 +73,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 			if(list != null && !list.isEmpty()) {
 				o.setSkuCount(list.size());
 				o.setWeight(list.get(0).getWeight());
-				o.setCount(list.stream().mapToInt(DetailsSku::getNum).sum());
+				o.setCount(list.stream().filter(s->s.getState()>0).mapToInt(DetailsSku::getNum).sum());
 			}
 		});
 		
