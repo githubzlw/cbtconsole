@@ -476,11 +476,11 @@ function getShippingCost(){
 	}
 	var localHost = window.location.href;
 	var  url = "";
-	if(localHost.indexOf("1.9") > -1 || localHost.indexOf("1.27") > -1 || localHost.indexOf("27.115") > -1){
-	    url = "https://www.import-express.com/shippingCost/getShippingCost";
+	url = "https://www.import-express.com/shippingCost/getShippingCost";
+	/*if(localHost.indexOf("1.9") > -1 || localHost.indexOf("1.27") > -1 || localHost.indexOf("27.115") > -1){
     } else {
 	    url = "http://192.168.1.66:8087/shippingCost/getShippingCost";
-    }
+    }*/
 	 jQuery.ajax({
 		       url:url,
 		       data:{
