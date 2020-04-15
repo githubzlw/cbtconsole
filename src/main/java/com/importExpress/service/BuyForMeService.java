@@ -6,6 +6,7 @@ import java.util.Map;
 import com.importExpress.pojo.BFOrderDetail;
 import com.importExpress.pojo.BFOrderDetailSku;
 import com.importExpress.pojo.BFOrderInfo;
+import com.importExpress.pojo.BuyForMeSearchLog;
 
 public interface BuyForMeService {
 	/**申请单列表
@@ -49,5 +50,9 @@ public interface BuyForMeService {
 	int finshOrder(int bfId);
 	
 	int updateOrderDetailsSkuWeight(String weight,int bfdid);
+
+	List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
+
+	int querySearchListCount(BuyForMeSearchLog searchLog);
 	
 }

@@ -3,6 +3,7 @@ package com.importExpress.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,10 +11,6 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.mapper.BuyForMeMapper;
-import com.importExpress.pojo.BFOrderDetail;
-import com.importExpress.pojo.BFOrderDetailSku;
-import com.importExpress.pojo.BFOrderInfo;
-import com.importExpress.pojo.DetailsSku;
 import com.importExpress.service.BuyForMeService;
 
 @Service
@@ -102,6 +99,16 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 	@Override
 	public int updateOrderDetailsSkuWeight(String weight,int bfdid) {
 		return buyForMemapper.updateOrderDetailsSkuWeight(weight,bfdid);
+	}
+
+	@Override
+	public List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog) {
+		return buyForMemapper.querySearchList(searchLog);
+	}
+
+	@Override
+	public int querySearchListCount(BuyForMeSearchLog searchLog) {
+		return buyForMemapper.querySearchListCount(searchLog);
 	}
 
 }

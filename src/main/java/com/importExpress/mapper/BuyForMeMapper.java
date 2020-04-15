@@ -3,6 +3,7 @@ package com.importExpress.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.importExpress.pojo.BuyForMeSearchLog;
 import org.apache.ibatis.annotations.Param;
 
 import com.importExpress.pojo.BFOrderDetail;
@@ -63,5 +64,9 @@ public interface BuyForMeMapper {
 	Map<String,Object> getOrder(String orderNo);
 	
 	int updateOrderDetailsSkuWeight(@Param("weight")String weight,@Param("bfdid")int bfdid);
+
+	List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
+
+	int querySearchListCount(BuyForMeSearchLog searchLog);
     
 }
