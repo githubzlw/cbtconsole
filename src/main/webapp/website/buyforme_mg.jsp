@@ -32,7 +32,7 @@
 .w350{width: 350px;}
 </style>
 </head>
-<body>
+<body style="background-color: #dff0d8;">
 	<div class="container-fluid report">
 		<h1 class="text-center">Buy For Me 申请单</h1>
 			
@@ -57,6 +57,15 @@
 						<option value="3" ${queryParam.state==3 ? 'selected="selected"':''}>已支付</option>
 				</select>
 				</label>
+				<label class="w200">负责人： <select class="form-control  p_qs_r" id="query_admin" >
+						<option value="0" ${queryParam.admin==0 ? 'selected="selected"':''}>全部</option>
+						<c:forEach var="adm" items="${lstAdms }">
+						<option value="${adm.id }" ${queryParam.admin==adm.id ? 'selected="selected"':''}>${adm.admname }</option>
+						</c:forEach>
+						
+				</select>
+				</label>
+				
 				<button class="btn btn-info bt_ready"  id="query_button_check">查询</button>
 				
 			</div>
@@ -64,17 +73,19 @@
 		<div class="row mt20">
 			<table class="table table-bordered">
 				<thead>
-					<tr><th>申请ID</th><th>订单号</th><th>用户ID</th><th>状态</th><th>支付金额</th><th>交期时间</th><th>时间</th><th>备注</th></tr>
+					<tr><th width="7%">申请ID</th><th width="10%">订单号</th><th width="10%">用户ID</th><th width="10%">状态</th>
+					<th width="10%">支付金额</th><th width="6%">交期/运费</th><th width="6%">负责人</th><th width="12%">时间</th><th>备注</th></tr>
 				</thead>
 				<tbody>
 				<c:forEach items="${orders }" var="order" varStatus="index">
 					<tr>
 					 <td >${order.id}</td>
-						<td ><a href="/cbtconsole/bf/detail?no=${order.orderNo}&bfid=${order.id}">${order.orderNo}</a></td>
+						<td ><a href="/cbtconsole/bf/detail?no=${order.orderNo}&bfid=${order.id}" target="_blank">${order.orderNo}</a></td>
 						<td >${order.userId}</td>
-						<td >${order.state}</td>
+						<td >${order.stateContent}</td>
 						<td >${order.payPrice}</td>
-						<td >${order.deliveryTime}</td>
+						<td >${order.deliveryTime}/${order.method}/${order.feight}</td>
+						<td >${order.adminName}</td>
 						<td >${order.createTime}</td>
 						<td >${order.remark}</td>
 					</tr>

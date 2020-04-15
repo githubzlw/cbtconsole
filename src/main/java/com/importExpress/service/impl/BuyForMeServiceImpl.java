@@ -8,10 +8,15 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cbt.jdbc.DBHelper;
+import com.cbt.pojo.Admuser;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.mapper.BuyForMeMapper;
+import com.importExpress.pojo.*;
 import com.importExpress.service.BuyForMeService;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 @Service
 public class BuyForMeServiceImpl implements BuyForMeService {
@@ -20,8 +25,18 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 
 	@Override
 	public List<BFOrderInfo> getOrders(Map<String, Object> map) {
-		
-		return buyForMemapper.getOrders(map);
+		List<BFOrderInfo> orders = buyForMemapper.getOrders(map);
+		if(orders == null) {
+			return orders;
+		}
+//		订单状态：-1 取消，0申请，1处理中 2销售处理完成 3已支付;
+		orders.stream().forEach(o->{
+			String content = o.getState() == -1 ? "取消" : o.getState() == 0 ?
+					"申请中":o.getState() == 1 ?"处理中":o.getState() == 2 ?
+							"销售处理完成":o.getState() == 3 ?"已支付":"";
+			o.setStateContent(content);
+		});
+		return orders;
 	}
 
 	@Override

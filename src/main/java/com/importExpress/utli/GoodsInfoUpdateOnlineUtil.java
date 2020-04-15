@@ -165,9 +165,9 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setEndetail(checkAndReplaceQuotes(bean.getEndetail()));
         inputData.setRevise_weight(bean.getReviseWeight());
         inputData.setFinal_weight(bean.getFinalWeight());
-        inputData.setPrice(bean.getPrice());
-        inputData.setWprice(bean.getWprice());
-        inputData.setRange_price(bean.getRangePrice());
+        // inputData.setPrice(bean.getPrice());
+        // inputData.setWprice(bean.getWprice());
+        // inputData.setRange_price(bean.getRangePrice());
         // inputData.setSku(bean.getSku());
         inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
         inputData.setBm_flag("1");
@@ -180,7 +180,7 @@ public class GoodsInfoUpdateOnlineUtil {
             inputData.setPriceReviseFlag("1");
         }
         if (StringUtils.isNotBlank(bean.getFeeprice())) {
-            inputData.setFeeprice(bean.getFeeprice());
+            // inputData.setFeeprice(bean.getFeeprice());
         }
         if (bean.getEninfo() == null || "".equals(bean.getEninfo()) || bean.getEninfo().length() < 10) {
             inputData.setIs_show_det_img_flag("0");
@@ -425,7 +425,7 @@ public class GoodsInfoUpdateOnlineUtil {
             }
         }
         if (!json.isOk()) {
-            if (count > 3) {
+            if (count > 4) {
                 setOffOnlineByPid(inputData.getPid(), "更新线上MongoDB失败");
             } else {
                 System.err.println("updateOnlineAndSolr pid:" + inputData.getPid() + ",retry count:" + count);
@@ -515,7 +515,7 @@ public class GoodsInfoUpdateOnlineUtil {
         if (json.isOk()) {
             return updateOnlineAndSolr(inputData, isSolr, 0);
         } else {
-            if (count > 3) {
+            if (count > 4) {
                 setOffOnlineByPid(inputData.getPid(), "更新本地MongoDB失败");
             } else {
                 System.err.println("updateLocalAndSolr pid:" + inputData.getPid() + ",retry count:" + count);
@@ -545,8 +545,9 @@ public class GoodsInfoUpdateOnlineUtil {
             inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
             inputData.setValid("0");
             int count = 0;
-            while (count < 5 && !isSu) {
-                isSu = updateLocalAndSolr(inputData, 1, 0);
+            isSu = updateLocalAndSolr(inputData, 1, 0);
+
+            /*while (count < 5 && !isSu) {
                 count++;
                 try {
                     Thread.sleep(5000 + count * 1000);
@@ -554,7 +555,7 @@ public class GoodsInfoUpdateOnlineUtil {
                     e.printStackTrace();
                     logger.error("pid:" + pid + ",setOffOnlineByPid error", e);
                 }
-            }
+            }*/
             CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
             customGoodsDao.setGoodsValid(pid, "Ling", 1, -1, 6, remark);
             if (!isSu) {

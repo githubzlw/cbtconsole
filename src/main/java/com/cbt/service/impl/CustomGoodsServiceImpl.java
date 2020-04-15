@@ -140,6 +140,17 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 customGoodsDao.publishTo28(bean);
             }
 
+            if(bean.getValid() == 0 || bean.getValid() == 2){
+                //更新SkuGoodsOffers和SingleOffersChild信息
+                int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
+                if (count > 0) {
+                    customGoodsDao.updateSkuGoodsOffers(bean.getPid(), Double.parseDouble(bean.getFinalWeight()));
+                } else {
+                    customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.parseDouble(bean.getFinalWeight()));
+                }
+            }
+
+
             /*//更新SkuGoodsOffers和SingleOffersChild信息
             int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
             //如果存在SkuGoodsOffers信息直接更新SkuGoodsOffers

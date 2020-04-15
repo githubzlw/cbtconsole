@@ -3,12 +3,11 @@ package com.importExpress.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.importExpress.pojo.*;
 import com.importExpress.pojo.BuyForMeSearchLog;
 import org.apache.ibatis.annotations.Param;
 
-import com.importExpress.pojo.BFOrderDetail;
-import com.importExpress.pojo.BFOrderDetailSku;
-import com.importExpress.pojo.BFOrderInfo;
+import com.cbt.pojo.Admuser;
 
 public interface BuyForMeMapper {
 	/**更新order状态
@@ -21,6 +20,12 @@ public interface BuyForMeMapper {
 	 * @return
 	 */
 	int updateOrdersDetailsState(@Param("id")int id,@Param("state")int state);
+	/**回复备注
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int updateOrdersDetailsRemark(@Param("id")int id,@Param("remark")String remark);
 	/**更新details sku状态
 	 * @param id
 	 * @return
@@ -63,10 +68,41 @@ public interface BuyForMeMapper {
 	
 	Map<String,Object> getOrder(String orderNo);
 	
+	List<Admuser> lstAdms();
+
 	int updateOrderDetailsSkuWeight(@Param("weight")String weight,@Param("bfdid")int bfdid);
+
+	int updateDeliveryTime(@Param("orderNo")String orderNo,@Param("time")String time,@Param("feight")String feight,@Param("method")String method);
+	int insertRemark(@Param("orderNo")String orderNo,@Param("remark")String remark);
+	List<Map<String,String>> getRemark(String orderNo);
+
+	List<Map<String,String>> getTransport();
+	/**修改地址
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int updateOrdersAddress(Map<String,String> map);
 
 	List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
 
 	int querySearchListCount(BuyForMeSearchLog searchLog);
-    
+
+	/**删除商品
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int deleteProduct(int bfdid);
+
+	/**国家列表
+	 * @return
+	 */
+	List<ZoneBean> lstCountry();
+
+	int updateOrderAllState(int id);
+
+	int insertBFChat(BFChat bfChat);
+
+	List<BFChat> queryBFChatList(BFChat bfChat);
 }

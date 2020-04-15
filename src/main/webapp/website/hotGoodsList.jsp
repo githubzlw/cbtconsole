@@ -409,8 +409,12 @@
                         }else{
                             $("#nw_goods_salable").text("美加可售卖");
                         }
-                        $("#nw_goods_goodsimg").attr("src",
-                            json.remotpath + json.img);
+                        var img = json.img;
+                        if(img.indexOf("http:") > -1 || img.indexOf("https:") > -1){
+                            $("#nw_goods_goodsimg").attr("src", img);
+                        }else{
+                            $("#nw_goods_goodsimg").attr("src", json.remotpath + img);
+                        }
                         $("#nw_goods_goodsprice").text(json.price);
                     } else {
                         $.messager.alert("提醒", data.message, "error");

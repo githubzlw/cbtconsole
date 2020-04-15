@@ -19,4 +19,5 @@ public class BFOrderDetailSku {
 	private String priceBuyc;
 	private String shipFeight;
 	private String weight;
+	private String unit;
 }

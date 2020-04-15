@@ -17,4 +17,8 @@ public class BFOrderInfo {
 	private String ip;
 	private String remark;
 	private int adminId;
+	private String stateContent;
+	private String method;
+	private String feight;
+	private String adminName;
 }
