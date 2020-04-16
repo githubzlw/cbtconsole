@@ -18,6 +18,8 @@
     <result column="address_id" property="addressId" jdbcType="INTEGER" />
     <result column="admin_id" property="adminId" jdbcType="INTEGER" />
     <result column="admName" property="adminName" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="country" property="country" jdbcType="VARCHAR" />
   </resultMap>
   <resultMap id="detailResultMap" type="com.importExpress.pojo.BFOrderDetail" >
     <id column="id" property="id" jdbcType="INTEGER" />
@@ -65,7 +67,9 @@
   <select id="getOrders" resultMap="infoResultMap">
   select a.id,a.order_no,a.user_id,a.state,a.pay_price,a.product_cost,a.delivery_time,
   a.address_id,a.create_time,a.update_time,a.admin_id,a.ip,a.remark,a.ship_feight,a.delivery_method,
-  (select admName from admin_r_user where userid=a.user_id limit 1) admName
+  (select admName from admin_r_user where userid=a.user_id limit 1) admName,
+  (select email from user where id=a.user_id limit 1) email,
+(select z.country from buyforme_address d left join zone z on d.country=z.id where d.id=a.address_id) country
   from buyforme_orderinfo a 
   where 1=1
   <if test="state !=-2">and a.state=#{state}</if>
