@@ -1800,7 +1800,8 @@
     
     function fireDisable(isShow) {
 		$("#idAddResourceOffline").prop("disabled", isShow);
-		$("#bh_submit").prop("disabled", isShow);
+		// 20200416 注释
+		// $("#bh_submit").prop("disabled", isShow);
 		if(isShow){
 			$("#on_notice").show();
 		} else {
