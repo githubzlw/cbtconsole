@@ -2932,7 +2932,7 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<input type="button" value="提交" onclick="insertOrderReplenishment();" id="bh_submit" disabled="disabled"
+				<input type="button" value="提交" onclick="insertOrderReplenishment();" id="bh_submit"
 			   style="width: 90px; height: 40px; margin-top: 20px;" /> <input
 			type="button" value="取消" onclick="$('#apbhdiv').hide();"
 			style="width: 90px; height: 40px;" />
