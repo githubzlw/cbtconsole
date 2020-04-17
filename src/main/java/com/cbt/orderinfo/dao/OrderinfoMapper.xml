@@ -991,7 +991,12 @@
 		select admName from admuser where id=#{adminid}
 	</select>
     <select id="getAdmNameByShipno" resultType="INTEGER">
-        SELECT ta.adminid FROM tb_1688_accounts ta INNER JOIN taobao_1688_order_history t ON ta.account=t.username WHERE t.shipno=#{shipno} AND ta.del=1 LIMIT 1
+        SELECT ta.adminid FROM tb_1688_accounts ta INNER JOIN taobao_1688_order_history t ON ta.account=t.username
+        WHERE t.shipno=#{shipno} AND ta.del=1
+        union
+        SELECT ta.adminid FROM tb_1688_accounts ta INNER JOIN taobao_1688_order_history_offline t ON ta.account=t.username
+        WHERE t.shipno=#{shipno} AND ta.del=1
+        LIMIT 1
     </select>
     <select id="queryOrderBuyer" resultType="INTEGER">
 		SELECT COUNT(id) FROM goods_distribution WHERE orderid=#{orderNo}
@@ -1584,5 +1589,9 @@
         select orderid,id,goodsid,1 as goodstatus,goods_pid,yourorder,1 as is_replenishment from order_details
         where orderid=#{orderid} and id = #{odid}
     </insert>
-    <select id="getTbShip" resultType="java.util.Map">select  itemid,itemqty ,skuID from taobao_1688_order_history where shipno=#{shipno}</select>
+    <select id="getTbShip" resultType="java.util.Map">
+        select  itemid,itemqty ,skuID from taobao_1688_order_history where shipno=#{shipno}
+        union
+        select itemid,itemqty ,skuID from taobao_1688_order_history_offline where shipno=#{shipno}
+    </select>
 </mapper>

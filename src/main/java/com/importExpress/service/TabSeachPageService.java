@@ -54,4 +54,13 @@ public interface TabSeachPageService {
     boolean updateTitleAndKey(int sid);
 
     long updateAuthorizedInfoValid(String shopId, int valid);
+
+    int updateSeachPagesSite(int website, int id);
+
+    int updateSeachPagesSate(int id, int sate);
+
+    int deleteCate(int id);
+
+    int deleteBanner(int id);
+
 }
