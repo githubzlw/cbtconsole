@@ -582,6 +582,9 @@ public class OrderInfoController{
 						map.put("itemid", itemid);
 						
 						Integer count = shipMap.get(itemid+"_"+skuid);
+						if(count == null){
+							count = shipMap.get(itemid+"_");
+						}
 						if(count != null && count+1 > Integer.parseInt(usecount)) {
 							iOrderinfoService.updateGoodStatus(map);
 						}
