@@ -1862,7 +1862,8 @@
 
     <select id="getRefundAmount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
      SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history_refund
-     WHERE data_add_time>=#{startTime} and data_add_time<![CDATA[<=]]>#{endTime} AND tbOr1688 between 0 and 3
+     WHERE data_add_time>=#{startTime} and data_add_time<![CDATA[<=]]>#{endTime} AND (tbOr1688 between 0 and 3 )
+        and length(ifnull(paydata,'')) > 0
 	 <if test="userName != null">
 		  and username=#{userName}
 	</if>
@@ -1872,7 +1873,8 @@
   </select>
     <select id="getRefundAmountCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
      SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history_refund
-     WHERE paydata>=#{startTime} and paydata<![CDATA[<=]]>#{endTime} AND tbOr1688 between 0 and 3
+     WHERE paydata>=#{startTime} and paydata<![CDATA[<=]]>#{endTime} AND (tbOr1688 between 0 and 3)
+        and length(ifnull(paydata,'')) > 0
 	 <if test="userName != null">
 		  and username=#{userName}
 	  </if>
