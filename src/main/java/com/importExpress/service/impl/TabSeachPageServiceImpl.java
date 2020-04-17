@@ -186,4 +186,24 @@ public class TabSeachPageServiceImpl implements TabSeachPageService {
     public long updateAuthorizedInfoValid(String shopId, int valid) {
         return tabSeachPageMapper.updateAuthorizedInfoValid(shopId, valid);
     }
+
+	@Override
+	public int updateSeachPagesSite(int website, int id) {
+		return tabSeachPageMapper.updateSeachPagesSite(website, id);
+	}
+
+	@Override
+	public int updateSeachPagesSate(int id, int sate) {
+		return tabSeachPageMapper.updateSeachPagesSate(id, sate);
+	}
+
+	@Override
+	public int deleteCate(int id) {
+		return tabSeachPageMapper.deleteCate(id);
+	}
+
+	@Override
+	public int deleteBanner(int id) {
+		return tabSeachPageMapper.deleteBanner(id);
+	}
 }
