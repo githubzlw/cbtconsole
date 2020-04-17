@@ -484,7 +484,8 @@
     function insertOrderReplenishment(){
         var rep_type = $("input[name='bh_rep_type']:checked").val();
         if($("input[name='bh_rep_type']:checked").size()<1){
-            $("#hmsgid").html("请选择补货类型");
+            // $("#hmsgid").html("请选择补货类型");
+            alert("请选择补货类型");
             return ;
         }
         var buycount = $("#bh_buycount").val();
@@ -510,11 +511,14 @@
                 remark:remark,shop_id:bh_shop_id,odid:odid},
             success : function(data){  //返回受影响的行数
                 if(Number(data)>0){
-                    $("#hmsgid").html("添加成功");
-                    var dom=document.getElementById("is_replenishment");
-                    dom.setAttribute("style","background-color:red;") ;
+                	alert("添加成功");
+                    // $("#hmsgid").html("添加成功");
+                    $("#apbhdiv").hide();
+                    // var dom=document.getElementById("is_replenishment");
+                    // dom.setAttribute("style","background-color:red;") ;
                 }else{
-                    $("#hmsgid").html("添加失败");
+                	alert("添加失败");
+                    // $("#hmsgid").html("添加失败");
                 }
             }
         });
@@ -688,11 +692,17 @@
         $("#apbhdiv textarea").val("");
         $("#apbhdiv h1").html("");
         $("input[name='bh_rep_type']").attr("checked",false);
+        $("#bh_submit").prop("disabled", false);
     }
     function apbhcle2(){
         $("#divdhy input[type='text']").val("");
         $("#divdhy textarea").val("");
     }
+
+    function apbhdivHide(){
+    	$('#apbhdiv').hide();
+    	$("#idAddResourceOffline").prop("disabled", true);
+	}
 
     $(function(){
         $("#hide_remarkDiv").click(function(){
@@ -1800,8 +1810,6 @@
     
     function fireDisable(isShow) {
 		$("#idAddResourceOffline").prop("disabled", isShow);
-		// 20200416 注释
-		// $("#bh_submit").prop("disabled", isShow);
 		if(isShow){
 			$("#on_notice").show();
 		} else {
@@ -2935,7 +2943,7 @@
 			<td colspan="2">
 				<input type="button" value="提交" onclick="insertOrderReplenishment();" id="bh_submit"
 			   style="width: 90px; height: 40px; margin-top: 20px;" /> <input
-			type="button" value="取消" onclick="$('#apbhdiv').hide();"
+			type="button" value="取消" onclick="apbhdivHide();"
 			style="width: 90px; height: 40px;" />
 			</td>
 		</tr>
