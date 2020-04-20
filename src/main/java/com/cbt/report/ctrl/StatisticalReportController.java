@@ -2517,20 +2517,24 @@ public class StatisticalReportController {
         map.put("limitNum", 20);
         List<TaoBaoOrderInfo> list = null;
         int count = 0;
-        list = taoBaoOrderService.getRefundAmount(map);
-        count = taoBaoOrderService.getRefundAmountCount(map).size();
-        for (TaoBaoOrderInfo c : list) {
-            if ("0".equals(c.getTbOr1688())) {
-                c.setTbOr1688("淘宝");
-            } else if ("1".equals(c.getTbOr1688())) {
-                c.setTbOr1688("1688");
-            } else if ("3".equals(c.getTbOr1688())) {
-                c.setTbOr1688("天猫");
-            } else {
-                c.setTbOr1688("未知");
+        try {
+            list = taoBaoOrderService.getRefundAmount(map);
+            count = taoBaoOrderService.getRefundAmountCount(map).size();
+            for (TaoBaoOrderInfo c : list) {
+                if ("0".equals(c.getTbOr1688())) {
+                    c.setTbOr1688("淘宝");
+                } else if ("1".equals(c.getTbOr1688())) {
+                    c.setTbOr1688("1688");
+                } else if ("3".equals(c.getTbOr1688())) {
+                    c.setTbOr1688("天猫");
+                } else {
+                    c.setTbOr1688("未知");
+                }
+                c.setItemname("<a target='_blank' href='" + c.getItemurl() + "'>" + c.getItemname().substring(0, c.getItemname().length() / 3) + "</a>");
+                c.setImgurl("<img src='" + c.getImgurl() + "' height='100' width='100'>");
             }
-            c.setItemname("<a target='_blank' href='" + c.getItemurl() + "'>" + c.getItemname().substring(0, c.getItemname().length() / 3) + "</a>");
-            c.setImgurl("<img src='" + c.getImgurl() + "' height='100' width='100'>");
+        }catch (Exception e){
+            e.printStackTrace();
         }
         json.setRows(list);
         json.setTotal(count);

@@ -735,4 +735,11 @@ public interface TaoBaoOrderMapper {
     */
    List<TaoBaoOrderInfo> getRefundAmountCount(Map<Object, Object> map);
 
+	/**
+	 * 获取1688订单申请退款的信息
+	 * @param list
+	 * @return
+	 */
+   List<Map<String, Object>> refundApplication(@Param("list") List<String> list);
+
 }

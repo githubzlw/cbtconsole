@@ -1867,18 +1867,33 @@
 	 <if test="userName != null">
 		  and username=#{userName}
 	</if>
-        <if test="limitNum > 0">
-            limit #{page},#{limitNum}
-        </if>
+    order by paydata desc
+    <if test="limitNum > 0">
+        limit #{page},#{limitNum}
+    </if>
   </select>
     <select id="getRefundAmountCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
-     SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history_refund
+     SELECT count(0) FROM taobao_1688_order_history_refund
      WHERE paydata>=#{startTime} and paydata<![CDATA[<=]]>#{endTime} AND (tbOr1688 between 0 and 3)
         and length(ifnull(paydata,'')) > 0
 	 <if test="userName != null">
 		  and username=#{userName}
-	  </if>
-        order by paydata desc
+	</if>
   </select>
+
+    <select id="refundApplication" parameterType="java.util.List" resultType="java.util.HashMap">
+        select b.orderid,b.orderstatus,b.totalprice,ROUND(sum(b.itemprice * b.itemqty),2) as
+        good_price,ifnull(b.refund_money,0) as refund_money from (
+        select a.itemid,a.orderid,a.orderstatus,a.totalprice,a.itemprice,a.itemqty,ifnull(b.refund_money,0) as
+        refund_money
+        from taobao_1688_order_history_refund a left join return_display b
+        on a.orderid = b.1688_order and a.itemid = b.item and a.sku = b.sku
+        where 1=1 and a.orderid in
+        <foreach collection="list" item="orderid" open="(" close=")" separator=",">
+            #{orderid}
+        </foreach>
+        ) b group by b.orderid
+    </select>
+
 </mapper>
 
