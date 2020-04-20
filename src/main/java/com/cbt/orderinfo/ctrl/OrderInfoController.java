@@ -261,7 +261,8 @@ public class OrderInfoController{
 			String expresstrackid = request.getParameter("expresstrackid");
 			String checked = request.getParameter("checked");
 			String selectType = request.getParameter("selectType");
-			list = iOrderinfoService.getOrder(expresstrackid, checked, selectType);
+			String offlineType = request.getParameter("offlineType");
+			list = iOrderinfoService.getOrder(expresstrackid, checked, selectType, offlineType);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -581,6 +582,9 @@ public class OrderInfoController{
 						map.put("itemid", itemid);
 						
 						Integer count = shipMap.get(itemid+"_"+skuid);
+						if(count == null){
+							count = shipMap.get(itemid+"_");
+						}
 						if(count != null && count+1 > Integer.parseInt(usecount)) {
 							iOrderinfoService.updateGoodStatus(map);
 						}

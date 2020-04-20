@@ -441,6 +441,15 @@ public class RefundController {
                     } else if (actionFlag == 4) {
                         json = refundByUserId(detailsBean, type, user.getAdmName());
                     }
+                } else {
+                    if (actionFlag == 1) {
+                        //主管同意状态
+                        detailsBean.setRefundState(2);
+                        detailsBean.setRemark("系统自动确认为主管审批状态(销售)");
+                        refundNewService.setAndRemark(detailsBean);
+                        //使用MQ更新线上状态
+                        updateOnlineRefundState(detailsBean);
+                    }
                 }
             } else {
                 json.setOk(false);

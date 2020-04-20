@@ -58,4 +58,12 @@ public interface TabSeachPageMapper {
     void updateShopBrand(ShopUrlAuthorizedInfoPO bean);
 
     String queryShopBrand(@Param("shopId") String shopId);
+
+    int updateSeachPagesSite(@Param("website") int website, @Param("id") int id);
+
+    int updateSeachPagesSate(@Param("id") int id, @Param("sate") int sate);
+
+    int deleteCate(@Param("id") int id);
+
+    int deleteBanner(@Param("id") int id);
 }

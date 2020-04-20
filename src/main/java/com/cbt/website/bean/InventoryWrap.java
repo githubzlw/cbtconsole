@@ -49,6 +49,12 @@ public class InventoryWrap {
 	 */
 	private int ibid;
 	/**
+	 * inventory_barcode_record tem_id
+	 */
+	private int ibTemId;
+	
+	
+	/**
 	 * 0：采购使用库存,等待仓库移出库存 1：订单取消，等待仓库移入库存 2：已完成移出库存 3：已完成移入库存 4：仓库取消了出库请求 5：仓库取消了入库请求',
 	 */
 	private int ibState;

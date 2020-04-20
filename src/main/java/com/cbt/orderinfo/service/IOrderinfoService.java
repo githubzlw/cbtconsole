@@ -244,7 +244,7 @@ public interface IOrderinfoService {
 	 * @param checked
 	 * @return
 	 */
-	public List<SearchResultInfo> getOrder(String shipno, String checked, String selectType);
+	public List<SearchResultInfo> getOrder(String shipno, String checked, String selectType, String offlineType);
 
 	/**
 	 * 获取采购人
