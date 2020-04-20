@@ -1328,8 +1328,8 @@ public class TabSeachPageController {
                     params.add(new BasicNameValuePair("sid", bean.getId() + ""));
                     params.add(new BasicNameValuePair("keyword", bean.getKeyword()));
                     params.add(new BasicNameValuePair("webSite", String.valueOf(bean.getWebSite())));
-                    String url = "http://192.168.1.67:8383/CbtStaticize/tabseachpage/staticize.do";
-                    // String url = cbtstaticizePath + "/tabseachpage/staticize.do";
+                    // String url = "http://192.168.1.67:8383/CbtStaticize/tabseachpage/staticize.do";
+                    String url = cbtstaticizePath + "/tabseachpage/staticize.do";
                     result = getContentClientPost(url, params, "\"status\":true", 3);
                 }
             }
