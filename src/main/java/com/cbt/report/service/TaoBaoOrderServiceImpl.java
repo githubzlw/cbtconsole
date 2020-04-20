@@ -1378,17 +1378,17 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 			List<String> list = refundAmountList.stream().map(TaoBaoOrderInfo::getOrderid).collect(Collectors.toList());
 
 			List<Map<String, Object>> mapList = taoBaoOrderMapper.refundApplication(list);
-			if(CollectionUtils.isNotEmpty(mapList)){
+			if(CollectionUtils.isNotEmpty(mapList)) {
 				Map<String, Map<String, Object>> tempMap = new HashMap<>();
-				for(Map<String, Object> mapCl : mapList){
+				for (Map<String, Object> mapCl : mapList) {
 					tempMap.put(mapCl.get("orderid").toString(), mapCl);
 				}
-				refundAmountList.forEach(e->{
-					if(tempMap.containsKey(e.getOrderid())){
-						double refund_money = Double.parseDouble(tempMap.get("refund_money").toString());
-						double good_price = Double.parseDouble(tempMap.get("good_price").toString());
-						if(refund_money > 0 && refund_money > good_price / 4 * 3){
-							e.setTotalprice(tempMap.get("refund_money").toString());
+				refundAmountList.forEach(e -> {
+					if (tempMap.containsKey(e.getOrderid())) {
+						double refund_money = Double.parseDouble(tempMap.get(e.getOrderid()).get("refund_money").toString());
+						double good_price = Double.parseDouble(tempMap.get(e.getOrderid()).get("good_price").toString());
+						if (refund_money > 0 && refund_money > good_price / 4 * 3) {
+							e.setTotalprice(tempMap.get(e.getOrderid()).get("refund_money").toString());
 						}
 					}
 				});
