@@ -486,7 +486,7 @@
 					<tr id="${i.index}${gbbpl.orderNo}">
 						<td id="canl${i.index}${gbbpl.orderNo}"> 
 							<img  width='200px' title="" height='200px;' src="${gbbpl.imgpath }" style='' >
-							<br />${gbb.currency}&nbsp;${gbbpl.price}&nbsp;&nbsp;&nbsp;<a target='_blank' href="${gbbpl.url}" class="a1" >Info</a>
+							<br />${gbb.currency}&nbsp;${gbbpl.price}&nbsp;&nbsp;&nbsp;<a target='_blank' href="https://www.import-express.com${gbbpl.url}" class="a1" >Info</a>
 							&nbsp;RMB&nbsp;${gbbpl.priceRmb}
 							<br />商品号:${gbbpl.goodscarid}
 							<br />${gbbpl.goodsName}
@@ -514,8 +514,9 @@
 						</td>
 						<!-- 1688 start -->
 						<c:forEach items="${gbb.aliSourceList }" var ="asl" varStatus="k" >
-							<c:if test="${ gbbpl.url==asl.aligSourceUrl && gbbpl.goodscarid==asl.goodscarid}">
-							
+							<%--<c:if test="${ gbbpl.url==asl.aligSourceUrl && gbbpl.goodscarid==asl.goodscarid}">--%>
+                            <c:if test="${ gbbpl.urlPd==asl.aligSourceUrlPd}">
+
 								<td> 
 										<img  width='200px' title="" height='200px;' src="${asl.aliSourceImgUrl }"  style="cursor: pointer;border:6px solid red;" 
 										onclick="findImgId(this,'canl${i.index}${gbbpl.orderNo}')" id ="tbimg00${i.index}${k.index}${gbbpl.orderNo}">
