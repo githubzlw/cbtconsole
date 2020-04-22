@@ -560,20 +560,20 @@
         function querySearchGoods(id) {
             var webType = $("#web_size_type").val();
             var localUrl = window.location.href;
-            var url = "http://192.168.1.29:8081/goodslist?background=1&hotid=";
+            var url = "http://192.168.1.29:8081/goodslistxx?background=1&hotid=";
             if (localUrl.indexOf(".1.27:") > -1 || localUrl.indexOf(".1.9:") > -1) {
-                url = "https://www.import-express.com/goodslist?background=1&hotid=";
+                url = "https://www.import-express.com/goodslistxx?background=1&hotid=";
                 if (webType == 2) {
-                    url = "https://www.kidsproductwholesale.com/goodslist?background=1&hotid=";
+                    url = "https://www.kidsproductwholesale.com/goodslistxx?background=1&hotid=";
                 } else if (webType == 3){
-                    url = "https://www.petstoreinc.com/goodslist?background=1&hotid=";
+                    url = "https://www.petstoreinc.com/goodslistxx?background=1&hotid=";
                 } else if (webType == 4){
-                    url = "https://www.restaurantkitchenequipments.com/goodslist?background=1&hotid=";
+                    url = "https://www.restaurantkitchenequipments.com/goodslistxx?background=1&hotid=";
                 }
             } else if (localUrl.indexOf(".1.29:") > -1) {
-                url = "http://192.168.1.29:8081/goodslist?background=1&hotid=";
+                url = "http://192.168.1.29:8081/goodslistxx?background=1&hotid=";
             }else if(localUrl.indexOf("127.0.0.1") > -1 || localUrl.indexOf("localhost") > -1){
-                url = "http://127.0.0.1:8087/goodslist?background=1&hotid=";
+                url = "http://127.0.0.1:8087/goodslistxx?background=1&hotid=";
             }
             var param = "height=900,width=1666,top=0,left=200,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
             window.open(url + id, "windows", param);

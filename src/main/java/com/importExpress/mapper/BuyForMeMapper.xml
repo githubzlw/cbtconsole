@@ -18,6 +18,8 @@
     <result column="address_id" property="addressId" jdbcType="INTEGER" />
     <result column="admin_id" property="adminId" jdbcType="INTEGER" />
     <result column="admName" property="adminName" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="country" property="country" jdbcType="VARCHAR" />
   </resultMap>
   <resultMap id="detailResultMap" type="com.importExpress.pojo.BFOrderDetail" >
     <id column="id" property="id" jdbcType="INTEGER" />
@@ -65,8 +67,10 @@
   <select id="getOrders" resultMap="infoResultMap">
   select a.id,a.order_no,a.user_id,a.state,a.pay_price,a.product_cost,a.delivery_time,
   a.address_id,a.create_time,a.update_time,a.admin_id,a.ip,a.remark,a.ship_feight,a.delivery_method,
-  (select admName from admin_r_user where userid=a.user_id limit 1) admName
-  from buyforme_orderinfo a
+  b.admName,
+  (select email from user where id=a.user_id limit 1) email,
+(select z.country from buyforme_address d left join zone z on d.country=z.id where d.id=a.address_id) country
+  from buyforme_orderinfo a  left join admin_r_user b on a.user_id=b.userid
   where 1=1
   <if test="state !=-2">and a.state=#{state}</if>
   <if test="orderNo !=null">and a.order_no=#{orderNo}</if>
@@ -77,11 +81,11 @@
   </select>
 
   <select id="getOrdersCount" resultType="Integer">
-  select  count(*) from buyforme_orderinfo where 1=1
-  <if test="state !=-2">and state=#{state}</if>
-  <if test="orderNo !=null">and order_no=#{orderNo}</if>
-  <if test="userId !=null">and user_id=#{userId}</if>
-  <if test="admid !=0">and admin_id=#{admid}</if>
+  select  count(*) from buyforme_orderinfo b left join admin_r_user a on b.user_id=a.userid where 1=1
+  <if test="state !=-2">and b.state=#{state}</if>
+  <if test="orderNo !=null">and b.order_no=#{orderNo}</if>
+  <if test="userId !=null">and b.user_id=#{userId}</if>
+  <if test="admid !=0">and a.adminid=#{admid}</if>
   </select>
 
   <select id="getOrderDetails" resultMap="detailResultMap">
@@ -150,7 +154,7 @@ recipients=#{recipients},statename=#{statename},street=#{street}
 where id=#{id}
 </update>
 
-<select id="lstAdms" resultMap="admMap">select  id,admName from  admuser where roleType=4 and status=1</select>
+<select id="lstAdms" resultMap="admMap">select  id,admName from  admuser where roleType=4 and buyAuto=1 and status=1</select>
 
 <update id="deleteProduct">
 update buyforme_details a left join  buyforme_details_sku b on a.id=b.bf_details_id

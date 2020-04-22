@@ -373,6 +373,13 @@
         (#{TbGoodsid},#{TbOrderid},2,#{orderid},#{totalprice},#{taobao_name},#{itemid},#{taobaoPrice},#{goodsQty},#{goods_sku},#{shipno},
         #{taobao_url},#{username},#{preferential},now(),#{goods_imgs},'无','等待买家确认收货',now(),now(),'等待买家确认收货',now(),#{odid})
     </insert>
+
+    <insert id="insertTaoBaoOrderOffline">
+        insert into taobao_1688_order_history_offline(importGoodsid,importOrderid,tbOr1688,orderid,totalprice,itemname,itemid,itemprice,
+        itemqty,sku,shipno,itemurl,username,preferential,paydata,imgurl,shipper,shipstatus,creattime,delivery_date,orderstatus,orderdate,odid) values
+        (#{TbGoodsid},#{TbOrderid},2,#{orderid},#{totalprice},#{taobao_name},#{itemid},#{taobaoPrice},#{goodsQty},#{goods_sku},#{shipno},
+        #{taobao_url},#{username},#{preferential},now(),#{goods_imgs},'无','等待买家确认收货',now(),now(),'等待买家确认收货',now(),#{odid})
+    </insert>
     <update id="updateLockInventory">
         update lock_inventory set is_use=1 where od_id=#{od_id}
     </update>
@@ -896,5 +903,25 @@ where a.path_catid like #{catid} and cu.valid=1 and a.flag=0 group by a.catid
         select id,od_id as odId,orderid as orderNo,confirm_userid as confirmUserId,confirm_time as confirmTime,
         goodsid as goodsId,usecount as useCount,buycount as buyCount,purchase_state as purchaseState
         from order_product_source where orderid = #{orderNo} and confirm_userid > 0
+    </select>
+
+    <select id="getTaobaoInfo" resultType="java.util.Map">
+        select * from taobao_1688_order_history where 1=1
+        <if test="shipno != null">
+            and shipno = #{shipno}
+        </if>
+        <if test="taobao_id != null">
+            and orderid = #{taobao_id}
+        </if>
+        limit 1
+    </select>
+
+    <insert id="insertIntoOffPurchase" parameterType="java.util.Map">
+        insert into purchase_offonline_log(order_no,od_id,taobao_id,ship_no,admin_id)
+        values(#{orderno},#{odid},#{taobao_id},#{shipno},#{adminid})
+    </insert>
+
+    <select id="getOfflineInfoByShipno" resultType="java.util.Map">
+        select * from offline_purchase_records where shipno = #{shipno}
     </select>
 </mapper>

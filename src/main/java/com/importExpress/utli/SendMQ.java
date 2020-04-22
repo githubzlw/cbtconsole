@@ -3,6 +3,7 @@ package com.importExpress.utli;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.mq.RPCClient;
 import com.cbt.util.SysParamUtil;
+import com.importExpress.mail.MailTemplateBean;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -302,6 +303,17 @@ public class SendMQ {
             log.error("sendMsgByRPC", e);
             return null;
         }
+    }
+
+    public static void sendMail(MailTemplateBean mailTemplateBean) throws Exception {
+        Channel channel = getChannel();
+        channel.queueDeclare("mail", true, false, false, null);
+        String jsonStr = JSONObject.toJSONString(mailTemplateBean);
+        System.out.println(jsonStr.getBytes("UTF-8"));
+
+        channel.basicPublish("", "mail", null, jsonStr.getBytes("UTF-8"));
+        System.out.println(" [x] Sent '" + jsonStr + "'");
+        closeChannel(channel);
     }
 
 }

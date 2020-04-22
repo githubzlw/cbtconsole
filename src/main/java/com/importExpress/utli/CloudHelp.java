@@ -1,12 +1,9 @@
 package com.importExpress.utli;
 
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.importExpress.pojo.CommonResult;
 import com.importExpress.pojo.PageWrap;
@@ -27,6 +24,12 @@ public class CloudHelp {
 
 	private UrlUtil instance = UrlUtil.getInstance();
 	private  final String SEARCH_URL = UrlUtil.ZUUL_SEARCH + "search/products";
+	public  final String FLUSH_URL_CATEGORY = UrlUtil.ZUUL_SEARCH + "flush/category";
+	public  final String FLUSH_URL_ATRRID = UrlUtil.ZUUL_SEARCH + "flush/atrrid";
+	public  final String FLUSH_URL_SYNONYMS = UrlUtil.ZUUL_SEARCH + "flush/synonyms/key";
+	public  final String FLUSH_URL_SYNONYMS_CATEGORY = UrlUtil.ZUUL_SEARCH + "flush/synonyms/category";
+	public  final String FLUSH_URL_PRIORITY = UrlUtil.ZUUL_SEARCH + "flush/priority/category";
+	public  final String FLUSH_URL_PRICE = UrlUtil.ZUUL_SEARCH + "flush/category/price";
 
 
 	private Gson gson = new Gson();
@@ -68,6 +71,23 @@ public class CloudHelp {
 	private CommonResult cloudCallback(SearchParam param,String url){
 		try {
 			JSONObject jsonObject = instance.callUrlByPost(url, param);
+			CommonResult commonResult = JSON.toJavaObject(jsonObject,CommonResult.class);
+			return commonResult;
+		}catch (Exception e){
+			log.error("Call Cloud ERROR HAPPEND:"+url,e);
+		}
+		return CommonResult.failed("CALL SEARCH SERVICE ERROR");
+	}
+	
+	
+	/**请求微服务
+	 * @param param
+	 * @param url
+	 * @return
+	 */
+	public CommonResult cloudCallback(String url){
+		try {
+			JSONObject jsonObject = instance.callUrlByGet(url);
 			CommonResult commonResult = JSON.toJavaObject(jsonObject,CommonResult.class);
 			return commonResult;
 		}catch (Exception e){

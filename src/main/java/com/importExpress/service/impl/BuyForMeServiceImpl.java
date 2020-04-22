@@ -27,57 +27,57 @@ public class BuyForMeServiceImpl implements BuyForMeService {
             return orders;
         }
 //		订单状态：-1 取消，0申请，1处理中 2销售处理完成 3已支付;
-        orders.stream().forEach(o -> {
-            String content = o.getState() == -1 ? "取消" : o.getState() == 0 ?
-                    "申请中" : o.getState() == 1 ? "处理中" : o.getState() == 2 ?
-                    "销售处理完成" : o.getState() == 3 ? "已支付" : "";
-            o.setStateContent(content);
-        });
-        return orders;
-    }
+		orders.stream().forEach(o->{
+			String content = o.getState() == -1 ? "取消" : o.getState() == 0 ?
+					"申请中":o.getState() == 1 ?"处理中":o.getState() == 2 ?
+							"销售处理完成":o.getState() == 3 ?"待支付":o.getState() == 4 ?"已支付":"";
+			o.setStateContent(content);
+		});
+		return orders;
+	}
 
     @Override
     public int getOrdersCount(Map<String, Object> map) {
         return buyForMemapper.getOrdersCount(map);
     }
 
-    @Override
-    public List<BFOrderDetail> getOrderDetails(String orderNo, String bfId) {
-        List<BFOrderDetail> orderDetails = buyForMemapper.getOrderDetails(orderNo);
-        if (orderDetails == null || orderDetails.isEmpty()) {
-            return Lists.newArrayList();
-        }
-        List<BFOrderDetailSku> orderDetailsSku = getOrderDetailsSku(bfId);
-        if (orderDetailsSku == null || orderDetailsSku.isEmpty()) {
-            return orderDetails;
-        }
-        Map<Integer, List<DetailsSku>> detailsIdSku = Maps.newHashMap();
-        orderDetailsSku.stream().forEach(o -> {
-            int bfDetailsId = o.getBfDetailsId();
-            List<DetailsSku> list = detailsIdSku.get(bfDetailsId);
-            list = list == null ? Lists.newArrayList() : list;
-            DetailsSku detailsSku = DetailsSku.builder().num(o.getNum()).skuid(o.getSkuid())
-                    .price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).id(o.getId())
-                    .priceBuy(o.getPriceBuy()).priceBuyc(o.getPriceBuyc()).shipFeight(o.getShipFeight())
-                    .weight(o.getWeight())
-                    .state(o.getState())
-                    .unit(o.getUnit())
-                    .build();
-            list.add(detailsSku);
-            detailsIdSku.put(bfDetailsId, list);
-        });
-        orderDetails.stream().forEach(o -> {
-            List<DetailsSku> list = detailsIdSku.get(o.getId());
-            o.setSkus(list);
-            if (list != null && !list.isEmpty()) {
-                o.setSkuCount(list.size());
-                o.setWeight(list.get(0).getWeight());
-                o.setCount(list.stream().mapToInt(DetailsSku::getNum).sum());
-            }
-        });
-
-        return orderDetails;
-    }
+	@Override
+	public List<BFOrderDetail> getOrderDetails(String orderNo,String bfId) {
+		List<BFOrderDetail> orderDetails = buyForMemapper.getOrderDetails(orderNo);
+		if(orderDetails == null || orderDetails.isEmpty()) {
+			return Lists.newArrayList();
+		}
+		List<BFOrderDetailSku> orderDetailsSku = getOrderDetailsSku(bfId);
+		if(orderDetailsSku == null || orderDetailsSku.isEmpty()) {
+			return orderDetails;
+		}
+		Map<Integer,List<DetailsSku>> detailsIdSku = Maps.newHashMap();
+		orderDetailsSku.stream().forEach(o->{
+			int bfDetailsId = o.getBfDetailsId();
+			List<DetailsSku> list = detailsIdSku.get(bfDetailsId);
+			list = list == null ? Lists.newArrayList() : list;
+			DetailsSku detailsSku = DetailsSku.builder().num(o.getNum()).skuid(o.getSkuid())
+			.price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).id(o.getId())
+			.priceBuy(o.getPriceBuy()).priceBuyc(o.getPriceBuyc()).shipFeight(o.getShipFeight())
+			.weight(o.getWeight())
+			.state(o.getState())
+			.unit(o.getUnit())
+			.build();
+			list.add(detailsSku);
+			detailsIdSku.put(bfDetailsId, list);
+		});
+		orderDetails.stream().forEach(o->{
+			List<DetailsSku> list = detailsIdSku.get(o.getId());
+			o.setSkus(list);
+			if(list != null && !list.isEmpty()) {
+				o.setSkuCount(list.size());
+				o.setWeight(list.get(0).getWeight());
+				o.setCount(list.stream().filter(s->s.getState()>0).mapToInt(DetailsSku::getNum).sum());
+			}
+		});
+		
+		return orderDetails;
+	}
 
     @Override
     public List<BFOrderDetailSku> getOrderDetailsSku(String bfId) {

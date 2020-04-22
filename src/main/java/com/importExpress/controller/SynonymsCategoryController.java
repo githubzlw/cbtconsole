@@ -15,8 +15,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.cbt.util.StrUtils;
 import com.cbt.warehouse.util.StringUtil;
 import com.google.common.collect.Maps;
+import com.importExpress.pojo.CommonResult;
 import com.importExpress.pojo.SynonymsCategoryWrap;
 import com.importExpress.service.SynonymsCategoryService;
+import com.importExpress.utli.CloudHelp;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SynonymsCategoryController {
 	@Autowired
 	private SynonymsCategoryService syCategoryService;
+	@Autowired
+	private CloudHelp cloudHelp;
 	
 	/**列表
 	 * @param request
@@ -118,6 +122,8 @@ public class SynonymsCategoryController {
 		}
 		return result;
 	}
+	
+	
 	/**删除类别同义词
 	 * @param request
 	 * @param response

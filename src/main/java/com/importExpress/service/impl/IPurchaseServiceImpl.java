@@ -661,11 +661,14 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		int row = 0;
 		StringBuffer orderid = new StringBuffer();
 		try{
+			int offline = 0;
+			pruchaseMapper.insertIntoOffPurchase(map);
 			String itemid = Util.getItemid(map.get("taobao_url"));
 			if (itemid == null || "".equals(itemid)) {
 				itemid = "0000";
 			}
 			if (map.get("shipno") == null || map.get("shipno").equals("")) {
+				offline = 1;
 				map.remove("shipno");
 				StringBuffer orderid1 = new StringBuffer();
 				for (int i = 0; i < 7; i++) {
@@ -680,6 +683,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				if (StringUtil.isNotBlank(tbOrderid)){
 					orderid.append(tbOrderid);
 				} else {
+					offline = 1;
 					for (int i = 0; i < 7; i++) {
 						orderid.append((int) (Math.random() * 100));
 					}
@@ -692,7 +696,13 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				row = 1;
 			}else{
 				map.put("orderid",orderid.toString());
-				pruchaseMapper.insertTaoBaoOrder(map);
+				pruchaseMapper.insertTaoBaoOrderOffline(map);
+
+				/*if(offline > 0){
+					pruchaseMapper.insertTaoBaoOrderOffline(map);
+				} else {
+					pruchaseMapper.insertTaoBaoOrder(map);
+				}*/
 				row = 2;
 			}
 			map.put("orderid",orderid.toString());
@@ -2248,5 +2258,15 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		int addIdRelationTable = inventoryMapper.addIdRelationTable(map);
 		
 		return addIdRelationTable;
+	}
+
+	@Override
+	public Map<String, String> getTaobaoInfo(String shipno, String taobao_id) {
+		return pruchaseMapper.getTaobaoInfo(shipno, taobao_id);
+	}
+
+	@Override
+	public List<Map<String, String>> getOfflineInfoByShipno(String shipno){
+		return pruchaseMapper.getOfflineInfoByShipno(shipno);
 	}
 }

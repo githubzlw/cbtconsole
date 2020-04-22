@@ -91,7 +91,8 @@
 	</select>
 	
 	<update id="updateDetail" parameterType="com.importExpress.pojo.TabSeachPagesDetailBean">
-		update tab_seach_pages_details set name=#{name},catid=#{catid},relateKeyWordUrl=#{relateKeyWordUrl},seach_url=#{seachUrl},keyword=#{keyword},anti_words=#{antiWords},sort=#{sort} where id=#{id}
+		update tab_seach_pages_details set name=#{name},catid=#{catid},relateKeyWordUrl=#{relateKeyWordUrl},seach_url=#{seachUrl},keyword=#{keyword},anti_words=#{antiWords},sort=#{sort},banner_img_name=#{bannerImgName},banner_img_url=#{bannerImgUrl},
+		 banner_name=#{bannerName},banner_describe=#{bannerDescribe}  where id=#{id}
 	</update>
 	
 	<update id="deleteDetail">
@@ -188,5 +189,26 @@
         WHERE shop_id = #{shopId}
         LIMIT 1
     </select>
+
+
+	<update id="updateSeachPagesSite">
+		update tab_seach_pages set web_site=#{website}
+		 where id=#{id}
+	</update>
+
+	<update id="updateSeachPagesSate">
+		update tab_seach_pages set sate=#{sate}
+		 where id=#{id}
+	</update>
+
+	<update id="deleteCate">
+		update tab_seach_pages set pid = -1 where pid= #{id};
+		update tab_seach_pages set sate=1 where id= #{id};
+	</update>
+
+	<update id="deleteBanner">
+		update tab_seach_pages_details set banner_img_name = null, banner_img_url = null, banner_name = null,
+		banner_describe = null where id= #{id}
+	</update>
 
 </mapper>

@@ -6,6 +6,7 @@ import com.cbt.common.StringUtils;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.*;
 import com.cbt.report.dao.TaoBaoOrderMapper;
+import com.cbt.util.BigDecimalUtil;
 import com.cbt.util.DoubleUtil;
 import com.cbt.warehouse.ctrl.NewOrderDetailsCtr;
 import com.cbt.warehouse.pojo.Shipments;
@@ -15,6 +16,7 @@ import com.cbt.website.bean.InventoryData;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
 import com.importExpress.mapper.IPurchaseMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +25,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -1369,12 +1373,39 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 
 	@Override
 	public List<TaoBaoOrderInfo> getRefundAmount(Map<Object, Object> map) {
-		return taoBaoOrderMapper.getRefundAmount(map);
+		List<TaoBaoOrderInfo> refundAmountList = taoBaoOrderMapper.getRefundAmount(map);
+		if(CollectionUtils.isNotEmpty(refundAmountList)){
+			List<String> list = refundAmountList.stream().map(TaoBaoOrderInfo::getOrderid).collect(Collectors.toList());
+
+			List<Map<String, Object>> mapList = taoBaoOrderMapper.refundApplication(list);
+			if(CollectionUtils.isNotEmpty(mapList)) {
+				Map<String, Map<String, Object>> tempMap = new HashMap<>();
+				for (Map<String, Object> mapCl : mapList) {
+					tempMap.put(mapCl.get("orderid").toString(), mapCl);
+				}
+				refundAmountList.forEach(e -> {
+					if (tempMap.containsKey(e.getOrderid())) {
+						double refund_money = Double.parseDouble(tempMap.get(e.getOrderid()).get("refund_money").toString());
+						double good_price = Double.parseDouble(tempMap.get(e.getOrderid()).get("good_price").toString());
+						if (refund_money > 0 && refund_money > good_price / 4 * 3) {
+							e.setTotalprice(tempMap.get(e.getOrderid()).get("refund_money").toString());
+						}
+					}
+				});
+				tempMap.clear();
+			}
+		}
+		return refundAmountList;
 	}
 
 	@Override
 	public List<TaoBaoOrderInfo> getRefundAmountCount(Map<Object, Object> map) {
 		return taoBaoOrderMapper.getRefundAmountCount(map);
+	}
+
+	@Override
+	public List<Map<String, Object>> refundApplication(List<String> list) {
+		return taoBaoOrderMapper.refundApplication(list);
 	}
 
 	@Override

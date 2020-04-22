@@ -32,6 +32,7 @@
         <result column="is_delete" property="isDelete" jdbcType="INTEGER" />
         <result column="is_use" property="isUse" jdbcType="INTEGER" />
         <result column="ib_id" property="ibid" jdbcType="INTEGER" />
+        <result column="ib_tem_id" property="ibTemId" jdbcType="INTEGER" />
         <result column="ib_state" property="ibState" jdbcType="INTEGER" />
         <result column="createtime" property="createtime" jdbcType="VARCHAR" />
         <result column="in_barcode" property="inBarcode" jdbcType="VARCHAR" />
@@ -732,8 +733,8 @@
     </update>
     
     <insert id="insertInventoryBarcodeRecord" parameterType="com.cbt.website.bean.InventoryBarcodeRecord">
-    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id,createtime,updatetime,change_num) 
-    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId},now(),now(),#{changeNum})
+    insert into inventory_barcode_record(in_id,in_barcode,order_barcode,lock_id,state,admid,od_id,createtime,updatetime,change_num,tem_id) 
+    values(#{inventoryId},#{inventoryBarcode},#{orderBarcode},#{lockId},#{state},#{admid},#{odId},now(),now(),#{changeNum},#{temId})
     </insert>
     
     <update id="updateBarcodeRecord">
@@ -758,8 +759,9 @@
     </select>
     <select id="inventoryBarcodeList" resultMap="InventoryWrapMap">
     select ib.in_id,li.lock_remaining,ib.od_id,li.flag,li.is_delete,li.is_use,ib.updatetime as createtime,li.id as li_id,
-    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,ib.change_num,
-    isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,
+    ib.in_barcode,ib.order_barcode,ib.id as ib_id,ib.state as ib_state,ib.remark as ib_remark,ib.change_num,ib.tem_id as ib_tem_id,
+    isk.car_img as isk_car_img,isk.goods_pid as isk_goods_pid,isk.good_name as isk_goods_name,
+    isk.sku as isk_sku,isk.skuid as isk_skuid,isk.specid as isk_specid,
     od.goods_pid,od.car_img as od_car_img,od.car_type as od_sku,od.orderid,
     ods.specid as od_specid,ods.skuid as od_skuid
     
@@ -920,4 +922,21 @@
     <if test="enddate!=''">and createtime &lt;#{enddate}</if>
     <if test="type !=-1">and change_type =#{type}</if>
     </select>
+    
+    <insert id="addInventoryTemporary" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.website.bean.InventoryTemporary">
+    insert into inventory_sku_temporary(
+    inventory_count,tbskuid,tbspecid,shipno,barcode,car_type,skuid,specid,odid,
+    adminId,admName,log_remark,unit,storage_count,when_count,goodid,storage_type,orderid) 
+    values(#{inventory_count},#{tbskuid},#{tbspecid},#{shipno},#{barcode},#{car_type},
+    #{skuid},#{specid},#{odid},#{adminId},#{admName},#{log_remark},#{unit},
+    #{storage_count},#{when_count},#{goodid},#{storage_type},#{orderid})</insert>
+    
+    <update id="updateInventoryTemporary">update inventory_sku_temporary set state=#{state} where id=#{id} </update>
+    
+    <select id="getInventoryTemporary" resultType="java.util.Map">
+    select inventory_count,tbskuid,tbspecid,shipno,barcode,car_type,skuid,specid,odid,
+    adminId,admName,log_remark,unit,storage_count,when_count,goodid,storage_type,orderid 
+    from  inventory_sku_temporary where id=#{id} and state=0</select>
+    
+    
 </mapper>

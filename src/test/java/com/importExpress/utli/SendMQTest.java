@@ -1,6 +1,9 @@
 package com.importExpress.utli;
 
 
+import com.importExpress.mail.MailBean;
+import com.importExpress.mail.TemplateType;
+import com.importExpress.mail.WelcomeMailTemplateBean;
 import org.junit.Test;
 import org.testng.Assert;
 
@@ -45,5 +48,22 @@ public class SendMQTest {
      */
     public void sendMsgByRPC4() {
         Assert.assertEquals("-1", SendMQ.sendMsgByRPC(new RunSqlModel("UPDATE TEMP_TEST SET xxxxxx='333' WHERE PID='3'")));
+    }
+
+    @Test
+    public void sendMail() throws Exception {
+        MailBean mailBean = new MailBean();
+        mailBean.setTest(true);
+        mailBean.setSiteEnum(SiteEnum.KIDS);
+        mailBean.setTo("luohao@kairong.com");
+        mailBean.setTemplateType(TemplateType.WELCOME);
+
+        WelcomeMailTemplateBean welcomeBean = new WelcomeMailTemplateBean();
+        welcomeBean.setActivationCode("aabbcc");
+        welcomeBean.setFrom("kairong");
+        welcomeBean.setName("luohao");
+        welcomeBean.setPass("pass");
+        welcomeBean.setMailBean(mailBean);
+        SendMQ.sendMail(welcomeBean);
     }
 }

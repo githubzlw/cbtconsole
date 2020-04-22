@@ -21,4 +21,8 @@ public class BFOrderInfo {
 	private String method;
 	private String feight;
 	private String adminName;
+	
+	private String email;
+	private String country;
+	
 }

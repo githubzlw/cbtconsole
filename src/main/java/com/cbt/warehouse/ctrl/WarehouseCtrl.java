@@ -4436,64 +4436,73 @@ public class WarehouseCtrl {
 			page = (page - 1) * 20;
 		}
 
-		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
-		map.put("orderid", orderid);
-		map.put("userid", userid);
-		map.put("express_no", express_no);
-		int count = iWarehouseService.getCountForwarderplck(map); // 总记录数
-		map.put("startNum", page);
-		map.put("settleWeight", "");// 重量
-		map.put("shipprice", "");// 价格
+		try {
+			Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
+			map.put("orderid", orderid);
+			map.put("userid", userid);
+			map.put("express_no", express_no);
+			int count = iWarehouseService.getCountForwarderplck(map); // 总记录数
+			map.put("startNum", page);
+			map.put("settleWeight", "");// 重量
+			map.put("shipprice", "");// 价格
 
-		List<Forwarder> forwarderlist = iWarehouseService.getForwarderplck(map); // 结果集
-		for (Forwarder forwarder : forwarderlist) {
-			if(forwarder.getIsDropshipFlag()==1){
-				forwarder.setUser_id(forwarder.getUser_id()+"<img src='/cbtconsole/img/ds1.png' style='width:25px;margin-top: 2px;' title='drop shipping'>");
-			}
-			double a=0.00;
-			if(StringUtil.isNotBlank(forwarder.getSvolume()) && forwarder.getSvolume().contains("*")){
-				String [] datas=forwarder.getSvolume().split("\\*");
-				if("emsinten".equals(forwarder.getTransportcompany())){
-					a=Double.valueOf(datas[0])*Double.valueOf(datas[1])*Double.valueOf(datas[2])/5000;
-				}else{
-					a=Double.valueOf(datas[0])*Double.valueOf(datas[1])*Double.valueOf(datas[2])/6000;
+			List<Forwarder> forwarderlist = iWarehouseService.getForwarderplck(map); // 结果集
+			for (Forwarder forwarder : forwarderlist) {
+				if (forwarder.getIsDropshipFlag() == 1) {
+					forwarder.setUser_id(forwarder.getUser_id() + "<img src='/cbtconsole/img/ds1.png' style='width:25px;margin-top: 2px;' title='drop shipping'>");
 				}
-				double b=Double.valueOf(forwarder.getSweight())>Double.valueOf(forwarder.getVolumeweight())?Double.valueOf(forwarder.getSweight()):Double.valueOf(forwarder.getVolumeweight());
-				if(a>b){
-					forwarder.setTypes("抛货");
-				}else{
-					forwarder.setTypes("重货");
+				double a = 0.00;
+				if (StringUtil.isNotBlank(forwarder.getSvolume()) && forwarder.getSvolume().contains("*")) {
+					String[] datas = forwarder.getSvolume().split("\\*");
+					System.err.println("forwarder.getSvolume():" + forwarder.getSvolume());
+					if ("emsinten".equals(forwarder.getTransportcompany())) {
+						a = Double.valueOf(datas[0]) * Double.valueOf(datas[1]) * Double.valueOf(datas[2]) / 5000;
+					} else {
+						a = Double.valueOf(datas[0]) * Double.valueOf(datas[1]) * Double.valueOf(datas[2]) / 6000;
+					}
+					double b = Double.valueOf(forwarder.getSweight()) > Double.valueOf(forwarder.getVolumeweight()) ? Double.valueOf(forwarder.getSweight()) : Double.valueOf(forwarder.getVolumeweight());
+					if (a > b) {
+						forwarder.setTypes("抛货");
+					} else {
+						forwarder.setTypes("重货");
+					}
 				}
+				StringBuffer bf = new StringBuffer();
+				bf.append("<select id='logistics_name_" + forwarder.getId() + "'>");
+				bf.append("<option value='JCEX'>佳成JCEX</option>");
+				bf.append("<option value='emsinten'>邮政</option>");
+				bf.append("<option value='SF'>顺丰-睦鹏</option>");
+				bf.append("<option value='ups'>ups</option>");
+				bf.append("<option value='DHL'>DHL</option>");
+				bf.append("<option value='TNT'>TNT</option>");
+				bf.append("<option value='TL'>泰蓝-舜衡安</option>");
+				bf.append("<option value='深圳诚泰'>航邮-深圳诚泰</option>");
+				bf.append("<option value='灿鑫'>灿鑫</option>");
+				bf.append("<option value='Dpex'>Dpex</option>");
+				bf.append("<option value='Fedex'>Fedex</option>");
+				bf.append("<option value='原飞航'>原飞航</option>");
+				bf.append("<option value='yodel'>yodel</option>");
+				bf.append("<option value='zto'>中通</option>");
+				bf.append("<option value='迅邮'>迅邮</option>");
+				bf.append("<option value='usps'>USPS</option>");
+				bf.append("</select><script>$('#logistics_name_" + forwarder.getId() + "').val('" + forwarder.getTransportcompany() + "');</script>");
+				forwarder.setTransportcompany(bf.toString());
+				bf.setLength(0);
+				if (StringUtil.isBlank(forwarder.getExchange_rate()) || "null".equals(forwarder.getExchange_rate())) {
+					forwarder.setExchange_rate("6.3");
+				}
+				forwarder.setEstimatefreight(Double.valueOf(df.format(forwarder.getEstimatefreight() * Double.parseDouble(forwarder.getExchange_rate()))));
+				forwarder.setExpressno("<input type='text' id='express_no_" + forwarder.getId() + "' value='" + forwarder.getExpressno() + "'/><button onclick=\"updateExperssNo(" + forwarder.getId() + ",'" + forwarder.getShipmentno() + "','" + forwarder.getSvolume() + "','" + forwarder.getSweight() + "','" + forwarder.getFreight() + "','" + forwarder.getZoneId() + "')\">修改</button>");
 			}
-			StringBuffer bf=new StringBuffer();
-			bf.append("<select id='logistics_name_"+forwarder.getId()+"'>");
-			bf.append("<option value='JCEX'>佳成JCEX</option>");
-			bf.append("<option value='emsinten'>邮政</option>");
-			bf.append("<option value='SF'>顺丰-睦鹏</option>");
-			bf.append("<option value='ups'>ups</option>");
-			bf.append("<option value='DHL'>DHL</option>");
-			bf.append("<option value='TNT'>TNT</option>");
-			bf.append("<option value='TL'>泰蓝-舜衡安</option>");
-			bf.append("<option value='深圳诚泰'>航邮-深圳诚泰</option>");
-			bf.append("<option value='灿鑫'>灿鑫</option>");
-			bf.append("<option value='Dpex'>Dpex</option>");
-			bf.append("<option value='Fedex'>Fedex</option>");
-			bf.append("<option value='原飞航'>原飞航</option>");
-			bf.append("<option value='yodel'>yodel</option>");
-			bf.append("<option value='zto'>中通</option>");
-			bf.append("<option value='迅邮'>迅邮</option>");
-			bf.append("<option value='usps'>USPS</option>");
-			bf.append("</select><script>$('#logistics_name_"+forwarder.getId()+"').val('"+forwarder.getTransportcompany()+"');</script>");
-			forwarder.setTransportcompany(bf.toString());
-			bf.setLength(0);
-			if(StringUtil.isBlank(forwarder.getExchange_rate()) || "null".equals(forwarder.getExchange_rate())){
-				forwarder.setExchange_rate("6.3");
-			}
-			forwarder.setEstimatefreight(Double.valueOf(df.format(forwarder.getEstimatefreight()*Double.parseDouble(forwarder.getExchange_rate()))));
-			forwarder.setExpressno("<input type='text' id='express_no_"+forwarder.getId()+"' value='"+forwarder.getExpressno()+"'/><button onclick=\"updateExperssNo("+forwarder.getId()+",'" + forwarder.getShipmentno()+ "','"+forwarder.getSvolume()+"','"+forwarder.getSweight()+"','"+forwarder.getFreight()+"','"+forwarder.getZoneId()+"')\">修改</button>");
+			json.setRows(forwarderlist);
+			json.setTotal(count);
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("getForwarderPlck orderid:[{}],userid:[{}],express_no:[{}], error:", orderid, userid, express_no, e);
+			json.setError(e.getMessage());
 		}
-		json.setRows(forwarderlist);
-		json.setTotal(count);
+
+
 		return json;
 	}
 

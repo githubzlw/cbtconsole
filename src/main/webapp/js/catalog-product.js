@@ -362,9 +362,10 @@ function searchFromRemote(){
 				return ;
 			}
 			var paramv = data.param;
-			$("#current-page-h").html(paramv.currentPage);
-			$("#total-page").html(paramv.amountPage);
-			$("#current-page").val(paramv.currentPage);
+			var pagemap = data.pagemap;
+			$("#current-page-h").html(pagemap.current);
+			$("#total-page").html(pagemap.amount);
+			$("#current-page").val(pagemap.current);
 			$("#param-catid").val(paramv.catid);
 			var qcatid = paramv.catid;
 			var productHtml = $(".product-list").html();
@@ -416,7 +417,7 @@ function searchFromRemote(){
 			if(data.recordCount > 0){
 				$(".product-page").show();
 			}
-			totalpage = parseInt(paramv.amountPage);
+			totalpage = parseInt(pagemap.amount);
 			$('.img-lazy').lazyload({effect: "fadeIn"});
 		},
 		error:function(e){
