@@ -31,7 +31,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		orders.stream().forEach(o->{
 			String content = o.getState() == -1 ? "取消" : o.getState() == 0 ?
 					"申请中":o.getState() == 1 ?"处理中":o.getState() == 2 ?
-							"销售处理完成":o.getState() == 3 ?"已支付":"";
+							"销售处理完成":o.getState() == 3 ?"待支付":o.getState() == 4 ?"已支付":"";
 			o.setStateContent(content);
 		});
 		return orders;
