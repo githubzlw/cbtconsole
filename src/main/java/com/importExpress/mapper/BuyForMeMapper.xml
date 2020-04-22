@@ -75,7 +75,7 @@
   <if test="state !=-2">and a.state=#{state}</if>
   <if test="orderNo !=null">and a.order_no=#{orderNo}</if>
   <if test="userId !=null">and a.user_id=#{userId}</if>
-  <if test="admid !=0">and b.adminid=#{admid}</if>
+  <if test="admid !=0">and a.admin_id=#{admid}</if>
   order by a.create_time desc
   limit #{page},30
   </select>
@@ -89,7 +89,7 @@
   </select>
 
   <select id="getOrderDetails" resultMap="detailResultMap">
-  select id,order_no,title,pic_url,price,num_iid,num,detail_url,state,remark,create_time,remark_replay 
+  select id,order_no,title,pic_url,price,num_iid,num,detail_url,state,remark,create_time,remark_replay
   from buyforme_details where order_no=#{orderNo}
   </select>
 
@@ -100,14 +100,14 @@
 
   <insert id="addOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
   insert into buyforme_details_sku(bf_id,bf_details_id,num_iid,skuid,price,num,remark,
-  state,product_url,sku,price_buy,price_buy_c,ship_feight,weight,unit) 
+  state,product_url,sku,price_buy,price_buy_c,ship_feight,weight,unit)
   values(#{bfId},#{bfDetailsId},#{numIid},#{skuid},#{price},#{num},#{remark},#{state},
   #{productUrl},#{sku},#{priceBuy},#{priceBuyc},#{shipFeight},#{weight},#{unit})
   </insert>
 
   <update id="updateOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
   update buyforme_details_sku set sku=#{sku},product_url=#{productUrl},num=#{num},price=#{price},
-  ship_feight=#{shipFeight},price_buy=#{priceBuy},price_buy_c=#{priceBuyc},weight=#{weight},unit=#{unit} 
+  ship_feight=#{shipFeight},price_buy=#{priceBuy},price_buy_c=#{priceBuyc},weight=#{weight},unit=#{unit}
   where id=#{id}
   </update>
 
@@ -134,8 +134,8 @@
   select  a.id as bf_id,a.create_time,a.order_no,a.user_id,b.name,b.email,a.state,c.address,a.delivery_time,
   a.delivery_method,a.ship_feight,a.sample_flag,a.address_id,c.recipients,
    c.address2,c.phone_number,c.zip_code,c.statename,c.street,c.address_email,d.country,c.country as countryId
-  from buyforme_orderinfo a left join user b on a.user_id=b.id 
-  left join buyforme_address c on a.address_id=c.id 
+  from buyforme_orderinfo a left join user b on a.user_id=b.id
+  left join buyforme_address c on a.address_id=c.id
   left join zone d on c.country=d.id
   where a.order_no=#{orderNo}
   </select>
@@ -150,14 +150,14 @@
 <update id="updateOrdersAddress">
 update buyforme_address set address=#{address},address2=#{address2},
 country=#{country},phone_number=#{phone},zip_code=#{code},
-recipients=#{recipients},statename=#{statename},street=#{street}  
+recipients=#{recipients},statename=#{statename},street=#{street}
 where id=#{id}
 </update>
 
 <select id="lstAdms" resultMap="admMap">select  id,admName from  admuser where roleType=4 and buyAuto=1 and status=1</select>
 
 <update id="deleteProduct">
-update buyforme_details a left join  buyforme_details_sku b on a.id=b.bf_details_id 
+update buyforme_details a left join  buyforme_details_sku b on a.id=b.bf_details_id
 set a.state=-1,b.state=-1 where a.id=#{bfdid}
 </update>
 
@@ -180,5 +180,41 @@ update  buyforme_orderinfo a left join
  left join  buyforme_details c on c.order_no=a.order_no
 set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
 </update>
+
+    <select id="querySearchList" parameterType="com.importExpress.pojo.BuyForMeSearchLog" resultType="com.importExpress.pojo.BuyForMeSearchLog">
+        select id,search_type,search_content,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as
+        create_time,ip,user_id,session_id
+        from buyforme_search_log
+        where 1=1
+        <if test="create_time != null">
+            and create_time >= #{create_time}
+        </if>
+        <if test="end_time != null">
+            and #{end_time} >= create_time
+        </if>
+        <if test="search_type > 0">
+            and search_type = #{search_type}
+        </if>
+        order by create_time desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="querySearchListCount" parameterType="com.importExpress.pojo.BuyForMeSearchLog" resultType="java.lang.Integer">
+        select count(0)
+        from buyforme_search_log
+        where 1=1
+        <if test="create_time != null">
+            and create_time >= #{create_time}
+        </if>
+        <if test="end_time != null">
+            and #{end_time} > create_time
+        </if>
+
+        <if test="search_type > 0">
+            and search_type = #{search_type}
+        </if>
+    </select>
 
 </mapper>

@@ -4,12 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cbt.pojo.Admuser;
-import com.importExpress.pojo.BFChat;
-import com.importExpress.pojo.BFOrderDetail;
-import com.importExpress.pojo.BFOrderDetailSku;
-import com.importExpress.pojo.BFOrderInfo;
-import com.importExpress.pojo.TransportMethod;
-import com.importExpress.pojo.ZoneBean;
+import com.importExpress.pojo.*;
 
 public interface BuyForMeService {
 	/**更新order状态
@@ -120,4 +115,9 @@ public interface BuyForMeService {
 	int insertBFChat(BFChat bfChat);
 
 	List<BFChat> queryBFChatList(BFChat bfChat);
+
+	List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
+
+	int querySearchListCount(BuyForMeSearchLog searchLog);
+
 }

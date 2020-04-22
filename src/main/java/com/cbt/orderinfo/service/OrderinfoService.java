@@ -1877,6 +1877,20 @@ public class OrderinfoService implements IOrderinfoService {
 		}
 		List<OrderDetailsBean> list=orderinfoMapper.getOrdersDetails(orderNo);
 		for(OrderDetailsBean odb:list){
+
+			if(org.apache.commons.lang3.StringUtils.isNotBlank(odb.getImg_type())){
+				String[] imgTypeList = odb.getImg_type().split("@");
+				StringBuffer sb = new StringBuffer();
+				Arrays.stream(imgTypeList).forEach(e->{
+					if(e.lastIndexOf("http") > 5){
+						sb.append("@").append(e.substring(e.lastIndexOf("http")));
+					}else{
+						sb.append("@").append(e);
+					}
+				});
+				odb.setImg_type(sb.toString().substring(1));
+			}
+
 			String aliLink = "";
 			String alipid = Utility.getStringIsNull(odb.getAlipid()) ?odb.getAlipid() : "0";
 			if (!"0".equals(alipid)) {
@@ -1983,6 +1997,9 @@ public class OrderinfoService implements IOrderinfoService {
 				car_img = car_img.replace("32x32", "400x400");
 			}else if (car_img.indexOf("60x60") > -1) {
 				car_img = car_img.replace("60x60", "400x400");
+			}
+			if(car_img.lastIndexOf("http") > 5){
+				car_img = car_img.substring(car_img.lastIndexOf("http"));
 			}
 			odb.setGoods_img(car_img);
 			odb.setGoods_freight(odb.getGoodsfreight());
