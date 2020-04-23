@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.pojo.*;
 import com.importExpress.service.BuyForMeService;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import lombok.extern.slf4j.Slf4j;
@@ -342,7 +343,7 @@ public class BuyForMeController {
             String sbfdid = request.getParameter("bfdid");
             String pid = request.getParameter("pid");
             String order_no = request.getParameter("order_no");
-            int bfdid = StrUtils.isNum(sbfdid) ? Integer.valueOf(sbfdid) : 0;
+            int bfdid = StrUtils.isNum(sbfdid) ? Integer.parseInt(sbfdid) : 0;
 
             if (StringUtils.isBlank(sbfdid) || StringUtils.isBlank(pid) || StringUtils.isBlank(order_no)) {
                 mv.put("state", 500);
@@ -351,12 +352,12 @@ public class BuyForMeController {
             }
 
             List<String> lstValues = Lists.newArrayList();
-            String sql = "insert into buyforme_pid_chat(pid,bd_id,content,order_no) values(?,?,?,?)";
+            String sql = "insert into buyforme_pid_chat(pid,bd_id,order_no,content) values(?,?,?,?)";
 
             lstValues.add(pid);
             lstValues.add(String.valueOf(bfdid));
-            lstValues.add(remark);
             lstValues.add(order_no);
+            lstValues.add(GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(remark));
             String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(DBHelper.covertToSQL(sql, lstValues)));
 
             int updateOrderDetailsSkuState = 0;
