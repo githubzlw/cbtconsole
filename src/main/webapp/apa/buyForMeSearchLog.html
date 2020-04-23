@@ -137,14 +137,13 @@
             console.log(val)
             $.ajax({
                 type: "GET",
-                url: "",
-                data: {},
+                url: "https://www.import-express.com/queryCyNameByIp",
                 dataType: "JSON",
                 beforeSend: function () {
 
                 },
                 success: function (res) {
-                    alert()
+
                 },
                 error: function (res) {
                     console.log(res);
