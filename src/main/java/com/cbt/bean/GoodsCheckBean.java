@@ -714,11 +714,29 @@ public class GoodsCheckBean {
 	 * aliSourceUrl
 	 */
 	private String aliSourceUrl;
-	
+
+	public String getAligSourceUrlPd() {
+		return aligSourceUrlPd;
+	}
+
+	public String getUrlPd() {
+		return urlPd;
+	}
+
+	public void setUrlPd(String urlPd) {
+		this.urlPd = urlPd;
+	}
+
+	public void setAligSourceUrlPd(String aligSourceUrlPd) {
+		this.aligSourceUrlPd = aligSourceUrlPd;
+	}
+
 	/**
+
 	 * aligSourceUrl
 	 */
 	private String aligSourceUrl;
+	private String aligSourceUrlPd;
 	
 	/**
 	 * aliSourceOrderNo
@@ -1298,6 +1316,7 @@ public class GoodsCheckBean {
 	 * url
 	 */
 	private String url;
+	private String urlPd;
 	
 	/**
 	 * imgurl

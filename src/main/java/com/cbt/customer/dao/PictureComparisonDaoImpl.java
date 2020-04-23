@@ -506,7 +506,12 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 				gfb1.setpId(rs1.getInt("id"));
 				gfb1.setGoodsName(rs1.getString("goodsname"));
 				gfb1.setGoodsnamecn(rs1.getString("goodsnamecn"));
+
+				//update 20200422一个商品多个规格情况只录入一遍 start
 				gfb1.setUrl(rs1.getString("url"));
+                gfb1.setUrlPd(rs1.getString("url").substring(rs1.getString("url").lastIndexOf("-")+1));
+                //update 20200422一个商品多个规格情况只录入一遍 end
+
 				gfb1.setImgpath(rs1.getString("imgpath"));
 				gfb1.setPrice(rs1.getString("price"));
 				gfb1.setTbImg(rs1.getString("tbimg"));
@@ -553,7 +558,11 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			while(rs2.next()){
 				GoodsCheckBean gfb2 = new GoodsCheckBean();
 				gfb2.setAliSourceOrderNo(orderNo);
+                //update 20200422一个商品多个规格情况只录入一遍 start
 				gfb2.setAligSourceUrl(rs2.getString("goods_url"));
+                gfb2.setAligSourceUrlPd(rs2.getString("goods_url").substring(rs2.getString("goods_url").lastIndexOf("-")+1));
+                //update 20200422一个商品多个规格情况只录入一遍 end
+
 				gfb2.setAliSourceUrl(rs2.getString("goods_purl"));
 				gfb2.setAliSourceImgUrl(StringUtils.isStrNull(rs2.getString("goods_img_url"))?rs2.getString("car_img"):rs2.getString("goods_img_url"));
 				gfb2.setAliSourcePrice(rs2.getString("goods_price"));
@@ -690,7 +699,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 				if(gsfList.get(i).getOrderNo().equals(pictureList.get(k).getOrderNo())){
 					for(int b=0;b<aliSourceList.size();b++){
 						//1688商品
-						if(pictureList.get(k).getUrl()!=null && aliSourceList.get(b).getAligSourceUrl()!=null 
+						if(pictureList.get(k).getUrl()!=null && aliSourceList.get(b).getAligSourceUrl()!=null
 								&& pictureList.get(k).getUrl().equals(aliSourceList.get(b).getAligSourceUrl())
 								&& pictureList.get(k).getOrderNo().equals(aliSourceList.get(b).getAliSourceOrderNo())
 								&& pictureList.get(k).getGoodscarid()==aliSourceList.get(b).getGoodscarid() ){
