@@ -125,31 +125,6 @@
                 return val
             }
         }
-        function getCountryVal(val, row, index){
-            if (val) {
-                return getCountry(val);
-            }
-            else{
-                return val;
-            }
-        }
-        function getCountry(val){
-            console.log(val)
-            $.ajax({
-                type: "GET",
-                url: "https://www.import-express.com/queryCyAllNameByIp",
-                dataType: "JSON",
-                beforeSend: function () {
-
-                },
-                success: function (res) {
-
-                },
-                error: function (res) {
-                    console.log(res);
-                }
-            })
-        }
     </script>
 
 </head>
@@ -183,7 +158,7 @@
         <th data-options="field:'search_type',align:'center',width:'120px',formatter:formatType">搜索类型</th>
         <th data-options="field:'search_content',align:'center',width:'330px',formatter:formatContent">搜索内容</th>
         <th data-options="field:'create_time',align:'center',width:'120px'">搜索时间</th>
-        <th data-options="field:'ip',align:'center',width:'100px',formatter:getCountryVal">国家</th>
+        <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
         <th data-options="field:'ip',align:'center',width:'100px'">IP</th>
     </tr>
     </thead>

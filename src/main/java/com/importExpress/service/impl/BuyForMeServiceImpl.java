@@ -1,22 +1,31 @@
 package com.importExpress.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.cbt.common.UrlUtil;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.Admuser;
+import com.cbt.util.GetConfigureInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.importExpress.mapper.BuyForMeMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.service.BuyForMeService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class BuyForMeServiceImpl implements BuyForMeService {
+    private static final String getFreightCostUrl = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
+     private static com.cbt.common.UrlUtil instance = UrlUtil.getInstance();
     @Autowired
     private BuyForMeMapper buyForMemapper;
 
@@ -231,7 +240,27 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 
     @Override
     public List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog) {
-        return buyForMemapper.querySearchList(searchLog);
+        List<BuyForMeSearchLog> buyForMeSearchLogs = buyForMemapper.querySearchList(searchLog);
+        buyForMeSearchLogs.stream().forEach(buyForMeSearchLog ->{
+            String ip = buyForMeSearchLog.getIp();
+            if(ip.indexOf("192.168")>-1|| ip.indexOf("127.0")>-1){
+                ip = "2.24.0.0";
+            }
+             String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","queryNameByIp?ip="+ip);
+            CommonResult commonResult =null;
+            try {
+                String requestUrl = url;
+                JSONObject jsonObject = instance.doGet(requestUrl);
+                commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+            } catch (IOException e) {
+                log.error("CartController refresh ",e);
+            }
+            if(commonResult.getCode() == 200){
+                String data = (String) commonResult.getData();
+                buyForMeSearchLog.setCountryName(data);
+            }
+            });
+        return buyForMeSearchLogs;
     }
 
     @Override
