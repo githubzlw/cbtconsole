@@ -2399,3 +2399,18 @@ function openOverSeaSplit(orderNo) {
     var param = "height=860,width=1500,top=80,left=200,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
     window.open(url, "windows", param);
 }
+
+function showMsg(msg) {
+	var text = msg;
+	$.dialog({
+		title : '查看替换消息',
+		content : text,
+		max : false,
+		min : false,
+		lock : true,
+		drag : false,
+		fixed : true,
+		cancel : function() {
+		}
+	});
+}

@@ -1256,8 +1256,11 @@
                                     新交期：${orderd.change_delivery}
                                 </c:if>
                             </em><br>
-                            <span  class="blink">替代产品:</span><br>
-                            <span class="basic-r" style="display: inline-block;overflow: hidden;width: 70px;word-break: keep-all;white-space: nowrap;text-overflow: ellipsis;line-height: 28px;float: left;"  title="${orderd.replacement_product}" >${orderd.replacement_product}</span></td>
+                            <c:if test="${not empty  orderd.replacement_product }">
+                                <span >替代产品:</span><br>
+                                <button class="basic-r" style="display: inline-block;overflow: hidden;width: 70px;word-break: keep-all;white-space: nowrap;text-overflow: ellipsis;line-height: 28px;float: left;"  title="${orderd.replacement_product}"  onclick="showMsg('${orderd.replacement_product}')">${orderd.replacement_product}</button>
+                            </c:if>
+                        </td>
                         </td>
                         <td><input type="hidden"
                                    value="${orderd.state},${order.state},${orderd.orsstate},${orderd.od_state},${orderd.checked}">
