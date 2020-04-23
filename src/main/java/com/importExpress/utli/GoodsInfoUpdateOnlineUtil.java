@@ -348,11 +348,12 @@ public class GoodsInfoUpdateOnlineUtil {
     public static String checkAndReplaceQuotes(String str) {
         String tempStr = str;
         if (StringUtils.isNotBlank(str)) {
-            if (str.contains("'")) {
-                tempStr = str.replace("'", "\\'");
-            }
+
             if (str.contains("\"")) {
                 tempStr = str.replace("\"", "\\\"");
+            }
+            if (str.contains("\'")) {
+                tempStr = str.replace("\'", "\\\'");
             }
         }
         return tempStr;

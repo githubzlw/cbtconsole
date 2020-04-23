@@ -328,10 +328,10 @@ $(function(){
 		jQuery.ajax({
 			url:"/cbtconsole/bf/deremark",
 			data:{
-				"remark":remark,
 				"bfdid":bfdid,
 				"order_no":orderNo,
-				"pid":pid
+				"pid":pid,
+				"remark":remark
 			},
 			type:"post",
 			success:function(data){
