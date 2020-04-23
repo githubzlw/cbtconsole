@@ -1,8 +1,20 @@
 package com.importExpress.service.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.cbt.pojo.Buy4MeCusotme;
+import com.cbt.pojo.BuyForMeStatistic;
+import com.cbt.util.GetConfigureInfo;
+import com.cbt.website.util.EasyUiJsonResult;
+import com.cbt.website.util.JsonResult;
+import com.google.gson.Gson;
+import com.importExpress.utli.UrlUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +24,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.mapper.BuyForMeMapper;
 import com.importExpress.pojo.*;
-import com.importExpress.service.BuyForMeService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 
 @Service
-public class BuyForMeServiceImpl implements BuyForMeService {
+@Slf4j
+public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeService {
+
+	private static final String getFreightCostUrl = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
+
+	private static UrlUtil instance = UrlUtil.getInstance();
+
 	@Autowired
 	private BuyForMeMapper buyForMemapper;
 
@@ -43,7 +60,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 	}
 
 	@Override
-	public List<BFOrderDetail> getOrderDetails(String orderNo,String bfId) {
+	public List<BFOrderDetail> getOrderDetails(String orderNo, String bfId) {
 		List<BFOrderDetail> orderDetails = buyForMemapper.getOrderDetails(orderNo);
 		if(orderDetails == null || orderDetails.isEmpty()) {
 			return Lists.newArrayList();
@@ -99,7 +116,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		return result;
 	}
 	@Override
-	public int updateOrderDetailsSkuState(int id,int state) {
+	public int updateOrderDetailsSkuState(int id, int state) {
 		return buyForMemapper.updateOrderDetailsSkuState(id, state);
 	}
 	@Override
@@ -112,11 +129,11 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		return buyForMemapper.getOrder(orderNo);
 	}
 	@Override
-	public int updateOrderDetailsSkuWeight(String weight,int bfdid) {
+	public int updateOrderDetailsSkuWeight(String weight, int bfdid) {
 		return buyForMemapper.updateOrderDetailsSkuWeight(weight,bfdid);
 	}
 	@Override
-	public int updateDeliveryTime(String orderNo,String time,String feight,String method){
+	public int updateDeliveryTime(String orderNo, String time, String feight, String method){
 		int updateDeliveryTime = buyForMemapper.updateDeliveryTime(orderNo,time,feight,method);
 		if(updateDeliveryTime > 0) {
 			String sql = "update buyforme_orderinfo set delivery_time =?,ship_feight=?,delivery_method=? where order_no=?";
@@ -131,7 +148,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		return updateDeliveryTime;
 	}
 	@Override
-	public int insertRemark(String orderNo,String remark) {
+	public int insertRemark(String orderNo, String remark) {
 		return buyForMemapper.insertRemark(orderNo,remark);
 	}
 
@@ -236,6 +253,94 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 		}
 		return update;
 	}
-	
+	@Override
+	public EasyUiJsonResult queryCustomers(ShopCarUserStatistic statistic){
+		EasyUiJsonResult json=new EasyUiJsonResult();
+		CommonResult commonResult = new CommonResult();
+		String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","buy4me/queryAll");
+
+		com.alibaba.fastjson.JSONObject jsonObject;
+		try {
+			String requestUrl = url;
+			jsonObject = instance.doGet(requestUrl);
+			commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+		} catch (IOException e) {
+			log.error("CartController refresh ",e);
+		}
+		if(commonResult.getCode() == 200){
+
+			int limitNum = statistic.getLimitNum();
+			int num = statistic.getNum();
+			List<String> list = (List<String>)commonResult.getData();
+			int length = 0;
+			if (list == null) {
+				list = new ArrayList<>();
+			} else {
+				length = list.size();
+				if (length > 1) {
+					// 分页
+					list = list.stream().skip(num).limit(limitNum).collect(Collectors.toList());
+				}
+			}
+			List<Buy4MeCusotme> list1 = new ArrayList<>();
+			String s = "car:";
+			list.stream().forEach(e ->{
+				if(e.indexOf(s) > -1){
+					e = e.split(s)[1];
+				}
+				Buy4MeCusotme buy4MeCusotme = new Buy4MeCusotme();
+				buy4MeCusotme.setUserId(e);
+				buy4MeCusotme.setJumpLink(e);
+				list1.add(buy4MeCusotme);
+			});
+			json.setRows(list1);
+			json.setTotal(length);
+		}else {
+			json.setSuccess(false);
+		}
+		return json;
+	}
+	@Override
+	public JsonResult getCustomerCartDetails(String userId){
+
+		JsonResult jsonResult = new JsonResult();
+		CommonResult commonResult = new CommonResult();
+		String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","buy4me/"+userId);
+		jsonResult.setErrorInfo("error!");
+		com.alibaba.fastjson.JSONObject jsonObject;
+		try {
+			String requestUrl = url;
+			jsonObject = instance.doGet(requestUrl);
+			commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+		} catch (IOException e) {
+			log.error("CartController refresh ",e);
+		}
+		if(commonResult.getCode() == 200){
+			String data1 = (String)commonResult.getData();
+			BuyForMeStatistic data = new Gson().fromJson(data1, BuyForMeStatistic.class);
+			jsonResult = JsonResult.success(data);
+		}
+		return jsonResult;
+	}
+
+	@Override
+	public CommonResult putMsg(String userId,String itemid,String msg){
+
+		JsonResult jsonResult = new JsonResult();
+		CommonResult commonResult = new CommonResult();
+		String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","buy4me/"+userId+"/"+itemid);
+		jsonResult.setErrorInfo("error!");
+		com.alibaba.fastjson.JSONObject jsonObject;
+		try {
+			String requestUrl = url;
+			Map<String,Object> map = new HashMap<>();
+			map.put("msg",msg);
+			jsonObject = instance.doPost (requestUrl,map);
+			commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+		} catch (IOException e) {
+			log.error("CartController refresh ",e);
+		}
+		return commonResult;
+	}
 
 }
