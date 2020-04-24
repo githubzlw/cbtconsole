@@ -637,6 +637,7 @@ public class BuyForMeController {
             int total = buyForMeService.querySearchListCount(searchLog);
             if (total > 0) {
                 List<BuyForMeSearchLog> searchLogs = buyForMeService.querySearchList(searchLog);
+
                 json.setSuccess(searchLogs, total);
             } else {
                 json.setSuccess(new ArrayList<>(), 0);

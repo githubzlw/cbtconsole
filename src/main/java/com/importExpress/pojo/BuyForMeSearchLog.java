@@ -32,4 +32,5 @@ public class BuyForMeSearchLog {
     private String end_time;
     private int limitNum;
     private int startNum;
+    private String countryName;
 }
