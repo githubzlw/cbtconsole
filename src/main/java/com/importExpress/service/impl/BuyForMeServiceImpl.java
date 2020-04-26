@@ -365,6 +365,7 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
 			}
 			List<Buy4MeCusotme> list1 = new ArrayList<>();
 			String s = "car:";
+			list = this.filterHaveOrderUsers(list);
 			list.stream().forEach(e ->{
 				if(e.indexOf(s) > -1){
 					e = e.split(s)[1];
@@ -381,4 +382,18 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
 		}
 		return json;
 	}
+	public List<String> filterHaveOrderUsers(List<String> allList){
+        List<String> userIdList = new ArrayList<>();
+        allList.stream().forEach(e->{
+            String[] split = e.split("car:");
+            e = split[1];
+            userIdList.add(e);
+        });
+        //@date：2020/4/26 5:38 下午 Description : 获取有订单的列表
+        List<String> userLists = buyForMemapper.queryAllOrderUnPay();
+        userIdList.removeAll(userLists);
+        userLists.clear();
+        allList.clear();
+        return userIdList;
+    }
 }

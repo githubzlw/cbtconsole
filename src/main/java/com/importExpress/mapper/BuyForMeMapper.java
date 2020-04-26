@@ -105,4 +105,6 @@ public interface BuyForMeMapper {
 	int insertBFChat(BFChat bfChat);
 
 	List<BFChat> queryBFChatList(BFChat bfChat);
+
+	List<String> queryAllOrderUnPay();
 }

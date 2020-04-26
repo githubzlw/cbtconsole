@@ -217,4 +217,7 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         </if>
     </select>
 
+    <select id="queryAllOrderUnPay"  resultType="String">
+        select user_id from buyforme_orderinfo where state in (0,1,2)
+    </select>
 </mapper>
