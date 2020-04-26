@@ -148,6 +148,9 @@ $(function(){
 
 
 	function getChatList(msg) {
+		if (!msg || msg == ' '){
+			return;
+		}
 		var json = eval(msg)
 		$("#chat_history").empty();
 		var content = '<div class="link-top"></div><h3>历史交流</h3>';

@@ -19,24 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.cbt.common.UrlUtil;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.Admuser;
-import com.cbt.util.GetConfigureInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import com.importExpress.mapper.BuyForMeMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
