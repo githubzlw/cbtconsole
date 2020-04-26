@@ -77,6 +77,7 @@ public class FreightUtlity {
                 logger.warn("getFreightByOrderno error :<:<:<");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.warn("getFreightByOrderno error,orderNo:[{}],e:[{}]" + orderNo + e.getMessage());
         }
         return freight;
