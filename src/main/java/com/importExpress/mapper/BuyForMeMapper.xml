@@ -75,7 +75,7 @@
   <if test="state !=-2">and a.state=#{state}</if>
   <if test="orderNo !=null">and a.order_no=#{orderNo}</if>
   <if test="userId !=null">and a.user_id=#{userId}</if>
-  <if test="admid !=0">and a.admin_id=#{admid}</if>
+  <if test="admid !=0">and b.admin_id=#{admid}</if>
   order by a.create_time desc
   limit #{page},30
   </select>
