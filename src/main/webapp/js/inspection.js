@@ -1166,7 +1166,7 @@ function search() {
                                 + '\',\''
                                 + expresstrackid
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'","\\\'")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1197,7 +1197,7 @@ function search() {
                                 + '\',\''
                                 + expresstrackid
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'","\\\'")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1225,7 +1225,7 @@ function search() {
                                 + '\',\''
                                 + json[i].shipno
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'","\\\'")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1249,7 +1249,7 @@ function search() {
                                 + '\',\''
                                 + json[i].shipno
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'","\\\'")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1280,7 +1280,7 @@ function search() {
                             + '\',\''
                             + json[i].shipno
                             + '\',\''
-                            + json[i].strcar_type
+                            + json[i].strcar_type.replace("'","\\\'")
                             + '\',\''
                             + json[i].userid
                             + '\',\''
@@ -1305,7 +1305,7 @@ function search() {
                                 + '\',\''
                                 + json[i].shipno
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'","\\\'")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1344,7 +1344,7 @@ function search() {
                                 + '\',\''
                                 + json[i].shipno
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'","\\\'")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1564,7 +1564,7 @@ function search() {
                                     + '\',\''
                                     + expresstrackid
                                     + '\',\''
-                                    + json[i].strcar_type
+                                    + json[i].strcar_type.replace("'","\\\'")
                                     + '\',\''
                                     + json[i].userid
                                     + '\',\''
@@ -1595,7 +1595,7 @@ function search() {
                                     + '\',\''
                                     + expresstrackid
                                     + '\',\''
-                                    + json[i].strcar_type
+                                    + json[i].strcar_type.replace("'","\\\'")
                                     + '\',\''
                                     + json[i].userid
                                     + '\',\''

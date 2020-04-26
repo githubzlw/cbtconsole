@@ -8,6 +8,9 @@ import com.importExpress.pojo.*;
 import java.util.List;
 import java.util.Map;
 
+import com.cbt.pojo.Admuser;
+import com.importExpress.pojo.*;
+
 public interface BuyForMeService {
     List<BFOrderInfo> getOrders(Map<String, Object> map);
 
@@ -56,4 +59,9 @@ public interface BuyForMeService {
     JsonResult getCustomerCartDetails(String userId);
 
     CommonResult putMsg(String userId, String itemid, String msg);
+
+	List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
+
+	int querySearchListCount(BuyForMeSearchLog searchLog);
+
 }

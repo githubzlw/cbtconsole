@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>buyForMe搜索日志</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style>
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        #buy_search_query_form {
+            font-size: 18px;
+        }
+
+        .enter_btn {
+            margin-bottom: 10px;
+            width: 130px;
+            height: 26px;
+            color: #ffffff;
+            background-color: #009688;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+    </style>
+    <script>
+        $(document).ready(function () {
+            setDatagrid();
+        });
+
+
+        function setDatagrid() {
+            $('#buy_search_easyui-datagrid').datagrid({
+                title: 'BuyForMe搜索日志',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#buy_search_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/bf/searchList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                nowrap: false,//超出换行
+                rownumbers: true,
+                pageSize: 30,//默认选择的分页是每页50行数据
+                pageList: [30, 50, 100],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadSuccess: function (data) {
+                 /*   if (!data.success) {
+                        $.messager.alert(data.message);
+                    }*/
+                }
+            });
+        }
+
+        function doQuery() {
+            var begin_time = $("#begin_time").val();
+            var end_time = $("#end_time").val();
+            var search_type = $("#search_type").val();
+            $("#buy_search_easyui-datagrid").datagrid("load", {
+                "beginTime": begin_time,
+                "endTime": end_time,
+                "searchType": search_type
+            });
+        }
+
+        function formatUserId(val, row, index) {
+            if (val > 0) {
+                return '<a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=">' + val + '</a>';
+            } else {
+                return '';
+            }
+        }
+
+        function formatType(val, row, index) {
+            if (val == 1) {
+                return '关键词';
+            } else if (val == 2) {
+                return '图片';
+            } else if (val == 3) {
+                return 'url';
+            }
+            return '';
+        }
+
+        function formatContent(val, row, index) {
+            if (val.indexOf("http") > -1) {
+                return '<a target="_blank" href="' + val + '">' + val + '</a>';
+            } else {
+                return val
+            }
+        }
+    </script>
+
+</head>
+<body>
+
+<div id="buy_search_top_toolbar" style="padding: 5px; height: auto">
+    <form id="buy_search_query_form" action="#" onsubmit="return false;">
+			<span>日期:<input id="begin_time" class="Wdate"
+                            style="width: 110px; height: 24px" type="text" value=""
+                            onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></span>
+        &nbsp;&nbsp;<span>到:<input id="end_time" class="Wdate"
+                                   style="width: 110px; height: 24px" type="text" value=""
+                                   onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></span>
+        &nbsp;&nbsp; <span>搜索类型:<select id="search_type"
+                                        style="font-size: 16px; height: 24px; width: 150px;">
+					<option value="0" selected="selected">全部</option>
+        <option value="1">关键词</option>
+        <option value="2">图片</option>
+        <option value="3">url</option>
+			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span><input type="button"
+                     class="enter_btn" value="查询" onclick="doQuery()"/></span>
+    </form>
+</div>
+
+<table id="buy_search_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'user_id',align:'center',width:'100px',formatter:formatUserId">客户ID</th>
+        <th data-options="field:'search_type',align:'center',width:'120px',formatter:formatType">搜索类型</th>
+        <th data-options="field:'search_content',align:'center',width:'330px',formatter:formatContent">搜索内容</th>
+        <th data-options="field:'create_time',align:'center',width:'120px'">搜索时间</th>
+        <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
+        <th data-options="field:'ip',align:'center',width:'100px'">IP</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>
