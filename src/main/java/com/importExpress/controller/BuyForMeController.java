@@ -1,5 +1,30 @@
 package com.importExpress.controller;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.cbt.website.util.EasyUiJsonResult;
+import com.cbt.website.util.UploadByOkHttp;
+import com.google.gson.Gson;
+import com.importExpress.pojo.*;
+import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.common.aliasing.qual.LeakedToResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.ModelAndView;
+
 import com.cbt.jdbc.DBHelper;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.pojo.Admuser;
@@ -672,5 +697,56 @@ public class BuyForMeController {
             return JsonResult.error(e.getMessage());
         }
     }
+    @RequestMapping("/queryCustomers")
+	@ResponseBody
+	public EasyUiJsonResult queryCustomers(HttpServletRequest request, HttpServletResponse response){
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		ShopCarUserStatistic statistic = new ShopCarUserStatistic();
+		int startNum = 0;
+		int limitNum = 30;
+		String rowsStr = request.getParameter("rows");
+		if (StringUtils.isNotBlank(rowsStr)) {
+			limitNum = Integer.valueOf(rowsStr);
+		}
+		String pageStr = request.getParameter("page");
+		if (StringUtils.isNotBlank(pageStr)) {
+			startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+		}
+
+		String userIdStr = request.getParameter("userId");
+		int userId = 0;
+		if (StringUtils.isNotBlank(userIdStr)) {
+			userId = Integer.parseInt(userIdStr);
+		}
+		String userEmail = request.getParameter("userEmail");
+		if (StringUtils.isNotBlank(userEmail)) {
+			statistic.setUserEmail(userEmail);
+		}
+		statistic.setUserId(userId);
+		statistic.setStartNum(startNum);
+		statistic.setLimitNum(limitNum);
+		json = buyForMeService. queryCustomers(statistic);
+    	return json;
+	}
+	@GetMapping("/{userId}")
+	public ModelAndView getCartDetailByCustomerId(@PathVariable(value = "userId") String userId, HttpServletRequest request){
+		ModelAndView mv = new ModelAndView("buyforme_cart_detail");
+		JsonResult customerCartDetails = buyForMeService.getCustomerCartDetails(userId);
+		List<ZoneBean> lstCountry = buyForMeService.lstCountry();
+		mv.addObject("countrys", lstCountry);
+		if(customerCartDetails.getData() != null){
+			request.setAttribute("result",customerCartDetails.getData());
+			//mv.addObject("result",new Gson().toJson(customerCartDetails.getData()));
+		}
+		return mv;
+	}
+	@PostMapping("/{userId}/{itemid}")
+	@ResponseBody
+	public CommonResult putMsg(@PathVariable(value = "userId") String userId,
+							   @PathVariable(value = "itemid") String itemid,
+							   @RequestParam(value = "msg",defaultValue = "1")String msg){
+		CommonResult commonResult = buyForMeService.putMsg(userId, itemid, msg);
+		return commonResult;
+	}
 
 }

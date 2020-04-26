@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>buy for me cart details</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+    <link rel="stylesheet"
+          href="/cbtconsole/css/bootstrap/bootstrap.min.css">
+    <style type="text/css">
+        /* 主页 */
+        .b-add{width: 141px;height: 100px; background: #d9edf7; border-radius: 54px;}
+        .report .form-control {display: inline-block;width: 70%;}
+        .report .form-control-i {display: inline-block;width: 30%;}
+        .report .form-control-i200 {display: inline-block;width: 50%;}
+        .report select.form-control {width: 48%;}
+        .report {font-size: 16px;color: #333;width: 1700px;}
+        .report label {margin-right: 10px;}
+        .report .mt20 {margin-top: 20px;}
+        .report .row2 button {margin-right: 10px;}
+        .report b {font-size: 18px;}
+        .report .w200 {width: 200px;}
+        .report .w350 {width: 350px;}
+        .report .w160 {width: 160px;}
+        .report .w800 {width: 1100px;}
+        .report .w90 {width: 1699px;margin-top: 50px;border: 1px solid #8a6d3b;height: 120px;    margin-left: -30px;}
+        .mt5 {margin-top: 5px;}
+        .tc, .trnasparent {width: 100%;height: 100%;background-color: rgba(0, 0, 0, .5);position: fixed;z-index: 1;display: none;text-align: center;}
+        .tc {background-color: rgba(0, 0, 0, 0);top: 0;left: 0;}
+        /* 产品弹窗 tc1 */
+        .tc,.tc *{font-size:16px;}
+        .tc1 .form-horizontal .control-label{text-align: left;}
+        .tc1 th{font-weight: normal;}
+        .tc1 th,.tc1 td{text-align: center;}
+        .tc1 label{font-weight: normal;}
+        .tc1 .remark label{margin-right:32px;}
+        .tc1 button{width: 300px;}
+        .tc1 .container{margin-top:50px;}
+        .tc1 table td:last-child{text-align: center;}
+        .tc1 table input[type="radio"]{width:20px;height:20px;}
+        .tc1{position:absolute;z-index:10;display:none;top:100px;left:44%;margin-left:-300px;background-color:#fff;
+            padding: 20px;max-height: 715px;}
+        .tc1_table,.tc2_table{max-height:500px;height:auto;overflow-y:auto;}
+        #chat_history{width: 100%;height: 600px;overflow-y: auto;}
+        .img-responsive, #chat_history img{max-width: 135px;max-height: 135px;margin-top: 11px;}
+        .w350{width: 350px;}
+        .btn-re-n{margin-bottom: 3px;margin-left: 17px;}
+        .remark-dn{width: 360px;height:105px;margin-top: 5px;border: 1px solid #ccc;border-radius: 4px;}
+        .h50{height: 50px;}
+        .input-w1{width: 64px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
+        .input-w4{width: 100px;border: 1px solid #ccc;border-radius: 4px;height: 34px;}
+        .w99{width:1700px;margin-top: 15px;border: 1px solid #8a6d3b;min-height: 150px;}
+        .wt35{ margin-left: 2px; height: 35px;margin-top: 10px;}
+        .sku-td{margin-top: 5px;}
+        .sku-u-td{margin-top: 5px;}
+        .table-sku{width:100%;}
+        .rowweight{ margin-left: -2px;}
+        .w120{width:115px;}
+        .input-w5{width: 378px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+        .input-w3{width: 50px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+        .input-w25{width: 38px;border: 1px solid #ccc; border-radius: 4px;height: 25px;}
+        .input-w8{width: 254px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+        .input-w6{width: 92%;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+        .btn-weight{cursor: pointer;}
+        .btn-update{cursor: pointer;}
+        .btn-invalid{cursor: pointer;}
+        .rb-add{margin-left: 1px;margin-top: 10px;}
+        .b-add{cursor: pointer;}
+        .w89{width: 99%;margin-left: 1%;margin-top: 12px;}
+        .w11{width: 99%;margin-left: 1%;}
+        .detail-div{width:1520px;}
+        .td-in-valid{text-decoration:line-through;}
+        .th-font{font-size: 14px;color: #ca5252;font-weight: initial;}
+        .remark-row{margin-top: 10px;    width: 85%;}
+        .td-font-new{font-size: 14px;color: #ca5252;font-weight:bold;margin-left: 5px;}
+        .ormnum{border: 1px dashed #f90;padding: 2px;margin-left: 5px;font-size: 17px;}
+        .mar-l{margin-left: 10px;margin-top: 15px;width: 90%;}
+        .btn-delivery-time{margin-left: 2px;}
+        .delivery-time{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
+        .delivery-method{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
+        .delivery-feight{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
+        .img-dv{width: 10%;}
+        /* .btn-finsh{margin-left: 1445px;} */
+        .remark-replay{border: 1px solid #ccc;border-radius: 4px;height: 34px;width:30%;}
+        .td-font-view{margin-left: 2%;cursor: pointer;}
+        .text-al{text-align: left;    margin-top: 22px; height: 46px;}
+        .tc-al-name{font-size: 18px;font-weight: bold;}
+        .tc1{width: 800px;border: 3px solid #ccc;border-radius: 21px;}
+        .sy-content{    margin-left: 1%;font-size: 20px;font-weight: bold;color: #ef110c;}
+        body{min-height:100%;}
+        .num-span{margin-left: 2%;}
+        .btn-update-address{display: none;}
+        .delete-all{font-weight: bold;font-size: 15px;color: #ef0e09;}
+        #in-state{margin-left: 22px;width:266px;}
+        #in-city{margin-left: 15px;width: 260px;}
+        #in-street{width: 260px;}
+        #in-recipients{width: 256px;}
+        #in-address{margin-left: 10px;width: 256px;}
+        #in-country{width: 265px;height: 27px;}
+        #in-phone{margin-left: 10px;}
+        .adm-state-content{font-size: 20px;color:#1181e0;font-weight: bold;}
+        .w22{width: 360px;}
+        .w10{width:85px;margin-top: -24px;}
+        .delivery-method{width: 380px;}
+        .de-w1{width:170px;}
+        .input-w75{width: 75px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+
+        #xhe0_iframe {min-height: 440px;}
+        .link-top {width: 100%;height: 1px;border-top: solid #ACC0D8 1px;}
+        .span_sty {background-color: #c1f3b7;}
+        .btn-div{    margin-left: 1445px; width: 200px;}
+    </style>
+</head>
+
+<body>
+<div style="background-color:#eaf5e5;min-height:100%;width:2000px;">
+    6666666666
+</div>
+<input type="hidden" value="0" id="method-change">
+</body>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/msg-confirm.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/buyforme_details.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript"
+        src="/cbtconsole/js/xheditor-1.2.2.min.js"></script>
+<script type="text/javascript"
+        src="/cbtconsole/js/xheditor_lang/zh-cn.js"></script>
+<link rel="stylesheet" type="text/css"
+      href="/cbtconsole/js/xheditor_skin/vista/iframe.css"/>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
