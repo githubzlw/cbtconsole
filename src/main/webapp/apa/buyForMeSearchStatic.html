@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>BuyForMe搜索静态化</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style>
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        #buy_static_query_form {
+            font-size: 18px;
+        }
+
+        .enter_btn {
+            margin-bottom: 10px;
+            width: 130px;
+            height: 26px;
+            color: #ffffff;
+            background-color: #009688;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+    </style>
+    <script>
+        $(document).ready(function () {
+            setDatagrid();
+            closeDialog();
+        });
+
+
+        function setDatagrid() {
+            $('#buy_static_easyui-datagrid').datagrid({
+                title: 'BuyForMe搜索静态化',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#buy_static_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/bf/queryStaticList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                nowrap: false,//超出换行
+                rownumbers: true,
+                pageSize: 30,//默认选择的分页是每页50行数据
+                pageList: [30, 50, 100],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadSuccess: function (data) {
+                    /*   if (!data.success) {
+                           $.messager.alert(data.message);
+                       }*/
+                }
+            });
+        }
+
+        function closeDialog() {
+            $('#add_dlg').dialog('close');
+        }
+
+        function openDialog() {
+            $("#qr_keyword").val("");
+            $("#qr_pid1").val("");
+            $("#qr_pid2").val("");
+            $('#add_dlg').dialog('open');
+        }
+
+        function doQuery() {
+            var begin_time = $("#begin_time").val();
+            var end_time = $("#end_time").val();
+            var keyword = $("#keyword").val();
+            $("#buy_static_easyui-datagrid").datagrid("load", {
+                "create_time": begin_time,
+                "end_time": end_time,
+                "keyword": keyword
+            });
+        }
+
+        function formatOpt(val, row, index) {
+            var content = '<button onclick="openDialog()">新增</button>';
+            content += '<button>编辑</button>';
+            content += '<button>删除</button>';
+            return content;
+        }
+
+        function saveSearchKeyWord() {
+            var keyword = $("#qr_keyword").val();
+            var pid1 = $("#qr_pid1").val();
+            var pid2 = $("#qr_pid2").val();
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/bf/insertIntoSearchStatic',
+                data: {
+                    "keyword": keyword,
+                    "pid1": pid1,
+                    "pid2":pid2
+                },
+                success: function (data) {
+                    var json = eval('(' + data + ')');
+                    if (json.ok) {
+                        showMessage("执行成功");
+                        window.location.reload();
+                    } else {
+                        showMessage(json.message);
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "error", "error");
+                }
+            });
+        }
+    </script>
+
+</head>
+<body>
+
+<div id="buy_static_top_toolbar" style="padding: 5px; height: auto">
+    <form id="buy_static_query_form" action="#" onsubmit="return false;">
+			<span>日期:<input id="begin_time" class="Wdate"
+                            style="width: 110px; height: 24px" type="text" value=""
+                            onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></span>
+        &nbsp;&nbsp;<span>到:<input id="end_time" class="Wdate"
+                                   style="width: 110px; height: 24px" type="text" value=""
+                                   onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></span>
+        &nbsp;&nbsp; <span>关键词:<input id="keyword" style="width: 240px;height: 24px;"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span><input type="button"
+                     class="enter_btn" value="查询" onclick="doQuery()"/></span>
+        &nbsp;&nbsp;<span><button onclick="openDialog()">新增搜索关键词</button></span>
+    </form>
+</div>
+
+
+<div id="add_dlg" class="easyui-dialog" title="添加搜索关键词"
+     data-options="modal:true"
+     style="width: 460px; height: 280px; padding: 10px;">
+
+    <table>
+        <tr>
+            <td>关键词:</td>
+            <td><input id="qr_keyword" style="width: 260px;height: 24px;"/></td>
+        </tr>
+        <tr>
+            <td>置顶PID1:</td>
+            <td><input id="qr_pid1" style="width: 260px;height: 24px;"/></td>
+        </tr>
+        <tr>
+            <td>置顶PID1:</td>
+            <td><input id="qr_pid2" style="width: 260px;height: 24px;"/></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: center">
+                <button onclick="saveSearchKeyWord()">确定</button>
+                <button onclick="closeDialog()">取消</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table id="buy_static_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'keyword',align:'center',width:'100px'">关键词</th>
+        <th data-options="field:'pid1',align:'center',width:'120px'">置顶PID1</th>
+        <th data-options="field:'pid2',align:'center',width:'330px'">置顶PID2</th>
+        <th data-options="field:'create_time',align:'center',width:'120px'">创建时间</th>
+        <th data-options="field:'update_time',align:'center',width:'120px'">更新时间</th>
+        <th data-options="field:'admin_name',align:'center',width:'100px'">录入人</th>
+        <th data-options="field:'opt',align:'center',width:'100px',formatter:formatOpt">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>

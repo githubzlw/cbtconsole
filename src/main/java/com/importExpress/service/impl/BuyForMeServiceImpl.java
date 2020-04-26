@@ -269,6 +269,51 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     }
 
     @Override
+    public List<BFSearchStatic> queryStaticList(BFSearchStatic searchStatic) {
+        return buyForMemapper.queryStaticList(searchStatic);
+    }
+
+    @Override
+    public int queryStaticListCount(BFSearchStatic searchStatic) {
+        return buyForMemapper.queryStaticListCount(searchStatic);
+    }
+
+    @Override
+    public int insertIntoSearchStatic(BFSearchStatic searchStatic) {
+        return buyForMemapper.insertIntoSearchStatic(searchStatic);
+    }
+
+    @Override
+    public int updateSearchStatic(BFSearchStatic searchStatic) {
+        return buyForMemapper.updateSearchStatic(searchStatic);
+    }
+
+    @Override
+    public int deleteSearchStatic(BFSearchStatic searchStatic) {
+        return buyForMemapper.deleteSearchStatic(searchStatic);
+    }
+
+    @Override
+    public List<BFSearchPid> queryPidByStaticId(int staticId) {
+        return buyForMemapper.queryPidByStaticId(staticId);
+    }
+
+    @Override
+    public int insertIntoStaticPid(BFSearchPid searchPid) {
+        return buyForMemapper.insertIntoStaticPid(searchPid);
+    }
+
+    @Override
+    public int updateStaticPid(BFSearchPid searchPid) {
+        return buyForMemapper.updateStaticPid(searchPid);
+    }
+
+    @Override
+    public int deleteStaticPid(BFSearchPid searchPid) {
+        return buyForMemapper.deleteStaticPid(searchPid);
+    }
+
+    @Override
     public int cancelOrders(int id) {
         int update = buyForMemapper.updateOrderAllState(id);
         if (update > 0) {

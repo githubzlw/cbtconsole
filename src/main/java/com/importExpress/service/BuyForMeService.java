@@ -120,4 +120,22 @@ public interface BuyForMeService {
 
 	int querySearchListCount(BuyForMeSearchLog searchLog);
 
+	List<BFSearchStatic> queryStaticList(BFSearchStatic searchStatic);
+
+	int queryStaticListCount(BFSearchStatic searchStatic);
+
+	int insertIntoSearchStatic(BFSearchStatic searchStatic);
+
+	int updateSearchStatic(BFSearchStatic searchStatic);
+
+	int deleteSearchStatic(BFSearchStatic searchStatic);
+
+	List<BFSearchPid> queryPidByStaticId(int staticId);
+
+	int insertIntoStaticPid(BFSearchPid searchPid);
+
+	int updateStaticPid(BFSearchPid searchPid);
+
+	int deleteStaticPid(BFSearchPid searchPid);
+
 }

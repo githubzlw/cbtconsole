@@ -13,10 +13,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.pojo.*;
 import com.importExpress.service.BuyForMeService;
-import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,6 +33,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -98,31 +98,31 @@ public class BuyForMeController {
     @RequestMapping("/detail")
     @ResponseBody
     public ModelAndView orderDetail(HttpServletRequest request, HttpServletResponse response) {
-    	ModelAndView mv = new ModelAndView("buyforme_detail");
-    	try {
-			
-    		String orderNo = request.getParameter("no");
-    		String bfid = request.getParameter("bfid");
-    		List<BFOrderDetail> orderDetails = buyForMeService.getOrderDetails(orderNo,bfid);
-    		mv.addObject("orderDetails", orderDetails);
-    		//订单状态：-1 取消，0申请，1处理中 2销售处理完成 3已支付
-    		
-    		Map<String, Object> order = buyForMeService.getOrder(orderNo);
-    		if(order != null) {
-    			int state = Integer.parseInt(StrUtils.object2Str(order.get("state")));
-    			String strState = state == -1?"申请已取消":state==0?
-    					"申请待处理":state==1?"申请处理中":state==2?"销售处理完成":state==3?"待支付":state==4?"已支付":"";
-    			order.put("stateContent", strState);
-    			String delivery_method = StrUtils.object2Str(order.get("delivery_method"));
-    			order.put("delivery_method", delivery_method);
-    		}
-    		List<Map<String,String>> remark = buyForMeService.getRemark(orderNo);
-    		mv.addObject("remark", remark);
-    		mv.addObject("order", order);
-    		
-    		List<ZoneBean> lstCountry = buyForMeService.lstCountry();
-    		mv.addObject("countrys", lstCountry);
-    		
+        ModelAndView mv = new ModelAndView("buyforme_detail");
+        try {
+
+            String orderNo = request.getParameter("no");
+            String bfid = request.getParameter("bfid");
+            List<BFOrderDetail> orderDetails = buyForMeService.getOrderDetails(orderNo, bfid);
+            mv.addObject("orderDetails", orderDetails);
+            //订单状态：-1 取消，0申请，1处理中 2销售处理完成 3已支付
+
+            Map<String, Object> order = buyForMeService.getOrder(orderNo);
+            if (order != null) {
+                int state = Integer.parseInt(StrUtils.object2Str(order.get("state")));
+                String strState = state == -1 ? "申请已取消" : state == 0 ?
+                        "申请待处理" : state == 1 ? "申请处理中" : state == 2 ? "销售处理完成" : state == 3 ? "待支付" : state == 4 ? "已支付" : "";
+                order.put("stateContent", strState);
+                String delivery_method = StrUtils.object2Str(order.get("delivery_method"));
+                order.put("delivery_method", delivery_method);
+            }
+            List<Map<String, String>> remark = buyForMeService.getRemark(orderNo);
+            mv.addObject("remark", remark);
+            mv.addObject("order", order);
+
+            List<ZoneBean> lstCountry = buyForMeService.lstCountry();
+            mv.addObject("countrys", lstCountry);
+
 //    		Map<String, List<String>> transport = buyForMeService.getTransport();
 //    		mv.addObject("transport", transport);
         } catch (Exception e) {
@@ -627,8 +627,7 @@ public class BuyForMeController {
             }
             if (StringUtils.isNotBlank(endTime)) {
                 LocalDate today = LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                today.plusDays(1);
-                searchLog.setEnd_time(today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                searchLog.setEnd_time(today.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             }
             if (searchType != null && searchType > 0) {
                 searchLog.setSearch_type(searchType);
@@ -669,6 +668,236 @@ public class BuyForMeController {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("queryBFChatList,bfChat[{}],error", bfChat, e);
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+
+    @RequestMapping("/queryStaticList")
+    @ResponseBody
+    public JsonResult queryStaticList(HttpServletRequest request, String beginTime, String endTime, String keyword,
+                                      Integer page, Integer rows) {
+
+        BFSearchStatic searchStatic = new BFSearchStatic();
+        try {
+
+            if (rows == null) {
+                rows = 30;
+            }
+            if (page == null) {
+                page = 1;
+            }
+            if(StringUtils.isNotBlank(keyword)){
+                searchStatic.setKeyword(keyword);
+            }
+
+            searchStatic.setDel_flag(-1);
+            searchStatic.setStartNum((page - 1) * rows);
+            searchStatic.setLimitNum(rows);
+            if (StringUtils.isNotBlank(beginTime)) {
+                searchStatic.setCreate_time(beginTime);
+            }
+            if (StringUtils.isNotBlank(endTime)) {
+                LocalDate today = LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                searchStatic.setEnd_time(today.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+
+            int count = buyForMeService.queryStaticListCount(searchStatic);
+            if (count > 0) {
+                List<BFSearchStatic> searchStaticList = buyForMeService.queryStaticList(searchStatic);
+                return JsonResult.success(searchStaticList, count);
+            } else {
+                return JsonResult.success(new ArrayList<>(), 0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("queryStaticList,searchStatic[{}],error", searchStatic, e);
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+
+    @RequestMapping("/insertIntoSearchStatic")
+    @ResponseBody
+    public JsonResult insertIntoSearchStatic(HttpServletRequest request, BFSearchStatic searchStatic) {
+        Assert.notNull(searchStatic, "searchStatic null");
+        Assert.isTrue(searchStatic.getId() > 0, "static_id null");
+        Assert.notNull(searchStatic.getKeyword(), "keyword null");
+        try {
+            Admuser userInfo = UserInfoUtils.getUserInfo(request);
+            if (null == userInfo || userInfo.getId() == 0) {
+                return JsonResult.error("请登录后操作");
+            }
+            searchStatic.setAdmin_id(userInfo.getId());
+            int count = buyForMeService.insertIntoSearchStatic(searchStatic);
+
+            if (searchStatic.getId() > 0) {
+                String sql = "insert into buyforme_search_static(id,keyword,pid1,pid2,admin_id)" +
+                        "values(%s,'%s','%s','%s',%s)";
+
+                String keyword = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchStatic.getKeyword());
+                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getId(), keyword, searchStatic.getPid1(),
+                        searchStatic.getPid2(), searchStatic.getAdmin_id()));
+            }
+
+
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("insertIntoSearchStatic,searchStatic[{}],error", searchStatic, e);
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+    @RequestMapping("/updateSearchStatic")
+    @ResponseBody
+    public JsonResult updateSearchStatic(HttpServletRequest request, BFSearchStatic searchStatic) {
+        Assert.notNull(searchStatic, "searchStatic null");
+        Assert.isTrue(searchStatic.getId() > 0, "static_id null");
+        Assert.notNull(searchStatic.getKeyword(), "keyword null");
+        try {
+            Admuser userInfo = UserInfoUtils.getUserInfo(request);
+            if (null == userInfo || userInfo.getId() == 0) {
+                return JsonResult.error("请登录后操作");
+            }
+            int count = buyForMeService.updateSearchStatic(searchStatic);
+
+            String sql = "update buyforme_search_static set keyword = '%s',pid1= '%s',pid2= '%s' where id = %s";
+            String keyword = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchStatic.getKeyword());
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, keyword, searchStatic.getPid1(),
+                    searchStatic.getPid2(), searchStatic.getId()));
+
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("updateSearchStatic,searchStatic[{}],error", searchStatic, e);
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+    @RequestMapping("/deleteSearchStatic")
+    @ResponseBody
+    public JsonResult deleteSearchStatic(HttpServletRequest request, BFSearchStatic searchStatic) {
+        Assert.notNull(searchStatic, "searchStatic null");
+        Assert.isTrue(searchStatic.getId() > 0, "static_id null");
+        try {
+            Admuser userInfo = UserInfoUtils.getUserInfo(request);
+            if (null == userInfo || userInfo.getId() == 0) {
+                return JsonResult.error("请登录后操作");
+            }
+            int count = buyForMeService.deleteSearchStatic(searchStatic);
+
+            String sql = "update buyforme_search_static set del_flag = %s where id = %s";
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getDel_flag(), searchStatic.getId()));
+
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("deleteSearchStatic,searchStatic[{}],error", searchStatic, e);
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+    @RequestMapping("/queryPidByStaticId")
+    @ResponseBody
+    public JsonResult queryPidByStaticId(HttpServletRequest request, BFSearchPid searchPid) {
+
+        try {
+            Admuser userInfo = UserInfoUtils.getUserInfo(request);
+            if (null == userInfo || userInfo.getId() == 0) {
+                return JsonResult.error("请登录后操作");
+            }
+            List<BFSearchPid> bfSearchPidList = buyForMeService.queryPidByStaticId(searchPid.getStatic_id());
+            List<BFSearchPid> collect = bfSearchPidList.stream().filter(e -> e.getPid().equals(searchPid.getPid())).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(collect)) {
+                return JsonResult.success(collect.get(0));
+            } else {
+                return JsonResult.error("没有数据");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("queryPidByStaticId,searchPid[{}],error", searchPid, e);
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+    @RequestMapping("/insertIntoStaticPid")
+    @ResponseBody
+    public JsonResult insertIntoStaticPid(HttpServletRequest request, BFSearchPid searchPid) {
+        Assert.notNull(searchPid, "searchPid null");
+        Assert.notNull(searchPid.getPid(), "pid null");
+        Assert.isTrue(searchPid.getStatic_id() > 0, "static_id null");
+        try {
+            Admuser userInfo = UserInfoUtils.getUserInfo(request);
+            if (null == userInfo || userInfo.getId() == 0) {
+                return JsonResult.error("请登录后操作");
+            }
+            searchPid.setAdmin_id(userInfo.getId());
+            int count = buyForMeService.insertIntoStaticPid(searchPid);
+
+            if (searchPid.getId() > 0) {
+                String sql = "insert into buyforme_search_pid(id,static_id,pid,title,admin_id) " +
+                        "values(%s,%s,'%s','%s',%s)";
+
+                String title = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchPid.getTitle());
+                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getId(), searchPid.getStatic_id(),
+                        title, searchPid.getAdmin_id()));
+            }
+
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("deleteSearchStatic,searchPid[{}],error", searchPid, e);
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+    @RequestMapping("/updateStaticPid")
+    @ResponseBody
+    public JsonResult updateStaticPid(HttpServletRequest request, BFSearchPid searchPid) {
+        Assert.notNull(searchPid, "searchPid null");
+        Assert.notNull(searchPid.getPid(), "pid null");
+        Assert.isTrue(searchPid.getStatic_id() > 0, "static_id null");
+        try {
+
+            Admuser userInfo = UserInfoUtils.getUserInfo(request);
+            if (null == userInfo || userInfo.getId() == 0) {
+                return JsonResult.error("请登录后操作");
+            }
+            int count = buyForMeService.updateStaticPid(searchPid);
+
+            String sql = "update buyforme_search_pid set title = '%s' where static_id = %s and pid = '%s'";
+
+            String title = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchPid.getTitle());
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getId(), searchPid.getStatic_id(),
+                    title, searchPid.getAdmin_id()));
+
+
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("updateStaticPid,searchPid[{}],error", searchPid, e);
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+    @RequestMapping("/deleteStaticPid")
+    @ResponseBody
+    public JsonResult deleteStaticPid(HttpServletRequest request, BFSearchPid searchPid) {
+        Assert.notNull(searchPid, "searchPid null");
+        Assert.notNull(searchPid.getPid(), "pid null");
+        Assert.isTrue(searchPid.getStatic_id() > 0, "static_id null");
+        try {
+            Admuser userInfo = UserInfoUtils.getUserInfo(request);
+            if (null == userInfo || userInfo.getId() == 0) {
+                return JsonResult.error("请登录后操作");
+            }
+            int count = buyForMeService.deleteStaticPid(searchPid);
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("deleteStaticPid,searchPid[{}],error", searchPid, e);
             return JsonResult.error(e.getMessage());
         }
     }

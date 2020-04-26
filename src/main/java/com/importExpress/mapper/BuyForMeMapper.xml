@@ -217,4 +217,82 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         </if>
     </select>
 
+    <select id="queryStaticList" parameterType="com.importExpress.pojo.BFSearchStatic" resultType="com.importExpress.pojo.BFSearchStatic">
+        select a.id,a.keyword,a.pid1,a.pid2,a.admin_id,a.del_flag,b.admName as admin_name,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time
+        from buyforme_search_static a left join admuser b on a.admin_id = b.id
+        where 1=1
+        <if test="keyword != null">
+            and a.keyword like concat(''',#{keyword},'%'')
+        </if>
+        <if test="create_time != null">
+            and a.create_time >= #{create_time}
+        </if>
+        <if test="end_time != null">
+            and #{end_time} > a.create_time
+        </if>
+        <if test="admin_id > 0">
+            and a.admin_id = #{admin_id}
+        </if>
+        <if test="del_flag > -1">
+            and a.del_flag = #{del_flag}
+        </if>
+        order by a.create_time desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryStaticListCount" parameterType="com.importExpress.pojo.BFSearchStatic" resultType="com.importExpress.pojo.BFSearchStatic">
+        select count(0)
+        from buyforme_search_static a left join admuser b on a.admin_id = b.id
+        where 1=1
+        <if test="keyword != null">
+            and a.keyword like concat(''',#{keyword},'%'')
+        </if>
+        <if test="create_time != null">
+            and a.create_time >= #{create_time}
+        </if>
+        <if test="end_time != null">
+            and #{end_time} > a.create_time
+        </if>
+        <if test="admin_id > 0">
+            and a.admin_id = #{admin_id}
+        </if>
+        <if test="del_flag > -1">
+            and a.del_flag = #{del_flag}
+        </if>
+    </select>
+
+    <insert id="insertIntoSearchStatic" parameterType="com.importExpress.pojo.BFSearchStatic" useGeneratedKeys="true" keyProperty="id">
+        insert into buyforme_search_static(keyword,pid1,pid2,admin_id)
+        values(#{keyword},#{pid1},#{pid2},#{admin_id})
+    </insert>
+    <update id="updateSearchStatic" parameterType="com.importExpress.pojo.BFSearchStatic">
+        update buyforme_search_static set keyword = #{keyword},pid1= #{pid1},pid2= #{pid2}
+        where id = #{id}
+    </update>
+    <update id="deleteSearchStatic" parameterType="com.importExpress.pojo.BFSearchStatic">
+        update buyforme_search_static set del_flag = #{del_flag} where id = #{id}
+    </update>
+
+    <select id="queryPidByStaticId" parameterType="com.importExpress.pojo.BFSearchPid">
+        select a.id,a.static_id,a.pid,a.title,a.admin_id,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,
+        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.del_flag,b.admName as admin_name
+        from buyforme_search_pid a left join admuser b on a.admin_id = b.id
+        where a.static_id = #{static_id}
+    </select>
+    <insert id="insertIntoStaticPid" parameterType="com.importExpress.pojo.BFSearchPid" useGeneratedKeys="true" keyProperty="id">
+        insert into buyforme_search_pid(static_id,pid,title,admin_id)
+        values(#{static_id},#{pid},#{title},#{admin_id})
+    </insert>
+    <update id="updateStaticPid" parameterType="com.importExpress.pojo.BFSearchPid">
+        update buyforme_search_pid set title = #{title}
+        where static_id = #{static_id} and pid = #{pid}
+    </update>
+    <update id="deleteStaticPid" parameterType="com.importExpress.pojo.BFSearchPid">
+        update buyforme_search_pid set del_flag = #{del_flag}
+        where static_id = #{static_id} and pid = #{pid}
+    </update>
+
 </mapper>
