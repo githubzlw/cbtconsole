@@ -71,6 +71,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
 			.weight(o.getWeight())
 			.state(o.getState())
 			.unit(o.getUnit())
+            .imgUrl(o.getImgUrl())
 			.build();
 			list.add(detailsSku);
 			detailsIdSku.put(bfDetailsId, list);
@@ -97,7 +98,30 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     public int addOrderDetailsSku(BFOrderDetailSku detailSku) {
         int result = 0;
         if (detailSku.getId() == 0) {
-            result = buyForMemapper.addOrderDetailsSku(detailSku);
+            // result = buyForMemapper.addOrderDetailsSku(detailSku);
+            // 使用MQ插入sku数据
+            List<String> lstValues = Lists.newArrayList();
+            String sql2 = "insert into buyforme_details_sku(sku,product_url,num,price,price_buy,price_buy_c,ship_feight,weight,unit,state,id,bf_id,bf_details_id,num_iid,skuid,remark)" +
+                    "  values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            lstValues.add(detailSku.getSku());
+            lstValues.add(detailSku.getProductUrl());
+            lstValues.add(String.valueOf(detailSku.getNum()));
+            lstValues.add(detailSku.getPrice());
+            lstValues.add(detailSku.getPriceBuy());
+            lstValues.add(detailSku.getPriceBuyc());
+            lstValues.add(detailSku.getShipFeight());
+            lstValues.add(detailSku.getWeight());
+            lstValues.add(detailSku.getUnit());
+            lstValues.add(String.valueOf(detailSku.getState()));
+            lstValues.add(String.valueOf(detailSku.getId()));
+            lstValues.add(String.valueOf(detailSku.getBfId()));
+            lstValues.add(String.valueOf(detailSku.getBfDetailsId()));
+            lstValues.add(detailSku.getNumIid());
+            lstValues.add(detailSku.getSkuid());
+            lstValues.add(detailSku.getRemark());
+            lstValues.add(String.valueOf(detailSku.getState()));
+            SendMQ.sendMsg(new RunSqlModel(DBHelper.covertToSQL(sql2, lstValues)));
+            result = 99;
         } else {
             result = buyForMemapper.updateOrderDetailsSku(detailSku);
         }

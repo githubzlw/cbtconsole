@@ -114,6 +114,7 @@ body{min-height:100%;}
 .link-top {width: 100%;height: 1px;border-top: solid #ACC0D8 1px;}
 .span_sty {background-color: #c1f3b7;}
 .btn-div{    margin-left: 1445px; width: 200px;}
+.img_sty{max-height: 65px;max-width: 65px;}
 </style>
 </head>
 
@@ -229,7 +230,11 @@ body{min-height:100%;}
 						<c:if test="${sku.state == 1}">
 						<td>
 						<input type="hidden" class="lu_id" value="${sku.id}">
-						<input type="text" class="input-w8 lu_sku" value="${sku.sku}"></td>
+						<input type="text" class="input-w8 lu_sku" value="${sku.sku}">
+						<if test="${sku.imgUrl != null}">
+							<img src="${sku.imgUrl}" class="img_sty">
+						</if>
+						</td>
 						<td class="td-price">USD:<span class="lu-price-buy">${sku.priceBuy }</span>(CNY:<input type="text" value="${sku.priceBuyc }" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>
 						<td>${detail.price }</td>
 						<td>USD:<input type="text" value="${sku.price }" class="lu-price-sale input-w1">(含运费<input type="text" value="${sku.shipFeight }" class="lu-ship-feight input-w1">)</td>

@@ -53,6 +53,7 @@
     <result column="product_url" property="productUrl" jdbcType="VARCHAR" />
     <result column="weight" property="weight" jdbcType="VARCHAR" />
     <result column="unit" property="unit" jdbcType="VARCHAR" />
+    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
   </resultMap>
 
   <resultMap id="admMap" type="com.cbt.pojo.Admuser" >
@@ -94,7 +95,8 @@
   </select>
 
   <select id="getOrderDetailsSku" resultMap="skuResultMap">
-  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,ship_feight,weight,unit
+  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,
+  ship_feight,weight,unit,img_url
   from buyforme_details_sku where bf_id= #{bfId}
   </select>
 

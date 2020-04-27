@@ -177,8 +177,9 @@ $(function(){
 	});
 	$('.transparent-bg').click(function(){
 		$('.transparent,.transparent-bg').hide();
-	})
-	$(".b-add").click(function(){
+	});
+	$(".b-add").hide();
+	/*$(".b-add").click(function(){
 		var price = $(this).parents(".de-td").find(".price-ss").val();
 		var html = '<tr class="sku-td">'+
 			'<td><input type="text" class="input-w8 lu_sku" value=""></td>'+
@@ -192,7 +193,7 @@ $(function(){
 		'</tr>';
 		$(this).parents(".detail-div").find(".lu_tr").append(html);
 		bindClick();
-	})
+	})*/
 
 	$(".btn-finsh").click(function(){
 		var valid = 0;
@@ -308,7 +309,14 @@ $(function(){
 			type:"post",
 			success:function(data){
 				if(data.state == 200){
-					window.location.reload();
+                    if (data.message) {
+                        $.MsgBox.Alert("提示", data.message);
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+				        window.location.reload();
+                    }
 				}else{
 					$.MsgBox.Alert("提示", "修改规格失败!");
 				}

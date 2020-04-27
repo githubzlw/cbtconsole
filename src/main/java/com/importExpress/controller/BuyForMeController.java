@@ -196,8 +196,10 @@ public class BuyForMeController {
             }
             mv.put("state", addOrderDetailsSku > 0 ? 200 : 500);
             mv.put("orderDetails", addOrderDetailsSku);
+            mv.put("message", addOrderDetailsSku == 99 ? "插入线上，等待拉取" : "");
         } catch (Exception e) {
             mv.put("state", 500);
+            mv.put("message", e.getMessage());
             e.printStackTrace();
         }
         return mv;

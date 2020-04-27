@@ -20,4 +20,5 @@ public class BFOrderDetailSku {
 	private String shipFeight;
 	private String weight;
 	private String unit;
+	private String imgUrl;
 }

@@ -18,4 +18,5 @@ public class DetailsSku {
 	private String weight;
 	private int state;
 	private String unit;
+	private String imgUrl;
 }
