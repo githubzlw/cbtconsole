@@ -223,7 +223,7 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         from buyforme_search_static a left join admuser b on a.admin_id = b.id
         where 1=1
         <if test="keyword != null">
-            and a.keyword like concat(''',#{keyword},'%'')
+            and a.keyword = #{keyword}
         </if>
         <if test="create_time != null">
             and a.create_time >= #{create_time}
@@ -236,6 +236,9 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         </if>
         <if test="del_flag > -1">
             and a.del_flag = #{del_flag}
+        </if>
+        <if test="del_flag == -1">
+            and a.del_flag > -1
         </if>
         order by a.create_time desc
         <if test="limitNum > 0">
@@ -243,12 +246,13 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         </if>
     </select>
 
-    <select id="queryStaticListCount" parameterType="com.importExpress.pojo.BFSearchStatic" resultType="com.importExpress.pojo.BFSearchStatic">
+    <select id="queryStaticListCount" parameterType="com.importExpress.pojo.BFSearchStatic" resultType="java.lang.Integer">
         select count(0)
         from buyforme_search_static a left join admuser b on a.admin_id = b.id
         where 1=1
         <if test="keyword != null">
-            and a.keyword like concat(''',#{keyword},'%'')
+            <!--and a.keyword like concat(''',#{keyword},'%'')-->
+            and a.keyword = #{keyword}
         </if>
         <if test="create_time != null">
             and a.create_time >= #{create_time}
@@ -261,6 +265,9 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         </if>
         <if test="del_flag > -1">
             and a.del_flag = #{del_flag}
+        </if>
+        <if test="del_flag == -1">
+            and a.del_flag > -1
         </if>
     </select>
 
@@ -276,7 +283,7 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         update buyforme_search_static set del_flag = #{del_flag} where id = #{id}
     </update>
 
-    <select id="queryPidByStaticId" parameterType="com.importExpress.pojo.BFSearchPid">
+    <select id="queryPidByStaticId" parameterType="com.importExpress.pojo.BFSearchPid" resultType="com.importExpress.pojo.BFSearchPid">
         select a.id,a.static_id,a.pid,a.title,a.admin_id,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,
         DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.del_flag,b.admName as admin_name
         from buyforme_search_pid a left join admuser b on a.admin_id = b.id
@@ -291,8 +298,7 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         where static_id = #{static_id} and pid = #{pid}
     </update>
     <update id="deleteStaticPid" parameterType="com.importExpress.pojo.BFSearchPid">
-        update buyforme_search_pid set del_flag = #{del_flag}
-        where static_id = #{static_id} and pid = #{pid}
+        delete from buyforme_search_pid where static_id = #{static_id} and pid = #{pid}
     </update>
 
 </mapper>

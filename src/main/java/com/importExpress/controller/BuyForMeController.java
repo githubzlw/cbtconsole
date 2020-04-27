@@ -687,7 +687,7 @@ public class BuyForMeController {
             if (page == null) {
                 page = 1;
             }
-            if(StringUtils.isNotBlank(keyword)){
+            if (StringUtils.isNotBlank(keyword)) {
                 searchStatic.setKeyword(keyword);
             }
 
@@ -703,12 +703,15 @@ public class BuyForMeController {
             }
 
             int count = buyForMeService.queryStaticListCount(searchStatic);
+            JsonResult json = new JsonResult();
             if (count > 0) {
                 List<BFSearchStatic> searchStaticList = buyForMeService.queryStaticList(searchStatic);
-                return JsonResult.success(searchStaticList, count);
+                searchStaticList.forEach(e -> e.setPidList(buyForMeService.queryPidByStaticId(e.getId())));
+                json.setSuccess(searchStaticList, count);
             } else {
-                return JsonResult.success(new ArrayList<>(), 0);
+                json.setSuccess(new ArrayList<>(), 0);
             }
+            return json;
         } catch (Exception e) {
             e.printStackTrace();
             log.error("queryStaticList,searchStatic[{}],error", searchStatic, e);
@@ -721,7 +724,6 @@ public class BuyForMeController {
     @ResponseBody
     public JsonResult insertIntoSearchStatic(HttpServletRequest request, BFSearchStatic searchStatic) {
         Assert.notNull(searchStatic, "searchStatic null");
-        Assert.isTrue(searchStatic.getId() > 0, "static_id null");
         Assert.notNull(searchStatic.getKeyword(), "keyword null");
         try {
             Admuser userInfo = UserInfoUtils.getUserInfo(request);
@@ -729,19 +731,24 @@ public class BuyForMeController {
                 return JsonResult.error("请登录后操作");
             }
             searchStatic.setAdmin_id(userInfo.getId());
-            int count = buyForMeService.insertIntoSearchStatic(searchStatic);
 
-            if (searchStatic.getId() > 0) {
-                String sql = "insert into buyforme_search_static(id,keyword,pid1,pid2,admin_id)" +
-                        "values(%s,'%s','%s','%s',%s)";
+            int count = buyForMeService.queryStaticListCount(searchStatic);
+            if (count > 0) {
+                return JsonResult.error("已经存在这个关键词");
+            } else {
+                count = buyForMeService.insertIntoSearchStatic(searchStatic);
 
-                String keyword = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchStatic.getKeyword());
-                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getId(), keyword, searchStatic.getPid1(),
-                        searchStatic.getPid2(), searchStatic.getAdmin_id()));
+                if (searchStatic.getId() > 0) {
+                    String sql = "insert into buyforme_search_static(id,keyword,pid1,pid2,admin_id)" +
+                            "values(%s,'%s','%s','%s',%s)";
+
+                    String keyword = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchStatic.getKeyword());
+                    NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getId(), keyword, searchStatic.getPid1(),
+                            searchStatic.getPid2(), searchStatic.getAdmin_id()));
+                }
+                return JsonResult.success(count);
             }
 
-
-            return JsonResult.success(count);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("insertIntoSearchStatic,searchStatic[{}],error", searchStatic, e);
@@ -760,7 +767,22 @@ public class BuyForMeController {
             if (null == userInfo || userInfo.getId() == 0) {
                 return JsonResult.error("请登录后操作");
             }
-            int count = buyForMeService.updateSearchStatic(searchStatic);
+
+            BFSearchStatic tempStatic = new BFSearchStatic();
+            tempStatic.setDel_flag(-1);
+            tempStatic.setKeyword(searchStatic.getKeyword());
+            List<BFSearchStatic> list = buyForMeService.queryStaticList(tempStatic);
+            int count = 0;
+            if (CollectionUtils.isNotEmpty(list)) {
+                List<BFSearchStatic> collect = list.stream().filter(e -> e.getId() != searchStatic.getId()).collect(Collectors.toList());
+                if (CollectionUtils.isNotEmpty(collect)) {
+                    count = 1;
+                }
+            }
+            if (count > 0) {
+                return JsonResult.error("存在重复的关键词");
+            }
+            count = buyForMeService.updateSearchStatic(searchStatic);
 
             String sql = "update buyforme_search_static set keyword = '%s',pid1= '%s',pid2= '%s' where id = %s";
             String keyword = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchStatic.getKeyword());
@@ -838,11 +860,10 @@ public class BuyForMeController {
 
             if (searchPid.getId() > 0) {
                 String sql = "insert into buyforme_search_pid(id,static_id,pid,title,admin_id) " +
-                        "values(%s,%s,'%s','%s',%s)";
+                        "values(%s,%s,'%s','%s',%ss)";
 
                 String title = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchPid.getTitle());
-                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getId(), searchPid.getStatic_id(),
-                        title, searchPid.getAdmin_id()));
+                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getId(), searchPid.getStatic_id(), searchPid.getPid(), title, searchPid.getAdmin_id()));
             }
 
             return JsonResult.success(count);
@@ -894,6 +915,9 @@ public class BuyForMeController {
                 return JsonResult.error("请登录后操作");
             }
             int count = buyForMeService.deleteStaticPid(searchPid);
+
+            String sql = "delete from buyforme_search_pid where static_id= #{static_id} and pid = #{pid}";
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getStatic_id(), searchPid.getPid()));
             return JsonResult.success(count);
         } catch (Exception e) {
             e.printStackTrace();

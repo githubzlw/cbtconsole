@@ -2,6 +2,8 @@ package com.importExpress.pojo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author: JiangXW
  * @version: v1.0
@@ -16,6 +18,7 @@ public class BFSearchStatic {
     private String pid1;
     private String pid2;
     private String create_time;
+    private String update_time;
     private int admin_id;
     private String admin_name;
 
@@ -24,4 +27,6 @@ public class BFSearchStatic {
     private int del_flag;
     private int limitNum;
     private int startNum;
+
+    private List<BFSearchPid> pidList;
 }
