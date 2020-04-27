@@ -1,10 +1,7 @@
 package com.importExpress.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.cbt.pojo.Buy4MeCusotme;
@@ -349,34 +346,79 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
 			log.error("CartController refresh ",e);
 		}
 		if(commonResult.getCode() == 200){
+            int userId = statistic.getUserId();
+            if(userId != 0){
+                List<String> list = (List<String>)commonResult.getData();
+                int length = 0;
+                if (list == null) {
+                    list = new ArrayList<>();
+                } else {
+                    length = list.size();
+                    if (length > 1) {
+                        // filter
+                        String user = list.stream().filter(e -> e.equals(userId)).findFirst().orElse(null);
+                        if(null != user){
+                            List<Buy4MeCusotme> list1 = new ArrayList<>();
+                            String s = "car:";
+                            list = this.filterHaveOrderUsers(list);
+                            list.stream().forEach(e ->{
+                                if(e.indexOf(s) > -1){
+                                    e = e.split(s)[1];
+                                }
+                                boolean hasMsg = false;
+                                if(e.indexOf(":") > -1){
+                                    hasMsg = true;
+                                }
+                                Buy4MeCusotme buy4MeCusotme = new Buy4MeCusotme();
+                                buy4MeCusotme.setUserId(e);
+                                buy4MeCusotme.setJumpLink(e);
+                                buy4MeCusotme.setHasMsg(hasMsg);
+                                list1.add(buy4MeCusotme);
+                            });
+                            Collections.reverse(list1);
+                            json.setRows(list1);
+                            json.setTotal(length);
+                        }else {
+                            json.setSuccess(false);
+                        }
+                    }
+                }
 
-			int limitNum = statistic.getLimitNum();
-			int num = statistic.getNum();
-			List<String> list = (List<String>)commonResult.getData();
-			int length = 0;
-			if (list == null) {
-				list = new ArrayList<>();
-			} else {
-				length = list.size();
-				if (length > 1) {
-					// 分页
-					list = list.stream().skip(num).limit(limitNum).collect(Collectors.toList());
-				}
-			}
-			List<Buy4MeCusotme> list1 = new ArrayList<>();
-			String s = "car:";
-			list = this.filterHaveOrderUsers(list);
-			list.stream().forEach(e ->{
-				if(e.indexOf(s) > -1){
-					e = e.split(s)[1];
-				}
-				Buy4MeCusotme buy4MeCusotme = new Buy4MeCusotme();
-				buy4MeCusotme.setUserId(e);
-				buy4MeCusotme.setJumpLink(e);
-				list1.add(buy4MeCusotme);
-			});
-			json.setRows(list1);
-			json.setTotal(length);
+            }else {
+                int limitNum = statistic.getLimitNum();
+                int num = statistic.getNum();
+                List<String> list = (List<String>)commonResult.getData();
+                int length = 0;
+                if (list == null) {
+                    list = new ArrayList<>();
+                } else {
+                    length = list.size();
+                    if (length > 1) {
+                        // 分页
+                        list = list.stream().skip(num).limit(limitNum).collect(Collectors.toList());
+                    }
+                }
+                List<Buy4MeCusotme> list1 = new ArrayList<>();
+                String s = "car:";
+                list = this.filterHaveOrderUsers(list);
+                list.stream().forEach(e ->{
+                    if(e.indexOf(s) > -1){
+                        e = e.split(s)[1];
+                    }
+                    boolean hasMsg = false;
+                    if(e.indexOf(":") > -1){
+                        hasMsg = true;
+                    }
+                    Buy4MeCusotme buy4MeCusotme = new Buy4MeCusotme();
+                    buy4MeCusotme.setUserId(e);
+                    buy4MeCusotme.setJumpLink(e);
+                    buy4MeCusotme.setHasMsg(hasMsg);
+                    list1.add(buy4MeCusotme);
+                });
+                Collections.reverse(list1);
+                json.setRows(list1);
+                json.setTotal(length);
+            }
 		}else {
 			json.setSuccess(false);
 		}

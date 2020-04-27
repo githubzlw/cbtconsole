@@ -194,6 +194,13 @@
         function formatUserId(val, row, index) {
             return '<a target="_blank" href="/cbtconsole/bf/' + val + '">' + val + '</a>';
         }
+        function formatMsg(val, row, index) {
+            var msg = "没有新消息！"
+            if (val){
+                msg = '有新消息了！'
+            }
+            return '<span>' + msg + '</span>';
+        }
         function lookuso(userid,usermail) {
 
             $.ajax({
@@ -282,23 +289,23 @@
              <div style="display:inline">用户id：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><div style="display:inline"><input id="cusid" type="text"></div>
          </div>
         <div>
-            <div style="display:inline">用户email：</div><div style="display:inline"><input id="cusemail" type="text"></div>
+            <div style="display:block">用户email：</div><div style="display:inline"><input id="cusemail" type="text"></div>
         </div>
         <div>
-            <div style="display:inline">用户名：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><div style="display:inline"><input id="cusname" type="text"></div>
+            <div style="display:block">用户名：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><div style="display:inline"><input id="cusname" type="text"></div>
         </div>
         <div>
-            <div style="display:inline">创建时间：&nbsp;&nbsp;</div><div style="display:inline"><input id="custime" type="text"></div>
+            <div style="display:block">创建时间：&nbsp;&nbsp;</div><div style="display:inline"><input id="custime" type="text"></div>
         </div>
         <br/>
         <div>
-            <div style="display:inline">用户选择的感兴趣Business Services：</div>
+            <div style="display:block">用户选择的感兴趣Business Services：</div>
             <div ><textarea name="reworkmesB"  id="reworkmesB"  cols="40"   rows="5"   style="OVERFLOW:   hidden"></textarea></div>
         </div>
 
         <br/>
         <div>
-            <div style="display:inline">用户其它的留言要求：</div>
+            <div style="display:block">用户其它的留言要求：</div>
             <div ><textarea name="reworkmesY"  id="reworkmesY"  cols="40"   rows="8"   style="OVERFLOW:   hidden"></textarea></div>
         </div>
 
@@ -347,8 +354,9 @@
 <table id="shop_marketing_easyui-datagrid" class="easyui-datagrid">
     <thead>
     <tr>
-        <th data-options="field:'userId',align:'center',width:'90px'">用户ID</th>
+        <!--<th data-options="field:'userId',align:'center',width:'90px'">用户ID</th>-->
         <th data-options="field:'jumpLink',width:'150px',formatter:formatUserId">Link</th>
+        <th data-options="field:'hasMsg',width:'150px',formatter:formatMsg">Has New Msg</th>
        <!-- <th data-options="field:'userEmail',width:'150px'">用户Email</th>
         <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
         <th data-options="field:'site',align:'center',width:'80px',formatter:formatSite">网站</th>

@@ -21,4 +21,5 @@ import lombok.Data;
 public class Buy4MeCusotme {
     public String userId;
     public String jumpLink;
+    public boolean hasMsg;
 }
