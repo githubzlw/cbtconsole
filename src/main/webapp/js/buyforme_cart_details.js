@@ -162,7 +162,10 @@ $(function(){
 			if (type == 0){
 				user = "Customer"
 			}
-			if (type == 0){
+			createtime = user +"("+createtime+")"
+			content += '<div class="link-top"></div><p><span class="span_sty">'
+				+ createtime + '</span>:<span>' + content1 + '</span></p>';
+			/*if (type == 0){
 				createtime = user +"("+createtime+")"
 				content += '<div class="link-top"></div><p><span class="span_sty">'
 				+ createtime + '</span>:<span>' + content1 + '</span></p>';
@@ -171,7 +174,7 @@ $(function(){
 				createtime = user +"("+createtime+")"
 				content += '<a><div class="link-top"></div><p><span '+click+' class="span_sty">'
 				+ createtime + '</span>:<span>' + content1 + '</span></p></a>';
-			}
+			}*/
 
 		}
 		$("#chat_history").append(content);
