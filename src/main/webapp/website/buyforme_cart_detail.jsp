@@ -70,6 +70,9 @@ body{min-height:100%;}
 </head>
 
 <body>
+<script>
+	var all = '${result.itemList}'
+</script>
 <div style="background-color:#eaf5e5;min-height:100%;width:2000px;">
 	<div class="container-fluid report">
 		<h1 class="text-center">Buy For Me Cart</h1>
@@ -97,7 +100,7 @@ body{min-height:100%;}
 			<input value="${detail.id}" class="bfdid" type="hidden">
 			<input value="${detail.num_iid}" class="bfpid" type="hidden">
 			<input value="${detail.totalPrice}" class="price-ss" type="hidden">
-			<span style="display: none" id="msg"> ${detail.remarkReplay}</span>
+			<span style="display: none" id="msg"> ${detail.remark_replay}</span>
 			<div class="col-xs-1 de-w1">
 			<img src="/cbtconsole/img/beforeLoad.gif" data-original="${detail.pic_url }" class="img-responsive img-lazy img-de-v">
 			<a href="${detail.detail_url }" target="_blank">商品原始链接</a>
@@ -118,8 +121,8 @@ body{min-height:100%;}
 			<div class="row w11">
 			<div class="row th-font">用户备注:</div>
 			<div class="row remark-row">Q:<span class="th-font-l de-remarl-q">${detail.remark}</span><i class="td-font-new">New!</i> <i class="td-font-view">View</i></div>
-			<div class="remark-replay" style="display:none;">${detail.remark_replay}</div>
-			<div class="remark-replay" style="display:none;">${detail.remarkReplay}</div>
+			<%--<div class="remark-replay" style="display:none;">${detail.remark_replay}</div>--%>
+			<%--<div class="remark-replay" style="display:none;">${detail.remarkReplay}</div>--%>
 			</div>
 			</div>
 				<br><br><br>

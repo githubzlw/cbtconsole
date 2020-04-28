@@ -22,4 +22,5 @@ public class Buy4MeCusotme {
     public String userId;
     public String jumpLink;
     public boolean hasMsg;
+    public String adm;
 }

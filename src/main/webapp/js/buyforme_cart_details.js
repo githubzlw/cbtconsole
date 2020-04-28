@@ -142,12 +142,12 @@ $(function(){
 		$("#remark-replay-content").val(replay);
 
 		var msg = parentsdiv.find("#msg").html();
-		getChatList(msg);
+		getChatList(msg,pid);
 		$('.tc,.trnasparent,.tc1').show();
 	})
 
 
-	function getChatList(msg) {
+	function getChatList(msg,pid) {
 		if (!msg || msg == ' '){
 			return;
 		}
@@ -163,8 +163,14 @@ $(function(){
 				user = "Customer"
 			}
 			createtime = user +"("+createtime+")"
-			content += '<div class="link-top"></div><p><span class="span_sty">'
+			if (type == 0){
+				content += '<div class="link-top"></div><p><span class="span_sty">'
 				+ createtime + '</span>:<span>' + content1 + '</span></p>';
+			}else {
+				content += '<div class="link-top"></div><p><span onclick="del('+json[i].id+","+  pid,+','+ content1 +')" class="span_sty">'
+				+ createtime + '</span>:<span>' + content1 + '</span></p>';
+			}
+
 		}
 		$("#chat_history").append(content);
 	}
@@ -544,5 +550,25 @@ function changePrice(t){
 	var price = parseFloat(cny/7.0832).toFixed(2);
 	$(t).parents(".td-price").find(".lu-price-buy").text(price);
 
+}
+
+function del(id,pid,msg) {
+	var text = " <div id=\"split_div\"> " +msg;
+	"</div>";
+	$.dialog({
+		title : '是否删除该条消息！',
+		content : text,
+		max : false,
+		min : false,
+		lock : true,
+		drag : false,
+		fixed : true,
+		ok : function() {
+			alert(pid+':'+id);
+		},
+		cancel : function() {
+
+		}
+	});
 }
 

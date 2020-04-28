@@ -65,7 +65,12 @@
             getAdminList();
             loadWebSize();
         });
-
+        function blink(){
+            var color="#f00|#0f0|#00f|#880|#808|#088|yellow|green|blue|gray";
+            color=color.split("|");
+            $(".blink").css('color',color[parseInt(Math.random()*color.length)]);
+        }
+        setInterval("blink()",200);
         function setDatagrid() {
             $('#shop_marketing_easyui-datagrid').datagrid({
                 title: 'buyforme 购物车列表',
@@ -107,33 +112,11 @@
         }
 
         function doQuery() {
-            var allCus=1;
-            var cal=document.getElementById("newCus").checked;
-            if(cal==true){
-                allCus=0;
-            }
-            var isOrder = $("#query_is_order").val();
             var userId = $("#query_user_id").val();
-            var userEmail = $("#query_user_email").val();
-            var followId = $("#query_follow_id").val();
             var adminId = $("#query_admin_id").val();
-            var follow  = $("#oporder").val();
-            var countryId = $('#query_country_id').combobox('getValue');
-            var beginMoney = $("#query_begin_money").val();
-            var endMoney = $("#query_end_money").val();
-            var webSite = $("#web_size_type").val();
             $("#shop_marketing_easyui-datagrid").datagrid("load", {
-                "isOrder": isOrder,
                 "userId": userId,
-                "userEmail": userEmail,
-                "followId": followId,
-                "adminId": adminId,
-                "countryId": countryId,
-                "beginMoney": beginMoney,
-                "endMoney": endMoney,
-                "allCus": allCus,
-                "follow": follow,
-                "site": webSite
+                "adminId": adminId
             });
         }
 
@@ -153,7 +136,7 @@
                         var content = '<option value="0" selected="selected">全部</option>';
                         var json = data.data;
                         for (var i = 0; i < json.length; i++) {
-                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                            content += '<option value="' + json[i].confirmusername + '" ">' + json[i].confirmusername + '</option>';
                         }
                         $("#query_admin_id").append(content);
                         $("#query_follow_id").append(content);
@@ -192,14 +175,17 @@
         }
 
         function formatUserId(val, row, index) {
-            return '<a target="_blank" href="/cbtconsole/bf/' + val + '">' + val + '</a>';
+            return '<a  href="/cbtconsole/bf/' + val + '">' + val + '</a>';
         }
         function formatMsg(val, row, index) {
             var msg = "没有新消息！"
             if (val){
                 msg = '有新消息了！'
+                return '<span  class="blink" style="display: inline-block;overflow: hidden;word-break: keep-all;white-space: nowrap;text-overflow: ellipsis;line-height: 28px;float: left;" >' + msg + '</span>';
+            }else {
+                return '<span>' + msg + '</span>';
             }
-            return '<span>' + msg + '</span>';
+
         }
         function lookuso(userid,usermail) {
 
@@ -315,35 +301,15 @@
     <form id="shop_marketing_query_form" action="#" onsubmit="return false;">
 
         <span>客户ID:<input id="query_user_id" type="text" value="" style="width: 100px;height: 22px;"/></span>
-        &nbsp;&nbsp;<span>客户邮箱:<input id="query_user_email" type="text" value="" style="width: 180px;height: 22px;"/></span>
-        &nbsp;&nbsp;<span>国家: <select id="query_country_id" style="font-size: 16px; height: 26px; width: 200px;">
-			</select></span>&nbsp;&nbsp;<span>金额: <input id="query_begin_money" type="number" style="width: 80px;height: 22px;"/>
-            -<input id="query_end_money"  type="number" style="width: 80px;height: 22px;"/></span>
-        <span>是否跟进: <select id="query_is_order" style="font-size: 16px; height: 26px; width: 90px;">-->
-					<option value="-1" selected="selected">全部</option>
-                    <option value="0">已跟进</option>
-                   <option value="1">未跟进</option>
-			</select></span>&nbsp;&nbsp;
-        <span>是否下单: <select id="oporder" style="font-size: 16px; height: 26px; width: 90px;">-->
-					<option value="-1" selected="selected">全部</option>
-                    <option value="0">未下单</option>
-                   <option value="1">已下单</option>
-			</select></span>&nbsp;&nbsp;
         <span>销售: <select id="query_admin_id"
                                                           style="font-size: 16px; height: 26px; width: 90px;">
 					<option value="-1" selected="selected">全部</option>
             </select></span>&nbsp;&nbsp;
-        <span>网站:<select id="web_size_type" style="height: 28px;width: 120px;">
-                                <option value="1">import</option>
-                                <option value="2">kids</option>
-                                <option value="3">pets</option>
-                            </select></span>
         <!--<span>跟进人: <select id="query_follow_id"-->
                                                            <!--style="font-size: 16px; height: 26px; width: 90px;">-->
                         <!--<option value="-1" selected="selected">全部</option>-->
 			<!--</select>-->
     <!--</span>&nbsp;&nbsp;-->
-        <br><input id="newCus" type="checkbox" style="">是否填写问卷  是勾选/否不勾选
         <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
         <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
 
@@ -354,9 +320,9 @@
 <table id="shop_marketing_easyui-datagrid" class="easyui-datagrid">
     <thead>
     <tr>
-        <!--<th data-options="field:'userId',align:'center',width:'90px'">用户ID</th>-->
+        <th data-options="field:'adm',align:'center',width:'90px'">AdminName</th>
         <th data-options="field:'jumpLink',width:'150px',formatter:formatUserId">Link</th>
-        <th data-options="field:'hasMsg',width:'150px',formatter:formatMsg">Has New Msg</th>
+        <th data-options="field:'hasMsg',width:'150px',formatter:formatMsg">Message</th>
        <!-- <th data-options="field:'userEmail',width:'150px'">用户Email</th>
         <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
         <th data-options="field:'site',align:'center',width:'80px',formatter:formatSite">网站</th>

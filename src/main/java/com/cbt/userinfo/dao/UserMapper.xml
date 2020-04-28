@@ -220,5 +220,7 @@
             </if>
         </if>
     </select>
-
+    <select id="queryAdmByUser" resultType="String">
+        select admName from admin_r_user where userid = #{userId};
+    </select>
 </mapper>
