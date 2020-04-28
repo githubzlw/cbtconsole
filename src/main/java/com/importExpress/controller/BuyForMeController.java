@@ -9,6 +9,7 @@ import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.cbt.pojo.BuyForMeStatistic;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.UploadByOkHttp;
 import com.google.gson.Gson;
@@ -718,9 +719,9 @@ public class BuyForMeController {
 		if (StringUtils.isNotBlank(userIdStr)) {
 			userId = Integer.parseInt(userIdStr);
 		}
-		String userEmail = request.getParameter("userEmail");
-		if (StringUtils.isNotBlank(userEmail)) {
-			statistic.setUserEmail(userEmail);
+		String adminId = request.getParameter("adminId");
+		if (StringUtils.isNotBlank(adminId) && !adminId.equals("0")) {
+			statistic.setAdmname (adminId);
 		}
 		statistic.setUserId(userId);
 		statistic.setStartNum(startNum);
@@ -735,7 +736,7 @@ public class BuyForMeController {
 		List<ZoneBean> lstCountry = buyForMeService.lstCountry();
 		mv.addObject("countrys", lstCountry);
 		if(customerCartDetails.getData() != null){
-			request.setAttribute("result",customerCartDetails.getData());
+            request.setAttribute("result",customerCartDetails.getData());
 			//mv.addObject("result",new Gson().toJson(customerCartDetails.getData()));
 		}
 		return mv;

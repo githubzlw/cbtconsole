@@ -1,20 +1,20 @@
 package com.importExpress.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.cbt.pojo.Buy4MeCusotme;
 import com.cbt.pojo.BuyForMeStatistic;
+import com.cbt.userinfo.dao.UserMapper;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.google.gson.Gson;
 import com.importExpress.utli.UrlUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.xmlbeans.impl.jam.mutable.MPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +38,8 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
 
 	@Autowired
 	private BuyForMeMapper buyForMemapper;
-
+	@Autowired
+    UserMapper userMapper;
     @Override
     public List<BFOrderInfo> getOrders(Map<String, Object> map) {
         List<BFOrderInfo> orders = buyForMemapper.getOrders(map);
@@ -310,6 +311,10 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
 		if(commonResult.getCode() == 200){
 			String data1 = (String)commonResult.getData();
 			BuyForMeStatistic data = new Gson().fromJson(data1, BuyForMeStatistic.class);
+            data.getItemList().stream().forEach(e->{
+                List<CustomerQuestionsAndReplayBean> remarkReplay = e.getRemarkReplay();
+                e.setRemark_replay(new Gson().toJson(remarkReplay));
+            });
 			jsonResult = JsonResult.success(data);
 		}
 		return jsonResult;
@@ -349,36 +354,82 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
 			log.error("CartController refresh ",e);
 		}
 		if(commonResult.getCode() == 200){
+            int userId = statistic.getUserId();
+            int limitNum = statistic.getLimitNum();
+            int num = statistic.getNum();
+            String admname = statistic.getAdmname();
+            List<String> list = (List<String>)commonResult.getData();
+            int length = 0;
+            if (list == null) {
+                list = new ArrayList<>();
+            } else {
+                length = list.size();
+                if (length > 1) {
+                    // 分页
+                    list = list.stream().skip(num).limit(limitNum).collect(Collectors.toList());
+                }
+            }
 
-			int limitNum = statistic.getLimitNum();
-			int num = statistic.getNum();
-			List<String> list = (List<String>)commonResult.getData();
-			int length = 0;
-			if (list == null) {
-				list = new ArrayList<>();
-			} else {
-				length = list.size();
-				if (length > 1) {
-					// 分页
-					list = list.stream().skip(num).limit(limitNum).collect(Collectors.toList());
-				}
-			}
-			List<Buy4MeCusotme> list1 = new ArrayList<>();
-			String s = "car:";
-			list.stream().forEach(e ->{
-				if(e.indexOf(s) > -1){
-					e = e.split(s)[1];
-				}
-				Buy4MeCusotme buy4MeCusotme = new Buy4MeCusotme();
-				buy4MeCusotme.setUserId(e);
-				buy4MeCusotme.setJumpLink(e);
-				list1.add(buy4MeCusotme);
-			});
-			json.setRows(list1);
-			json.setTotal(length);
+            String s = "car:";
+            Map<String,String> hasNewMsgMap = new HashMap<>();
+            List<String> list1 = new ArrayList<>();
+            list.stream().forEach(e->{
+                if(e.indexOf(s) > -1){
+                    e = e.split(s)[1];
+                }
+                if(e.indexOf(":") > -1){
+                    e = e.split(":")[0];
+                    hasNewMsgMap.put(e,e);
+                }
+                list1.add(e);
+            });
+            list = this.filterHaveOrderUsers(list1);
+            List<Buy4MeCusotme> list2 = new ArrayList<>();
+            list.stream().forEach(e ->{
+                boolean hasMsg = false;
+                if(hasNewMsgMap.containsKey(e)){
+                    hasMsg = true;
+                }
+                String adm = "admin(未分配)";
+                if(StringUtils.isNumeric(e)){
+                    String dbName = userMapper.queryAdmByUser(e);
+                    if(StringUtils.isNotBlank(dbName)){
+                        adm = dbName;
+                    }
+                }
+                Buy4MeCusotme buy4MeCusotme = new Buy4MeCusotme();
+                buy4MeCusotme.setUserId(e);
+                buy4MeCusotme.setJumpLink(e);
+                buy4MeCusotme.setHasMsg(hasMsg);
+                buy4MeCusotme.setAdm(adm);
+                list2.add(buy4MeCusotme);
+            });
+            if(userId != 0){
+                List<Buy4MeCusotme> collect = list2.stream().filter(e -> e.getUserId().equals(String.valueOf(userId))).collect(Collectors.toList());
+                json.setRows(collect);
+                json.setTotal(collect.size());
+            }else if(StringUtils.isNotBlank(admname)){
+                List<Buy4MeCusotme> collect = list2.stream().filter(e -> e.getAdm().equals(admname)).collect(Collectors.toList());
+                json.setRows(collect);
+                json.setTotal(collect.size());
+            }
+            else{
+                Collections.reverse(list2);
+                json.setRows(list2);
+                json.setTotal(length);
+            }
+
 		}else {
 			json.setSuccess(false);
 		}
 		return json;
 	}
+	public List<String> filterHaveOrderUsers(List<String> allList){
+        List<String> userIdList = new ArrayList<>();
+        //@date：2020/4/26 5:38 下午 Description : 获取有订单的列表
+        List<String> userLists = buyForMemapper.queryAllOrderUnPay();
+        allList.removeAll(userLists);
+        userLists.clear();
+        return allList;
+    }
 }
