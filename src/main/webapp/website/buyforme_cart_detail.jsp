@@ -172,6 +172,12 @@ body{min-height:100%;}
             src="/cbtconsole/js/xheditor_lang/zh-cn.js"></script>
     <link rel="stylesheet" type="text/css"
           href="/cbtconsole/js/xheditor_skin/vista/iframe.css"/>
+
+<script type="text/javascript" src="/cbtconsole/js/main.js"></script>
+<script type="text/javascript"
+		src="/cbtconsole/js/lhgdialog/lhgdialog.min.js?self=true&skin=discuz"></script>
+<script type="text/javascript"
+		src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
 </html>
 
 

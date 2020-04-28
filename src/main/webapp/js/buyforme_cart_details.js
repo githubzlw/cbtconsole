@@ -162,13 +162,15 @@ $(function(){
 			if (type == 0){
 				user = "Customer"
 			}
-			createtime = user +"("+createtime+")"
 			if (type == 0){
+				createtime = user +"("+createtime+")"
 				content += '<div class="link-top"></div><p><span class="span_sty">'
 				+ createtime + '</span>:<span>' + content1 + '</span></p>';
 			}else {
-				content += '<div class="link-top"></div><p><span onclick="del('+json[i].id+","+  pid,+','+ content1 +')" class="span_sty">'
-				+ createtime + '</span>:<span>' + content1 + '</span></p>';
+				var click  = 'onclick="del('+json[i].id+','+pid+','+ createtime +')"';
+				createtime = user +"("+createtime+")"
+				content += '<a><div class="link-top"></div><p><span '+click+' class="span_sty">'
+				+ createtime + '</span>:<span>' + content1 + '</span></p></a>';
 			}
 
 		}
