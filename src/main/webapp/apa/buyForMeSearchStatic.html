@@ -102,6 +102,7 @@
                 siteUrl = "https://www.import-express.com/";
             } else {
                 siteUrl = "http://127.0.0.1:8080/";
+                // siteUrl = "http://192.168.1.163:8081/";
             }
         }
 
@@ -452,7 +453,7 @@
                 success: function (data) {
                     if (data.ok) {
                         $('#buy_static_easyui-datagrid').datagrid('reload');
-                        var url = siteUrl+'/buy/searchStatic/" + index + "/" + id;
+                        var url = siteUrl+"/buy/searchStatic/" + index + "/" + id;
                         var iWidth = 1080; //弹出窗口的宽度;
                         var iHeight = 660; //弹出窗口的高度;
                         var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
