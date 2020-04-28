@@ -88,12 +88,22 @@
     </style>
     <script>
         var pidList = {};
+        var siteUrl = "https://www.import-express.com/";
         $(document).ready(function () {
             getAdminList();
             setDatagrid();
             closeDialog();
+            chooseSite();
         });
 
+        function chooseSite() {
+            var url = window.location.href;
+            if(url.indexOf("192.168.1.9") || url.indexOf("27.115.38.42") || url.indexOf("192.168.1.27")){
+                siteUrl = "https://www.import-express.com/";
+            } else {
+                siteUrl = "http://127.0.0.1:8080/";
+            }
+        }
 
         function setDatagrid() {
             $('#buy_static_easyui-datagrid').datagrid({
@@ -342,7 +352,8 @@
             } else if (val == 1) {
                 return '<b>正在生成json文件</b>';
             } else if (val == 2) {
-                return '<a href="http://127.0.0.1:8087/apa/buyforme-new-search.html?static_flag=1&keyword=' + row.keyword
+                if(window.location.href){}
+                return '<a href="'+siteUrl+'apa/buyforme-new-search.html?static_flag=1&keyword=' + row.keyword
                     + '" target="_blank">成功(预览)</a>' +
                     '<br><b>[' + row.json_name + ']</b>';
             } else {
@@ -441,7 +452,7 @@
                 success: function (data) {
                     if (data.ok) {
                         $('#buy_static_easyui-datagrid').datagrid('reload');
-                        var url = "http://127.0.0.1:8087/buy/searchStatic/" + index + "/" + id;
+                        var url = siteUrl+'/buy/searchStatic/" + index + "/" + id;
                         var iWidth = 1080; //弹出窗口的宽度;
                         var iHeight = 660; //弹出窗口的高度;
                         var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
