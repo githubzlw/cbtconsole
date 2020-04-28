@@ -138,4 +138,6 @@ public interface BuyForMeService {
 
 	int deleteStaticPid(BFSearchPid searchPid);
 
+	int setJsonState(int flag, String ids);
+
 }

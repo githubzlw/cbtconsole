@@ -338,6 +338,11 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     }
 
     @Override
+    public int setJsonState(int flag, String ids) {
+        return buyForMemapper.setJsonState(flag, ids);
+    }
+
+    @Override
     public int cancelOrders(int id) {
         int update = buyForMemapper.updateOrderAllState(id);
         if (update > 0) {

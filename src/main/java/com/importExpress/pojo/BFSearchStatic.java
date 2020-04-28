@@ -28,5 +28,9 @@ public class BFSearchStatic {
     private int limitNum;
     private int startNum;
 
+    private Integer state;
+    private String json_name;
+
     private List<BFSearchPid> pidList;
+    private int num;
 }

@@ -678,7 +678,7 @@ public class BuyForMeController {
     @RequestMapping("/queryStaticList")
     @ResponseBody
     public JsonResult queryStaticList(HttpServletRequest request, String beginTime, String endTime, String keyword,
-                                      Integer page, Integer rows) {
+                                      String admin_id, Integer page, Integer rows) {
 
         BFSearchStatic searchStatic = new BFSearchStatic();
         try {
@@ -692,7 +692,9 @@ public class BuyForMeController {
             if (StringUtils.isNotBlank(keyword)) {
                 searchStatic.setKeyword(keyword);
             }
-
+            if (StringUtils.isNotBlank(admin_id) && Integer.parseInt(admin_id) > 0) {
+                searchStatic.setAdmin_id(Integer.parseInt(admin_id));
+            }
             searchStatic.setDel_flag(-1);
             searchStatic.setStartNum((page - 1) * rows);
             searchStatic.setLimitNum(rows);
@@ -811,8 +813,9 @@ public class BuyForMeController {
             }
             int count = buyForMeService.deleteSearchStatic(searchStatic);
 
-            String sql = "update buyforme_search_static set del_flag = %s where id = %s";
-            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getDel_flag(), searchStatic.getId()));
+            String sql = "delete from buyforme_search_static where id = %s;";
+            sql += "delete from buyforme_search_pid where static_id =%s;";
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getId(), searchStatic.getId()));
 
             return JsonResult.success(count);
         } catch (Exception e) {
@@ -860,12 +863,31 @@ public class BuyForMeController {
             searchPid.setAdmin_id(userInfo.getId());
             int count = buyForMeService.insertIntoStaticPid(searchPid);
 
-            if (searchPid.getId() > 0) {
-                String sql = "insert into buyforme_search_pid(id,static_id,pid,title,admin_id) " +
-                        "values(%s,%s,'%s','%s',%ss)";
 
+            if (searchPid.getId() > 0) {
+
+
+                BFSearchStatic searchStatic = new BFSearchStatic();
+                searchStatic.setId(searchPid.getStatic_id());
+                if (searchPid.getNum() > 1) {
+                    searchStatic.setPid2(searchPid.getPid());
+                } else {
+                    searchStatic.setPid1(searchPid.getPid());
+                }
+                searchStatic.setNum(searchPid.getNum());
+                buyForMeService.updateSearchStatic(searchStatic);
+
+                String sql = "insert into buyforme_search_pid(id,static_id,pid,title,admin_id) " +
+                        "values(%s,%s,'%s','%s',%s);";
                 String title = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchPid.getTitle());
-                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getId(), searchPid.getStatic_id(), searchPid.getPid(), title, searchPid.getAdmin_id()));
+
+                if (searchPid.getNum() == 2) {
+                    sql += "update buyforme_search_static set pid2= '%s' where id = %s;";
+                } else if (searchPid.getNum() == 1) {
+                    sql += "update buyforme_search_static set pid1= '%s' where id = %s;";
+                }
+
+                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getId(), searchPid.getStatic_id(), searchPid.getPid(), title, searchPid.getAdmin_id(), searchPid.getPid(), searchPid.getStatic_id()));
             }
 
             return JsonResult.success(count);
@@ -893,8 +915,7 @@ public class BuyForMeController {
             String sql = "update buyforme_search_pid set title = '%s' where static_id = %s and pid = '%s'";
 
             String title = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchPid.getTitle());
-            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getId(), searchPid.getStatic_id(),
-                    title, searchPid.getAdmin_id()));
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, title, searchPid.getStatic_id(), searchPid.getPid()));
 
 
             return JsonResult.success(count);
@@ -918,12 +939,40 @@ public class BuyForMeController {
             }
             int count = buyForMeService.deleteStaticPid(searchPid);
 
-            String sql = "delete from buyforme_search_pid where static_id= #{static_id} and pid = #{pid}";
-            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getStatic_id(), searchPid.getPid()));
+            String sql = "delete from buyforme_search_pid where static_id= %s and pid = '%s';";
+            sql += "update buyforme_search_static set pid1= '' where id = %s and pid1 = '%s';";
+            sql += "update buyforme_search_static set pid2= '' where id = %s and pid2 = '%s';";
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getStatic_id(), searchPid.getPid(),
+                    searchPid.getStatic_id(), searchPid.getPid(), searchPid.getStatic_id(), searchPid.getPid()));
             return JsonResult.success(count);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("deleteStaticPid,searchPid[{}],error", searchPid, e);
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+    @RequestMapping("/setJsonState")
+    @ResponseBody
+    public JsonResult setJsonState(HttpServletRequest request, Integer flag, String ids) {
+        Assert.isTrue(null != flag || StringUtils.isNotBlank(ids), "flag or ids is null");
+        try {
+            Admuser userInfo = UserInfoUtils.getUserInfo(request);
+            if (null == userInfo || userInfo.getId() == 0) {
+                return JsonResult.error("请登录后操作");
+            }
+            String sql = "update buyforme_search_static set state = 1";
+            if (null == flag || flag < 0) {
+                flag = 0;
+            } else {
+                sql = "update buyforme_search_static set state = 1 where id in(" + ids + ")";
+            }
+            int count = buyForMeService.setJsonState(flag, ids);
+            NotifyToCustomerUtil.sendSqlByMq(sql);
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("setJsonState,flag[{}],ids[{}],error", flag, ids, e);
             return JsonResult.error(e.getMessage());
         }
     }

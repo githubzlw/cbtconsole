@@ -22,4 +22,6 @@ public class BFSearchPid {
 
     private int del_flag;
 
+    private int num;
+
 }
