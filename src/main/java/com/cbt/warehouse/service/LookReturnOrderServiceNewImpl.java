@@ -698,4 +698,17 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		return json;
 	}
 
+    @Override
+    public EasyUiJsonResult AddOnlyRefund(String orid, Double odmany, String admName) {
+        EasyUiJsonResult json=new EasyUiJsonResult();
+        try {
+            this.lookReturnOrderServiceNewMapper.AddOnlyRefund(orid,odmany,admName);
+            json.setRows(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setRows(0);
+        }
+        return json;
+    }
+
 }

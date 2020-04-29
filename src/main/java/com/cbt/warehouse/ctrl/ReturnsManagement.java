@@ -261,8 +261,17 @@ public class ReturnsManagement {
 			Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		json=this.lookReturnOrderServiceNew.AddRetAllOrder(cusorder,tbOrder,returnNO,adm.getAdmName());		
 		 return json;
-	}	
-	@RequestMapping(value = "/FindOdid")
+	}
+    @RequestMapping(value = "/AddOnlyRefund")
+    @ResponseBody
+    public EasyUiJsonResult AddOnlyRefund(@RequestParam("orid")String orid,@RequestParam("odmany")Double odmany,HttpServletRequest request,HttpServletResponse response){
+        EasyUiJsonResult json=new EasyUiJsonResult();
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+        json=this.lookReturnOrderServiceNew.AddOnlyRefund(orid,odmany,adm.getAdmName());
+        return json;
+    }
+    @RequestMapping(value = "/FindOdid")
 	@ResponseBody
 	public EasyUiJsonResult FindOdid(@RequestParam("cusorder")String cusorder){
 		EasyUiJsonResult json=new EasyUiJsonResult();

@@ -153,7 +153,25 @@
             var Tborder=$("#Tborderus").val()
             window.location.href="/cbtconsole/Look/FindOtherOrder?Tborder="+Tborder
         }
+        function tuihuo() {
+            var orid=$("#orid").val()
+            var odmany=$("#odmany").val()
+            alert(orid)
+            $.ajax({
+                type: "post",
+                url: "/cbtconsole/Look/AddOnlyRefund",
+                data: {orid:orid,odmany:odmany},
+                success: function (res) {
+                    if (res.rows == 1) {
+                        $.messager.alert('提示', '操作成功');
+                        window.location.reload();
+                    } else {
+                        $.messager.alert('提示', '操作失败');
 
+                    }
+                }
+            });
+        }
         function returnOt() {
             var Tborder=$("#Tborderus").val()
             var returnNO=$("#openRt").val()
@@ -210,7 +228,10 @@
 </head>
 <body>
 <h2>特殊订单</h2>
-1688订单号：<input type="text" id="Tborderus" value="${Tborder}">&nbsp;&nbsp;&nbsp;&nbsp; <button onclick="FindTbOrder()">查询</button><br/><br/><br/>
+1688订单号：<input type="text" id="Tborderus" value="${Tborder}">&nbsp;&nbsp;&nbsp;&nbsp; <button onclick="FindTbOrder()">查询</button><br/>
+<br/>
+1688订单号：<input type="text" id="orid">退货金额：<input type="text" id="odmany"><button onclick="tuihuo()">确认</button>(仅退货)
+<br/><br/>
 
 <tr>
     <td>
