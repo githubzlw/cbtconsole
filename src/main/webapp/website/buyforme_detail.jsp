@@ -85,7 +85,8 @@ padding: 20px;max-height: 715px;}
 .delivery-method{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 .delivery-feight{border: 1px solid #ccc;border-radius: 4px;height: 35px;}
 .img-dv{width: 10%;}
-/* .btn-finsh{margin-left: 1445px;} */
+ .btn-finsh{margin-left: 100px;}
+ .btn-can-not-buy{background-color: #f50c0c !important;}
 .remark-replay{border: 1px solid #ccc;border-radius: 4px;height: 34px;width:30%;}
 .td-font-view{margin-left: 2%;cursor: pointer;}
 .text-al{text-align: left;    margin-top: 22px; height: 46px;}
@@ -113,7 +114,7 @@ body{min-height:100%;}
 #xhe0_iframe {min-height: 440px;}
 .link-top {width: 100%;height: 1px;border-top: solid #ACC0D8 1px;}
 .span_sty {background-color: #c1f3b7;}
-.btn-div{    margin-left: 1445px; width: 200px;}
+.btn-div{    margin-left: 1366px; width: 400px;}
 .img_sty{max-height: 65px;max-width: 65px;}
 </style>
 </head>
@@ -286,12 +287,13 @@ body{min-height:100%;}
 		</c:forEach>
 		<br>
 		<div class="row btn-div">
-		<c:if test="${order.state==0 ||  order.state==1}">
-		<button class="btn btn-success btn-finsh">确认订单</button>
-		</c:if>
-		<c:if test="${order.state==0 ||  order.state==1 || order.state==2}">
-		<button class="btn btn-warning btn-can-not-buy">不能采购</button>		
-		</c:if>
+			<c:if test="${order.state==0 ||  order.state==1 || order.state==2}">
+				<button class="btn btn-warning btn-can-not-buy">不能采购</button>
+			</c:if>
+			<c:if test="${order.state==0 ||  order.state==1}">
+				<button class="btn btn-success btn-finsh">确认订单</button>
+			</c:if>
+
 		</div>
 		
 		</div>
