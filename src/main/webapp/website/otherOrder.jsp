@@ -156,17 +156,16 @@
         function tuihuo() {
             var orid=$("#orid").val()
             var odmany=$("#odmany").val()
-            alert(orid)
             $.ajax({
                 type: "post",
                 url: "/cbtconsole/Look/AddOnlyRefund",
                 data: {orid:orid,odmany:odmany},
                 success: function (res) {
                     if (res.rows == 1) {
-                        $.messager.alert('提示', '操作成功');
+                       alert(res.message);
                         window.location.reload();
                     } else {
-                        $.messager.alert('提示', '操作失败');
+                        $.messager.alert('提示',  res.message);
 
                     }
                 }
