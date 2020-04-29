@@ -60,7 +60,7 @@
 				<label class="w200">负责人： <select class="form-control  p_qs_r" id="query_admin" >
 						<option value="0" ${queryParam.admin==0 ? 'selected="selected"':''}>全部</option>
 						<c:forEach var="adm" items="${lstAdms }">
-						<option value="${adm.id }" ${queryParam.admin==adm.id ? 'selected="selected"':''}>${adm.admname }</option>
+						<option value="${adm.id }" ${queryParam.admid==adm.id ? 'selected="selected"':''}>${adm.admname }</option>
 						</c:forEach>
 						
 				</select>
