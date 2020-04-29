@@ -356,18 +356,12 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
 		if(commonResult.getCode() == 200){
             int userId = statistic.getUserId();
             int limitNum = statistic.getLimitNum();
-            int num = statistic.getNum();
+            int num = statistic.getStartNum();
             String admname = statistic.getAdmname();
             List<String> list = (List<String>)commonResult.getData();
             int length = 0;
             if (list == null) {
                 list = new ArrayList<>();
-            } else {
-                length = list.size();
-                if (length > 1) {
-                    // 分页
-                    list = list.stream().skip(num).limit(limitNum).collect(Collectors.toList());
-                }
             }
 
             String s = "car:";
@@ -384,6 +378,12 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
                 list1.add(e);
             });
             list = this.filterHaveOrderUsers(list1);
+            length = list.size();
+            if (length > 1) {
+                //Collections.reverse(list);
+                // 分页
+                list = list.stream().skip(num).limit(limitNum).collect(Collectors.toList());
+            }
             List<Buy4MeCusotme> list2 = new ArrayList<>();
             list.stream().forEach(e ->{
                 boolean hasMsg = false;
@@ -404,6 +404,7 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
                 buy4MeCusotme.setAdm(adm);
                 list2.add(buy4MeCusotme);
             });
+
             if(userId != 0){
                 List<Buy4MeCusotme> collect = list2.stream().filter(e -> e.getUserId().equals(String.valueOf(userId))).collect(Collectors.toList());
                 json.setRows(collect);
@@ -414,7 +415,7 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
                 json.setTotal(collect.size());
             }
             else{
-                Collections.reverse(list2);
+                //Collections.reverse(list2);
                 json.setRows(list2);
                 json.setTotal(length);
             }
