@@ -704,7 +704,7 @@ public class BuyForMeController {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		ShopCarUserStatistic statistic = new ShopCarUserStatistic();
 		int startNum = 0;
-		int limitNum = 30;
+		int limitNum = 10;
 		String rowsStr = request.getParameter("rows");
 		if (StringUtils.isNotBlank(rowsStr)) {
 			limitNum = Integer.valueOf(rowsStr);
