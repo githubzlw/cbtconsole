@@ -382,7 +382,11 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
             if (length > 1) {
                 //Collections.reverse(list);
                 // 分页
-                list = list.stream().skip(num).limit(limitNum).collect(Collectors.toList());
+                if(userId != 0){
+                    list =  list.stream().filter(e->e.equals(String.valueOf(userId))).collect(Collectors.toList());
+                }else if(StringUtils.isBlank(admname)) {
+                    list = list.stream().skip(num).limit(limitNum).collect(Collectors.toList());
+                }
             }
             List<Buy4MeCusotme> list2 = new ArrayList<>();
             list.stream().forEach(e ->{
@@ -391,13 +395,20 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
                     hasMsg = true;
                 }
                 String adm = "admin(未分配)";
+                Buy4MeCusotme buy4MeCusotme = new Buy4MeCusotme();
                 if(StringUtils.isNumeric(e)){
-                    String dbName = userMapper.queryAdmByUser(e);
-                    if(StringUtils.isNotBlank(dbName)){
-                        adm = dbName;
+                   Map<String,String> userInfoMap= userMapper.queryAdmByUser(e);
+                    if(null !=userInfoMap ){
+                        if(StringUtils.isNotBlank(userInfoMap.get("admName"))){
+                            adm = userInfoMap.get("admName");
+                        }
+                        if(StringUtils.isNotBlank(userInfoMap.get("chinapostbig"))){
+                            buy4MeCusotme.setCountry(userInfoMap.get("chinapostbig"));
+                        }
+
+
                     }
                 }
-                Buy4MeCusotme buy4MeCusotme = new Buy4MeCusotme();
                 buy4MeCusotme.setUserId(e);
                 buy4MeCusotme.setJumpLink(e);
                 buy4MeCusotme.setHasMsg(hasMsg);
@@ -406,16 +417,29 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
             });
 
             if(userId != 0){
-                List<Buy4MeCusotme> collect = list2.stream().filter(e -> e.getUserId().equals(String.valueOf(userId))).collect(Collectors.toList());
-                json.setRows(collect);
-                json.setTotal(collect.size());
+                //List<Buy4MeCusotme> collect = list2.stream().filter(e -> e.getUserId().equals(String.valueOf(userId))).collect(Collectors.toList());
+                list2.stream().forEach(e->{
+                    JsonResult customerCartDetails = getCustomerCartDetails(e.getUserId());
+                    pase(e, customerCartDetails);
+                });
+                json.setRows(list2);
+                json.setTotal(list2.size());
             }else if(StringUtils.isNotBlank(admname)){
                 List<Buy4MeCusotme> collect = list2.stream().filter(e -> e.getAdm().equals(admname)).collect(Collectors.toList());
+                collect = collect.stream().skip(num).limit(limitNum).collect(Collectors.toList());
+                collect.stream().forEach(e->{
+                    JsonResult customerCartDetails = getCustomerCartDetails(e.getUserId());
+                    pase(e, customerCartDetails);
+                });
                 json.setRows(collect);
                 json.setTotal(collect.size());
             }
             else{
                 //Collections.reverse(list2);
+                list2.stream().forEach(e->{
+                    JsonResult customerCartDetails = getCustomerCartDetails(e.getUserId());
+                    pase(e, customerCartDetails);
+                });
                 json.setRows(list2);
                 json.setTotal(length);
             }
@@ -425,7 +449,15 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
 		}
 		return json;
 	}
-	public List<String> filterHaveOrderUsers(List<String> allList){
+
+    private void pase(Buy4MeCusotme e, JsonResult customerCartDetails) {
+        BuyForMeStatistic data = (BuyForMeStatistic) customerCartDetails.getData();
+        e.setTotalNum(data.getTotalNum());
+        e.setTotalPrice(data.getTotalPrice());
+        e.setItemNum(data.getItemNum());
+    }
+
+    public List<String> filterHaveOrderUsers(List<String> allList){
         List<String> userIdList = new ArrayList<>();
         //@date：2020/4/26 5:38 下午 Description : 获取有订单的列表
         List<String> userLists = buyForMemapper.queryAllOrderUnPay();
