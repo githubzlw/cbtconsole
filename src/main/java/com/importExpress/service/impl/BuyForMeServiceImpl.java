@@ -265,25 +265,26 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     @Override
     public List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog) {
         List<BuyForMeSearchLog> buyForMeSearchLogs = buyForMemapper.querySearchList(searchLog);
-        buyForMeSearchLogs.stream().forEach(buyForMeSearchLog ->{
+        buyForMeSearchLogs.stream().forEach(buyForMeSearchLog -> {
             String ip = buyForMeSearchLog.getIp();
-            if(ip.indexOf("192.168")>-1|| ip.indexOf("127.0")>-1){
+            if (ip.contains("192.168") || ip.contains("127.0") || ip.contains("0:0:0:0:0:0:0:1")) {
                 ip = "2.24.0.0";
             }
-             String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","queryNameByIp?ip="+ip);
-            CommonResult commonResult =null;
+            String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "queryNameByIp?ip=" + ip);
+            CommonResult commonResult = null;
             try {
                 String requestUrl = url;
                 JSONObject jsonObject = instance.doGet(requestUrl);
                 commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
             } catch (IOException e) {
-                log.error("CartController refresh ",e);
+                e.printStackTrace();
+                log.error("CartController refresh ", e);
             }
-            if(commonResult.getCode() == 200){
+            if (null != commonResult && commonResult.getCode() == 200) {
                 String data = (String) commonResult.getData();
                 buyForMeSearchLog.setCountryName(data);
             }
-            });
+        });
         return buyForMeSearchLogs;
     }
 

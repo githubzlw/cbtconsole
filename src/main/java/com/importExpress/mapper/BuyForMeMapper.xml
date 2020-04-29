@@ -96,7 +96,7 @@
 
     <select id="getOrderDetailsSku" resultMap="skuResultMap">
   select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,
-  ship_feight,weight,unit,img_url
+  ship_feight,weight,unit,img_url, sku_name
   from buyforme_details_sku where bf_id= #{bfId}
   </select>
 

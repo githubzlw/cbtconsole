@@ -98,10 +98,10 @@
 
         function chooseSite() {
             var url = window.location.href;
-            if(url.indexOf("192.168.1.9") || url.indexOf("27.115.38.42") || url.indexOf("192.168.1.27")){
+            if(url.indexOf("192.168.1.9") > -1 || url.indexOf("27.115.38.42")> -1 || url.indexOf("192.168.1.27") > -1){
                 siteUrl = "https://www.import-express.com/";
             } else {
-                siteUrl = "http://127.0.0.1:8080/";
+                siteUrl = "http://192.168.1.67:8087/";
                 // siteUrl = "http://192.168.1.163:8081/";
             }
         }
@@ -210,14 +210,14 @@
                         }
                     }
                 }
-                content += '<a href="#" title="点击编辑PID标题" onclick="setPidInfo(1,' + val + ',' + row.id + ')">'
+                content += '<a href="#" title="点击编辑PID标题" onclick="setPidInfo(1, 1,' + val + ',' + row.id + ')">'
                     + val + '(编辑)</a>';
                 content += '&nbsp;&nbsp;<a style="color: red;" href="#" onclick="delPidInfo(' + val + ',' + row.id + ')">删除</a>';
 
                 return content;
             } else {
                 var pidVal = null;
-                return '<a href="#" onclick="setPidInfo(0,' + pidVal + ',' + row.id + ')">新增PID</a>';
+                return '<a href="#" onclick="setPidInfo(0, 1,' + pidVal + ',' + row.id + ')">新增PID</a>';
             }
         }
 
@@ -233,24 +233,24 @@
                         }
                     }
                 }
-                content += '<a href="#" title="点击编辑PID标题" onclick="setPidInfo(2,' + val + ',' + row.id + ')">'
+                content += '<a href="#" title="点击编辑PID标题" onclick="setPidInfo(1, 2,' + val + ',' + row.id + ')">'
                     + val + '(编辑)</a>';
                 content += '&nbsp;&nbsp;<a style="color: red;" href="#" onclick="delPidInfo(' + val + ',' + row.id + ')">删除</a>';
 
                 return content;
             } else {
                 var pidVal = null;
-                return '<a href="#" onclick="setPidInfo(0,' + pidVal + ',' + row.id + ')">新增PID</a>';
+                return '<a href="#" onclick="setPidInfo(0, 2,' + pidVal + ',' + row.id + ')">新增PID</a>';
             }
         }
 
-        function setPidInfo(num, pid, static_id) {
+        function setPidInfo(flag ,num, pid, static_id) {
             $("#p_static_id").val(static_id);
             $("#p_id").val(pid);
 
             $("#p_num").val(num);
 
-            if (num == 0) {
+            if (flag == 0) {
                 $("#p_id").attr("readonly", false);
                 $("#p_insert_flag").val(1);
             } else {

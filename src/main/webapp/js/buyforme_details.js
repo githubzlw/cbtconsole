@@ -283,6 +283,7 @@ $(function(){
 		var url = trp.find(".lu_url").val();
 		var unit = trp.find(".lu_unit").val();
 		var sku = trp.find(".lu_sku").val();
+		var skuid = trp.find(".lu_skuid").val();
 		var id = trp.find(".lu_id").val();
 		var weight = $(this).parents(".detail-div").find(".lu-weight").val();
 		if(num == '' || parseInt(num) < 1 || price == '' || priceBuy==''||priceBuyc==''||url==''||sku==''||unit==''||shipFeight==''){
@@ -304,7 +305,8 @@ $(function(){
 				"url":url,
 				"weight":weight,
 				"unit":unit,
-				"sku":sku
+				"sku":sku,
+				"skuid":skuid
 			},
 			type:"post",
 			success:function(data){

@@ -230,6 +230,7 @@ body{min-height:100%;}
 						<c:if test="${sku.state == 1}">
 						<td>
 						<input type="hidden" class="lu_id" value="${sku.id}">
+						<input type="hidden" class="lu_skuid" value="${sku.skuid}">
 						<input type="text" class="input-w8 lu_sku" value="${sku.sku}">
 						<if test="${sku.imgUrl != null}">
 							<img src="${sku.imgUrl}" class="img_sty">

@@ -189,8 +189,7 @@ public class BuyForMeController {
                 detailSku.setSku(request.getParameter("sku"));
                 detailSku.setWeight(request.getParameter("weight"));
                 detailSku.setUnit(request.getParameter("unit"));
-                String skuid = "";
-                detailSku.setSkuid(skuid);
+                detailSku.setSkuid(request.getParameter("skuid"));
                 detailSku.setState(1);
                 addOrderDetailsSku = buyForMeService.addOrderDetailsSku(detailSku);
             }
@@ -813,9 +812,11 @@ public class BuyForMeController {
             }
             int count = buyForMeService.deleteSearchStatic(searchStatic);
 
-            String sql = "delete from buyforme_search_static where id = %s;";
-            sql += "delete from buyforme_search_pid where static_id =%s;";
-            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getId(), searchStatic.getId()));
+            String sql = "delete from buyforme_search_static where id = %s";
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getId()));
+
+            sql = "delete from buyforme_search_pid where static_id =%s";
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getId()));
 
             return JsonResult.success(count);
         } catch (Exception e) {
@@ -874,20 +875,22 @@ public class BuyForMeController {
                 } else {
                     searchStatic.setPid1(searchPid.getPid());
                 }
-                searchStatic.setNum(searchPid.getNum());
+                searchStatic.setNum(searchPid.getNum() > 0 ? searchPid.getNum() : 1);
                 buyForMeService.updateSearchStatic(searchStatic);
 
                 String sql = "insert into buyforme_search_pid(id,static_id,pid,title,admin_id) " +
-                        "values(%s,%s,'%s','%s',%s);";
+                        "values(%s,%s,'%s','%s',%s)";
                 String title = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchPid.getTitle());
 
-                if (searchPid.getNum() == 2) {
-                    sql += "update buyforme_search_static set pid2= '%s' where id = %s;";
-                } else if (searchPid.getNum() == 1) {
-                    sql += "update buyforme_search_static set pid1= '%s' where id = %s;";
-                }
+                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getId(), searchPid.getStatic_id(), searchPid.getPid(), title, searchPid.getAdmin_id()));
 
-                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getId(), searchPid.getStatic_id(), searchPid.getPid(), title, searchPid.getAdmin_id(), searchPid.getPid(), searchPid.getStatic_id()));
+                if (searchPid.getNum() == 2) {
+                    sql = "update buyforme_search_static set pid2= '%s' where id = %s";
+
+                } else if (searchPid.getNum() == 1) {
+                    sql = "update buyforme_search_static set pid1= '%s' where id = %s";
+                }
+                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getPid(), searchPid.getStatic_id()));
             }
 
             return JsonResult.success(count);
@@ -939,11 +942,14 @@ public class BuyForMeController {
             }
             int count = buyForMeService.deleteStaticPid(searchPid);
 
-            String sql = "delete from buyforme_search_pid where static_id= %s and pid = '%s';";
-            sql += "update buyforme_search_static set pid1= '' where id = %s and pid1 = '%s';";
-            sql += "update buyforme_search_static set pid2= '' where id = %s and pid2 = '%s';";
-            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getStatic_id(), searchPid.getPid(),
-                    searchPid.getStatic_id(), searchPid.getPid(), searchPid.getStatic_id(), searchPid.getPid()));
+            String sql = "delete from buyforme_search_pid where static_id= %s and pid = '%s'";
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getStatic_id(), searchPid.getPid()));
+            sql = "update buyforme_search_static set pid1= '' where id = %s and pid1 = '%s'";
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getPid(), searchPid.getStatic_id()));
+            sql = "update buyforme_search_static set pid2= '' where id = %s and pid2 = '%s'";
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchPid.getPid(), searchPid.getStatic_id()));
+
+
             return JsonResult.success(count);
         } catch (Exception e) {
             e.printStackTrace();
