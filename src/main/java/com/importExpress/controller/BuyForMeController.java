@@ -221,10 +221,10 @@ public class BuyForMeController {
 
             String id = request.getParameter("id");
             String bfId = request.getParameter("bfId");
-            Assert.notNull(bfId,"bfId is null");
+            Assert.notNull(bfId, "bfId is null");
             int updateOrderDetailsSkuState =
-            buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id) ? Integer.parseInt(id) : 0, 0,
-                    Integer.parseInt(bfId));
+                    buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id) ? Integer.parseInt(id) : 0, 0,
+                            Integer.parseInt(bfId));
             mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
         } catch (Exception e) {
             mv.put("state", 500);
@@ -615,7 +615,7 @@ public class BuyForMeController {
     @RequestMapping("/searchList")
     @ResponseBody
     public JsonResult searchList(HttpServletRequest request, String beginTime, String endTime, Integer searchType,
-                                 Integer page, Integer rows) {
+                                 Integer userId, String sessionId, Integer page, Integer rows) {
         JsonResult json = new JsonResult();
         try {
             BuyForMeSearchLog searchLog = new BuyForMeSearchLog();
@@ -634,8 +634,14 @@ public class BuyForMeController {
                 LocalDate today = LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                 searchLog.setEnd_time(today.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             }
-            if (searchType != null && searchType > 0) {
+            if (null != searchType && searchType > 0) {
                 searchLog.setSearch_type(searchType);
+            }
+            if (null != userId && userId > 0) {
+                searchLog.setUser_id(userId);
+            }
+            if (StringUtils.isNotBlank(sessionId)) {
+                searchLog.setSession_id(sessionId);
             }
 
             int total = buyForMeService.querySearchListCount(searchLog);
@@ -680,7 +686,7 @@ public class BuyForMeController {
 
     @RequestMapping("/queryStaticList")
     @ResponseBody
-    public JsonResult queryStaticList(HttpServletRequest request, String beginTime, String endTime, String keyword,
+    public JsonResult queryStaticList(String beginTime, String endTime, String keyword,
                                       String admin_id, Integer page, Integer rows) {
 
         BFSearchStatic searchStatic = new BFSearchStatic();
@@ -984,6 +990,59 @@ public class BuyForMeController {
             e.printStackTrace();
             log.error("setJsonState,flag[{}],ids[{}],error", flag, ids, e);
             return JsonResult.error(e.getMessage());
+        }
+    }
+
+
+    @RequestMapping("/pidLogList")
+    @ResponseBody
+    public JsonResult pidLogList(String beginTime, String endTime, Integer type, String pid,
+                                 Integer userId, String sessionId, Integer page, Integer rows) {
+        JsonResult json = new JsonResult();
+        try {
+            BuyForMePidLog pidLog = new BuyForMePidLog();
+            if (rows == null) {
+                rows = 30;
+            }
+            if (page == null) {
+                page = 1;
+            }
+            pidLog.setStartNum((page - 1) * rows);
+            pidLog.setLimitNum(rows);
+            if (StringUtils.isNotBlank(beginTime)) {
+                pidLog.setCreate_time(beginTime);
+            }
+            if (StringUtils.isNotBlank(pid)) {
+                pidLog.setPid(pid);
+            }
+            if (StringUtils.isNotBlank(endTime)) {
+                LocalDate today = LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                pidLog.setEnd_time(today.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (null != type && type > -1) {
+                pidLog.setType(type);
+            }
+            if (null != userId && userId > 0) {
+                pidLog.setUser_id(userId);
+            }
+            if (StringUtils.isNotBlank(sessionId)) {
+                pidLog.setSession_id(sessionId);
+            }
+
+            int total = buyForMeService.pidLogListCount(pidLog);
+            if (total > 0) {
+                List<BuyForMePidLog> searchLogs = buyForMeService.pidLogList(pidLog);
+
+                json.setSuccess(searchLogs, total);
+            } else {
+                json.setSuccess(new ArrayList<>(), 0);
+            }
+            return json;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("pidLogList beginTime:[{}],endTime:[{}],type:[{}]", beginTime, endTime, type, e);
+            json.setErrorInfo(e.getMessage());
+            return json;
         }
     }
 

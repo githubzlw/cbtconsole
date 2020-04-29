@@ -14,18 +14,21 @@ import com.importExpress.service.BuyForMeService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class BuyForMeServiceImpl implements BuyForMeService {
     private static final String getFreightCostUrl = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
-     private static com.cbt.common.UrlUtil instance = UrlUtil.getInstance();
+    private static com.cbt.common.UrlUtil instance = UrlUtil.getInstance();
     @Autowired
     private BuyForMeMapper buyForMemapper;
 
@@ -36,58 +39,58 @@ public class BuyForMeServiceImpl implements BuyForMeService {
             return orders;
         }
 //		订单状态：-1 取消，0申请，1处理中 2销售处理完成 3已支付;
-		orders.stream().forEach(o->{
-			String content = o.getState() == -1 ? "取消" : o.getState() == 0 ?
-					"申请中":o.getState() == 1 ?"处理中":o.getState() == 2 ?
-							"销售处理完成":o.getState() == 3 ?"待支付":o.getState() == 4 ?"已支付":"";
-			o.setStateContent(content);
-		});
-		return orders;
-	}
+        orders.stream().forEach(o -> {
+            String content = o.getState() == -1 ? "取消" : o.getState() == 0 ?
+                    "申请中" : o.getState() == 1 ? "处理中" : o.getState() == 2 ?
+                    "销售处理完成" : o.getState() == 3 ? "待支付" : o.getState() == 4 ? "已支付" : "";
+            o.setStateContent(content);
+        });
+        return orders;
+    }
 
     @Override
     public int getOrdersCount(Map<String, Object> map) {
         return buyForMemapper.getOrdersCount(map);
     }
 
-	@Override
-	public List<BFOrderDetail> getOrderDetails(String orderNo,String bfId) {
-		List<BFOrderDetail> orderDetails = buyForMemapper.getOrderDetails(orderNo);
-		if(orderDetails == null || orderDetails.isEmpty()) {
-			return Lists.newArrayList();
-		}
-		List<BFOrderDetailSku> orderDetailsSku = getOrderDetailsSku(bfId);
-		if(orderDetailsSku == null || orderDetailsSku.isEmpty()) {
-			return orderDetails;
-		}
-		Map<Integer,List<DetailsSku>> detailsIdSku = Maps.newHashMap();
-		orderDetailsSku.stream().forEach(o->{
-			int bfDetailsId = o.getBfDetailsId();
-			List<DetailsSku> list = detailsIdSku.get(bfDetailsId);
-			list = list == null ? Lists.newArrayList() : list;
-			DetailsSku detailsSku = DetailsSku.builder().num(o.getNum()).skuid(o.getSkuid())
-			.price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).id(o.getId())
-			.priceBuy(o.getPriceBuy()).priceBuyc(o.getPriceBuyc()).shipFeight(o.getShipFeight())
-			.weight(o.getWeight())
-			.state(o.getState())
-			.unit(o.getUnit())
-            .imgUrl(o.getImgUrl())
-			.build();
-			list.add(detailsSku);
-			detailsIdSku.put(bfDetailsId, list);
-		});
-		orderDetails.stream().forEach(o->{
-			List<DetailsSku> list = detailsIdSku.get(o.getId());
-			o.setSkus(list);
-			if(list != null && !list.isEmpty()) {
-				o.setSkuCount(list.size());
-				o.setWeight(list.get(0).getWeight());
-				o.setCount(list.stream().filter(s->s.getState()>0).mapToInt(DetailsSku::getNum).sum());
-			}
-		});
-		
-		return orderDetails;
-	}
+    @Override
+    public List<BFOrderDetail> getOrderDetails(String orderNo, String bfId) {
+        List<BFOrderDetail> orderDetails = buyForMemapper.getOrderDetails(orderNo);
+        if (orderDetails == null || orderDetails.isEmpty()) {
+            return Lists.newArrayList();
+        }
+        List<BFOrderDetailSku> orderDetailsSku = getOrderDetailsSku(bfId);
+        if (orderDetailsSku == null || orderDetailsSku.isEmpty()) {
+            return orderDetails;
+        }
+        Map<Integer, List<DetailsSku>> detailsIdSku = Maps.newHashMap();
+        orderDetailsSku.stream().forEach(o -> {
+            int bfDetailsId = o.getBfDetailsId();
+            List<DetailsSku> list = detailsIdSku.get(bfDetailsId);
+            list = list == null ? Lists.newArrayList() : list;
+            DetailsSku detailsSku = DetailsSku.builder().num(o.getNum()).skuid(o.getSkuid())
+                    .price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).id(o.getId())
+                    .priceBuy(o.getPriceBuy()).priceBuyc(o.getPriceBuyc()).shipFeight(o.getShipFeight())
+                    .weight(o.getWeight())
+                    .state(o.getState())
+                    .unit(o.getUnit())
+                    .imgUrl(o.getImgUrl())
+                    .build();
+            list.add(detailsSku);
+            detailsIdSku.put(bfDetailsId, list);
+        });
+        orderDetails.stream().forEach(o -> {
+            List<DetailsSku> list = detailsIdSku.get(o.getId());
+            o.setSkus(list);
+            if (list != null && !list.isEmpty()) {
+                o.setSkuCount(list.size());
+                o.setWeight(list.get(0).getWeight());
+                o.setCount(list.stream().filter(s -> s.getState() > 0).mapToInt(DetailsSku::getNum).sum());
+            }
+        });
+
+        return orderDetails;
+    }
 
     @Override
     public List<BFOrderDetailSku> getOrderDetailsSku(String bfId) {
@@ -266,26 +269,35 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     @Override
     public List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog) {
         List<BuyForMeSearchLog> buyForMeSearchLogs = buyForMemapper.querySearchList(searchLog);
-        buyForMeSearchLogs.stream().forEach(buyForMeSearchLog -> {
-            String ip = buyForMeSearchLog.getIp();
-            if (ip.contains("192.168") || ip.contains("127.0") || ip.contains("0:0:0:0:0:0:0:1")) {
-                ip = "2.24.0.0";
-            }
-            String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "queryNameByIp?ip=" + ip);
-            CommonResult commonResult = null;
-            try {
-                String requestUrl = url;
-                JSONObject jsonObject = instance.doGet(requestUrl);
-                commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-                log.error("CartController refresh ", e);
-            }
-            if (null != commonResult && commonResult.getCode() == 200) {
-                String data = (String) commonResult.getData();
-                buyForMeSearchLog.setCountryName(data);
-            }
-        });
+
+        if (CollectionUtils.isNotEmpty(buyForMeSearchLogs)) {
+            Map<String, List<BuyForMeSearchLog>> listMap = buyForMeSearchLogs.stream().collect(Collectors.groupingBy(BuyForMeSearchLog::getIp));
+
+            listMap.forEach((k, v) -> {
+                if (StringUtils.isNotBlank(k)) {
+                    String ip = k;
+                    if (ip.contains("192.168") || ip.contains("127.0") || ip.contains("0:0:0:0:0:0:0:1")) {
+                        ip = "2.24.0.0";
+                    }
+                    String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "queryNameByIp?ip=" + ip);
+                    CommonResult commonResult = null;
+                    try {
+                        String requestUrl = url;
+                        JSONObject jsonObject = instance.doGet(requestUrl);
+                        commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        log.error("CartController refresh ", e);
+                    }
+                    if (null != commonResult && commonResult.getCode() == 200) {
+                        String data = (String) commonResult.getData();
+                        v.forEach(cl -> cl.setCountryName(data));
+                    }
+                }
+            });
+            listMap.clear();
+        }
+
         return buyForMeSearchLogs;
     }
 
@@ -342,6 +354,16 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     @Override
     public int setJsonState(int flag, String ids) {
         return buyForMemapper.setJsonState(flag, ids);
+    }
+
+    @Override
+    public List<BuyForMePidLog> pidLogList(BuyForMePidLog pidLog) {
+        return buyForMemapper.pidLogList(pidLog);
+    }
+
+    @Override
+    public int pidLogListCount(BuyForMePidLog pidLog) {
+        return buyForMemapper.pidLogListCount(pidLog);
     }
 
     @Override

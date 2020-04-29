@@ -148,4 +148,8 @@ public interface BuyForMeMapper {
     int deleteStaticPid(BFSearchPid searchPid);
 
     int setJsonState(@Param("flag") int flag, @Param("ids") String ids);
+
+    List<BuyForMePidLog> pidLogList(BuyForMePidLog pidLog);
+
+	int pidLogListCount(BuyForMePidLog pidLog);
 }

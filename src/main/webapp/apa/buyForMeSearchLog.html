@@ -55,8 +55,24 @@
 
     </style>
     <script>
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg); //匹配目标参数
+            if (r != null) return unescape(r[2]);
+            return null; //返回参数值
+        }
+
         $(document).ready(function () {
+            var user_id = getUrlParam("userId");
+            if (/^\+?[1-9][0-9]*$/.test(user_id)) {
+                $("#user_id").val(user_id);
+            } else {
+                $("#session_id").val(user_id);
+            }
             setDatagrid();
+            var opts = $("#buy_search_easyui-datagrid").datagrid("options");
+		    opts.url = "/cbtconsole/bf/searchList";
+		    doQuery();
         });
 
 
@@ -68,7 +84,7 @@
                 striped: true,//设置为true将交替显示行背景。
                 collapsible: true,//显示可折叠按钮
                 toolbar: "#buy_search_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
-                url: '/cbtconsole/bf/searchList',//url调用Action方法
+                url: '',//url调用Action方法
                 loadMsg: '数据装载中......',
                 singleSelect: true,//为true时只能选择单行
                 fitColumns: true,//允许表格自动缩放，以适应父容器
@@ -81,9 +97,9 @@
                     padding: '8 8 10 8'
                 },
                 onLoadSuccess: function (data) {
-                 /*   if (!data.success) {
-                        $.messager.alert(data.message);
-                    }*/
+                    /*   if (!data.success) {
+                           $.messager.alert(data.message);
+                       }*/
                 }
             });
         }
@@ -92,10 +108,14 @@
             var begin_time = $("#begin_time").val();
             var end_time = $("#end_time").val();
             var search_type = $("#search_type").val();
+            var user_id = $("#user_id").val();
+            var session_id = $("#session_id").val();
             $("#buy_search_easyui-datagrid").datagrid("load", {
                 "beginTime": begin_time,
                 "endTime": end_time,
-                "searchType": search_type
+                "searchType": search_type,
+                "userId": user_id,
+                "sessionId": session_id
             });
         }
 
@@ -144,7 +164,11 @@
         <option value="1">关键词</option>
         <option value="2">图片</option>
         <option value="3">url</option>
-			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;
+			</select></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span>客户ID:<input id="user_id" style="width: 100px;height: 24px;"/></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>sessionId:<input style="width: 200px;height: 24px;" id="session_id"/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
         <span><input type="button"
                      class="enter_btn" value="查询" onclick="doQuery()"/></span>
     </form>
@@ -155,11 +179,12 @@
     <thead>
     <tr>
         <th data-options="field:'user_id',align:'center',width:'100px',formatter:formatUserId">客户ID</th>
-        <th data-options="field:'search_type',align:'center',width:'120px',formatter:formatType">搜索类型</th>
+        <th data-options="field:'search_type',align:'center',width:'100px',formatter:formatType">搜索类型</th>
         <th data-options="field:'search_content',align:'center',width:'330px',formatter:formatContent">搜索内容</th>
         <th data-options="field:'create_time',align:'center',width:'120px'">搜索时间</th>
-        <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
+        <th data-options="field:'countryName',align:'center',width:'80px'">国家</th>
         <th data-options="field:'ip',align:'center',width:'100px'">IP</th>
+        <th data-options="field:'session_id',align:'center',width:'160px'">SessionId</th>
     </tr>
     </thead>
     <tbody>
@@ -167,4 +192,8 @@
 </table>
 
 </body>
+<script type="text/javascript">
+
+
+</script>
 </html>
