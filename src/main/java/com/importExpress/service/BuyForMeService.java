@@ -49,7 +49,7 @@ public interface BuyForMeService {
 	 * @param id
 	 * @return
 	 */
-	int updateOrderDetailsSkuState(int id,int state);
+	int updateOrderDetailsSkuState(int id,int state, int bfId);
 	/**
 	 * @param detailSku
 	 * @return
