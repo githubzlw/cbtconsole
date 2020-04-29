@@ -229,7 +229,7 @@
 <h2>特殊订单</h2>
 1688订单号：<input type="text" id="Tborderus" value="${Tborder}">&nbsp;&nbsp;&nbsp;&nbsp; <button onclick="FindTbOrder()">查询</button><br/>
 <br/>
-1688订单号：<input type="text" id="orid">退货金额：<input type="text" id="odmany"><button onclick="tuihuo()">确认</button>(仅退货)
+1688订单号：<input type="text" id="orid">退货金额：<input type="text" id="odmany"><button onclick="tuihuo()">确认</button>(仅退歀)
 <br/><br/>
 
 <tr>
