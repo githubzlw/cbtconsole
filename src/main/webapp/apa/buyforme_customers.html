@@ -86,7 +86,7 @@
                 rownumbers: true,
                 nowrap: false,
                 pageSize: 10,//默认选择的分页是每页50行数据
-                pageList: [5, 10],//可以选择的分页集合
+                pageList: [1,5,10,20],//可以选择的分页集合
                 pagination: true,//分页
                 style: {
                     padding: '8 8 10 8'
@@ -175,7 +175,22 @@
         }
 
         function formatUserId(val, row, index) {
-            return '<a  href="/cbtconsole/bf/' + val + '">' + val + '</a>';
+            var tourist=val;
+            if (isNaN(val)){
+                tourist='游客';
+                return '<a  href="/cbtconsole/bf/' + val + '">' + tourist + '</a>';
+            }else {
+
+                return '<a  href="/cbtconsole/bf/' + val + '">' + tourist + '</a>';;
+
+            }
+        }
+        function formatTotal(val, row, index) {
+            var total = val;
+            return '<span>'+ total +' $</span>';
+        }
+        function formatSearch(val, row, index) {
+            return '<a  href="/cbtconsole/apa/buyForMeSearchLog.html?userId=' + val + '">Search Log</a>';
         }
         function formatMsg(val, row, index) {
             var msg = "没有新消息！"
@@ -187,85 +202,10 @@
             }
 
         }
-        function lookuso(userid,usermail) {
-
-            $.ajax({
-                type: "POST",
-                url: "/cbtconsole/NewCustomersFollow/queryCustomByUserId",
-                data: {userid:userid},
-                dataType:"json",
-                success: function(msg) {
-                if (msg.data!=1){
-                 $("#cusid").val(msg.data.userId);
-                    $("#cusname").val(msg.data.userName);
-                    $("#cusemail").val(usermail);
-                    $("#custime").val(msg.data.createTime);
-                    $("#reworkmesB").val(msg.data.userTypeDesc);
-                    $("#reworkmesY").val(msg.data.remarks)
-                }
-                }
-                })
-            $('#user_remark').window('open');
-        }
-
-        function formatMoney(val, row, index) {
-            if(val > 0){
-                return '<a  href="/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId='+
-                    row.userId + '" target="_blank" style="color: red;">'+val+'</a>';
-            }else{
-                return '<a target="_blank" href="/cbtconsole/NewCustomersFollow/queryNewCustomByUserId?userEmail='+row.userEmail+'&userId=' +
-                    row.userId + '" target="_blank" >'+val+'</a>';
-            }
-        }
-
-        function formatSite(val, row, index) {
-            if (val) {
-                if (val == 0 || val == 1) {
-                    return 'IMPORT';
-                } else if (val == 2) {
-                    return 'KIDS';
-                } else if (val == 3) {
-                    return 'IMPORT/KIDS';
-                } else if (val == 4) {
-                    return 'PETS';
-                } else {
-                    return '';
-                }
-            } else {
-                return '';
-            }
-        }
-
-        function formatFirstdiscount(val, row, index) {
-            if(val > 0){
-                return "否";
-            }else{
-                return '<a target="_blank" href="/cbtconsole/order/getOrderInfo.do?page=1&userid=&orderno=&email=' + row.userEmail + '&state=-2&trackState=0&buyuser=0&admuserid=0&startdate=&enddate=&showUnpaid=0&type=&paymentid=">是</a>';
-            }
-        }
-        function formatuso(val, row, index) {
-            if(val > 0){
-                return '<a  href="javascript:void(0);"  onclick="lookuso(\''+row.userId+'\',\''+row.userEmail+'\')" >查看问卷</a>';
-            }else{
-                return val;
-
-            }
-        }
-
-        function formatOperation(val, row, index) {
-
-               var content=   '<a href="http://192.168.1.27:10004/helpServlet?action=writeNewEmail&className=EmailListServlet&userEmail='+row.userEmail+'&usname='+row.admname+'&uspassword='+row.password+'" target="_blank" >跟进</a>';
-
-            return content;
-        }
-        function formatCount(val, row, index) {
-            return '<a target="_blank" href="/cbtconsole/NewCustomersFollow/queryNewCustomByUserId?userEmail='+row.userEmail+'&userId=' +
-                row.userId + '" target="_blank" >'+val+'</a>';
-        }
 
     </script>
 </head>
-<body>
+<body style="background-color: #88997f;">
 <div id="user_remark" class="easyui-window"  title="问卷调查"
      data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
      style="width:800px;height:auto;display: none;font-size: 16px;">
@@ -320,24 +260,14 @@
 <table id="shop_marketing_easyui-datagrid" class="easyui-datagrid">
     <thead>
     <tr>
-        <th data-options="field:'adm',align:'center',width:'90px'">AdminName</th>
-        <th data-options="field:'jumpLink',width:'150px',formatter:formatUserId">Link</th>
-        <th data-options="field:'hasMsg',width:'150px',formatter:formatMsg">Message</th>
-       <!-- <th data-options="field:'userEmail',width:'150px'">用户Email</th>
-        <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
-        <th data-options="field:'site',align:'center',width:'80px',formatter:formatSite">网站</th>
-        <th data-options="field:'firstdiscount',align:'center',width:'80px',formatter:formatFirstdiscount">是否下单</th>
-        <th data-options="field:'usco',align:'center',width:'90px',formatter:formatuso">问卷</th>
-        <th data-options="field:'totalCatid',align:'center',width:'80px'">购物车商品种类</th>
-        <th data-options="field:'totalPrice',align:'center',width:'100px',formatter:formatMoney">购物车总金额</th>
-        <th data-options="field:'num',align:'center',width:'100px',formatter:formatCount">用户浏览商品次数</th>
-        <th data-options="field:'averagePrice',align:'center',width:'90px'">均价</th>
-        <th data-options="field:'lastAddCartTime',align:'center',width:'130px'">注册时间</th>
-        <th data-options="field:'saleName',align:'center',width:'90px'">销售</th>
-        <th data-options="field:'lastLoginTime',align:'center',width:'130px'">销售跟进时间</th>
-        &lt;!&ndash;<th data-options="field:'followAdminName',align:'center',width:'100px'">跟进人员</th>&ndash;&gt;
-        <th data-options="field:'followTime',align:'center',width:'130px'">购物车营销跟进时间</th>-->
-        <!--<th data-options="field:'opFlag',align:'center',width:'100px',formatter:formatOperation">操作</th>-->
+        <th data-options="field:'adm',align:'center',width:'10%'">AdminName</th>
+        <th data-options="field:'totalPrice',align:'center',width:'10%',formatter:formatTotal">总金额/$</th>
+        <th data-options="field:'totalNum',align:'center',width:'10%'">产品总数量</th>
+        <th data-options="field:'itemNum',align:'center',width:'10%'">产品量</th>
+        <th data-options="field:'jumpLink',align:'center',width:'20%',formatter:formatUserId">Customer&Link</th>
+        <th data-options="field:'hasMsg',align:'center',width:'20%',formatter:formatMsg">Message</th>
+        <th data-options="field:'userId',align:'center',width:'10%',formatter:formatSearch">Search History</th>
+        <th data-options="field:'country',align:'center',width:'10%'">用户国家</th>
     </tr>
     </thead>
     <tbody>
