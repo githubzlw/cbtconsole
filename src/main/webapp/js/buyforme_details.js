@@ -360,10 +360,12 @@ $(function(){
 	})
 	$(".btn-invalid").click(function(){
 		var id = $(this).parents(".sku-u-td").find(".lu_id").val();
+		var bfid = $("#query_bf_id").val();
 		jQuery.ajax({
 			url:"/cbtconsole/bf/invalid",
 			data:{
-				"id":id
+				"id":id,
+				"bfId":bfid
 			},
 			type:"post",
 			success:function(data){

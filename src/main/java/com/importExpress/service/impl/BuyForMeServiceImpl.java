@@ -132,7 +132,8 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     }
 
     @Override
-    public int updateOrderDetailsSkuState(int id, int state) {
+    public int updateOrderDetailsSkuState(int id, int state, int bfId) {
+        buyForMemapper.updateOrdersState(bfId, 1);
         return buyForMemapper.updateOrderDetailsSkuState(id, state);
     }
 

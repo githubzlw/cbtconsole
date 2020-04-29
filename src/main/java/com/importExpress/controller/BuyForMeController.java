@@ -169,10 +169,12 @@ public class BuyForMeController {
             String id = request.getParameter("id");
             String delete = request.getParameter("delete");
             int addOrderDetailsSku = 0;
+            String bfId = request.getParameter("bfid");
+            Assert.notNull(bfId, "bfId is null");
             if (StringUtils.isNotBlank(delete) && "1".equals(delete)) {
-                addOrderDetailsSku = buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id) ? Integer.parseInt(id) : 0, -1);
+                addOrderDetailsSku = buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id) ? Integer.parseInt(id) : 0, -1, Integer.parseInt(bfId));
             } else {
-                String bfId = request.getParameter("bfid");
+
                 String bfDetailsId = request.getParameter("bfdid");
                 String num = request.getParameter("num");
                 BFOrderDetailSku detailSku = new BFOrderDetailSku();
@@ -218,9 +220,11 @@ public class BuyForMeController {
         try {
 
             String id = request.getParameter("id");
+            String bfId = request.getParameter("bfId");
+            Assert.notNull(bfId,"bfId is null");
             int updateOrderDetailsSkuState =
-                    buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id) ? Integer.parseInt(id) : 0, 0);
-
+            buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id) ? Integer.parseInt(id) : 0, 0,
+                    Integer.parseInt(bfId));
             mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
         } catch (Exception e) {
             mv.put("state", 500);
