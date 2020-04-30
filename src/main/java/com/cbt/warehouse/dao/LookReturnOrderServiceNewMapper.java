@@ -103,4 +103,8 @@ public interface LookReturnOrderServiceNewMapper {
 	returndisplay FindOrderByTbid(@Param("tbId") String tbId);
     @Select("SELECT SUM(Return_number) from return_display WHERE tb_id=#{tbId}")
     int FindRetuByTbid(@Param("tbId") String tbId);
+    @Insert("INSERT INTO Only_refund (`1688_order`, `total_amount`, `Refund_people`, `refund_date`) VALUES (#{orid}, #{odmany}, #{admName}, now());")
+    void AddOnlyRefund(@Param("orid") String orid, @Param("odmany") Double odmany, @Param("admName") String admName);
+    @Select("SELECT COUNT(1) FROM only_refund WHERE 1688_order=#{orid}")
+	int findOrder(@Param("orid") String orid);
 }

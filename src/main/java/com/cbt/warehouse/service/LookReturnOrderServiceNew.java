@@ -55,4 +55,6 @@ public interface LookReturnOrderServiceNew {
 	List<returndisplay> FindAllByTborder(String tborder);
 
     EasyUiJsonResult AddOtherOrder(List<returndisplay> list, String admName);
+
+    EasyUiJsonResult AddOnlyRefund(String orid, Double odmany, String admName);
 }

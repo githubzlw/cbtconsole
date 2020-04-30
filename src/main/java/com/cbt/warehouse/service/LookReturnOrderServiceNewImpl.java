@@ -698,4 +698,25 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		return json;
 	}
 
+    @Override
+    public EasyUiJsonResult AddOnlyRefund(String orid, Double odmany, String admName) {
+        EasyUiJsonResult json=new EasyUiJsonResult();
+        try {
+            int tatol=this.lookReturnOrderServiceNewMapper.findOrder(orid);
+            if (tatol>0){
+                json.setRows(0);
+                json.setMessage("该订单已退过");
+                return json;
+            }
+            this.lookReturnOrderServiceNewMapper.AddOnlyRefund(orid,odmany,admName);
+            json.setRows(1);
+            json.setMessage("退货成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setRows(0);
+            json.setMessage("退货失败");
+        }
+        return json;
+    }
+
 }
