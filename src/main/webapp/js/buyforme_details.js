@@ -438,8 +438,15 @@ function bindClick(){
 		var unit = trp.find(".lu_unit").val();
 		var sku = trp.find(".lu_sku").val();
 		var weight = $(this).parents(".detail-div").find(".lu-weight").val();
+
 		if(num == '' || parseInt(num) < 1 || price == '' || priceBuy==''||priceBuyc==''||url==''||sku==''||unit==''||shipFeight==''){
 			$.MsgBox.Alert("提示", "请确认所填信息是否准确!");
+			return ;
+		}
+
+		var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
+		if (!reg.test(weight)) {
+			$.MsgBox.Alert("提示", "重量必须为正数，最多三位小数！");
 			return ;
 		}
 	    jQuery.ajax({
