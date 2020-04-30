@@ -8,7 +8,7 @@
 </style>
 
 
-<title>Buy for me</title>
+<title>BuyForMe详情</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet"
 	href="/cbtconsole/css/bootstrap/bootstrap.min.css">

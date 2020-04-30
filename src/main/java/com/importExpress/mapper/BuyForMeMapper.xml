@@ -190,7 +190,7 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
     <select id="querySearchList" parameterType="com.importExpress.pojo.BuyForMeSearchLog"
             resultType="com.importExpress.pojo.BuyForMeSearchLog">
         select id,search_type,search_content,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as
-        create_time,ip,user_id,session_id
+        create_time,ip,user_id,session_id,country as countryName
         from buyforme_search_log
         where 1=1
         <if test="create_time != null">
@@ -352,7 +352,7 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
     <select id="pidLogList" parameterType="com.importExpress.pojo.BuyForMePidLog"
             resultType="com.importExpress.pojo.BuyForMePidLog">
         select id,type,title,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as
-        create_time,pid,user_id,session_id,img_url
+        create_time,pid,user_id,session_id,img_url,ip
         from buyforme_pid_log
         where 1=1
         <if test="create_time != null">
@@ -367,7 +367,7 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         <if test="type > -1">
             and type = #{type}
         </if>
-        <if test="user_id != null">
+        <if test="user_id > 0">
             and user_id = #{user_id}
         </if>
         <if test="session_id != null">
@@ -396,12 +396,18 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         <if test="type > -1">
             and type = #{type}
         </if>
-        <if test="user_id != null">
+        <if test="user_id > 0">
             and user_id = #{user_id}
         </if>
         <if test="session_id != null">
             and session_id = #{session_id}
         </if>
     </select>
+
+    <update id="updateSearchLogCountry" parameterType="java.util.Collection">
+        <foreach collection="list" separator=";" item="item">
+            update buyforme_search_log set country = #{item.countryName} where ip = #{item.ip}
+        </foreach>
+    </update>
 
 </mapper>

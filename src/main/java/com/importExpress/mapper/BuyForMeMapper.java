@@ -4,6 +4,7 @@ import com.cbt.pojo.Admuser;
 import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -152,4 +153,6 @@ public interface BuyForMeMapper {
     List<BuyForMePidLog> pidLogList(BuyForMePidLog pidLog);
 
 	int pidLogListCount(BuyForMePidLog pidLog);
+
+	int updateSearchLogCountry(@Param("list") Collection<BuyForMeSearchLog> list);
 }

@@ -501,15 +501,15 @@ public class BuyForMeController {
             lstValues.clear();
             for (BFOrderDetailSku o : orderDetailsSku) {
                 lstValues.clear();
-                lstValues.add(o.getSku());
-                lstValues.add(o.getProductUrl());
+                lstValues.add(StringUtils.isBlank(o.getSku()) ? "" : o.getSku());
+                lstValues.add(StringUtils.isBlank(o.getProductUrl()) ? "" : o.getProductUrl());
                 lstValues.add(String.valueOf(o.getNum()));
-                lstValues.add(o.getPrice());
-                lstValues.add(o.getPriceBuy());
-                lstValues.add(o.getPriceBuyc());
-                lstValues.add(o.getShipFeight());
-                lstValues.add(o.getWeight());
-                lstValues.add(o.getUnit());
+                lstValues.add(StringUtils.isBlank(o.getPrice()) ? "0" : o.getPrice());
+                lstValues.add(StringUtils.isBlank(o.getPriceBuy()) ? "0" : o.getPriceBuy());
+                lstValues.add(StringUtils.isBlank(o.getPriceBuyc()) ? "0" : o.getPriceBuyc());
+                lstValues.add(StringUtils.isBlank(o.getShipFeight()) ? "0" : o.getShipFeight());
+                lstValues.add(StringUtils.isBlank(o.getWeight()) ? "0" : o.getWeight());
+                lstValues.add(StringUtils.isBlank(o.getUnit()) ? "" : o.getUnit());
                 lstValues.add(String.valueOf(o.getState()));
                 lstValues.add(String.valueOf(o.getId()));
                 String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(DBHelper.covertToSQL(sql1, lstValues)));
@@ -517,8 +517,8 @@ public class BuyForMeController {
                     lstValues.add(String.valueOf(o.getBfId()));
                     lstValues.add(String.valueOf(o.getBfDetailsId()));
                     lstValues.add(o.getNumIid());
-                    lstValues.add(o.getSkuid());
-                    lstValues.add(o.getRemark());
+                    lstValues.add(StringUtils.isBlank(o.getSkuid()) ? "0" : o.getSkuid());
+                    lstValues.add(StringUtils.isBlank(o.getRemark()) ? "" : o.getRemark());
                     lstValues.add(String.valueOf(o.getState()));
                     SendMQ.sendMsg(new RunSqlModel(DBHelper.covertToSQL(sql2, lstValues)));
                 }
@@ -1021,6 +1021,8 @@ public class BuyForMeController {
             }
             if (null != type && type > -1) {
                 pidLog.setType(type);
+            } else {
+                pidLog.setType(-1);
             }
             if (null != userId && userId > 0) {
                 pidLog.setUser_id(userId);

@@ -20,6 +20,7 @@ public class BuyForMePidLog {
     private int user_id;
     private String session_id;
     private String create_time;
+    private String ip;
 
     private String end_time;
     private int limitNum;

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,6 +32,8 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     private static com.cbt.common.UrlUtil instance = UrlUtil.getInstance();
     @Autowired
     private BuyForMeMapper buyForMemapper;
+
+    private Map<String, String> ipMap = new HashMap<>();
 
     @Override
     public List<BFOrderInfo> getOrders(Map<String, Object> map) {
@@ -271,31 +274,56 @@ public class BuyForMeServiceImpl implements BuyForMeService {
         List<BuyForMeSearchLog> buyForMeSearchLogs = buyForMemapper.querySearchList(searchLog);
 
         if (CollectionUtils.isNotEmpty(buyForMeSearchLogs)) {
-            Map<String, List<BuyForMeSearchLog>> listMap = buyForMeSearchLogs.stream().collect(Collectors.groupingBy(BuyForMeSearchLog::getIp));
+            Map<String, List<BuyForMeSearchLog>> listMap = buyForMeSearchLogs.stream().filter(e -> StringUtils.isBlank(e.getCountryName())).collect(Collectors.groupingBy(BuyForMeSearchLog::getIp));
+            if (null != listMap && listMap.size() > 0) {
+                Map<String, BuyForMeSearchLog> searchLogMap = new HashMap<>();
+                listMap.forEach((k, v) -> {
+                    if (StringUtils.isNotBlank(k)) {
+                        String ip = k;
+                        if (ip.contains("192.168") || ip.contains("127.0") || ip.contains("0:0:0:0:0:0:0:1")) {
+                            ip = "2.24.0.0";
+                        }
+                        if (ipMap.containsKey(ip)) {
+                            String data = ipMap.get(ip);
+                            v.forEach(cl -> cl.setCountryName(data));
+                            if (!searchLogMap.containsKey(ip)) {
+                                BuyForMeSearchLog tempLog = new BuyForMeSearchLog();
+                                tempLog.setIp(ip);
+                                tempLog.setCountryName(data);
+                                searchLogMap.put(ip, tempLog);
+                            }
+                        } else {
+                            String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "queryNameByIp?ip=" + ip);
+                            CommonResult commonResult = null;
+                            try {
+                                String requestUrl = url;
+                                JSONObject jsonObject = instance.doGet(requestUrl);
+                                commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                log.error("CartController refresh ", e);
+                            }
+                            if (null != commonResult && commonResult.getCode() == 200) {
+                                String data = (String) commonResult.getData();
+                                ipMap.put(ip, data);
+                                v.forEach(cl -> cl.setCountryName(data));
+                                if (!searchLogMap.containsKey(ip)) {
+                                    BuyForMeSearchLog tempLog = new BuyForMeSearchLog();
+                                    tempLog.setIp(ip);
+                                    tempLog.setCountryName(data);
+                                    searchLogMap.put(ip, tempLog);
+                                }
+                            }
+                        }
 
-            listMap.forEach((k, v) -> {
-                if (StringUtils.isNotBlank(k)) {
-                    String ip = k;
-                    if (ip.contains("192.168") || ip.contains("127.0") || ip.contains("0:0:0:0:0:0:0:1")) {
-                        ip = "2.24.0.0";
                     }
-                    String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "queryNameByIp?ip=" + ip);
-                    CommonResult commonResult = null;
-                    try {
-                        String requestUrl = url;
-                        JSONObject jsonObject = instance.doGet(requestUrl);
-                        commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        log.error("CartController refresh ", e);
-                    }
-                    if (null != commonResult && commonResult.getCode() == 200) {
-                        String data = (String) commonResult.getData();
-                        v.forEach(cl -> cl.setCountryName(data));
-                    }
+                });
+                listMap.clear();
+                if(searchLogMap.size() > 0){
+                    buyForMemapper.updateSearchLogCountry(searchLogMap.values());
+                    searchLogMap.clear();
                 }
-            });
-            listMap.clear();
+            }
         }
 
         return buyForMeSearchLogs;

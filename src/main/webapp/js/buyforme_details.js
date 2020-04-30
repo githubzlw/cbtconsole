@@ -385,6 +385,11 @@ $(function(){
 	$(".btn-weight").click(function(){
 		var bfdid = $(this).parents(".de-td").find(".bfdid").val();
 		var weight = $(this).parents(".rowweight").find(".lu-weight").val();
+		var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
+		if (!reg.test(weight)) {
+			$.MsgBox.Alert("提示", "重量必须为正数，最多三位小数！");
+			return ;
+		}
 		jQuery.ajax({
 			url:"/cbtconsole/bf/weight",
 			data:{
