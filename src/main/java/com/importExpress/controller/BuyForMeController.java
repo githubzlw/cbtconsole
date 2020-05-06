@@ -736,7 +736,7 @@ public class BuyForMeController {
 		statistic.setUserId(userId);
 		statistic.setStartNum(startNum);
 		statistic.setLimitNum(limitNum);
-		json = buyForMeService. queryCustomers(statistic);
+		json = buyForMeService.queryCustomers(statistic);
     	return json;
 	}
 	@GetMapping("/{userId}")

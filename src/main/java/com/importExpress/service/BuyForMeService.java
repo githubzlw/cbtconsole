@@ -25,7 +25,11 @@ public interface BuyForMeService {
 
     int addOrderDetailsSku(BFOrderDetailSku detailSku);
 
-    int updateOrderDetailsSkuState(int id, int state);
+    	/**更新sku状态
+	 * @param id
+	 * @return
+	 */
+	int updateOrderDetailsSkuState(int id,int state, int bfId);
 
     int finshOrder(int id);
 
@@ -64,7 +68,6 @@ public interface BuyForMeService {
     CommonResult putMsg(String userId, String itemid, String msg);
 
 	List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
-    List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
 
     int querySearchListCount(BuyForMeSearchLog searchLog);
 
