@@ -170,7 +170,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 	}
 
 	@Override
-	public EasyUiJsonResult UpdaeReturnOrder(String ship,String ch,String money) {
+	public EasyUiJsonResult UpdaeReturnOrder(String ship,String ch,String money,Double freight) {
 		// TODO Auto-generated method stub
 		EasyUiJsonResult json=new EasyUiJsonResult();
 		double moneyd=Double.parseDouble(money.replaceAll(" ",""));
@@ -179,7 +179,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 			ch="线下补发";
 			bo=this.lookReturnOrderServiceNewMapper.UpdaeReturnOrderCh(ship,ch);
 		}else {
-			bo = this.lookReturnOrderServiceNewMapper.UpdaeReturnOrder(ship,moneyd);
+			bo = this.lookReturnOrderServiceNewMapper.UpdaeReturnOrder(ship,moneyd,freight);
 		}
 		if(bo){
 			json.setRows(0);
@@ -708,7 +708,13 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
                 json.setMessage("该订单已退过");
                 return json;
             }
+			returndisplay re=new returndisplay();
             this.lookReturnOrderServiceNewMapper.AddOnlyRefund(orid,odmany,admName);
+            re.setA1688Order(orid);
+            re.setOptUser(admName);
+            re.setActual_money(odmany);
+            re.setReturntime(df.format(new Date()));
+            this.lookReturnOrderServiceNewMapper.AddOrder(re);
             json.setRows(1);
             json.setMessage("退货成功");
         } catch (Exception e) {

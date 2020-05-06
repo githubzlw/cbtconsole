@@ -220,8 +220,9 @@
             <th data-options="field:'returnReason',width:40,halign:'center'">退货原因</th>
             <th data-options="field:'returntime',width:30,align:'center'">退货时间</th>
             <th data-options="field:'optUser',width:20,align:'center'">采购人员</th>
-            <th data-options="field:'actual_money',width:20,align:'center'">采购录入金额</th>
+            <th data-options="field:'actual_money',width:20,align:'center'">采购录入退款金额</th>
             <%--<th data-options="field:'refund_money',width:20,align:'center'">1688抓取退货价格</th>--%>
+            <th data-options="field:'freight',width:50,align:'center'">公司承担运费</th>
             <%--<th data-options="field:'stateShow',width:50,align:'center'">操作</th>--%>
 
 

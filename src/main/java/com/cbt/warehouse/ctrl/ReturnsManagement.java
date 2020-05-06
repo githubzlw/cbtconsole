@@ -59,13 +59,13 @@ public class ReturnsManagement {
 }
 	@RequestMapping(value = "/UpdaeReturnOrder")
 	@ResponseBody
-	public EasyUiJsonResult UpdaeReturnOrder(HttpServletRequest request,HttpServletResponse response){
+	public EasyUiJsonResult UpdaeReturnOrder(@RequestParam(value = "freight",defaultValue = "0")Double freight,HttpServletRequest request,HttpServletResponse response){
 		 EasyUiJsonResult json=new EasyUiJsonResult();
 		String ship= request.getParameter("ship");
 		String ch= request.getParameter("ch");
 		String money= request.getParameter("money");
 		//System.err.println("运单号"+ship);
-		json=this.lookReturnOrderServiceNew.UpdaeReturnOrder(ship,ch,money);
+		json=this.lookReturnOrderServiceNew.UpdaeReturnOrder(ship,ch,money,freight);
 		 return json;
 	}
 	@RequestMapping(value = "/RemReturnOrder")//驳回订单操作
