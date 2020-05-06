@@ -1048,4 +1048,44 @@ public class BuyForMeController {
         }
     }
 
+
+    @RequestMapping("/updateCountryList")
+    @ResponseBody
+    public CommonResult updateCountryList() {
+        try {
+            int limitNum = 500;
+            BuyForMeSearchLog searchLog = new BuyForMeSearchLog();
+            int count = buyForMeService.querySearchListCount(searchLog);
+            int fc = 0;
+            if (count > 0) {
+                fc = count / limitNum;
+                if (fc % limitNum > 0) {
+                    fc++;
+                }
+                searchLog.setLimitNum(limitNum);
+                count = 0;
+                for (int i = 1; i <= fc; i++) {
+                    searchLog.setStartNum((i - 1) * limitNum);
+                    List<BuyForMeSearchLog> searchLogList = buyForMeService.querySearchList(searchLog);
+                    if (CollectionUtils.isNotEmpty(searchLogList)) {
+                        System.err.println("i/fc:" + i + "/" + fc + ", size:" + searchLogList.size());
+                        try {
+                            count += buyForMeService.updateSearchLogList(searchLogList);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            log.error("updateCountryList error:", e);
+                        }
+                    } else {
+                        System.err.println("i/fc:" + i + "/" + fc + ", size:0");
+                    }
+                }
+            }
+            return CommonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("updateCountryList error:", e);
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
 }

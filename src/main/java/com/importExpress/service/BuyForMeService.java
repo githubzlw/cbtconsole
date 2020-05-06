@@ -186,4 +186,11 @@ public interface BuyForMeService {
     List<BuyForMePidLog> pidLogList(BuyForMePidLog pidLog);
 
     int pidLogListCount(BuyForMePidLog pidLog);
+
+    /**
+     * 更新国家
+     * @param searchLogList
+     * @return
+     */
+    int updateSearchLogList(List<BuyForMeSearchLog> searchLogList);
 }

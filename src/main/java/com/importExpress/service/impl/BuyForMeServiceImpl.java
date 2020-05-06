@@ -274,56 +274,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
         List<BuyForMeSearchLog> buyForMeSearchLogs = buyForMemapper.querySearchList(searchLog);
 
         if (CollectionUtils.isNotEmpty(buyForMeSearchLogs)) {
-            Map<String, List<BuyForMeSearchLog>> listMap = buyForMeSearchLogs.stream().filter(e -> StringUtils.isBlank(e.getCountryName())).collect(Collectors.groupingBy(BuyForMeSearchLog::getIp));
-            if (null != listMap && listMap.size() > 0) {
-                Map<String, BuyForMeSearchLog> searchLogMap = new HashMap<>();
-                listMap.forEach((k, v) -> {
-                    if (StringUtils.isNotBlank(k)) {
-                        String ip = k;
-                        if (ip.contains("192.168") || ip.contains("127.0") || ip.contains("0:0:0:0:0:0:0:1")) {
-                            ip = "2.24.0.0";
-                        }
-                        if (ipMap.containsKey(ip)) {
-                            String data = ipMap.get(ip);
-                            v.forEach(cl -> cl.setCountryName(data));
-                            if (!searchLogMap.containsKey(ip)) {
-                                BuyForMeSearchLog tempLog = new BuyForMeSearchLog();
-                                tempLog.setIp(ip);
-                                tempLog.setCountryName(data);
-                                searchLogMap.put(ip, tempLog);
-                            }
-                        } else {
-                            String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "queryNameByIp?ip=" + ip);
-                            CommonResult commonResult = null;
-                            try {
-                                String requestUrl = url;
-                                JSONObject jsonObject = instance.doGet(requestUrl);
-                                commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                log.error("CartController refresh ", e);
-                            }
-                            if (null != commonResult && commonResult.getCode() == 200) {
-                                String data = (String) commonResult.getData();
-                                ipMap.put(ip, data);
-                                v.forEach(cl -> cl.setCountryName(data));
-                                if (!searchLogMap.containsKey(ip)) {
-                                    BuyForMeSearchLog tempLog = new BuyForMeSearchLog();
-                                    tempLog.setIp(ip);
-                                    tempLog.setCountryName(data);
-                                    searchLogMap.put(ip, tempLog);
-                                }
-                            }
-                        }
-
-                    }
-                });
-                listMap.clear();
-                if(searchLogMap.size() > 0){
-                    buyForMemapper.updateSearchLogCountry(searchLogMap.values());
-                    searchLogMap.clear();
-                }
-            }
+            setCountryName(buyForMeSearchLogs);
         }
 
         return buyForMeSearchLogs;
@@ -395,6 +346,15 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     }
 
     @Override
+    public int updateSearchLogList(List<BuyForMeSearchLog> searchLogList) {
+
+        if (CollectionUtils.isNotEmpty(searchLogList)) {
+            return setCountryName(searchLogList);
+        }
+        return 0;
+    }
+
+    @Override
     public int cancelOrders(int id) {
         int update = buyForMemapper.updateOrderAllState(id);
         if (update > 0) {
@@ -407,5 +367,74 @@ public class BuyForMeServiceImpl implements BuyForMeService {
         return update;
     }
 
+
+    private int setCountryName(List<BuyForMeSearchLog> buyForMeSearchLogs) {
+
+        int count = 0;
+        // 获取已经读取到的IP信息，放入内存中
+        List<BuyForMeSearchLog> readList = buyForMeSearchLogs.stream().filter(e -> StringUtils.isNotBlank(e.getCountryName())).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(readList)) {
+            readList.forEach(e -> {
+                if (!ipMap.containsKey(e.getIp())) {
+                    ipMap.put(e.getIp(), e.getCountryName());
+                }
+            });
+            readList.clear();
+        }
+
+        Map<String, List<BuyForMeSearchLog>> listMap = buyForMeSearchLogs.stream().filter(e -> StringUtils.isBlank(e.getCountryName())).collect(Collectors.groupingBy(BuyForMeSearchLog::getIp));
+        if (null != listMap && listMap.size() > 0) {
+            Map<String, BuyForMeSearchLog> searchLogMap = new HashMap<>();
+            listMap.forEach((k, v) -> {
+                if (StringUtils.isNotBlank(k)) {
+                    String ip = k;
+                    if (ip.contains("192.168") || ip.contains("127.0") || ip.contains("0:0:0:0:0:0:0:1")) {
+                        ip = "2.24.0.0";
+                    }
+                    if (ipMap.containsKey(ip)) {
+                        String data = ipMap.get(ip);
+                        v.forEach(cl -> cl.setCountryName(data));
+                        if (!searchLogMap.containsKey(ip)) {
+                            BuyForMeSearchLog tempLog = new BuyForMeSearchLog();
+                            tempLog.setIp(ip);
+                            tempLog.setCountryName(data);
+                            searchLogMap.put(ip, tempLog);
+                        }
+                    } else {
+                        String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "queryNameByIp?ip=" + ip);
+                        CommonResult commonResult = null;
+                        try {
+                            String requestUrl = url;
+                            JSONObject jsonObject = instance.doGet(requestUrl);
+                            commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            log.error("CartController refresh ", e);
+                        }
+                        if (null != commonResult && commonResult.getCode() == 200) {
+                            String data = (String) commonResult.getData();
+                            System.err.println(ip + "->" + data);
+                            ipMap.put(ip, data);
+                            v.forEach(cl -> cl.setCountryName(data));
+                            if (!searchLogMap.containsKey(ip)) {
+                                BuyForMeSearchLog tempLog = new BuyForMeSearchLog();
+                                tempLog.setIp(ip);
+                                tempLog.setCountryName(data);
+                                searchLogMap.put(ip, tempLog);
+                            }
+                        }
+                    }
+
+                }
+            });
+            listMap.clear();
+            count = searchLogMap.size();
+            if (count > 0) {
+                buyForMemapper.updateSearchLogCountry(searchLogMap.values());
+                searchLogMap.clear();
+            }
+        }
+        return count;
+    }
 
 }
