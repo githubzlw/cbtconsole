@@ -314,4 +314,35 @@ public class ReturnsManagement {
 		}
 		return json;
 	}
+	@RequestMapping("/Lookstatement")
+	@ResponseBody
+	public EasyUiJsonResult Lookstatement(HttpServletRequest request,HttpServletResponse response){
+		String admJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
+		String users = user.getAdmName();
+		EasyUiJsonResult json=new EasyUiJsonResult();
+		String optTimeStart=request.getParameter("optTimeStart");
+		String optTimeEnd=request.getParameter("optTimeEnd");
+		String applyUser=request.getParameter("location_type");
+		int page = Integer.parseInt(request.getParameter("page"));
+		if (page > 0) {
+			page = (page - 1) * 40;
+		}
+		json=this.lookReturnOrderServiceNew.Lookstatement(optTimeStart,optTimeEnd,applyUser,page);
+        request.setAttribute("tatolmaney",json.getMessage());
+		return json;
+	}
+	@RequestMapping("/gettatolmaney")
+	@ResponseBody
+	public Double gettatolmaney(HttpServletRequest request,HttpServletResponse response){
+		String admJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
+		String users = user.getAdmName();
+		EasyUiJsonResult json=new EasyUiJsonResult();
+		String optTimeStart=request.getParameter("optTimeStart");
+		String optTimeEnd=request.getParameter("optTimeEnd");
+		String applyUser=request.getParameter("location_type");
+		Double tatolmaney=this.lookReturnOrderServiceNew.gettatolmaney(optTimeStart,optTimeEnd,applyUser);
+		return tatolmaney;
+	}
 }
