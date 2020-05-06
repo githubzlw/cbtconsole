@@ -188,31 +188,60 @@ public class UrlUtil {
 	    public JSONObject doPost(String url, Map<String,Object> params) throws IOException {
 	        FormBody.Builder builder = addParamToBuilder(params);
 	        FormBody body = builder.build();
-	        Request request = new Request.Builder()
+	        Request request = new Request.Builder().addHeader("Accept","*/*")
+					.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
 	                .url(url)
 	                .post(body)
 	                .build();
-	        // Create a new Call object with delete method.
-	        Response response = client.newCall(request).execute();
-	        if (!response.isSuccessful()) {
-	            log.error("url:[{}]",url);
-	            throw new IOException("response is not successful");
-	        }
-	        return response.body() != null ?
-	                JSON.parseObject(response.body().string()) : null;
+	        return executeCall(url, request);
 	    }
 	    public JSONObject doGet(String url) throws IOException {
-	        Request request = new Request.Builder()
-	                .url(url)
-	                .get()
-	                .build();
-	        // Create a new Call object with delete method.
-	        Response response = client.newCall(request).execute();
-	        if (!response.isSuccessful()) {
-	            log.error("url:[{}]",url);
-	            throw new IOException("response is not successful");
-	        }
-	        return response.body() != null ?
-	                JSON.parseObject(response.body().string()) : null;
+			Request request = new Request.Builder().addHeader("Accept","*/*")
+					.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+					.url(url)
+					.get()
+					.build();
+
+			return executeCall(url, request);
 	    }
+	/**
+	 * call url by retry times
+	 * @param url
+	 * @param request
+	 * @return
+	 * @throws IOException
+	 */
+	private JSONObject executeCall(String url, Request request) throws IOException {
+		Response response =null;
+		try{
+			response = client.newCall(request).execute();
+		}catch(IOException ioe){
+			//重试15次（每次1秒）
+			try {
+				int count=0;
+				while(true){
+					Thread.sleep(1000);
+					try {
+						response = client.newCall(request).execute();
+					} catch (IOException e) {
+						log.warn("do retry ,times=[{}]",count);
+					}
+					if(count>15){
+						break;
+					}
+					++count;
+				}
+			} catch (InterruptedException e) {
+			}
+		}
+
+		if (response==null || !response.isSuccessful()) {
+			log.error("url:[{}]", url);
+			throw new IOException("call url is not successful");
+		}
+
+		return response.body() != null ?
+				JSON.parseObject(response.body().string()) : null;
+	}
+
 }

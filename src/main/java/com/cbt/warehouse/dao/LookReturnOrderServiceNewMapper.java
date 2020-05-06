@@ -20,8 +20,8 @@ public interface LookReturnOrderServiceNewMapper {
 	List<returndisplay> FindReturndisplay(@Param("nameString")String nameString, @Param("state")String state,
 			@Param("a1688Shipno")String a1688Shipno, @Param("optTimeStart")String optTimeStart, @Param("optTimeEnd")String optTimeEnd,@Param("page")int page,@Param("userOther")String userOther,@Param("user")String user,@Param("a1688order")String a1688order,@Param("pid")String pid,@Param("skuid")String skuid);
 
-	@Update("UPDATE return_display SET State=0,returntime=NOW(),actual_money=#{money} WHERE id=#{ship} ")
-	Boolean UpdaeReturnOrder(@Param("ship")String ship,@Param("money") double money);
+	@Update("UPDATE return_display SET State=0,returntime=NOW(),actual_money=#{money},freight=#{freight} WHERE id=#{ship} ")
+	Boolean UpdaeReturnOrder(@Param("ship")String ship,@Param("money") double money,@Param("freight")double freight);
 
 	@Delete("UPDATE return_display set reason=#{cusorder},return_number=0,State=5,returntime=NOW() where id=#{ship}")
 	Boolean RemReturnOrder(@Param("ship")String ship,@Param("cusorder") String cusorder);
@@ -47,8 +47,8 @@ public interface LookReturnOrderServiceNewMapper {
 			"ir.orderid=#{cusorder} and ir.itemid=#{pid} LIMIT 1")
 	returndisplay FindReturndisplayBypid(@Param("cusorder")String orid,@Param("pid")String pid);
     
-    @Insert("INSERT INTO `return_display` (`customer_info`, `1688_order`, `1688_shipno`, `item`, `item_number`, `apply_user`, `apply_time`,`opt_user`,`State`,`return_reason`, `barcode`, `return_number`, `tb_id`, `sku`) VALUES (#{re.customerorder}, #{re.a1688Order}, #{re.a1688Shipno}, #{re.item}, #{re.itemNumber}, "
-    		+ "#{re.applyUser}, #{re.applyTime},#{re.optUser},#{re.State}, #{re.returnReason}, #{re.barcode}, #{re.returnNumber},#{re.tbId},#{re.sku});")
+    @Insert("INSERT INTO `return_display` (`customer_info`, `1688_order`, `1688_shipno`, `item`, `item_number`, `apply_user`, `apply_time`,`opt_user`,`State`,`return_reason`, `barcode`, `return_number`, `tb_id`, `sku`,`returntime`,`actual_money`) VALUES (#{re.customerorder}, #{re.a1688Order}, #{re.a1688Shipno}, #{re.item}, #{re.itemNumber}, "
+    		+ "#{re.applyUser}, #{re.applyTime},#{re.optUser},#{re.State}, #{re.returnReason}, #{re.barcode}, #{re.returnNumber},#{re.tbId},#{re.sku},#{re.returntime},#{re.actual_money});")
 	Boolean AddOrder(@Param("re")returndisplay re);
 
 	@Select("SELECT distinct orderid as a1688Order,orderdate as placeDate,itemid as item,seller as sellerpeo,SUM(itemqty) as itemNumber,shipno as a1688Shipno,username as optUser,delivery_date as signtime "
@@ -103,4 +103,18 @@ public interface LookReturnOrderServiceNewMapper {
 	returndisplay FindOrderByTbid(@Param("tbId") String tbId);
     @Select("SELECT SUM(Return_number) from return_display WHERE tb_id=#{tbId}")
     int FindRetuByTbid(@Param("tbId") String tbId);
+    @Insert("INSERT INTO Only_refund (`1688_order`, `total_amount`, `Refund_people`, `refund_date`) VALUES (#{orid}, #{odmany}, #{admName}, now());")
+    void AddOnlyRefund(@Param("orid") String orid, @Param("odmany") Double odmany, @Param("admName") String admName);
+    @Select("SELECT COUNT(1) FROM only_refund WHERE 1688_order=#{orid}")
+	int findOrder(@Param("orid") String orid);
+
+	List<returndisplay> Lookstatement(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
+
+	int LookstatementCount(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
+
+	List<returndisplay> LookstatementOnly(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
+
+	int LookstatementOnlyCount(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
+
+	double LookstatementManey(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
 }

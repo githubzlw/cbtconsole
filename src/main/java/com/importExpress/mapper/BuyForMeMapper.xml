@@ -65,21 +65,21 @@
         <result column="country" property="country" jdbcType="VARCHAR"/>
     </resultMap>
 
-    <select id="getOrders" resultMap="infoResultMap">
-        select a.id,a.order_no,a.user_id,a.state,a.pay_price,a.product_cost,a.delivery_time,
-        a.address_id,a.create_time,a.update_time,a.admin_id,a.ip,a.remark,a.ship_feight,a.delivery_method,
-        b.admName,
-        (select email from user where id=a.user_id limit 1) email,
-        (select z.country from buyforme_address d left join zone z on d.country=z.id where d.id=a.address_id) country
-        from buyforme_orderinfo a left join admin_r_user b on a.user_id=b.userid
-        where 1=1
-        <if test="state !=-2">and a.state=#{state}</if>
-        <if test="orderNo !=null">and a.order_no=#{orderNo}</if>
-        <if test="userId !=null">and a.user_id=#{userId}</if>
-        <if test="admid !=0">and a.admin_id=#{admid}</if>
-        order by a.create_time desc
-        limit #{page},30
-    </select>
+  <select id="getOrders" resultMap="infoResultMap">
+  select a.id,a.order_no,a.user_id,a.state,a.pay_price,a.product_cost,a.delivery_time,
+  a.address_id,a.create_time,a.update_time,a.admin_id,a.ip,a.remark,a.ship_feight,a.delivery_method,
+  b.admName,
+  (select email from user where id=a.user_id limit 1) email,
+(select z.country from buyforme_address d left join zone z on d.country=z.id where d.id=a.address_id) country
+  from buyforme_orderinfo a  left join admin_r_user b on a.user_id=b.userid
+  where 1=1
+  <if test="state !=-2">and a.state=#{state}</if>
+  <if test="orderNo !=null">and a.order_no=#{orderNo}</if>
+  <if test="userId !=null">and a.user_id=#{userId}</if>
+  <if test="admid !=0">and b.adminid=#{admid}</if>
+  order by a.create_time desc
+  limit #{page},30
+  </select>
 
     <select id="getOrdersCount" resultType="Integer">
         select count(*) from buyforme_orderinfo b left join admin_r_user a on b.user_id=a.userid where 1=1
@@ -404,6 +404,9 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         </if>
     </select>
 
+    <select id="queryAllOrderUnPay"  resultType="String">
+        select user_id from buyforme_orderinfo where state in (0,1,2)
+    </select>
     <update id="updateSearchLogCountry" parameterType="java.util.Collection">
         <foreach collection="list" separator=";" item="item">
             update buyforme_search_log set country = #{item.countryName} where ip = #{item.ip}

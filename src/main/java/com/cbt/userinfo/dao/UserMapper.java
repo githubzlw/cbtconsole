@@ -103,5 +103,5 @@ public interface UserMapper {
 	List<UserInfo> queryBusinessMembershipAuthorization(UserInfo userInfo);
 
 	int queryBusinessMembershipAuthorizationCount(UserInfo userInfo);
-
+	Map<String,String> queryAdmByUser(@Param("userId")String userId);
 }

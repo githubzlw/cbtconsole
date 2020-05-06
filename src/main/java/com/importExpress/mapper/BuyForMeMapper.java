@@ -68,62 +68,53 @@ public interface BuyForMeMapper {
     List<BFOrderDetailSku> getOrderDetailsSku(String bfId);
 
 
-    /**
-     * @param detailSku
-     * @return
-     */
-    int addOrderDetailsSku(BFOrderDetailSku detailSku);
+	/**
+	 * @param detailSku
+	 * @return
+	 */
+	int addOrderDetailsSku(BFOrderDetailSku detailSku);
+	
+	/**
+	 * @param detailSku
+	 * @return
+	 */
+	int updateOrderDetailsSku(BFOrderDetailSku detailSku);
+	
+	Map<String,Object> getOrder(String orderNo);
+	
+	List<Admuser> lstAdms();
 
-    /**
-     * @param detailSku
-     * @return
-     */
-    int updateOrderDetailsSku(BFOrderDetailSku detailSku);
+	int updateOrderDetailsSkuWeight(@Param("weight")String weight,@Param("bfdid")int bfdid);
 
-    Map<String, Object> getOrder(String orderNo);
+	int updateDeliveryTime(@Param("orderNo")String orderNo,@Param("time")String time,@Param("feight")String feight,@Param("method")String method);
+	int insertRemark(@Param("orderNo")String orderNo,@Param("remark")String remark);
+	List<Map<String,String>> getRemark(String orderNo);
 
-    List<Admuser> lstAdms();
+	List<Map<String,String>> getTransport();
+	/**修改地址
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int updateOrdersAddress(Map<String,String> map);
 
-    int updateOrderDetailsSkuWeight(@Param("weight") String weight, @Param("bfdid") int bfdid);
+	List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
 
-    int updateDeliveryTime(@Param("orderNo") String orderNo, @Param("time") String time, @Param("feight") String feight, @Param("method") String method);
+	int querySearchListCount(BuyForMeSearchLog searchLog);
 
-    int insertRemark(@Param("orderNo") String orderNo, @Param("remark") String remark);
+	/**删除商品
+	 * @param id
+	 * @param remark
+	 * @return
+	 */
+	int deleteProduct(int bfdid);
 
-    List<Map<String, String>> getRemark(String orderNo);
+	/**国家列表
+	 * @return
+	 */
+	List<ZoneBean> lstCountry();
 
-    List<Map<String, String>> getTransport();
-
-    /**
-     * 修改地址
-     *
-     * @param id
-     * @param remark
-     * @return
-     */
-    int updateOrdersAddress(Map<String, String> map);
-
-    List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
-
-    int querySearchListCount(BuyForMeSearchLog searchLog);
-
-    /**
-     * 删除商品
-     *
-     * @param id
-     * @param remark
-     * @return
-     */
-    int deleteProduct(int bfdid);
-
-    /**
-     * 国家列表
-     *
-     * @return
-     */
-    List<ZoneBean> lstCountry();
-
-    int updateOrderAllState(int id);
+	int updateOrderAllState(int id);
 
     int insertBFChat(BFChat bfChat);
 
@@ -155,4 +146,6 @@ public interface BuyForMeMapper {
 	int pidLogListCount(BuyForMePidLog pidLog);
 
 	int updateSearchLogCountry(@Param("list") Collection<BuyForMeSearchLog> list);
+
+	List<String> queryAllOrderUnPay();
 }

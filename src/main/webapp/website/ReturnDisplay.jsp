@@ -307,9 +307,10 @@ function returnApply(page){
 
     var ship= $('#field＿name').val();
     var money=$('#money').val();
+    var freight=$('#freight').val();
     var url ="/cbtconsole/Look/UpdaeReturnOrder";
     var data = {
-        "ship":ship,"ch":ch,money:money
+        ship:ship,ch:ch,money:money,freight:freight
     }
     $.ajax(
         {
@@ -387,7 +388,7 @@ function rejectedok(page) {
 			是否退钱：
 			<input type='radio' size='5' name='radioname' value='0' id='c' />是
 			<input type='radio' size='5' name='radioname' value='1' id='c' />否
-			<br/>退款金额：<input id="money" type="text">
+			<br/>退款金额：<input id="money" type="text"><br/>公司承担运费金额：<input id="freight" type="text">
 		</div>
 	<div style="margin:20px 0 20px 40px;">
 		<a href="javascript:void(0)" class="easyui-linkbutton"
@@ -447,6 +448,7 @@ function rejectedok(page) {
 				<input class="but_color" type="button" value="查询" onclick="doQuery(1)">
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
 			</form>
+			<div style="text-align: right"><a style="font-size: 15px;color: red" target="_blank" href="statements.jsp">简易对账单</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<div style="text-align: right"><a style="font-size: 15px;color: red" target="_blank" href="/cbtconsole/Look/FindOtherOrder">特殊订单处理</a></div>
 		</div>
 		

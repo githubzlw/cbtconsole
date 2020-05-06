@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>buyforme 购物车列表</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #shop_marketing_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #shop_marketing_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 16px;
+        }
+
+        .datagrid-row{
+            height: 26px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 90px;
+            height: 28px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+
+        .combobox-item{
+            font-size: 14px !important;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setDatagrid();
+            queryAllCountry();
+            getAdminList();
+            loadWebSize();
+        });
+        function blink(){
+            var color="#f00|#0f0|#00f|#880|#808|#088|yellow|green|blue|gray";
+            color=color.split("|");
+            $(".blink").css('color',color[parseInt(Math.random()*color.length)]);
+        }
+        setInterval("blink()",200);
+        function setDatagrid() {
+            $('#shop_marketing_easyui-datagrid').datagrid({
+                title: 'buyforme 购物车列表',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#shop_marketing_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/bf/queryCustomers',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 10,//默认选择的分页是每页50行数据
+                pageList: [1,5,10,20],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.messager.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                       // $.messager.alert(data.message);
+                    }
+                }
+            });
+        }
+
+        function queryAllCountry() {
+            $('#query_country_id').combobox({
+                url:'/cbtconsole/shopCarMarketingCtr/queryAllCountry',
+                valueField:'id',
+                textField:'country'
+            });
+        }
+
+        function doQuery() {
+            var userId = $("#query_user_id").val();
+            var adminId = $("#query_admin_id").val();
+            $("#shop_marketing_easyui-datagrid").datagrid("load", {
+                "userId": userId,
+                "adminId": adminId
+            });
+        }
+
+        function doResetForm() {
+            $("#shop_marketing_query_form")[0].reset();
+        }
+
+        function getAdminList() {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/NewCustomersFollow/queryAllSale",
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#query_admin_id").empty();
+                        $("#query_follow_id").empty();
+                        var content = '<option value="0" selected="selected">全部</option>';
+                        var json = data.data;
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<option value="' + json[i].confirmusername + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                        $("#query_admin_id").append(content);
+                        $("#query_follow_id").append(content);
+                    } else {
+                        console.log("获取用户列表失败，原因 :" + data.message);
+                    }
+                },
+                error: function (res) {
+                    console.log("网络获取失败");
+                }
+            });
+        }
+
+        function loadWebSize() {
+            $.ajax({
+                type: 'POST',
+                url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
+                data: {},
+                success: function (json) {
+                    if (json.ok) {
+                        var data = json.data;
+                        var content = '<option value="-1">全部</option>';
+                        for(var key in data){
+                            content += '<option value="'+key+'">'+data[key]+'</option>'
+                        }
+                        $("#web_size_type").empty();
+                        $("#web_size_type").append(content);
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
+
+        function formatUserId(val, row, index) {
+            var tourist=val;
+            if (isNaN(val)){
+                tourist='游客';
+                return '<a  href="/cbtconsole/bf/' + val + '">' + tourist + '</a>';
+            }else {
+
+                return '<a  href="/cbtconsole/bf/' + val + '">' + tourist + '</a>';;
+
+            }
+        }
+        function formatTotal(val, row, index) {
+            var total = val;
+            return '<span>'+ total +' $</span>';
+        }
+        function formatSearch(val, row, index) {
+            return '<a  href="/cbtconsole/apa/buyForMeSearchLog.html?userId=' + val + '">Search Log</a>';
+        }
+        function formatMsg(val, row, index) {
+            var msg = "没有新消息！"
+            if (val){
+                msg = '有新消息了！'
+                return '<span  class="blink" style="display: inline-block;overflow: hidden;word-break: keep-all;white-space: nowrap;text-overflow: ellipsis;line-height: 28px;float: left;" >' + msg + '</span>';
+            }else {
+                return '<span>' + msg + '</span>';
+            }
+
+        }
+
+    </script>
+</head>
+<body style="background-color: #88997f;">
+<div id="user_remark" class="easyui-window"  title="问卷调查"
+     data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+     style="width:800px;height:auto;display: none;font-size: 16px;">
+    <div id="sediv" style="margin-left:20px;text-align:center">
+
+         <div >
+             <div style="display:inline">用户id：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><div style="display:inline"><input id="cusid" type="text"></div>
+         </div>
+        <div>
+            <div style="display:block">用户email：</div><div style="display:inline"><input id="cusemail" type="text"></div>
+        </div>
+        <div>
+            <div style="display:block">用户名：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><div style="display:inline"><input id="cusname" type="text"></div>
+        </div>
+        <div>
+            <div style="display:block">创建时间：&nbsp;&nbsp;</div><div style="display:inline"><input id="custime" type="text"></div>
+        </div>
+        <br/>
+        <div>
+            <div style="display:block">用户选择的感兴趣Business Services：</div>
+            <div ><textarea name="reworkmesB"  id="reworkmesB"  cols="40"   rows="5"   style="OVERFLOW:   hidden"></textarea></div>
+        </div>
+
+        <br/>
+        <div>
+            <div style="display:block">用户其它的留言要求：</div>
+            <div ><textarea name="reworkmesY"  id="reworkmesY"  cols="40"   rows="8"   style="OVERFLOW:   hidden"></textarea></div>
+        </div>
+
+    </div>
+</div>
+<div id="shop_marketing_toolbar" style="padding: 5px; height: auto">
+    <form id="shop_marketing_query_form" action="#" onsubmit="return false;">
+
+        <span>客户ID:<input id="query_user_id" type="text" value="" style="width: 100px;height: 22px;"/></span>
+        <span>销售: <select id="query_admin_id"
+                                                          style="font-size: 16px; height: 26px; width: 90px;">
+					<option value="-1" selected="selected">全部</option>
+            </select></span>&nbsp;&nbsp;
+        <!--<span>跟进人: <select id="query_follow_id"-->
+                                                           <!--style="font-size: 16px; height: 26px; width: 90px;">-->
+                        <!--<option value="-1" selected="selected">全部</option>-->
+			<!--</select>-->
+    <!--</span>&nbsp;&nbsp;-->
+        <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
+        <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
+
+    </form>
+
+</div>
+
+<table id="shop_marketing_easyui-datagrid" class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'adm',align:'center',width:'10%'">AdminName</th>
+        <th data-options="field:'totalPrice',align:'center',width:'10%',formatter:formatTotal">总金额/$</th>
+        <th data-options="field:'totalNum',align:'center',width:'10%'">产品总数量</th>
+        <th data-options="field:'itemNum',align:'center',width:'10%'">产品量</th>
+        <th data-options="field:'jumpLink',align:'center',width:'20%',formatter:formatUserId">Customer&Link</th>
+        <th data-options="field:'hasMsg',align:'center',width:'20%',formatter:formatMsg">Message</th>
+        <th data-options="field:'userId',align:'center',width:'10%',formatter:formatSearch">Search History</th>
+        <th data-options="field:'country',align:'center',width:'10%'">用户国家</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>
