@@ -15,6 +15,7 @@ import com.cbt.website.util.UploadByOkHttp;
 import com.google.gson.Gson;
 import com.importExpress.pojo.*;
 import lombok.NonNull;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.common.aliasing.qual.LeakedToResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -636,7 +637,7 @@ public class BuyForMeController {
     @RequestMapping("/searchList")
     @ResponseBody
     public JsonResult searchList(HttpServletRequest request, String beginTime, String endTime, Integer searchType,
-                                 Integer page, Integer rows) {
+                                 Integer userId, String sessionId, Integer page, Integer rows) {
         JsonResult json = new JsonResult();
         try {
             BuyForMeSearchLog searchLog = new BuyForMeSearchLog();
@@ -653,11 +654,16 @@ public class BuyForMeController {
             }
             if (StringUtils.isNotBlank(endTime)) {
                 LocalDate today = LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                today.plusDays(1);
-                searchLog.setEnd_time(today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                searchLog.setEnd_time(today.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             }
-            if (searchType != null && searchType > 0) {
+            if (null != searchType && searchType > 0) {
                 searchLog.setSearch_type(searchType);
+            }
+            if (null != userId && userId > 0) {
+                searchLog.setUser_id(userId);
+            }
+            if (StringUtils.isNotBlank(sessionId)) {
+                searchLog.setSession_id(sessionId);
             }
 
             int total = buyForMeService.querySearchListCount(searchLog);
@@ -749,5 +755,44 @@ public class BuyForMeController {
 		CommonResult commonResult = buyForMeService.putMsg(userId, itemid, msg);
 		return commonResult;
 	}
+
+	@RequestMapping("/updateCountryList")
+    @ResponseBody
+    public CommonResult updateCountryList() {
+        try {
+            int limitNum = 500;
+            BuyForMeSearchLog searchLog = new BuyForMeSearchLog();
+            int count = buyForMeService.querySearchListCount(searchLog);
+            int fc = 0;
+            if (count > 0) {
+                fc = count / limitNum;
+                if (fc % limitNum > 0) {
+                    fc++;
+                }
+                searchLog.setLimitNum(limitNum);
+                count = 0;
+                for (int i = 1; i <= fc; i++) {
+                    searchLog.setStartNum((i - 1) * limitNum);
+                    List<BuyForMeSearchLog> searchLogList = buyForMeService.querySearchList(searchLog);
+                    if (CollectionUtils.isNotEmpty(searchLogList)) {
+                        System.err.println("i/fc:" + i + "/" + fc + ", size:" + searchLogList.size());
+                        try {
+                            count += buyForMeService.updateSearchLogList(searchLogList);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            log.error("updateCountryList error:", e);
+                        }
+                    } else {
+                        System.err.println("i/fc:" + i + "/" + fc + ", size:0");
+                    }
+                }
+            }
+            return CommonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("updateCountryList error:", e);
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 
 }

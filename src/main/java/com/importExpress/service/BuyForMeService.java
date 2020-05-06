@@ -64,4 +64,11 @@ public interface BuyForMeService {
 
 	int querySearchListCount(BuyForMeSearchLog searchLog);
 
+	/**
+     * 更新国家
+     * @param searchLogList
+     * @return
+     */
+    int updateSearchLogList(List<BuyForMeSearchLog> searchLogList);
+
 }

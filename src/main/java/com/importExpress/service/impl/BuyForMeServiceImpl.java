@@ -11,8 +11,10 @@ import com.cbt.util.GetConfigureInfo;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.google.gson.Gson;
+import com.importExpress.service.BuyForMeService;
 import com.importExpress.utli.UrlUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.impl.jam.mutable.MPackage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ import com.importExpress.utli.SendMQ;
 
 @Service
 @Slf4j
-public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeService {
+public class BuyForMeServiceImpl implements BuyForMeService {
 
 	private static final String getFreightCostUrl = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
 
@@ -40,6 +42,9 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
 	private BuyForMeMapper buyForMemapper;
 	@Autowired
     UserMapper userMapper;
+
+	private Map<String, String> ipMap = new HashMap<>();
+
     @Override
     public List<BFOrderInfo> getOrders(Map<String, Object> map) {
         List<BFOrderInfo> orders = buyForMemapper.getOrders(map);
@@ -252,31 +257,24 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
     @Override
     public List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog) {
         List<BuyForMeSearchLog> buyForMeSearchLogs = buyForMemapper.querySearchList(searchLog);
-        buyForMeSearchLogs.stream().forEach(buyForMeSearchLog ->{
-            String ip = buyForMeSearchLog.getIp();
-            if(ip.indexOf("192.168")>-1|| ip.indexOf("127.0")>-1){
-                ip = "2.24.0.0";
-            }
-             String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","queryNameByIp?ip="+ip);
-            CommonResult commonResult =null;
-            try {
-                String requestUrl = url;
-                JSONObject jsonObject = instance.doGet(requestUrl);
-                commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
-            } catch (IOException e) {
-                log.error("CartController refresh ",e);
-            }
-            if(commonResult.getCode() == 200){
-                String data = (String) commonResult.getData();
-                buyForMeSearchLog.setCountryName(data);
-            }
-            });
+        if (CollectionUtils.isNotEmpty(buyForMeSearchLogs)) {
+            setCountryName(buyForMeSearchLogs);
+        };
         return buyForMeSearchLogs;
     }
 
     @Override
     public int querySearchListCount(BuyForMeSearchLog searchLog) {
         return buyForMemapper.querySearchListCount(searchLog);
+    }
+
+    @Override
+    public int updateSearchLogList(List<BuyForMeSearchLog> searchLogList) {
+
+        if (CollectionUtils.isNotEmpty(searchLogList)) {
+            return setCountryName(searchLogList);
+        }
+        return 0;
     }
 
     @Override
@@ -464,5 +462,76 @@ public class BuyForMeServiceImpl implements com.importExpress.service.BuyForMeSe
         allList.removeAll(userLists);
         userLists.clear();
         return allList;
+    }
+
+
+
+    private int setCountryName(List<BuyForMeSearchLog> buyForMeSearchLogs) {
+
+        int count = 0;
+        // 获取已经读取到的IP信息，放入内存中
+        List<BuyForMeSearchLog> readList = buyForMeSearchLogs.stream().filter(e -> StringUtils.isNotBlank(e.getCountryName())).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(readList)) {
+            readList.forEach(e -> {
+                if (!ipMap.containsKey(e.getIp())) {
+                    ipMap.put(e.getIp(), e.getCountryName());
+                }
+            });
+            readList.clear();
+        }
+
+        Map<String, List<BuyForMeSearchLog>> listMap = buyForMeSearchLogs.stream().filter(e -> StringUtils.isBlank(e.getCountryName())).collect(Collectors.groupingBy(BuyForMeSearchLog::getIp));
+        if (null != listMap && listMap.size() > 0) {
+            Map<String, BuyForMeSearchLog> searchLogMap = new HashMap<>();
+            listMap.forEach((k, v) -> {
+                if (StringUtils.isNotBlank(k)) {
+                    String ip = k;
+                    if (ip.contains("192.168") || ip.contains("127.0") || ip.contains("0:0:0:0:0:0:0:1")) {
+                        ip = "2.24.0.0";
+                    }
+                    if (ipMap.containsKey(ip)) {
+                        String data = ipMap.get(ip);
+                        v.forEach(cl -> cl.setCountryName(data));
+                        if (!searchLogMap.containsKey(ip)) {
+                            BuyForMeSearchLog tempLog = new BuyForMeSearchLog();
+                            tempLog.setIp(ip);
+                            tempLog.setCountryName(data);
+                            searchLogMap.put(ip, tempLog);
+                        }
+                    } else {
+                        String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "queryNameByIp?ip=" + ip);
+                        CommonResult commonResult = null;
+                        try {
+                            String requestUrl = url;
+                            JSONObject jsonObject = instance.doGet(requestUrl);
+                            commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            log.error("CartController refresh ", e);
+                        }
+                        if (null != commonResult && commonResult.getCode() == 200) {
+                            String data = (String) commonResult.getData();
+                            System.err.println(ip + "->" + data);
+                            ipMap.put(ip, data);
+                            v.forEach(cl -> cl.setCountryName(data));
+                            if (!searchLogMap.containsKey(ip)) {
+                                BuyForMeSearchLog tempLog = new BuyForMeSearchLog();
+                                tempLog.setIp(ip);
+                                tempLog.setCountryName(data);
+                                searchLogMap.put(ip, tempLog);
+                            }
+                        }
+                    }
+
+                }
+            });
+            listMap.clear();
+            count = searchLogMap.size();
+            if (count > 0) {
+                buyForMemapper.updateSearchLogCountry(searchLogMap.values());
+                searchLogMap.clear();
+            }
+        }
+        return count;
     }
 }

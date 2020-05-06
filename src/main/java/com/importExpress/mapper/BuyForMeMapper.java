@@ -1,5 +1,6 @@
 package com.importExpress.mapper;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -107,4 +108,7 @@ public interface BuyForMeMapper {
 	List<BFChat> queryBFChatList(BFChat bfChat);
 
 	List<String> queryAllOrderUnPay();
+
+	int updateSearchLogCountry(@Param("list") Collection<BuyForMeSearchLog> list);
+
 }

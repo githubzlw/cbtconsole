@@ -20,6 +20,7 @@ public class FilterChainDefinitionMapBuilder {
 		// 定时任务调用过滤
 		map.put("/mongo/syncAllGoodsToMongo", "anon");
 		map.put("/editc/publicToOnline", "anon");
+		map.put("/bf/updateCountryList", "anon");
 		// 接口调用
 		map.put("/mongo/insertOrUpdateMongodb", "anon");
 		map.put("/userLogin/loginOut.do", "logout");
