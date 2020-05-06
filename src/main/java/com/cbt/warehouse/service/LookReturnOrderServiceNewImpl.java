@@ -719,4 +719,73 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
         return json;
     }
 
+    @Override
+    public EasyUiJsonResult Lookstatement(String optTimeStart, String optTimeEnd, String applyUser, int page) {
+        EasyUiJsonResult json=new EasyUiJsonResult();
+        String nameString=null;
+        if ("".equals(applyUser)||"全部".equals(applyUser)||"1".equals(applyUser)) {
+            nameString=null;
+        }else {
+            Admuser us=this.lookReturnOrderServiceNewMapper.findUserName(applyUser);
+            nameString=us.getAdmName();
+        }
+        if ("".equals(optTimeStart)){
+            optTimeStart=null;
+        }
+        if ("".equals(optTimeEnd)){
+            optTimeEnd=null;
+        }
+        if ("BY1".equalsIgnoreCase(nameString)){
+            nameString="mindy";
+        }
+        if ("BY2".equalsIgnoreCase(nameString)){
+            nameString="helen";
+        }
+        if ("BY3".equalsIgnoreCase(nameString)){
+            nameString="camille";
+        }
+        List<returndisplay> list=this.lookReturnOrderServiceNewMapper.Lookstatement(nameString,optTimeStart,optTimeEnd,page,applyUser);
+        if (list.size()==0) {
+            json.setRows(list);
+            json.setTotal(0);
+            return json;
+        }
+        int total=this.lookReturnOrderServiceNewMapper.LookstatementCount(nameString,optTimeStart,optTimeEnd,page,applyUser);
+        json.setRows(list);
+        json.setTotal(total);
+        return json;
+    }
+
+    @Override
+    public Double gettatolmaney(String optTimeStart, String optTimeEnd, String applyUser) {
+        try {
+            String nameString = null;
+            if ("".equals(applyUser) || "全部".equals(applyUser) || "1".equals(applyUser)) {
+                nameString = null;
+            } else {
+                Admuser us = this.lookReturnOrderServiceNewMapper.findUserName(applyUser);
+                nameString = us.getAdmName();
+            }
+            if ("".equals(optTimeStart)) {
+                optTimeStart = null;
+            }
+            if ("".equals(optTimeEnd)) {
+                optTimeEnd = null;
+            }
+            if ("BY1".equalsIgnoreCase(nameString)) {
+                nameString = "mindy";
+            }
+            if ("BY2".equalsIgnoreCase(nameString)) {
+                nameString = "helen";
+            }
+            if ("BY3".equalsIgnoreCase(nameString)) {
+                nameString = "camille";
+            }
+            Double totalmaney = this.lookReturnOrderServiceNewMapper.LookstatementManey(nameString, optTimeStart, optTimeEnd, 1, applyUser);
+            return totalmaney;
+        }catch (Exception e) {
+            return 0.0;
+        }
+    }
+
 }

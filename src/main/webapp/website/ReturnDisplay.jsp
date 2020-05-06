@@ -447,6 +447,7 @@ function rejectedok(page) {
 				<input class="but_color" type="button" value="查询" onclick="doQuery(1)">
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
 			</form>
+			<div style="text-align: right"><a style="font-size: 15px;color: red" target="_blank" href="statements.jsp">简易对账单</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<div style="text-align: right"><a style="font-size: 15px;color: red" target="_blank" href="/cbtconsole/Look/FindOtherOrder">特殊订单处理</a></div>
 		</div>
 		

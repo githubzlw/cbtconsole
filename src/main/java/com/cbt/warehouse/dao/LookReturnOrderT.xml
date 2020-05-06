@@ -126,4 +126,53 @@ taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1
 		</if>
 		<if test="skuid!=null">and th.skuID=#{skuid}</if>
 	</select>
+	<select id="Lookstatement" resultType="com.cbt.warehouse.pojo.returndisplay" >
+     SELECT
+     1688_order as a1688Order,
+     opt_user as optUser,
+     returntime,
+     actual_money,
+     refund_money,
+	 return_reason as returnReason
+      from return_display
+       WHERE 1=1
+		<if test="nameString != null">
+			AND opt_user=#{nameString}
+		</if>
+		<if test="optTimeStart != null">
+			AND returntime&gt;#{optTimeStart}
+		</if>
+		<if test="optTimeEnd != null">
+			AND returntime&lt;#{optTimeEnd}
+		</if>
+       GROUP BY 1688_order ORDER BY returntime DESC limit #{page},40
+	</select>
+	<select id="LookstatementCount" resultType="java.lang.Integer" >
+    SELECT count(1) FROM (SELECT* from return_display
+		WHERE 1=1
+		<if test="nameString != null">
+			AND opt_user=#{nameString}
+		</if>
+		<if test="optTimeStart != null">
+			AND returntime&gt;#{optTimeStart}
+		</if>
+		<if test="optTimeEnd != null">
+			AND returntime&lt;#{optTimeEnd}
+		</if>
+     GROUP BY 1688_order) a
+	</select>
+	<select id="LookstatementManey" resultType="java.lang.Double" >
+    SELECT sum(actual_money) FROM (SELECT* from return_display
+		WHERE 1=1
+		<if test="nameString != null">
+			AND opt_user=#{nameString}
+		</if>
+		<if test="optTimeStart != null">
+			AND returntime&gt;#{optTimeStart}
+		</if>
+		<if test="optTimeEnd != null">
+			AND returntime&lt;#{optTimeEnd}
+		</if>
+     GROUP BY 1688_order) a
+	</select>
 </mapper>

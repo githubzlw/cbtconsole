@@ -57,4 +57,8 @@ public interface LookReturnOrderServiceNew {
     EasyUiJsonResult AddOtherOrder(List<returndisplay> list, String admName);
 
     EasyUiJsonResult AddOnlyRefund(String orid, Double odmany, String admName);
+
+	EasyUiJsonResult Lookstatement(String optTimeStart, String optTimeEnd, String applyUser, int page);
+
+    Double gettatolmaney(String optTimeStart, String optTimeEnd, String applyUser);
 }

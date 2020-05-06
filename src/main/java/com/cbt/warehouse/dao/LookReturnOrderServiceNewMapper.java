@@ -107,4 +107,14 @@ public interface LookReturnOrderServiceNewMapper {
     void AddOnlyRefund(@Param("orid") String orid, @Param("odmany") Double odmany, @Param("admName") String admName);
     @Select("SELECT COUNT(1) FROM only_refund WHERE 1688_order=#{orid}")
 	int findOrder(@Param("orid") String orid);
+
+	List<returndisplay> Lookstatement(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
+
+	int LookstatementCount(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
+
+	List<returndisplay> LookstatementOnly(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
+
+	int LookstatementOnlyCount(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
+
+	double LookstatementManey(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
 }
