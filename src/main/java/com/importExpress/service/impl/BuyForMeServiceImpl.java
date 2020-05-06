@@ -1,49 +1,50 @@
 package com.importExpress.service.impl;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.alibaba.fastjson.JSONObject;
+import com.cbt.jdbc.DBHelper;
+import com.cbt.pojo.Admuser;
 import com.cbt.pojo.Buy4MeCusotme;
 import com.cbt.pojo.BuyForMeStatistic;
 import com.cbt.userinfo.dao.UserMapper;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.importExpress.mapper.BuyForMeMapper;
+import com.importExpress.pojo.*;
 import com.importExpress.service.BuyForMeService;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import com.importExpress.utli.UrlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xmlbeans.impl.jam.mutable.MPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSONObject;
-import com.cbt.jdbc.DBHelper;
-import com.cbt.pojo.Admuser;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.importExpress.mapper.BuyForMeMapper;
-import com.importExpress.pojo.*;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class BuyForMeServiceImpl implements BuyForMeService {
 
-	private static final String getFreightCostUrl = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
+    private static final String getFreightCostUrl = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
 
-	private static UrlUtil instance = UrlUtil.getInstance();
+    private static UrlUtil instance = UrlUtil.getInstance();
 
-	@Autowired
-	private BuyForMeMapper buyForMemapper;
-	@Autowired
+    @Autowired
+    private BuyForMeMapper buyForMemapper;
+    @Autowired
     UserMapper userMapper;
 
-	private Map<String, String> ipMap = new HashMap<>();
+    private Map<String, String> ipMap = new HashMap<>();
 
     @Override
     public List<BFOrderInfo> getOrders(Map<String, Object> map) {
@@ -52,57 +53,57 @@ public class BuyForMeServiceImpl implements BuyForMeService {
             return orders;
         }
 //		订单状态：-1 取消，0申请，1处理中 2销售处理完成 3已支付;
-		orders.stream().forEach(o->{
-			String content = o.getState() == -1 ? "取消" : o.getState() == 0 ?
-					"申请中":o.getState() == 1 ?"处理中":o.getState() == 2 ?
-							"销售处理完成":o.getState() == 3 ?"待支付":o.getState() == 4 ?"已支付":"";
-			o.setStateContent(content);
-		});
-		return orders;
-	}
+        orders.stream().forEach(o -> {
+            String content = o.getState() == -1 ? "取消" : o.getState() == 0 ?
+                    "申请中" : o.getState() == 1 ? "处理中" : o.getState() == 2 ?
+                    "销售处理完成" : o.getState() == 3 ? "待支付" : o.getState() == 4 ? "已支付" : "";
+            o.setStateContent(content);
+        });
+        return orders;
+    }
 
     @Override
     public int getOrdersCount(Map<String, Object> map) {
         return buyForMemapper.getOrdersCount(map);
     }
 
-	@Override
-	public List<BFOrderDetail> getOrderDetails(String orderNo, String bfId) {
-		List<BFOrderDetail> orderDetails = buyForMemapper.getOrderDetails(orderNo);
-		if(orderDetails == null || orderDetails.isEmpty()) {
-			return Lists.newArrayList();
-		}
-		List<BFOrderDetailSku> orderDetailsSku = getOrderDetailsSku(bfId);
-		if(orderDetailsSku == null || orderDetailsSku.isEmpty()) {
-			return orderDetails;
-		}
-		Map<Integer,List<DetailsSku>> detailsIdSku = Maps.newHashMap();
-		orderDetailsSku.stream().forEach(o->{
-			int bfDetailsId = o.getBfDetailsId();
-			List<DetailsSku> list = detailsIdSku.get(bfDetailsId);
-			list = list == null ? Lists.newArrayList() : list;
-			DetailsSku detailsSku = DetailsSku.builder().num(o.getNum()).skuid(o.getSkuid())
-			.price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).id(o.getId())
-			.priceBuy(o.getPriceBuy()).priceBuyc(o.getPriceBuyc()).shipFeight(o.getShipFeight())
-			.weight(o.getWeight())
-			.state(o.getState())
-			.unit(o.getUnit())
-			.build();
-			list.add(detailsSku);
-			detailsIdSku.put(bfDetailsId, list);
-		});
-		orderDetails.stream().forEach(o->{
-			List<DetailsSku> list = detailsIdSku.get(o.getId());
-			o.setSkus(list);
-			if(list != null && !list.isEmpty()) {
-				o.setSkuCount(list.size());
-				o.setWeight(list.get(0).getWeight());
-				o.setCount(list.stream().filter(s->s.getState()>0).mapToInt(DetailsSku::getNum).sum());
-			}
-		});
-		
-		return orderDetails;
-	}
+    @Override
+    public List<BFOrderDetail> getOrderDetails(String orderNo, String bfId) {
+        List<BFOrderDetail> orderDetails = buyForMemapper.getOrderDetails(orderNo);
+        if (orderDetails == null || orderDetails.isEmpty()) {
+            return Lists.newArrayList();
+        }
+        List<BFOrderDetailSku> orderDetailsSku = getOrderDetailsSku(bfId);
+        if (orderDetailsSku == null || orderDetailsSku.isEmpty()) {
+            return orderDetails;
+        }
+        Map<Integer, List<DetailsSku>> detailsIdSku = Maps.newHashMap();
+        orderDetailsSku.stream().forEach(o -> {
+            int bfDetailsId = o.getBfDetailsId();
+            List<DetailsSku> list = detailsIdSku.get(bfDetailsId);
+            list = list == null ? Lists.newArrayList() : list;
+            DetailsSku detailsSku = DetailsSku.builder().num(o.getNum()).skuid(o.getSkuid())
+                    .price(o.getPrice()).url(o.getProductUrl()).sku(o.getSku()).id(o.getId())
+                    .priceBuy(o.getPriceBuy()).priceBuyc(o.getPriceBuyc()).shipFeight(o.getShipFeight())
+                    .weight(o.getWeight())
+                    .state(o.getState())
+                    .unit(o.getUnit())
+                    .build();
+            list.add(detailsSku);
+            detailsIdSku.put(bfDetailsId, list);
+        });
+        orderDetails.stream().forEach(o -> {
+            List<DetailsSku> list = detailsIdSku.get(o.getId());
+            o.setSkus(list);
+            if (list != null && !list.isEmpty()) {
+                o.setSkuCount(list.size());
+                o.setWeight(list.get(0).getWeight());
+                o.setCount(list.stream().filter(s -> s.getState() > 0).mapToInt(DetailsSku::getNum).sum());
+            }
+        });
+
+        return orderDetails;
+    }
 
     @Override
     public List<BFOrderDetailSku> getOrderDetailsSku(String bfId) {
@@ -113,7 +114,30 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     public int addOrderDetailsSku(BFOrderDetailSku detailSku) {
         int result = 0;
         if (detailSku.getId() == 0) {
-            result = buyForMemapper.addOrderDetailsSku(detailSku);
+            // result = buyForMemapper.addOrderDetailsSku(detailSku);
+            // 使用MQ插入sku数据
+            List<String> lstValues = Lists.newArrayList();
+            String sql2 = "insert into buyforme_details_sku(sku,product_url,num,price,price_buy,price_buy_c,ship_feight,weight,unit,state,id,bf_id,bf_details_id,num_iid,skuid,remark)" +
+                    "  values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            lstValues.add(detailSku.getSku());
+            lstValues.add(detailSku.getProductUrl());
+            lstValues.add(String.valueOf(detailSku.getNum()));
+            lstValues.add(detailSku.getPrice());
+            lstValues.add(detailSku.getPriceBuy());
+            lstValues.add(detailSku.getPriceBuyc());
+            lstValues.add(detailSku.getShipFeight());
+            lstValues.add(detailSku.getWeight());
+            lstValues.add(detailSku.getUnit());
+            lstValues.add(String.valueOf(detailSku.getState()));
+            lstValues.add(String.valueOf(detailSku.getId()));
+            lstValues.add(String.valueOf(detailSku.getBfId()));
+            lstValues.add(String.valueOf(detailSku.getBfDetailsId()));
+            lstValues.add(detailSku.getNumIid());
+            lstValues.add(detailSku.getSkuid());
+            lstValues.add(detailSku.getRemark());
+            lstValues.add(String.valueOf(detailSku.getState()));
+            SendMQ.sendMsg(new RunSqlModel(DBHelper.covertToSQL(sql2, lstValues)));
+            result = 99;
         } else {
             result = buyForMemapper.updateOrderDetailsSku(detailSku);
         }
@@ -124,7 +148,8 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     }
 
     @Override
-    public int updateOrderDetailsSkuState(int id, int state) {
+    public int updateOrderDetailsSkuState(int id, int state, int bfId) {
+        buyForMemapper.updateOrdersState(bfId, 1);
         return buyForMemapper.updateOrderDetailsSkuState(id, state);
     }
 
@@ -257,15 +282,77 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     @Override
     public List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog) {
         List<BuyForMeSearchLog> buyForMeSearchLogs = buyForMemapper.querySearchList(searchLog);
+
         if (CollectionUtils.isNotEmpty(buyForMeSearchLogs)) {
             setCountryName(buyForMeSearchLogs);
-        };
+        }
+
         return buyForMeSearchLogs;
     }
 
     @Override
     public int querySearchListCount(BuyForMeSearchLog searchLog) {
         return buyForMemapper.querySearchListCount(searchLog);
+    }
+
+    @Override
+    public List<BFSearchStatic> queryStaticList(BFSearchStatic searchStatic) {
+        return buyForMemapper.queryStaticList(searchStatic);
+    }
+
+    @Override
+    public int queryStaticListCount(BFSearchStatic searchStatic) {
+        return buyForMemapper.queryStaticListCount(searchStatic);
+    }
+
+    @Override
+    public int insertIntoSearchStatic(BFSearchStatic searchStatic) {
+        return buyForMemapper.insertIntoSearchStatic(searchStatic);
+    }
+
+    @Override
+    public int updateSearchStatic(BFSearchStatic searchStatic) {
+        return buyForMemapper.updateSearchStatic(searchStatic);
+    }
+
+    @Override
+    public int deleteSearchStatic(BFSearchStatic searchStatic) {
+        return buyForMemapper.deleteSearchStatic(searchStatic);
+    }
+
+    @Override
+    public List<BFSearchPid> queryPidByStaticId(int staticId) {
+        return buyForMemapper.queryPidByStaticId(staticId);
+    }
+
+    @Override
+    public int insertIntoStaticPid(BFSearchPid searchPid) {
+        return buyForMemapper.insertIntoStaticPid(searchPid);
+    }
+
+    @Override
+    public int updateStaticPid(BFSearchPid searchPid) {
+        return buyForMemapper.updateStaticPid(searchPid);
+    }
+
+    @Override
+    public int deleteStaticPid(BFSearchPid searchPid) {
+        return buyForMemapper.deleteStaticPid(searchPid);
+    }
+
+    @Override
+    public int setJsonState(int flag, String ids) {
+        return buyForMemapper.setJsonState(flag, ids);
+    }
+
+    @Override
+    public List<BuyForMePidLog> pidLogList(BuyForMePidLog pidLog) {
+        return buyForMemapper.pidLogList(pidLog);
+    }
+
+    @Override
+    public int pidLogListCount(BuyForMePidLog pidLog) {
+        return buyForMemapper.pidLogListCount(pidLog);
     }
 
     @Override
@@ -291,87 +378,88 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     }
 
 
-	@Override
-	public JsonResult getCustomerCartDetails(String userId){
+    @Override
+    public JsonResult getCustomerCartDetails(String userId) {
 
-		JsonResult jsonResult = new JsonResult();
-		CommonResult commonResult = new CommonResult();
-		String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","buy4me/"+userId);
-		jsonResult.setErrorInfo("error!");
-		com.alibaba.fastjson.JSONObject jsonObject;
-		try {
-			String requestUrl = url;
-			jsonObject = instance.doGet(requestUrl);
-			commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
-		} catch (IOException e) {
-			log.error("CartController refresh ",e);
-		}
-		if(commonResult.getCode() == 200){
-			String data1 = (String)commonResult.getData();
-			BuyForMeStatistic data = new Gson().fromJson(data1, BuyForMeStatistic.class);
-            data.getItemList().stream().forEach(e->{
+        JsonResult jsonResult = new JsonResult();
+        CommonResult commonResult = new CommonResult();
+        String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "buy4me/" + userId);
+        jsonResult.setErrorInfo("error!");
+        com.alibaba.fastjson.JSONObject jsonObject;
+        try {
+            String requestUrl = url;
+            jsonObject = instance.doGet(requestUrl);
+            commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+        } catch (IOException e) {
+            log.error("CartController refresh ", e);
+        }
+        if (commonResult.getCode() == 200) {
+            String data1 = (String) commonResult.getData();
+            BuyForMeStatistic data = new Gson().fromJson(data1, BuyForMeStatistic.class);
+            data.getItemList().stream().forEach(e -> {
                 List<CustomerQuestionsAndReplayBean> remarkReplay = e.getRemarkReplay();
                 e.setRemark_replay(new Gson().toJson(remarkReplay));
             });
-			jsonResult = JsonResult.success(data);
-		}
-		return jsonResult;
-	}
+            jsonResult = JsonResult.success(data);
+        }
+        return jsonResult;
+    }
 
-	@Override
-	public CommonResult putMsg(String userId,String itemid,String msg){
+    @Override
+    public CommonResult putMsg(String userId, String itemid, String msg) {
 
-		JsonResult jsonResult = new JsonResult();
-		CommonResult commonResult = new CommonResult();
-		String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","buy4me/"+userId+"/"+itemid);
-		jsonResult.setErrorInfo("error!");
-		com.alibaba.fastjson.JSONObject jsonObject;
-		try {
-			String requestUrl = url;
-			Map<String,Object> map = new HashMap<>();
-			map.put("msg",msg);
-			jsonObject = instance.doPost (requestUrl,map);
-			commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
-		} catch (IOException e) {
-			log.error("CartController refresh ",e);
-		}
-		return commonResult;
-	}
-	@Override
-	public EasyUiJsonResult queryCustomers(ShopCarUserStatistic statistic){
-		EasyUiJsonResult json=new EasyUiJsonResult();
-		CommonResult commonResult = new CommonResult();
-		String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId","buy4me/queryAll");
+        JsonResult jsonResult = new JsonResult();
+        CommonResult commonResult = new CommonResult();
+        String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "buy4me/" + userId + "/" + itemid);
+        jsonResult.setErrorInfo("error!");
+        com.alibaba.fastjson.JSONObject jsonObject;
+        try {
+            String requestUrl = url;
+            Map<String, Object> map = new HashMap<>();
+            map.put("msg", msg);
+            jsonObject = instance.doPost(requestUrl, map);
+            commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+        } catch (IOException e) {
+            log.error("CartController refresh ", e);
+        }
+        return commonResult;
+    }
 
-		com.alibaba.fastjson.JSONObject jsonObject;
-		try {
-			String requestUrl = url;
-			jsonObject = instance.doGet(requestUrl);
-			commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
-		} catch (IOException e) {
-			log.error("CartController refresh ",e);
-		}
-		if(commonResult.getCode() == 200){
+    @Override
+    public EasyUiJsonResult queryCustomers(ShopCarUserStatistic statistic) {
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        CommonResult commonResult = new CommonResult();
+        String url = getFreightCostUrl.replace("shopCartMarketingCtr/getMinFreightByUserId", "buy4me/queryAll");
+
+        com.alibaba.fastjson.JSONObject jsonObject;
+        try {
+            String requestUrl = url;
+            jsonObject = instance.doGet(requestUrl);
+            commonResult = new Gson().fromJson(jsonObject.toJSONString(), CommonResult.class);
+        } catch (IOException e) {
+            log.error("CartController refresh ", e);
+        }
+        if (commonResult.getCode() == 200) {
             int userId = statistic.getUserId();
             int limitNum = statistic.getLimitNum();
             int num = statistic.getStartNum();
             String admname = statistic.getAdmname();
-            List<String> list = (List<String>)commonResult.getData();
+            List<String> list = (List<String>) commonResult.getData();
             int length = 0;
             if (list == null) {
                 list = new ArrayList<>();
             }
 
             String s = "car:";
-            Map<String,String> hasNewMsgMap = new HashMap<>();
+            Map<String, String> hasNewMsgMap = new HashMap<>();
             List<String> list1 = new ArrayList<>();
-            list.stream().forEach(e->{
-                if(e.indexOf(s) > -1){
+            list.stream().forEach(e -> {
+                if (e.indexOf(s) > -1) {
                     e = e.split(s)[1];
                 }
-                if(e.indexOf(":") > -1){
+                if (e.indexOf(":") > -1) {
                     e = e.split(":")[0];
-                    hasNewMsgMap.put(e,e);
+                    hasNewMsgMap.put(e, e);
                 }
                 list1.add(e);
             });
@@ -380,27 +468,27 @@ public class BuyForMeServiceImpl implements BuyForMeService {
             if (length > 1) {
                 //Collections.reverse(list);
                 // 分页
-                if(userId != 0){
-                    list =  list.stream().filter(e->e.equals(String.valueOf(userId))).collect(Collectors.toList());
-                }else if(StringUtils.isBlank(admname)) {
+                if (userId != 0) {
+                    list = list.stream().filter(e -> e.equals(String.valueOf(userId))).collect(Collectors.toList());
+                } else if (StringUtils.isBlank(admname)) {
                     list = list.stream().skip(num).limit(limitNum).collect(Collectors.toList());
                 }
             }
             List<Buy4MeCusotme> list2 = new ArrayList<>();
-            list.stream().forEach(e ->{
+            list.stream().forEach(e -> {
                 boolean hasMsg = false;
-                if(hasNewMsgMap.containsKey(e)){
+                if (hasNewMsgMap.containsKey(e)) {
                     hasMsg = true;
                 }
                 String adm = "admin(未分配)";
                 Buy4MeCusotme buy4MeCusotme = new Buy4MeCusotme();
-                if(StringUtils.isNumeric(e)){
-                   Map<String,String> userInfoMap= userMapper.queryAdmByUser(e);
-                    if(null !=userInfoMap ){
-                        if(StringUtils.isNotBlank(userInfoMap.get("admName"))){
+                if (StringUtils.isNumeric(e)) {
+                    Map<String, String> userInfoMap = userMapper.queryAdmByUser(e);
+                    if (null != userInfoMap) {
+                        if (StringUtils.isNotBlank(userInfoMap.get("admName"))) {
                             adm = userInfoMap.get("admName");
                         }
-                        if(StringUtils.isNotBlank(userInfoMap.get("chinapostbig"))){
+                        if (StringUtils.isNotBlank(userInfoMap.get("chinapostbig"))) {
                             buy4MeCusotme.setCountry(userInfoMap.get("chinapostbig"));
                         }
 
@@ -414,27 +502,26 @@ public class BuyForMeServiceImpl implements BuyForMeService {
                 list2.add(buy4MeCusotme);
             });
 
-            if(userId != 0){
+            if (userId != 0) {
                 //List<Buy4MeCusotme> collect = list2.stream().filter(e -> e.getUserId().equals(String.valueOf(userId))).collect(Collectors.toList());
-                list2.stream().forEach(e->{
+                list2.stream().forEach(e -> {
                     JsonResult customerCartDetails = getCustomerCartDetails(e.getUserId());
                     pase(e, customerCartDetails);
                 });
                 json.setRows(list2);
                 json.setTotal(list2.size());
-            }else if(StringUtils.isNotBlank(admname)){
+            } else if (StringUtils.isNotBlank(admname)) {
                 List<Buy4MeCusotme> collect = list2.stream().filter(e -> e.getAdm().equals(admname)).collect(Collectors.toList());
                 collect = collect.stream().skip(num).limit(limitNum).collect(Collectors.toList());
-                collect.stream().forEach(e->{
+                collect.stream().forEach(e -> {
                     JsonResult customerCartDetails = getCustomerCartDetails(e.getUserId());
                     pase(e, customerCartDetails);
                 });
                 json.setRows(collect);
                 json.setTotal(collect.size());
-            }
-            else{
+            } else {
                 //Collections.reverse(list2);
-                list2.stream().forEach(e->{
+                list2.stream().forEach(e -> {
                     JsonResult customerCartDetails = getCustomerCartDetails(e.getUserId());
                     pase(e, customerCartDetails);
                 });
@@ -442,11 +529,11 @@ public class BuyForMeServiceImpl implements BuyForMeService {
                 json.setTotal(length);
             }
 
-		}else {
-			json.setSuccess(false);
-		}
-		return json;
-	}
+        } else {
+            json.setSuccess(false);
+        }
+        return json;
+    }
 
     private void pase(Buy4MeCusotme e, JsonResult customerCartDetails) {
         BuyForMeStatistic data = (BuyForMeStatistic) customerCartDetails.getData();
@@ -455,7 +542,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
         e.setItemNum(data.getItemNum());
     }
 
-    public List<String> filterHaveOrderUsers(List<String> allList){
+    public List<String> filterHaveOrderUsers(List<String> allList) {
         List<String> userIdList = new ArrayList<>();
         //@date：2020/4/26 5:38 下午 Description : 获取有订单的列表
         List<String> userLists = buyForMemapper.queryAllOrderUnPay();
@@ -463,8 +550,6 @@ public class BuyForMeServiceImpl implements BuyForMeService {
         userLists.clear();
         return allList;
     }
-
-
 
     private int setCountryName(List<BuyForMeSearchLog> buyForMeSearchLogs) {
 
@@ -534,4 +619,5 @@ public class BuyForMeServiceImpl implements BuyForMeService {
         }
         return count;
     }
+
 }

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>BuyForMe商品点击日志</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+</head>
+<style type="text/css">
+    .datagrid-htable {
+        text-align: center;
+        height: 30px;
+        font-size: 24px;
+    }
+
+    .but_color {
+        background: #44a823;
+        width: 80px;
+        height: 30px;
+        border: 1px #aaa solid;
+        color: #fff;
+    }
+
+    #bf_pid_query_form {
+        font-size: 18px;
+    }
+
+    #button_style {
+        font-size: 18px;
+    }
+
+    .panel-title {
+        text-align: center;
+        height: 30px;
+        font-size: 24px;
+    }
+
+    .bf_pid_rYear, .bf_pid_rMonth, .but_color {
+        padding: 5px;
+        font-size: 14px
+    }
+
+    .bf_pid_rYear, .bf_pid_rMonth {
+        margin-right: 18px
+    }
+
+    #bf_pid_top_toolbar {
+        padding: 20px 28px !important;
+    }
+
+    .datagrid-header .datagrid-cell span, .datagrid-cell,
+    .datagrid-cell-group, .datagrid-header-rownumber,
+    .datagrid-cell-rownumber {
+        font-size: 14px;
+    }
+
+    .img_sty {
+        max-width: 100px;
+        max-height: 100px;
+    }
+
+    .div_sty_img img {
+        max-width: 550px;
+        max-height: 550px;
+    }
+
+    .enter_btn {
+        margin-bottom: 10px;
+        width: 130px;
+        height: 26px;
+        color: #ffffff;
+        background-color: #009688;
+        transform: rotate(0deg);
+        font-size: 16px;
+        border-radius: 4px;
+        border-width: 1px;
+        border-style: solid;
+        text-align: center;
+        font-weight: normal;
+        font-style: normal;
+    }
+</style>
+<script type="text/javascript">
+
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg); //匹配目标参数
+        if (r != null) return unescape(r[2]);
+        return null; //返回参数值
+    }
+
+    $(function () {
+        setDatagrid();
+        closeBigImg();
+        var user_id = getUrlParam("userId");
+        if (user_id) {
+            if (/^\+?[1-9][0-9]*$/.test(user_id)) {
+                $("#user_id").val(user_id);
+            } else {
+                $("#session_id").val(user_id);
+            }
+        }
+
+        var opts = $("#bf_pid_easyui-datagrid").datagrid("options");
+        opts.url = "/cbtconsole/bf/pidLogList";
+        doQuery();
+    });
+
+    function setDatagrid() {
+        $('#bf_pid_easyui-datagrid').datagrid({
+            title: 'BuyForMe商品点击日志',
+            width: "100%",
+            fit: true,//自动补全
+            striped: true,//设置为true将交替显示行背景。
+            collapsible: true,//显示可折叠按钮
+            toolbar: "#bf_pid_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+            url: '',//url调用Action方法
+            loadMsg: '数据装载中......',
+            singleSelect: true,//为true时只能选择单行
+            fitColumns: true,//允许表格自动缩放，以适应父容器
+            rownumbers: true,
+            pageSize: 20,//默认选择的分页是每页50行数据
+            pageList: [20, 50, 100],//可以选择的分页集合
+            pagination: true,//分页
+            style: {
+                padding: '8 8 10 8'
+            },
+            onLoadError: function () {
+                $.messager.alert("提示信息", "获取数据信息失败");
+                return;
+            },
+            onLoadSuccess: function (data) {
+
+            }
+        });
+    }
+
+    function doQuery() {
+        var begin_time = $("#begin_time").val();
+        var end_time = $("#end_time").val();
+        var search_type = $("#search_type").val();
+        var user_id = $("#user_id").val();
+        var session_id = $("#session_id").val();
+        var pid = $("#qr_pid").val();
+        $("#bf_pid_easyui-datagrid").datagrid("load", {
+            "beginTime": begin_time,
+            "endTime": end_time,
+            "type": search_type,
+            "userId": user_id,
+            "sessionId": session_id,
+            "pid": pid
+        });
+    }
+
+
+    function formatUserId(val, row, index) {
+        if (val > 0) {
+            return '<a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=' + val + '">' + val + '</a>';
+        } else {
+            return '';
+        }
+    }
+
+    function formatType(val, row, index) {
+        if (val == 0) {
+            return 'AliExpress';
+        } else if (val == 1) {
+            return 'TaoBao';
+        }
+        return '';
+    }
+
+
+    function formatPidUrl(val, row, index) {
+        if (row.type == 0) {
+            return '<a target="_blank" href="https://www.aliexpress.com/item/' + val + '.html">' + val + '</a>';
+        } else if (row.type == 1) {
+            // http://item.taobao.com/item.htm?id=545828993398
+            return '<a target="_blank" href="https://item.taobao.com/item.htm?id=' + val + '">' + val + '</a>';
+        } else {
+            return val;
+        }
+    }
+
+    function formatPidInfo(val, row, index) {
+        var content = '<div>';
+
+        if (val) {
+            content += '<p>' + val + '</p>';
+        }
+        if (row.img_url) {
+            content += '<img class="img_sty" src="' + row.img_url + '" onclick="bigImg(\'' + row.img_url + '\')"/>';
+        }
+        content += '</div>';
+        return content;
+    }
+
+    function bigImg(img) {
+        $('#big_img').empty();
+        htm_ = "<img title='点击放大图片' style='max-width:600px;max-height:600px;' src=" + img
+            + "><br><input class='s_btn' type='button' value='关闭' onclick='closeBigImg()' />";
+        $("#big_img").append(htm_);
+        $('#img_dlg').dialog('open');
+
+    }
+
+    function closeBigImg() {
+        $('#big_img').empty();
+        $('#img_dlg').dialog('close');
+    }
+</script>
+<body>
+<div id="bf_pid_top_toolbar" style="padding: 5px; height: auto">
+    <form id="bf_pid_query_form" action="#" onsubmit="return false;">
+			<span>日期:<input id="begin_time" class="Wdate"
+                            style="width: 110px; height: 24px" type="text" value=""
+                            onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></span>
+        &nbsp;&nbsp;<span>到:<input id="end_time" class="Wdate"
+                                   style="width: 110px; height: 24px" type="text" value=""
+                                   onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></span>
+        &nbsp;&nbsp; <span>网站:<select id="search_type"
+                                      style="font-size: 16px; height: 26px; width: 120px;">
+					<option value="-1" selected="selected">全部</option>
+        <option value="0">AliExpress</option>
+        <option value="1">TaoBao</option>
+			</select></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span>PID:<input id="qr_pid" style="width: 180px;height: 24px;"/></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>客户ID:<input id="user_id" style="width: 100px;height: 24px;"/></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>sessionId:<input style="width: 300px;height: 24px;" id="session_id"/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span><input type="button"
+                     class="enter_btn" value="查询" onclick="doQuery()"/></span>
+        <b style="color: red;">*点击放大图片</b>
+    </form>
+</div>
+<div id="img_dlg" class="easyui-dialog" title="大图" data-options="modal:true"
+     style="width: 700px; height: 700px; padding: 10px;">
+    <div class="div_sty_img" id="big_img"></div>
+</div>
+
+<table id="bf_pid_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'user_id',align:'center',width:'100px',formatter:formatUserId">客户ID</th>
+        <th data-options="field:'type',align:'center',width:'100px',formatter:formatType">网站</th>
+        <th data-options="field:'pid',align:'center',width:'100px',formatter:formatPidUrl">PID</th>
+        <th data-options="field:'title',align:'center',width:'330px',formatter:formatPidInfo">标题</th>
+        <th data-options="field:'create_time',align:'center',width:'120px'">点击时间</th>
+        <th data-options="field:'session_id',align:'center',width:'160px'">SessionId</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</body>
+</html>

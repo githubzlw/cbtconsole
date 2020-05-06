@@ -1,68 +1,69 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.importExpress.mapper.BuyForMeMapper" >
-  <resultMap id="infoResultMap" type="com.importExpress.pojo.BFOrderInfo" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
-    <result column="pay_price" property="payPrice" jdbcType="VARCHAR" />
-    <result column="product_cost" property="productCost" jdbcType="VARCHAR" />
-    <result column="delivery_time" property="deliveryTime" jdbcType="VARCHAR" />
-    <result column="create_time" property="createTime" jdbcType="VARCHAR" />
-    <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
-    <result column="ip" property="ip" jdbcType="VARCHAR" />
-    <result column="delivery_method" property="method" jdbcType="VARCHAR" />
-    <result column="ship_feight" property="feight" jdbcType="VARCHAR" />
-    <result column="user_id" property="userId" jdbcType="INTEGER" />
-    <result column="state" property="state" jdbcType="INTEGER" />
-    <result column="address_id" property="addressId" jdbcType="INTEGER" />
-    <result column="admin_id" property="adminId" jdbcType="INTEGER" />
-    <result column="admName" property="adminName" jdbcType="VARCHAR" />
-    <result column="email" property="email" jdbcType="VARCHAR" />
-    <result column="country" property="country" jdbcType="VARCHAR" />
-  </resultMap>
-  <resultMap id="detailResultMap" type="com.importExpress.pojo.BFOrderDetail" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
-    <result column="state" property="state" jdbcType="INTEGER" />
-    <result column="num" property="num" jdbcType="INTEGER" />
-    <result column="title" property="title" jdbcType="VARCHAR" />
-    <result column="pic_url" property="picUrl" jdbcType="VARCHAR" />
-    <result column="num_iid" property="numIid" jdbcType="VARCHAR" />
-    <result column="price" property="price" jdbcType="VARCHAR" />
-    <result column="detail_url" property="detailUrl" jdbcType="VARCHAR" />
-    <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="remark_replay" property="remarkReplay" jdbcType="VARCHAR" />
-    <result column="create_time" property="createTime" jdbcType="VARCHAR" />
-  </resultMap>
+<mapper namespace="com.importExpress.mapper.BuyForMeMapper">
+    <resultMap id="infoResultMap" type="com.importExpress.pojo.BFOrderInfo">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="pay_price" property="payPrice" jdbcType="VARCHAR"/>
+        <result column="product_cost" property="productCost" jdbcType="VARCHAR"/>
+        <result column="delivery_time" property="deliveryTime" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
+        <result column="ip" property="ip" jdbcType="VARCHAR"/>
+        <result column="delivery_method" property="method" jdbcType="VARCHAR"/>
+        <result column="ship_feight" property="feight" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+        <result column="state" property="state" jdbcType="INTEGER"/>
+        <result column="address_id" property="addressId" jdbcType="INTEGER"/>
+        <result column="admin_id" property="adminId" jdbcType="INTEGER"/>
+        <result column="admName" property="adminName" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="country" property="country" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="detailResultMap" type="com.importExpress.pojo.BFOrderDetail">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="state" property="state" jdbcType="INTEGER"/>
+        <result column="num" property="num" jdbcType="INTEGER"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="pic_url" property="picUrl" jdbcType="VARCHAR"/>
+        <result column="num_iid" property="numIid" jdbcType="VARCHAR"/>
+        <result column="price" property="price" jdbcType="VARCHAR"/>
+        <result column="detail_url" property="detailUrl" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="remark_replay" property="remarkReplay" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="VARCHAR"/>
+    </resultMap>
 
-  <resultMap id="skuResultMap" type="com.importExpress.pojo.BFOrderDetailSku" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="bf_id" property="bfId" jdbcType="INTEGER" />
-    <result column="bf_details_id" property="bfDetailsId" jdbcType="INTEGER" />
-    <result column="num" property="num" jdbcType="INTEGER" />
-    <result column="state" property="state" jdbcType="INTEGER" />
-    <result column="num_iid" property="numIid" jdbcType="VARCHAR" />
-    <result column="skuid" property="skuid" jdbcType="VARCHAR" />
-    <result column="sku" property="sku" jdbcType="VARCHAR" />
-    <result column="remark" property="remark" jdbcType="VARCHAR" />
-    <result column="price" property="price" jdbcType="VARCHAR" />
-    <result column="price_buy" property="priceBuy" jdbcType="VARCHAR" />
-    <result column="price_buy_c" property="priceBuyc" jdbcType="VARCHAR" />
-    <result column="ship_feight" property="shipFeight" jdbcType="VARCHAR" />
-    <result column="product_url" property="productUrl" jdbcType="VARCHAR" />
-    <result column="weight" property="weight" jdbcType="VARCHAR" />
-    <result column="unit" property="unit" jdbcType="VARCHAR" />
-  </resultMap>
+    <resultMap id="skuResultMap" type="com.importExpress.pojo.BFOrderDetailSku">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="bf_id" property="bfId" jdbcType="INTEGER"/>
+        <result column="bf_details_id" property="bfDetailsId" jdbcType="INTEGER"/>
+        <result column="num" property="num" jdbcType="INTEGER"/>
+        <result column="state" property="state" jdbcType="INTEGER"/>
+        <result column="num_iid" property="numIid" jdbcType="VARCHAR"/>
+        <result column="skuid" property="skuid" jdbcType="VARCHAR"/>
+        <result column="sku" property="sku" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="price" property="price" jdbcType="VARCHAR"/>
+        <result column="price_buy" property="priceBuy" jdbcType="VARCHAR"/>
+        <result column="price_buy_c" property="priceBuyc" jdbcType="VARCHAR"/>
+        <result column="ship_feight" property="shipFeight" jdbcType="VARCHAR"/>
+        <result column="product_url" property="productUrl" jdbcType="VARCHAR"/>
+        <result column="weight" property="weight" jdbcType="VARCHAR"/>
+        <result column="unit" property="unit" jdbcType="VARCHAR"/>
+        <result column="img_url" property="imgUrl" jdbcType="VARCHAR"/>
+    </resultMap>
 
-  <resultMap id="admMap" type="com.cbt.pojo.Admuser" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="admName" property="admname" jdbcType="VARCHAR" />
-  </resultMap>
-  <resultMap id="zoneBeanMap" type="com.importExpress.pojo.ZoneBean" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="country" property="country" jdbcType="VARCHAR" />
-  </resultMap>
+    <resultMap id="admMap" type="com.cbt.pojo.Admuser">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="admName" property="admname" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="zoneBeanMap" type="com.importExpress.pojo.ZoneBean">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="country" property="country" jdbcType="VARCHAR"/>
+    </resultMap>
 
   <select id="getOrders" resultMap="infoResultMap">
   select a.id,a.order_no,a.user_id,a.state,a.pay_price,a.product_cost,a.delivery_time,
@@ -80,32 +81,33 @@
   limit #{page},30
   </select>
 
-  <select id="getOrdersCount" resultType="Integer">
-  select  count(*) from buyforme_orderinfo b left join admin_r_user a on b.user_id=a.userid where 1=1
-  <if test="state !=-2">and b.state=#{state}</if>
-  <if test="orderNo !=null">and b.order_no=#{orderNo}</if>
-  <if test="userId !=null">and b.user_id=#{userId}</if>
-  <if test="admid !=0">and a.adminid=#{admid}</if>
-  </select>
+    <select id="getOrdersCount" resultType="Integer">
+        select count(*) from buyforme_orderinfo b left join admin_r_user a on b.user_id=a.userid where 1=1
+        <if test="state !=-2">and b.state=#{state}</if>
+        <if test="orderNo !=null">and b.order_no=#{orderNo}</if>
+        <if test="userId !=null">and b.user_id=#{userId}</if>
+        <if test="admid !=0">and a.adminid=#{admid}</if>
+    </select>
 
-  <select id="getOrderDetails" resultMap="detailResultMap">
+    <select id="getOrderDetails" resultMap="detailResultMap">
   select id,order_no,title,pic_url,price,num_iid,num,detail_url,state,remark,create_time,remark_replay
   from buyforme_details where order_no=#{orderNo}
   </select>
 
-  <select id="getOrderDetailsSku" resultMap="skuResultMap">
-  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,ship_feight,weight,unit
+    <select id="getOrderDetailsSku" resultMap="skuResultMap">
+  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,
+  ship_feight,weight,unit,img_url
   from buyforme_details_sku where bf_id= #{bfId}
   </select>
 
-  <insert id="addOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
+    <insert id="addOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
   insert into buyforme_details_sku(bf_id,bf_details_id,num_iid,skuid,price,num,remark,
   state,product_url,sku,price_buy,price_buy_c,ship_feight,weight,unit)
   values(#{bfId},#{bfDetailsId},#{numIid},#{skuid},#{price},#{num},#{remark},#{state},
   #{productUrl},#{sku},#{priceBuy},#{priceBuyc},#{shipFeight},#{weight},#{unit})
   </insert>
 
-  <update id="updateOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
+    <update id="updateOrderDetailsSku" parameterType="com.importExpress.pojo.BFOrderDetailSku">
   update buyforme_details_sku set sku=#{sku},product_url=#{productUrl},num=#{num},price=#{price},
   ship_feight=#{shipFeight},price_buy=#{priceBuy},price_buy_c=#{priceBuyc},weight=#{weight},unit=#{unit}
   where id=#{id}
@@ -116,13 +118,13 @@
   where bf_details_id=#{bfdid}
   </update>
 
-  <update id="updateOrderDetailsSkuState">
+    <update id="updateOrderDetailsSkuState">
   update buyforme_details_sku set state=#{state} where id=#{id}
   </update>
-  <update id="updateOrdersDetailsState">
+    <update id="updateOrdersDetailsState">
   update buyforme_details set state=#{state} where id=#{id}
   </update>
-  <update id="updateOrdersState">
+    <update id="updateOrdersState">
   update buyforme_orderinfo set state=#{state} where id=#{id}
   </update>
 
@@ -130,7 +132,7 @@
   update buyforme_details set remark_replay=#{remark} where id=#{id}
   </update>
 
-  <select id="getOrder" resultType="Map">
+    <select id="getOrder" resultType="Map">
   select  a.id as bf_id,a.create_time,a.order_no,a.user_id,b.name,b.email,a.state,c.address,a.delivery_time,
   a.delivery_method,a.ship_feight,a.sample_flag,a.address_id,c.recipients,
    c.address2,c.phone_number,c.zip_code,c.statename,c.street,c.address_email,d.country,c.country as countryId
@@ -140,41 +142,45 @@
   where a.order_no=#{orderNo}
   </select>
 
-  <update id="updateDeliveryTime">update buyforme_orderinfo set delivery_time = #{time},ship_feight=#{feight},delivery_method=#{method} where order_no=#{orderNo}</update>
-  <insert id="insertRemark">insert into buyforme_remark (remark,order_no,create_time) values (#{remark},#{orderNo},now())</insert>
+    <update id="updateDeliveryTime">update buyforme_orderinfo set delivery_time = #{time},ship_feight=#{feight},delivery_method=#{method} where order_no=#{orderNo}</update>
+    <insert id="insertRemark">insert into buyforme_remark (remark,order_no,create_time) values (#{remark},#{orderNo},now())</insert>
 
-  <select id="getRemark" resultType="java.util.Map">select remark,create_time from buyforme_remark where order_no=#{orderNo}</select>
+    <select id="getRemark"
+            resultType="java.util.Map">select remark,create_time from buyforme_remark where order_no=#{orderNo}</select>
 
-  <select id="getTransport" resultType="java.util.Map">SELECT  transport_mode,shipping_time from tab_transit_freightinfo_unite_new GROUP BY transport_mode,shipping_time</select>
+    <select id="getTransport"
+            resultType="java.util.Map">SELECT  transport_mode,shipping_time from tab_transit_freightinfo_unite_new GROUP BY transport_mode,shipping_time</select>
 
-<update id="updateOrdersAddress">
+    <update id="updateOrdersAddress">
 update buyforme_address set address=#{address},address2=#{address2},
 country=#{country},phone_number=#{phone},zip_code=#{code},
 recipients=#{recipients},statename=#{statename},street=#{street}
 where id=#{id}
 </update>
 
-<select id="lstAdms" resultMap="admMap">select  id,admName from  admuser where roleType=4 and buyAuto=1 and status=1</select>
+    <select id="lstAdms"
+            resultMap="admMap">select  id,admName from  admuser where roleType=4 and buyAuto=1 and status=1</select>
 
-<update id="deleteProduct">
+    <update id="deleteProduct">
 update buyforme_details a left join  buyforme_details_sku b on a.id=b.bf_details_id
 set a.state=-1,b.state=-1 where a.id=#{bfdid}
 </update>
 
-<select id="lstCountry" resultMap="zoneBeanMap">select id,country from zone </select>
+    <select id="lstCountry" resultMap="zoneBeanMap">select id,country from zone </select>
 
-  <insert id="insertBFChat" parameterType="com.importExpress.pojo.BFChat">
+    <insert id="insertBFChat" parameterType="com.importExpress.pojo.BFChat">
     insert into buyforme_pid_chat(pid,bd_id,content,order_no)
     values(#{pid},#{bd_id},#{content},#{order_no})
   </insert>
 
-  <select id="queryBFChatList" parameterType="com.importExpress.pojo.BFChat" resultType="com.importExpress.pojo.BFChat">
+    <select id="queryBFChatList" parameterType="com.importExpress.pojo.BFChat"
+            resultType="com.importExpress.pojo.BFChat">
     select id,pid,bd_id,content,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as createTime,order_no
     from buyforme_pid_chat
     where bd_id = #{bd_id}
   </select>
 
-<update id="updateOrderAllState">
+    <update id="updateOrderAllState">
 update  buyforme_orderinfo a left join
  buyforme_details_sku b on a.id=b.bf_id
  left join  buyforme_details c on c.order_no=a.order_no
@@ -230,13 +236,181 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         </if>
     </select>
 
+    <select id="queryStaticList" parameterType="com.importExpress.pojo.BFSearchStatic"
+            resultType="com.importExpress.pojo.BFSearchStatic">
+        select a.id,a.keyword,a.pid1,a.pid2,a.admin_id,a.del_flag,b.admName as admin_name,a.state,a.json_name,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as
+        update_time
+        from buyforme_search_static a left join admuser b on a.admin_id = b.id
+        where 1=1
+        <if test="keyword != null">
+            and a.keyword = #{keyword}
+        </if>
+        <if test="create_time != null">
+            and a.create_time >= #{create_time}
+        </if>
+        <if test="end_time != null">
+            and #{end_time} > a.create_time
+        </if>
+        <if test="admin_id > 0">
+            and a.admin_id = #{admin_id}
+        </if>
+        <if test="del_flag > -1">
+            and a.del_flag = #{del_flag}
+        </if>
+        <if test="del_flag == -1">
+            and a.del_flag > -1
+        </if>
+        order by a.create_time desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryStaticListCount" parameterType="com.importExpress.pojo.BFSearchStatic"
+            resultType="java.lang.Integer">
+        select count(0)
+        from buyforme_search_static a left join admuser b on a.admin_id = b.id
+        where 1=1
+        <if test="keyword != null">
+            <!--and a.keyword like concat(''',#{keyword},'%'')-->
+            and a.keyword = #{keyword}
+        </if>
+        <if test="create_time != null">
+            and a.create_time >= #{create_time}
+        </if>
+        <if test="end_time != null">
+            and #{end_time} > a.create_time
+        </if>
+        <if test="admin_id > 0">
+            and a.admin_id = #{admin_id}
+        </if>
+        <if test="del_flag > -1">
+            and a.del_flag = #{del_flag}
+        </if>
+        <if test="del_flag == -1">
+            and a.del_flag > -1
+        </if>
+    </select>
+
+    <insert id="insertIntoSearchStatic" parameterType="com.importExpress.pojo.BFSearchStatic" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into buyforme_search_static(keyword,pid1,pid2,admin_id)
+        values(#{keyword},#{pid1},#{pid2},#{admin_id})
+    </insert>
+    <update id="updateSearchStatic" parameterType="com.importExpress.pojo.BFSearchStatic">
+        update buyforme_search_static set id = #{id}
+        <if test="num > 1">
+            ,pid2= #{pid2}
+        </if>
+        <if test="num == 1">
+            ,pid1= #{pid1}
+        </if>
+        <if test="num == 0">
+            ,keyword = #{keyword}
+        </if>
+        where id = #{id}
+    </update>
+    <update id="deleteSearchStatic" parameterType="com.importExpress.pojo.BFSearchStatic">
+        delete from buyforme_search_static where id = #{id};
+        delete from buyforme_search_pid where static_id = #{id};
+    </update>
+
+    <select id="queryPidByStaticId" parameterType="com.importExpress.pojo.BFSearchPid"
+            resultType="com.importExpress.pojo.BFSearchPid">
+        select a.id,a.static_id,a.pid,a.title,a.admin_id,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,
+        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.del_flag,b.admName as admin_name
+        from buyforme_search_pid a left join admuser b on a.admin_id = b.id
+        where a.static_id = #{static_id}
+    </select>
+    <insert id="insertIntoStaticPid" parameterType="com.importExpress.pojo.BFSearchPid" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into buyforme_search_pid(static_id,pid,title,admin_id)
+        values(#{static_id},#{pid},#{title},#{admin_id})
+    </insert>
+    <update id="updateStaticPid" parameterType="com.importExpress.pojo.BFSearchPid">
+        update buyforme_search_pid set title = #{title}
+        where static_id = #{static_id} and pid = #{pid}
+    </update>
+    <update id="deleteStaticPid" parameterType="com.importExpress.pojo.BFSearchPid">
+        delete from buyforme_search_pid where static_id = #{static_id} and pid = #{pid};
+        update buyforme_search_static set pid1= '' where id =#{static_id} and pid1 = #{pid};
+        update buyforme_search_static set pid2= '' where id =#{static_id} and pid2 = #{pid};
+    </update>
+
+    <update id="setJsonState">
+        update buyforme_search_static set state = 1
+        <if test="flag == 0">
+            where 1=1
+        </if>
+        <if test="flag > 0">
+            where id in(#{ids})
+        </if>
+    </update>
+
+
+    <select id="pidLogList" parameterType="com.importExpress.pojo.BuyForMePidLog"
+            resultType="com.importExpress.pojo.BuyForMePidLog">
+        select id,type,title,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as
+        create_time,pid,user_id,session_id,img_url,ip
+        from buyforme_pid_log
+        where 1=1
+        <if test="create_time != null">
+            and create_time >= #{create_time}
+        </if>
+        <if test="end_time != null">
+            and #{end_time} >= create_time
+        </if>
+        <if test="pid != null">
+            and pid = #{pid}
+        </if>
+        <if test="type > -1">
+            and type = #{type}
+        </if>
+        <if test="user_id > 0">
+            and user_id = #{user_id}
+        </if>
+        <if test="session_id != null">
+            and session_id = #{session_id}
+        </if>
+        order by create_time desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="pidLogListCount" parameterType="com.importExpress.pojo.BuyForMePidLog"
+            resultType="java.lang.Integer">
+        select count(0)
+        from buyforme_pid_log
+        where 1=1
+        <if test="create_time != null">
+            and create_time >= #{create_time}
+        </if>
+        <if test="end_time != null">
+            and #{end_time} > create_time
+        </if>
+        <if test="pid != null">
+            and pid = #{pid}
+        </if>
+        <if test="type > -1">
+            and type = #{type}
+        </if>
+        <if test="user_id > 0">
+            and user_id = #{user_id}
+        </if>
+        <if test="session_id != null">
+            and session_id = #{session_id}
+        </if>
+    </select>
+
     <select id="queryAllOrderUnPay"  resultType="String">
         select user_id from buyforme_orderinfo where state in (0,1,2)
     </select>
-
     <update id="updateSearchLogCountry" parameterType="java.util.Collection">
         <foreach collection="list" separator=";" item="item">
             update buyforme_search_log set country = #{item.countryName} where ip = #{item.ip}
         </foreach>
     </update>
+
 </mapper>
