@@ -339,6 +339,14 @@ public class OrderCancelApprovalController {
                     approvalService.insertIntoApprovalDetails(approvalDetails);
                     //使用MQ更新线上状态
                     updateOnlineDealState(approvalBean);
+
+                    // 自动审批
+                    approvalBean.setDealState(2);
+                    approvalService.updateOrderCancelApprovalState(approvalBean);
+                    approvalDetails.setDealState(2);
+                    approvalDetails.setRemark(remark + "@【系统自动审批】");
+                    approvalService.insertIntoApprovalDetails(approvalDetails);
+
                 }else if(dealState == 4){
                     approvalService.updateOrderCancelApprovalState(approvalBean);
                     approvalDetails.setDealState(3);
