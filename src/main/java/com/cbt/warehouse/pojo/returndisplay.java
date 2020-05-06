@@ -37,6 +37,55 @@ private double actual_money;//采购输入价格
 private String refund_time;//退款时间
 private double refund_money;//1688抓取退货金额
 private String differences;//金额差异原因
+private Double freight;//公司承担运费
+
+	@Override
+	public String toString() {
+		return "returndisplay{" +
+				"id=" + id +
+				", customerorder='" + customerorder + '\'' +
+				", a1688Order='" + a1688Order + '\'' +
+				", a1688Shipno='" + a1688Shipno + '\'' +
+				", item='" + item + '\'' +
+				", itemNumber=" + itemNumber +
+				", applyUser='" + applyUser + '\'' +
+				", applyTime='" + applyTime + '\'' +
+				", optUser='" + optUser + '\'' +
+				", optTime='" + optTime + '\'' +
+				", shipno='" + shipno + '\'' +
+				", changeShipno='" + changeShipno + '\'' +
+				", State=" + State +
+				", returnNumber=" + returnNumber +
+				", endTime='" + endTime + '\'' +
+				", returnReason='" + returnReason + '\'' +
+				", barcode='" + barcode + '\'' +
+				", placeDate='" + placeDate + '\'' +
+				", signtime='" + signtime + '\'' +
+				", orderInfo='" + orderInfo + '\'' +
+				", sellerpeo='" + sellerpeo + '\'' +
+				", pepoInfo='" + pepoInfo + '\'' +
+				", stateShow='" + stateShow + '\'' +
+				", tbId='" + tbId + '\'' +
+				", sku='" + sku + '\'' +
+				", itemname='" + itemname + '\'' +
+				", imgurl='" + imgurl + '\'' +
+				", returntime='" + returntime + '\'' +
+				", reason='" + reason + '\'' +
+				", actual_money=" + actual_money +
+				", refund_time='" + refund_time + '\'' +
+				", refund_money=" + refund_money +
+				", differences='" + differences + '\'' +
+				", freight=" + freight +
+				'}';
+	}
+
+	public Double getFreight() {
+		return freight;
+	}
+
+	public void setFreight(Double freight) {
+		this.freight = freight;
+	}
 
 	public double getActual_money() {
 		return actual_money;
@@ -117,21 +166,8 @@ public String getTbId() {
 public void setTbId(String tbId) {
 	this.tbId = tbId;
 }
-@Override
-public String toString() {
-	return "returndisplay [id=" + id + ", customerorder=" + customerorder
-			+ ", a1688Order=" + a1688Order + ", a1688Shipno=" + a1688Shipno
-			+ ", item=" + item + ", itemNumber=" + itemNumber + ", applyUser="
-			+ applyUser + ", applyTime=" + applyTime + ", optUser=" + optUser
-			+ ", optTime=" + optTime + ", shipno=" + shipno + ", changeShipno="
-			+ changeShipno + ", State=" + State + ", returnNumber="
-			+ returnNumber + ", endTime=" + endTime + ", returnReason="
-			+ returnReason + ", barcode=" + barcode + ", placeDate="
-			+ placeDate + ", signtime=" + signtime + ", orderInfo=" + orderInfo
-			+ ", sellerpeo=" + sellerpeo + ", pepoInfo=" + pepoInfo
-			+ ", stateShow=" + stateShow + "]";
-}
-public String getStateShow() {
+
+	public String getStateShow() {
 	return stateShow;
 }
 public void setStateShow(String stateShow) {

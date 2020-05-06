@@ -156,20 +156,24 @@
         function tuihuo() {
             var orid=$("#orid").val()
             var odmany=$("#odmany").val()
-            $.ajax({
-                type: "post",
-                url: "/cbtconsole/Look/AddOnlyRefund",
-                data: {orid:orid,odmany:odmany},
-                success: function (res) {
-                    if (res.rows == 1) {
-                       alert(res.message);
-                        window.location.reload();
-                    } else {
-                        $.messager.alert('提示',  res.message);
+            if (odmany!=''&&!isNaN(odmany)){
+                $.ajax({
+                    type: "post",
+                    url: "/cbtconsole/Look/AddOnlyRefund",
+                    data: {orid:orid,odmany:odmany},
+                    success: function (res) {
+                        if (res.rows == 1) {
+                            alert(res.message);
+                            window.location.reload();
+                        } else {
+                            $.messager.alert('提示',  res.message);
 
+                        }
                     }
-                }
-            });
+                });
+            }else {
+                alert("请填入正确的退款金额")
+            }
         }
         function returnOt() {
             var Tborder=$("#Tborderus").val()
@@ -229,7 +233,7 @@
 <h2>特殊订单</h2>
 1688订单号：<input type="text" id="Tborderus" value="${Tborder}">&nbsp;&nbsp;&nbsp;&nbsp; <button onclick="FindTbOrder()">查询</button><br/>
 <br/>
-1688订单号：<input type="text" id="orid">退货金额：<input type="text" id="odmany"><button onclick="tuihuo()">确认</button>(仅退歀)
+1688订单号：<input type="text" id="orid">退货金额：<input type="text" id="odmany" ><button onclick="tuihuo()">确认</button>(仅退歀)
 <br/><br/>
 
 <tr>

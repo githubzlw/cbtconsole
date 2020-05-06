@@ -12,7 +12,7 @@ public interface LookReturnOrderServiceNew {
 	EasyUiJsonResult FindReturndisplay(String applyUser, String state,
 			String a1688Shipno, String optTimeStart, String optTimeEnd,int page,int mid,String user,String a1688order,String pid,String skuid);
 
-	EasyUiJsonResult UpdaeReturnOrder(String ship,String ch,String money);
+	EasyUiJsonResult UpdaeReturnOrder(String ship,String ch,String money,Double freight);
 
 	EasyUiJsonResult RemReturnOrder(String ship,String cusorder);
 

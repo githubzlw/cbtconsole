@@ -133,7 +133,8 @@ taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1
      returntime,
      actual_money,
      refund_money,
-	 return_reason as returnReason
+	 return_reason as returnReason,
+	 freight
       from return_display
        WHERE 1=1
 		<if test="nameString != null">
