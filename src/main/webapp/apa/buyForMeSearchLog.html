@@ -53,6 +53,10 @@
             font-style: normal;
         }
 
+        .img_sty{
+            max-height: 80px;
+            max-width: 80px;
+        }
     </style>
     <script>
         function getUrlParam(name) {
@@ -121,7 +125,15 @@
 
         function formatUserId(val, row, index) {
             if (val > 0) {
-                return '<a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId="' + val + '>' + val + '</a>';
+                return '<a target="_blank" href="/cbtconsole/apa/buyForMePidLog.html?userId=' + val + '">' + val + '</a>';
+            } else {
+                return '';
+            }
+        }
+
+        function formatSession(val, row, index) {
+            if (val) {
+                return '<a target="_blank" href="/cbtconsole/apa/buyForMePidLog.html?userId=' + val + '">' + val + '</a>';
             } else {
                 return '';
             }
@@ -140,7 +152,12 @@
 
         function formatContent(val, row, index) {
             if (val.indexOf("http") > -1) {
-                return '<a target="_blank" href="' + val + '">' + val + '</a>';
+                if(val.indexOf(".jpeg") > -1 || val.indexOf(".jpg") > -1 || val.indexOf(".png") > -1
+                    || val.indexOf(".JPEG") > -1 || val.indexOf(".JPG") > -1 || val.indexOf(".PNG") > -1){
+                    return '<img class="img_sty" src="'+val+'" />';
+                } else {
+                    return '<a target="_blank" href="' + val + '">' + val + '</a>';
+                }
             } else {
                 return val
             }
@@ -184,7 +201,7 @@
         <th data-options="field:'create_time',align:'center',width:'120px'">搜索时间</th>
         <th data-options="field:'countryName',align:'center',width:'80px'">国家</th>
         <th data-options="field:'ip',align:'center',width:'100px'">IP</th>
-        <th data-options="field:'session_id',align:'center',width:'160px'">SessionId</th>
+        <th data-options="field:'session_id',align:'center',width:'160px',formatter:formatSession">SessionId</th>
     </tr>
     </thead>
     <tbody>
