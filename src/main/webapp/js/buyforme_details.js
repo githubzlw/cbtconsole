@@ -177,8 +177,9 @@ $(function(){
 	});
 	$('.transparent-bg').click(function(){
 		$('.transparent,.transparent-bg').hide();
-	})
-	$(".b-add").click(function(){
+	});
+	$(".b-add").hide();
+	/*$(".b-add").click(function(){
 		var price = $(this).parents(".de-td").find(".price-ss").val();
 		var html = '<tr class="sku-td">'+
 			'<td><input type="text" class="input-w8 lu_sku" value=""></td>'+
@@ -192,7 +193,7 @@ $(function(){
 		'</tr>';
 		$(this).parents(".detail-div").find(".lu_tr").append(html);
 		bindClick();
-	})
+	})*/
 
 	$(".btn-finsh").click(function(){
 		var valid = 0;
@@ -282,6 +283,7 @@ $(function(){
 		var url = trp.find(".lu_url").val();
 		var unit = trp.find(".lu_unit").val();
 		var sku = trp.find(".lu_sku").val();
+		var skuid = trp.find(".lu_skuid").val();
 		var id = trp.find(".lu_id").val();
 		var weight = $(this).parents(".detail-div").find(".lu-weight").val();
 		if(num == '' || parseInt(num) < 1 || price == '' || priceBuy==''||priceBuyc==''||url==''||sku==''||unit==''||shipFeight==''){
@@ -303,12 +305,20 @@ $(function(){
 				"url":url,
 				"weight":weight,
 				"unit":unit,
-				"sku":sku
+				"sku":sku,
+				"skuid":skuid
 			},
 			type:"post",
 			success:function(data){
 				if(data.state == 200){
-					window.location.reload();
+                    if (data.message) {
+                        $.MsgBox.Alert("提示", data.message);
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+				        window.location.reload();
+                    }
 				}else{
 					$.MsgBox.Alert("提示", "修改规格失败!");
 				}
@@ -350,10 +360,12 @@ $(function(){
 	})
 	$(".btn-invalid").click(function(){
 		var id = $(this).parents(".sku-u-td").find(".lu_id").val();
+		var bfid = $("#query_bf_id").val();
 		jQuery.ajax({
 			url:"/cbtconsole/bf/invalid",
 			data:{
-				"id":id
+				"id":id,
+				"bfId":bfid
 			},
 			type:"post",
 			success:function(data){
@@ -373,6 +385,11 @@ $(function(){
 	$(".btn-weight").click(function(){
 		var bfdid = $(this).parents(".de-td").find(".bfdid").val();
 		var weight = $(this).parents(".rowweight").find(".lu-weight").val();
+		var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
+		if (!reg.test(weight)) {
+			$.MsgBox.Alert("提示", "重量必须为正数，最多三位小数！");
+			return ;
+		}
 		jQuery.ajax({
 			url:"/cbtconsole/bf/weight",
 			data:{
@@ -426,8 +443,15 @@ function bindClick(){
 		var unit = trp.find(".lu_unit").val();
 		var sku = trp.find(".lu_sku").val();
 		var weight = $(this).parents(".detail-div").find(".lu-weight").val();
+
 		if(num == '' || parseInt(num) < 1 || price == '' || priceBuy==''||priceBuyc==''||url==''||sku==''||unit==''||shipFeight==''){
 			$.MsgBox.Alert("提示", "请确认所填信息是否准确!");
+			return ;
+		}
+
+		var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
+		if (!reg.test(weight)) {
+			$.MsgBox.Alert("提示", "重量必须为正数，最多三位小数！");
 			return ;
 		}
 	    jQuery.ajax({

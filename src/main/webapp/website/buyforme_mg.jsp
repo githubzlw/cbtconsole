@@ -8,7 +8,7 @@
 </style>
 
 
-<title>Buy for me</title>
+<title>BuyForMe申请单</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet"
 	href="/cbtconsole/css/bootstrap/bootstrap.min.css">
@@ -34,7 +34,7 @@
 </head>
 <body style="background-color: #dff0d8;">
 	<div class="container-fluid report">
-		<h1 class="text-center">Buy For Me 申请单</h1>
+		<h1 class="text-center">BuyForMe申请单</h1>
 			
 		<div class="row">
 			<div >

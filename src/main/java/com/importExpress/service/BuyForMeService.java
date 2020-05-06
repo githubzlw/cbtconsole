@@ -1,6 +1,9 @@
 package com.importExpress.service;
 
 import com.cbt.pojo.Admuser;
+import com.importExpress.pojo.*;
+
+import com.cbt.pojo.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.*;
@@ -22,7 +25,11 @@ public interface BuyForMeService {
 
     int addOrderDetailsSku(BFOrderDetailSku detailSku);
 
-    int updateOrderDetailsSkuState(int id, int state);
+    	/**更新sku状态
+	 * @param id
+	 * @return
+	 */
+	int updateOrderDetailsSkuState(int id,int state, int bfId);
 
     int finshOrder(int id);
 
@@ -62,6 +69,37 @@ public interface BuyForMeService {
 
 	List<BuyForMeSearchLog> querySearchList(BuyForMeSearchLog searchLog);
 
-	int querySearchListCount(BuyForMeSearchLog searchLog);
+    int querySearchListCount(BuyForMeSearchLog searchLog);
 
+    List<BFSearchStatic> queryStaticList(BFSearchStatic searchStatic);
+
+    int queryStaticListCount(BFSearchStatic searchStatic);
+
+    int insertIntoSearchStatic(BFSearchStatic searchStatic);
+
+    int updateSearchStatic(BFSearchStatic searchStatic);
+
+    int deleteSearchStatic(BFSearchStatic searchStatic);
+
+    List<BFSearchPid> queryPidByStaticId(int staticId);
+
+    int insertIntoStaticPid(BFSearchPid searchPid);
+
+    int updateStaticPid(BFSearchPid searchPid);
+
+    int deleteStaticPid(BFSearchPid searchPid);
+
+    int setJsonState(int flag, String ids);
+
+
+    List<BuyForMePidLog> pidLogList(BuyForMePidLog pidLog);
+
+    int pidLogListCount(BuyForMePidLog pidLog);
+
+    /**
+     * 更新国家
+     * @param searchLogList
+     * @return
+     */
+    int updateSearchLogList(List<BuyForMeSearchLog> searchLogList);
 }
