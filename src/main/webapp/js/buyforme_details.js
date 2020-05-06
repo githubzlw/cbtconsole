@@ -178,8 +178,8 @@ $(function(){
 	$('.transparent-bg').click(function(){
 		$('.transparent,.transparent-bg').hide();
 	});
-	$(".b-add").hide();
-	/*$(".b-add").click(function(){
+	// $(".b-add").hide();
+	$(".b-add").click(function(){
 		var price = $(this).parents(".de-td").find(".price-ss").val();
 		var html = '<tr class="sku-td">'+
 			'<td><input type="text" class="input-w8 lu_sku" value=""></td>'+
@@ -193,7 +193,7 @@ $(function(){
 		'</tr>';
 		$(this).parents(".detail-div").find(".lu_tr").append(html);
 		bindClick();
-	})*/
+	})
 
 	$(".btn-finsh").click(function(){
 		var valid = 0;
