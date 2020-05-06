@@ -497,8 +497,7 @@ public class OrderCancelApprovalController {
                         if (orderPay > 0) {
                             approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
                         }
-                        if (approvalOld.getDealState() == 1) {
-                            //  || approvalOld.getDealState() == 2
+                        if (approvalOld.getDealState() == 1 || approvalOld.getDealState() == 2) {
                             approvalBean.setDealState(2);
                             approvalService.updateOrderCancelApprovalState(approvalBean);
                             approvalDetails.setDealState(2);
