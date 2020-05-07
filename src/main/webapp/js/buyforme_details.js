@@ -104,13 +104,15 @@ $(function(){
 			$.MsgBox.Alert("提示", "请确认运费、交期是否准确!");
 			return ;
 		}
+		var bfid = $("#query_bf_id").val();
 		jQuery.ajax({
 			url:"/cbtconsole/bf/time",
 			data:{
 				"orderNo":ormnum,
 				"feight":feight,
 				"method":method,
-				"time":time
+				"time":time,
+				"bfid":bfid
 			},
 			type:"post",
 			success:function(data){
@@ -370,7 +372,8 @@ $(function(){
 			type:"post",
 			success:function(data){
 				if(data.state == 200){
-					window.location.reload();
+					$.MsgBox.Alert("提示", "执行成功，请重新刷新运费和确认订单");
+					setTimeout(function(){window.location.reload();},3000);
 				}else{
 					$.MsgBox.Alert("提示", "规格取消失败!");
 				}
