@@ -114,30 +114,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     public int addOrderDetailsSku(BFOrderDetailSku detailSku) {
         int result = 0;
         if (detailSku.getId() == 0) {
-            // result = buyForMemapper.addOrderDetailsSku(detailSku);
-            // 使用MQ插入sku数据
-            List<String> lstValues = Lists.newArrayList();
-            String sql2 = "insert into buyforme_details_sku(sku,product_url,num,price,price_buy,price_buy_c,ship_feight,weight,unit,state,id,bf_id,bf_details_id,num_iid,skuid,remark)" +
-                    "  values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            lstValues.add(detailSku.getSku());
-            lstValues.add(detailSku.getProductUrl());
-            lstValues.add(String.valueOf(detailSku.getNum()));
-            lstValues.add(detailSku.getPrice());
-            lstValues.add(detailSku.getPriceBuy());
-            lstValues.add(detailSku.getPriceBuyc());
-            lstValues.add(detailSku.getShipFeight());
-            lstValues.add(detailSku.getWeight());
-            lstValues.add(detailSku.getUnit());
-            lstValues.add(String.valueOf(detailSku.getState()));
-            lstValues.add(String.valueOf(detailSku.getId()));
-            lstValues.add(String.valueOf(detailSku.getBfId()));
-            lstValues.add(String.valueOf(detailSku.getBfDetailsId()));
-            lstValues.add(detailSku.getNumIid());
-            lstValues.add(detailSku.getSkuid());
-            lstValues.add(detailSku.getRemark());
-            lstValues.add(String.valueOf(detailSku.getState()));
-            SendMQ.sendMsg(new RunSqlModel(DBHelper.covertToSQL(sql2, lstValues)));
-            result = 99;
+            result = buyForMemapper.addOrderDetailsSku(detailSku);
         } else {
             result = buyForMemapper.updateOrderDetailsSku(detailSku);
         }
@@ -169,8 +146,9 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     }
 
     @Override
-    public int updateDeliveryTime(String orderNo, String time, String feight, String method) {
+    public int updateDeliveryTime(String orderNo, String time, String feight, String method, int bfid) {
         int updateDeliveryTime = buyForMemapper.updateDeliveryTime(orderNo, time, feight, method);
+        // buyForMemapper.updateOrdersState(bfid, 1);
         if (updateDeliveryTime > 0) {
             String sql = "update buyforme_orderinfo set delivery_time =?,ship_feight=?,delivery_method=? where order_no=?";
             List<String> lstValue = Lists.newArrayList();
@@ -293,66 +271,6 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     @Override
     public int querySearchListCount(BuyForMeSearchLog searchLog) {
         return buyForMemapper.querySearchListCount(searchLog);
-    }
-
-    @Override
-    public List<BFSearchStatic> queryStaticList(BFSearchStatic searchStatic) {
-        return buyForMemapper.queryStaticList(searchStatic);
-    }
-
-    @Override
-    public int queryStaticListCount(BFSearchStatic searchStatic) {
-        return buyForMemapper.queryStaticListCount(searchStatic);
-    }
-
-    @Override
-    public int insertIntoSearchStatic(BFSearchStatic searchStatic) {
-        return buyForMemapper.insertIntoSearchStatic(searchStatic);
-    }
-
-    @Override
-    public int updateSearchStatic(BFSearchStatic searchStatic) {
-        return buyForMemapper.updateSearchStatic(searchStatic);
-    }
-
-    @Override
-    public int deleteSearchStatic(BFSearchStatic searchStatic) {
-        return buyForMemapper.deleteSearchStatic(searchStatic);
-    }
-
-    @Override
-    public List<BFSearchPid> queryPidByStaticId(int staticId) {
-        return buyForMemapper.queryPidByStaticId(staticId);
-    }
-
-    @Override
-    public int insertIntoStaticPid(BFSearchPid searchPid) {
-        return buyForMemapper.insertIntoStaticPid(searchPid);
-    }
-
-    @Override
-    public int updateStaticPid(BFSearchPid searchPid) {
-        return buyForMemapper.updateStaticPid(searchPid);
-    }
-
-    @Override
-    public int deleteStaticPid(BFSearchPid searchPid) {
-        return buyForMemapper.deleteStaticPid(searchPid);
-    }
-
-    @Override
-    public int setJsonState(int flag, String ids) {
-        return buyForMemapper.setJsonState(flag, ids);
-    }
-
-    @Override
-    public List<BuyForMePidLog> pidLogList(BuyForMePidLog pidLog) {
-        return buyForMemapper.pidLogList(pidLog);
-    }
-
-    @Override
-    public int pidLogListCount(BuyForMePidLog pidLog) {
-        return buyForMemapper.pidLogListCount(pidLog);
     }
 
     @Override

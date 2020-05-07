@@ -53,7 +53,6 @@
         <result column="product_url" property="productUrl" jdbcType="VARCHAR"/>
         <result column="weight" property="weight" jdbcType="VARCHAR"/>
         <result column="unit" property="unit" jdbcType="VARCHAR"/>
-        <result column="img_url" property="imgUrl" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="admMap" type="com.cbt.pojo.Admuser">
@@ -65,21 +64,21 @@
         <result column="country" property="country" jdbcType="VARCHAR"/>
     </resultMap>
 
-  <select id="getOrders" resultMap="infoResultMap">
-  select a.id,a.order_no,a.user_id,a.state,a.pay_price,a.product_cost,a.delivery_time,
-  a.address_id,a.create_time,a.update_time,a.admin_id,a.ip,a.remark,a.ship_feight,a.delivery_method,
-  b.admName,
-  (select email from user where id=a.user_id limit 1) email,
-(select z.country from buyforme_address d left join zone z on d.country=z.id where d.id=a.address_id) country
-  from buyforme_orderinfo a  left join admin_r_user b on a.user_id=b.userid
-  where 1=1
-  <if test="state !=-2">and a.state=#{state}</if>
-  <if test="orderNo !=null">and a.order_no=#{orderNo}</if>
-  <if test="userId !=null">and a.user_id=#{userId}</if>
-  <if test="admid !=0">and b.adminid=#{admid}</if>
-  order by a.create_time desc
-  limit #{page},30
-  </select>
+    <select id="getOrders" resultMap="infoResultMap">
+        select a.id,a.order_no,a.user_id,a.state,a.pay_price,a.product_cost,a.delivery_time,
+        a.address_id,a.create_time,a.update_time,a.admin_id,a.ip,a.remark,a.ship_feight,a.delivery_method,
+        b.admName,
+        (select email from user where id=a.user_id limit 1) email,
+        (select z.country from buyforme_address d left join zone z on d.country=z.id where d.id=a.address_id) country
+        from buyforme_orderinfo a left join admin_r_user b on a.user_id=b.userid
+        where 1=1
+        <if test="state !=-2">and a.state=#{state}</if>
+        <if test="orderNo !=null">and a.order_no=#{orderNo}</if>
+        <if test="userId !=null">and a.user_id=#{userId}</if>
+        <if test="admid !=0">and b.adminid=#{admid}</if>
+        order by a.create_time desc
+        limit #{page},30
+    </select>
 
     <select id="getOrdersCount" resultType="Integer">
         select count(*) from buyforme_orderinfo b left join admin_r_user a on b.user_id=a.userid where 1=1
@@ -95,8 +94,7 @@
   </select>
 
     <select id="getOrderDetailsSku" resultMap="skuResultMap">
-  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,
-  ship_feight,weight,unit,img_url
+  select id,bf_id,bf_details_id,num_iid,skuid,price,num,remark,state,product_url,sku,price_buy,price_buy_c,ship_feight,weight,unit
   from buyforme_details_sku where bf_id= #{bfId}
   </select>
 
@@ -150,6 +148,7 @@
 
     <select id="getTransport"
             resultType="java.util.Map">SELECT  transport_mode,shipping_time from tab_transit_freightinfo_unite_new GROUP BY transport_mode,shipping_time</select>
+
 
     <update id="updateOrdersAddress">
 update buyforme_address set address=#{address},address2=#{address2},
@@ -236,181 +235,13 @@ set a.state=-1,b.state=-1,c.state=-1  where a.id=#{id}
         </if>
     </select>
 
-    <select id="queryStaticList" parameterType="com.importExpress.pojo.BFSearchStatic"
-            resultType="com.importExpress.pojo.BFSearchStatic">
-        select a.id,a.keyword,a.pid1,a.pid2,a.admin_id,a.del_flag,b.admName as admin_name,a.state,a.json_name,
-        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as
-        update_time
-        from buyforme_search_static a left join admuser b on a.admin_id = b.id
-        where 1=1
-        <if test="keyword != null">
-            and a.keyword = #{keyword}
-        </if>
-        <if test="create_time != null">
-            and a.create_time >= #{create_time}
-        </if>
-        <if test="end_time != null">
-            and #{end_time} > a.create_time
-        </if>
-        <if test="admin_id > 0">
-            and a.admin_id = #{admin_id}
-        </if>
-        <if test="del_flag > -1">
-            and a.del_flag = #{del_flag}
-        </if>
-        <if test="del_flag == -1">
-            and a.del_flag > -1
-        </if>
-        order by a.create_time desc
-        <if test="limitNum > 0">
-            limit #{startNum},#{limitNum}
-        </if>
-    </select>
-
-    <select id="queryStaticListCount" parameterType="com.importExpress.pojo.BFSearchStatic"
-            resultType="java.lang.Integer">
-        select count(0)
-        from buyforme_search_static a left join admuser b on a.admin_id = b.id
-        where 1=1
-        <if test="keyword != null">
-            <!--and a.keyword like concat(''',#{keyword},'%'')-->
-            and a.keyword = #{keyword}
-        </if>
-        <if test="create_time != null">
-            and a.create_time >= #{create_time}
-        </if>
-        <if test="end_time != null">
-            and #{end_time} > a.create_time
-        </if>
-        <if test="admin_id > 0">
-            and a.admin_id = #{admin_id}
-        </if>
-        <if test="del_flag > -1">
-            and a.del_flag = #{del_flag}
-        </if>
-        <if test="del_flag == -1">
-            and a.del_flag > -1
-        </if>
-    </select>
-
-    <insert id="insertIntoSearchStatic" parameterType="com.importExpress.pojo.BFSearchStatic" useGeneratedKeys="true"
-            keyProperty="id">
-        insert into buyforme_search_static(keyword,pid1,pid2,admin_id)
-        values(#{keyword},#{pid1},#{pid2},#{admin_id})
-    </insert>
-    <update id="updateSearchStatic" parameterType="com.importExpress.pojo.BFSearchStatic">
-        update buyforme_search_static set id = #{id}
-        <if test="num > 1">
-            ,pid2= #{pid2}
-        </if>
-        <if test="num == 1">
-            ,pid1= #{pid1}
-        </if>
-        <if test="num == 0">
-            ,keyword = #{keyword}
-        </if>
-        where id = #{id}
-    </update>
-    <update id="deleteSearchStatic" parameterType="com.importExpress.pojo.BFSearchStatic">
-        delete from buyforme_search_static where id = #{id};
-        delete from buyforme_search_pid where static_id = #{id};
-    </update>
-
-    <select id="queryPidByStaticId" parameterType="com.importExpress.pojo.BFSearchPid"
-            resultType="com.importExpress.pojo.BFSearchPid">
-        select a.id,a.static_id,a.pid,a.title,a.admin_id,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,
-        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.del_flag,b.admName as admin_name
-        from buyforme_search_pid a left join admuser b on a.admin_id = b.id
-        where a.static_id = #{static_id}
-    </select>
-    <insert id="insertIntoStaticPid" parameterType="com.importExpress.pojo.BFSearchPid" useGeneratedKeys="true"
-            keyProperty="id">
-        insert into buyforme_search_pid(static_id,pid,title,admin_id)
-        values(#{static_id},#{pid},#{title},#{admin_id})
-    </insert>
-    <update id="updateStaticPid" parameterType="com.importExpress.pojo.BFSearchPid">
-        update buyforme_search_pid set title = #{title}
-        where static_id = #{static_id} and pid = #{pid}
-    </update>
-    <update id="deleteStaticPid" parameterType="com.importExpress.pojo.BFSearchPid">
-        delete from buyforme_search_pid where static_id = #{static_id} and pid = #{pid};
-        update buyforme_search_static set pid1= '' where id =#{static_id} and pid1 = #{pid};
-        update buyforme_search_static set pid2= '' where id =#{static_id} and pid2 = #{pid};
-    </update>
-
-    <update id="setJsonState">
-        update buyforme_search_static set state = 1
-        <if test="flag == 0">
-            where 1=1
-        </if>
-        <if test="flag > 0">
-            where id in(#{ids})
-        </if>
-    </update>
-
-
-    <select id="pidLogList" parameterType="com.importExpress.pojo.BuyForMePidLog"
-            resultType="com.importExpress.pojo.BuyForMePidLog">
-        select id,type,title,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as
-        create_time,pid,user_id,session_id,img_url,ip
-        from buyforme_pid_log
-        where 1=1
-        <if test="create_time != null">
-            and create_time >= #{create_time}
-        </if>
-        <if test="end_time != null">
-            and #{end_time} >= create_time
-        </if>
-        <if test="pid != null">
-            and pid = #{pid}
-        </if>
-        <if test="type > -1">
-            and type = #{type}
-        </if>
-        <if test="user_id > 0">
-            and user_id = #{user_id}
-        </if>
-        <if test="session_id != null">
-            and session_id = #{session_id}
-        </if>
-        order by create_time desc
-        <if test="limitNum > 0">
-            limit #{startNum},#{limitNum}
-        </if>
-    </select>
-
-    <select id="pidLogListCount" parameterType="com.importExpress.pojo.BuyForMePidLog"
-            resultType="java.lang.Integer">
-        select count(0)
-        from buyforme_pid_log
-        where 1=1
-        <if test="create_time != null">
-            and create_time >= #{create_time}
-        </if>
-        <if test="end_time != null">
-            and #{end_time} > create_time
-        </if>
-        <if test="pid != null">
-            and pid = #{pid}
-        </if>
-        <if test="type > -1">
-            and type = #{type}
-        </if>
-        <if test="user_id > 0">
-            and user_id = #{user_id}
-        </if>
-        <if test="session_id != null">
-            and session_id = #{session_id}
-        </if>
-    </select>
-
-    <select id="queryAllOrderUnPay"  resultType="String">
+    <select id="queryAllOrderUnPay" resultType="String">
         select user_id from buyforme_orderinfo where state in (0,1,2)
     </select>
+
     <update id="updateSearchLogCountry" parameterType="java.util.Collection">
         <foreach collection="list" separator=";" item="item">
             update buyforme_search_log set country = #{item.countryName} where ip = #{item.ip}
         </foreach>
     </update>
-
 </mapper>
