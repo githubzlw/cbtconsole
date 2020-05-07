@@ -1,31 +1,5 @@
 package com.importExpress.controller;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.cbt.pojo.BuyForMeStatistic;
-import com.cbt.website.util.EasyUiJsonResult;
-import com.cbt.website.util.UploadByOkHttp;
-import com.google.gson.Gson;
-import com.importExpress.pojo.*;
-import lombok.NonNull;
-import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.common.aliasing.qual.LeakedToResult;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.ModelAndView;
-
 import com.cbt.jdbc.DBHelper;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.pojo.Admuser;
@@ -33,6 +7,7 @@ import com.cbt.util.FtpConfig;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.GoodsInfoUtils;
 import com.cbt.util.StrUtils;
+import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.UploadByOkHttp;
 import com.google.common.collect.Lists;
@@ -43,13 +18,12 @@ import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
@@ -124,31 +98,31 @@ public class BuyForMeController {
     @RequestMapping("/detail")
     @ResponseBody
     public ModelAndView orderDetail(HttpServletRequest request, HttpServletResponse response) {
-    	ModelAndView mv = new ModelAndView("buyforme_detail");
-    	try {
-			
-    		String orderNo = request.getParameter("no");
-    		String bfid = request.getParameter("bfid");
-    		List<BFOrderDetail> orderDetails = buyForMeService.getOrderDetails(orderNo,bfid);
-    		mv.addObject("orderDetails", orderDetails);
-    		//订单状态：-1 取消，0申请，1处理中 2销售处理完成 3已支付
-    		
-    		Map<String, Object> order = buyForMeService.getOrder(orderNo);
-    		if(order != null) {
-    			int state = Integer.parseInt(StrUtils.object2Str(order.get("state")));
-    			String strState = state == -1?"申请已取消":state==0?
-    					"申请待处理":state==1?"申请处理中":state==2?"销售处理完成":state==3?"待支付":state==4?"已支付":"";
-    			order.put("stateContent", strState);
-    			String delivery_method = StrUtils.object2Str(order.get("delivery_method"));
-    			order.put("delivery_method", delivery_method);
-    		}
-    		List<Map<String,String>> remark = buyForMeService.getRemark(orderNo);
-    		mv.addObject("remark", remark);
-    		mv.addObject("order", order);
-    		
-    		List<ZoneBean> lstCountry = buyForMeService.lstCountry();
-    		mv.addObject("countrys", lstCountry);
-    		
+        ModelAndView mv = new ModelAndView("buyforme_detail");
+        try {
+
+            String orderNo = request.getParameter("no");
+            String bfid = request.getParameter("bfid");
+            List<BFOrderDetail> orderDetails = buyForMeService.getOrderDetails(orderNo, bfid);
+            mv.addObject("orderDetails", orderDetails);
+            //订单状态：-1 取消，0申请，1处理中 2销售处理完成 3已支付
+
+            Map<String, Object> order = buyForMeService.getOrder(orderNo);
+            if (order != null) {
+                int state = Integer.parseInt(StrUtils.object2Str(order.get("state")));
+                String strState = state == -1 ? "申请已取消" : state == 0 ?
+                        "申请待处理" : state == 1 ? "申请处理中" : state == 2 ? "销售处理完成" : state == 3 ? "待支付" : state == 4 ? "已支付" : "";
+                order.put("stateContent", strState);
+                String delivery_method = StrUtils.object2Str(order.get("delivery_method"));
+                order.put("delivery_method", delivery_method);
+            }
+            List<Map<String, String>> remark = buyForMeService.getRemark(orderNo);
+            mv.addObject("remark", remark);
+            mv.addObject("order", order);
+
+            List<ZoneBean> lstCountry = buyForMeService.lstCountry();
+            mv.addObject("countrys", lstCountry);
+
 //    		Map<String, List<String>> transport = buyForMeService.getTransport();
 //    		mv.addObject("transport", transport);
         } catch (Exception e) {
@@ -194,11 +168,12 @@ public class BuyForMeController {
         try {
             String id = request.getParameter("id");
             String delete = request.getParameter("delete");
+            String bfId = request.getParameter("bfid");
             int addOrderDetailsSku = 0;
             if (StringUtils.isNotBlank(delete) && "1".equals(delete)) {
-                addOrderDetailsSku = buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id) ? Integer.parseInt(id) : 0, -1);
+                addOrderDetailsSku = buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id) ? Integer.parseInt(id) : 0, -1, Integer.parseInt(bfId));
             } else {
-                String bfId = request.getParameter("bfid");
+
                 String bfDetailsId = request.getParameter("bfdid");
                 String num = request.getParameter("num");
                 BFOrderDetailSku detailSku = new BFOrderDetailSku();
@@ -243,9 +218,11 @@ public class BuyForMeController {
         try {
 
             String id = request.getParameter("id");
+            String bfId = request.getParameter("bfId");
+            Assert.notNull(bfId, "bfId is null");
             int updateOrderDetailsSkuState =
-                    buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id) ? Integer.parseInt(id) : 0, 0);
-
+                    buyForMeService.updateOrderDetailsSkuState(StringUtils.isNotBlank(id) ? Integer.parseInt(id) : 0, 0,
+                            Integer.parseInt(bfId));
             mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
         } catch (Exception e) {
             mv.put("state", 500);
@@ -295,7 +272,9 @@ public class BuyForMeController {
             String time = request.getParameter("time");
             String feight = request.getParameter("feight");
             String method = request.getParameter("method");
-            int update = buyForMeService.updateDeliveryTime(orderNo, time, feight, method);
+            String bfid = request.getParameter("bfid");
+            Assert.notNull(bfid, "bfid is null");
+            int update = buyForMeService.updateDeliveryTime(orderNo, time, feight, method, Integer.parseInt(bfid));
             mv.put("state", update > 0 ? 200 : 500);
         } catch (Exception e) {
             mv.put("state", 500);
@@ -636,7 +615,7 @@ public class BuyForMeController {
     @RequestMapping("/searchList")
     @ResponseBody
     public JsonResult searchList(HttpServletRequest request, String beginTime, String endTime, Integer searchType,
-                                 Integer page, Integer rows) {
+                                 Integer userId, String sessionId, Integer page, Integer rows) {
         JsonResult json = new JsonResult();
         try {
             BuyForMeSearchLog searchLog = new BuyForMeSearchLog();
@@ -653,11 +632,16 @@ public class BuyForMeController {
             }
             if (StringUtils.isNotBlank(endTime)) {
                 LocalDate today = LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                today.plusDays(1);
-                searchLog.setEnd_time(today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                searchLog.setEnd_time(today.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             }
-            if (searchType != null && searchType > 0) {
+            if (null != searchType && searchType > 0) {
                 searchLog.setSearch_type(searchType);
+            }
+            if (null != userId && userId > 0) {
+                searchLog.setUser_id(userId);
+            }
+            if (StringUtils.isNotBlank(sessionId)) {
+                searchLog.setSession_id(sessionId);
             }
 
             int total = buyForMeService.querySearchListCount(searchLog);
@@ -698,56 +682,98 @@ public class BuyForMeController {
             return JsonResult.error(e.getMessage());
         }
     }
-    @RequestMapping("/queryCustomers")
-	@ResponseBody
-	public EasyUiJsonResult queryCustomers(HttpServletRequest request, HttpServletResponse response){
-		EasyUiJsonResult json = new EasyUiJsonResult();
-		ShopCarUserStatistic statistic = new ShopCarUserStatistic();
-		int startNum = 0;
-		int limitNum = 10;
-		String rowsStr = request.getParameter("rows");
-		if (StringUtils.isNotBlank(rowsStr)) {
-			limitNum = Integer.valueOf(rowsStr);
-		}
-		String pageStr = request.getParameter("page");
-		if (StringUtils.isNotBlank(pageStr)) {
-			startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
-		}
 
-		String userIdStr = request.getParameter("userId");
-		int userId = 0;
-		if (StringUtils.isNotBlank(userIdStr)) {
-			userId = Integer.parseInt(userIdStr);
-		}
-		String adminId = request.getParameter("adminId");
-		if (StringUtils.isNotBlank(adminId) && !adminId.equals("0")) {
-			statistic.setAdmname (adminId);
-		}
-		statistic.setUserId(userId);
-		statistic.setStartNum(startNum);
-		statistic.setLimitNum(limitNum);
-		json = buyForMeService. queryCustomers(statistic);
-    	return json;
-	}
-	@GetMapping("/{userId}")
-	public ModelAndView getCartDetailByCustomerId(@PathVariable(value = "userId") String userId, HttpServletRequest request){
-		ModelAndView mv = new ModelAndView("buyforme_cart_detail");
-		JsonResult customerCartDetails = buyForMeService.getCustomerCartDetails(userId);
-		List<ZoneBean> lstCountry = buyForMeService.lstCountry();
-		mv.addObject("countrys", lstCountry);
-		if(customerCartDetails.getData() != null){
-            request.setAttribute("result",customerCartDetails.getData());
-			//mv.addObject("result",new Gson().toJson(customerCartDetails.getData()));
-		}
-		return mv;
-	}
-	@PostMapping("/{userId}/{itemid}")
-	@ResponseBody
-	public CommonResult putMsg(@PathVariable(value = "userId") String userId,
-							   @PathVariable(value = "itemid") String itemid,
-							   @RequestParam(value = "msg",defaultValue = "1")String msg){
-		CommonResult commonResult = buyForMeService.putMsg(userId, itemid, msg);
-		return commonResult;
-	}
+    @RequestMapping("/queryCustomers")
+    @ResponseBody
+    public EasyUiJsonResult queryCustomers(HttpServletRequest request, HttpServletResponse response) {
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        ShopCarUserStatistic statistic = new ShopCarUserStatistic();
+        int startNum = 0;
+        int limitNum = 10;
+        String rowsStr = request.getParameter("rows");
+        if (StringUtils.isNotBlank(rowsStr)) {
+            limitNum = Integer.valueOf(rowsStr);
+        }
+        String pageStr = request.getParameter("page");
+        if (StringUtils.isNotBlank(pageStr)) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+
+        String userIdStr = request.getParameter("userId");
+        int userId = 0;
+        if (StringUtils.isNotBlank(userIdStr)) {
+            userId = Integer.parseInt(userIdStr);
+        }
+        String adminId = request.getParameter("adminId");
+        if (StringUtils.isNotBlank(adminId) && !adminId.equals("0")) {
+            statistic.setAdmname(adminId);
+        }
+        statistic.setUserId(userId);
+        statistic.setStartNum(startNum);
+        statistic.setLimitNum(limitNum);
+        json = buyForMeService.queryCustomers(statistic);
+        return json;
+    }
+
+    @GetMapping("/{userId}")
+    public ModelAndView getCartDetailByCustomerId(@PathVariable(value = "userId") String userId, HttpServletRequest request) {
+        ModelAndView mv = new ModelAndView("buyforme_cart_detail");
+        JsonResult customerCartDetails = buyForMeService.getCustomerCartDetails(userId);
+        List<ZoneBean> lstCountry = buyForMeService.lstCountry();
+        mv.addObject("countrys", lstCountry);
+        if (customerCartDetails.getData() != null) {
+            request.setAttribute("result", customerCartDetails.getData());
+            //mv.addObject("result",new Gson().toJson(customerCartDetails.getData()));
+        }
+        return mv;
+    }
+
+    @PostMapping("/{userId}/{itemid}")
+    @ResponseBody
+    public CommonResult putMsg(@PathVariable(value = "userId") String userId,
+                               @PathVariable(value = "itemid") String itemid,
+                               @RequestParam(value = "msg", defaultValue = "1") String msg) {
+        CommonResult commonResult = buyForMeService.putMsg(userId, itemid, msg);
+        return commonResult;
+    }
+
+    @RequestMapping("/updateCountryList")
+    @ResponseBody
+    public CommonResult updateCountryList() {
+        try {
+            int limitNum = 500;
+            BuyForMeSearchLog searchLog = new BuyForMeSearchLog();
+            int count = buyForMeService.querySearchListCount(searchLog);
+            int fc = 0;
+            if (count > 0) {
+                fc = count / limitNum;
+                if (fc % limitNum > 0) {
+                    fc++;
+                }
+                searchLog.setLimitNum(limitNum);
+                count = 0;
+                for (int i = 1; i <= fc; i++) {
+                    searchLog.setStartNum((i - 1) * limitNum);
+                    List<BuyForMeSearchLog> searchLogList = buyForMeService.querySearchList(searchLog);
+                    if (CollectionUtils.isNotEmpty(searchLogList)) {
+                        System.err.println("i/fc:" + i + "/" + fc + ", size:" + searchLogList.size());
+                        try {
+                            count += buyForMeService.updateSearchLogList(searchLogList);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            log.error("updateCountryList error:", e);
+                        }
+                    } else {
+                        System.err.println("i/fc:" + i + "/" + fc + ", size:0");
+                    }
+                }
+            }
+            return CommonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("updateCountryList error:", e);
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 
 }
