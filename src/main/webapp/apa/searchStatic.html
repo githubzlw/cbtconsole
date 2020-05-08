@@ -130,6 +130,7 @@
         closeDialog();
         setDatagrid();
         getAdminList();
+        doQuery();
     });
 
     function chooseSite() {
@@ -137,7 +138,7 @@
         if (url.indexOf("192.168.1.9") > -1 || url.indexOf("27.115.38.42") > -1 || url.indexOf("192.168.1.27") > -1) {
             siteUrl = "http://52.37.218.73:15792/CbtStaticize/";
         } else {
-            siteUrl = "http://192.168.1.67:8383/CbtStaticize/";
+            siteUrl = "http://192.168.1.153:8088/CbtStaticize/";
             // siteUrl = "http://192.168.1.163:8081/";
         }
     }
@@ -444,7 +445,7 @@
         <th data-options="field:'keyword',align:'center',width:'160px'">关键词</th>
         <th data-options="field:'site',align:'center',width:'70px',formatter:formatSite">网站</th>
         <th data-options="field:'valid',align:'center',width:'70px',formatter:formatValid">是否启用</th>
-        <th data-options="field:'state',align:'center',width:'120px',formatter:formatState">状态</th>
+        <th data-options="field:'state',align:'center',width:'160px',formatter:formatState">状态</th>
         <th data-options="field:'create_time',align:'center',width:'110px'">创建时间</th>
         <th data-options="field:'admin_name',align:'center',width:'70px'">创建人</th>
         <th data-options="field:'update_time',align:'center',width:'110px'">更新时间</th>
