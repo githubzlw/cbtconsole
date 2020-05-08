@@ -526,9 +526,14 @@ public class OrderwsDao implements IOrderwsDao {
                     }
                 }
             }
-        } catch (SQLException e) {
+        }
+        /*catch (SQLException e) {
             e.printStackTrace();
-        } finally {
+        }*/
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
             DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
