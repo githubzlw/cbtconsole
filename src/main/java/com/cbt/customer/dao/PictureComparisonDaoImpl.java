@@ -5406,20 +5406,33 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 					sql = sql +"from goodsdatacheck gk ";
 					sql = sql +"where gk.id ="+goodsId;
 				}else{
+					//update 20200508 start
+//					sql = sql +"select  gk.id,gk.url,gk.price,gk.goodsname,gk.imgpath,gk.tburl,gk.tbprice,gk.tbname,gk.tbimg,gk.tburl1,gk.tbprice1,gk.tbname1,gk.tbimg1, ";
+//					sql = sql +"gk.tburl2,gk.tbprice2,gk.tbname2,gk.tbimg2,gk.tburl3,gk.tbprice3,gk.tbname3,gk.tbimg3, ";
+//					sql = sql +"gs.goods_purl,gs.goods_price,gs.goods_name as chagoodsname,gs.goods_img_url ";
+//					sql = sql +"from  goods_source gs left join goodsdatacheck gk ";
+//					sql = sql +"on gs.goods_url = gk.url ";
+//					sql = sql +"where gs.goods_url =? ";
+//					sql = sql +"and gs.goods_purl =? ";
+//					sql = sql +"and gk.id =? ";
+
 					sql = sql +"select  gk.id,gk.url,gk.price,gk.goodsname,gk.imgpath,gk.tburl,gk.tbprice,gk.tbname,gk.tbimg,gk.tburl1,gk.tbprice1,gk.tbname1,gk.tbimg1, ";
 					sql = sql +"gk.tburl2,gk.tbprice2,gk.tbname2,gk.tbimg2,gk.tburl3,gk.tbprice3,gk.tbname3,gk.tbimg3, ";
 					sql = sql +"gs.goods_purl,gs.goods_price,gs.goods_name as chagoodsname,gs.goods_img_url ";
-					sql = sql +"from  goods_source gs left join goodsdatacheck gk ";
-					sql = sql +"on gs.goods_url = gk.url ";
-					sql = sql +"where gs.goods_url =? ";
-					sql = sql +"and gs.goods_purl =? ";
-					sql = sql +"and gk.id =? ";
+					sql = sql +"from  goodsdatacheck gk left join goods_source gs ";
+					sql = sql +"on gs.goods_purl =? ";
+					sql = sql +"and  func_get_split_string(gs.goods_url,'-',20)= func_get_split_string(gk.url,'-',20)   ";
+					sql = sql +"where gk.id =? ";
+					//update 20200508 end
+
 				}
 				stmt = conn.prepareStatement(sql);
 				if(!"tb1".equals(changeFlag) && !"tb2".equals(changeFlag) && !"tb3".equals(changeFlag) && !"tb4".equals(changeFlag)){
-					stmt.setString(1, importUrl);
-					stmt.setString(2, changeFlag);
-					stmt.setInt(3, goodsId);
+					//del 20200508 start
+//					stmt.setString(1, importUrl);
+					//del 20200508 end
+					stmt.setString(1, changeFlag);
+					stmt.setInt(2, goodsId);
 				}
 				rs = stmt.executeQuery();
 				if(rs.next()){
