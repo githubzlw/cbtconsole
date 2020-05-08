@@ -1,6 +1,7 @@
 package com.importExpress.controller;
 
 import com.alibaba.fastjson.JSONArray;
+import com.cbt.pojo.SearchStatic;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.BigDecimalUtil;
 import com.cbt.util.Redis;
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -51,7 +53,6 @@ public class HotManageController {
 
     // private static final String HOT_FILE_LOCAL_PATH = "E:/hotJson";
     // private static final String HOT_UPLOAD_TO_PATH = "http://127.0.0.1:8087/popProducts/hotFileUpload";
-
 
 
     private OKHttpUtils okHttpUtils = new OKHttpUtils();
@@ -109,7 +110,7 @@ public class HotManageController {
         }
         int webSite = 1;
         String webSiteStr = request.getParameter("webSite");
-        if(StringUtils.isNotBlank(webSiteStr) && Integer.valueOf(webSiteStr) > 0){
+        if (StringUtils.isNotBlank(webSiteStr) && Integer.valueOf(webSiteStr) > 0) {
             webSite = Integer.valueOf(webSiteStr);
         }
         HotCategory param = new HotCategory();
@@ -236,11 +237,11 @@ public class HotManageController {
             enter_sort = Integer.valueOf(enter_sortStr);
         }
 
-        int webSite =0;
+        int webSite = 0;
         String webSiteStr = request.getParameter("webSite");
-        if(StringUtils.isNotBlank(webSiteStr) && Integer.valueOf(webSiteStr) > 0){
+        if (StringUtils.isNotBlank(webSiteStr) && Integer.valueOf(webSiteStr) > 0) {
             webSite = Integer.valueOf(webSiteStr);
-        }else {
+        } else {
             json.setOk(false);
             json.setMessage("获取网站类别失败");
             return json;
@@ -351,11 +352,11 @@ public class HotManageController {
             enter_sort = Integer.valueOf(enter_sortStr);
         }
 
-        int webSite =0;
+        int webSite = 0;
         String webSiteStr = request.getParameter("webSite");
-        if(StringUtils.isNotBlank(webSiteStr) && Integer.valueOf(webSiteStr) > 0){
+        if (StringUtils.isNotBlank(webSiteStr) && Integer.valueOf(webSiteStr) > 0) {
             webSite = Integer.valueOf(webSiteStr);
-        }else {
+        } else {
             json.setOk(false);
             json.setMessage("获取网站类别失败");
             return json;
@@ -450,11 +451,11 @@ public class HotManageController {
 
         String categoryIdStr = request.getParameter("categoryId");
         String webType = request.getParameter("webType");
-        if(StringUtils.isBlank(webType)) {
+        if (StringUtils.isBlank(webType)) {
             mv.addObject("isShow", 0);
             mv.addObject("message", "获取网站类别失败");
             return mv;
-        }else{
+        } else {
             mv.addObject("webType", webType);
         }
 
@@ -474,13 +475,13 @@ public class HotManageController {
             int isOnTotal = 0;
             for (HotSellingGoods goods : goodsList) {
                 String goodsImgUrl = goods.getGoodsImg();
-                if(goodsImgUrl.indexOf("http")>-1){
-                    if(goodsImgUrl.split("http").length > 2){
-                        goods.setGoodsImg("http"+ goodsImgUrl.split("http")[2]);
+                if (goodsImgUrl.indexOf("http") > -1) {
+                    if (goodsImgUrl.split("http").length > 2) {
+                        goods.setGoodsImg("http" + goodsImgUrl.split("http")[2]);
                     }
                 }
-                if("1".equals(goods.getIsOn())){
-                    isOnTotal ++;
+                if ("1".equals(goods.getIsOn())) {
+                    isOnTotal++;
                 }
                 String range_price = StrUtils.object2Str(goods.getRangePrice());
                 String maxPrice = "";
@@ -1003,62 +1004,62 @@ public class HotManageController {
 
 
     /**
-	 * 刷新热卖商品json文件
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping("/refreshHotJson")
-	@ResponseBody
-	public int refreshHotJson(HttpServletRequest request,HttpServletResponse response){
+     * 刷新热卖商品json文件
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/refreshHotJson")
+    @ResponseBody
+    public int refreshHotJson(HttpServletRequest request, HttpServletResponse response) {
 
-		try {
-		    HotCategory param = new HotCategory();
-		    param.setIsOn(1);
-			for (int hotType = 1; hotType < 8; hotType++) {
-				List<HotCategoryShow> resultList = new ArrayList<HotCategoryShow>();
-				param.setHotType(hotType);
-				List<HotCategory> categoryList = hotManageService.queryCategoryList(param);
-				List<HotSellGoods> hotGoodsList = hotManageService.queryGoodsByHotType(hotType);
-				genHotGoodsData(categoryList,hotGoodsList,resultList);
-				//匹配文件信息
-				String fileName = "";
-				if (hotType == 1) {
-					fileName = "queryAllHotGoodsOld.json";
-				} else if (hotType == 2) {
-					fileName = "index-new-C2.json";
-				} else if (hotType == 3) {
-					fileName = "index-new-C3.json";
-				} else if (hotType == 4) {
-					fileName = "queryGoodsByHotTypePanda.json";
-				} else if (hotType == 5) {
-					fileName = "queryGoodsByHotTypeAlisa.json";
-				} else if (hotType == 6) {
-					fileName = "queryAllHotGoodsMobile.json";
-				} else if (hotType == 7) {
-					fileName = "index-new-C4.json";
-				}
-				writeHotGoodsJson(resultList, fileName);
-				categoryList.clear();
-				hotGoodsList.clear();
-				resultList.clear();
-			}
-			// 刷新到线上
-            boolean isSuccess = uploadFileToOnline();
-			if(isSuccess){
-			    return 1;
-            }else{
-			    return 0;
+        try {
+            HotCategory param = new HotCategory();
+            param.setIsOn(1);
+            for (int hotType = 1; hotType < 8; hotType++) {
+                List<HotCategoryShow> resultList = new ArrayList<HotCategoryShow>();
+                param.setHotType(hotType);
+                List<HotCategory> categoryList = hotManageService.queryCategoryList(param);
+                List<HotSellGoods> hotGoodsList = hotManageService.queryGoodsByHotType(hotType);
+                genHotGoodsData(categoryList, hotGoodsList, resultList);
+                //匹配文件信息
+                String fileName = "";
+                if (hotType == 1) {
+                    fileName = "queryAllHotGoodsOld.json";
+                } else if (hotType == 2) {
+                    fileName = "index-new-C2.json";
+                } else if (hotType == 3) {
+                    fileName = "index-new-C3.json";
+                } else if (hotType == 4) {
+                    fileName = "queryGoodsByHotTypePanda.json";
+                } else if (hotType == 5) {
+                    fileName = "queryGoodsByHotTypeAlisa.json";
+                } else if (hotType == 6) {
+                    fileName = "queryAllHotGoodsMobile.json";
+                } else if (hotType == 7) {
+                    fileName = "index-new-C4.json";
+                }
+                writeHotGoodsJson(resultList, fileName);
+                categoryList.clear();
+                hotGoodsList.clear();
+                resultList.clear();
             }
-		} catch (Exception e) {
-			e.printStackTrace();
-			return 0;
-		}
-	}
+            // 刷新到线上
+            boolean isSuccess = uploadFileToOnline();
+            if (isSuccess) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
 
 
-
-	@RequestMapping(value = "/useGoodsPromotionFlag")
+    @RequestMapping(value = "/useGoodsPromotionFlag")
     @ResponseBody
     public JsonResult useGoodsPromotionFlag(HttpServletRequest request, HttpServletResponse response) {
 
@@ -1110,7 +1111,7 @@ public class HotManageController {
     public EasyUiJsonResult getHotTypeList(Integer hotType) {
 
         EasyUiJsonResult json = new EasyUiJsonResult();
-        if(hotType == null || hotType< 0){
+        if (hotType == null || hotType < 0) {
             json.setSuccess(false);
             json.setMessage("获取类别失败");
             return json;
@@ -1144,10 +1145,10 @@ public class HotManageController {
         JsonResult json = new JsonResult();
         HotClassInfo classInfo = new HotClassInfo();
 
-        if(StringUtils.isNotBlank(jsonName)){
+        if (StringUtils.isNotBlank(jsonName)) {
             classInfo.setJsonName(jsonName);
         }
-        if(StringUtils.isNotBlank(className)){
+        if (StringUtils.isNotBlank(className)) {
             classInfo.setClassName(className);
         }
         if (rows > 0 && page > 0) {
@@ -1214,14 +1215,14 @@ public class HotManageController {
             List<HotClassInfo> list = hotManageService.getClassInfoList(classInfo);
             HotClassInfo classInfoRs = null;
             if (list != null && list.size() > 0) {
-                for(HotClassInfo info : list){
-                    if(info.getId() == id){
+                for (HotClassInfo info : list) {
+                    if (info.getId() == id) {
                         classInfoRs = info;
                         break;
                     }
                 }
                 list.clear();
-                if(classInfoRs == null){
+                if (classInfoRs == null) {
                     json.setOk(false);
                     json.setMessage("获取信息失败");
                     return json;
@@ -1267,7 +1268,7 @@ public class HotManageController {
             json.setOk(false);
             json.setMessage("获取json名称失败");
             return json;
-        }else if(!jsonName.endsWith(".json")){
+        } else if (!jsonName.endsWith(".json")) {
             jsonName += ".json";
         }
         try {
@@ -1296,7 +1297,7 @@ public class HotManageController {
     @RequestMapping("/deleteClassIfo")
     @ResponseBody
     public JsonResult deleteClassIfo(HttpServletRequest request,
-                                   @RequestParam(value = "id", required = true) Integer id) {
+                                     @RequestParam(value = "id", required = true) Integer id) {
 
         JsonResult json = new JsonResult();
         com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
@@ -1323,43 +1324,189 @@ public class HotManageController {
         return json;
     }
 
-	/**
-	 * 热卖json信息写入
-	 * @param resultList
-	 * @param fileName
-	 */
-	private void writeHotGoodsJson(List<HotCategoryShow> resultList,String fileName) {
-		FileWriter fw = null;
-		PrintWriter out = null;
-		try {
-			File patentFile = new File(HOT_FILE_LOCAL_PATH);
-			if(!(patentFile.exists() && patentFile.isDirectory())){
-				patentFile.mkdirs();
-			}
-			fw = new FileWriter(HOT_FILE_LOCAL_PATH + "/" + fileName, false);
-			out = new PrintWriter(fw);
-			//JSONObject dataJson = JSONObject.fromObject(resultList);
-			out.write(JSONArray.toJSONString(resultList));
-			out.println();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			LOG.error(fileName + " writeHotGoodsJson,error:" + e.getMessage());
-		} finally {
-			if (fw != null) {
-				try {
-					fw.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (out != null) {
-				out.close();
-			}
-		}
-	}
+    @RequestMapping("/searchStaticList")
+    @ResponseBody
+    public JsonResult searchStaticList(SearchStatic searchStatic) {
 
-	private boolean uploadFileToOnline() {
+        JsonResult json = new JsonResult();
+        try {
+            Assert.notNull(searchStatic, "searchStatic null");
+
+            if (StringUtils.isBlank(searchStatic.getKeyword())) {
+                searchStatic.setKeyword(null);
+            }
+            if (searchStatic.getRows() == null) {
+                searchStatic.setRows(50);
+            }
+            if (searchStatic.getPage() == null) {
+                searchStatic.setPage(1);
+            }
+            searchStatic.setStartNum((searchStatic.getPage() - 1) * searchStatic.getRows());
+            searchStatic.setLimitNum(searchStatic.getRows());
+
+            int count = hotManageService.querySearchStaticListCount(searchStatic);
+            if (count > 0) {
+                List<SearchStatic> list = hotManageService.querySearchStaticList(searchStatic);
+                json.setSuccess(list, count);
+            } else {
+                json.setSuccess(new ArrayList<>(), count);
+            }
+            return json;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("searchStatic，原因 :" + e.getMessage());
+            return JsonResult.error("searchStatic error，原因:" + e.getMessage());
+        }
+    }
+
+
+    @RequestMapping("/addStatic")
+    @ResponseBody
+    public JsonResult addStatic(HttpServletRequest request, SearchStatic searchStatic) {
+
+        try {
+            Assert.notNull(searchStatic, "searchStatic null");
+            com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+            if (admuser == null || admuser.getId() == 0) {
+                return JsonResult.error("请登录后重试");
+            }
+            int count = hotManageService.checkSearchStatic(searchStatic);
+            if (count > 0) {
+                return JsonResult.error("已经存在关键词");
+            }
+            searchStatic.setValid(1);
+            searchStatic.setAdmin_id(admuser.getId());
+            count = hotManageService.addSearchStatic(searchStatic);
+            if (searchStatic.getId() > 0) {
+                String sql = "insert into search_keyword_ready(id,keyword,site,valid,admin_id) " +
+                        "values(%s,'%s',%s,%s,%s)";
+                String keyword = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchStatic.getKeyword());
+                NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getId(), keyword, searchStatic.getSite(),
+                        searchStatic.getValid(), searchStatic.getAdmin_id()));
+            }
+
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("addStatic，原因 :" + e.getMessage());
+            return JsonResult.error("addStatic error，原因:" + e.getMessage());
+        }
+    }
+
+
+    @RequestMapping("/updateStatic")
+    @ResponseBody
+    public JsonResult updateStatic(HttpServletRequest request, SearchStatic searchStatic) {
+
+        try {
+            Assert.notNull(searchStatic, "searchStatic null");
+            com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+            if (admuser == null || admuser.getId() == 0) {
+                return JsonResult.error("请登录后重试");
+            }
+
+            int count = hotManageService.checkSearchStatic(searchStatic);
+            if (count > 0) {
+                return JsonResult.error("已经存在关键词");
+            }
+            searchStatic.setUp_admin_id(admuser.getId());
+            count = hotManageService.updateSearchStatic(searchStatic);
+            String keyword = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(searchStatic.getKeyword());
+            String sql = "update search_keyword_ready set keyword = '%s',site = %s,up_admin_id = %s,state = 0 where id = %s";
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, keyword, searchStatic.getSite(), searchStatic.getUp_admin_id(),
+                    searchStatic.getId()));
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("updateStatic，原因 :" + e.getMessage());
+            return JsonResult.error("updateStatic error，原因:" + e.getMessage());
+        }
+    }
+
+
+    @RequestMapping("/updateValid")
+    @ResponseBody
+    public JsonResult updateValid(HttpServletRequest request, SearchStatic searchStatic) {
+
+        try {
+            Assert.notNull(searchStatic, "searchStatic null");
+            com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+            if (admuser == null || admuser.getId() == 0) {
+                return JsonResult.error("请登录后重试");
+            }
+
+            searchStatic.setUp_admin_id(admuser.getId());
+            int count = hotManageService.updateValid(searchStatic);
+            String sql = "update search_keyword_ready set valid = %s,up_admin_id =  %s,state = 0 where id = %s";
+
+            NotifyToCustomerUtil.sendSqlByMq(String.format(sql, searchStatic.getValid(), searchStatic.getUp_admin_id(),
+                    searchStatic.getId()));
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("updateValid，原因 :" + e.getMessage());
+            return JsonResult.error("updateValid error，原因:" + e.getMessage());
+        }
+    }
+
+    @RequestMapping("/setJsonState")
+    @ResponseBody
+    public JsonResult setJsonState(HttpServletRequest request, SearchStatic searchStatic) {
+
+        try {
+            Assert.notNull(searchStatic, "searchStatic null");
+            com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+            if (admuser == null || admuser.getId() == 0) {
+                return JsonResult.error("请登录后重试");
+            }
+            int count = hotManageService.setJsonState(searchStatic);
+            return JsonResult.success(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("setJsonState，原因 :" + e.getMessage());
+            return JsonResult.error("setJsonState error，原因:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 热卖json信息写入
+     *
+     * @param resultList
+     * @param fileName
+     */
+    private void writeHotGoodsJson(List<HotCategoryShow> resultList, String fileName) {
+        FileWriter fw = null;
+        PrintWriter out = null;
+        try {
+            File patentFile = new File(HOT_FILE_LOCAL_PATH);
+            if (!(patentFile.exists() && patentFile.isDirectory())) {
+                patentFile.mkdirs();
+            }
+            fw = new FileWriter(HOT_FILE_LOCAL_PATH + "/" + fileName, false);
+            out = new PrintWriter(fw);
+            //JSONObject dataJson = JSONObject.fromObject(resultList);
+            out.write(JSONArray.toJSONString(resultList));
+            out.println();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error(fileName + " writeHotGoodsJson,error:" + e.getMessage());
+        } finally {
+            if (fw != null) {
+                try {
+                    fw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (out != null) {
+                out.close();
+            }
+        }
+    }
+
+    private boolean uploadFileToOnline() {
         boolean isSuccess = false;
         File file = new File(HOT_FILE_LOCAL_PATH);
         if (file.exists() && file.isDirectory()) {
@@ -1370,7 +1517,7 @@ public class HotManageController {
             for (File child : childList) {
                 try {
                     childSuccess = okHttpUtils.postFileNoParam(HOT_UPLOAD_TO_PATH, child);
-                    if(childSuccess){
+                    if (childSuccess) {
                         count++;
                     }
                 } catch (Exception e) {
@@ -1388,55 +1535,55 @@ public class HotManageController {
     }
 
 
-	private void genHotGoodsData(List<HotCategory> categoryList,List<HotSellGoods> hotGoodsList,List<HotCategoryShow> resultList) {
-		for (HotCategory hotCategory : categoryList) {
-			HotCategoryShow categoryShow = new HotCategoryShow();
-			categoryShow.setHotType(hotCategory.getHotType());
-			categoryShow.setId(hotCategory.getId());
-			categoryShow.setShowImg(hotCategory.getShowImg());
-			categoryShow.setShowName(hotCategory.getShowName());
-			categoryShow.setSorting(hotCategory.getSorting());
-			resultList.add(categoryShow);
-		}
-		//使用商品匹配类别
-		for (HotSellGoods hotGd : hotGoodsList) {
+    private void genHotGoodsData(List<HotCategory> categoryList, List<HotSellGoods> hotGoodsList, List<HotCategoryShow> resultList) {
+        for (HotCategory hotCategory : categoryList) {
+            HotCategoryShow categoryShow = new HotCategoryShow();
+            categoryShow.setHotType(hotCategory.getHotType());
+            categoryShow.setId(hotCategory.getId());
+            categoryShow.setShowImg(hotCategory.getShowImg());
+            categoryShow.setShowName(hotCategory.getShowName());
+            categoryShow.setSorting(hotCategory.getSorting());
+            resultList.add(categoryShow);
+        }
+        //使用商品匹配类别
+        for (HotSellGoods hotGd : hotGoodsList) {
 
-			HotSellGoodsShow sellGoodsShow = new HotSellGoodsShow();
-			sellGoodsShow.setAmazon_price(hotGd.getAmazon_price());
-			sellGoodsShow.setAsin_code(hotGd.getAsin_code());
-			sellGoodsShow.setDiscountBeginTime(hotGd.getDiscountBeginTime());
-			sellGoodsShow.setDiscountEndTime(hotGd.getDiscountEndTime());
-			sellGoodsShow.setDiscountId(hotGd.getDiscountId());
-			sellGoodsShow.setPrice1688(hotGd.getPrice1688());
-			sellGoodsShow.setDiscountPercentage(hotGd.getDiscountPercentage());
-			if (hotGd.getDiscountPercentage() > 0) {
-				double discountPrice = Double.valueOf(hotGd.getMaxPrice()) * ( 1 + hotGd.getDiscountPercentage() / 100D) ;
-				sellGoodsShow.setDiscountPrice(BigDecimalUtil.truncateDouble(discountPrice, 2));
-				sellGoodsShow.setPrice1688(hotGd.getMaxPrice());
-			}
-			sellGoodsShow.setDiscountSort(hotGd.getDiscountSort());
-			sellGoodsShow.setGoods_import_url(hotGd.getGoods_import_url());
-			sellGoodsShow.setGoods_img(hotGd.getGoods_img());
-			sellGoodsShow.setGoods_pid(hotGd.getGoods_pid());
-			sellGoodsShow.setGoods_price(hotGd.getGoods_price());
-			sellGoodsShow.setGoods_unit(hotGd.getGoods_unit());
-			sellGoodsShow.setHot_id(Integer.valueOf(hotGd.getHot_selling_id()));
-			sellGoodsShow.setMoq(hotGd.getMoq());
-			sellGoodsShow.setPrice_show(hotGd.getPrice_show());
-			sellGoodsShow.setProfit_margin(hotGd.getProfit_margin());
-			sellGoodsShow.setRangePrice(hotGd.getRangePrice());
-			sellGoodsShow.setShow_name(hotGd.getShow_name());
+            HotSellGoodsShow sellGoodsShow = new HotSellGoodsShow();
+            sellGoodsShow.setAmazon_price(hotGd.getAmazon_price());
+            sellGoodsShow.setAsin_code(hotGd.getAsin_code());
+            sellGoodsShow.setDiscountBeginTime(hotGd.getDiscountBeginTime());
+            sellGoodsShow.setDiscountEndTime(hotGd.getDiscountEndTime());
+            sellGoodsShow.setDiscountId(hotGd.getDiscountId());
+            sellGoodsShow.setPrice1688(hotGd.getPrice1688());
+            sellGoodsShow.setDiscountPercentage(hotGd.getDiscountPercentage());
+            if (hotGd.getDiscountPercentage() > 0) {
+                double discountPrice = Double.valueOf(hotGd.getMaxPrice()) * (1 + hotGd.getDiscountPercentage() / 100D);
+                sellGoodsShow.setDiscountPrice(BigDecimalUtil.truncateDouble(discountPrice, 2));
+                sellGoodsShow.setPrice1688(hotGd.getMaxPrice());
+            }
+            sellGoodsShow.setDiscountSort(hotGd.getDiscountSort());
+            sellGoodsShow.setGoods_import_url(hotGd.getGoods_import_url());
+            sellGoodsShow.setGoods_img(hotGd.getGoods_img());
+            sellGoodsShow.setGoods_pid(hotGd.getGoods_pid());
+            sellGoodsShow.setGoods_price(hotGd.getGoods_price());
+            sellGoodsShow.setGoods_unit(hotGd.getGoods_unit());
+            sellGoodsShow.setHot_id(Integer.valueOf(hotGd.getHot_selling_id()));
+            sellGoodsShow.setMoq(hotGd.getMoq());
+            sellGoodsShow.setPrice_show(hotGd.getPrice_show());
+            sellGoodsShow.setProfit_margin(hotGd.getProfit_margin());
+            sellGoodsShow.setRangePrice(hotGd.getRangePrice());
+            sellGoodsShow.setShow_name(hotGd.getShow_name());
 
-			for (HotCategoryShow hotCategoryShow : resultList) {
-				if (hotCategoryShow.getId() == sellGoodsShow.getHot_id()) {
-					if (hotCategoryShow.getGoodsList() == null || hotCategoryShow.getGoodsList().size() == 0) {
-						hotCategoryShow.setGoodsList(new ArrayList<HotSellGoodsShow>());
-					}
-					hotCategoryShow.getGoodsList().add(sellGoodsShow);
-				}
-			}
-		}
-	}
+            for (HotCategoryShow hotCategoryShow : resultList) {
+                if (hotCategoryShow.getId() == sellGoodsShow.getHot_id()) {
+                    if (hotCategoryShow.getGoodsList() == null || hotCategoryShow.getGoodsList().size() == 0) {
+                        hotCategoryShow.setGoodsList(new ArrayList<HotSellGoodsShow>());
+                    }
+                    hotCategoryShow.getGoodsList().add(sellGoodsShow);
+                }
+            }
+        }
+    }
 
 
     private void insertCategoryOnline(HotCategory param) {
@@ -1485,22 +1632,22 @@ public class HotManageController {
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
-    private void AutoSub8Hour(HotDiscount hotDiscount){
-        try{
+    private void AutoSub8Hour(HotDiscount hotDiscount) {
+        try {
 
             Calendar calendar = Calendar.getInstance();
 
-            if(StringUtils.isNotBlank(hotDiscount.getBeginTime())){
+            if (StringUtils.isNotBlank(hotDiscount.getBeginTime())) {
                 calendar.setTime(DATE_FORMAT.parse(hotDiscount.getBeginTime()));
-                calendar.add(Calendar.HOUR_OF_DAY,-8);
+                calendar.add(Calendar.HOUR_OF_DAY, -8);
                 hotDiscount.setBeginTime(DATE_FORMAT.format(calendar.getTime()));
             }
-            if(StringUtils.isNotBlank(hotDiscount.getEndTime())){
+            if (StringUtils.isNotBlank(hotDiscount.getEndTime())) {
                 calendar.setTime(DATE_FORMAT.parse(hotDiscount.getEndTime()));
-                calendar.add(Calendar.HOUR_OF_DAY,-8);
+                calendar.add(Calendar.HOUR_OF_DAY, -8);
                 hotDiscount.setEndTime(DATE_FORMAT.format(calendar.getTime()));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -1565,9 +1712,9 @@ public class HotManageController {
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
-    private void deleteHotClassInfoOnline(int id){
-	    String sql = "delete from hot_class_info where id = " + id;
-	    NotifyToCustomerUtil.sendSqlByMq(sql);
+    private void deleteHotClassInfoOnline(int id) {
+        String sql = "delete from hot_class_info where id = " + id;
+        NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
 }

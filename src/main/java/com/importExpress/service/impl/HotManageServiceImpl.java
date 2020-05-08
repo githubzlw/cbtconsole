@@ -1,5 +1,6 @@
 package com.importExpress.service.impl;
 
+import com.cbt.pojo.SearchStatic;
 import com.cbt.warehouse.pojo.HotCategory;
 import com.cbt.warehouse.pojo.HotClassInfo;
 import com.cbt.warehouse.pojo.HotDiscount;
@@ -200,6 +201,41 @@ public class HotManageServiceImpl implements HotManageService {
     @Override
     public int deleteHotClassInfo(int id) {
         return hotManageMapper.deleteHotClassInfo(id);
+    }
+
+    @Override
+    public List<SearchStatic> querySearchStaticList(SearchStatic searchStatic) {
+        return hotManageMapper.querySearchStaticList(searchStatic);
+    }
+
+    @Override
+    public int querySearchStaticListCount(SearchStatic searchStatic) {
+        return hotManageMapper.querySearchStaticListCount(searchStatic);
+    }
+
+    @Override
+    public int checkSearchStatic(SearchStatic searchStatic) {
+        return hotManageMapper.checkSearchStatic(searchStatic);
+    }
+
+    @Override
+    public int addSearchStatic(SearchStatic searchStatic) {
+        return hotManageMapper.addSearchStatic(searchStatic);
+    }
+
+    @Override
+    public int updateSearchStatic(SearchStatic searchStatic) {
+        return hotManageMapper.updateSearchStatic(searchStatic);
+    }
+
+    @Override
+    public int updateValid(SearchStatic searchStatic) {
+        return hotManageMapper.updateValid(searchStatic);
+    }
+
+    @Override
+    public int setJsonState(SearchStatic searchStatic) {
+        return hotManageMapper.setJsonState(searchStatic);
     }
 
 

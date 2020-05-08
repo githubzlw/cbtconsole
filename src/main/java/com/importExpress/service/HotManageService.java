@@ -1,5 +1,6 @@
 package com.importExpress.service;
 
+import com.cbt.pojo.SearchStatic;
 import com.cbt.warehouse.pojo.HotCategory;
 import com.cbt.warehouse.pojo.HotClassInfo;
 import com.cbt.warehouse.pojo.HotDiscount;
@@ -156,5 +157,20 @@ public interface HotManageService {
      * @return
      */
 	int deleteHotClassInfo(int id);
+
+
+	List<SearchStatic> querySearchStaticList(SearchStatic searchStatic);
+
+	int querySearchStaticListCount(SearchStatic searchStatic);
+
+	int checkSearchStatic(SearchStatic searchStatic);
+
+	int addSearchStatic(SearchStatic searchStatic);
+
+	int updateSearchStatic(SearchStatic searchStatic);
+
+	int updateValid(SearchStatic searchStatic);
+
+	int setJsonState(SearchStatic searchStatic);
 
 }

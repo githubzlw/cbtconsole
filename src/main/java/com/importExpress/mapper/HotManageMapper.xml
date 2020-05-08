@@ -34,40 +34,40 @@
     </resultMap>
 
 
-    <resultMap id="HotSellGoodsMap" type="com.importExpress.pojo.HotSellGoods" >
-	    <result column="show_name" property="show_name" />
-	    <result column="selling_price" property="selling_price" />
-	    <result column="wholesale_price_1" property="wholesale_price_1" />
-	    <result column="wholesale_price_2" property="wholesale_price_2" />
-	    <result column="wholesale_price_3" property="wholesale_price_3" />
-	    <result column="goods_img" property="goods_img" />
-	    <result column="hot_selling_id" property="hot_selling_id" />
-	    <result column="goods_url" property="goods_url" />
-	    <result column="goods_pid" property="goods_pid" />
-	    <result column="goods_price" property="goods_price" />
-	    <result column="rangePrice" property="rangePrice" />
-	    <result column="isNewCloud" property="isNewCloud" />
-	    <result column="morder" property="moq" />
-	    <result column="asin_code" property="asin_code" />
-	    <result column="amazon_price" property="amazon_price" /><!-- price1688 -->
-	    <result column="price" property="price1688" />
+    <resultMap id="HotSellGoodsMap" type="com.importExpress.pojo.HotSellGoods">
+        <result column="show_name" property="show_name"/>
+        <result column="selling_price" property="selling_price"/>
+        <result column="wholesale_price_1" property="wholesale_price_1"/>
+        <result column="wholesale_price_2" property="wholesale_price_2"/>
+        <result column="wholesale_price_3" property="wholesale_price_3"/>
+        <result column="goods_img" property="goods_img"/>
+        <result column="hot_selling_id" property="hot_selling_id"/>
+        <result column="goods_url" property="goods_url"/>
+        <result column="goods_pid" property="goods_pid"/>
+        <result column="goods_price" property="goods_price"/>
+        <result column="rangePrice" property="rangePrice"/>
+        <result column="isNewCloud" property="isNewCloud"/>
+        <result column="morder" property="moq"/>
+        <result column="asin_code" property="asin_code"/>
+        <result column="amazon_price" property="amazon_price"/><!-- price1688 -->
+        <result column="price" property="price1688"/>
 
-		<result column="discount_id" property="discountId" />
-		<result column="discount_percentage" property="discountPercentage" />
-		<result column="discount_begin_time" property="discountBeginTime" />
-		<result column="discount_end_time" property="discountEndTime" />
-		<result column="discount_sort" property="discountSort" />
+        <result column="discount_id" property="discountId"/>
+        <result column="discount_percentage" property="discountPercentage"/>
+        <result column="discount_begin_time" property="discountBeginTime"/>
+        <result column="discount_end_time" property="discountEndTime"/>
+        <result column="discount_sort" property="discountSort"/>
 
-		<result column="evaluation_id" property="evaluationId" />
-		<result column="evaluation_sku_id" property="evaluationSkuId" />
-		<result column="evaluation_user_id" property="evaluationUserId" />
-		<result column="evaluation_content" property="evaluationContent" />
-		<result column="evaluation_level" property="evaluationLevel" />
-		<result column="evaluation_service_level" property="evaluationServiceLevel" />
-		<result column="evaluation_time" property="evaluationTime" />
-		<result column="is_sold_flag" property="isSoldFlag" />
-		<result column="feeprice" property="feeprice" />
-	  </resultMap>
+        <result column="evaluation_id" property="evaluationId"/>
+        <result column="evaluation_sku_id" property="evaluationSkuId"/>
+        <result column="evaluation_user_id" property="evaluationUserId"/>
+        <result column="evaluation_content" property="evaluationContent"/>
+        <result column="evaluation_level" property="evaluationLevel"/>
+        <result column="evaluation_service_level" property="evaluationServiceLevel"/>
+        <result column="evaluation_time" property="evaluationTime"/>
+        <result column="is_sold_flag" property="isSoldFlag"/>
+        <result column="feeprice" property="feeprice"/>
+    </resultMap>
 
     <sql id="hotCategoryColumn">
 		id,category_name,show_name,show_img,is_on,sorting,hot_type,
@@ -232,25 +232,26 @@
 
 
     <select id="queryCategoryList" resultMap="hotCategoryResultMap"
-			parameterType="com.cbt.warehouse.pojo.HotCategory">
-		select a.id,a.category_name,a.show_name,a.show_img,a.is_on,a.sorting,a.hot_type,
-		a.admin_id,b.admName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.update_admin_id,
-		DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time
-		from hot_category a left join admuser b on a.admin_id =b.id
-		where 1=1
-		<if test=" isOn > -1">
-			and a.is_on = #{isOn}
-		</if>
-		<if test=" hotType > 0">
-			and a.hot_type = #{hotType}
-		</if>
-		order by a.is_on desc,a.sorting desc
-		<if test=" limitNum > 0">
-			limit #{startNum},#{limitNum}
-		</if>
-	</select>
+            parameterType="com.cbt.warehouse.pojo.HotCategory">
+        select a.id,a.category_name,a.show_name,a.show_img,a.is_on,a.sorting,a.hot_type,
+        a.admin_id,b.admName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.update_admin_id,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time
+        from hot_category a left join admuser b on a.admin_id =b.id
+        where 1=1
+        <if test=" isOn > -1">
+            and a.is_on = #{isOn}
+        </if>
+        <if test=" hotType > 0">
+            and a.hot_type = #{hotType}
+        </if>
+        order by a.is_on desc,a.sorting desc
+        <if test=" limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
 
-    <select id="getClassInfoList" resultType="com.cbt.warehouse.pojo.HotClassInfo" parameterType="com.cbt.warehouse.pojo.HotClassInfo">
+    <select id="getClassInfoList" resultType="com.cbt.warehouse.pojo.HotClassInfo"
+            parameterType="com.cbt.warehouse.pojo.HotClassInfo">
         select a.id,a.class_name as className,a.json_name as jsonName,
         a.admin_id as adminId,b.admName as adminName,a.update_admin_id as updateAdminId,c.admName as updateAdminName,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,
@@ -269,7 +270,8 @@
         </if>
     </select>
 
-    <insert id="insertIntoHotClassInfo" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.warehouse.pojo.HotClassInfo">
+    <insert id="insertIntoHotClassInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.cbt.warehouse.pojo.HotClassInfo">
         insert into hot_class_info(class_name,json_name,admin_id)
         values(#{className},#{jsonName},#{adminId})
     </insert>
@@ -282,4 +284,75 @@
     <delete id="deleteHotClassInfo">
         delete from hot_class_info where id = #{id}
     </delete>
+
+    <select id="querySearchStaticList" parameterType="com.cbt.pojo.SearchStatic" resultType="com.cbt.pojo.SearchStatic">
+        select a.id,a.keyword,a.site,a.valid,a.json_name,a.state,
+        a.create_time,a.update_time,a.admin_id,a.up_admin_id,b.admName as admin_name
+        from search_keyword_ready a left join admuser b on a.admin_id = b.id
+        where 1=1
+        <if test="keyword != null">
+            and a.keyword = #{keyword}
+        </if>
+        <if test="site > 0">
+            and a.site = #{site}
+        </if>
+        <if test="valid > -1">
+            and a.valid = #{valid}
+        </if>
+        <if test="admin_id > 0">
+            and a.admin_id = #{admin_id}
+        </if>
+        order by a.create_time desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="querySearchStaticListCount" parameterType="com.cbt.pojo.SearchStatic" resultType="java.lang.Integer">
+        select count(0)
+        from search_keyword_ready a
+        where 1=1
+        <if test="keyword != null">
+            and a.keyword = #{keyword}
+        </if>
+        <if test="site > 0">
+            and a.site = #{site}
+        </if>
+        <if test="valid > -1">
+            and a.valid = #{valid}
+        </if>
+        <if test="admin_id > 0">
+            and a.admin_id = #{admin_id}
+        </if>
+    </select>
+
+    <select id="checkSearchStatic" parameterType="com.cbt.pojo.SearchStatic" resultType="java.lang.Integer">
+        select count(0) from search_keyword_ready
+        where keyword = #{keyword} and site = #{site}
+        <if test="id > 0">
+            and id != #{id}
+        </if>
+    </select>
+
+    <insert id="addSearchStatic" parameterType="com.cbt.pojo.SearchStatic" useGeneratedKeys="true" keyProperty="id">
+        insert into search_keyword_ready(keyword,site,valid,admin_id)
+        values(#{keyword},#{site},#{valid},#{admin_id})
+    </insert>
+
+    <update id="updateSearchStatic" parameterType="com.cbt.pojo.SearchStatic">
+        update search_keyword_ready set keyword = #{keyword},site = #{site},up_admin_id = #{up_admin_id},state = 0
+        where id = #{id}
+    </update>
+
+    <update id="updateValid" parameterType="com.cbt.pojo.SearchStatic">
+        update search_keyword_ready set valid = #{valid},up_admin_id = #{up_admin_id},state = 0
+        where id = #{id}
+    </update>
+
+    <update id="setJsonState" parameterType="com.cbt.pojo.SearchStatic">
+        update search_keyword_ready set state = #{state} where site = #{site}
+        <if test="id > 0">
+            and id = #{id}
+        </if>
+    </update>
 </mapper>
