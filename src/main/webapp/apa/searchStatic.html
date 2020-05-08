@@ -230,7 +230,7 @@
 
     function formatState(val, row, index) {
         if (val == -1) {
-            return '<b style="color: red;">失败</b>';
+            return '<b style="color: red;">失败(' + row.json_name + ')</b>';
         } else if (val == 0) {
             return '待处理';
         } else if (val == 1) {
