@@ -6314,6 +6314,7 @@ public class WarehouseCtrl {
 	@RequestMapping(value = "/getPackageInfoList", method = RequestMethod.GET, produces = "text/html;charset=UTF-8")
 	public String getPackageInfoList(HttpServletRequest request,
 									 HttpServletResponse response) {
+		try{
 	    if (LOCALHOST == null) {
             LOCALHOST = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
         }
@@ -6329,6 +6330,7 @@ public class WarehouseCtrl {
 				String [] t=svolume.split("\\*");
 				vol = (Double.parseDouble(t[0])*0.01)*(Double.parseDouble(t[1])*0.01)*(Double.parseDouble(t[2])*0.01);
 			}
+			System.err.println(JSONObject.toJSONString(s));
 			Map freightFeeMap = freightFeeSerive.getFreightFee(Double.parseDouble(s.getSweight()), vol, s.getZid(), "原飞航", s.getFedexie(), svolume);
 			double freightFee=Double.valueOf(freightFeeMap.get("freightFee").toString());
 			freightFee=freightFee/s.getExchange_rate();
@@ -6388,7 +6390,7 @@ public class WarehouseCtrl {
                 list.get(i).setCountryMsg(orderinfoService.checkCountryMsg(orderid));
 
 			} catch (Exception e) {
-
+				e.printStackTrace();
 				LOG.error("包裹列变获取用户地址信息出错：订单号:【" + orderid + "】", e);
 			}
 
@@ -6399,6 +6401,9 @@ public class WarehouseCtrl {
 
 		request.setAttribute("list", list);
 		request.setAttribute("sbxxlist", sbxxlist);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 		return "packagelist";
 	}
 

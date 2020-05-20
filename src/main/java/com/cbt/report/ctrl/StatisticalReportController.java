@@ -2492,7 +2492,7 @@ public class StatisticalReportController {
             throws ServletException, IOException, ParseException {
         EasyUiJsonResult json = new EasyUiJsonResult();
         Map<Object, Object> map = new HashMap<Object, Object>();
-        int page = Integer.valueOf(request.getParameter("page"));
+        int page = Integer.parseInt(request.getParameter("page"));
         String times = request.getParameter("times");
         String userName = request.getParameter("userName");
         String startTime = "";
