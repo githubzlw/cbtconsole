@@ -104,6 +104,32 @@ $(function () {
             $.MsgBox.Alert("提示", "请确认运费、交期是否准确!");
             return;
         }
+
+        var weight = 0;
+        $(".lu-weight").each(function () {
+            var luweight = $(this).val();
+            if (luweight != '' && parseFloat(luweight) > 0.000001) {
+                var lucount = parseInt($(this).parents(".de-td").find(".lucount").val());
+                if (lucount == 0) {
+                    weight = weight + parseFloat(luweight);
+                } else {
+                    weight = weight + parseFloat(luweight) * lucount;
+                }
+            }
+        });
+
+        if (method.indexOf('CIF') > -1 && (method.indexOf('SEA') > -1 || (method.indexOf('AIR') > -1 && method.length < 5) || method.indexOf('WAY') > -1)) {
+            if (parseFloat(weight) < 100) {
+                $.MsgBox.Alert("提示", "此运输方式总量大于等于100!");
+                return;
+            }
+        } else if (method.indexOf('Air') > -1) {
+            if (parseFloat(weight) < 21) {
+                $.MsgBox.Alert("提示", "此运输方式总量大于等于21!");
+                return;
+            }
+        }
+
         var bfid = $("#query_bf_id").val();
         jQuery.ajax({
             url: "/cbtconsole/bf/time",
