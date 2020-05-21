@@ -181,7 +181,7 @@ function fnAddDate(datas,day){
 }
 //统计
 function fnGetStatistic() {
-    var url = '/cbtconsole/order/getOrderStates.do';
+    var url = '/cbtconsole/order/getOrderStates';
     var noDeleteCount = '';
     // if (typeof (sessionStorage.getItem("fnGetStatistic")) != 'undefined' && sessionStorage.getItem("fnGetStatistic") !=null) {
     //     noDeleteCount = JSON.parse(sessionStorage.getItem("fnGetStatistic"));
@@ -245,6 +245,9 @@ function fnGetStatistic() {
 				} else {
 					alert('获取头部数量错误');
 				}
+			},
+			error:function (res) {
+				console.log(res);
 			}
 		});
 	}
