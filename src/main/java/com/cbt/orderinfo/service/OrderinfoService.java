@@ -2140,8 +2140,8 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
-	public List<Map<String, Integer>> getOrdersState(int admuserid) {
-		List<Map<String, Integer>> result = orderinfoMapper.getOrdersState(admuserid);
+	public List<Map<String, Object>> getOrdersState(int admuserid) {
+		List<Map<String, Object>> result = orderinfoMapper.getOrdersState(admuserid);
 		//国际物流预警中预警条数
 		Calendar ca = Calendar.getInstance();
 		ca.add(Calendar.DATE, - 90);
@@ -2151,8 +2151,8 @@ public class OrderinfoService implements IOrderinfoService {
             put("warning", 0);
         }};
 		Integer waring0 = tabTrackInfoMapping.getTrackInfoListCount(param);
-		Map<String, Integer> cywMap = new HashMap<String, Integer>();
-		cywMap.put("state", 1);
+		Map<String, Object> cywMap = new HashMap<String, Object>();
+		cywMap.put("state", "1");
 		cywMap.put("counts", waring0);
 		result.add(cywMap);
 		// 支付失败的订单
@@ -2160,7 +2160,7 @@ public class OrderinfoService implements IOrderinfoService {
        	if(CollectionUtils.isNotEmpty(orderNoList)){
 			List<Map<String, String>> list = orderinfoMapper.getorderPending(orderNoList);
 			orderNoList.clear();
-			for (Map<String, Integer> bean : result) {
+			for (Map<String, Object> bean : result) {
 				if ("order_pending".equals(bean.get("state"))) {
 					bean.put("counts", list==null?0:list.size());
 				}

@@ -640,7 +640,7 @@ public interface OrderinfoMapper {
 	 * @return
 	 * 		订单状态值，状态对应数量值
 	 */
-	public List<Map<String, Integer>> getOrdersState(@Param("admuserid") int admuserid);
+	public List<Map<String, Object>> getOrdersState(@Param("admuserid") int admuserid);
 
 	/**
 	 * 获取纯销售和采销一体账户信息
