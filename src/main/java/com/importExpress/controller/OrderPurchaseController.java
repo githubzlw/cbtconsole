@@ -21,9 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -323,6 +321,69 @@ public class OrderPurchaseController {
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition",
                     "attachment;filename=" + timeBegin.getYear() + "-" + timeBegin.getMonthValue() + "-1688PurchaseForOurOrder.xls");
+            response.setCharacterEncoding("utf-8");
+            ouputStream = response.getOutputStream();
+            wb.write(ouputStream);
+            ouputStream.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ouputStream != null) {
+                    ouputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    @RequestMapping("/taobaoListGroupExcel")
+    @ResponseBody
+    public void taobaoListGroupExcel(HttpServletRequest request, HttpServletResponse response,
+                                @RequestParam(name = "beginTime", required = true) String beginTime) {
+        OutputStream ouputStream = null;
+        try {
+            OrderPurchase orderPurchase = new OrderPurchase();
+            LocalDateTime timeBegin = DateFormatUtil.getTimeWithStr(beginTime + " 00:00:00");
+
+            LocalDateTime timeEnd = timeBegin.plusMonths(1);
+            orderPurchase.setBeginTime(beginTime);
+            orderPurchase.setEndTime(DateFormatUtil.formatDateToYearAndMonthAndDayString(timeEnd));
+
+            orderPurchaseService.getCurrentOrder(orderPurchase);
+
+            List<OrderPurchase> orderPurchaseList = orderPurchaseService.taobaoList(orderPurchase);
+            if (CollectionUtils.isNotEmpty(orderPurchaseList)) {
+                orderPurchaseList.forEach(e -> {
+                    e.setYear(timeBegin.getYear() + "-" + timeBegin.getMonthValue());
+                    if (StringUtils.isNotBlank(e.getOrderid())) {
+                        if (e.getExchange_rate() < 6) {
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder() * EXCHANGE_RATE, 2));
+                        } else {
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder() * e.getExchange_rate(), 2));
+                        }
+                    }
+                });
+            }
+
+            Set<String> groupMap = new HashSet<>();
+            List<OrderPurchase> rsList = new ArrayList<>();
+            orderPurchaseList.forEach(e->{
+                if(!groupMap.contains(e.getTb_orderid())){
+                    rsList.add(e);
+                    groupMap.add(e.getTb_orderid());
+                }
+            });
+
+            groupMap.clear();
+            orderPurchaseList.clear();
+            HSSFWorkbook wb = genOrderPurchaseListExcelDetail(rsList, timeBegin.getYear() + "年" + timeBegin.getMonthValue() + "月1688采购对应我司订单汇总");
+            orderPurchaseList.clear();
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-disposition",
+                    "attachment;filename=" + timeBegin.getYear() + "-" + timeBegin.getMonthValue() + "-1688PurchaseForOurOrderGroup.xls");
             response.setCharacterEncoding("utf-8");
             ouputStream = response.getOutputStream();
             wb.write(ouputStream);
