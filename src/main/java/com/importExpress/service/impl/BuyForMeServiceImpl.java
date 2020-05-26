@@ -87,7 +87,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
                     .priceBuy(o.getPriceBuy()).priceBuyc(o.getPriceBuyc()).shipFeight(o.getShipFeight())
                     .weight(o.getWeight())
                     .state(o.getState())
-                    .unit(o.getUnit())
+                    .unit(o.getUnit()).imgUrl(o.getImgUrl())
                     .build();
             list.add(detailsSku);
             detailsIdSku.put(bfDetailsId, list);

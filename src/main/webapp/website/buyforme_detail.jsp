@@ -61,7 +61,7 @@ padding: 20px;max-height: 715px;}
 .table-sku{width:100%;}
 .rowweight{ margin-left: -2px;}
 .w120{width:115px;}
-.input-w5{width: 378px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+.input-w5{width: 315px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .input-w3{width: 50px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .input-w25{width: 38px;border: 1px solid #ccc; border-radius: 4px;height: 25px;}
 .input-w8{width: 254px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
@@ -214,14 +214,14 @@ body{min-height:100%;}
 				<table class="table-sku">
 				<thead>
 					<tr>
-						<th width="16%" class="th-font">下单规格:</th>
+						<th width="22%" class="th-font">下单规格:</th>
 						<th width="14%" class="th-font">货源价格:</th>
 						<th width="5%" class="th-font">搜索价格:</th>
 						<th width="15%" class="th-font">售卖价格(免邮价):</th>
 						<th width="4%" class="th-font">数量:</th>
-						<th width="6%" class="th-font">单位:</th>
+						<th width="4%" class="th-font">单位:</th>
 						<!-- <th>时间</th> -->
-						<th width="31%" class="th-font">货源:</th>
+						<th width="26%" class="th-font">货源:</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -230,12 +230,13 @@ body{min-height:100%;}
 					 <tr class="sku-u-td">
 						<c:if test="${sku.state == 1}">
 						<td>
+							<if test="${sku.imgUrl != null}">
+							<img src="${sku.imgUrl}" class="img_sty">
+						</if>
 						<input type="hidden" class="lu_id" value="${sku.id}">
 						<input type="hidden" class="lu_skuid" value="${sku.skuid}">
 						<input type="text" class="input-w8 lu_sku" value="${sku.sku}">
-						<if test="${sku.imgUrl != null}">
-							<img src="${sku.imgUrl}" class="img_sty">
-						</if>
+
 						</td>
 						<td class="td-price">USD:<span class="lu-price-buy">${sku.priceBuy }</span>(CNY:<input type="text" value="${sku.priceBuyc }" class="lu-price-buy-c input-w1" onchange="changePrice(this)">)</td>
 						<td>${detail.price }</td>
