@@ -63,12 +63,12 @@
             resultType="com.importExpress.pojo.OrderPurchase">
         select aa.*,bb.*
         from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
-        th.paydata as orderdate,specid,skuid
+        th.paydata as orderdate,specid,skuid,orderstatus,username
         from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and (th.tbOr1688 between 0 and 3)
         and off_line = 0
         group by th.orderid,th.shipno,th.itemid) bb
 		left join (select ir.tborderid,ir.orderid,ir.shipno as od_shipno,ir.itemid as od_pid,ir.specid as tb_specid,ir.skuid as tb_skuid,
-				od.yourorder,od.goodsprice,od.state,od.purchase_state,oi.orderpaytime,oi.exchange_rate
+				od.yourorder,od.goodsprice,od.state as od_state,od.purchase_state,oi.orderpaytime,oi.exchange_rate
 				from
 				id_relationtable ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
 				inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
@@ -77,6 +77,7 @@
         ) aa
         on bb.tb_orderid = aa.tborderid and bb.itemid = aa.od_pid
         <!--and bb.specid = aa.tb_specid and bb.skuid = aa.tb_skuid-->
+        where bb.username != '策融by5'
         order by bb.orderdate desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
@@ -86,7 +87,7 @@
     <select id="taobaoListCount" parameterType="com.importExpress.pojo.OrderPurchase" resultType="java.lang.Integer">
         select count(0)
         from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
-        th.paydata as orderdate,specid,skuid
+        th.paydata as orderdate,specid,skuid,orderstatus,username
         from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and (th.tbOr1688 between 0 and 3)
         and off_line = 0
         group by th.orderid,th.shipno,th.itemid) bb
@@ -99,7 +100,30 @@
         where oi.orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month)
         ) aa
         on bb.tb_orderid = aa.tborderid and bb.itemid = aa.od_pid
+        where bb.username != '策融by5'
         <!--and bb.specid = aa.tb_specid and bb.skuid = aa.tb_skuid-->
+    </select>
+
+
+    <select id="taobaoListGroup" parameterType="com.importExpress.pojo.OrderPurchase"
+            resultType="com.importExpress.pojo.OrderPurchase">
+        select aa.*,bb.*
+        from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
+        th.paydata as orderdate,specid,skuid,orderstatus,username
+        from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and (th.tbOr1688 between 0 and 3)
+        and off_line = 0
+        group by th.orderid) bb
+		left join (select ir.tborderid,ir.orderid,ir.shipno as od_shipno,ir.itemid as od_pid,ir.specid as tb_specid,ir.skuid as tb_skuid,
+				od.yourorder,od.goodsprice,od.state as od_state,od.purchase_state,oi.orderpaytime,oi.exchange_rate
+				from
+				id_relationtable ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
+				inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
+        where oi.orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month)
+        ) aa
+        on bb.tb_orderid = aa.tborderid and bb.itemid = aa.od_pid
+        where bb.username != '策融by5'
+        group by bb.tb_orderid
+        order by bb.orderdate desc
     </select>
 
 </mapper>
