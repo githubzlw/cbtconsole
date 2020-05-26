@@ -103,7 +103,7 @@
     </style>
     <script>
         var pidList = {};
-        var siteUrl = "https://www.import-express.com/";
+        var siteUrl = "http://52.37.218.73:15792/CbtStaticize/";
         $(document).ready(function () {
             getAdminList();
             setDatagrid();
@@ -114,9 +114,9 @@
         function chooseSite() {
             var url = window.location.href;
             if(url.indexOf("192.168.1.9") > -1 || url.indexOf("27.115.38.42")> -1 || url.indexOf("192.168.1.27") > -1){
-                siteUrl = "https://www.import-express.com/";
+                siteUrl = "http://52.37.218.73:15792/CbtStaticize/";
             } else {
-                siteUrl = "http://192.168.1.67:8087/";
+                siteUrl = "http://192.168.1.67:8087/CbtStaticize/";
                 // siteUrl = "http://192.168.1.163:8081/";
             }
         }

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>搜索静态化管理</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+</head>
+<style type="text/css">
+    .datagrid-htable {
+        text-align: center;
+        height: 30px;
+        font-size: 24px;
+    }
+
+    .but_color {
+        background: #44a823;
+        width: 80px;
+        height: 30px;
+        border: 1px #aaa solid;
+        color: #fff;
+    }
+
+    #sc_st_query_form {
+        font-size: 18px;
+    }
+
+    #button_style {
+        font-size: 18px;
+    }
+
+    .panel-title {
+        text-align: center;
+        height: 30px;
+        font-size: 24px;
+    }
+
+    .sc_st_rYear, .sc_st_rMonth, .but_color {
+        padding: 5px;
+        font-size: 14px
+    }
+
+    .sc_st_rYear, .sc_st_rMonth {
+        margin-right: 18px
+    }
+
+    #sc_st_top_toolbar {
+        padding: 20px 28px !important;
+    }
+
+    .datagrid-header .datagrid-cell span, .datagrid-cell,
+    .datagrid-cell-group, .datagrid-header-rownumber,
+    .datagrid-cell-rownumber {
+        font-size: 14px;
+    }
+
+    .img_sty {
+        max-width: 100px;
+        max-height: 100px;
+    }
+
+    .div_sty_img img {
+        max-width: 550px;
+        max-height: 550px;
+    }
+
+    .enter_btn {
+        margin-bottom: 10px;
+        width: 90px;
+        height: 26px;
+        color: #ffffff;
+        background-color: #009688;
+        transform: rotate(0deg);
+        font-size: 16px;
+        border-radius: 4px;
+        border-width: 1px;
+        border-style: solid;
+        text-align: center;
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .enter_btn_long {
+        margin-bottom: 10px;
+        width: 150px;
+        height: 26px;
+        color: #ffffff;
+        background-color: #30ad07;
+        transform: rotate(0deg);
+        font-size: 16px;
+        border-radius: 4px;
+        border-width: 1px;
+        border-style: solid;
+        text-align: center;
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .del_btn {
+        margin-bottom: 10px;
+        width: 110px;
+        height: 26px;
+        color: #ffffff;
+        background-color: red;
+        transform: rotate(0deg);
+        font-size: 16px;
+        border-radius: 4px;
+        border-width: 1px;
+        border-style: solid;
+        text-align: center;
+        font-weight: normal;
+        font-style: normal;
+    }
+</style>
+<script type="text/javascript">
+
+    var siteUrl = "http://52.37.218.73:15792/CbtStaticize/";
+
+    $(function () {
+        chooseSite();
+        closeDialog();
+        setDatagrid();
+        getAdminList();
+        doQuery();
+    });
+
+    function chooseSite() {
+        var url = window.location.href;
+        if (url.indexOf("192.168.1.9") > -1 || url.indexOf("27.115.38.42") > -1 || url.indexOf("192.168.1.27") > -1) {
+            siteUrl = "http://52.37.218.73:15792/CbtStaticize/";
+        } else {
+            siteUrl = "http://192.168.1.153:8088/CbtStaticize/";
+            // siteUrl = "http://192.168.1.163:8081/";
+        }
+    }
+
+    function getAdminList() {
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/singleGoods/getAdminList",
+            data: {},
+            success: function (data) {
+                if (data.ok) {
+                    $("#query_admin_id").empty();
+                    var content = '<option value="0" selected="selected">全部</option>';
+                    var json = data.data;
+                    for (var i = 0; i < json.length; i++) {
+                        content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                    }
+                    $("#query_admin_id").append(content);
+                } else {
+                    console.log("获取用户列表失败，原因 :" + data.message);
+                }
+            },
+            error: function (res) {
+                console.log("网络获取失败");
+            }
+        });
+    }
+
+    function setDatagrid() {
+        $('#sc_st_easyui-datagrid').datagrid({
+            title: '搜索静态化管理',
+            width: "100%",
+            fit: true,//自动补全
+            striped: true,//设置为true将交替显示行背景。
+            collapsible: true,//显示可折叠按钮
+            toolbar: "#sc_st_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+            url: '/cbtconsole/hotManage/searchStaticList',//url调用Action方法
+            loadMsg: '数据装载中......',
+            singleSelect: true,//为true时只能选择单行
+            fitColumns: true,//允许表格自动缩放，以适应父容器
+            rownumbers: true,
+            pageSize: 50,//默认选择的分页是每页50行数据
+            pageList: [20, 50, 100],//可以选择的分页集合
+            pagination: true,//分页
+            style: {
+                padding: '8 8 10 8'
+            },
+            onLoadSuccess: function (data) {
+
+            }
+        });
+    }
+
+    function doQuery() {
+        var qr_keyword = $("#qr_keyword").val();
+        var qr_valid = $("#qr_valid").val();
+        var qr_state = $("#qr_state").val();
+        var qr_site = $("#qr_site").val();
+        $("#sc_st_easyui-datagrid").datagrid("load", {
+            "keyword": qr_keyword,
+            "valid": qr_valid,
+            "site": qr_site,
+            "state": qr_state
+        });
+    }
+
+
+    function formatSite(val, row, index) {
+        if (val == 1) {
+            return 'Import';
+        } else if (val == 2) {
+            return 'Kids';
+        } else if (val == 3) {
+            return 'Pets';
+        } else if (val == 4) {
+            return 'Home';
+        }
+        return '';
+    }
+
+    function formatValid(val, row, index) {
+        if (val == 0) {
+            return '<b style="color: red;">关闭</b>';
+        } else if (val == 1) {
+            return '启用';
+        }
+        return '';
+    }
+
+
+    function formatState(val, row, index) {
+        if (val == -1) {
+            return '<b style="color: red;">失败(' + row.json_name + ')</b>';
+        } else if (val == 0) {
+            return '待处理';
+        } else if (val == 1) {
+            return '生成中';
+        } else if (val == 2) {
+            return '成功(' + row.json_name + ')';
+        }
+        return '';
+    }
+
+    function funOpt(val, row, index) {
+        var content = '<button class="enter_btn" onclick="updateStatic(' + row.id + ',' + index + ')">编辑</button>&nbsp;&nbsp;&nbsp;';
+        if (row.valid == 0) {
+            content += '<button class="enter_btn" onclick="updateValid(1,' + row.id + ')">启用</button>&nbsp;&nbsp;&nbsp;';
+        } else {
+            content += '<button class="del_btn" onclick="updateValid(0,' + row.id + ')">关闭</button>&nbsp;&nbsp;&nbsp;';
+            content += '<button class="enter_btn_long" onclick="genJsonFile(1,' + row.id + ',' + row.site + ')">生成json文件</button>&nbsp;&nbsp;&nbsp;';
+        }
+        return content;
+    }
+
+    function updateStatic(id, index) {
+        $('#sc_st_easyui-datagrid').datagrid('selectRow', index);
+        var row = $('#sc_st_easyui-datagrid').datagrid('getSelected');
+        if (row) {
+            $("#key_new").val(row["keyword"]);
+            $("#key_id").val(id);
+            $("#add_site").val(row["site"]);
+            $('#add_dlg').dialog('open');
+        }
+    }
+
+    function addStatic() {
+        var keyword = $("#key_new").val();
+        var key_id = $("#key_id").val();
+        var add_site = $("#add_site").val();
+        if (keyword) {
+            var upUrl = "/cbtconsole/hotManage/addStatic";
+            if (key_id > 0) {
+                upUrl = "/cbtconsole/hotManage/updateStatic";
+            }
+            $.ajax({
+                type: "POST",
+                url: upUrl,
+                data: {id: key_id, keyword: keyword, site: add_site},
+                success: function (data) {
+                    if (data.ok) {
+                        if (key_id > 0) {
+                            closeDialog();
+                            $('#sc_st_easyui-datagrid').datagrid('reload');
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提醒", "error", "error");
+                }
+            });
+        } else {
+            $.messager.alert("提醒", "请输入关键词", "info");
+        }
+    }
+
+    function updateValid(flag, id) {
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/hotManage/updateValid",
+            data: {id: id, valid: flag},
+            success: function (data) {
+                if (data.ok) {
+                    $('#sc_st_easyui-datagrid').datagrid('reload');
+                } else {
+                    $.messager.alert("提醒", data.message, "error");
+                }
+            },
+            error: function (res) {
+                $.messager.alert("提醒", "error", "error");
+            }
+        });
+    }
+
+    function closeDialog() {
+        $("#key_id").val(0);
+        $("#key_new").val("");
+        $("#add_site").val(1);
+        $('#add_dlg').dialog('close');
+    }
+
+    function openDialog() {
+        $("#key_id").val(0);
+        $("#key_new").val("");
+        $("#add_site").val(1);
+        $('#add_dlg').dialog('open');
+    }
+
+    function genJsonFile(flag, id, site) {
+        if (site == 0) {
+            site = $("#qr_site").val();
+        }
+        if (site < 1) {
+            $.messager.alert("提醒", "请选择网站", "error");
+        } else {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: "/cbtconsole/hotManage/setJsonState",
+                data: {
+                    "id": id,
+                    "state": flag,
+                    "site": site
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        var count = 30000;
+                        if (flag > 0) {
+                            count = 500;
+                        }
+                        setTimeout(function () {
+                            $('#sc_st_easyui-datagrid').datagrid('reload');
+                        }, count);
+
+                        var url = siteUrl + "searchHtml/keywordData.do?webSite=" + site + "&flag=" + flag + "&ids=" + id;
+                        var iWidth = 1080; //弹出窗口的宽度;
+                        var iHeight = 660; //弹出窗口的高度;
+                        var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
+                        var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置;
+                        var param = "height=" + iHeight + ",width=" + iWidth + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no";
+                        window.open(url, 'windows', param);
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "error", "error");
+                }
+            });
+        }
+    }
+</script>
+<body>
+<div id="sc_st_top_toolbar" style="padding: 5px; height: auto">
+    <form id="sc_st_query_form" action="#" onsubmit="return false;">
+        <span><button class="enter_btn_long" onclick="openDialog()">新增关键词</button></span>&nbsp;&nbsp;
+        <span>关键词:<input id="qr_keyword" style="width: 180px;height: 24px;"/></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>启用关闭:
+        <select id="qr_valid" style="font-size: 16px; height: 26px; width: 120px;">
+					<option value="-1" selected="selected">全部</option>
+                    <option value="0">关闭</option>
+                    <option value="1">启用</option>
+			</select>
+        </span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>状态:
+        <select id="qr_state" style="font-size: 16px; height: 26px; width: 120px;">
+					<option value="-2" selected="selected">全部</option>
+                    <option value="-1">失败</option>
+                    <option value="0">待处理</option>
+            <option value="1">生成中</option>
+            <option value="2">成功</option>
+			</select>
+        </span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>网站:<select id="qr_site" style="font-size: 16px; height: 26px; width: 120px;">
+					<option value="0" selected="selected">全部</option>
+                    <option value="1">Import</option>
+                    <option value="2">Kids</option>
+                    <option value="3">Pets</option>
+                    <option value="4">Home</option>
+			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span><input type="button"
+                     class="enter_btn" value="查询" onclick="doQuery()"/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span><button class="enter_btn_long" onclick="genJsonFile(0,0,0)">一键生成json文件</button></span>
+    </form>
+</div>
+
+<div id="add_dlg" class="easyui-dialog" title="关键词"
+     data-options="modal:true"
+     style="width: 360px; height: 180px; padding: 10px;">
+    <table>
+        <tr>
+            <td>关键词:</td>
+            <td>
+                <input type="hidden" id="key_id" value="0"/>
+                <input id="key_new" value="" style="width: 260px;height: 24px;"/>
+            </td>
+        </tr>
+        <tr>
+            <td>网站:</td>
+            <td><select id="add_site" style="font-size: 16px; height: 26px; width: 260px;">
+                <option value="1">Import</option>
+                <option value="2">Kids</option>
+                <option value="3">Pets</option>
+                <option value="4">Home</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: center">
+                <button onclick="addStatic()">确定</button>
+                <button onclick="closeDialog()">取消</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table id="sc_st_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'keyword',align:'center',width:'160px'">关键词</th>
+        <th data-options="field:'site',align:'center',width:'70px',formatter:formatSite">网站</th>
+        <th data-options="field:'valid',align:'center',width:'70px',formatter:formatValid">是否启用</th>
+        <th data-options="field:'state',align:'center',width:'160px',formatter:formatState">状态</th>
+        <th data-options="field:'create_time',align:'center',width:'110px'">创建时间</th>
+        <th data-options="field:'admin_name',align:'center',width:'70px'">创建人</th>
+        <th data-options="field:'update_time',align:'center',width:'110px'">更新时间</th>
+        <th data-options="field:'opt',align:'center',width:'180px',formatter:funOpt">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</body>
+</html>
