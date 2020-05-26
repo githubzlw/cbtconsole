@@ -2184,6 +2184,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         PreparedStatement stmt28 = null;
         String up28Sql = "update custom_benchmark_ready_newest set valid=?,goodsstate=?,unsellableReason = ?,flag=? where pid = ?";
         int rs = 0;
+        String logSql = "insert into custom_pid_off_log(pid, admin_id, off_reason) values(?,?,?)";
         try {
             conn.setAutoCommit(false);
             rs = 0;
@@ -2211,6 +2212,13 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 stmt28.setString(5, pid);
                 //rs = stmt28.executeUpdate();
                 stmt28.executeUpdate();
+
+                stmt = conn.prepareStatement(logSql);
+                stmt.setString(1, pid);
+                stmt.setInt(2, adminId);
+                stmt.setString(3, remark);
+                stmt.executeUpdate();
+                conn.commit();
             } else {
                 conn.rollback();
             }

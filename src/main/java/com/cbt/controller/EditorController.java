@@ -384,38 +384,13 @@ public class EditorController {
             if (!(goods.getShowMainImage().contains("http"))) {
                 goods.setShowMainImage(localpath + goods.getShowMainImage());
             }
-            // 分割eninfo数据，不替换remotepath相同的路径
-            String enInfo = goods.getEninfo().replaceAll("<br><img", "<img").replaceAll("<br /><img", "<img");
-            // 使用img标签进行分割
-            String[] enInfoLst = enInfo.split("<img");
-            StringBuffer textBf = new StringBuffer();
-            for (String srcStr : enInfoLst) {
-                // 判断是否含有全路径的图片
-                if (srcStr.indexOf("http:") > -1 || srcStr.indexOf("https:") > -1) {
-                    // 是否存在img标签的判断，使用img含有src的判断
-                    if (srcStr.indexOf("src=") > -1) {
-                        textBf.append("<br><img " + srcStr);
-                    } else {
-                        textBf.append(srcStr);
-                    }
-                } else {
-                    // 是否存在img标签的判断，使用img含有src的判断
-                    if (srcStr.indexOf("src=") > -1) {
-                        textBf.append("<br><img " + srcStr.replaceAll("src=\"", "src=\"" + localpath));
-                    } else {
-                        textBf.append(srcStr);
-                    }
-                }
-            }
-            // 使用完成后清理数据
-            enInfoLst = null;
 
             // 判断是否是人为修改的重量，如果是则显示修改的重量，否则显示默认的重量
             if (goods.getReviseWeight() == null || "".equals(goods.getReviseWeight())) {
                 goods.setReviseWeight(goods.getFinalWeight());
             }
 
-            String text = textBf.toString();
+            String text = GoodsInfoUtils.dealEnInfoImg(goods.getEninfo() , goods.getRemotpath());
 
             // 已经放入产品表的size_info_en字段
             //获取文字尺码数据

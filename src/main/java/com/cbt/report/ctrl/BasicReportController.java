@@ -1487,7 +1487,7 @@ public class BasicReportController {
             json.setMessage("获取分页数失败");
             return json;
         } else {
-            pageNum = Integer.valueOf(pageNumStr);
+            pageNum = Integer.parseInt(pageNumStr);
         }
 
         String stateNumStr = request.getParameter("page");
@@ -1576,11 +1576,11 @@ public class BasicReportController {
                 }
             }
 
-            List<OrderCancelBean> filterList = orderCancels.stream()
+            /*List<OrderCancelBean> filterList = orderCancels.stream()
                     .filter(e-> Math.abs(e.getAmount()) == Math.abs(e.getPayAmount()) || e.getAmount() == 0 || e.getPayAmount()==0)
                     .collect(Collectors.toList());
-            orderCancels.clear();
-            HSSFWorkbook wb = genOrderCancelWithIpnExcel(filterList, yearStr + "年" + monthStr + "IPN订单取消详情");
+            orderCancels.clear();*/
+            HSSFWorkbook wb = genOrderCancelWithIpnExcel(orderCancels, yearStr + "年" + monthStr + "IPN订单取消详情");
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition",
                     "attachment;filename=" + yearStr + "-" + monthStr + "-IpnOrderCancel.xls");

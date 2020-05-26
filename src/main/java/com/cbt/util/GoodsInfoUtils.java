@@ -1662,4 +1662,20 @@ public class GoodsInfoUtils {
         return isSu;
     }
 
+    public static String dealEnInfoImg(String enInfo, String remotePath){
+        if(StringUtils.isNotBlank(enInfo)){
+            Document docHtml = Jsoup.parse(enInfo);
+            Elements imgList = docHtml.getElementsByTag("img");
+            for(Element imgEl : imgList){
+                String imgUrl = imgEl.attr("src");
+                if(StringUtils.isNotBlank(imgUrl) && !imgUrl.contains("http")){
+                    imgEl.attr("src", remotePath + imgUrl);
+                }
+            }
+            return docHtml.html();
+        }else{
+            return enInfo;
+        }
+    }
+
 }

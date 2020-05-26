@@ -946,13 +946,13 @@
                     <tr>
                         <td>Country:</td>
                         <td>
-                            <input type="text" id="ordercountry" style="width: 180px" disabled="disabled" value="">
-                            <%--<select id="ordercountry" style="width: 180px" disabled="disabled" >
+                            <%--<input type="text" id="ordercountry" style="width: 180px" disabled="disabled" value="">--%>
+                            <select id="ordercountry" style="width: 180px" disabled="disabled" >
                                 <c:forEach items="${countryList }" var="zone">
                                     <option value="${zone.country}">${zone.country}</option>
                                 </c:forEach>
 
-                            </select>--%>
+                            </select>
                         </td>
                     </tr>
                     <tr>

@@ -147,6 +147,26 @@
             return '<a href="/cbtconsole/userinfo/getUserInfo.do?userId=' + val + '" target="_blank">' + val + '</a>';
         }
 
+
+        function exportKopExcelTotal() {
+            var year = $("#pfo_rYear").val();
+            if (year == null || year == "" || year == "0" || year == "-1") {
+                showMessage('请选择年份');
+                return;
+            }
+            var month = $("#pfo_rMonth").val();
+            if (month == null || month == "" || month == "0" || month == "-1") {
+                showMessage('请选择月份');
+                return;
+            }
+            var time = year + "-" + month + "-01";
+            window.location.href = "/cbtconsole/orderPurchase/taobaoListGroupExcel?beginTime=" + time;
+        }
+
+        function formatUserId(val, row, index) {
+            return '<a href="/cbtconsole/userinfo/getUserInfo.do?userId=' + val + '" target="_blank">' + val + '</a>';
+        }
+
         function formatState(val, row, index) {
             if (val == 0) {
                 return '待采购';
@@ -237,6 +257,8 @@
             <input class="but_color" type="button" value="重置" onclick="doKopReset()">
             &nbsp;
             <input class="but_color" type="button" value="导出Excel详细" onclick="exportKopExcelDetail()">
+            &nbsp;
+            <input class="but_color" type="button" value="导出Excel汇总" onclick="exportKopExcelTotal()">
 
         </form>
 
