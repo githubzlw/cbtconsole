@@ -148,7 +148,7 @@ public class BuyForMeServiceImpl implements BuyForMeService {
     @Override
     public int updateDeliveryTime(String orderNo, String time, String feight, String method, int bfid) {
         int updateDeliveryTime = buyForMemapper.updateDeliveryTime(orderNo, time, feight, method);
-        // buyForMemapper.updateOrdersState(bfid, 1);
+        buyForMemapper.updateOrdersState(bfid, 1);
         if (updateDeliveryTime > 0) {
             String sql = "update buyforme_orderinfo set delivery_time =?,ship_feight=?,delivery_method=? where order_no=?";
             List<String> lstValue = Lists.newArrayList();

@@ -145,6 +145,7 @@ $(function () {
                 if (data.state == 200) {
                     $.MsgBox.Alert("提示", "交期确认成功");
                     $("#method-change").val(2);
+                    window.location.reload();
                 } else {
                     $.MsgBox.Alert("提示", "交期确认失败!");
                 }
@@ -206,7 +207,7 @@ $(function () {
     $('.transparent-bg').click(function () {
         $('.transparent,.transparent-bg').hide();
     });
-    // $(".b-add").hide();
+    $(".b-add").hide();
     $(".b-add").click(function () {
         var price = $(this).parents(".de-td").find(".price-ss").val();
         var html = '<tr class="sku-td">' +
@@ -558,11 +559,11 @@ function getShippingCost(state) {
         success: function (res) {
             if (res.code == 200) {
                 var gmethod = $("#h-delivery-method").val();
-                costList = res.data.transitPricecostList
+                costList = res.data.transitPricecostList;
                 var method = '';
                 for (var i = 0; i < costList.length; i++) {
                     var shippingMethod = costList[i].shippingmethod;
-                    if (gmethod != '' && shippingMethod == gmethod.toLowerCase()) {
+                    if (gmethod != '' && shippingMethod.toLowerCase() == gmethod.toLowerCase()) {
                         // method +='<option selected="selected" value="'+costList[i].shippingmethod+'">'+costList[i].shippingmethod+'</option>';
 
                         if (shippingMethod.indexOf('CIF') > -1 && (shippingMethod.indexOf('SEA') > -1 || (shippingMethod.indexOf('AIR') > -1 && shippingMethod.length < 5) || shippingMethod.indexOf('WAY') > -1)) {
