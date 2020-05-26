@@ -360,9 +360,11 @@ public class OrderPurchaseController {
                     e.setYear(timeBegin.getYear() + "-" + timeBegin.getMonthValue());
                     if (StringUtils.isNotBlank(e.getOrderid())) {
                         if (e.getExchange_rate() < 6) {
-                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder() * EXCHANGE_RATE, 2));
+                            //  * EXCHANGE_RATE
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder(), 2));
                         } else {
-                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder() * e.getExchange_rate(), 2));
+                            //  * e.getExchange_rate()
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder(), 2));
                         }
                     }
                 });
