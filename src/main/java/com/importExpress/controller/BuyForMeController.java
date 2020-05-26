@@ -507,9 +507,9 @@ public class BuyForMeController {
                 lstValues.add(o.getPrice());
                 lstValues.add(o.getPriceBuy());
                 lstValues.add(o.getPriceBuyc());
-                lstValues.add(o.getShipFeight());
-                lstValues.add(o.getWeight());
-                lstValues.add(o.getUnit());
+                lstValues.add(o.getShipFeight() == null ? "0" : o.getShipFeight());
+                lstValues.add(o.getWeight() == null ? "0" : o.getWeight());
+                lstValues.add(o.getUnit() == null ? "" : o.getUnit());
                 lstValues.add(String.valueOf(o.getState()));
                 lstValues.add(String.valueOf(o.getId()));
                 String sendMsgByRPC = SendMQ.sendMsgByRPC(new RunSqlModel(DBHelper.covertToSQL(sql1, lstValues)));
