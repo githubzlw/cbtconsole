@@ -267,9 +267,11 @@ public class OrderPurchaseController {
                     if (StringUtils.isNotBlank(e.getOd_shipno())) {
                         e.setYear(timeBegin.getYear() + "-" + timeBegin.getMonthValue());
                         if (e.getExchange_rate() < 6) {
-                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * EXCHANGE_RATE, 2));
+                            //  * EXCHANGE_RATE
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice(), 2));
                         } else {
-                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getExchange_rate(), 2));
+                            //  * e.getExchange_rate()
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice(), 2));
                         }
                     }
                 });
@@ -308,9 +310,11 @@ public class OrderPurchaseController {
                     e.setYear(timeBegin.getYear() + "-" + timeBegin.getMonthValue());
                     if (StringUtils.isNotBlank(e.getOrderid())) {
                         if (e.getExchange_rate() < 6) {
-                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder() * EXCHANGE_RATE, 2));
+                            //  * EXCHANGE_RATE
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder(), 2));
                         } else {
-                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder() * e.getExchange_rate(), 2));
+                            // * e.getExchange_rate()
+                            e.setGoodsprice(BigDecimalUtil.truncateDouble(e.getGoodsprice() * e.getYourorder() , 2));
                         }
                     }
                 });
@@ -354,7 +358,7 @@ public class OrderPurchaseController {
 
             orderPurchaseService.getCurrentOrder(orderPurchase);
 
-            List<OrderPurchase> orderPurchaseList = orderPurchaseService.taobaoList(orderPurchase);
+            List<OrderPurchase> orderPurchaseList = orderPurchaseService.taobaoListGroup(orderPurchase);
             if (CollectionUtils.isNotEmpty(orderPurchaseList)) {
                 orderPurchaseList.forEach(e -> {
                     e.setYear(timeBegin.getYear() + "-" + timeBegin.getMonthValue());
@@ -369,19 +373,19 @@ public class OrderPurchaseController {
                     }
                 });
             }
-
-            Set<String> groupMap = new HashSet<>();
-            List<OrderPurchase> rsList = new ArrayList<>();
-            orderPurchaseList.forEach(e->{
-                if(!groupMap.contains(e.getTb_orderid())){
-                    rsList.add(e);
-                    groupMap.add(e.getTb_orderid());
+            double totalRefund = 0;
+            double totalPrice = 0;
+            for(OrderPurchase cd : orderPurchaseList){
+                if("交易取消".equalsIgnoreCase(cd.getOrderstatus()) || "退款".equalsIgnoreCase(cd.getOrderstatus())){
+                    totalRefund += Double.parseDouble(cd.getTotalprice());
+                } else {
+                    totalPrice += Double.parseDouble(cd.getTotalprice());
                 }
-            });
+            }
 
-            groupMap.clear();
-            orderPurchaseList.clear();
-            HSSFWorkbook wb = genOrderPurchaseListExcelDetail(rsList, timeBegin.getYear() + "年" + timeBegin.getMonthValue() + "月1688采购对应我司订单汇总");
+            System.err.println(totalRefund);
+            System.err.println(totalPrice);
+            HSSFWorkbook wb = genOrderPurchaseListExcelDetail(orderPurchaseList, timeBegin.getYear() + "年" + timeBegin.getMonthValue() + "月1688采购对应我司订单汇总");
             orderPurchaseList.clear();
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition",
@@ -428,7 +432,7 @@ public class OrderPurchaseController {
         cell.setCellValue("下单数量");
         cell.setCellStyle(style);
         cell = row.createCell(5);
-        cell.setCellValue("下单总格(RMB)");
+        cell.setCellValue("下单总格(USD)");
         cell.setCellStyle(style);
         cell = row.createCell(6);
         cell.setCellValue("商品状态");
@@ -443,12 +447,15 @@ public class OrderPurchaseController {
         cell.setCellValue("采购商品");
         cell.setCellStyle(style);
         cell = row.createCell(10);
-        cell.setCellValue("采购数量");
+        cell.setCellValue("采购状态");
         cell.setCellStyle(style);
         cell = row.createCell(11);
-        cell.setCellValue("采购总价(RMB)");
+        cell.setCellValue("采购数量");
         cell.setCellStyle(style);
         cell = row.createCell(12);
+        cell.setCellValue("采购总价(RMB)");
+        cell.setCellStyle(style);
+        cell = row.createCell(13);
         cell.setCellValue("采购支付时间");
         cell.setCellStyle(style);
 
@@ -474,9 +481,10 @@ public class OrderPurchaseController {
             row.createCell(7).setCellValue(bc.getTb_orderid());
             row.createCell(8).setCellValue(bc.getShipno());
             row.createCell(9).setCellValue(bc.getItemurl());
-            row.createCell(10).setCellValue(bc.getItemqty());
-            row.createCell(11).setCellValue(bc.getTotalprice());
-            row.createCell(12).setCellValue(bc.getOrderdate());
+            row.createCell(10).setCellValue(bc.getOrderstatus());
+            row.createCell(11).setCellValue(bc.getItemqty());
+            row.createCell(12).setCellValue(bc.getTotalprice());
+            row.createCell(13).setCellValue(bc.getOrderdate());
         }
         return wb;
     }

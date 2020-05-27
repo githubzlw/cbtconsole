@@ -31,6 +31,8 @@ public class OrderPurchase {
     private String orderdate;
     private String tb_orderid;
 
+    private String orderstatus;
+
     private String year;
     private String month;
 
