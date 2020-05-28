@@ -1060,7 +1060,7 @@ function search() {
                                 + '\',\''
                                 + expresstrackid
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'", "")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1093,7 +1093,7 @@ function search() {
                                 + '\',\''
                                 + expresstrackid
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'", "")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1125,7 +1125,7 @@ function search() {
                                 + '\',\''
                                 + json[i].shipno
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'", "")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1151,7 +1151,7 @@ function search() {
                                 + '\',\''
                                 + json[i].shipno
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'", "")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1177,7 +1177,7 @@ function search() {
                                 + '\',\''
                                 + json[i].shipno
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'", "")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1203,7 +1203,7 @@ function search() {
                                 + '\',\''
                                 + json[i].shipno
                                 + '\',\''
-                                + json[i].strcar_type
+                                + json[i].strcar_type.replace("'", "")
                                 + '\',\''
                                 + json[i].userid
                                 + '\',\''
@@ -1232,7 +1232,7 @@ function search() {
 //											str+='<button style="height: 30px;width:80px;" onclick="window.open(\'/cbtconsole/supplierscoring/supplierproducts?shop_id='+json[i].shop_id+'\',\'_blank\')">供应商打分</button>';
                                 str += '<button style="height: 30px;width:80px;" onclick="openSupplierDiv(\'' + json[i].shop_id + '\')">供应商打分</button>';
                             }
-                            str += '<button style="height: 30px;width:80px;" id="' + json[i].orderid + '_relabel_' + json[i].odid + '" onclick="relabel(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].taobao_itemid + '\',\'' + json[i].strcar_type + '\',\'' + json[i].userid + '\',\'' + json[i].goods_p_price + '\',\'' + json[i].goods_url.replace("\'", "") + '\')">重打标签</button>';
+                            str += '<button style="height: 30px;width:80px;" id="' + json[i].orderid + '_relabel_' + json[i].odid + '" onclick="relabel(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].taobao_itemid + '\',\'' + json[i].strcar_type.replace("'", "") + '\',\'' + json[i].userid + '\',\'' + json[i].goods_p_price + '\',\'' + json[i].goods_url.replace("\'", "") + '\')">重打标签</button>';
                         }
                         str += '</div><div style="height:56px;font-size: 20px;color: red; font-weight: bold">备注：'
                         if (json[i].remark != 'null' && json[i].remark != null) {
@@ -1463,7 +1463,7 @@ function search() {
                                     + '\',\''
                                     + expresstrackid
                                     + '\',\''
-                                    + json[i].strcar_type
+                                    + json[i].strcar_type.replace("'", "")
                                     + '\',\''
                                     + json[i].userid
                                     + '\',\''
@@ -1496,7 +1496,7 @@ function search() {
                                     + '\',\''
                                     + expresstrackid
                                     + '\',\''
-                                    + json[i].strcar_type
+                                    + json[i].strcar_type.replace("'", "")
                                     + '\',\''
                                     + json[i].userid
                                     + '\',\''
@@ -1520,7 +1520,7 @@ function search() {
                                     + '\',\''
                                     + json[i].goodsid
                                     + '\',' + i + ',0)">验货取消</button>';
-                                str += '<button style="height: 30px;width:80px;" id="' + json[i].orderid + '_relabel_' + json[i].odid + '" onclick="relabel(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].taobao_itemid + '\',\'' + json[i].strcar_type + '\',\'' + json[i].userid + '\',\'' + json[i].goods_p_price + '\',\'' + json[i].goods_url.replace("\'", "") + '\')">重打标签</button>';
+                                str += '<button style="height: 30px;width:80px;" id="' + json[i].orderid + '_relabel_' + json[i].odid + '" onclick="relabel(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].taobao_itemid + '\',\'' + json[i].strcar_type.replace("'", "") + '\',\'' + json[i].userid + '\',\'' + json[i].goods_p_price + '\',\'' + json[i].goods_url.replace("\'", "") + '\')">重打标签</button>';
                             }
 
                             str += '</div><div style="height:56px;font-size:10px;">备注：'
