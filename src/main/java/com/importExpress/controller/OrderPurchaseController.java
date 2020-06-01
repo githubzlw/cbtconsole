@@ -359,6 +359,33 @@ public class OrderPurchaseController {
             orderPurchaseService.getCurrentOrder(orderPurchase);
 
             List<OrderPurchase> orderPurchaseList = orderPurchaseService.taobaoListGroup(orderPurchase);
+            /*List<OrderPurchase> orderPurchaseList = orderPurchaseService.taobaoList(orderPurchase);
+
+            Map<String, List<OrderPurchase>> hasMap= orderPurchaseList.stream().filter(e-> StringUtils.isNotBlank(e.getOrderid())).collect(Collectors.groupingBy(OrderPurchase::getTb_orderid));
+
+            Map<String, List<OrderPurchase>> noMap = orderPurchaseList.stream().filter(e -> StringUtils.isBlank(e.getOrderid())).collect(Collectors.groupingBy(OrderPurchase::getTb_orderid));
+
+            orderPurchaseList.clear();
+
+            Set<String> orderSet = new HashSet<>();
+
+            hasMap.forEach((k, v) -> {
+                orderSet.add(v.get(0).getOrderid());
+                orderPurchaseList.add(v.get(0));
+            });
+
+
+            noMap.forEach((k, v) -> {
+                if (!orderSet.contains(v.get(0).getOrderid())) {
+                    orderSet.add(v.get(0).getOrderid());
+                    orderPurchaseList.add(v.get(0));
+                }
+            });
+
+            hasMap.clear();
+            noMap.clear();*/
+
+
             if (CollectionUtils.isNotEmpty(orderPurchaseList)) {
                 orderPurchaseList.forEach(e -> {
                     e.setYear(timeBegin.getYear() + "-" + timeBegin.getMonthValue());

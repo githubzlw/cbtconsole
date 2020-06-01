@@ -18,7 +18,7 @@
 			src="http://cdn.staticfile.org/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
 	<link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
 	<script type="text/javascript" src="/cbtconsole/js/JsBarcode.all.js"></script>
-	<script type="text/javascript" src="/cbtconsole/js/newtrack.js"></script>
+	<script type="text/javascript" src="/cbtconsole/js/newtrack_gp.js"></script>
 	<title>快递扫描页面</title>
 	<style>
 		.mod_pay6 {
@@ -108,7 +108,11 @@
 		}
 		#div_clothing table,#ss_div table,#dz_div table{background-color: pink;}
 		#div_clothing input,#ss_div input,#dz_div input{background-color: #eee;}
-
+		.goods_choose_chb{
+			height: 30px;
+    		width: 30px;
+    		float: right;
+		}
 	</style>
 	<style type="text/css">
 		*{
@@ -224,6 +228,12 @@
 		.t { line-height:20px; height:20px; width:280px; overflow:hidden; background-color:#27C; color:white; font-weight:bold; border-bottom:1px outset blue; text-align:center; }
 		.winBody { height:236px; width:600px; overflow-x:hidden; overflow-y:auto; border-top:0px inset blue; padding:10px; text-indent:10px; background-color:white; }
 		#take_photo{position: fixed;right:0;top:0;}
+
+		.choose_chk{
+			float: right;
+    height: 28px;
+    width: 28px;
+		}
 
 	</style>
 	<%
@@ -624,9 +634,9 @@
 	<div style="clear:both;"></div>
 
 	<div id="amazon"></div>
-	<div id="taobao_info">
+	<div id="taobao_info" class="taobao_btn_class">
 		<input type="button" id="sureAllTrack" onclick="allTrack(1)" value="一键确认入库" style="display: none;height: 30px;width:80px;float:left;color:red;margin-right:20px"/>
-		<input type="button" id="canceAllTrack" onclick="allTrack(0)" value="一键取消入库" style="display: none;height: 30px;width:80px;color:red;"/>
+		<input type="button" id="canceAllTrack" onclick="allTrack(0)" value="一键取消入库" style="display: none;height: 30px;width:80px;color:red;float:left;"/>
 		<div id="insertMessage" style="font-size:30px;color:red;"></div>
 		<div id="taobaoInfos"></div>
 	</div>

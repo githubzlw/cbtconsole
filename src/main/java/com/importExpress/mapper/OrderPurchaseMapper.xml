@@ -107,6 +107,7 @@
 
     <select id="taobaoListGroup" parameterType="com.importExpress.pojo.OrderPurchase"
             resultType="com.importExpress.pojo.OrderPurchase">
+        select * from (
         select aa.*,bb.*
         from (select distinct th.orderid as tb_orderid,th.shipno,th.itemurl,th.itemid,th.itemqty as itemqty,th.totalprice,
         th.paydata as orderdate,specid,skuid,orderstatus,username
@@ -120,10 +121,11 @@
 				inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
         where oi.orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month)
         ) aa
-        on bb.tb_orderid = aa.tborderid and bb.itemid = aa.od_pid
+        on (bb.tb_orderid = aa.tborderid or bb.shipno = aa.od_shipno)  and bb.itemid = aa.od_pid
         where bb.username != '策融by5'
-        group by bb.tb_orderid
-        order by bb.orderdate desc
+        order by aa.orderid desc) alk
+        group by tb_orderid order by orderdate desc
+
     </select>
 
 </mapper>

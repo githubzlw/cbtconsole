@@ -267,7 +267,7 @@
 		.mod_pay3 {
 			width: 720px;
 			position: fixed;
-			top: 250px;
+			top: 120px;
 			left: 15%;
 			z-index: 1011;
 			background: gray;

@@ -536,6 +536,16 @@ public class OrderInfoController {
         request.setCharacterEncoding("utf-8");
         response.setCharacterEncoding("utf-8");
         Map<String, String> map = new HashMap<String, String>();
+
+        String tbInfo = request.getParameter("tbInfo");
+        if (StringUtils.isBlank(tbInfo)) {
+            PrintWriter out = response.getWriter();
+            out.print(0);
+            out.flush();
+            out.close();
+            return;
+        }
+
         try {
             String shipno = request.getParameter("shipno");
             String type = request.getParameter("type");
@@ -551,8 +561,44 @@ public class OrderInfoController {
             map.put("warehouseRemark", "");
             map.put("status", "1");
             map.put("repState", "1");
+
+            Map<String, String> resultMap = new HashMap<>();
+            if (StringUtils.isBlank(tbOrderId) || StringUtils.isBlank(shipno)) {
+                PrintWriter out = response.getWriter();
+                resultMap.put("code","0");
+                resultMap.put("message","采购订单号或者运单号为空");
+                out.print(resultMap);
+                out.flush();
+                out.close();
+                return;
+            }
+
+
+            // 根据前端传递过来的信息直接更新或者保持，不再从数据库读取
+            List<SearchResultInfo> list = JSONArray.parseArray(tbInfo, SearchResultInfo.class);
+            if (CollectionUtils.isEmpty(list)) {
+                PrintWriter out = response.getWriter();
+                resultMap.put("code","0");
+                resultMap.put("message","获取数据异常");
+                out.print(resultMap);
+                out.flush();
+                out.close();
+                return;
+            }
+
             if ("1".equals(type)) {
-                //运单产品信息
+                list.forEach(e-> {
+                    map.put("odid", e.getOdid());
+                    map.put("goodurl", e.getGoods_url());
+                    map.put("goodid", String.valueOf(e.getGoodsid()));
+                    map.put("orderid", e.getOrderid());
+                    map.put("count", "0");
+                    map.put("itemid", e.getTaobao_itemid());
+
+                    iOrderinfoService.updateGoodStatus(map);
+                });
+
+                /*//运单产品信息
                 Map<String, Integer> shipMap = iOrderinfoService.getTbShip(shipno);
                 if (shipMap != null && !shipMap.isEmpty()) {
                     List<Map<String, Object>> allList = iOrderinfoService.allTrack(map);
@@ -579,7 +625,7 @@ public class OrderInfoController {
                             iOrderinfoService.updateGoodStatus(map);
                         }
                     }
-                }
+                }*/
 
             } else if ("0".equals(type)) {
                 List<OrderDetailsBean> oList = iOrderinfoService.getAllCancelDetails(map);
