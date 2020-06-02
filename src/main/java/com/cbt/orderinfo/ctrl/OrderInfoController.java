@@ -594,6 +594,7 @@ public class OrderInfoController {
                     map.put("orderid", e.getOrderid());
                     map.put("count", "0");
                     map.put("itemid", e.getTaobao_itemid());
+                    map.put("tbOrderId", e.getTaobao_orderid());
 
                     iOrderinfoService.updateGoodStatus(map);
                 });
