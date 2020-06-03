@@ -592,6 +592,7 @@ function allTrack(type) {
                 } else if (type == "0") {
                     alert("一键取消入库成功");
                 }
+                $(".rm_btn_cl").remove();
                 search();
             } else {
                 if (type == "1") {
@@ -1298,7 +1299,7 @@ function search() {
                     if (checked == "0") {
                         $(".taobao_btn_class").prepend('<button onclick="noChooseBtn()" style="height: 30px;width: 80px;margin-left: 50px;">取消全选</button>');
                         for(var orno in orderJson){
-                            $(".taobao_btn_class").prepend('<button id="btn_id_'+orno+'" onclick="chooseOrderAll(\''+orno +'\')" style="color: red;height: 30px;width: 120px;margin-left: 30px;">全选'+orno+'</button>');
+                            $(".taobao_btn_class").prepend('<button class="rm_btn_cl" id="btn_id_'+orno+'" onclick="chooseOrderAll(\''+orno +'\')" style="color: red;height: 30px;width: 120px;margin-left: 30px;">全选'+orno+'</button>');
                         }
 
                         $("#sureAllTrack").css("display", "block");
