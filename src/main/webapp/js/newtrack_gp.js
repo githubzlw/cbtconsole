@@ -722,7 +722,7 @@ function put_print1(strcartype, count, tbOrderId, goods_name, barcode, odid, goo
 }
 
 function search() {
-    document.getElementById('operatediv').style.display = 'block';
+    // document.getElementById('operatediv').style.display = 'block';
     $("#kwhid").val("");
     totalqty = "0";
     userBuyCount = "0";
