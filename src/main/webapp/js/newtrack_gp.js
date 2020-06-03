@@ -592,6 +592,7 @@ function allTrack(type) {
                 } else if (type == "0") {
                     alert("一键取消入库成功");
                 }
+                search();
             } else {
                 if (type == "1") {
                     alert("一键确认入库失败");
