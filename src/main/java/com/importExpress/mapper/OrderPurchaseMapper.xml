@@ -120,6 +120,7 @@
 				id_relationtable ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
 				inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
         where oi.orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month)
+        group by ir.tborderid,ir.itemid
         ) aa
         on (bb.tb_orderid = aa.tborderid or bb.shipno = aa.od_shipno)  and bb.itemid = aa.od_pid
         where bb.username != '策融by5'
