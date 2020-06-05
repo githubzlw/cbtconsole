@@ -133,4 +133,8 @@ public interface BuyForMeMapper {
 
     int updateSearchLogCountry(@Param("list") Collection<BuyForMeSearchLog> list);
 
+    List<BuyForMePidLog> pidLogList(BuyForMePidLog pidLog);
+
+	int pidLogListCount(BuyForMePidLog pidLog);
+
 }

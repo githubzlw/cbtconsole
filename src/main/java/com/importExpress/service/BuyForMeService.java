@@ -74,4 +74,8 @@ public interface BuyForMeService {
      * @return
      */
     int updateSearchLogList(List<BuyForMeSearchLog> searchLogList);
+
+    List<BuyForMePidLog> pidLogList(BuyForMePidLog pidLog);
+
+    int pidLogListCount(BuyForMePidLog pidLog);
 }

@@ -538,4 +538,14 @@ public class BuyForMeServiceImpl implements BuyForMeService {
         return count;
     }
 
+    @Override
+    public List<BuyForMePidLog> pidLogList(BuyForMePidLog pidLog) {
+        return buyForMemapper.pidLogList(pidLog);
+    }
+
+    @Override
+    public int pidLogListCount(BuyForMePidLog pidLog) {
+        return buyForMemapper.pidLogListCount(pidLog);
+    }
+
 }
