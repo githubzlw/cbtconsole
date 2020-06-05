@@ -776,4 +776,56 @@ public class BuyForMeController {
         }
     }
 
+    @RequestMapping("/pidLogList")
+    @ResponseBody
+    public JsonResult pidLogList(String beginTime, String endTime, Integer type, String pid,
+                                 Integer userId, String sessionId, Integer page, Integer rows) {
+        JsonResult json = new JsonResult();
+        try {
+            BuyForMePidLog pidLog = new BuyForMePidLog();
+            if (rows == null) {
+                rows = 30;
+            }
+            if (page == null) {
+                page = 1;
+            }
+            pidLog.setStartNum((page - 1) * rows);
+            pidLog.setLimitNum(rows);
+            if (StringUtils.isNotBlank(beginTime)) {
+                pidLog.setCreate_time(beginTime);
+            }
+            if (StringUtils.isNotBlank(pid)) {
+                pidLog.setPid(pid);
+            }
+            if (StringUtils.isNotBlank(endTime)) {
+                LocalDate today = LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                pidLog.setEnd_time(today.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+            if (null != type && type > -1) {
+                pidLog.setType(type);
+            }
+            if (null != userId && userId > 0) {
+                pidLog.setUser_id(userId);
+            }
+            if (StringUtils.isNotBlank(sessionId)) {
+                pidLog.setSession_id(sessionId);
+            }
+
+            int total = buyForMeService.pidLogListCount(pidLog);
+            if (total > 0) {
+                List<BuyForMePidLog> searchLogs = buyForMeService.pidLogList(pidLog);
+
+                json.setSuccess(searchLogs, total);
+            } else {
+                json.setSuccess(new ArrayList<>(), 0);
+            }
+            return json;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("pidLogList beginTime:[{}],endTime:[{}],type:[{}]", beginTime, endTime, type, e);
+            json.setErrorInfo(e.getMessage());
+            return json;
+        }
+    }
+
 }
