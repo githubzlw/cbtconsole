@@ -1132,8 +1132,8 @@ public class RefundDaoImpl implements RefundDaoPlus{
 		if(StrUtils.isNullOrEmpty(useridList)){
 			return map;
 		}
-		String sql = "select *from refund where type=2 and userid in ("+useridList+")";
-		Connection conn = DBHelper.getInstance().getConnection2();
+		String sql = "select * from refund where type=2 and userid in ("+useridList+")";
+		Connection conn = DBHelper.getInstance().getConnection();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		try {
