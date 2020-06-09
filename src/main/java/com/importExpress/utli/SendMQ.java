@@ -34,15 +34,15 @@ public class SendMQ {
      * 优惠卷json数据
      */
     private final static String COUPON_NAME = "coupon"; //发送优惠卷到线上 （mq 连接27更新线上，连接98更新153）
-    private final static String COUPON_NAME_KIDS = "coupon_kids"; //发送优惠卷到kids线上 （mq 连接27更新线上，连接98更新153）
-    private final static String COUPON_NAME_PETS = "coupon_pets"; //发送优惠卷到pet线上 （mq 连接27更新线上，连接98更新153）
+    // private final static String COUPON_NAME_KIDS = "coupon_kids"; //发送优惠卷到kids线上 （mq 连接27更新线上，连接98更新153）
+    // private final static String COUPON_NAME_PETS = "coupon_pets"; //发送优惠卷到pet线上 （mq 连接27更新线上，连接98更新153）
     /**
      * 优惠卷json数据
      */
     private final static String RECOMMEND_NAME = "recommend";
     private final static String QUEUE_REDIS_NAME = "redis";
-    private final static String QUEUE_REDIS_NAME_KIDS = "redis_kids";
-    private final static String QUEUE_REDIS_NAME_PETS = "redis_pets";
+    // private final static String QUEUE_REDIS_NAME_KIDS = "redis_kids";
+    // private final static String QUEUE_REDIS_NAME_PETS = "redis_pets";
     /**
      * 客户授权MQ
      */
@@ -107,11 +107,11 @@ public class SendMQ {
     public static void sendCouponMsg(String couponJson, int website) throws Exception {
         Channel channel = getChannel();
         if (website == 3) {
-            channel.queueDeclare(COUPON_NAME_PETS, false, false, false, null);
-            channel.basicPublish("", COUPON_NAME_PETS, null, couponJson.getBytes("UTF-8"));
+            channel.queueDeclare(COUPON_NAME, false, false, false, null);
+            channel.basicPublish("", COUPON_NAME, null, couponJson.getBytes("UTF-8"));
         } else if (website == 2) {
-            channel.queueDeclare(COUPON_NAME_KIDS, false, false, false, null);
-            channel.basicPublish("", COUPON_NAME_KIDS, null, couponJson.getBytes("UTF-8"));
+            channel.queueDeclare(COUPON_NAME, false, false, false, null);
+            channel.basicPublish("", COUPON_NAME, null, couponJson.getBytes("UTF-8"));
         } else if (website == 1) {
             channel.queueDeclare(COUPON_NAME, false, false, false, null);
             channel.basicPublish("", COUPON_NAME, null, couponJson.getBytes("UTF-8"));
@@ -228,11 +228,11 @@ public class SendMQ {
             channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
             channel.basicPublish("", QUEUE_REDIS_NAME, null, json.getBytes("UTF-8"));
         } else if (website == 1) {
-            channel.queueDeclare(QUEUE_REDIS_NAME_KIDS, false, false, false, null);
-            channel.basicPublish("", QUEUE_REDIS_NAME_KIDS, null, json.getBytes("UTF-8"));
+            channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
+            channel.basicPublish("", QUEUE_REDIS_NAME, null, json.getBytes("UTF-8"));
         } else if (website == 2) {
-            channel.queueDeclare(QUEUE_REDIS_NAME_PETS, false, false, false, null);
-            channel.basicPublish("", QUEUE_REDIS_NAME_PETS, null, json.getBytes("UTF-8"));
+            channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
+            channel.basicPublish("", QUEUE_REDIS_NAME, null, json.getBytes("UTF-8"));
         }
         System.err.println(" [x] Sent '" + json + "'");
         log.info(" [x] Sent '" + json + "'");
