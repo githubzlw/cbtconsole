@@ -12,6 +12,8 @@ import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.UploadByOkHttp;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.*;
 import com.importExpress.service.BuyForMeService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
@@ -42,6 +44,9 @@ public class BuyForMeController {
 
     @Autowired
     private BuyForMeService buyForMeService;
+
+    @Autowired
+    private SendMailFactory sendMailFactory;
 
 
     @RequestMapping("/orders")
@@ -348,9 +353,12 @@ public class BuyForMeController {
             String sbfdid = request.getParameter("bfdid");
             String pid = request.getParameter("pid");
             String order_no = request.getParameter("order_no");
+            String userId = request.getParameter("userId");
+            String userEmail = request.getParameter("userEmail");
             int bfdid = StrUtils.isNum(sbfdid) ? Integer.parseInt(sbfdid) : 0;
 
-            if (StringUtils.isBlank(sbfdid) || StringUtils.isBlank(pid) || StringUtils.isBlank(order_no)) {
+            if (StringUtils.isBlank(sbfdid) || StringUtils.isBlank(pid) || StringUtils.isBlank(order_no)
+                    || StringUtils.isBlank(userId) || StringUtils.isBlank(userEmail)) {
                 mv.put("state", 500);
                 mv.put("message", "param error");
                 return mv;
@@ -375,6 +383,16 @@ public class BuyForMeController {
 				updateOrderDetailsSkuState = buyForMeService.insertBFChat(bfChat);*/
             }
             mv.put("state", updateOrderDetailsSkuState > 0 ? 200 : 500);
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("orderNo", order_no);
+            model.put("remark", remark);
+            model.put("userId", userId);
+            model.put("userEmail", userEmail);
+            String title = "BuyForMe Reply";
+            if (updateOrderDetailsSkuState > 0) {
+                sendMailFactory.sendMail(userEmail, null, title, model, TemplateType.BUYFORME_PID_CHAT);
+            }
         } catch (Exception e) {
             mv.put("state", 500);
             e.printStackTrace();

@@ -364,13 +364,17 @@ $(function () {
         var pid = $("#tc_pid").val();
         var remark = $("#remark-replay-content").val();
         var orderNo = $("#buy_order_no").text();
+        var userId = $("#user_id_rd").text();
+        var userEmail = $("#user_email_rd").text();
         jQuery.ajax({
             url: "/cbtconsole/bf/deremark",
             data: {
                 "bfdid": bfdid,
                 "order_no": orderNo,
                 "pid": pid,
-                "remark": remark
+                "remark": remark,
+                "userId": userId,
+                "userEmail": userEmail
             },
             type: "post",
             success: function (data) {

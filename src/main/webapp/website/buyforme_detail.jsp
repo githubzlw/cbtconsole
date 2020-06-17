@@ -131,8 +131,8 @@ body{min-height:100%;}
 			<div class="col-xs-4"><span class="th-font">关联订单号:</span><span></span></div>
 			</div>
 			<div class="row h50">
-			<div class="col-xs-4"><span class="th-font">用户名:</span><span>${order.name }</span>(<span>${order.user_id }</span>)</div>
-			<div class="col-xs-4"><span class="th-font">邮箱地址:</span><span>${order.email }</span></div>
+			<div class="col-xs-4"><span class="th-font">用户名:</span><span>${order.name }</span>(<span id="user_id_rd">${order.user_id }</span>)</div>
+			<div class="col-xs-4"><span class="th-font">邮箱地址:</span><span id="user_email_rd">${order.email }</span></div>
 			<div class="col-xs-4"><span class="th-font">下单时间:</span><span>${order.create_time}</span></div>
 			</div>
 			<div class="row"><span class="sy-content"><c:if test="${order.sample_flag ==1 }">送样</c:if></span></div>
