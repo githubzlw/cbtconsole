@@ -1884,6 +1884,11 @@
 	</if>
   </select>
 
+
+    <update id="update_taobao_refund_amount">
+        {call update_taobao_refund_amount(#{update_time})}
+    </update>
+
     <select id="refundApplication" parameterType="java.util.List" resultType="java.util.HashMap">
         select b.orderid,b.orderstatus,b.totalprice,ROUND(sum(b.itemprice * b.itemqty),2) as
         good_price,ifnull(b.refund_money,0) as refund_money from (

@@ -3432,6 +3432,7 @@ public class StatisticalReportController {
         int month = date.getMonth();
         String filename = "";
         System.err.println("------------map :" + map.toString());
+        taoBaoOrderService.update_taobao_refund_amount(startTime);
         list = taoBaoOrderService.getRefundAmount(map);
         // filename = "抓取正常采购订单明细报表" + times;
         filename = "captureTheNormalPurchaseOrderRefundDetails" + times;

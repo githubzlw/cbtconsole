@@ -735,6 +735,8 @@ public interface TaoBaoOrderMapper {
     */
    List<TaoBaoOrderInfo> getRefundAmountCount(Map<Object, Object> map);
 
+   void update_taobao_refund_amount(String update_time);
+
 	/**
 	 * 获取1688订单申请退款的信息
 	 * @param list

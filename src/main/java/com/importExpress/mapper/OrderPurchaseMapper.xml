@@ -9,6 +9,7 @@
         select order_no,tp.createtime from orderinfo oi, tem_payment1 tp
         where SUBSTRING(CONCAT(oi.order_no,'_'),1,locate('_',CONCAT(oi.order_no,'_'))-1) = tp.orderid
         and tp.createtime between #{beginTime} and #{endTime} and oi.state in(1,2,3,4,5);
+        call update_taobao_refund_amount(#{beginTime});
     </insert>
 
     <select id="queryForList" parameterType="com.importExpress.pojo.OrderPurchase"

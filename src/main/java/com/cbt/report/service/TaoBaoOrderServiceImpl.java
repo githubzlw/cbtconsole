@@ -1399,6 +1399,11 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 	}
 
 	@Override
+	public void update_taobao_refund_amount(String update_time) {
+		taoBaoOrderMapper.update_taobao_refund_amount(update_time);
+	}
+
+	@Override
 	public List<TaoBaoOrderInfo> getRefundAmountCount(Map<Object, Object> map) {
 		return taoBaoOrderMapper.getRefundAmountCount(map);
 	}
