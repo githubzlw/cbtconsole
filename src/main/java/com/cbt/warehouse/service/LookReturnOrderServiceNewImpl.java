@@ -713,8 +713,12 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
             re.setA1688Order(orid);
             re.setOptUser(admName);
             re.setActual_money(odmany);
+            re.setShipno("0");
+            re.setState(1);
             re.setReturntime(df.format(new Date()));
-            this.lookReturnOrderServiceNewMapper.AddOrder(re);
+            re.setApplyTime(df.format(new Date()));
+            re.setOptTime(df.format(new Date()));
+            this.lookReturnOrderServiceNewMapper.AddNOOrder(re);
             json.setRows(1);
             json.setMessage("退货成功");
         } catch (Exception e) {
