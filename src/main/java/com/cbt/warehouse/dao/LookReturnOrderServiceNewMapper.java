@@ -107,7 +107,9 @@ public interface LookReturnOrderServiceNewMapper {
     void AddOnlyRefund(@Param("orid") String orid, @Param("odmany") Double odmany, @Param("admName") String admName);
     @Select("SELECT COUNT(1) FROM only_refund WHERE 1688_order=#{orid}")
 	int findOrder(@Param("orid") String orid);
-
+	@Insert("INSERT INTO `return_display` (`customer_info`, `1688_order`, `1688_shipno`, `item`, `item_number`, `apply_user`, `apply_time`,`opt_user`,`shipno`,`State`,`return_reason`, `barcode`, `return_number`, `tb_id`, `sku`,`returntime`,`actual_money`) VALUES (#{re.customerorder}, #{re.a1688Order}, #{re.a1688Shipno}, #{re.item}, #{re.itemNumber}, "
+			+ "#{re.applyUser}, #{re.applyTime},#{re.optUser},#{re.shipno},#{re.State}, #{re.returnReason}, #{re.barcode}, #{re.returnNumber},#{re.tbId},#{re.sku},#{re.returntime},#{re.actual_money});")
+	Boolean AddNOOrder(@Param("re")returndisplay re);
 	List<returndisplay> Lookstatement(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
 
 	int LookstatementCount(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
