@@ -709,6 +709,8 @@ public interface TaobaoOrderService {
     */
    List<TaoBaoOrderInfo> getRefundAmount(Map<Object, Object> map);
 
+   void update_taobao_refund_amount(String update_time);
+
    /**
     * 抓取正常采购订单退款明细数量
     * @param map
