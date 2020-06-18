@@ -416,6 +416,11 @@ public class BuyForMeServiceImpl implements BuyForMeService {
                 buy4MeCusotme.setUserId(e);
                 buy4MeCusotme.setJumpLink(e);
                 buy4MeCusotme.setHasMsg(hasMsg);
+                String useridAndMsg = e;
+                if(hasMsg){
+                    useridAndMsg += "&";
+                }
+                buy4MeCusotme.setOur_order_no(useridAndMsg);
                 buy4MeCusotme.setAdm(adm);
                 list2.add(buy4MeCusotme);
             });
