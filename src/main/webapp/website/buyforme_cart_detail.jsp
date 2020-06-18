@@ -120,7 +120,7 @@ body{min-height:100%;}
 			</div>
 			<div class="row w11">
 			<div class="row th-font">用户备注:</div>
-			<div class="row remark-row">Q:<span class="th-font-l de-remarl-q">${detail.remark}</span><i class="td-font-new">New!</i> <i class="td-font-view">View</i></div>
+			<div class="row remark-row">Q:<span class="th-font-l de-remarl-q">${detail.remark}</span><i class="td-font-new">New!</i> <i class="td-font-view">回复消息！</i></div>
 			<%--<div class="remark-replay" style="display:none;">${detail.remark_replay}</div>--%>
 			<%--<div class="remark-replay" style="display:none;">${detail.remarkReplay}</div>--%>
 			</div>

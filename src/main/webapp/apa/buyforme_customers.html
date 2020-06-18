@@ -178,10 +178,10 @@
             var tourist=val;
             if (isNaN(val)){
                 tourist='游客';
-                return '<a  href="/cbtconsole/bf/' + val + '">' + tourist + '</a>';
+                return '<a  target="_blank" href="/cbtconsole/bf/' + val + '">' + tourist + '</a>';
             }else {
 
-                return '<a  href="/cbtconsole/bf/' + val + '">' + tourist + '</a>';;
+                return '<a  target="_blank"  href="/cbtconsole/bf/' + val + '">' + tourist + '</a>';;
 
             }
         }
@@ -193,13 +193,23 @@
             return '<a  href="/cbtconsole/apa/buyForMeSearchLog.html?userId=' + val + '">Search Log</a>';
         }
         function formatMsg(val, row, index) {
+            var userId = val;
             var msg = "没有新消息！"
-            if (val){
+            if (val.indexOf("&") > -1){
                 msg = '有新消息了！'
-                return '<span  class="blink" style="display: inline-block;overflow: hidden;word-break: keep-all;white-space: nowrap;text-overflow: ellipsis;line-height: 28px;float: left;" >' + msg + '</span>';
+                userId = userId.replace("&","");
+                return '<a  href="/cbtconsole/bf/' + userId + '">  <span  class="blink" style="display: inline-block;overflow: hidden;word-break: keep-all;white-space: nowrap;text-overflow: ellipsis;line-height: 28px;float: left;" >' + msg + '</span></a>';
             }else {
                 return '<span>' + msg + '</span>';
             }
+
+           /* if (val){
+                msg = '有新消息了！'
+                return '<a  href="/cbtconsole/apa/buyForMeSearchLog.html?userId=\' + val + \'">  <span  class="blink" style="display: inline-block;overflow: hidden;word-break: keep-all;white-space: nowrap;text-overflow: ellipsis;line-height: 28px;float: left;" >' + msg + '</span></a>';
+
+            }else {
+                return '<span>' + msg + '</span>';
+            }*/
 
         }
 
@@ -265,7 +275,7 @@
         <th data-options="field:'totalNum',align:'center',width:'10%'">产品总数量</th>
         <th data-options="field:'itemNum',align:'center',width:'10%'">产品量</th>
         <th data-options="field:'jumpLink',align:'center',width:'20%',formatter:formatUserId">Customer&Link</th>
-        <th data-options="field:'hasMsg',align:'center',width:'20%',formatter:formatMsg">Message</th>
+        <th data-options="field:'our_order_no',align:'center',width:'20%',formatter:formatMsg">Message</th>
         <th data-options="field:'userId',align:'center',width:'10%',formatter:formatSearch">Search History</th>
         <th data-options="field:'country',align:'center',width:'10%'">用户国家</th>
     </tr>
