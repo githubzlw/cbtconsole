@@ -511,7 +511,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 				gfb1.setUrl(rs1.getString("url"));
                 gfb1.setUrlPd(rs1.getString("url").substring(rs1.getString("url").lastIndexOf("-")+1));
                 //update 20200422一个商品多个规格情况只录入一遍 end
-				gfb1.setGoodsPid(rs1.getString("goods_pid"));
+//				gfb1.setGoodsPid(rs1.getString("goods_pid"));
 
 				gfb1.setImgpath(rs1.getString("imgpath"));
 				gfb1.setPrice(rs1.getString("price"));
