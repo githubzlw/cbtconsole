@@ -429,7 +429,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		sql = sql +" where oi.order_no=? ";
 		sql = sql +" order by oi.order_no desc limit ?, ? ";
 		String sql1 ="select distinct od.orderid order_no,od.userid,CAST(IF(IFNULL(oi.exchange_rate,0)<=0,6.3,oi.exchange_rate) AS DECIMAL(10,2)) AS exchange_rate," +
-				"'USD' currency,od.id as od_id,od.goodsid as goodscarid,gdc.url,gdc.imgpath ,gdc.id as id,gdc.goodsname,gdc.url ";
+				"'USD' currency,od.id as od_id,od.goodsid as goodscarid,od.goods_pid,gdc.url,gdc.imgpath ,gdc.id as id,gdc.goodsname,gdc.url ";
 		sql1 = sql1 +" as url,gdc.imgurl,gdc.imgpath,gdc.tbimg,gdc.tburl,od.goodsprice as price,gdc.tbimg1,gdc.tburl1,gdc.tbimg2,gdc.tburl2,gdc.tbimg3, ";
 		sql1 = sql1+" gdc.tburl3,gdc.tbimg4,gdc.tburl4,gdc.tbimg5,gdc.tburl5,gdc.tbprice,gdc.tbprice1,gdc.tbprice2,gdc.tbprice3,gdc.tbprice4,gdc.tbprice5,gdc.tbname,gdc.tbname1,gdc.tbname2,gdc.tbname3,gdc.tbname4,gdc.tbname5, ";
 		sql1 = sql1 +" od.yourorder as usecount,ops.purchase_state purchasestate,gdc.id as gooddataid,gdc.goodsnamecn   ";
@@ -511,6 +511,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 				gfb1.setUrl(rs1.getString("url"));
                 gfb1.setUrlPd(rs1.getString("url").substring(rs1.getString("url").lastIndexOf("-")+1));
                 //update 20200422一个商品多个规格情况只录入一遍 end
+				gfb1.setGoodsPid(rs1.getString("goods_pid"));
 
 				gfb1.setImgpath(rs1.getString("imgpath"));
 				gfb1.setPrice(rs1.getString("price"));
