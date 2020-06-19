@@ -486,7 +486,8 @@
 					<tr id="${i.index}${gbbpl.orderNo}">
 						<td id="canl${i.index}${gbbpl.orderNo}"> 
 							<img  width='200px' title="" height='200px;' src="${gbbpl.imgpath }" style='' >
-							<br />${gbb.currency}&nbsp;${gbbpl.price}&nbsp;&nbsp;&nbsp;<a target='_blank' href="https://www.import-express.com${gbbpl.url}" class="a1" >Info</a>
+							<%--<br />${gbb.currency}&nbsp;${gbbpl.price}&nbsp;&nbsp;&nbsp;<a target='_blank' href="https://www.import-express.com${gbbpl.url}" class="a1" >Info</a>--%>
+							<br />${gbb.currency}&nbsp;${gbbpl.price}&nbsp;&nbsp;&nbsp;<a target='_blank' href="https://www.import-express.com/goodsinfo/cbtconsole-0-0-0-1${gbbpl.goodsPid}.html" class="a1" >Info</a>
 							&nbsp;RMB&nbsp;${gbbpl.priceRmb}
 							<br />商品号:${gbbpl.goodscarid}
 							<br />${gbbpl.goodsName}
