@@ -45,6 +45,7 @@ public class ImgDownload {
 
 	public static boolean downFromImgService(String imgUrl,String fileName) {
 
+		String ipUrl = imgUrl.replace("https://img.import-express.com","http://104.247.194.50");
 		boolean isDown = false;
 		File file = new File(fileName);
 		if(checkDownFileByName(fileName)){
@@ -57,7 +58,7 @@ public class ImgDownload {
 			OkHttpClient client = new OkHttpClient.Builder().connectTimeout(180, TimeUnit.SECONDS)
 					.readTimeout(90, TimeUnit.SECONDS).writeTimeout(90, TimeUnit.SECONDS).build();
 			Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*")
-					.addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").get().url(imgUrl).build();
+					.addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").get().url(ipUrl).build();
 			Response response = client.newCall(request).execute();
 
 			inputStream = response.body().byteStream();
