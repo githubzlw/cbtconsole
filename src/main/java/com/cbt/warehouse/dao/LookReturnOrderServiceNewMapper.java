@@ -119,4 +119,12 @@ public interface LookReturnOrderServiceNewMapper {
 	int LookstatementOnlyCount(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
 
 	double LookstatementManey(@Param("nameString") String nameString, @Param("optTimeStart") String optTimeStart, @Param("optTimeEnd") String optTimeEnd, @Param("page") int page, @Param("applyUser") String applyUser);
+    @Select("select COUNT(1) from taobao_1688_order_history where orderstatus in('交易关闭','交易取消','已退款','退款中','退款成功') AND orderid=#{orid}")
+	int getOrderCount(@Param("orid") String orid);
+    @Select("select COUNT(1) from taobao_1688_order_history_refund where  orderstatus in('交易关闭','交易取消','已退款','退款中','退款成功') AND orderid=#{orid}")
+	int getOrderRCount(@Param("orid") String orid);
+    @Insert("INSERT INTO taobao_1688_order_history (`tbOr1688`,`orderid`, `orderdate`, `totalprice`, `orderstatus`,`update_time`, `off_line`) VALUES ('0',#{orid},now(),0,'退款中',now(),1);")
+	void AddOrderINTaobao(@Param("orid")String orid);
+    @Insert("INSERT INTO taobao_1688_order_history_refund (`tbOr1688`,`orderid`, `orderdate`, `totalprice`, `orderstatus`,`update_time`,`data_add_time`) VALUES ('0',#{orid},now(),0,'退款中',now(),now());")
+	void AddOrderINTaobaoR(@Param("orid") String orid);
 }
