@@ -6,6 +6,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -55,8 +57,10 @@ public class ImgDownload {
 		FileOutputStream fileOutputStream = null;
 		ByteArrayOutputStream output = null;
 		try {
-			OkHttpClient client = new OkHttpClient.Builder().connectTimeout(180, TimeUnit.SECONDS)
-					.readTimeout(90, TimeUnit.SECONDS).writeTimeout(90, TimeUnit.SECONDS).build();
+			OkHttpClient client = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS)
+					.readTimeout(300, TimeUnit.SECONDS).writeTimeout(300, TimeUnit.SECONDS)
+					.hostnameVerifier((s, sslSession) -> true)
+					.build();
 			Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*")
 					.addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").get().url(ipUrl).build();
 			Response response = client.newCall(request).execute();
