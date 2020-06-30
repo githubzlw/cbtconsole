@@ -192,7 +192,7 @@ function doReset(){
 			</form>
 		</div>
 		<a href="javascript:exportdata();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">导出</a>
-		<span>【${param.times}】采购订单取消销售订单总金额</span><span style="color:red">￥【${param.amount}】</span>
+		<span>【${param.times}】采购订单明细</span><span style="color:red">￥【${param.amount}】</span>
 	</div>
 	
 		<table class="easyui-datagrid" id="easyui-datagrid"   style="width:1500px;height:900px">
