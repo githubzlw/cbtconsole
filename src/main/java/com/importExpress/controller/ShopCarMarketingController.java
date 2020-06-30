@@ -374,7 +374,7 @@ public class ShopCarMarketingController {
 
             //获取原来的重新生成goods_carconfig数据
             // GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
-            ShopCarNewBean carNewBean = goodsCarconfigService.queryShopCarNewBeanByUserId(userId);
+            /*ShopCarNewBean carNewBean = goodsCarconfigService.queryShopCarNewBeanByUserId(userId);
             if ("1".equals(websiteType)) {
                 if (StringUtils.isBlank(carNewBean.getImportData()) || carNewBean.getImportData().length() < 10) {
                     json.setOk(false);
@@ -391,7 +391,24 @@ public class ShopCarMarketingController {
                 json.setOk(false);
                 json.setMessage("获取网站类别异常");
                 return json;
+            }*/
+
+            if ("1".equals(websiteType) || "2".equals(websiteType) || "3".equals(websiteType)) {
+                //查询当前客户存在的购物车数据
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.parseInt(websiteType));
+                if (CollectionUtils.isEmpty(shopCarMarketingList)) {
+                    json.setOk(false);
+                    json.setMessage("客户购物车信息为空");
+                    return json;
+                }
+                shopCarMarketingList.clear();
+            } else {
+                json.setOk(false);
+                json.setMessage("获取网站类别异常");
+                return json;
             }
+
+
 
                 /*List<GoodsCarActiveSimplBean> listActive = new ArrayList<>();
 
