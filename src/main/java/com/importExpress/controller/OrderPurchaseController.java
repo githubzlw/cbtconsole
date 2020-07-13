@@ -480,9 +480,12 @@ public class OrderPurchaseController {
         cell.setCellValue("采购数量");
         cell.setCellStyle(style);
         cell = row.createCell(12);
-        cell.setCellValue("采购总价(RMB)");
+        cell.setCellValue("单品采购金额");
         cell.setCellStyle(style);
         cell = row.createCell(13);
+        cell.setCellValue("采购总价(RMB)");
+        cell.setCellStyle(style);
+        cell = row.createCell(14);
         cell.setCellValue("采购支付时间");
         cell.setCellStyle(style);
 
@@ -510,8 +513,9 @@ public class OrderPurchaseController {
             row.createCell(9).setCellValue(bc.getItemurl());
             row.createCell(10).setCellValue(bc.getOrderstatus());
             row.createCell(11).setCellValue(bc.getItemqty());
-            row.createCell(12).setCellValue(bc.getTotalprice());
-            row.createCell(13).setCellValue(bc.getOrderdate());
+            row.createCell(12).setCellValue(bc.getItemprice());
+            row.createCell(13).setCellValue(bc.getTotalprice());
+            row.createCell(14).setCellValue(bc.getOrderdate());
         }
         return wb;
     }
