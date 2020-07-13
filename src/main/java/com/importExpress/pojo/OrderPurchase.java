@@ -27,6 +27,7 @@ public class OrderPurchase {
     private String itemid;
     private String itemurl;
     private String itemqty;
+    private String itemprice;
     private String totalprice;
     private String orderdate;
     private String tb_orderid;
