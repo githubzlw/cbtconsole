@@ -253,12 +253,17 @@
             // $("#goodsWeight").html(goodsWeight);
             $("#es_p").html(ec_p + "%");
             $("#ac_p").html(ac_p + "%");
+
             var cname = "<%=request.getAttribute("countryName")%>"; //国际运输方式中的国家名
             var orderNo = "<%=request.getAttribute("orderNo")%>"; //订单号
             var oids = "<%=request.getAttribute("str_oid")%>"; //订单下所有的oid
             if (orderNo != "" && cname != "" && cname != null) {
                 searchCountry(cname, orderNo);
             }
+
+            //订单保存利润数据
+            saveLrData(orderNo,es_profit,ac_profit,end_profit);
+
             var userid = <%=request.getAttribute("userid")%>;
             queryRepeat(userid);
             getBuyer(oids);

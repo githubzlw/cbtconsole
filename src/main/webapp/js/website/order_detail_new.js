@@ -2068,6 +2068,22 @@ function searchCountry(cname, orderNo){
     });
 }
 
+function saveLrData(orderNo,esProfit,acProfit,endProfit){
+    $.ajax({
+        url:"/cbtconsole/orderInfo/saveOrderProfit.do",
+        type : "post",
+        dataType:"json",
+        data :{"orderNo":orderNo,"esProfit":esProfit,"acProfit":acProfit,"endProfit":endProfit},
+        success:function(data){
+            // if(data.ok){
+            //     if(cname!=data){
+            //         $("#od_country").css("display","inline");
+            //     }
+            // }
+        }
+    });
+}
+
 function queryRepeat(uid){
     $.ajax({
         url:"/cbtconsole/orderDetails/queryRepeatUserid.do",
