@@ -480,10 +480,10 @@ public class OrderPurchaseController {
         cell.setCellValue("采购数量");
         cell.setCellStyle(style);
         cell = row.createCell(12);
-        cell.setCellValue("采购金额(RMB)");
+        cell.setCellValue("采购单价(RMB)");
         cell.setCellStyle(style);
         cell = row.createCell(13);
-        cell.setCellValue("采购总价(RMB)");
+        cell.setCellValue("采购订单总价(RMB)");
         cell.setCellStyle(style);
         cell = row.createCell(14);
         cell.setCellValue("采购支付时间");
