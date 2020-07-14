@@ -412,7 +412,7 @@ public class OrderPurchaseController {
 
             System.err.println(totalRefund);
             System.err.println(totalPrice);
-            HSSFWorkbook wb = genOrderPurchaseListExcelDetail(orderPurchaseList, timeBegin.getYear() + "年" + timeBegin.getMonthValue() + "月1688采购对应我司订单汇总");
+            HSSFWorkbook wb = genOrderPurchaseListExcelGroup(orderPurchaseList, timeBegin.getYear() + "年" + timeBegin.getMonthValue() + "月1688采购对应我司订单汇总");
             orderPurchaseList.clear();
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition",
@@ -483,9 +483,6 @@ public class OrderPurchaseController {
         cell.setCellValue("采购单价(RMB)");
         cell.setCellStyle(style);
         cell = row.createCell(13);
-        cell.setCellValue("采购订单总价(RMB)");
-        cell.setCellStyle(style);
-        cell = row.createCell(14);
         cell.setCellValue("采购支付时间");
         cell.setCellStyle(style);
 
@@ -514,12 +511,92 @@ public class OrderPurchaseController {
             row.createCell(10).setCellValue(bc.getOrderstatus());
             row.createCell(11).setCellValue(bc.getItemqty());
             row.createCell(12).setCellValue(bc.getItemprice());
-            row.createCell(13).setCellValue(bc.getTotalprice());
-            row.createCell(14).setCellValue(bc.getOrderdate());
+            row.createCell(13).setCellValue(bc.getOrderdate());
         }
         return wb;
     }
 
+
+    private HSSFWorkbook genOrderPurchaseListExcelGroup(List<OrderPurchase> orderPurchaseList, String title) {
+
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sheet = wb.createSheet(title);
+        HSSFRow row = sheet.createRow((int) 0);
+        HSSFCellStyle style = wb.createCellStyle();
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+
+        HSSFCell cell = row.createCell(0);
+        cell.setCellValue("年月份");
+        cell.setCellStyle(style);
+        cell = row.createCell(1);
+        cell.setCellValue("订单号");
+        cell.setCellStyle(style);
+        cell = row.createCell(2);
+        cell.setCellValue("下单时间");
+        cell.setCellStyle(style);
+        cell = row.createCell(3);
+        cell.setCellValue("订单商品PID");
+        cell.setCellStyle(style);
+        cell = row.createCell(4);
+        cell.setCellValue("下单数量");
+        cell.setCellStyle(style);
+        cell = row.createCell(5);
+        cell.setCellValue("下单总格(USD)");
+        cell.setCellStyle(style);
+        cell = row.createCell(6);
+        cell.setCellValue("商品状态");
+        cell.setCellStyle(style);
+        cell = row.createCell(7);
+        cell.setCellValue("1688订单号");
+        cell.setCellStyle(style);
+        cell = row.createCell(8);
+        cell.setCellValue("1688运单号");
+        cell.setCellStyle(style);
+        cell = row.createCell(9);
+        cell.setCellValue("采购商品");
+        cell.setCellStyle(style);
+        cell = row.createCell(10);
+        cell.setCellValue("采购状态");
+        cell.setCellStyle(style);
+        cell = row.createCell(11);
+        cell.setCellValue("采购数量");
+        cell.setCellStyle(style);
+        cell = row.createCell(12);
+        cell.setCellValue("采购订单总价(RMB)");
+        cell.setCellStyle(style);
+        cell = row.createCell(13);
+        cell.setCellValue("采购支付时间");
+        cell.setCellStyle(style);
+
+        for (int i = 0; i < orderPurchaseList.size(); i++) {
+            row = sheet.createRow((int) i + 1);
+            OrderPurchase bc = orderPurchaseList.get(i);
+            // 第四步，创建单元格，并设置值
+            row.createCell(0).setCellValue(bc.getYear());
+            row.createCell(1).setCellValue(bc.getOrderid());
+            row.createCell(2).setCellValue(bc.getOrderpaytime());
+            row.createCell(3).setCellValue(bc.getOd_pid());
+            row.createCell(4).setCellValue(bc.getYourorder());
+            row.createCell(5).setCellValue(bc.getGoodsprice());
+            if (bc.getOd_state() == 0) {
+                row.createCell(6).setCellValue("待采购");
+            } else if (bc.getOd_state() == 1) {
+                row.createCell(6).setCellValue("入库");
+            } else if (bc.getOd_state() == -1 || bc.getOd_state() == 2) {
+                row.createCell(6).setCellValue("取消");
+            } else {
+                row.createCell(6).setCellValue("");
+            }
+            row.createCell(7).setCellValue(bc.getTb_orderid());
+            row.createCell(8).setCellValue(bc.getShipno());
+            row.createCell(9).setCellValue(bc.getItemurl());
+            row.createCell(10).setCellValue(bc.getOrderstatus());
+            row.createCell(11).setCellValue(bc.getItemqty());
+            row.createCell(12).setCellValue(bc.getTotalprice());
+            row.createCell(13).setCellValue(bc.getOrderdate());
+        }
+        return wb;
+    }
 
     private HSSFWorkbook genOrderPurchaseListExcelTotal(List<OrderPurchase> orderPurchaseList, String title) {
 
