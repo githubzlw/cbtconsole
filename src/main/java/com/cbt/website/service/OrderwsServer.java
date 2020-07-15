@@ -564,6 +564,9 @@ public class OrderwsServer implements IOrderwsServer {
 		return dao.queryCountryNameByOrderNo(orderNo);
 	}
 
+	public int saveOrderProfit(String orderid, String esProfit, String acProfit,String endProfit) {
+		return dao.saveOrderProfit(orderid, esProfit, acProfit,endProfit);
+	}
 	public List<Integer> getRepeatUserid(int id) {
 		return dao.getRepeatUserid(id);
 	}

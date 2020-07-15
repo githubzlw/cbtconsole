@@ -808,6 +808,8 @@ public interface IOrderwsDao {
 
 	public String queryCountryNameByOrderNo(String orderNo);
 
+	public int saveOrderProfit(String orderid, String esProfit, String acProfit,String endProfit);
+
 	public List<Integer> getRepeatUserid(int id);
 
 	public List<Map<String, String>> getCustCountry(String orderno);

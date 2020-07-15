@@ -461,6 +461,8 @@ public interface IOrderwsServer {
 
 	public String queryCountryNameByOrderNo(String orderNo);
 
+	public int saveOrderProfit(String orderid, String esProfit, String acProfit,String endProfit);
+
 	/**
 	 * 运费抵扣
 	 *

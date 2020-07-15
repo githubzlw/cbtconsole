@@ -2749,6 +2749,29 @@ public class OrderwsDao implements IOrderwsDao {
     }
 
     @Override
+    public int saveOrderProfit(String orderid, String esProfit, String acProfit,String endProfit) {
+        String sql = "replace into order_profit(order_no,es_profit,ac_profit,end_profit) values(?,?,?,?)";
+        Connection conn = DBHelper.getInstance().getConnection();
+        PreparedStatement stmt = null;
+        int res = 0;
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, orderid);
+            stmt.setString(2, esProfit);
+            stmt.setString(3, acProfit);
+            stmt.setString(4, endProfit);
+            res = stmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return res;
+    }
+
+
+    @Override
     public AdvanceOrderBean getAdvanceBean(String orderid) {
         String sql = "select orderno,freight,tariffs,createtime,questions,answer from advance_order where orderno=?";
         Connection conn = DBHelper.getInstance().getConnection();

@@ -63,6 +63,29 @@ public class NewOrderInfoCtr {
 	}
 
 	/**
+	 * 订单利润数据保存
+	 *
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/saveOrderProfit.do")
+	@ResponseBody
+	public void saveOrderProfit(HttpServletRequest request, HttpServletResponse response) {
+		String orderNo = request.getParameter("orderNo");
+		String esProfit = request.getParameter("esProfit");
+		String acProfit = request.getParameter("acProfit");
+		String endProfit = request.getParameter("endProfit");
+		try {
+			IOrderwsServer server = new OrderwsServer();
+			int count = server.saveOrderProfit(orderNo, esProfit, acProfit,endProfit);
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("订单利润插入失败：" + e.getMessage());
+		}
+
+	}
+
+	/**
 	 * 采购页面查询订单支付金额等信息
 	 * @param request
 	 * @param response
