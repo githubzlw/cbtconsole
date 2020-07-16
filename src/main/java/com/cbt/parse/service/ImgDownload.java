@@ -241,7 +241,7 @@ public class ImgDownload {
         boolean isDown = false;
         File downFlie = new File(fileName);
 
-        if (downFlie.exists() && downFlie.length() > 512) {
+        if (downFlie.exists() && downFlie.length() > 400) {
 			try {
 				if (ColorRGBUtil.getInstance().checkImage(fileName)) {
 					System.err.println("fileName:" + fileName + " gray img");
