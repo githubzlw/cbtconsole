@@ -2102,11 +2102,16 @@ public class NewOrderDetailsCtr {
 //                    sbBuffer.append("<br>Import-Express Team");
                     //SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
 //							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
+					String flagId = request.getParameter("flagId");
+                    if(StringUtils.isBlank(flagId)){
+                    	flagId = "0";
+					}
                     model.put("email", confirmEmail);
                     model.put("name", toEmail);
                     model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
                     model.put("accountLink", SwitchDomainNameUtil.checkNullAndReplace(AppConfig.center_path, MultiSiteUtil.getSiteTypeNum(orderNo)));
                     model.put("orderNo", orderNo);
+                    model.put("flagId", flagId);
                     String modeStr = JSONObject.toJSONString(model);
                     try {
 						sendMailFactory.sendMail(toEmail, null, "Your "+webSiteTitle+" Order " + orderNo + " transaction is closed!",

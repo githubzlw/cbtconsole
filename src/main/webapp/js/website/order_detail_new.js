@@ -593,6 +593,10 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
         fixed : true,
         ok : function() {
                 // 按钮不可用
+			var flagId = 0;
+                if(orderno.indexOf("_") > -1){
+                	flagId = $("#select_flag_id").val();
+				}
                 $("#closeOrder").attr("disabled", true);
                 $("#closeOrder").hide();
                 $(".mask").show().text("正在执行，请等待...");
@@ -611,7 +615,8 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
                         "totalPrice" : totalPrice,
                         "weight" : weight,
                         "isDropshipOrder" : isDropshipOrder,
-						"websiteType" : websiteType
+						"websiteType" : websiteType,
+						"flagId":flagId
                     };
                     $.ajax({
                         url : '/cbtconsole/orderDetails/closeOrder.do',
@@ -666,7 +671,8 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
                             "freight" : freight,
                             "isDropshipOrder" : isDropshipOrder,
                             'isDropshipOrder1':isDropshipOrder1,
-							"websiteType" : websiteType
+							"websiteType" : websiteType,
+							"flagId":flagId
                         };
 
                         $.ajax({
