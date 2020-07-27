@@ -1,4 +1,10 @@
 $(function(){
+	$('.trnasparent').click(function(){
+		$('.tc,.trnasparent').hide();
+	});
+	$('.transparent-bg').click(function(){
+		$('.transparent,.transparent-bg').hide();
+	})
 	$(".yhovercancle").click(function(){
 		$("#corder_detail").hide();
 	})
@@ -447,6 +453,20 @@ function addInventory(barcode, inventory_count, orderid, odid, goodid,count, rec
         }
     });
 }
+var th = 0 ;
+function clickRa(){
+	$(".ra-i").click(function(){
+		var odid = $(this).val();
+		var pid = $(this).attr("name");
+		var skuid = $(this).parents(".ra-cls").find(".ra-skuid").text();//attr("name");
+		$(".th_skuid_"+odid).html(skuid);
+		 $(".th_tbpid_"+odid).html(pid);
+		 th =1;
+	})
+	
+	
+	
+}
 var scrollTop;
 /**
  * 验货无误
@@ -495,17 +515,62 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     var tbspecid = '';
     var tbskuid = '';
     var count = 0;
-    if((specid && specid!='' )||( skuid && skuid!='')){
+    var tbPid = '';
+    $("#replace-product").html('');
+    var thflag = 0;
+    if(skuid && skuid!=''){
     	//采购货源产品规格id
     	tbspecid= specid !=''? $(".specId_"+specid).html():'';
     	tbskuid=skuid!='' ? $(".skuID_"+skuid).html() : '';
-    	if((tbspecid!=''&&specid == tbspecid || tbskuid!=''&&skuid == tbskuid)){
+    	if(tbskuid!=''&&skuid == tbskuid){
+    		th = 0;
+    		thflag = 1;
     		var skucount = $(".itemqty_"+specid+"_"+skuid).html();
     		if(Number(skucount) > 0){
     			count = skucount;
     			//$("#" + orderid + "count_" + odid + "").val(count);
     		}
     	}
+    }
+    if(thflag == 0){
+    	th = 0;
+		tbskuid = $(".th_skuid_"+odid).html();
+		tbPid = $(".th_tbpid_"+odid).html();
+		if(tbskuid==''){
+			 $.ajax({
+		            url: "/cbtconsole/order/getReplace",
+		            type: "post",
+		            async: true,
+		            data: {
+		            	shipno: shipno,
+		                odid: odid
+		            },
+		            success: function (data) {
+		               var hml = '';
+		               var arr = data.data;
+		               for(var i=0;i<arr.length;i++){
+		            	   
+		            	   hml +='<tr class="ra-cls">'+
+		            	   '<td><input type="radio" name="'+arr[i].itemid+'" class="ra-i" value="'+odid+'"></td>'+
+		            	   '<td>'+arr[i].sku+'</td>'+
+		            	   '<td class="ra-skuid">'+arr[i].skuID+'</td>'+
+		            	   '<td><img src="'+arr[i].imgurl+'"></td>'+
+		            	   '</tr>'
+		            	   
+		               }
+		            	$("#replace-product").html(hml);
+		            	if(hml != ''){
+		            		$(".replace-dv").show();
+		            		$(".trnasparent").show();
+		            		clickRa();
+		            	}
+		            }
+		        });
+			
+			return;
+		}else{
+			th = 1;
+		}
     }
     //验货人员实际输入数量
    var temcount = $("#" + orderid + "count_" + odid + "").val();//验货数量
@@ -529,12 +594,14 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     }
     //同步重量
     saveWeight(orderid, odid, itemid);
-    
    $.ajax({
             url: "/cbtconsole/order/updateCheckStatus",
             type: "post",
             async: true,
             data: {
+            	th:th,
+            	tbPid:tbPid,
+            	tbskuid:tbskuid,
                 orderid: orderid,
                 goodid: goodid,
                 status: status,
@@ -1104,7 +1171,7 @@ function search() {
                         
                         str += '<p>specId:<font color="red" class="specid_' + json[i].orderid +'_'+json[i].odid+ '">'+json[i].specId
                         + '</font></p><p color="red">skuID:<font color="red" class="skuID_'+ json[i].orderid +'_'+json[i].odid+'">' + json[i].skuID 
-                        + '</font></p>'+'<input type="hidden" class="itemid_sourceCount" value="0"/>';
+                        + '</font><font class="th_skuid_'+json[i].odid+'" style="display:none;"></font><font class="th_tbpid_'+json[i].odid+'" style="display:none;"></font></p>'+'<input type="hidden" class="itemid_sourceCount" value="0"/>';
                         
                         if (checked == "1") {
                             queryRecord(json[i].odid);

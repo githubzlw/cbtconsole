@@ -8,11 +8,13 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.orderinfo.service.IOrderinfoService;
+import com.cbt.orderinfo.service.OrderinfoService;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.RechangeRecord;
 import com.cbt.processes.service.ISpiderServer;
 import com.cbt.util.Utility;
 import com.cbt.util.*;
+import com.cbt.warehouse.pojo.returnbill;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PurchaseGoodsBean;
@@ -26,6 +28,7 @@ import com.cbt.website.util.UploadByOkHttp;
 import com.google.gson.Gson;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.CommonResult;
 import com.importExpress.pojo.InputData;
 import com.importExpress.pojo.OrderStatic;
 import com.importExpress.service.IPurchaseService;
@@ -375,9 +378,12 @@ public class OrderInfoController {
         int res = 0, num = 0;
         List<Tb1688OrderHistory> checkOrder = null;
         try {
-            map.put("orderid", request.getParameter("orderid"));
+            map.put("th", request.getParameter("th"));
+            map.put("tbPid", request.getParameter("tbPid"));
+            map.put("tbskuid", request.getParameter("tbskuid"));
             map.put("goodid", request.getParameter("goodid"));
             map.put("status", request.getParameter("status"));
+            map.put("orderid", request.getParameter("orderid"));
             map.put("goodurl", request.getParameter("goodurl"));
             map.put("barcode", request.getParameter("barcode"));
             map.put("userid", request.getParameter("userid"));
@@ -1532,5 +1538,29 @@ public class OrderInfoController {
             log.error("更新失败", e);
         }
         return ret;
+    }
+    /**
+     *替换产品
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "/getReplace")
+    @ResponseBody
+    public CommonResult getReplace(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String shipno = request.getParameter("shipno");
+        String odid = request.getParameter("odid");
+        try {
+        	List<Map<String,Object>> replace = iOrderinfoService.getReplace(odid,shipno);
+        	replace.stream().forEach(r->{
+        		String imgurl = (String)r.get("imgurl");
+        		r.put("imgurl", imgurl.replace("60x60", "220x220"));
+        	});
+        	return CommonResult.success(replace);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return CommonResult.failed();
     }
 }
