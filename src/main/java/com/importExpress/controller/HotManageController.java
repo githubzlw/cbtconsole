@@ -54,7 +54,7 @@ public class HotManageController {
     // private static final String HOT_UPLOAD_TO_PATH = "http://127.0.0.1:8087/popProducts/hotFileUpload";
 
     private static final String STATIC_UTL_REMOTE = "http://52.37.218.73:15792/CbtStaticize/productHtml/genJson.do";
-    private static final String STATIC_UTL_LOCAL = "http://192.168.1.153:8088/CbtStaticize/productHtml/genJson.do";
+    private static final String STATIC_UTL_LOCAL = "http://192.168.1.67:8383/CbtStaticize/productHtml/genJson.do";
 
 
 
@@ -1356,6 +1356,12 @@ public class HotManageController {
         }
         try {
 
+            // 获取管接口和电缆PID信息,过滤掉
+            List<String> pipeList = customGoodsService.getPipeList();
+            if(CollectionUtils.isEmpty(pipeList)){
+                pipeList = new ArrayList<>();
+            }
+
             String ip = request.getRemoteAddr();
             String url ;
             boolean isOnline = false;
@@ -1368,6 +1374,7 @@ public class HotManageController {
                 url = STATIC_UTL_LOCAL;
             }
             int totalNum = 0;
+            List<String> finalPipeList = pipeList;
             // 默认使用solr数据
             if (solrFlag > 0) {
                 int limitNum = 300;
@@ -1377,22 +1384,27 @@ public class HotManageController {
                     fc++;
                 }
                 List<GoodsParseBean> list;
+
+
                 for (int i = 1; i <= fc; i++) {
                     list = customGoodsService.queryCustomGoodsByLimit((i - 1) * limitNum, i * limitNum);
                     StringBuffer spPid = new StringBuffer();
 
                     if (CollectionUtils.isNotEmpty(list)) {
                         AtomicInteger count = new AtomicInteger();
+
                         list.forEach(e -> {
-                            if (flag > -1) {
-                                if (e.getValid() == flag) {
-                                    spPid.append("," + e.getPid());
-                                    count.getAndIncrement();
-                                }
-                            } else {
-                                if (e.getValid() == 1 || e.getValid() == 2) {
-                                    spPid.append("," + e.getPid());
-                                    count.getAndIncrement();
+                            if (!finalPipeList.contains(e.getPid())) {
+                                if (flag > -1) {
+                                    if (e.getValid() == flag) {
+                                        spPid.append("," + e.getPid());
+                                        count.getAndIncrement();
+                                    }
+                                } else {
+                                    if (e.getValid() == 1 || e.getValid() == 2) {
+                                        spPid.append("," + e.getPid());
+                                        count.getAndIncrement();
+                                    }
                                 }
                             }
                         });
@@ -1407,7 +1419,9 @@ public class HotManageController {
                         list.clear();
                     }
                     if(totalNum > 0){
-                        // break;
+                        if(totalNum > 1000){
+                                break;
+                            }
                     }
                 }
             } else {
@@ -1415,32 +1429,39 @@ public class HotManageController {
                 int count = 0;
                 StringBuffer spPid = new StringBuffer();
                 for (Product product : productList) {
-                    spPid.append("," + product.getPid());
-                    count++;
-                    if (count % 200 == 0) {
-                        // 转存数据
+                    if (!finalPipeList.contains(product.getPid())) {
+                        spPid.append("," + product.getPid());
                         count++;
-                        System.err.println("solr cicle :" + count + "/total:" + productList.size());
-                        int countFlag =  getByStaticTomcat(spPid.toString().substring(1), webSite, url);
-                        if(countFlag == 0){
-                            countFlag =  getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                        if (count % 200 == 0) {
+                            // 转存数据
+                            count++;
+                            System.err.println("solr cicle :" + count + "/total:" + productList.size());
+                            int countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                            if (countFlag == 0) {
+                                countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                            }
+                            totalNum += countFlag;
                         }
-                        totalNum +=countFlag;
-                    }
-                    if(totalNum > 0){
-                        // break;
+                        if (totalNum > 0) {
+                            if(totalNum > 1000){
+                                break;
+                            }
+
+                        }
                     }
                 }
 
                 if (count % 200 > 0) {
                     System.err.println("solr cicle :" + count + "/total:" + productList.size());
-                    int countFlag =  getByStaticTomcat(spPid.toString().substring(1), webSite, url);
-                    if(countFlag == 0){
-                        countFlag =  getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                    int countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                    if (countFlag == 0) {
+                        countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
                     }
-                    totalNum +=countFlag;
+                    totalNum += countFlag;
                 }
             }
+            finalPipeList.clear();
+            pipeList.clear();
             json.setSuccess("执行成功，总数:" + totalNum , totalNum);
             json.setOk(true);
         } catch (Exception e) {

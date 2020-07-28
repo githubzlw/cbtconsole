@@ -686,4 +686,10 @@ public interface CustomGoodsMapper {
      * @return
      */
     int setSalable(@Param("pid") String pid, @Param("flag") int flag, @Param("adminId") int adminId);
+
+    /**
+     * 获取管接口和电缆PID信息
+     * @return
+     */
+    List<String> getPipeList();
 }

@@ -1007,4 +1007,10 @@ public interface CustomGoodsService {
      * @return
      */
     int setSalable(String pid, int flag, int adminId);
+
+    /**
+     * 获取管接口和电缆PID信息
+     * @return
+     */
+    List<String> getPipeList();
 }
