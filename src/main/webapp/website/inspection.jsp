@@ -18,6 +18,28 @@
 	<script type="text/javascript" src="/cbtconsole/js/inspection.js"></script>
 	<title>验货页面</title>
 	<style>
+	#replace-product.td{width:220px;}
+	#replace-dv-f{    position: absolute;
+    z-index: 10;
+    top: 41%;
+    left: 32%;
+    background-color: #fff;
+    padding: 20px;
+    max-height: 800px;}
+	.tc {
+    background-color: rgba(0, 0, 0, 0);
+    top: 0;
+    left: 0;
+}
+	.tc, .trnasparent {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    position: fixed;
+    z-index: 1;
+    display: none;
+    text-align: center;
+    }
 		.mod_pay6 {
 			width: 400px;
 			height:400px;
@@ -237,6 +259,8 @@
 		.brand_state_f{
 		background: #6bdc3c;
 		}
+		.table-p td,th{border: 1px solid #ddd;}
+
 	</style>
 	<%
 		//取出当前登录用户
@@ -1094,5 +1118,31 @@
  <input class="yhovercancle" type="button" value="取消验货"  style="width: 80px;float: left;"/>
  </div>
 </div>
+<div class="replace-dv tc" style="display: none;">
+<div class="trnasparent" style="display: none;"></div>
+<div id="replace-dv-f" >
+<h3>请选择货源</h3>
+<table class="table-p">
+<thead>
+<tr>
+<td></td>
+<td>sku</td>
+<td>skuid</td>
+<td>图片</td>
+</tr>
+</thead>
+<tbody id="replace-product">
+
+
+</tbody>
+</table>
+
+</div>
+
+
+</div>
+
+
+
 </body>
 </html>

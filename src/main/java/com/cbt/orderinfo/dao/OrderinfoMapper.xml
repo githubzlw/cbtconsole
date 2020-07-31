@@ -1594,4 +1594,20 @@
         union
         select itemid,itemqty ,skuID from taobao_1688_order_history_offline where shipno=#{shipno}
     </select>
+    
+    <select id="exsisProductReplace" resultType="Integer">
+    select id from order_product_replace where orderid=#{orderid}
+    </select>
+    <insert id="addProductReplace" parameterType="com.cbt.bean.ProductReplace">
+    insert into order_product_replace(orderid,goods_pid,skuid,tb_goods_pid,tb_skuid) values(#{orderid},#{goodsPid},#{skuid},#{tbGoodsPid},#{tbSkuid})
+    </insert>
+    
+    <select id="getReplace" resultType="java.util.Map">
+    select  o.last_tb_1688_itemid,o.tb_1688_itemid,o.od_id,t.skuID,t.imgurl,t.sku,t.itemid,t.itemqty    
+from  order_product_source o left join taobao_1688_order_history t on (o.tb_1688_itemid=t.itemid or o.last_tb_1688_itemid=t.itemid)
+
+where o.od_id=#{odid} and t.shipno=#{shipno}
+    
+    </select>
+    
 </mapper>

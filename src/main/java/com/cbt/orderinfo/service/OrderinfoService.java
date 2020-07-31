@@ -25,6 +25,7 @@ import com.cbt.bean.OrderChange;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Orderinfo;
 import com.cbt.bean.Payment;
+import com.cbt.bean.ProductReplace;
 import com.cbt.bean.ShippingBean;
 import com.cbt.bean.TabTransitFreightinfoUniteNew;
 import com.cbt.bean.Tb1688OrderHistory;
@@ -53,6 +54,7 @@ import com.cbt.website.bean.SearchTaobaoInfo;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.pojo.SplitGoodsNumBean;
@@ -437,7 +439,7 @@ public class OrderinfoService implements IOrderinfoService {
 	public List<Tb1688OrderHistory> getGoodsData(String shipno) {
 		List<Tb1688OrderHistory> list=orderinfoMapper.getGoodsData(shipno);
 		for(Tb1688OrderHistory t:list){
-			t.setImgurl(t.getImgurl().replace(".80x80","").replace(".60x60",""));
+			t.setImgurl(t.getImgurl().replace(".80x80","").replace(".60x60",".220x220"));
 			t.setSkuID(StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID());
 			t.setSpecId(StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId());
 		}
@@ -632,6 +634,7 @@ public class OrderinfoService implements IOrderinfoService {
 					searchresultinfo.setTaobaoId(Integer.parseInt(map.get("taobao_id").toString()));
 				}
 
+				
 				info.add(searchresultinfo);
 				resultFinalList.add(map);
 			}
@@ -893,7 +896,17 @@ public class OrderinfoService implements IOrderinfoService {
 					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
 				}
 			}
-
+			
+			ProductReplace product = new ProductReplace();
+			product.setGoodsPid(map.get("itemid"));
+			product.setOrderid(Integer.parseInt(map.get("odid")));
+			product.setSkuid(map.get("skuid"));
+			product.setTbGoodsPid(map.get("tbPid"));
+			product.setTbSkuid(map.get("tbskuid"));
+			Integer exsisProductReplace = orderinfoMapper.exsisProductReplace(product);
+			if( exsisProductReplace == null || exsisProductReplace < 1) {
+				orderinfoMapper.addProductReplace(product);
+			}
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -2321,6 +2334,15 @@ public class OrderinfoService implements IOrderinfoService {
 		SendMQ.sendMsg(new RunSqlModel(sql));
 		return orderinfoMapper.updateOrderNoToNewNo(oldOrderNo, newOrderNo);
 	}
+
+
+
+
+	@Override
+	public List<Map<String,Object>> getReplace(String odid,String shipno) {
+		return orderinfoMapper.getReplace(odid,shipno);
+	}
+	
 }
 
 

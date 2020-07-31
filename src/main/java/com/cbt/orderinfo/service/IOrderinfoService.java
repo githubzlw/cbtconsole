@@ -20,6 +20,8 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 public interface IOrderinfoService {
+	
+	List<Map<String,Object>> getReplace(String odid,String shipno);
 
 	public List<Map<String, String>> getOrders(int userID, int state, Date startdate, Date enddate, String email,
                                                String orderno, int startpage, int page, int admuserid, int buyid, int showUnpaid, String type, int status);

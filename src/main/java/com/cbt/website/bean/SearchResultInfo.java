@@ -3,6 +3,8 @@ package com.cbt.website.bean;
 import java.util.Arrays;
 import java.util.List;
 
+import com.cbt.bean.ProductReplace;
+
 import lombok.Data;
 /**
  * @author Administrator
@@ -78,6 +80,7 @@ public class SearchResultInfo {
 	private String context;//采购备注
 	private String specId;
 	private String skuID;
+	
 	
 	/**
 	 * 品牌名称
