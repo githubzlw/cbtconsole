@@ -484,6 +484,13 @@ public class EditorController {
             int salable = customGoodsService.querySalableByPid(pid);
             mv.addObject("salable",salable);
 
+            if(StringUtils.isNotBlank(goods.getRangePrice())){
+                // 显示sku重量
+                mv.addObject("isSkuFlag",1);
+            } else {
+                mv.addObject("isSkuFlag",0);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             mv.addObject("uid", 0);
