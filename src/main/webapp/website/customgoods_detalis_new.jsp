@@ -2450,8 +2450,12 @@
                             <div class="goods_p">
                                 <p class="ul_size">
                                         <%--<a href="/cbtconsole/editc/querySkuByPid?pid=${goods.pid}" target="_blank">编辑sku重量</a>--%>
-                                    <input type="button" class="s_btn" value="编辑sku重量"
+                                    <c:if test="${isSkuFlag > 0}">
+                                        <input type="button" class="s_btn" value="编辑sku重量"
                                            onclick="openSkuEdit('${goods.pid}')"/>
+                                        <b style="color: red">取重量逻辑:重量和体积重量谁大取谁的值</b>
+                                    </c:if>
+
                                 </p>
                             </div>
                             <div class="goods_p">
@@ -2465,8 +2469,11 @@
                                 <p class="goods_color">重量:</p>
                                 <p class="ul_size">
                                     <span class="goods_cur">${goods.finalWeight}</span><em>KG</em>
-                                    <input type="button" value="修改重量" class="s_btn"
+                                    <c:if test="${isSkuFlag == 0}">
+                                        <input type="button" value="修改重量" class="s_btn"
                                            onclick="beginUpdateWeight('${goods.pid}',${goods.finalWeight})"/>
+                                        <b style="color: red">取重量逻辑:重量和体积重量谁大取谁的值</b>
+                                    </c:if>
                                     <c:if test="${goods.isWeigthZero > 0}">
                                         <b style="color: red;font-size: 18px;">*抓取1688重量为空</b>
                                     </c:if>
@@ -2481,8 +2488,11 @@
                                 <p class="goods_color">体积重量:</p>
                                 <p class="ul_size">
                                     <span id="goods_volum_weight" class="goods_cur">${goods.volumeWeight}</span><em>KG</em>
-                                    <input type="button" value="修改体积重量" class="s_btn"
+                                    <c:if test="${isSkuFlag == 0}">
+                                        <input type="button" value="修改体积重量" class="s_btn"
                                            onclick="updateVolumeWeight('${goods.pid}',${goods.volumeWeight})"/>
+                                        <b style="color: red">取重量逻辑:重量和体积重量谁大取谁的值</b>
+                                    </c:if>
                                 </p>
                             </div>
                             <div class="goods_p">

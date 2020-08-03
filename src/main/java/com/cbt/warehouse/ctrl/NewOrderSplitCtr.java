@@ -443,7 +443,7 @@ public class NewOrderSplitCtr {
         // 新的订单商品总价
         double totalGoodsCostNew = 0;
         for (OrderDetailsBean nwOdDt : nwOrderDetails) {
-            totalGoodsCostNew += Double.valueOf(nwOdDt.getGoodsprice()) * nwOdDt.getYourorder();
+            totalGoodsCostNew += Double.parseDouble(nwOdDt.getGoodsprice()) * nwOdDt.getYourorder();
         }
         if (totalGoodsCostNew > 0) {
 

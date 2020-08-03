@@ -191,8 +191,9 @@
               <tr>
                 <td>
                   <table class="soapbox">
-                    <tr>
-                      <td class="soapbox-title">Your order was cancelled</td>
+                    <tr th:switch="${flagId}">
+                      <td class="soapbox-title" th:case ="'0'">Your order was cancelled</td>
+                      <td class="soapbox-title" th:case ="'1'">Some items in your order were cancelled</td>
                     </tr>
                   </table>
                   
@@ -207,7 +208,7 @@
                               <p class="user_id_ple">Order #:<i th:text="${orderNo}">QA18474027512271</i></p>
                               <div class="cancel_p" th:switch="${flagId}">
                                 <p th:case ="'0'">Your order <span th:text="${orderNo}"></span> fails to be approved and it has been cancelled.</p>
-                                <p th:case ="'1'">Your order <span th:text="${orderNo}"></span> fails to be approved and it has been cancelled(Partial cancellation of order).</p>
+                                <p th:case ="'1'">Your order <span th:text="${orderNo}"></span> fails to be approved and some items in your order were cancelled(Partial cancellation of order).</p>
                                  <p>The order amount has been returned to your balance. </p>
                                 <p>You can continue to shop with the balance or withdraw it to your PAYPAL account.</p>
                                 <p>And you can search this order in <a  href="https://www.restaurantkitchenequipments.com/orderInfo/getOrders?state=-1"

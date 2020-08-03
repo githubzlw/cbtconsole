@@ -58,6 +58,7 @@
     <div style="margin-left: 120px;">
 
         <h1>产品SKU重量修改(体积重量默认显示重量数据)</h1>
+        <h3><b style="color: red">取重量逻辑:重量和体积重量谁大取谁的值</b></h3>
         <table border="1" cellspacing="0" cellpadding="0" bgcolor="#f5e9cf">
                 <%--<caption><span>PID:${pid}</span></caption>--%>
             <thead style="text-align: center;">
