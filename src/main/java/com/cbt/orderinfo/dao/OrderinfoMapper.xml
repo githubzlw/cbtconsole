@@ -1603,10 +1603,10 @@
     </insert>
     
     <select id="getReplace" resultType="java.util.Map">
-    select  o.last_tb_1688_itemid,o.tb_1688_itemid,o.od_id,t.skuID,t.imgurl,t.sku,t.itemid,t.itemqty    
+    select  o.last_tb_1688_itemid,o.tb_1688_itemid,o.od_id,t.skuID,t.imgurl,t.sku,t.itemid,t.itemqty   ,d.goods_pid  
 from  order_product_source o left join taobao_1688_order_history t on (o.tb_1688_itemid=t.itemid or o.last_tb_1688_itemid=t.itemid)
-
-where o.od_id=#{odid} and t.shipno=#{shipno}
+left join order_details d on o.od_id=d.id
+where o.od_id=#{odid} and t.shipno=#{shipno} limit 1
     
     </select>
     

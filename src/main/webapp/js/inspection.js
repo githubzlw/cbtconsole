@@ -546,28 +546,28 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
 		                odid: odid
 		            },
 		            success: function (data) {
-		               var hml = '';
-		               var arr = data.data;
-		               for(var i=0;i<arr.length;i++){
-		            	   
-		            	   hml +='<tr class="ra-cls">'+
-		            	   '<td><input type="radio" name="'+arr[i].itemid+'" class="ra-i" value="'+odid+'"></td>'+
-		            	   '<td>'+arr[i].sku+'</td>'+
-		            	   '<td class="ra-skuid">'+arr[i].skuID+'</td>'+
-		            	   '<td><img src="'+arr[i].imgurl+'"></td>'+
-		            	   '</tr>'
-		            	   
-		               }
-		            	$("#replace-product").html(hml);
-		            	if(hml != ''){
-		            		$(".replace-dv").show();
-		            		$(".trnasparent").show();
-		            		clickRa();
+		            	if(data.code==200){
+		            		var hml = '';
+				               var arr = data.data;
+				               for(var i=0;i<arr.length;i++){
+				            	   hml +='<tr class="ra-cls">'+
+				            	   '<td><input type="radio" name="'+arr[i].itemid+'" class="ra-i" value="'+odid+'"></td>'+
+				            	   '<td>'+arr[i].sku+'</td>'+
+				            	   '<td class="ra-skuid">'+arr[i].skuID+'</td>'+
+				            	   '<td><img src="'+arr[i].imgurl+'"></td>'+
+				            	   '</tr>'
+				            	   
+				               }
+				            	$("#replace-product").html(hml);
+				            	if(hml != ''){
+				            		$(".replace-dv").show();
+				            		$(".trnasparent").show();
+				            		clickRa();
+				            	}
+				            	return;
 		            	}
 		            }
 		        });
-			
-			return;
 		}else{
 			th = 1;
 		}

@@ -1552,12 +1552,20 @@ public class OrderInfoController {
         String shipno = request.getParameter("shipno");
         String odid = request.getParameter("odid");
         try {
-        	List<Map<String,Object>> replace = iOrderinfoService.getReplace(odid,shipno);
-        	replace.stream().forEach(r->{
-        		String imgurl = (String)r.get("imgurl");
-        		r.put("imgurl", imgurl.replace("60x60", "220x220"));
-        	});
-        	return CommonResult.success(replace);
+        	Map<String,Object> replace = iOrderinfoService.getReplace(odid,shipno);
+        	if(replace == null || replace.isEmpty()) {
+        		return CommonResult.failed(); 
+        	}
+        	String goods_pid = (String)replace.get("goods_pid");
+        	String itemid = (String)replace.get("itemid");
+        	if(!goods_pid.equals(itemid)) {
+        		//替换
+        		String imgurl = (String)replace.get("imgurl");
+        		replace.put("imgurl", imgurl.replace("60x60", "220x220"));
+        		replace.put("replace", true);
+        		return CommonResult.success(replace);
+        	}
+        	return CommonResult.failed();
         } catch (Exception e) {
             e.printStackTrace();
         }

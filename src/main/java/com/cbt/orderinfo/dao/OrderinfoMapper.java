@@ -38,7 +38,7 @@ import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.importExpress.pojo.SplitGoodsNumBean;
 @Repository
 public interface OrderinfoMapper {
-	List<Map<String,Object>> getReplace(@Param("odid")String odid,@Param("shipno")String shipno);
+	Map<String,Object> getReplace(@Param("odid")String odid,@Param("shipno")String shipno);
 	/**替换产品入库
 	 * @param product
 	 * @return
