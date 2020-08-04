@@ -1,6 +1,21 @@
 package com.cbt.orderinfo.service;
 
-import com.cbt.bean.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import com.cbt.bean.Address;
+import com.cbt.bean.AutoOrderBean;
+import com.cbt.bean.CodeMaster;
+import com.cbt.bean.Evaluate;
+import com.cbt.bean.Forwarder;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.bean.Orderinfo;
+import com.cbt.bean.ShippingBean;
+import com.cbt.bean.TabTransitFreightinfoUniteNew;
+import com.cbt.bean.Tb1688OrderHistory;
+import com.cbt.bean.UserBean;
 import com.cbt.email.entity.EmailReceive1;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.GoodsDistribution;
@@ -12,12 +27,6 @@ import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.SearchResultInfo;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.importExpress.pojo.SplitGoodsNumBean;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.ibatis.annotations.Param;
 
 public interface IOrderinfoService {
 	

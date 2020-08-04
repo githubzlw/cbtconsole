@@ -536,7 +536,8 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     	th = 0;
 		tbskuid = $(".th_skuid_"+odid).html();
 		tbPid = $(".th_tbpid_"+odid).html();
-		if(tbskuid==''){
+		var replacet = $(".th_replacet_"+odid).html();
+		if(tbskuid=='' && replacet ==''){
 			 $.ajax({
 		            url: "/cbtconsole/order/getReplace",
 		            type: "post",
@@ -546,28 +547,30 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
 		                odid: odid
 		            },
 		            success: function (data) {
-		               var hml = '';
-		               var arr = data.data;
-		               for(var i=0;i<arr.length;i++){
-		            	   
-		            	   hml +='<tr class="ra-cls">'+
-		            	   '<td><input type="radio" name="'+arr[i].itemid+'" class="ra-i" value="'+odid+'"></td>'+
-		            	   '<td>'+arr[i].sku+'</td>'+
-		            	   '<td class="ra-skuid">'+arr[i].skuID+'</td>'+
-		            	   '<td><img src="'+arr[i].imgurl+'"></td>'+
-		            	   '</tr>'
-		            	   
-		               }
-		            	$("#replace-product").html(hml);
-		            	if(hml != ''){
-		            		$(".replace-dv").show();
-		            		$(".trnasparent").show();
-		            		clickRa();
+		            	if(data.code==200){
+		            		var hml = '';
+				               var arr = data.data;
+				               for(var i=0;i<arr.length;i++){
+				            	   hml +='<tr class="ra-cls">'+
+				            	   '<td><input type="radio" name="'+arr[i].itemid+'" class="ra-i" value="'+odid+'">'+
+				            	   arr[i].sku+'</td>'+
+				            	   '<td class="ra-skuid">'+arr[i].skuID+'</td>'+
+				            	   '<td><img src="'+arr[i].imgurl+'" style="width:110px;height:110px;"></td>'+
+				            	   '</tr>'
+				            	   
+				               }
+				               if(hml !=''){
+				            	   
+				            	   $("#replace-product").html(hml);
+				            	   $(".replace-dv").show();
+				            	   $(".trnasparent").show();
+				            	   clickRa();
+				               }
 		            	}
 		            }
 		        });
-			
-			return;
+			 $(".th_replacet_"+odid).html("get replace");
+			 return;
 		}else{
 			th = 1;
 		}
@@ -1171,7 +1174,7 @@ function search() {
                         
                         str += '<p>specId:<font color="red" class="specid_' + json[i].orderid +'_'+json[i].odid+ '">'+json[i].specId
                         + '</font></p><p color="red">skuID:<font color="red" class="skuID_'+ json[i].orderid +'_'+json[i].odid+'">' + json[i].skuID 
-                        + '</font><font class="th_skuid_'+json[i].odid+'" style="display:none;"></font><font class="th_tbpid_'+json[i].odid+'" style="display:none;"></font></p>'+'<input type="hidden" class="itemid_sourceCount" value="0"/>';
+                        + '</font><font class="th_replacet_'+json[i].odid+'" style="display:none;"></font><font class="th_skuid_'+json[i].odid+'" style="display:none;"></font><font class="th_tbpid_'+json[i].odid+'" style="display:none;"></font></p>'+'<input type="hidden" class="itemid_sourceCount" value="0"/>';
                         
                         if (checked == "1") {
                             queryRecord(json[i].odid);

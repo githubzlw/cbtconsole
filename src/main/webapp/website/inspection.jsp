@@ -18,10 +18,12 @@
 	<script type="text/javascript" src="/cbtconsole/js/inspection.js"></script>
 	<title>验货页面</title>
 	<style>
+	.overflow-y-h{    max-height: 340px;
+    height: auto;overflow-y: auto;}
 	#replace-product.td{width:220px;}
 	#replace-dv-f{    position: absolute;
     z-index: 10;
-    top: 41%;
+    top: 11%;
     left: 32%;
     background-color: #fff;
     padding: 20px;
@@ -1122,13 +1124,13 @@
 <div class="trnasparent" style="display: none;"></div>
 <div id="replace-dv-f" >
 <h3>请选择货源</h3>
+<div class="overflow-y-h">
 <table class="table-p">
 <thead>
 <tr>
-<td></td>
-<td>sku</td>
-<td>skuid</td>
-<td>图片</td>
+<td style="width:100px;">sku</td>
+<td style="width:130px;">skuid</td>
+<td style="width:120px;">图片</td>
 </tr>
 </thead>
 <tbody id="replace-product">
@@ -1137,6 +1139,7 @@
 </tbody>
 </table>
 
+</div>
 </div>
 
 
