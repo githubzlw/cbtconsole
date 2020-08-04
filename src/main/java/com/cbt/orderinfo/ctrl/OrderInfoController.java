@@ -25,6 +25,7 @@ import com.cbt.website.dao2.WebsiteOrderDetailDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.UploadByOkHttp;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
@@ -1552,20 +1553,26 @@ public class OrderInfoController {
         String shipno = request.getParameter("shipno");
         String odid = request.getParameter("odid");
         try {
-        	Map<String,Object> replace = iOrderinfoService.getReplace(odid,shipno);
+        	List<Map<String,Object>> replace = iOrderinfoService.getReplace(odid,shipno);
         	if(replace == null || replace.isEmpty()) {
         		return CommonResult.failed(); 
         	}
-        	String goods_pid = (String)replace.get("goods_pid");
-        	String itemid = (String)replace.get("itemid");
-        	if(!goods_pid.equals(itemid)) {
-        		//替换
-        		String imgurl = (String)replace.get("imgurl");
-        		replace.put("imgurl", imgurl.replace("60x60", "220x220"));
-        		replace.put("replace", true);
-        		return CommonResult.success(replace);
+        	List<Map<String,Object>> result = Lists.newArrayList();
+        	replace.stream().forEach(r->{
+        		String goods_pid = (String)r.get("goods_pid");
+        		String itemid = (String)r.get("itemid");
+        		if(!goods_pid.equals(itemid)) {
+        			//替换
+        			String imgurl = (String)r.get("imgurl");
+        			r.put("imgurl", imgurl.replace("60x60", "220x220"));
+        			r.put("replace", true);
+        			result.add(r);
+        		}
+        	});
+        	if(CollectionUtils.isEmpty(result)) {
+        		return CommonResult.failed();
         	}
-        	return CommonResult.failed();
+        	return CommonResult.success(result);
         } catch (Exception e) {
             e.printStackTrace();
         }

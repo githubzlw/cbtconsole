@@ -2339,7 +2339,7 @@ public class OrderinfoService implements IOrderinfoService {
 
 
 	@Override
-	public Map<String,Object> getReplace(String odid,String shipno) {
+	public List<Map<String,Object>> getReplace(String odid,String shipno) {
 		return orderinfoMapper.getReplace(odid,shipno);
 	}
 	
