@@ -461,6 +461,7 @@ function clickRa(){
 		var skuid = $(this).parents(".ra-cls").find(".ra-skuid").text();//attr("name");
 		$(".th_skuid_"+odid).html(skuid);
 		 $(".th_tbpid_"+odid).html(pid);
+		 $(".th_replacet_"+odid).html("get replace");
 		 th =1;
 	})
 	
@@ -538,6 +539,7 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
 		tbPid = $(".th_tbpid_"+odid).html();
 		var replacet = $(".th_replacet_"+odid).html();
 		if(tbskuid=='' && replacet ==''){
+			$(".th_replacet_"+odid).html("");
 			 $.ajax({
 		            url: "/cbtconsole/order/getReplace",
 		            type: "post",
@@ -566,10 +568,12 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
 				            	   $(".trnasparent").show();
 				            	   clickRa();
 				               }
+		            	}else{
+		            		$(".th_replacet_"+odid).html("get replace");
 		            	}
 		            }
 		        });
-			 $(".th_replacet_"+odid).html("get replace");
+			 
 			 return;
 		}else{
 			th = 1;
