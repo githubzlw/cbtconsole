@@ -13,7 +13,9 @@
 	<%--<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2-website.js"></script>--%>
 	<%--<script type='text/javascript'--%>
 			<%--src='http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js'></script>--%>
-	<script src='http://code.jquery.com/jquery-2.1.4.min.js'></script>
+	<%--<script src='http://code.jquery.com/jquery-2.1.4.min.js'></script>--%>
+
+	<script src='/cbtconsole/js/jquery-2.1.4.min.js'></script>
 	<script type="text/javascript"
 			src="http://cdn.staticfile.org/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
 	<link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
