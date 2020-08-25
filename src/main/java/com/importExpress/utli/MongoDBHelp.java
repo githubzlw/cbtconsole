@@ -5,6 +5,7 @@ import com.importExpress.pojo.MongoGoodsBean;
 import com.mongodb.*;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.UpdateManyModel;
@@ -426,6 +427,37 @@ public enum MongoDBHelp {
         }
         this.closeConnection();
         return rs;
+    }
+
+    public void clearMongodb3(String collectionName){
+        this.getConnection();
+        if (mongoDatabase3 != null) {
+            mongoDatabase3.getCollection(collectionName).drop();
+        } else {
+            logger.error("mongoDatabase3 is null");
+        }
+    }
+
+
+    public void createIndex3(String collectionName) {
+        this.getConnection();
+        if (mongoDatabase3 != null) {
+            mongoDatabase3.getCollection(collectionName).drop();
+
+            List<BasicDBObject> bsons = new ArrayList<BasicDBObject>();
+            // pid,valid,catid1,shop_id
+            bsons.add(new BasicDBObject().append("pid", 1));//1升序，-1降序
+            bsons.add(new BasicDBObject().append("valid", 1));//1升序，-1降序
+            bsons.add(new BasicDBObject().append("catid1", 1));//1升序，-1降序
+            bsons.add(new BasicDBObject().append("shop_id", 1));//1升序，-1降序
+            MongoCollection<Document> collection = mongoDatabase3.getCollection(collectionName);
+            for (BasicDBObject bson : bsons) {
+                collection.createIndex(bson);
+            }
+        } else {
+            logger.error("mongoDatabase3 is null");
+        }
+
     }
 
 }

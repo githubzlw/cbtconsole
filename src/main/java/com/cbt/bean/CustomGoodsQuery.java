@@ -79,7 +79,10 @@ public class CustomGoodsQuery {
 	private String chKeyWord;
 
 	private Integer source;
+	private int webSize;
 
 	private int limitNum;
+
+	private int searchAble;
 
 }

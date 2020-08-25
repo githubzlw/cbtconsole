@@ -1025,4 +1025,12 @@ public interface CustomGoodsService {
      * @return
      */
     List<Map<String, Object>> getProductInfoByLimit(int minId, int maxId);
+
+    /**
+     * 产品店铺表更新，供可搜索使用
+     * @param shopId
+     * @param type
+     * @return
+     */
+    int updateCustomShopType(String shopId, int type);
 }

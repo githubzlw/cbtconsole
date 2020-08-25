@@ -13,7 +13,9 @@ import com.importExpress.listener.ContextListener;
 import com.importExpress.pojo.InputData;
 import com.importExpress.pojo.MongoGoodsBean;
 import com.importExpress.service.MongoGoodsService;
-import com.importExpress.utli.*;
+import com.importExpress.utli.EasyUiTreeUtils;
+import com.importExpress.utli.GoodsBeanUtil;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -103,7 +105,20 @@ public class MongoDBController {
 
 
         List<String> catidList = mongoGoodsService.findCatidFromMongo3(queryBean);
-        long count = catidList.size();
+        Map<String, List<String>> catidGroupList;
+
+        int count = 0;
+        Map<String, Integer> catidMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(catidList)) {
+            catidGroupList = catidList.stream().collect(Collectors.groupingBy(String::trim));
+            catidGroupList.forEach((k, v) -> catidMap.put(k, CollectionUtils.isNotEmpty(v) ? v.size() : 0));
+            count = catidGroupList.size();
+            catidGroupList.clear();
+        }
+
+
+
+        /*long count = catidList.size();
         Map<String, Integer> catidMap = new HashMap<>(11000);
         for (String catid : catidList) {
             if (catidMap.containsKey(catid)) {
@@ -111,7 +126,7 @@ public class MongoDBController {
             } else {
                 catidMap.put(catid, 1);
             }
-        }
+        }*/
 
         List<CategoryBean> categorys = ContextListener.getCopyList();
         categorys.stream().forEach(e -> {
@@ -122,7 +137,7 @@ public class MongoDBController {
         });
         catidList.clear();
 
-        List<Map<String, Object>> treeMap = EasyUiTreeUtils.genEasyUiTree(categorys, (int) count);
+        List<Map<String, Object>> treeMap = EasyUiTreeUtils.genEasyUiTree(categorys, count);
         categorys.clear();
         Long end = System.currentTimeMillis();
         System.err.println(end - begin);
@@ -136,7 +151,7 @@ public class MongoDBController {
         List<String> errorList = new ArrayList<>();
         try {
 
-            int limitNum = 100;
+            int limitNum = 400;
             int maxId = customGoodsService.queryMaxIdFromCustomGoods();
             int fc = maxId / limitNum;
             if (maxId % limitNum > 0) {
@@ -147,6 +162,7 @@ public class MongoDBController {
             int queryTotal = 0;
             int insertTotal = 0;
             Map<String, Integer> cidMap = new HashMap<>();
+            mongoGoodsService.clearDatabase();
 
             for (int i = 1; i <= fc; i++) {
                 try {

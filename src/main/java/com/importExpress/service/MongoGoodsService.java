@@ -135,4 +135,15 @@ public interface MongoGoodsService {
      */
     int insertOrUpdateMongodb(String pid) throws Exception;
 
+
+    /**
+     * 清空库
+     */
+    void clearDatabase();
+
+    /**
+     * 创建索引
+     */
+    void createDatabaseIndex();
+
 }

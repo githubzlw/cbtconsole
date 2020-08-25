@@ -8,7 +8,9 @@ import com.importExpress.pojo.MongoGoodsBean;
 import com.importExpress.service.MongoGoodsService;
 import com.importExpress.utli.MapAndBeanUtil;
 import com.importExpress.utli.MongoDBHelp;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.QueryOperators;
 import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.model.UpdateManyModel;
@@ -53,6 +55,7 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
         } else if ("4".equals(queryBean.getIsSort())) {
             sort.put("catid1", -1);
         }
+        System.err.println(find.toJson());
         List<MongoGoodsBean> list = MongoDBHelp.INSTANCE.findAnyFromMongo3(GOODS_COLLECTION_NAME, find, sort, queryBean.getPage(), 50);
 
         return changeToResultBean(list);
@@ -120,6 +123,7 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
     public long queryListByParamCount(CustomGoodsQuery queryBean) throws Exception {
 
         BasicDBObject find = getParamByQueryBean(queryBean);
+        System.err.println(find.toJson());
         return MongoDBHelp.INSTANCE.count3(GOODS_COLLECTION_NAME, find);
     }
 
@@ -133,6 +137,8 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
         BasicDBObject paramBean = new BasicDBObject();
         try {
             Map<String, Object> map = MapAndBeanUtil.bean2map(queryBean);
+            List<String> catidList = new ArrayList<>();
+            int webSiteFlag = 0;
             for (String key : map.keySet()) {
                 if (key != null && map.get(key) != null && StringUtils.isNotBlank(map.get(key).toString())) {
                     switch (key) {
@@ -140,7 +146,13 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
                             if (map.get(key) != null && StringUtils.isNotBlank(map.get(key).toString())
                                     && !"0".equals(map.get(key).toString())) {
                                 List<String> list = customGoodsMapper.queryCatidByPath(map.get(key).toString());
-                                paramBean.put("catid1", new BasicDBObject(QueryOperators.IN, list));
+                                // paramBean.put("catid1", new BasicDBObject(QueryOperators.IN, list));
+                                if(CollectionUtils.isNotEmpty(list)){
+                                    if(webSiteFlag > 0){
+                                        catidList.clear();
+                                    }
+                                    catidList.addAll(list);
+                                }
                                 break;
                             }
                         case "sttime":
@@ -342,10 +354,47 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
                             // paramBean.put("name", "/" + map.get(key).toString() + "/");
                             paramBean.put("name", pattern);
                             break;
+                        case "webSize":
+                            String webSite = map.get(key).toString();
+                            if (StringUtils.isNotBlank(webSite) && !"0".equals(webSite) && CollectionUtils.isEmpty(catidList)) {
+                                webSiteFlag = 1;
+                                List<String> list = customGoodsMapper.querySearchBySite(Integer.parseInt(webSite));
+                                if (CollectionUtils.isNotEmpty(list)) {
+                                    catidList.addAll(list);
+                                }
+                            }
+                            break;
+                            case "searchAble":
+                            String searchAble = map.get(key).toString();
+                            if (StringUtils.isNotBlank(searchAble) && Integer.parseInt(searchAble) > 0) {
+                                List<String> list = customGoodsMapper.queryShopIdByType(Integer.parseInt(searchAble));
+
+                                BasicDBList orList = new BasicDBList();
+                                orList.add(new BasicDBObject("shop_id", new BasicDBObject(QueryOperators.IN, list)));
+                                orList.add(new BasicDBObject("sold_flag", new BasicDBObject("$eq", "1")));
+                                orList.add(new BasicDBObject("searchable", new BasicDBObject("$eq", "1")));
+                                orList.add(new BasicDBObject("describe_good_flag", new BasicDBObject("$eq", "1")));
+
+                                BasicDBList values = new BasicDBList();
+                                values.add(new BasicDBObject(QueryOperators.OR, orList));
+                                paramBean.put(QueryOperators.AND, values);
+
+
+                               /*List<BasicDBObject> orList = new ArrayList<>();
+                                orList.add(new BasicDBObject("shop_id", new BasicDBObject(QueryOperators.IN, list)));
+                                orList.add(new BasicDBObject("sold_flag", new BasicDBObject("$eq", "1")));
+                                orList.add(new BasicDBObject("searchable", new BasicDBObject("$eq", "1")));
+                                orList.add(new BasicDBObject("describe_good_flag", new BasicDBObject("$eq", "1")));
+                                paramBean.put(QueryOperators.OR, orList);*/
+                            }
+                            break;
                         default:
                             // paramBean.put(key, map.get(key));
                     }
                 }
+            }
+            if(CollectionUtils.isNotEmpty(catidList)){
+                paramBean.put("catid1", new BasicDBObject(QueryOperators.IN, catidList));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -449,6 +498,16 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
                 }
                 return 1;
             }
+    }
+
+    @Override
+    public void clearDatabase() {
+        MongoDBHelp.INSTANCE.clearMongodb3(GOODS_COLLECTION_NAME);
+    }
+
+    @Override
+    public void createDatabaseIndex() {
+        MongoDBHelp.INSTANCE.createIndex3(GOODS_COLLECTION_NAME);
     }
 
     private List<WriteModel<Document>> changeToMongoInsertDocument(List<MongoGoodsBean> list) throws Exception {
