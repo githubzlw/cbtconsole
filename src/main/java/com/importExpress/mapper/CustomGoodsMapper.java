@@ -698,4 +698,25 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<Map<String, Object>> getProductInfoByLimit(@Param("minId") int minId, @Param("maxId") int maxId);
+
+    /**
+     * 获取网站类别数据
+     * @param webSite
+     * @return
+     */
+    List<String> querySearchBySite(int webSite);
+
+    /**
+     * 产品店铺表更新，供可搜索使用
+     * @param shopId
+     * @param type
+     * @return
+     */
+    int updateCustomShopType(@Param("shopId") String shopId, @Param("type") int type);
+
+    /**
+     * 根据类别查询店铺数据
+     * @return
+     */
+    List<String> queryShopIdByType(int type);
 }

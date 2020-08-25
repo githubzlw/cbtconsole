@@ -133,6 +133,10 @@ public class EditorController {
                 goods.setCanEdit(0);
             }
 
+            if(StringUtils.isBlank(goods.getRangePrice())){
+                goods.setWprice(goods.getFree_price_new());
+            }
+
             if (goods.getGoodsState() == 1) {
                 goods.setOffReason(null);
                 goods.setUnsellAbleReasonDesc(null);
@@ -564,9 +568,9 @@ public class EditorController {
 
             // 将goods的entype属性值取出来,即规格图
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
-            if (StringUtils.isNotBlank(goods.getSku())) {
+            if (StringUtils.isNotBlank(goods.getSku_new())) {
                 // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-                List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku(),ImportExSku.class);
+                List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(),ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
                 for (ImportExSkuShow exSku : cbSkus) {
                     if (StringUtils.isNotBlank(exSku.getSpecId())) {

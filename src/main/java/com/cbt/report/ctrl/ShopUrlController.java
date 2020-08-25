@@ -3740,11 +3740,12 @@ public class ShopUrlController {
         }
 
         try {
-            shopUrlService.setShopType(shopId, Integer.valueOf(type));
+            int typeInt = Integer.parseInt(type);
+            shopUrlService.setShopType(shopId, Integer.parseInt(type));
             LOG.info("shopId:" + shopId + "，更新店铺类型:" + type + ",操作人：" + user.getId() + "@" + user.getAdmName());
             json.setOk(true);
 
-            if ("1".equals(type)) {
+            if (typeInt == 1) {
                 // 批量更新店铺商品的打分数据
                 List<String> pidList = customGoodsService.queryPidByShopId(shopId);
                 if (pidList != null && pidList.size() > 0) {
@@ -3753,6 +3754,8 @@ public class ShopUrlController {
                     pidList.clear();
                 }
             }
+            // 更新产品店铺表数据，供查询可搜索使用
+            customGoodsService.updateCustomShopType(shopId, typeInt);
 
         } catch (Exception e) {
             e.printStackTrace();

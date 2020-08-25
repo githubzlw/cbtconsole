@@ -116,7 +116,7 @@ b {
 			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0",
 			"unsellableReason":"-1","fromFlag":"-1","finalWeightBegin":"","finalWeightEnd":"",
 			"minPrice":"","maxPrice":"","isSoldFlag":"-1","isWeigthZero":"0","isWeigthCatid":"0",
-			"shopId":"","chKeyWord":""
+			"shopId":"","chKeyWord":"","webSite":"0","searchAble":"0"
 	};
 	var isQuery =0;
 
@@ -336,10 +336,58 @@ b {
             $("#query_china_keyword").val(chKeyWord);
         }
 
+        var webSite = sessionStorage.getItem("webSite");
+        if(!(webSite == null || webSite == "")){
+            queryParams.webSite = webSite;
+            $("#web_site").val(webSite);
+        }
+
+        var searchAble = sessionStorage.getItem("searchAble");
+        if(!(searchAble == null || searchAble == "") && searchAble > 0){
+            queryParams.searchAble = searchAble;
+            $("#search_able").attr("checked", true);
+        } else{
+        	queryParams.searchAble = "0";
+        	$("#search_able").attr("checked", false);
+		}
+
+
 		createCateroryTree(queryParams.catid);
 		doQueryList();
         doStatistic();
+        loadWebSize();
 	});
+
+	function loadWebSize() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
+                data: {},
+                success: function (data) {
+                    var json = eval("(" + data + ")");
+                    if (json.ok) {
+
+                        var data = json.data;
+                        var content = '';
+                        for(var key in data){
+                            content += '<option value="'+key+'">'+data[key]+'</option>'
+                        }
+                        $("#web_site").empty();
+                        $("#web_site").append('<option value="0">All</option>');
+                        $("#web_site").append(content);
+                        if(queryParams.webSite > 0){
+                        	$("#web_site").val(queryParams.webSite);
+						}
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
 
 	function createCateroryTree(nodeId){
 		sessionStorage.setItem("catid", nodeId);
@@ -425,6 +473,8 @@ b {
 		var catid = $("#query_catid").val();
 		var shopId = $("#query_shop_id").val();
 		var chKeyWord = $("#query_china_keyword").val();
+		var webSite = $("#web_site").val();
+		var searchAble = $("#search_able").is(":checked") ? "1":"0";
 
 		sessionStorage.setItem("catid",catid);
 
@@ -474,7 +524,8 @@ b {
 
 		queryParams.shopId = shopId;
 		queryParams.chKeyWord = chKeyWord;
-
+		queryParams.webSite = webSite;
+		queryParams.searchAble = searchAble;
 
 		$(".easyui-tree").hide();
 		createCateroryTree(queryParams.catid);
@@ -532,6 +583,9 @@ b {
 
 			sessionStorage.setItem("shopId", queryParams.shopId);
 			sessionStorage.setItem("chKeyWord", queryParams.chKeyWord);
+			sessionStorage.setItem("webSite", queryParams.webSite);
+			sessionStorage.setItem("searchAble", queryParams.searchAble);
+
 
 			$('#goods_list').empty();
 			// /cutom/clist
@@ -549,7 +603,8 @@ b {
 			+"&unsellableReason="+queryParams.unsellableReason+"&fromFlag="+queryParams.fromFlag+"&finalWeightBegin="+queryParams.finalWeightBegin
 			+"&finalWeightEnd="+queryParams.finalWeightEnd+"&minPrice="+queryParams.minPrice+"&maxPrice="+queryParams.maxPrice
 			+"&isSoldFlag="+queryParams.isSoldFlag + "&isWeigthZero=" + queryParams.isWeigthZero + "&isWeigthCatid=" + queryParams.isWeigthCatid
-			+ "&shopId=" + queryParams.shopId + "&chKeyWord=" + queryParams.chKeyWord;
+			+ "&shopId=" + queryParams.shopId + "&chKeyWord=" + queryParams.chKeyWord+ "&webSite=" + queryParams.webSite
+					+ "&searchAble=" + queryParams.searchAble;
 
 			$('#goods_list').attr('src',encodeURI(url));
 		}
@@ -866,6 +921,15 @@ b {
 					<td><span>中文关键词:</span><input id="query_china_keyword" style="width: 160px;height: 22px;"/></td>
 					<td><span>类别ID:</span><input id="query_catid" style="width: 100px;height: 22px;"/></td>
 					<td><span>店铺ID:</span><input id="query_shop_id" style="width: 110px;height: 22px;"/></td>
+					<td><span>网站:</span><select id="web_site" style="width: 120px;height: 28px;">
+						<option value="0">All</option>
+						<option value="1">import</option>
+						<option value="2">kids</option>
+						<option value="3">pets</option>
+					</select></td>
+
+					<td style="display: none"><span>可搜索:</span><input type="checkbox" id="search_able"
+												style="width: 20px;height: 20px;display: none;" disabled="disabled"/></td>
 
 				</tr>
 			</table>

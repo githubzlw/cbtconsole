@@ -1065,5 +1065,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.getProductInfoByLimit(minId, maxId);
     }
 
+    @Override
+    public int updateCustomShopType(String shopId, int type) {
+        return customGoodsMapper.updateCustomShopType(shopId, type);
+    }
+
 
 }

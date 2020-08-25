@@ -128,6 +128,8 @@
         <result column="volume_weight" property="volumeWeight"/>
         <result column="path_catid" property="pathCatid"/>
         <result column="searchable" property="searchable"/>
+        <result column="free_price_new" property="free_price_new"/>
+        <result column="sku_new" property="sku_new"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -588,6 +590,14 @@
         <if test="chKeyWord !=null">
             and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
+        <if test="webSize > 0">
+            and cbu.catid1 in (select category_id from  1688_category ct,search_special ss
+            where FIND_IN_SET(ss.catid,ct.path) and (ss.type = #{webSize}))
+        </if>
+        <if test="searchAble > 0">
+            and (cbu.shop_id in (select shop_id from custom_shop_type where type = 1)
+            or cbu.sold_flag = 1 or cbu.searchable = 1 or cge.describe_good_flag = 1)
+        </if>
 
         <if test="isSort == 1">
             order by cge.search_num desc
@@ -755,6 +765,14 @@
         <if test="chKeyWord !=null">
             and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
+        <if test="webSize > 0">
+            and cbu.catid1 in (select category_id from  1688_category ct,search_special ss
+            where FIND_IN_SET(ss.catid,ct.path) and (ss.type = #{webSize}))
+        </if>
+        <if test="searchAble > 0">
+            and (cbu.shop_id in (select shop_id from custom_shop_type where type = 1)
+            or cbu.sold_flag = 1 or cbu.searchable = 1 or cge.describe_good_flag = 1)
+        </if>
     </select>
 
     <select id="queryCategoryByParam" resultMap="categoryResultMap" parameterType="com.cbt.bean.CustomGoodsQuery">
@@ -902,6 +920,14 @@
         <if test="chKeyWord !=null">
             and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
+        <if test="webSize > 0">
+            and cbu.catid1 in (select category_id from  1688_category ct,search_special ss
+            where FIND_IN_SET(ss.catid,ct.path) and (ss.type = #{webSize}))
+        </if>
+        <if test="searchAble > 0">
+            and (cbu.shop_id in (select shop_id from custom_shop_type where type = 1)
+            or cbu.sold_flag = 1 or cbu.searchable = 1 or cge.describe_good_flag = 1)
+        </if>
         group by catid1
         ) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
     </select>
@@ -921,7 +947,7 @@
         ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason,ifnull(cge.weight_flag,0) as weight_flag,
         ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num,
         ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag,
-        ifnull(pts.sort,-1) as topSort
+        ifnull(pts.sort,-1) as topSort, cbu.free_price_new, cbu.sku_new
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -1566,7 +1592,8 @@
         cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
         ifnull(cge.click_num,0) as click_num,
         ifnull(cbc.complain_id,'') as complain_id,ifnull(cge.price_1688,'') as price_1688,ifnull(cge.weight_check,'') as weight_check,
-        (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount
+        (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount,
+        cbu.sold_flag,cbu.searchable,ifnull(cge.describe_good_flag,0) as describe_good_flag
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid
@@ -1689,6 +1716,20 @@ select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feepri
     <select id="getProductInfoByLimit" resultType="java.util.Map">
         select * from custom_benchmark_ready
         where id > #{minId} and #{maxId} >= id
+    </select>
+
+    <select id="querySearchBySite" resultType="java.lang.String">
+        select category_id from  1688_category ct,search_special ss
+        where FIND_IN_SET(ss.catid,ct.path) and (ss.type = #{webSite})
+    </select>
+
+    <update id="updateCustomShopType">
+        insert into custom_shop_type(shop_id, type) value(#{shopId},#{type})
+        on duplicate key update type = #{type}
+    </update>
+
+    <select id="queryShopIdByType" resultType="java.lang.String">
+        select shop_id from custom_shop_type where type = #{type}
     </select>
 
 </mapper>

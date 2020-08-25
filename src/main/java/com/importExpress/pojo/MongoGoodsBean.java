@@ -90,4 +90,8 @@ public class MongoGoodsBean {
 
     private String sku;
 
+    private Integer sold_flag;
+    private Integer searchable;
+    private Integer describe_good_flag;
+
 }

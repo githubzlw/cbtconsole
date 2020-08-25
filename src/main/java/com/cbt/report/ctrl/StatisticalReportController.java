@@ -754,51 +754,56 @@ public class StatisticalReportController {
         if (request.getParameter("noFreeFreight") != null && !request.getParameter("noFreeFreight").equals("")) {
             noFreeFreight = Integer.valueOf(request.getParameter("noFreeFreight"));
         }
-        // 查询基本报表汇总信息
-        GeneralReport generalReport = new GeneralReport();
-        generalReport.setReportYear(reportYear);
-        generalReport.setReportMonth(reportMonth);
-        generalReport.setNoFreeFreight(noFreeFreight);
-        generalReport.setBreportId(2);
-        List<ReportInfo> reportInfoList = reportInfoService.selectByGeneral(generalReport);
-        // 查询报表基本信息
-        StatisticalReportVo statisticalReportVo = new StatisticalReportVo();
-        statisticalReportVo.setYear(reportYear);
-        statisticalReportVo.setMonth(reportMonth);
-        if (reportInfoList != null && reportInfoList.size() > 0) {
-            List<ReportDetailOrder> reportDetailList = reportDetailService.selectReportOrder(generalReport, orderName, -1);
-            statisticalReportVo.setReportDetailOrder(reportDetailList);
-            List<ReportDetailOrder> rdo_list = reportDetailService.selectReportOrderTotal(generalReport); // 订单报表统计
-            ReportInfo rp = new ReportInfo();
-            ReportDetailOrder rdo = rdo_list.get(0);
-            rp.setTotalExpenditure(rdo.getPurchasePrice()); // 合计采购金额
-            rp.setTotalRevenue(rdo.getSalesPrice()); // 合计收入金额
-            rp.setGoodsCount(rdo.getSalesVolumes());
-            rp.setRedundantCount(rdo.getBuycount() - rdo.getSalesVolumes());
-            rp.setOrderNum(reportDetailList.size());
-            rp.setFreight(rdo.getFreight());
-            rp.setAveragePrice(rdo.getSalesPrice() / rdo.getSalesVolumes());
-            rp.setProfitLoss((rdo.getSalesPrice() - rdo.getPurchasePrice() - rdo.getFreight()) / rdo.getSalesPrice() * 100);
+        try {
+            // 查询基本报表汇总信息
+            GeneralReport generalReport = new GeneralReport();
+            generalReport.setReportYear(reportYear);
+            generalReport.setReportMonth(reportMonth);
+            generalReport.setNoFreeFreight(noFreeFreight);
+            generalReport.setBreportId(2);
+            List<ReportInfo> reportInfoList = reportInfoService.selectByGeneral(generalReport);
+            // 查询报表基本信息
+            StatisticalReportVo statisticalReportVo = new StatisticalReportVo();
+            statisticalReportVo.setYear(reportYear);
+            statisticalReportVo.setMonth(reportMonth);
+            if (reportInfoList != null && reportInfoList.size() > 0) {
+                List<ReportDetailOrder> reportDetailList = reportDetailService.selectReportOrder(generalReport, orderName, -1);
+                statisticalReportVo.setReportDetailOrder(reportDetailList);
+                List<ReportDetailOrder> rdo_list = reportDetailService.selectReportOrderTotal(generalReport); // 订单报表统计
+                ReportInfo rp = new ReportInfo();
+                ReportDetailOrder rdo = rdo_list.get(0);
+                rp.setTotalExpenditure(rdo.getPurchasePrice()); // 合计采购金额
+                rp.setTotalRevenue(rdo.getSalesPrice()); // 合计收入金额
+                rp.setGoodsCount(rdo.getSalesVolumes());
+                rp.setRedundantCount(rdo.getBuycount() - rdo.getSalesVolumes());
+                rp.setOrderNum(reportDetailList.size());
+                rp.setFreight(rdo.getFreight());
+                rp.setAveragePrice(rdo.getSalesPrice() / rdo.getSalesVolumes());
+                rp.setProfitLoss((rdo.getSalesPrice() - rdo.getPurchasePrice() - rdo.getFreight()) / rdo.getSalesPrice() * 100);
 
-            reportInfoList.clear();
-            reportInfoList.add(rp);
-            statisticalReportVo.setReportInfoList(reportInfoList);
-            HSSFWorkbook wb = generalReportService.export(statisticalReportVo, type);
-            // String uuid = "export"+UUID.randomUUID().toString();
-            response.setContentType("application/vnd.ms-excel");
-            // response.setHeader("Content-disposition",
-            // "attachment;filename="+uuid);
-            Date date = new Date(System.currentTimeMillis());
-            int year = date.getYear() + 1900;
-            String filename = "";
-            filename = "OrderCategroy" + year;
-            filename = StringUtils.getFileName(filename);
-            response.setHeader("Content-disposition", "attachment;filename=" + filename);
-            OutputStream ouputStream = response.getOutputStream();
-            wb.write(ouputStream);
-            ouputStream.flush();
-            ouputStream.close();
+                reportInfoList.clear();
+                reportInfoList.add(rp);
+                statisticalReportVo.setReportInfoList(reportInfoList);
+                HSSFWorkbook wb = generalReportService.export(statisticalReportVo, type);
+                // String uuid = "export"+UUID.randomUUID().toString();
+                response.setContentType("application/vnd.ms-excel");
+                // response.setHeader("Content-disposition",
+                // "attachment;filename="+uuid);
+                Date date = new Date(System.currentTimeMillis());
+                int year = date.getYear() + 1900;
+                String filename = "";
+                filename = "OrderCategroy" + year;
+                filename = StringUtils.getFileName(filename);
+                response.setHeader("Content-disposition", "attachment;filename=" + filename);
+                OutputStream ouputStream = response.getOutputStream();
+                wb.write(ouputStream);
+                ouputStream.flush();
+                ouputStream.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     /**

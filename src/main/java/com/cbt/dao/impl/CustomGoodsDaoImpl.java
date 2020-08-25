@@ -3775,22 +3775,22 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
 
     @Override
     public int updateSourceProFlag(String pid, String finalWeight) {
-        Connection conn28 = DBHelper.getInstance().getConnection8();
-        PreparedStatement stmt28 = null;
-        String querySql = "update custom_benchmark_ready_newest set source_pro_flag = 7,final_weight = ? where pid = ?";
+        Connection conn27 = DBHelper.getInstance().getConnection();
+        PreparedStatement stmt27 = null;
+        String querySql = "update custom_benchmark_ready set source_pro_flag = 7,final_weight = ? where pid = ?";
         int count = -1;
         try {
-            stmt28 = conn28.prepareStatement(querySql);
-            stmt28.setString(1, finalWeight);
-            stmt28.setString(2, pid);
-            count = stmt28.executeUpdate();
+            stmt27 = conn27.prepareStatement(querySql);
+            stmt27.setString(1, finalWeight);
+            stmt27.setString(2, pid);
+            count = stmt27.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("pid:" + pid + ",updateSourceProFlag error :" + e.getMessage());
             LOG.error("pid:" + pid + ",updateSourceProFlag error :" + e.getMessage());
         } finally {
-            DBHelper.getInstance().closePreparedStatement(stmt28);
-            DBHelper.getInstance().closeConnection(conn28);
+            DBHelper.getInstance().closePreparedStatement(stmt27);
+            DBHelper.getInstance().closeConnection(conn27);
         }
         return count;
     }

@@ -146,6 +146,29 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private int topSort = -1;
 
+
+    // wprice 改成 free_price_new
+    //sku 改成sku_new  freeSkuPrice
+
+    private String free_price_new;
+    private String sku_new;
+
+    public String getSku_new() {
+        return sku_new;
+    }
+
+    public void setSku_new(String sku_new) {
+        this.sku_new = sku_new;
+    }
+
+    public String getFree_price_new() {
+        return free_price_new;
+    }
+
+    public void setFree_price_new(String free_price_new) {
+        this.free_price_new = free_price_new;
+    }
+
     public int getTopSort() {
         return topSort;
     }
