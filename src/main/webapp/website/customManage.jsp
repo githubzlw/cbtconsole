@@ -928,6 +928,7 @@ b {
 						<option value="3">pets</option>
 					</select></td>
 
+                    <%--<td><span>可搜索:</span><input type="checkbox" id="search_able" style="width: 20px;height: 20px;"/></td>--%>
 					<td style="display: none"><span>可搜索:</span><input type="checkbox" id="search_able"
 												style="width: 20px;height: 20px;display: none;" disabled="disabled"/></td>
 

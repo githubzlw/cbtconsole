@@ -134,7 +134,10 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
     }
 
     private BasicDBObject getParamByQueryBean(CustomGoodsQuery queryBean) {
+        BasicDBObject rsDb = new BasicDBObject();
         BasicDBObject paramBean = new BasicDBObject();
+        BasicDBObject searchBean = new BasicDBObject();
+        int searchAbleFlag = 0;
         try {
             Map<String, Object> map = MapAndBeanUtil.bean2map(queryBean);
             List<String> catidList = new ArrayList<>();
@@ -367,6 +370,7 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
                             case "searchAble":
                             String searchAble = map.get(key).toString();
                             if (StringUtils.isNotBlank(searchAble) && Integer.parseInt(searchAble) > 0) {
+                                searchAbleFlag = 1;
                                 List<String> list = customGoodsMapper.queryShopIdByType(Integer.parseInt(searchAble));
 
                                 BasicDBList orList = new BasicDBList();
@@ -375,9 +379,11 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
                                 orList.add(new BasicDBObject("searchable", new BasicDBObject("$eq", "1")));
                                 orList.add(new BasicDBObject("describe_good_flag", new BasicDBObject("$eq", "1")));
 
-                                BasicDBList values = new BasicDBList();
+                                searchBean.put(QueryOperators.OR, orList);
+
+                                /*BasicDBList values = new BasicDBList();
                                 values.add(new BasicDBObject(QueryOperators.OR, orList));
-                                paramBean.put(QueryOperators.AND, values);
+                                paramBean.put(QueryOperators.AND, values);*/
 
 
                                /*List<BasicDBObject> orList = new ArrayList<>();
@@ -395,6 +401,13 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
             }
             if(CollectionUtils.isNotEmpty(catidList)){
                 paramBean.put("catid1", new BasicDBObject(QueryOperators.IN, catidList));
+            }
+            if(searchAbleFlag > 0){
+                BasicDBList endList = new BasicDBList();
+                endList.add(paramBean);
+                endList.add(searchBean);
+                rsDb.put(QueryOperators.AND, endList);
+                return rsDb;
             }
         } catch (Exception e) {
             e.printStackTrace();
