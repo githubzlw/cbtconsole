@@ -2106,6 +2106,9 @@ public class NewOrderDetailsCtr {
                     if(StringUtils.isBlank(flagId)){
                     	flagId = "0";
 					}
+                    if(orderNo.contains("_") && !orderNo.contains("_SP")){
+                    	flagId = "1";
+					}
                     model.put("email", confirmEmail);
                     model.put("name", toEmail);
                     model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
