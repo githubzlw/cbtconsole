@@ -641,7 +641,7 @@ public class EditorController {
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
             /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
-            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
+            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku_new(),ImportExSku.class);
             String[] skuStrList = skuStr.split(";");
             String[] volumeSkuList = volumeSkuStr.split(";");
             double finalWeight = 0;

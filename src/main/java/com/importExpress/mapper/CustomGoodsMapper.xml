@@ -1298,7 +1298,7 @@
 
     <update id="updateSkuInfo">
         update custom_benchmark_ready
-        set  sku = #{sku},is_add_car_flag = 1
+        set  sku = #{sku},is_add_car_flag = 1,sku_new = #{sku}
         where pid = #{pid}
     </update>
 
