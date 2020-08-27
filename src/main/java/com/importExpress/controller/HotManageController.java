@@ -56,7 +56,7 @@ public class HotManageController {
     // private static final String HOT_UPLOAD_TO_PATH = "http://127.0.0.1:8087/popProducts/hotFileUpload";
 
     private static final String STATIC_UTL_REMOTE = "http://52.37.218.73:15792/CbtStaticize/productHtml/genJson.do";
-    private static final String STATIC_UTL_LOCAL = "http://192.168.1.67:8383/CbtStaticize/productHtml/genJson.do";
+    private static final String STATIC_UTL_LOCAL = "http://192.168.1.153:8383/CbtStaticize/productHtml/genJson.do";
 
 
     private OKHttpUtils okHttpUtils = new OKHttpUtils();
@@ -1532,7 +1532,7 @@ public class HotManageController {
                 List<GoodsParseBean> list;
 
 
-                for (int i = 1; i <= fc; i++) {
+                for (int i = fc; i >= 1; i--) {
                     list = customGoodsService.queryCustomGoodsByLimit((i - 1) * limitNum, i * limitNum);
                     StringBuffer spPid = new StringBuffer();
 
@@ -1569,7 +1569,7 @@ public class HotManageController {
                     }
                 }
             } else {
-                List<Product> productList = SolrProductUtils.getSolrKidsProducts(1, isOnline);
+                List<Product> productList = SolrProductUtils.getSolrKidsProducts(webSite, isOnline);
                 int count = 0;
                 StringBuffer spPid = new StringBuffer();
                 for (Product product : productList) {
