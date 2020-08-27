@@ -1732,4 +1732,10 @@ select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feepri
         select shop_id from custom_shop_type where type = #{type}
     </select>
 
+    <select id="getPipeList" resultType="java.lang.String">
+        select pid from  custom_cable group by pid
+        union
+        select pid from  custom_union_joint group by pid
+    </select>
+
 </mapper>

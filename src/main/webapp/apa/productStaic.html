@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>产品单页静态化</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            loadWebSize();
+
+        });
+
+        function loadWebSize() {
+            $.ajax({
+                type: 'POST',
+                url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
+                data: {},
+                success: function (json) {
+                    if (json.ok) {
+
+                        var data = json.data;
+                        var content = '';
+                        for (var key in data) {
+                            content += '<option value="' + key + '">' + data[key] + '</option>'
+                        }
+                        $("#web_size_type").empty();
+                        $("#web_size_type").append(content);
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
+
+        function hideState() {
+            var val = $("#database_id").val();
+            if (val > 0) {
+                $("#span_state").show();
+            } else {
+                $("#span_state").hide();
+            }
+        }
+
+        function staticProduct() {
+            $.messager.progress({
+                title: '正在执行',
+                msg: '请等待...'
+            });
+            var site = $("#web_size_type").val();
+            var solrFlag = $("#database_id").val();
+            var valid = $("#state_id").val();
+            // http://127.0.0.1:8084/cbtconsole/hotManage/staticProduct?valid=1&webSite=1&solrFlag=1
+            $.ajax({
+                type: 'POST',
+                url: '/cbtconsole/hotManage/staticProduct',
+                data: {webSite: site, solrFlag: solrFlag, valid: valid},
+                success: function (json) {
+                    $.messager.progress('close');
+                    if (json.ok) {
+                        $("#result_id").text(json.rows);
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.progress('close');
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                }
+            });
+        }
+    </script>
+    <style type="text/css">
+        .sty_cls{
+            text-align: center;
+            font-size: 18px;
+        }
+        .sty_cls select,button{
+            height: 36px;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+<h1 style="text-align: center;">产品单页静态化</h1>
+
+<div class="sty_cls" >
+
+    <span>网站:<select id="web_size_type">
+
+    </select></span>
+    &nbsp;&nbsp;
+    <span>数据读取:<select id="database_id" onchange="hideState()">
+        <option value="0">solr</option>
+        <option value="1">数据库</option>
+    </select></span>
+
+    &nbsp;&nbsp;
+    <span id="span_state" style="display: none;">商品状态:<select id="state_id">
+        <option value="-1">全部</option>
+        <option value="0">下架</option>
+        <option value="1">在线</option>
+        <option value="2">软下架</option>
+    </select></span>
+    &nbsp;&nbsp;
+    <button onclick="staticProduct()">执行</button>
+
+    <br>
+    <p>执行结果:<span id="result_id" style="color: red;"></span></p>
+</div>
+
+
+</body>
+</html>

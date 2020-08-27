@@ -1071,4 +1071,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
 
+    @Override
+    public List<String> getPipeList() {
+        return customGoodsMapper.getPipeList();
+    }
+
 }

@@ -12,6 +12,15 @@ public class GoodsParseBean {
     private String enInfo;
     private String remotePath;
     private String catid1;
+    private int valid;
+
+    public int getValid() {
+        return valid;
+    }
+
+    public void setValid(int valid) {
+        this.valid = valid;
+    }
 
     public String getCatid1() {
         return catid1;
