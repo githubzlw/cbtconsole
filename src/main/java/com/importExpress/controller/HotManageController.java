@@ -1532,7 +1532,7 @@ public class HotManageController {
                 List<GoodsParseBean> list;
 
 
-                for (int i = 1; i <= fc; i++) {
+                for (int i = fc; i >= 1; i--) {
                     list = customGoodsService.queryCustomGoodsByLimit((i - 1) * limitNum, i * limitNum);
                     StringBuffer spPid = new StringBuffer();
 
@@ -1569,7 +1569,7 @@ public class HotManageController {
                     }
                 }
             } else {
-                List<Product> productList = SolrProductUtils.getSolrKidsProducts(1, isOnline);
+                List<Product> productList = SolrProductUtils.getSolrKidsProducts(webSite, isOnline);
                 int count = 0;
                 StringBuffer spPid = new StringBuffer();
                 for (Product product : productList) {
