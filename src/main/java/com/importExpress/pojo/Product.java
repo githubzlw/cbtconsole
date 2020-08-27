@@ -1,8 +1,10 @@
 package com.importExpress.pojo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import org.bson.Document;
 
 @Data
 public class Product {
@@ -84,4 +86,28 @@ public class Product {
 	 * 商品库存标识  0没有库存  1有库存  hot
 	 */
 	private int isStock;
+
+	public Product(Document document) {
+        this.id = String.valueOf(document.get("pid"));
+        this.name = String.valueOf(document.get("enname"));
+    }
+
+    public Product(String pid, String custom_main_image) {
+        this.id = pid;
+        this.image =custom_main_image;
+    }
+
+    /*public Product(String pid, String remotpath, String localpath) {
+        this.id = pid;
+        this.remotpath = remotpath;
+        this.localpath = localpath;
+    }*/
+
+    public static List<String> getPidList(List<Product> proList){
+        List<String> resList = new ArrayList<String>();
+        for (Product bean : proList) {
+            resList.add(bean.getId());
+        }
+        return resList;
+    }
 }

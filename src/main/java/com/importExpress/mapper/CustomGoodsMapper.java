@@ -719,4 +719,11 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<String> queryShopIdByType(int type);
+
+    /**
+     * 获取管接口和电缆PID信息
+     * @return
+     */
+    List<String> getPipeList();
+
 }

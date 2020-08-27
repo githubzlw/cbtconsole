@@ -1033,4 +1033,10 @@ public interface CustomGoodsService {
      * @return
      */
     int updateCustomShopType(String shopId, int type);
+
+    /**
+     * 获取管接口和电缆PID信息
+     * @return
+     */
+    List<String> getPipeList();
 }

@@ -1,6 +1,7 @@
 package com.importExpress.controller;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.pojo.SearchStatic;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.BigDecimalUtil;
@@ -14,12 +15,11 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.Utility;
-import com.importExpress.pojo.GoodsEditBean;
-import com.importExpress.pojo.HotCategoryShow;
-import com.importExpress.pojo.HotSellGoods;
-import com.importExpress.pojo.HotSellGoodsShow;
+import com.importExpress.pojo.*;
 import com.importExpress.service.HotManageService;
 import com.importExpress.utli.*;
+import okhttp3.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Controller
@@ -53,6 +54,9 @@ public class HotManageController {
 
     // private static final String HOT_FILE_LOCAL_PATH = "E:/hotJson";
     // private static final String HOT_UPLOAD_TO_PATH = "http://127.0.0.1:8087/popProducts/hotFileUpload";
+
+    private static final String STATIC_UTL_REMOTE = "http://52.37.218.73:15792/CbtStaticize/productHtml/genJson.do";
+    private static final String STATIC_UTL_LOCAL = "http://192.168.1.67:8383/CbtStaticize/productHtml/genJson.do";
 
 
     private OKHttpUtils okHttpUtils = new OKHttpUtils();
@@ -1468,6 +1472,175 @@ public class HotManageController {
             return JsonResult.error("setJsonState error，原因:" + e.getMessage());
         }
     }
+
+
+    /**
+     * 产品单页静态化
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/staticProduct")
+    @ResponseBody
+    public JsonResult staticProduct(Integer valid, Integer webSite, Integer solrFlag,
+                                    HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        final int flag;
+        if (valid != null) {
+            flag = valid;
+        } else {
+            flag = -1;
+        }
+        if (solrFlag == null) {
+            solrFlag = 0;
+        }
+        if (webSite == null || webSite < 0 || webSite > 4) {
+            json.setOk(false);
+            json.setMessage("获取网站失败");
+            return json;
+        }
+        try {
+
+            // 获取管接口和电缆PID信息,过滤掉
+            List<String> pipeList = customGoodsService.getPipeList();
+            if (CollectionUtils.isEmpty(pipeList)) {
+                pipeList = new ArrayList<>();
+            }
+
+            String ip = request.getRemoteAddr();
+            String url;
+            boolean isOnline = false;
+            if (ip.contains("192.16.1.9") || ip.contains("192.16.1.27") || ip.contains("27.115.38.42")) {
+                url = STATIC_UTL_REMOTE;
+                isOnline = true;
+            } else {
+                // 192.168.1.153:8088
+                // url = STATIC_UTL_LOCAL.replace("192.168.1.153:8088","192.168.1.67:8383");
+                url = STATIC_UTL_LOCAL;
+            }
+            int totalNum = 0;
+            List<String> finalPipeList = pipeList;
+            // 默认使用solr数据
+            if (solrFlag > 0) {
+                int limitNum = 300;
+                int maxId = customGoodsService.queryMaxIdFromCustomGoods();
+                int fc = maxId / limitNum;
+                if (maxId % limitNum > 0) {
+                    fc++;
+                }
+                List<GoodsParseBean> list;
+
+
+                for (int i = 1; i <= fc; i++) {
+                    list = customGoodsService.queryCustomGoodsByLimit((i - 1) * limitNum, i * limitNum);
+                    StringBuffer spPid = new StringBuffer();
+
+                    if (CollectionUtils.isNotEmpty(list)) {
+                        AtomicInteger count = new AtomicInteger();
+
+                        list.forEach(e -> {
+                            if (!finalPipeList.contains(e.getPid())) {
+                                if (flag > -1) {
+                                    if (e.getValid() == flag) {
+                                        spPid.append("," + e.getPid());
+                                        count.getAndIncrement();
+                                    }
+                                } else {
+                                    if (e.getValid() == 1 || e.getValid() == 2) {
+                                        spPid.append("," + e.getPid());
+                                        count.getAndIncrement();
+                                    }
+                                }
+                            }
+                        });
+                        if (count.get() > 0) {
+                            System.err.println("database cicle:" + i + "/total:" + fc + "," + count.get());
+                            int countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                            if (countFlag == 0) {
+                                countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                            }
+                            totalNum += countFlag;
+                        }
+                        list.clear();
+                    }
+                    if (totalNum > 2) {
+                        break;
+                    }
+                }
+            } else {
+                List<Product> productList = SolrProductUtils.getSolrKidsProducts(1, isOnline);
+                int count = 0;
+                StringBuffer spPid = new StringBuffer();
+                for (Product product : productList) {
+                    if (!finalPipeList.contains(product.getId())) {
+                        spPid.append("," + product.getId());
+                        count++;
+                        if (count % 200 == 0) {
+                            // 转存数据
+                            count++;
+                            System.err.println("solr cicle :" + count + "/total:" + productList.size());
+                            int countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                            if (countFlag == 0) {
+                                countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                            }
+                            totalNum += countFlag;
+                        }
+                        if (totalNum > 2) {
+                            break;
+                        }
+                    }
+                }
+
+                if (count % 200 > 0) {
+                    System.err.println("solr cicle :" + count + "/total:" + productList.size());
+                    int countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                    if (countFlag == 0) {
+                        countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
+                    }
+                    totalNum += countFlag;
+                }
+            }
+            finalPipeList.clear();
+            pipeList.clear();
+            json.setSuccess("执行成功，总数:" + totalNum, totalNum);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+    private int getByStaticTomcat(String pidList, int webSite, String url) {
+        int count = 0;
+        try {
+            OkHttpClient okHttpClient = OKHttpUtils.getClientInstance();
+            RequestBody formBody = new FormBody.Builder()
+                    .add("webSite", String.valueOf(webSite))
+                    .add("pidList", pidList).build();
+            Request request = new Request.Builder().addHeader("Accept", "*/*")
+                    .addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+                    .url(url).post(formBody).build();
+            Response response = okHttpClient.newCall(request).execute();
+            String resultStr = response.body().string();
+            JSONObject json = JSONObject.parseObject(resultStr);
+            if ("200".equals(json.getString("code"))) {
+                System.err.println(resultStr);
+                count = json.getIntValue("data");
+            } else {
+                System.err.println(json.getString("message"));
+                LOG.error("getByStaticTomcat webSite: " + webSite + " ," + json.getString("message"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("staticProduct,error:", e);
+        }
+        return count;
+    }
+
 
     /**
      * 热卖json信息写入
