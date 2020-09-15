@@ -223,6 +223,12 @@
 
             
             $(function() {
+
+                var orderNo = getUrlParam("orderNo");
+                if(orderNo && orderNo.length > 3){
+                    $("#order_no").val(orderNo);
+                }
+
                 $('#main-datagrid').datagrid({
                     //title: '复购率退款数商品查询',
                     width: "100%",
@@ -888,6 +894,20 @@
             }
             $("#date_range_search").click();
 	    });
+
+
+
+        /*获取URL的参数，paramName为要获取的参数名，paramUrl为window.location.search获取的以?开始的搜索链接*/
+        function getParamByUrl(paramName,paramUrl){
+            var paramValue = "", isFound = !1;
+            if (paramUrl.indexOf("?") == 0 && paramUrl.indexOf("=") > 1) {
+            var arrSource = unescape(paramUrl).substring(1, paramUrl.length).split("&"), i = 0;
+            while (i < arrSource.length && !isFound) arrSource[i].indexOf("=") > 0
+            && arrSource[i].split("=")[0].toLowerCase() == paramName.toLowerCase()
+            && (paramValue = arrSource[i].split("=")[1], isFound = !0), i++
+            }
+            return paramValue == "" && (paramValue = null), paramValue
+        }
     </script>
 
 </html>
