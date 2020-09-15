@@ -27,6 +27,14 @@
 		src="/cbtconsole/js/lhgdialog/lhgdialog.min.js?self=true&skin=discuz"></script>
 <script type="text/javascript"
 		src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
+	<style type="text/css">
+		.shopno_show{
+			color: red;
+    font-family: -webkit-pictograph;
+    font-size: 15px;
+    text-decoration: solid;
+		}
+	</style>
 <title>订单管理</title>
 <script type="text/javascript">
 var page = parseInt(<%=request.getAttribute("page")%>, 0);
@@ -235,9 +243,13 @@ function fn(va) {
 			state_text = "购买中";
 			color = "#93926C;color:white";
 		} else if (state == "3") {
+			// var aStr=  "<a target='_blank' class='shopno_show' href='/cbtconsole/website/tab_track_info_list.html?orderNo="+json[i].order_no+"'>出运中</a>";
+			// state_text = aStr;
 			state_text = "出运中";
 			color = "#428484;color:white";
 		} else if (state == "4") {
+			// var aStr=  "<a target='_blank' class='shopno_show' href='/cbtconsole/website/tab_track_info_list.html?orderNo="+json[i].order_no+"'>完结</a>";
+			// state_text = aStr;
 			state_text = "完结";
 			color = "#008442;color:white";
 		} else if (state == "5") {
@@ -302,7 +314,9 @@ function fn(va) {
         } /*else {
             trackStateHtm = '备货中';
         }*/
-        $("#table tr:eq(" + row + ") td:eq(11)").after("<td style='background-color:"+trackStateColor+";'>"+ trackStateHtm + "</td>");
+        // class='shopno_show'
+        var aStr=  "<a target='_blank' class='shopno_show'  href='/cbtconsole/website/tab_track_info_list.html?orderNo="+json[i].order_no+"'>"+trackStateHtm+"</a>";
+        $("#table tr:eq(" + row + ") td:eq(11)").after("<td style='background-color:"+trackStateColor+";'>"+ aStr + "</td>");
         //订货国家
 		$("#table tr:eq(" + row + ") td:eq(12)").after("<td   id='custCountry"+json[i].order_no+"'  >" + (json[i].countrys == null || json[i].countrys == ''?"-":json[i].countrys)+ "</td>");
 		//预估国际运费/实际称重预估运费

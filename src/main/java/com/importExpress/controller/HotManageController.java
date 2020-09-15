@@ -56,7 +56,7 @@ public class HotManageController {
     // private static final String HOT_UPLOAD_TO_PATH = "http://127.0.0.1:8087/popProducts/hotFileUpload";
 
     private static final String STATIC_UTL_REMOTE = "http://52.37.218.73:15792/CbtStaticize/productHtml/genJson.do";
-    private static final String STATIC_UTL_LOCAL = "http://192.168.1.153:8383/CbtStaticize/productHtml/genJson.do";
+    private static final String STATIC_UTL_LOCAL = "http://192.168.1.29:8383/CbtStaticize/productHtml/genJson.do";
 
 
     private OKHttpUtils okHttpUtils = new OKHttpUtils();
@@ -1564,9 +1564,9 @@ public class HotManageController {
                         }
                         list.clear();
                     }
-                    if (totalNum > 2) {
+                    /*if (totalNum > 2) {
                         break;
-                    }
+                    }*/
                 }
             } else {
                 List<Product> productList = SolrProductUtils.getSolrKidsProducts(webSite, isOnline);
@@ -1586,9 +1586,9 @@ public class HotManageController {
                             }
                             totalNum += countFlag;
                         }
-                        if (totalNum > 2) {
+                        /*if (totalNum > 2) {
                             break;
-                        }
+                        }*/
                     }
                 }
 
