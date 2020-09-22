@@ -510,7 +510,9 @@ public class CustomerDisputeController {
     		fileMap.put("file1", file);
     	}
     	JSONObject in = new JSONObject();
-        in.put("evidence_type", evidence_type);
+    	JSONArray evidences = new JSONArray();
+    	JSONObject evidence = new JSONObject();
+    	evidence.put("evidence_type", evidence_type);
         
         JSONObject evidence_info = new JSONObject();
         if(StringUtils.isNotBlank(tracking_number) && StringUtils.isNotBlank(carrier_name)) {
@@ -532,10 +534,14 @@ public class CustomerDisputeController {
         	evidence_info.put("refund_ids", refund_id);
         }
         
-        in.put("evidence_info", evidence_info);
-        in.put("notes", content);
+        evidence.put("evidence_info", evidence_info);
+        evidence.put("notes", content);
+        evidences.add(evidence);
+        
+        in.put("evidences", evidences);
 		
         Map<String,Object> param = new HashMap<>();
+        
         param.put("input", in);
         
         
