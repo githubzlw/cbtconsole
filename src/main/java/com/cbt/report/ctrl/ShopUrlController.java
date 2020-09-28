@@ -3536,6 +3536,8 @@ public class ShopUrlController {
                     break;
                 }
             }
+            // 重量逻辑改动，不再需要检查重量了
+            isZone = false;
             if (isZone) {
                 json.setOk(false);
                 json.setMessage("类别：" + catid + ",存在平均重量没有设定的情况，请设置");
