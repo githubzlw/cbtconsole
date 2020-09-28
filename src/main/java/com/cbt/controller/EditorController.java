@@ -1694,10 +1694,10 @@ public class EditorController {
                             is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                             if (is) {
                                 String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
-                                is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
-                                        localDiskPath + newLocalPath);
+                                // is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath, localDiskPath + newLocalPath);
+                                is = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 1);
                                 if (is) {
-                                    imgList.add(ftpConfig.getLocalShowPath() + newLocalPath);
+                                    imgList.add(ftpConfig.getLocalShowPath() + localFilePath);
                                 } else {
                                     json.setOk(false);
                                     json.setMessage("压缩图片到700*700失败，终止执行");
