@@ -473,13 +473,13 @@ public class HotManageController {
         }
 
         try {
-            HotCategory hotCategory = hotManageService.getCategoryById(Integer.valueOf(categoryIdStr));
-            List<HotSellingGoods> goodsList = hotGoodsService.queryByHotSellingCategory(Integer.valueOf(categoryIdStr), hotCategory.getHotType());
+            HotCategory hotCategory = hotManageService.getCategoryById(Integer.parseInt(categoryIdStr));
+            List<HotSellingGoods> goodsList = hotGoodsService.queryByHotSellingCategory(Integer.parseInt(categoryIdStr), hotCategory.getHotType());
 
             int isOnTotal = 0;
             for (HotSellingGoods goods : goodsList) {
                 String goodsImgUrl = goods.getGoodsImg();
-                if (goodsImgUrl.indexOf("http") > -1) {
+                if (goodsImgUrl.contains("http")) {
                     if (goodsImgUrl.split("http").length > 2) {
                         goods.setGoodsImg("http" + goodsImgUrl.split("http")[2]);
                     }
@@ -536,12 +536,12 @@ public class HotManageController {
                 goods.setMaxPrice(maxPrice);
                 goods.setShowPrice(range_price);
                 if (hotCategory.getHotType() == 2) {
-                    goods.setVirtualOldPrice(BigDecimalUtil.truncateDouble(Double.valueOf(maxPrice) * (1 + goods.getDiscountPercentage() / 100D), 2));
+                    goods.setVirtualOldPrice(BigDecimalUtil.truncateDouble(Double.parseDouble(maxPrice) * (1 + goods.getDiscountPercentage() / 100D), 2));
                 }
-                goods.setGoodsUrl("https://www.import-express.com/goodsinfo/" + Utility.StringFilter(goods.getShowName()) + (goods.getIsNewCloud() > 0 ? "-3" : "-1") + goods.getGoodsPid() + ".html");
+                goods.setGoodsUrl("https://www.import-express.com/goodsinfo/" + Utility.StringFilter(goods.getShowName()) + "-0-0" + (goods.getIsNewCloud() > 0 ? "-3" : "-1") + goods.getGoodsPid() + ".html");
             }
 
-            SwitchDomainNameUtil.changeHotGoodsList(goodsList, Integer.valueOf(webType));
+            SwitchDomainNameUtil.changeHotGoodsList(goodsList, Integer.parseInt(webType));
             mv.addObject("isOnTotal", isOnTotal);
             mv.addObject("allTotal", goodsList.size());
             mv.addObject("isShow", 1);

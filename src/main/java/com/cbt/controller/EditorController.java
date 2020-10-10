@@ -1603,16 +1603,19 @@ public class EditorController {
                             String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
                             // 文件流输出到本地服务器指定路径
                             ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
+                            System.err.println(localDiskPath + localFilePath);
                             // 检查图片分辨率
                             boolean is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 100, 100);
+                            System.err.println("check Img Resolution:" + is);
                             if (is) {
                                 is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                                 if (is) {
                                     String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
-                                    is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
-                                            localDiskPath + newLocalPath);
+                                    // is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath, localDiskPath + newLocalPath);
+                                    is = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 1);
+                                    System.err.println("check Img Resolution 700:" + is);
                                     if (is) {
-                                        msg = ftpConfig.getLocalShowPath() + newLocalPath;
+                                        msg = ftpConfig.getLocalShowPath() + localFilePath;
                                     } else {
                                         json.setOk(false);
                                         json.setMessage("压缩图片到700*700失败，终止执行");
@@ -1691,10 +1694,10 @@ public class EditorController {
                             is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                             if (is) {
                                 String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
-                                is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
-                                        localDiskPath + newLocalPath);
+                                // is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath, localDiskPath + newLocalPath);
+                                is = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 1);
                                 if (is) {
-                                    imgList.add(ftpConfig.getLocalShowPath() + newLocalPath);
+                                    imgList.add(ftpConfig.getLocalShowPath() + localFilePath);
                                 } else {
                                     json.setOk(false);
                                     json.setMessage("压缩图片到700*700失败，终止执行");
