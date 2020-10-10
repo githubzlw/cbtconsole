@@ -161,8 +161,8 @@
 		cc.evaluation_level,cc.service_level as evaluation_service_level,DATE_FORMAT(cc.evaluation_time,'%Y-%m-%d %H:%i:%S') as evaluation_time,ifnull(cgs.salable,0) as salable
 		from
 		(select b.enname as show_name,a.amazon_price,a.asin_code,a.goods_img,a.hot_selling_id,a.goods_url,a.goods_pid,
-		b.price as goods_price,b.wprice,b.range_price,b.sellunit as goods_unit,b.isNewCloud,a.profit_margin,a.id,a.is_on,
-		b.is_sold_flag,b.feeprice,b.promotion_flag,b.unsellableReason,DATE_FORMAT(b.createtime,'%Y-%m-%d %H:%i:%S') as product_create_time,
+		b.price as goods_price,b.free_price_new as wprice,b.range_price_free_new as range_price,b.sellunit as goods_unit,b.isNewCloud,a.profit_margin,a.id,a.is_on,
+		b.is_sold_flag,b.free_price_new as feeprice,b.promotion_flag,b.unsellableReason,DATE_FORMAT(b.createtime,'%Y-%m-%d %H:%i:%S') as product_create_time,
 		DATE_FORMAT(c.publish_time,'%Y-%m-%d %H:%i:%S') as product_publish_time
 		from hot_selling_goods a,custom_benchmark_ready b,custom_goods_edit c
 		where a.hot_selling_id = #{hotCategoryId} and a.goods_pid = b.pid and b.pid = c.pid and b.valid =1) as aa
