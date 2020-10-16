@@ -152,6 +152,43 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private String free_price_new;
     private String sku_new;
+    private String range_price_free_new;
+
+    private String price_import;
+    private String price_kids;
+    private String price_pets;
+
+    public String getRange_price_free_new() {
+        return range_price_free_new;
+    }
+
+    public void setRange_price_free_new(String range_price_free_new) {
+        this.range_price_free_new = range_price_free_new;
+    }
+
+    public String getPrice_import() {
+        return price_import;
+    }
+
+    public void setPrice_import(String price_import) {
+        this.price_import = price_import;
+    }
+
+    public String getPrice_kids() {
+        return price_kids;
+    }
+
+    public void setPrice_kids(String price_kids) {
+        this.price_kids = price_kids;
+    }
+
+    public String getPrice_pets() {
+        return price_pets;
+    }
+
+    public void setPrice_pets(String price_pets) {
+        this.price_pets = price_pets;
+    }
 
     public String getSku_new() {
         return sku_new;

@@ -130,6 +130,9 @@
         <result column="searchable" property="searchable"/>
         <result column="free_price_new" property="free_price_new"/>
         <result column="sku_new" property="sku_new"/>
+        <result column="price_import" property="price_import"/>
+        <result column="price_kids" property="price_kids"/>
+        <result column="price_pets" property="price_pets"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -947,7 +950,7 @@
         ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason,ifnull(cge.weight_flag,0) as weight_flag,
         ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num,
         ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag,
-        ifnull(pts.sort,-1) as topSort, cbu.free_price_new, cbu.sku_new
+        ifnull(pts.sort,-1) as topSort, cbu.free_price_new, cbu.sku_new, cbu.price_import, cbu.price_kids,cbu.price_pets
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -1023,10 +1026,10 @@
             ,b.range_price=#{rangePrice},b.sku=#{sku}
         </if>
         <if test="feeprice != null">
-            ,b.price=#{price},b.feeprice=#{feeprice},b.range_price=#{rangePrice}
+            ,b.price=#{price},b.free_price_new=#{feeprice},price_import=#{price},price_kids=#{price},price_pets=#{price}
         </if>
         <if test="wprice != null">
-            ,b.price=#{price},b.wprice=#{wprice},b.range_price=#{rangePrice}
+            ,b.price=#{price},b.wprice=#{wprice},price_import=#{price},price_kids=#{price},price_pets=#{price}
         </if>
         <if test="type != null">
             ,b.entype=#{type}
@@ -1039,6 +1042,9 @@
         </if>
         <if test="customMainImage != null">
             ,b.custom_main_image=#{customMainImage}
+        </if>
+        <if test="morder != null">
+            ,b.morder=#{morder}
         </if>
         where a.pid = b.pid and b.pid = #{pid}
     </update>
@@ -1299,6 +1305,15 @@
     <update id="updateSkuInfo">
         update custom_benchmark_ready
         set  sku = #{sku},is_add_car_flag = 1,sku_new = #{sku}
+        <if test="rangePrice != null">
+            ,range_price = #{rangePrice}
+        </if>
+        <if test="rangePriceFree != null">
+            ,range_price_free_new = #{rangePriceFree}
+        </if>
+        <if test="minPrice > 0">
+            ,price_import = #{minPrice},price_kids = #{minPrice},price_pets = #{minPrice}
+        </if>
         where pid = #{pid}
     </update>
 
@@ -1737,5 +1752,14 @@ select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feepri
         union
         select pid from  custom_union_joint group by pid
     </select>
+
+    <select id="queryPidSingleBean" resultType="com.cbt.bean.ProductSingleBean">
+        select matchSource,pid,morder,wprice,range_price,free_price_new,range_price_free_new,sku_new,price_import,price_kids,price_pets
+from custom_benchmark_ready where pid = #{pid}
+    </select>
+
+    <update id="setNoUpdatePrice">
+        update custom_benchmark_ready set matchSource = #{flag} where pid = #{pid}
+    </update>
 
 </mapper>
