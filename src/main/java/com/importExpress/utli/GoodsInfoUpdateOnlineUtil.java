@@ -221,6 +221,9 @@ public class GoodsInfoUpdateOnlineUtil {
         if(StringUtils.isNotBlank(bean.getPrice_pets())){
             inputData.setPrice_pets(bean.getPrice_pets());
         }
+        if(bean.getMorder() > 0){
+            inputData.setMorder(String.valueOf(bean.getMorder()));
+        }
         //最终更新的json数据,json数据现在按照jack要求是写入文件，一条json数据对应一条语句 写在文件的一行，然后文件提供到jack
         return updateLocalAndSolr(inputData, 1, 0);
     }
