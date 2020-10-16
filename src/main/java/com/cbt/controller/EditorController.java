@@ -1127,7 +1127,7 @@ public class EditorController {
                     }
                     //格式化
                     DecimalFormat df = new DecimalFormat("######0.00");
-                    cgp.setPrice(df.format(minPrice));
+                    //cgp.setPrice(df.format(minPrice));
                     cgp.setWprice("[" + wprice.replace("@", " $ ") + "]");
                     cgp.setMorder(moq);
                 }
