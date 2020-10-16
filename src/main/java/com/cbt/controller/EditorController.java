@@ -804,7 +804,7 @@ public class EditorController {
             if(freeMin > 0 && freeMax >0){
                 range_price_free = freeMin + "-" + freeMax;
             }
-            customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight, range_price, range_price_free, freeMin > priceMin ? priceMin : freeMin);
+            customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight, range_price, range_price_free, Math.max(freeMin, 0));
 
             json.setOk(true);
             json.setMessage("执行成功，请到改动重量管理页面审核");

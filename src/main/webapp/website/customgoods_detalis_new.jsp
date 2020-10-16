@@ -2512,7 +2512,7 @@
                         <b style="font-size: 16px;color: red;">产品来源:${goods.fromFlagDesc}</b><br>
                     </c:if>
                     <c:if test="${goods.matchSource == '8'}">
-                        <b  style="font-size: 16px;color: red;">不刷新价格重量</b><br>
+                        <b  style="font-size: 16px;color: red;">B2C商品标记</b><br>
                     </c:if>
                     <c:if
                             test="${goods.isEdited == 1 || goods.isEdited == 2}">
@@ -2690,7 +2690,7 @@
                     <span class="s_btn" title="无需修改时点击检查通过" onclick="setGoodsValid('${goods.pid}',1)">检查通过</span>
                     &nbsp;&nbsp;&nbsp;
                     <c:if test="${goods.matchSource != '8'}">
-                        <span class="s_btn" onclick="setNoUpdatePrice('${goods.pid}',8)">标记不刷新价格重量</span>
+                        <span class="s_btn" onclick="setNoUpdatePrice('${goods.pid}',8)">标记B2C商品</span>
                     &nbsp;&nbsp;&nbsp;
                     </c:if>
                     <a target="_blank"
