@@ -407,81 +407,63 @@
             var wprice = "";
             var feePrice = "";
             var singSkus = "";
-            var range_price = $("#range_price_id").val();
-            var goodsPriceVal = $("#goods_price_id").val();
+            var range_price = $("#sg_range_price").val();
+            var range_price_free = $("#sg_range_price_free").val();
+            var sg_wprice = $("#sg_wprice").val();
+            var sg_free_price = $("#sg_free_price").val();
+            var isErr = true;
             //区间价格标识为空时，获取wprice表示的数据
             var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
-            var isErr = true;
-            if (range_price == null || range_price == "") {
-                range_price = "";
-                if (isSoldFlag > 0) {
-                    var feePriceVal = $("#feeprice_id").val();
-                    if (feePriceVal == null || feePriceVal == "") {
-                        feePriceVal = "";
-                    } else {
-                        var i = 0;
-                        $(".fee_price_inp").each(function () {
-                            var feeprice_num = $.trim($("#fee_price_num_" + i).val());
-                            var feeprice_val = $.trim($("#fee_price_val_" + i).val());
-                            i++;
-                            if (feeprice_num == null || feeprice_num == "") {
-                                showMessage("区间价格[商品数量]获取失败");
-                                return false;
-                            } else if (!reg.test(feeprice_val)) {
-                                showMessage("区间价格[" + feeprice_num + "]的价格异常");
-                                return false;
-                            } else {
-                                isErr = false;
-                                feePrice += "," + feeprice_num + "@" + feeprice_val;
-                            }
-                        });
-                    }
-                }
-                if (feePrice.length == 0) {
-                    var wpriceVal = $("#wprice_id").val();
-                    if (wpriceVal == null || wpriceVal == "") {
-                        if (goodsPriceVal == null || goodsPriceVal == "") {
-                            showMessage("商品价格获取失败");
-                            return false;
-                        } else {
-                            isErr = false;
-                        }
-                    } else {
-                        var i = 0;
-                        $(".wprice_inp").each(function () {
-                            var wprice_num = $.trim($("#wprice_num_" + i).val());
-                            var wprice_val = $.trim($("#wprice_val_" + i).val());
-                            i++;
-                            if (wprice_num == null || wprice_num == "") {
-                                showMessage("区间价格[商品数量]获取失败");
-                                return false;
-                            } else if (!reg.test(wprice_val)) {
-                                showMessage("区间价格[" + wprice_num + "]的价格异常");
-                                return false;
-                            } else {
-                                isErr = false;
-                                wprice += "," + wprice_num + "@" + wprice_val;
-                            }
-                        });
-                    }
-                }
-
-            } else {//不为空时，获取单个sku的所有数据
-                $(".inp_price").each(function () {
-                    var ppid = $(this).attr("id");
-                    var price = $(this).val();
-                    if (ppid == null || ppid == "") {
-                        showMessage("单规格价ID获取失败");
+            if (sg_wprice != null && sg_wprice != "" && sg_wprice.length > 2) {
+                sg_wprice = "";
+                var i = 0;
+                $(".wprice_inp").each(function () {
+                    var wprice_num = $.trim($("#wprice_num_" + i).val());
+                    var wprice_val = $.trim($("#wprice_val_" + i).val());
+                    i++;
+                    if (wprice_num == null || wprice_num == "") {
+                        showMessage("区间价格[商品数量]获取失败");
                         return false;
-                    } else if (!reg.test(price)) {
-                        showMessage("单规格价的价格异常");
+                    } else if (!reg.test(wprice_val)) {
+                        showMessage("区间价格[" + wprice_num + "]的价格异常");
                         return false;
                     } else {
                         isErr = false;
-                        singSkus += ";" + ppid + "@" + price;
+                        sg_wprice += "," + wprice_num + "@" + wprice_val;
                     }
                 });
+            } else{
+                isErr = false;
+                sg_wprice = ",";
             }
+
+            isErr = true;
+            if (sg_free_price != null && sg_free_price != "" && sg_free_price.length > 2) {
+                sg_free_price = "";
+                var i = 0;
+                $(".fee_price_inp").each(function () {
+                    var feeprice_num = $.trim($("#fee_price_num_" + i).val());
+                    var feeprice_val = $.trim($("#fee_price_val_" + i).val());
+                    i++;
+                    if (feeprice_num == null || feeprice_num == "") {
+                        showMessage("区间价格[商品数量]获取失败");
+                        return false;
+                    } else if (!reg.test(feeprice_val)) {
+                        showMessage("区间价格[" + feeprice_num + "]的价格异常");
+                        return false;
+                    } else {
+                        isErr = false;
+                        sg_free_price += "," + feeprice_num + "@" + feeprice_val;
+                    }
+                });
+            } else{
+                isErr = false;
+                sg_free_price = ",";
+            }
+
+            var goodsPriceVal = $("#goods_price_id").val();
+            var gd_moq = $("#gd_moq").val();
+
             if (isErr) {
                 return;
             } else {
@@ -502,10 +484,11 @@
                         "imgInfo": imgInfo,
                         "endetail": endetail,
                         "content": content,
-                        "sku": singSkus.substring(1),
-                        "wprice": wprice.substring(1),
-                        "feePrice": feePrice.substring(1),
+                        // "sku": singSkus.substring(1),
+                        "wprice": sg_wprice.substring(1),
+                        "feePrice": sg_free_price.substring(1),
                         "rangePrice": range_price,
+                        "rangePriceFree": range_price_free,
                         "bizPrice": bizPrice,
                         "goodsPrice": goodsPriceVal,
                         "sellUtil": sellUtil,
@@ -513,7 +496,8 @@
                         "typeDeleteIds": typeDeleteIds.substring(1),
                         "wordSizeInfo": wordSizeInfo,
                         "mainImg": mainImg,
-                        "skuCount":skuCount
+                        "skuCount": skuCount,
+                        "gd_moq": gd_moq
                     },
                     success: function (data) {
                         $('.mask').hide();
@@ -579,6 +563,32 @@
                 info += ";" + $(this).attr("src").trim();
             });
             return info.substring(1);
+        }
+
+
+        function setNoUpdatePrice(pid, flag) {
+            $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/cbtconsole/editc/setNoUpdatePrice',
+                    data: {
+                        "pid": pid,
+                        "flag": flag
+                    },
+                    success: function (data) {
+                        if (data.ok) {
+                            showMessage("执行成功，即将刷新页面");
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            $.messager.alert("提醒", data.message, "error");
+                        }
+                    },
+                    error: function (XMLResponse) {
+                        $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                    }
+                });
         }
 
         function setGoodsValid(pid, type) {
@@ -875,7 +885,7 @@
         }
 
         function openEditReview(id, country, review_score, review_flag, createtime, pid) {
-            var review_remark= $("#review_remark_" + id).text();
+            var review_remark = $("#review_remark_" + id).text();
             $("#oldCreateTime").val(createtime);
             $("#goods_pid").val(pid);
             $("#goods_id").val(id);
@@ -1476,7 +1486,7 @@
                     if (data.ok) {
                         var content = "";
                         var jsonData = data.data;
-                        for (var i=0;i< jsonData.length;i++) {
+                        for (var i = 0; i < jsonData.length; i++) {
                             content += '<option value="' + jsonData[i].id + '">' + jsonData[i].country + '</option>';
                         }
                         $("#query_country_id").empty();
@@ -1495,7 +1505,7 @@
 
         function setSearchable(pid, flag) {
             var content = '是否确认设置不可搜索标识';
-            if(flag > 0){
+            if (flag > 0) {
                 content = '是否确认设置可搜索标识';
             }
             $.messager.confirm('提示', content, function (rs) {
@@ -1506,7 +1516,7 @@
                         dataType: 'json',
                         url: '/cbtconsole/editc/setSearchable',
                         data: {
-                            "pid":pid,
+                            "pid": pid,
                             "flag": flag
                         },
                         success: function (data) {
@@ -1535,7 +1545,7 @@
             $.messager.prompt('提示信息', content, function (newSort) {
                 if (newSort) {
                     var reg = /(^[1-9]\d*$)/;
-                    if (reg.test(newSort) && 1<=newSort && newSort < 60000) {
+                    if (reg.test(newSort) && 1 <= newSort && newSort < 60000) {
                         if (num == newSort) {
                             $.messager.alert("提醒", "新的数值和原数值相同", "info");
                         } else {
@@ -1582,7 +1592,7 @@
 
         function setSalable(pid, flag) {
             var content = '是否确认设置取消美加不可售卖标识';
-            if(flag > 0){
+            if (flag > 0) {
                 content = '是否确认设置美加不可售卖标识';
             }
             $.messager.confirm('提示', content, function (rs) {
@@ -1593,7 +1603,7 @@
                         dataType: 'json',
                         url: '/cbtconsole/editc/setSalable',
                         data: {
-                            "pid":pid,
+                            "pid": pid,
                             "flag": flag
                         },
                         success: function (data) {
@@ -1663,7 +1673,7 @@
                     if (data.success) {
                         var content = "<option value='0'>请选择</option>";
                         var jsonData = data.rows;
-                        for (var i=0;i< jsonData.length;i++) {
+                        for (var i = 0; i < jsonData.length; i++) {
                             content += '<option value="' + jsonData[i].id + '">' + jsonData[i].showName + '</option>';
                         }
                         $("#hot_type_id").empty();
@@ -1682,10 +1692,10 @@
         function saveGoodsDescInfo(pid, obj) {
             $(obj).prop("disabled", true);
             var hotTypeId = $("#hot_type_id").val();
-            if(hotTypeId == null || hotTypeId== "" || hotTypeId == "0"){
+            if (hotTypeId == null || hotTypeId == "" || hotTypeId == "0") {
                 $.messager.alert("提醒", "获取分类ID失败", "error");
                 $(obj).prop("disabled", false);
-            }else{
+            } else {
                 $.ajax({
                     type: 'POST',
                     dataType: 'json',
@@ -1716,8 +1726,8 @@
         function saveOverSeaInfo(pid) {
             var countryId = $("#query_country_id").val();
             var isSupport = $("#query_is_support").val();
-            var categoryId= $("#sea_category_id").val();
-            if(!categoryId || categoryId <= 0){
+            var categoryId = $("#sea_category_id").val();
+            if (!categoryId || categoryId <= 0) {
                 showMessage("请选择类别数据");
                 return;
             } else {
@@ -1747,7 +1757,7 @@
                 });
             }
         }
-        
+
         function queryHotCategory() {
             var hotType = $("#sea_hot_class_id").val();
             $.ajax({
@@ -1760,7 +1770,7 @@
                     if (data.success) {
                         var content = "";
                         var jsonData = data.rows;
-                        for (var i=0;i< jsonData.length;i++) {
+                        for (var i = 0; i < jsonData.length; i++) {
                             content += '<option value="' + jsonData[i].id + '">' + jsonData[i].showName + '</option>';
                         }
                         $("#sea_category_id").empty();
@@ -1817,19 +1827,19 @@
             </tr>
             <tr>
                 <td>修改类别:</td>
-                <td><select id="select_catid" class="easyui-combotree" name="newCatid" style="width:250px;height: 36px;"></select>
+                <td><select id="select_catid" class="easyui-combotree" name="newCatid"
+                            style="width:250px;height: 36px;"></select>
                 </td>
             </tr>
             <tr>
                 <td colspan="2" style="text-align: center;">
                     <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="savePidNewCatidInfo()">保存</a>
                     &nbsp;&nbsp;<a href="#" class="easyui-linkbutton" iconCls="icon-cancel"
-                       onclick="javascript:$('#catid-dlg').dialog('close')">取消</a>
+                                   onclick="javascript:$('#catid-dlg').dialog('close')">取消</a>
                 </td>
             </tr>
         </table>
     </div>
-
 
 
     <div id="set_over_sea_div" class="easyui-dialog" title="设置海外仓"
@@ -2204,7 +2214,8 @@
             </c:if>
 
             <c:if test="${goods.topSort > 0}">
-                <span class="s_btn" onclick="setTopSort('${goods.pid}', ${goods.topSort})">搜索排序(值:${goods.topSort})</span>
+                <span class="s_btn"
+                      onclick="setTopSort('${goods.pid}', ${goods.topSort})">搜索排序(值:${goods.topSort})</span>
             </c:if>
             <c:if test="${goods.topSort < 1}">
                 <span class="s_btn" onclick="setTopSort('${goods.pid}', -1)">搜索排序</span>
@@ -2269,6 +2280,7 @@
                                 </ul>
                             </div>
                             </c:if>
+                            <br>
                             <div class="goods_type_${typeBean.type}">
                                 <p class="goods_color">${typeBean.type}:</p>
                                 <c:if test="${typeBean.img!='null' && typeBean.img !=''}">
@@ -2287,9 +2299,9 @@
                                             <c:if test="${typeBean.img!='null' && typeBean.img !=''}">
                                                 <input type="hidden" id="${typeBean.id}"/>
                                                 <img <%--onclick="addDeleteTypeId('${typeBean.id}')"--%>
-                                                     class="img_limit"
-                                                     src="${typeBean.img}" alt="${typeBean.value}"
-                                                     title="${typeBean.value}"/>
+                                                        class="img_limit"
+                                                        src="${typeBean.img}" alt="${typeBean.value}"
+                                                        title="${typeBean.value}"/>
                                             </c:if> <c:if test="${typeBean.img=='null' || typeBean.img ==''}">
                                             <%--<em id="${typeBean.id}" onclick="addDeleteTypeId('${typeBean.id}')"
                                                 title="${typeBean.value}">${typeBean.value}</em>--%>
@@ -2305,173 +2317,104 @@
                             </c:forEach>
 
 
-                                <%-- <div class="goods_p">
-                                    <p class="goods_color">免邮价格:</p>
-                                    <p class="ul_size">
-                                        <input type="text" class="pr_txt" value="${goods.fprice}"
-                                            disabled="disabled" /> <span class="goods_cur">$/ piece
-                                            &nbsp;&nbsp;<label class="lb_style">*不允许修改价格</label>
-                                        </span>
-                                    </p>
-                                </div> --%>
-
-                            <input id="range_price_id" value="${goods.rangePrice}" type="hidden"/>
-                            <c:if test="${not empty goods.rangePrice}">
+                            <div class="s_bot"></div>
+                            <!-- 非免邮价格显示-->
+                            <c:if test="${empty singleBean.range_price}">
                                 <div class="goods_p">
-                                    <p class="goods_color">单规格价(${isSoldFlag > 0 ? '免邮':'非免邮'}):</p>
+                                    <p class="goods_color">非免邮价:</p>
                                     <table border="1" cellspacing="0" cellpadding="0" class="table_style">
                                         <tr>
-                                            <c:forEach var="type_name" items="${typeNames}"
-                                                       varStatus="nameIndex">
-                                                <td id="type_name_${type_name.key}">${type_name.value}</td>
-                                            </c:forEach>
-                                            <td id="type_name_choose">单价<br> <input type="checkbox"
-                                                                                    onclick="allSamePrice(this)"/>全部相同
-                                            </td>
+                                            <td>商品数量</td>
+                                            <td>对应价格($)</td>
                                         </tr>
-
-                                        <c:forEach var="sku_bean" items="${showSku}" varStatus="skuIndex">
+                                        <c:forEach var="wprice" items="${fn:split(singleBean.wprice,',')}"
+                                                   varStatus="wpIndex">
                                             <tr>
-                                                <c:forEach var="tp_ar" items="${fn:split(sku_bean.skuAttrs,';')}">
-                                                    <td id="combine_id_${fn:split(tp_ar,'@')[0]}">${fn:split(tp_ar,'@')[2]}</td>
-                                                </c:forEach>
-                                                <td><input class="inp_style inp_price" title="单击可进行编辑"
-                                                           id="${sku_bean.ppIds}" value="${sku_bean.price}"/></td>
+                                                <td><input type="text" id="wprice_num_${wpIndex.index}"
+                                                           class="inp_style wprice_inp" title="单击可进行编辑"
+                                                           value="${fn:trim(fn:split(wprice,'@')[0])}"/></td>
+                                                <td><input type="text" id="wprice_val_${wpIndex.index}"
+                                                           class="inp_style" title="单击可进行编辑"
+                                                           value="${fn:trim(fn:split(wprice,'@')[1])}"/></td>
                                             </tr>
                                         </c:forEach>
                                     </table>
                                 </div>
-
                             </c:if>
-                            <c:if test="${empty goods.rangePrice}">
-                                <c:if test="${isSoldFlag > 0}">
-                                    <c:if test="${not empty goods.feeprice}">
-                                        <input id="feeprice_id" value="${goods.feeprice}" type="hidden"/>
-                                        <div class="goods_p">
-                                            <p class="goods_color">区间价格(免邮):</p>
 
-                                            <table border="1" cellspacing="0" cellpadding="0" class="table_style">
-                                                <tr>
-                                                    <td>商品数量</td>
-                                                    <td>对应价格($)</td>
-                                                </tr>
-                                                <c:forEach var="fee_price" items="${fn:split(goods.feeprice,',')}"
-                                                           varStatus="feeIndex">
-                                                    <tr>
-                                                            <%--<td id="wprice_num_${wpicIndex.index}">${fn:split(w_pic,'@')[0]}</td>--%>
-                                                        <td><input type="text" id="fee_price_num_${feeIndex.index}"
-                                                                   class="inp_style fee_price_inp" title="单击可进行编辑"
-                                                                   value="${fn:split(fee_price,'@')[0]}"/></td>
-                                                        <td><input type="text" id="fee_price_val_${feeIndex.index}"
-                                                                   class="inp_style fee_price_inp" title="单击可进行编辑"
-                                                                   value="${fn:split(fee_price,'@')[1]}"/></td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </table>
-                                        </div>
-                                    </c:if>
-                                    <c:if test="${empty goods.feeprice}">
-                                        <input id="wprice_id" value="${goods.wprice}" type="hidden"/>
-                                        <c:if test="${not empty goods.wprice}">
-                                            <div class="goods_p">
-                                                <p class="goods_color">区间价格(免邮):</p>
-
-                                                <table border="1" cellspacing="0" cellpadding="0" class="table_style">
-                                                    <tr>
-                                                        <td>商品数量</td>
-                                                        <td>对应价格($)</td>
-                                                    </tr>
-                                                    <c:forEach var="w_pic" items="${fn:split(goods.wprice,',')}"
-                                                               varStatus="wpicIndex">
-                                                        <tr>
-                                                                <%--<td id="wprice_num_${wpicIndex.index}">${fn:split(w_pic,'@')[0]}</td>--%>
-                                                            <td><input type="text" id="wprice_num_${wpicIndex.index}"
-                                                                       class="inp_style wprice_inp" title="单击可进行编辑"
-                                                                       value="${fn:split(w_pic,'@')[0]}"/></td>
-                                                            <td><input type="text" id="wprice_val_${wpicIndex.index}"
-                                                                       class="inp_style wprice_inp" title="单击可进行编辑"
-                                                                       value="${fn:split(w_pic,'@')[1]}"/></td>
-                                                        </tr>
-                                                    </c:forEach>
-                                                </table>
-                                            </div>
-                                        </c:if>
-
-                                        <c:if test="${empty goods.wprice}">
-                                            <div class="goods_p">
-                                                <p class="goods_color">商品价格:</p>
-                                                <input id="goods_price_id" type="number" class="pr_txt"
-                                                       value="${goods.price}" readonly="readonly"/>
-                                                <b style="font-size: 16px;color: red;">*(此价格不可修改)</b>
-                                            </div>
-                                        </c:if>
-                                    </c:if>
-
-                                </c:if>
-                                <c:if test="${isSoldFlag == 0}">
-                                    <input id="wprice_id" value="${goods.wprice}" type="hidden"/>
-                                    <c:if test="${not empty goods.wprice}">
-                                        <div class="goods_p">
-                                            <p class="goods_color">区间价格(非免邮):</p>
-
-                                            <table border="1" cellspacing="0" cellpadding="0" class="table_style">
-                                                <tr>
-                                                    <td>商品数量</td>
-                                                    <td>对应价格($)</td>
-                                                </tr>
-                                                <c:forEach var="w_pic" items="${fn:split(goods.wprice,',')}"
-                                                           varStatus="wpicIndex">
-                                                    <tr>
-                                                            <%--<td id="wprice_num_${wpicIndex.index}">${fn:split(w_pic,'@')[0]}</td>--%>
-                                                        <td><input type="text" id="wprice_num_${wpicIndex.index}"
-                                                                   class="inp_style wprice_inp" title="单击可进行编辑"
-                                                                   value="${fn:split(w_pic,'@')[0]}"/></td>
-                                                        <td><input type="text" id="wprice_val_${wpicIndex.index}"
-                                                                   class="inp_style wprice_inp" title="单击可进行编辑"
-                                                                   value="${fn:split(w_pic,'@')[1]}"/></td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </table>
-                                        </div>
-                                    </c:if>
-
-                                    <c:if test="${empty goods.wprice}">
-                                        <div class="goods_p">
-                                            <p class="goods_color">商品价格:</p>
-                                            <input id="goods_price_id" type="number" class="pr_txt"
-                                                   value="${goods.price}" readonly="readonly"/>
-                                            <b style="font-size: 16px;color: red;">*(此价格不可修改)</b>
-                                        </div>
-                                    </c:if>
-                                </c:if>
-
+                            <c:if test="${not empty singleBean.range_price}">
+                                <div class="goods_p">
+                                    <p class="goods_color">非免邮价:</p><p class="goods_color">${singleBean.range_price}</p>
+                                </div>
                             </c:if>
+
+                            <input type="hidden" id="sg_range_price" value="${singleBean.range_price}"/>
+                            <input type="hidden" id="sg_wprice" value="${singleBean.wprice}"/>
+                            <input type="hidden" id="sg_range_price_free" value="${singleBean.range_price_free_new}"/>
+                            <input type="hidden" id="sg_free_price" value="${singleBean.free_price_new}"/>
+                            <div class="s_bot"></div>
+                            <!-- 免邮价格显示-->
+                            <c:if test="${empty singleBean.range_price_free_new}">
+                                <div class="goods_p">
+                                    <input id="feeprice_id" value="${singleBean.free_price_new}" type="hidden"/>
+                                    <div class="goods_p">
+                                        <p class="goods_color">免邮价格:</p>
+
+                                        <table border="1" cellspacing="0" cellpadding="0" class="table_style">
+                                            <tr>
+                                                <td>商品数量</td>
+                                                <td>对应价格($)</td>
+                                            </tr>
+                                            <c:forEach var="fee_price"
+                                                       items="${fn:split(singleBean.free_price_new,',')}"
+                                                       varStatus="feeIndex">
+                                                <tr>
+                                                    <td><input type="text" id="fee_price_num_${feeIndex.index}"
+                                                               class="inp_style fee_price_inp" title="单击可进行编辑"
+                                                               value="${fn:trim(fn:split(fee_price,'@')[0])}"/></td>
+                                                    <td><input type="text" id="fee_price_val_${feeIndex.index}"
+                                                               class="inp_style" title="单击可进行编辑"
+                                                               value="${fn:trim(fn:split(fee_price,'@')[1])}"/></td>
+                                                </tr>
+                                            </c:forEach>
+                                        </table>
+                                    </div>
+                                </div>
+                            </c:if>
+
+                            <c:if test="${not empty singleBean.range_price_free_new}">
+                                <div class="goods_p">
+                                    <p class="goods_color">免邮价格:</p><p class="goods_color">${singleBean.range_price_free_new}</p>
+                                </div>
+                            </c:if>
+
+                            <div class="s_bot"></div>
 
                             <div class="goods_p">
                                 <p class="ul_size">
                                         <%--<a href="/cbtconsole/editc/querySkuByPid?pid=${goods.pid}" target="_blank">编辑sku重量</a>--%>
                                     <c:if test="${isSkuFlag > 0}">
                                         <input type="button" class="s_btn" value="编辑sku重量"
-                                           onclick="openSkuEdit('${goods.pid}')"/>
+                                               onclick="openSkuEdit('${goods.pid}')"/>
                                         <b style="color: red">取重量逻辑:重量和体积重量谁大取谁的值</b>
                                     </c:if>
 
                                 </p>
                             </div>
-                            <div class="goods_p">
+                            <%--<div class="goods_p">
                                 <p class="goods_color">bizPrice:</p>
                                 <p class="ul_size">
                                     <span class="goods_cur"><input class="pr_txt" id="biz_price"
                                                                    value="${goods.fpriceStr}"/></span>
                                 </p>
-                            </div>
+                            </div>--%>
                             <div class="goods_p">
                                 <p class="goods_color">重量:</p>
                                 <p class="ul_size">
                                     <span class="goods_cur">${goods.finalWeight}</span><em>KG</em>
                                     <c:if test="${isSkuFlag == 0}">
                                         <input type="button" value="修改重量" class="s_btn"
-                                           onclick="beginUpdateWeight('${goods.pid}',${goods.finalWeight})"/>
+                                               onclick="beginUpdateWeight('${goods.pid}',${goods.finalWeight})"/>
                                         <b style="color: red">取重量逻辑:重量和体积重量谁大取谁的值</b>
                                     </c:if>
                                     <c:if test="${goods.isWeigthZero > 0}">
@@ -2487,10 +2430,11 @@
                             <div class="goods_p">
                                 <p class="goods_color">体积重量:</p>
                                 <p class="ul_size">
-                                    <span id="goods_volum_weight" class="goods_cur">${goods.volumeWeight}</span><em>KG</em>
+                                    <span id="goods_volum_weight"
+                                          class="goods_cur">${goods.volumeWeight}</span><em>KG</em>
                                     <c:if test="${isSkuFlag == 0}">
                                         <input type="button" value="修改体积重量" class="s_btn"
-                                           onclick="updateVolumeWeight('${goods.pid}',${goods.volumeWeight})"/>
+                                               onclick="updateVolumeWeight('${goods.pid}',${goods.volumeWeight})"/>
                                         <b style="color: red">取重量逻辑:重量和体积重量谁大取谁的值</b>
                                     </c:if>
                                 </p>
@@ -2523,6 +2467,12 @@
                                 </p>
                             </div>
                             <div class="goods_p">
+                                <p class="goods_color">MOQ:</p>
+                                <p class="ul_size">
+                                    <input id="gd_moq" type="text" class="pr_txt" value="${singleBean.morder}"/>
+                                </p>
+                            </div>
+                            <div class="goods_p">
                                 <p class="goods_color">属性:</p>
                                 <div class="ul_size ul_size_p">
                                     <table id="attribute_table" border="1px" bordercolor="#ccc" cellspacing="0px"
@@ -2532,7 +2482,9 @@
                                             <c:forEach var="item" items="${showattribute}"
                                                        varStatus="itemIndex">
                                             <td width="32%"><input type="text" class="inp_style" title="单击可进行编辑"
-                                               id="sku_id_${item.key}" name="sku_key_val" value="${item.value}" onchange="addSkuLog('sku_id_${item.key}')"/>
+                                                                   id="sku_id_${item.key}" name="sku_key_val"
+                                                                   value="${item.value}"
+                                                                   onchange="addSkuLog('sku_id_${item.key}')"/>
                                             </td>
                                             <c:if
                                                     test="${(itemIndex.index+1) % 3 == 0 || itemIndex.index == itemLength-1}">
@@ -2558,6 +2510,9 @@
                             test="${goods.fromFlag > 0}">
                         <br>
                         <b style="font-size: 16px;color: red;">产品来源:${goods.fromFlagDesc}</b><br>
+                    </c:if>
+                    <c:if test="${goods.matchSource == '8'}">
+                        <b  style="font-size: 16px;color: red;">不刷新价格重量</b><br>
                     </c:if>
                     <c:if
                             test="${goods.isEdited == 1 || goods.isEdited == 2}">
@@ -2586,41 +2541,41 @@
                         <br><b style="font-size: 16px;color: red;">美加不可售卖标记</b>
                     </c:if>
                     <c:if test="${not empty goodsOverSeaList && fn:length(goodsOverSeaList) > 0}">
-                    <br>
-                    <div style="font-size: 20px;background-color: #a2f387" >
-                        <table border="1">
-                            <caption>海外仓设置</caption>
-                            <thead>
-                            <tr>
-                                <td>国家</td>
-                                <td>是否支持</td>
-                                <td>设置人</td>
-                                <td>设置时间</td>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            <c:forEach items="${goodsOverSeaList}" var="overSea">
+                        <br>
+                        <div style="font-size: 20px;background-color: #a2f387">
+                            <table border="1">
+                                <caption>海外仓设置</caption>
+                                <thead>
                                 <tr>
-                                    <td>
-                                            ${overSea.countryName}
-                                    </td>
-                                    <td>
-                                        <c:if test="${overSea.isSupport > 0}">
-                                            <b style="color: #2f5aff">支持</b>
-                                        </c:if>
-                                        <c:if test="${overSea.isSupport == 0}">
-                                            <b style="color: red">不支持</b>
-                                        </c:if>
-                                    </td>
-                                    <td>${overSea.adminName}</td>
-                                    <td>${overSea.createTime}</td>
+                                    <td>国家</td>
+                                    <td>是否支持</td>
+                                    <td>设置人</td>
+                                    <td>设置时间</td>
                                 </tr>
-                            </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
-                </c:if><c:if test="${goods.isBenchmark >0}">
+                                </thead>
+                                <tbody>
+
+                                <c:forEach items="${goodsOverSeaList}" var="overSea">
+                                    <tr>
+                                        <td>
+                                                ${overSea.countryName}
+                                        </td>
+                                        <td>
+                                            <c:if test="${overSea.isSupport > 0}">
+                                                <b style="color: #2f5aff">支持</b>
+                                            </c:if>
+                                            <c:if test="${overSea.isSupport == 0}">
+                                                <b style="color: red">不支持</b>
+                                            </c:if>
+                                        </td>
+                                        <td>${overSea.adminName}</td>
+                                        <td>${overSea.createTime}</td>
+                                    </tr>
+                                </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                    </c:if><c:if test="${goods.isBenchmark >0}">
                     <br>
                     <b style="font-size: 16px;">货源对标情况:${goods.isBenchmark ==1 ? '精确对标':'近似对标'}</b>
                 </c:if> <c:if test="${goods.bmFlag >0}">
@@ -2670,7 +2625,7 @@
                         <br>
                         <b style="font-size: 16px;color: red;">硬下架原因:${goods.unsellAbleReasonDesc}(系统下架)</b>
                     </c:if>
-                    </c:if>
+                </c:if>
                     <c:if test="${goods.valid == 2}">
                         <br>
                         <b style="font-size: 16px;color: red;">软下架原因:${goods.unsellAbleReasonDesc}</b>
@@ -2730,10 +2685,14 @@
                     &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
                     <span class="s_btn" onclick="setNewCatid('${goods.pid}','${goods.catid1}')">设置新类别</span>
                     <br>
-                    <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>
+                    <span class="s_btn" onclick="openReviewDiv()">添加产品评价</span>
                     &nbsp;&nbsp;&nbsp;
                     <span class="s_btn" title="无需修改时点击检查通过" onclick="setGoodsValid('${goods.pid}',1)">检查通过</span>
                     &nbsp;&nbsp;&nbsp;
+                    <c:if test="${goods.matchSource != '8'}">
+                        <span class="s_btn" onclick="setNoUpdatePrice('${goods.pid}',8)">标记不刷新价格重量</span>
+                    &nbsp;&nbsp;&nbsp;
+                    </c:if>
                     <a target="_blank"
                        href="http://192.168.1.29:8280/cbtconsole/customerServlet?action=findAllTaoBaoInfo&className=PictureComparisonServlet&aliPid=${goods.aliGoodsPid}&ylbbPid=${goods.pid}"
                        style="color: #ff0000;">重新对标</a>
@@ -2745,9 +2704,9 @@
                     <a target="_blank" href="https://detail.1688.com/offer/${goods.pid}.html">1688原链接</a>
                     &nbsp;&nbsp;&nbsp;
                     <a target="_blank"
-                                          href="${goods.onlineUrl}">线上链接</a>
+                       href="${goods.onlineUrl}">线上链接</a>
                     &nbsp;&nbsp;&nbsp;<a target="_blank"
-                                          href="${goods.aliGoodsUrl}">速卖通原链接</a>
+                                         href="${goods.aliGoodsUrl}">速卖通原链接</a>
                     <c:if test="${not empty shopId}">
                         &nbsp;&nbsp;&nbsp;
                         <a target="_blank"
@@ -2834,9 +2793,9 @@
             <span class="s_btn"
                   onclick="$('#multi_file_dlg').dialog('open');">详情多文件上传</span>
             &nbsp;&nbsp;&nbsp;<span id="change_img_english" class="s_btn"
-                  onclick="changeChineseImgToEnglishImg(${goods.pid})">替换图片文字为英文</span>
+                                    onclick="changeChineseImgToEnglishImg(${goods.pid})">替换图片文字为英文</span>
             &nbsp;&nbsp;&nbsp;<span id="use_ali_goods" class="s_btn"
-                  onclick="useAliGoodsDetails(${goods.pid})">使用速卖通详情</span>
+                                    onclick="useAliGoodsDetails(${goods.pid})">使用速卖通详情</span>
             <div class="bot_l">
                 <div class="b_left">
                     <h1 style="text-align: center">importE详情编辑框</h1>
@@ -2879,7 +2838,7 @@
                     },
                     success: function (json) {
                         if (json.ok) {
-                            var imgNw = '<img src="'+json.data+'"/>';
+                            var imgNw = '<img src="' + json.data + '"/>';
                             editorObj.pasteHTML(imgNw);
                         } else {
                             $.messager.alert("提醒", json.message, "error");
@@ -2984,10 +2943,11 @@
         }
     }
 
-    
+
     function onSkuclick() {
 
     }
+
     function addSkuLog(skuId) {
         skuJson[skuId] = 1;
     }
@@ -3181,39 +3141,39 @@
         var param = "height=660,width=900,top=160,left=550,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open("/cbtconsole/editc/querySkuByPid?pid=" + pid, "windows", param);
     }
-    
+
     function savePidNewCatidInfo() {
-            var pid = $("#catid_pid").val();
-            var oldCatid = $("#catid_old").val();
-            var node = $("#select_catid").combotree('tree').tree('getSelected');
-            var newCatid = node.id;
-            if (pid && oldCatid && newCatid) {
-                $.messager.progress({
-                    title: '正在保存',
-                    msg: '请等待...'
-                });
-                $.ajax({
-                    type: "POST",
-                    url: "/cbtconsole/editc/changePidToNewCatid",
-                    data: {pid: pid, oldCatid: oldCatid, newCatid: newCatid},
-                    success: function (data) {
-                        // $("#notice_id").hide();
-                        $.messager.progress('close');
-                        if (data.ok) {
-                            $('#catid-dlg').dialog('close');
-                        } else {
-                            $.messager.alert("提示信息", data.message, "error");
-                        }
-                    },
-                    error: function (res) {
-                        // $("#notice_id").hide();
-                        $.messager.progress('close');
-                        $.messager.alert("提示信息", "网络连接错误", "error");
+        var pid = $("#catid_pid").val();
+        var oldCatid = $("#catid_old").val();
+        var node = $("#select_catid").combotree('tree').tree('getSelected');
+        var newCatid = node.id;
+        if (pid && oldCatid && newCatid) {
+            $.messager.progress({
+                title: '正在保存',
+                msg: '请等待...'
+            });
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/editc/changePidToNewCatid",
+                data: {pid: pid, oldCatid: oldCatid, newCatid: newCatid},
+                success: function (data) {
+                    // $("#notice_id").hide();
+                    $.messager.progress('close');
+                    if (data.ok) {
+                        $('#catid-dlg').dialog('close');
+                    } else {
+                        $.messager.alert("提示信息", data.message, "error");
                     }
-                });
-            } else {
-                $.messager.alert("提示信息", "请填写完整信息", "info");
-            }
+                },
+                error: function (res) {
+                    // $("#notice_id").hide();
+                    $.messager.progress('close');
+                    $.messager.alert("提示信息", "网络连接错误", "error");
+                }
+            });
+        } else {
+            $.messager.alert("提示信息", "请填写完整信息", "info");
         }
+    }
 </script>
 </html>

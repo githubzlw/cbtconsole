@@ -68,7 +68,8 @@
                     <td id="type_name_${type_name.key}">${type_name.value}</td>
                 </c:forEach>
                 <td>规格中文</td>
-                <td>单价</td>
+                <td>非免邮价</td>
+                <td>免邮价</td>
                 <td>重量(KG)</td>
                 <td>体积重量(KG)</td>
             </tr>
@@ -82,7 +83,12 @@
                             style="width: 130px;">${fn:split(tp_ar,'@')[2]}</td>
                     </c:forEach>
                     <td style="width: 160px;text-align: center;"><span>${sku_bean.chType}</span></td>
-                    <td style="width: 80px;text-align: center;"><span>${sku_bean.price}</span></td>
+                    <td style="width: 80px;text-align: center;">
+                    <input class="inp_style inp_not_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
+                               value="${sku_bean.price}"/></td>
+                    <td style="width: 80px;text-align: center;">
+                    <input class="inp_style inp_free_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
+                               value="${sku_bean.freePrice}"/></td>
                     <td style="width: 80px;">
                         <input class="inp_style inp_cmn_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
                                value="${sku_bean.fianlWeight}"/></td>
@@ -196,6 +202,8 @@
         var reg = /(^[-+]?[1-9]\d*(\.\d{1,3})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
         var singSkus = "";
         var singVlmSkus = "";
+        var singPrice = "";
+        var singFreePrice = "";
         var isNotErr = true;
         $(".inp_cmn_price").each(function () {
             var ppid = $(this).attr("data-id");
@@ -227,6 +235,36 @@
                 singVlmSkus += ";" + ppid + "@" + pweight;
             }
         });
+        $(".inp_not_price").each(function () {
+            var ppid = $(this).attr("data-id");
+            var price = $(this).val();
+            if (ppid == null || ppid == "") {
+                showMessage("单规格ID获取失败");
+                isNotErr = false;
+                return false;
+            } else if (!reg.test(price)) {
+                showMessage("非免邮价格异常");
+                isNotErr = false;
+                return false;
+            } else {
+                singPrice += ";" + ppid + "@" + price;
+            }
+        });
+        $(".inp_free_price").each(function () {
+            var ppid = $(this).attr("data-id");
+            var freePrice = $(this).val();
+            if (ppid == null || ppid == "") {
+                showMessage("单规格ID获取失败");
+                isNotErr = false;
+                return false;
+            } else if (!reg.test(freePrice)) {
+                showMessage("免邮价格异常");
+                isNotErr = false;
+                return false;
+            } else {
+                singFreePrice += ";" + ppid + "@" + freePrice;
+            }
+        });
         if (isNotErr) {
             showMessage("正在执行，请等待...");
             $.ajax({
@@ -236,7 +274,9 @@
                 data: {
                     "pid": pid,
                     "sku": singSkus.substring(1),
-                    "volumeSku": singVlmSkus.substring(1)
+                    "volumeSku": singVlmSkus.substring(1),
+                    "singPrice": singPrice.substring(1),
+                    "singFreePrice": singFreePrice.substring(1)
                 },
                 success: function (data) {
                     $('.mask').hide();

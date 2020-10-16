@@ -203,6 +203,24 @@ public class GoodsInfoUpdateOnlineUtil {
         if(bean.getSkuCount() > 0){
             inputData.setIs_simplify("0");
         }
+        if(StringUtils.isNotBlank(bean.getFree_price_new())){
+            inputData.setFree_price_new(bean.getFree_price_new());
+        }
+        if(StringUtils.isNotBlank(bean.getRange_price_free_new())){
+            inputData.setRange_price_free_new(bean.getRange_price_free_new());
+        }
+        if(StringUtils.isNotBlank(bean.getSku_new())){
+            inputData.setSku_new(bean.getSku_new());
+        }
+        if(StringUtils.isNotBlank(bean.getPrice_import())){
+            inputData.setPrice_import(bean.getPrice_import());
+        }
+        if(StringUtils.isNotBlank(bean.getPrice_kids())){
+            inputData.setPrice_kids(bean.getPrice_kids());
+        }
+        if(StringUtils.isNotBlank(bean.getPrice_pets())){
+            inputData.setPrice_pets(bean.getPrice_pets());
+        }
         //最终更新的json数据,json数据现在按照jack要求是写入文件，一条json数据对应一条语句 写在文件的一行，然后文件提供到jack
         return updateLocalAndSolr(inputData, 1, 0);
     }

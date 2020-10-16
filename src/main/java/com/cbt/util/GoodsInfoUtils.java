@@ -299,8 +299,8 @@ public class GoodsInfoUtils {
             }
             skuAtLst = null;
             ipes.setPpIds(ites.getSkuPropIds().replace(",", "_"));
-            // ipes.setPrice(ites.getSkuVal().getActSkuCalPrice());
-            ipes.setPrice(Float.parseFloat(ites.getSkuVal().getFreeSkuPrice()));
+            ipes.setPrice(ites.getSkuVal().getActSkuCalPrice());
+            ipes.setFreePrice(Float.parseFloat(ites.getSkuVal().getFreeSkuPrice()));
             ipes.setFianlWeight(ites.getFianlWeight());
             ipes.setSpecId(ites.getSpecId());
             if (ites.getVolumeWeight() > 0) {

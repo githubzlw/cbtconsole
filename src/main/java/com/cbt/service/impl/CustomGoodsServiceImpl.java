@@ -750,14 +750,16 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public int updateGoodsSku(String pid, String oldSku, String newSku, int adminId, double finalWeight) {
+    public int updateGoodsSku(String pid, String oldSku, String newSku, int adminId, double finalWeight,
+                              String rangePrice, String rangePriceFree, float minPrice) {
         // 1.更新产品表sku数据和标识
-        customGoodsMapper.updateSkuInfo(pid, newSku);
+        customGoodsMapper.updateSkuInfo(pid, newSku, rangePrice, rangePriceFree, minPrice);
         // 2.插入sku日志
         customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
         // 3.走child表进行线上更新
         mongoDbLocalUtil.updatePid(pid);
-        return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
+        // return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
+        return 1;
     }
 
     @Override
@@ -841,7 +843,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 }
             }
             // 进行sku更新
-            updateGoodsSku(weightChange.getPid(), orGoods.getSku(), skuList.toString(), weightChange.getAdminId(), finalWeight);
+            updateGoodsSku(weightChange.getPid(), orGoods.getSku(), skuList.toString(), weightChange.getAdminId(), finalWeight, null, null, 0);
             skuList.clear();
         }
 
@@ -1074,6 +1076,16 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public List<String> getPipeList() {
         return customGoodsMapper.getPipeList();
+    }
+
+    @Override
+    public ProductSingleBean queryPidSingleBean(String pid) {
+        return customGoodsMapper.queryPidSingleBean(pid);
+    }
+
+    @Override
+    public int setNoUpdatePrice(String pid, String flag) {
+        return customGoodsMapper.setNoUpdatePrice(pid, flag);
     }
 
 }

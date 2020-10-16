@@ -3,6 +3,7 @@ package com.importExpress.mapper;
 import com.cbt.bean.CategoryBean;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
+import com.cbt.bean.ProductSingleBean;
 import com.cbt.website.bean.PurchasesBean;
 import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
@@ -397,7 +398,7 @@ public interface CustomGoodsMapper {
      * @param sku
      * @return
      */
-    int updateSkuInfo(@Param("pid") String pid, @Param("sku") String sku);
+    int updateSkuInfo(@Param("pid") String pid, @Param("sku") String sku,@Param("rangePrice") String rangePrice, @Param("rangePriceFree") String rangePriceFree, @Param("minPrice") float minPrice);
 
     /**
      * 插入sku更新日志
@@ -725,5 +726,9 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<String> getPipeList();
+
+    ProductSingleBean queryPidSingleBean(String pid);
+
+   int setNoUpdatePrice(@Param("pid") String pid, @Param("flag") String flag);
 
 }
