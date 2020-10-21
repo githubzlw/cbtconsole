@@ -52,6 +52,8 @@ public class CustomPidComboCtr {
 
         if (StringUtils.isBlank(comboQuery.getPid())) {
             comboQuery.setPid(null);
+        } else{
+            comboQuery.setPid(comboQuery.getPid().trim());
         }
         if (StringUtils.isBlank(comboQuery.getUuid())) {
             comboQuery.setUuid(null);
@@ -75,7 +77,7 @@ public class CustomPidComboCtr {
                     Map<String, CustomPidComboBean> mapBean = new HashMap<>();
                     for (CustomPidComboBean tempBean : rsList) {
                         pidList.add(tempBean.getPid());
-                        mapBean.put(tempBean.getPid(), tempBean);
+                        mapBean.put(tempBean.getPid().trim(), tempBean);
                     }
 
                     List<CustomGoodsPublish> pidInfos = goodsService.queryGoodsByPidList(pidList);

@@ -219,6 +219,7 @@
             $.messager.alert("提醒", "价格", "info");
             return;
         } else {
+            pid = $.trim(pid);
             var add_is_edit = $("#add_is_edit").val();
             if (add_is_edit > 0) {
                 $.ajax({
@@ -342,10 +343,41 @@
     function doQuery(page) {
         currPage = page;
         var pid = $("#query_pid").val();
+        if (!pid) {
+            pid = null;
+        }else{
+            pid = $.trim(pid);
+        }
         var uuid = $("#query_uuid").val();
+        if (!uuid) {
+            uuid = null;
+        }else{
+            uuid = $.trim(uuid);
+        }
         var admin_id = $("#query_admid").val();
+        if (!admin_id || admin_id == "0") {
+            admin_id = 0;
+        }
         var create_time = $("#query_begin_time").val();
+        if (!create_time) {
+            create_time = null;
+        }else{
+            create_time = $.trim(create_time);
+        }
         var update_time = $("#query_end_time").val();
+        if (!update_time) {
+            update_time = null;
+        }else{
+            update_time = $.trim(update_time);
+        }
+        var tempData = {
+            pid: pid,
+            uuid: uuid,
+            admin_id: admin_id,
+            create_time: create_time,
+            update_time: update_time,
+            page: page
+        };
         $.messager.progress({
             title: '正在执行',
             msg: '请等待...'
@@ -353,14 +385,7 @@
         $.ajax({
             type: "GET",
             url: "/cbtconsole/customPidCombo/getList",
-            data: {
-                pid: pid,
-                uuid: uuid,
-                admin_id: admin_id,
-                create_time: create_time,
-                update_time: update_time,
-                page: page
-            },
+            data: tempData,
             success: function (data) {
                 $.messager.progress('close');
                 if (data.ok) {
