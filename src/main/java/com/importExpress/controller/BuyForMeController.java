@@ -36,6 +36,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Controller
@@ -208,6 +209,62 @@ public class BuyForMeController {
         }
         return mv;
     }
+
+
+    @RequestMapping({"/batchAdd"})
+    @ResponseBody
+    public Map<String, Object> batchAddDetailSku(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> mv = Maps.newHashMap();
+        try {
+            String id = request.getParameter("id");
+            String bfId = request.getParameter("bfid");
+            String orderNo = request.getParameter("orderNo");
+            String bfDetailsId = request.getParameter("bfdid");
+            String num = request.getParameter("num");
+            String numiid = request.getParameter("numiid");
+            List<BFOrderDetail> orderDetails = this.buyForMeService.getOrderDetails(orderNo, bfId);
+            BFOrderDetail detailBean = orderDetails.stream().filter(e -> e.getNumIid().equals(numiid)).findFirst().orElse(null);
+            orderDetails.clear();
+            if (detailBean == null) {
+                mv.put("state", 500);
+                return mv;
+            }
+            String price = request.getParameter("price");
+            String priceBuy = request.getParameter("priceBuy");
+            String priceBuyc = request.getParameter("priceBuyc");
+            String shipFeight = request.getParameter("shipFeight");
+            String sku = request.getParameter("sku");
+            String weight = request.getParameter("weight");
+            String unit = request.getParameter("unit");
+            AtomicInteger count = new AtomicInteger();
+            detailBean.getSkus().forEach(e -> {
+                BFOrderDetailSku detailSku = new BFOrderDetailSku();
+                detailSku.setBfDetailsId(Integer.parseInt(bfDetailsId));
+                detailSku.setBfId(Integer.parseInt(bfId));
+                detailSku.setId(e.getId());
+                detailSku.setNum(e.getNum());
+                detailSku.setNumIid(numiid);
+                detailSku.setPrice(price);
+                detailSku.setPriceBuy(priceBuy);
+                detailSku.setPriceBuyc(priceBuyc);
+                detailSku.setShipFeight(shipFeight);
+                detailSku.setProductUrl(request.getParameter("url"));
+                detailSku.setSku(e.getSku());
+                detailSku.setWeight(weight);
+                detailSku.setUnit(unit);
+                String skuid = "";
+                detailSku.setSkuid(skuid);
+                detailSku.setState(1);
+                count.addAndGet(this.buyForMeService.addOrderDetailsSku(detailSku));
+            });
+            mv.put("state", (count.get() >= detailBean.getSkus().size()) ? 200 : 500);
+        } catch (Exception e) {
+            mv.put("state", 500);
+            e.printStackTrace();
+        }
+        return mv;
+    }
+
 
     /**
      * 无效规格

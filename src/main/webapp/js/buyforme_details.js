@@ -630,3 +630,67 @@ function changePrice(t) {
 
 }
 
+function batchUpdate(obj, pid) {
+    var bfid = $("#query_bf_id").val();
+    var trp = $(obj).parents(".sku-u-td");
+    var trdp = $(obj).parents(".de-td");
+    var bfdid = trdp.find(".bfdid").val();
+    var num = trp.find(".lu_count").val();
+    var numiid = trdp.find(".td-numiid").text();
+    var price = trp.find(".lu-price-sale").val();
+    var priceBuy = trp.find(".lu-price-buy").text();
+    var priceBuyc = trp.find(".lu-price-buy-c").val();
+    var shipFeight = trp.find(".lu-ship-feight").val();
+    var url = trp.find(".lu_url").val();
+    var unit = trp.find(".lu_unit").val();
+    var sku = trp.find(".lu_sku").val();
+    var skuid = trp.find(".lu_skuid").val();
+    var id = trp.find(".lu_id").val();
+    var weight = $(obj).parents(".detail-div").find(".lu-weight").val();
+    if (num == '' || parseInt(num) < 1 || price == '' || priceBuy == '' || priceBuyc == '' || url == '' || sku == '' || unit == '' || shipFeight == '') {
+        $.MsgBox.Alert("提示", "请确认所填信息是否准确!");
+        return;
+    }
+    var orderNo = $("#buy_order_no").text();
+    jQuery.ajax({
+        url: "/cbtconsole/bf/batchAdd",
+        data: {
+            "orderNo":orderNo,
+            "id": id,
+            "pid": pid,
+            "bfid": bfid,
+            "bfdid": bfdid,
+            "num": num,
+            "numiid": numiid,
+            "price": price,
+            "priceBuy": priceBuy,
+            "priceBuyc": priceBuyc,
+            "shipFeight": shipFeight,
+            "url": url,
+            "weight": weight,
+            "unit": unit,
+            "sku": sku,
+            "skuid": skuid
+        },
+        type: "post",
+        success: function (data) {
+            if (data.state == 200) {
+                if (data.message) {
+                    $.MsgBox.Alert("提示", data.message);
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    window.location.reload();
+                }
+            } else {
+                $.MsgBox.Alert("提示", "修改规格失败!");
+            }
+        },
+        error: function (e) {
+            $.MsgBox.Alert("提示", "修改规格失败");
+        }
+    });
+
+}
+
