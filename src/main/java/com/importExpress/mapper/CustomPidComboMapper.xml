@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.CustomPidComboMapper">
+
+    <select id="queryForList" parameterType="com.importExpress.pojo.CustomPidComboQuery"
+            resultType="com.importExpress.pojo.CustomPidComboBean">
+        select a.id,a.pid,a.is_main,a.uuid,a.div_price,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,
+        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.admin_id, b.admName as admin_name
+        from custom_pid_combo a left join admuser b on a.admin_id = b.id
+        where a.uuid in(select uuid from custom_pid_combo where 1=1
+        <if test="pid != null">
+            and pid = #{pid}
+        </if>
+        <if test="uuid != null">
+            and uuid = #{uuid}
+        </if>
+        <if test="create_time != null">
+            and create_time >= #{create_time}
+        </if>
+        <if test="update_time">
+            and #{update_time} >= update_time
+        </if>
+        <if test="admin_id > 0">
+            and #{admin_id} = admin_id
+        </if>
+        ) order by a.create_time desc
+    </select>
+
+    <select id="queryForListCount" resultType="java.lang.Integer">
+        select count(0)
+        from custom_pid_combo a left join admuser b on a.admin_id = b.id
+        where a.uuid in(select uuid from custom_pid_combo where 1=1
+        <if test="pid != null">
+            and pid = #{pid}
+        </if>
+        <if test="uuid != null">
+            and uuid = #{uuid}
+        </if>
+        <if test="create_time != null">
+            and create_time >= #{create_time}
+        </if>
+        <if test="update_time">
+            and #{update_time} >= update_time
+        </if>
+        <if test="admin_id > 0">
+            and #{admin_id} = admin_id
+        </if>
+        ) and a.is_main = 1
+    </select>
+
+    <insert id="insertCustomPidCombo" useGeneratedKeys="true" keyProperty="id" parameterType="com.importExpress.pojo.CustomPidComboBean">
+        insert into custom_pid_combo(pid,is_main,uuid,div_price,admin_id)
+        values (#{pid},#{is_main},#{uuid},#{div_price},#{admin_id})
+    </insert>
+
+    <update id="updateCustomPidCombo" parameterType="com.importExpress.pojo.CustomPidComboBean">
+        update custom_pid_combo set div_price = #{div_price},update_admin = #{update_admin}
+        where pid = #{pid} and uuid = #{uuid}
+    </update>
+
+    <delete id="deleteCustomPidCombo" parameterType="com.importExpress.pojo.CustomPidComboBean">
+        delete from custom_pid_combo where uuid = #{uuid}
+        <if test="is_main == 0">
+            and pid = #{pid}
+        </if>
+    </delete>
+
+</mapper>

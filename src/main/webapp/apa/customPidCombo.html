@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>产品单页套餐</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+
+    <script type="text/javascript">
+        var totalPage = 0;
+        var currPage = 0;
+        var limitNum = 20;
+    </script>
+
+    <style type="text/css">
+        .img_sty {
+            max-height: 180px;
+            max-width: 180px;
+        }
+
+        .inp_style {
+            height: 26px;
+            width: 120px;
+        }
+
+        .tr_sty {
+            background-color: #dcbbd9;
+        }
+
+        .enter_btn {
+            width: 110px;
+            height: 28px;
+            color: #ffffff;
+            background-color: #209258;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .del_btn {
+            width: 110px;
+            height: 28px;
+            color: black;
+            background-color: red;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+
+<div id="enter_div_sty" class="easyui-dialog" title="新增套餐"
+     data-options="modal:true" style="width: 444px; height: 400px;">
+
+    <table>
+        <tr>
+            <td>UUID:</td>
+            <td><input id="add_uuid" value="" disabled="disabled" style="width: 270px;height: 26px;"/>
+                <input id="add_is_main" value="0" type="hidden"/>
+                <input id="add_is_edit" value="0" type="hidden"/></td>
+        </tr>
+        <tr>
+            <td>PID:</td>
+            <td><input id="add_pid" value="" style="height: 26px;width: 224px;"/>
+                <button id="add_btn" class="enter_btn" onclick="queryPidInfo()">查询</button>
+                <span id="show_notice"
+                      style="color: red;display: none;">正在读取...</span>
+            </td>
+        </tr>
+        <tr>
+            <td>图片:</td>
+            <td><img id="pid_img" class="img_sty" src=""/></td>
+        </tr>
+        <tr id="add_price_tr">
+            <td>优惠价格:</td>
+            <td><input id="add_price" value="" style="width: 224px;height: 26px;"/>(USD)</td>
+        </tr>
+        <tr>
+            <td>
+                <button onclick="saveCombo()">保存</button>
+            </td>
+            <td>
+                <button onclick="closeDiv()">关闭</button>
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+
+<div style="text-align: center;">
+    <h3 style="text-align: center;">产品单页套餐</h3>
+    <div id="query_id">
+        <span>PID:<input id="query_pid" style="width: 150px;height: 26px;" value=""/></span>&nbsp;&nbsp;
+        <span>UUID:<input id="query_uuid" style="width: 310px;height: 26px;" value=""/></span>&nbsp;&nbsp;
+        <span>编辑人:<select id="query_admid" style="width: 130px;height: 26px;">
+            <option value="0">全部</option>
+        </select></span>&nbsp;&nbsp;
+        <span>开始时间:<input id="query_begin_time" class="Wdate" style="width: 100px; height: 24px" type="text" value=""
+                          onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"></span>&nbsp;&nbsp;
+        <span>结束时间:<input id="query_end_time" class="Wdate" style="width: 100px; height: 24px;" type="text" value=""
+                          onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"></span>&nbsp;&nbsp;
+        <button class="enter_btn" onclick="doQuery(1)">查询</button>&nbsp;&nbsp;
+        <button class="enter_btn" onclick="addCombo('', 1)">新增套餐</button>&nbsp;&nbsp;
+    </div>
+    <br>
+    <div id="show_body">
+        <table style="border-color: #c689c7;" border="1" cellpadding="1" cellspacing="0" align="center">
+            <thead>
+            <tr>
+                <td>序号</td>
+                <td>UUID</td>
+                <td>PID</td>
+                <td>图片</td>
+                <td>优惠减去价格</td>
+                <td>商品状态</td>
+                <td>编辑人</td>
+                <td>创建时间</td>
+                <td>更新时间</td>
+                <td>操作</td>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>num</td>
+                <td>uuid</td>
+                <td>pid</td>
+                <td>img_url</td>
+                <td>div_price</td>
+                <td>valid</td>
+                <td>admin_name</td>
+                <td>create_time</td>
+                <td>update_time</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="page_id">
+        <input type="hidden" value="0">总条数:<span id="rs_total">0</span>条&nbsp;&nbsp;
+        分页数:<span>20</span>条/页&nbsp;&nbsp;&nbsp;&nbsp; 总页数:<span><span id="curr_page">1</span><em>/</em><span
+            id="total_page"></span>
+		</span> 页&nbsp;&nbsp; <input type="button" value="上一页" onclick="doPage(-1)" class="enter_btn">&nbsp; <input
+            type="button" value="下一页" onclick="doPage(1)" class="enter_btn"> &nbsp;
+        第<input id="page_num" type="text" value="1" style="height: 26px;">
+        <input type="button" value="查询" onclick="doPage(0)" class="enter_btn">
+    </div>
+</div>
+
+
+</body>
+<script type="text/javascript">
+    $(function () {
+        getAdminList();
+        $("#show_body").hide();
+        $("#page_id").hide();
+        closeDiv();
+        doQuery(1);
+    });
+
+
+    function addCombo(uuid, isMain) {
+        closeDiv();
+        $("#add_is_edit").val(0);
+        $("#add_is_main").val(isMain);
+        $("#add_uuid").val(uuid);
+        if (isMain > 0) {
+            $("#add_price_tr").hide();
+        } else {
+            $("#add_price_tr").show();
+        }
+        $("#add_btn").prop("disabled", false);
+        $("#add_pid").prop("disabled", false);
+        openDiv();
+    }
+
+    function editCombo(uuid, pid, img, div_price) {
+        closeDiv();
+        $("#add_is_edit").val(1);
+        $("#add_uuid").val(uuid);
+        $("#add_pid").val(pid);
+        $("#pid_img").attr("src", img);
+        $("#add_btn").prop("disabled", true);
+        $("#add_pid").prop("disabled", true);
+        $("#add_price").val(div_price);
+        openDiv();
+    }
+
+    function saveCombo() {
+        var is_main = $("#add_is_main").val();
+        var uuid = $("#add_uuid").val();
+        var pid = $("#add_pid").val();
+        var pid_img = $("#pid_img").attr("src");
+        var add_price = $("#add_price").val();
+        if (!pid || !pid_img) {
+            $.messager.alert("提醒", "缺少PID、图片", "info");
+            return;
+        } else if (is_main == 0 && !add_price) {
+            $.messager.alert("提醒", "价格", "info");
+            return;
+        } else {
+            var add_is_edit = $("#add_is_edit").val();
+            if (add_is_edit > 0) {
+                $.ajax({
+                    type: "post",
+                    url: "/cbtconsole/customPidCombo/editInfo",
+                    data: {
+                        uuid: uuid,
+                        pid: pid,
+                        div_price: add_price
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.ok) {
+                            closeDiv();
+                            window.location.reload();
+                        } else {
+                            $.messager.alert("提醒", data.message, "error");
+                        }
+                    },
+                    error: function (res) {
+                        $.messager.alert("提醒", "连接异常，请重试", "error");
+                    }
+                });
+            } else {
+                if (!add_price) {
+                    add_price = 0;
+                }
+                var tempData = {
+                    is_main: is_main,
+                    uuid: uuid,
+                    pid: pid,
+                    div_price: add_price
+                };
+                $.ajax({
+                    type: "post",
+                    url: "/cbtconsole/customPidCombo/insertCombo",
+                    data: tempData,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.ok) {
+                            closeDiv();
+                            window.location.reload();
+                        } else {
+                            $.messager.alert("提醒", data.message, "error");
+                        }
+                    },
+                    error: function (res) {
+                        $.messager.alert("提醒", "连接异常，请重试", "error");
+                    }
+                });
+            }
+
+        }
+
+
+    }
+
+    function queryPidInfo() {
+        var pid = $("#add_pid").val();
+        if (!pid) {
+            $.messager.alert("提醒", "请输入PID", "info");
+            return;
+        } else {
+            $("#show_notice").show();
+            $.ajax({
+                type: "post",
+                url: "/cbtconsole/hotGoods/queryGoodsFrom1688.do",
+                data: {
+                    url: pid
+                },
+                dataType: "json",
+                success: function (data) {
+                    $("#show_notice").hide();
+                    if (data.ok) {
+                        var json = data.data;
+                        $("#show_notice").hide();
+                        var img = json.img;
+                        if (img.indexOf("http:") > -1 || img.indexOf("https:") > -1) {
+                            $("#pid_img").attr("src", img);
+                        } else {
+                            $("#pid_img").attr("src", json.remotpath + img);
+                        }
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (res) {
+                    $("#show_notice").hide();
+                    $.messager.alert("提醒", "连接异常，请重试", "error");
+                }
+            });
+        }
+
+    }
+
+    function doPage(num) {
+        if (num == 0) {
+            var cuPage = $("#page_num").val();
+            if (!cuPage) {
+                $.messager.alert("提醒", '请输入数量', "info");
+                return;
+            } else {
+                if (cuPage > currPage) {
+                    cuPage = currPage;
+                } else if (cuPage < 1) {
+                    cuPage = 1;
+                }
+            }
+            doQuery(cuPage);
+        } else {
+            var cuPage = totalPage + num;
+            if (cuPage > currPage) {
+                cuPage = currPage;
+            } else if (cuPage < 1) {
+                cuPage = 1;
+            }
+            doQuery(cuPage);
+        }
+    }
+
+    function doQuery(page) {
+        currPage = page;
+        var pid = $("#query_pid").val();
+        var uuid = $("#query_uuid").val();
+        var admin_id = $("#query_admid").val();
+        var create_time = $("#query_begin_time").val();
+        var update_time = $("#query_end_time").val();
+        $.messager.progress({
+            title: '正在执行',
+            msg: '请等待...'
+        });
+        $.ajax({
+            type: "GET",
+            url: "/cbtconsole/customPidCombo/getList",
+            data: {
+                pid: pid,
+                uuid: uuid,
+                admin_id: admin_id,
+                create_time: create_time,
+                update_time: update_time,
+                page: page
+            },
+            success: function (data) {
+                $.messager.progress('close');
+                if (data.ok) {
+                    $("#show_body").empty();
+                    if (data.total > 0) {
+                        $("#show_body").show();
+                        $("#page_id").show();
+                        genData(data.data, data.total);
+                    } else {
+                        // $.messager.alert("提醒", '查询结果空', "info");
+                        $.messager.show({
+                            title: '提示',
+                            msg: '查询结果空',
+                            showType: 'slide',
+                            timeout: 1000,
+                            style: {
+                                right: '',
+                                top: ($(window).height() * 0.35),
+                                bottom: ''
+                            }
+                        });
+                    }
+                } else {
+                    $.messager.alert("提醒", '执行错误:' + data.message, "error");
+                }
+            },
+            error: function (res) {
+                $.messager.progress('close');
+                $.messager.alert("提醒", '保存错误，请联系管理员', "error");
+            }
+        });
+    }
+
+    function genData(mapObj, total) {
+        totalPage = Math.ceil(total / limitNum);
+        $("#rs_total").text(total);
+        $("#curr_page").text(currPage);
+        $("#total_page").text(totalPage);
+
+
+        var mainList = mapObj.mainList;
+        var childList = mapObj.childList;
+        var childMap = {};
+        if (childList && childList.length > 0) {
+            for (var i = 0; i < childList.length; i++) {
+                if (!childMap.hasOwnProperty(childList[i].uuid)) {
+                    childMap[childList[i].uuid] = [];
+                }
+                childMap[childList[i].uuid].push(childList[i]);
+            }
+        }
+
+        var content = '';
+        if (mainList && mainList.length > 0) {
+            content += '<table style="border-color: #c689c7;" border="1" cellpadding="1" cellspacing="0" align="center">';
+            for (var j = 0; j < mainList.length; j++) {
+
+                if (j == 0) {
+                    content += '<thead>';
+                    content += '<tr style="background-color: aqua;height: 40px;">';
+                    content += '<td>序号</td>';
+                    content += '<td>UUID</td>';
+                    content += '<td>PID</td>';
+                    content += '<td>图片</td>';
+                    content += '<td>优惠减去价格(USD)</td>';
+                    content += '<td>商品状态</td>';
+                    content += '<td>编辑人</td>';
+                    content += '<td>创建时间</td>';
+                    content += '<td>修改时间</td>';
+                    content += '<td>操作</td>';
+                    content += '</tr>';
+                    content += '</thead>';
+                    content += '<tbody>';
+                }
+
+
+                content += '<tr class="tr_sty">';
+                content += '<td>' + (j + 1) + '</td>';
+                content += '<td>' + mainList[j].uuid + '</td>';
+                content += '<td>' + mainList[j].pid + '</td>';
+                content += '<td><img src="' + mainList[j].img_url + '" class="img_sty" /></td>';
+                content += '<td>' + mainList[j].div_price + '</td>';
+                if (mainList[j].valid == 1) {
+                    content += '<td>在线</td>';
+                } else {
+                    content += '<td><b style="color: red;">下架</b></td>';
+                }
+
+                content += '<td>' + mainList[j].admin_name + '</td>';
+                content += '<td>' + mainList[j].create_time + '</td>';
+                content += '<td>' + mainList[j].update_time + '</td>';
+                content += '<td><button class="enter_btn" onclick="addCombo(\'' + mainList[j].uuid + '\', 0)">新增套餐PID</button><br><br>' +
+                    '<button class="del_btn" onclick="deleteMainCombo(\'' + mainList[j].uuid + '\',\'' + mainList[j].pid + '\', 1)">删除此套餐</button></td>';
+                content += '</tr>';
+
+
+                var bodyJson = childMap[mainList[j].uuid];
+                if (bodyJson && bodyJson.length > 0) {
+                    for (var k = 0; k < bodyJson.length; k++) {
+                        content += '<tr>';
+                        content += '<td></td>';
+                        content += '<td><span class="tr_sty">' + mainList[j].pid + '套餐</span></td>';
+                        content += '<td>' + bodyJson[k].pid + '</td>';
+                        content += '<td><img src="' + bodyJson[k].img_url + '" class="img_sty" /></td>';
+                        content += '<td>' + bodyJson[k].div_price + '</td>';
+                        if (bodyJson[k].valid == 1) {
+                            content += '<td>在线</td>';
+                        } else {
+                            content += '<td><b style="color: red;">下架</b></td>';
+                        }
+
+                        content += '<td>' + bodyJson[k].admin_name + '</td>';
+                        content += '<td>' + bodyJson[k].create_time + '</td>';
+                        content += '<td>' + bodyJson[k].update_time + '</td>';
+                        content += '<td><button class="enter_btn" onclick="editCombo(\'' + bodyJson[k].uuid + '\',\'' + bodyJson[k].pid + '\',\'' + bodyJson[k].img_url + '\',\'' + bodyJson[k].div_price + '\')">编辑优惠价格</button><br><br><button class="del_btn" onclick="deleteMainCombo(\'' + bodyJson[k].uuid + '\',\'' + bodyJson[k].pid + '\', 0)">删除</button></td>';
+                        content += '</tr>';
+                    }
+                }
+            }
+            content += '</tbody>';
+            content += '</table>';
+            $("#show_body").append(content);
+        } else {
+            $.messager.alert("提醒", '当前获取数据空', "info");
+        }
+    }
+
+    function getAdminList() {
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/singleGoods/getAdminList",
+            data: {},
+            success: function (data) {
+                if (data.ok) {
+                    $("#query_admid").empty();
+                    var content = '<option value="0" selected="selected">全部</option>';
+                    var json = data.data;
+                    for (var i = 0; i < json.length; i++) {
+                        content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                    }
+                    $("#query_admid").append(content);
+                } else {
+                    console.log("获取用户列表失败，原因 :" + data.message);
+                }
+            },
+            error: function (res) {
+                console.log("网络获取失败");
+            }
+        });
+    }
+
+
+    function deleteMainCombo(uuid, pid, isMain) {
+        $.messager.confirm('系统提醒', '删除后数据不能恢复，是否执行？', function (r) {
+            if (r) {
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/customPidCombo/deleteMainCombo",
+                    data: {
+                        pid: pid,
+                        uuid: uuid,
+                        is_main: isMain
+                    },
+                    success: function (data) {
+                        if (data.ok) {
+                            // window.location.reload();
+                            doQuery(currPage);
+                        } else {
+                            $.messager.alert("提醒", '执行错误:' + data.message, "error");
+                        }
+                    },
+                    error: function (res) {
+                        $.messager.progress('close');
+                        $.messager.alert("提醒", '保存错误，请联系管理员', "error");
+                    }
+                });
+            }
+        });
+
+    }
+
+    function openDiv() {
+        $('#enter_div_sty').dialog('open');
+    }
+
+    function closeDiv() {
+        $('#enter_div_sty').dialog('close');
+        $("#add_is_main").val("");
+        $("#add_uuid").val("");
+        $("#add_pid").val("");
+        $("#pid_img").attr("src", "");
+        $("#add_price").val("");
+    }
+</script>
+</html>
