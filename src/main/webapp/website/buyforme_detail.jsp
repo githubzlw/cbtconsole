@@ -64,7 +64,7 @@ padding: 20px;max-height: 715px;}
 .input-w5{width: 315px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .input-w3{width: 50px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .input-w25{width: 38px;border: 1px solid #ccc; border-radius: 4px;height: 25px;}
-.input-w8{width: 254px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
+.input-w8{width: 315px;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .input-w6{width: 92%;border: 1px solid #ccc; border-radius: 4px;height: 34px;}
 .btn-weight{cursor: pointer;}
 .btn-update{cursor: pointer;}
@@ -136,7 +136,7 @@ body{min-height:100%;}
 			<div class="col-xs-4"><span class="th-font">下单时间:</span><span>${order.create_time}</span></div>
 			</div>
 			<div class="row"><span class="sy-content"><c:if test="${order.sample_flag ==1 }">送样</c:if></span></div>
-	
+
 	</div>
 	<div class="row w90">
 	<div class="row mar-l">
@@ -145,9 +145,9 @@ body{min-height:100%;}
 	<c:forEach items="${countrys }" var="lst">
 	<option value="${lst.id }" ${lst.id== order.countryId?"selected='selected'":""}>${lst.country }</option>
 	</c:forEach>
-	
+
 	</select>
-	
+
 	</div>
 	<div class="col-xs-2 w22"><span>City:<input type="text" value="${order.address }" id="in-city" disabled="disabled" class="disable-in-l"></span></div>
 	<div class="col-xs-2 w22"><span>Address:<input type="text" value="${order.address2 }" id="in-address" disabled="disabled" class="disable-in-l"></span></div>
@@ -163,21 +163,21 @@ body{min-height:100%;}
 	<button class="btn btn-info btn-update-address">更新地址</button></div>
 	</div>
 	</div>
-	
-	
+
+
 	<div class="row w90">
 	<button class="btn btn-info btn-re-n">添加备注内容(对内)</button> <span class="remark-title">备注内容:</span><input type="text" class="remark-dn" value="">
 	运费:<input type="text" value="${order.ship_feight}" class="delivery-feight" disabled="disabled">
 	交期:<input class="delivery-time" value="${order.delivery_time }" disabled="disabled" >
 	运输方式:
 	<select class="delivery-method">
-	
+
 	</select>
 	<input type="hidden" value="${order.delivery_method}" id="h-delivery-method">
 	<button class="btn btn-info btn-delivery-time">确认交期</button>
 	<input type="hidden" value="${order.countryId }" id="in-country-id">
 	</div>
-		
+
 		<div class="row mt20">
 		<c:forEach items="${orderDetails }" var="detail" varStatus="index">
 		<div class="row w99 de-td">
@@ -208,16 +208,16 @@ body{min-height:100%;}
 		<%-- <div class="row remark-replay-row">A:<button class="btn btn-info btn-replay">回复</button></div> --%>
 		<div class="remark-replay" style="display:none;">${detail.remarkReplay}</div>
 		</div>
-				
+
 		<div class="row">
 				<div class="w89">
 				<table class="table-sku">
 				<thead>
 					<tr>
-						<th width="22%" class="th-font">下单规格:</th>
-						<th width="14%" class="th-font">货源价格:</th>
+						<th width="24%" class="th-font">下单规格:</th>
+						<th width="13%" class="th-font">货源价格:</th>
 						<th width="5%" class="th-font">搜索价格:</th>
-						<th width="15%" class="th-font">售卖价格(免邮价):</th>
+						<th width="14%" class="th-font">售卖价格(免邮价):</th>
 						<th width="4%" class="th-font">数量:</th>
 						<th width="4%" class="th-font">单位:</th>
 						<!-- <th>时间</th> -->
@@ -225,7 +225,7 @@ body{min-height:100%;}
 					</tr>
 				</thead>
 				<tbody>
-					<tbody class="lu_tr">
+					<tbody class="lu_tr" id="tbody_pid_${detail.numIid}">
 					 <c:forEach items="${detail.skus }" var="sku">
 					 <tr class="sku-u-td">
 						<c:if test="${sku.state == 1}">
@@ -246,6 +246,7 @@ body{min-height:100%;}
 						<td><input type="text" class="input-w5 lu_url" value="${sku.url}">
 						<button class="btn btn-info btn-update">修改</button>
 						 <button class="btn btn-info btn-invalid">无效</button>
+						<button class="btn btn-info" onclick="batchUpdate(this,'${detail.numIid}')">批量修改</button>
 						</td></c:if>
 						<c:if test="${sku.state != 1}">
 						<td class="td-in-valid">${sku.sku}</td>
