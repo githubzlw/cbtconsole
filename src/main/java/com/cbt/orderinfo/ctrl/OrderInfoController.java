@@ -73,7 +73,7 @@ public class OrderInfoController {
     @Autowired
     private ISpiderServer spiderService;
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
-    private static final String SERVICE_LOCAL_PATH = "/usr/local/goodsimg";
+    private static final String SERVICE_LOCAL_PATH = "/data";
     private static final String SERVICE_SHOW_URL_1 = "http://img.import-express.com";
     private static final String SERVICE_SHOW_URL_2 = "http://img1.import-express.com";
     private static final String SERVICE_SHOW_URL_3 = "https://img.import-express.com";

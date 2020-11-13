@@ -49,7 +49,7 @@ public class ImgDownload {
 
 	public static boolean downFromImgService(String imgUrl,String fileName) {
 
-		String ipUrl = imgUrl.replace("https://img.import-express.com","http://104.247.194.50");
+		String ipUrl = imgUrl.replace("https://img.import-express.com","http://108.61.142.103");
 		boolean isDown = false;
 		File file = new File(fileName);
 		if(checkDownFileByName(fileName)){

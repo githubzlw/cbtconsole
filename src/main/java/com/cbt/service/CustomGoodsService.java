@@ -1042,5 +1042,5 @@ public interface CustomGoodsService {
 
     ProductSingleBean queryPidSingleBean(String pid);
 
-    int setNoUpdatePrice(String pid, String flag);
+    int setNoUpdatePrice(CustomGoodsPublish goods);
 }

@@ -432,7 +432,7 @@
                         sg_wprice += "," + wprice_num + "@" + wprice_val;
                     }
                 });
-            } else{
+            } else {
                 isErr = false;
                 sg_wprice = ",";
             }
@@ -456,7 +456,7 @@
                         sg_free_price += "," + feeprice_num + "@" + feeprice_val;
                     }
                 });
-            } else{
+            } else {
                 isErr = false;
                 sg_free_price = ",";
             }
@@ -568,27 +568,27 @@
 
         function setNoUpdatePrice(pid, flag) {
             $.ajax({
-                    type: 'POST',
-                    dataType: 'json',
-                    url: '/cbtconsole/editc/setNoUpdatePrice',
-                    data: {
-                        "pid": pid,
-                        "flag": flag
-                    },
-                    success: function (data) {
-                        if (data.ok) {
-                            showMessage("执行成功，即将刷新页面");
-                            setTimeout(function () {
-                                window.location.reload();
-                            }, 1500);
-                        } else {
-                            $.messager.alert("提醒", data.message, "error");
-                        }
-                    },
-                    error: function (XMLResponse) {
-                        $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                type: 'POST',
+                dataType: 'json',
+                url: '/cbtconsole/editc/setNoUpdatePrice',
+                data: {
+                    "pid": pid,
+                    "flag": flag
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        showMessage("执行成功，即将刷新页面");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
                     }
-                });
+                },
+                error: function (XMLResponse) {
+                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                }
+            });
         }
 
         function setGoodsValid(pid, type) {
@@ -2326,6 +2326,7 @@
                                         <tr>
                                             <td>商品数量</td>
                                             <td>对应价格($)</td>
+                                            <%--<td>操作</td>--%>
                                         </tr>
                                         <c:forEach var="wprice" items="${fn:split(singleBean.wprice,',')}"
                                                    varStatus="wpIndex">
@@ -2336,15 +2337,20 @@
                                                 <td><input type="text" id="wprice_val_${wpIndex.index}"
                                                            class="inp_style" title="单击可进行编辑"
                                                            value="${fn:trim(fn:split(wprice,'@')[1])}"/></td>
+                                                <%--<td>
+                                                    <button class="del_clo" onclick="delTableTr(this)">删除</button>
+                                                </td>--%>
                                             </tr>
                                         </c:forEach>
                                     </table>
+                                    <button class="clear_clo" onclick="addTableTr(this, 1)">新增一行</button>
                                 </div>
                             </c:if>
 
                             <c:if test="${not empty singleBean.range_price}">
                                 <div class="goods_p">
-                                    <p class="goods_color">非免邮价:</p><p class="goods_color">${singleBean.range_price}</p>
+                                    <p class="goods_color">非免邮价:</p>
+                                    <p class="goods_color">${singleBean.range_price}</p>
                                 </div>
                             </c:if>
 
@@ -2364,6 +2370,7 @@
                                             <tr>
                                                 <td>商品数量</td>
                                                 <td>对应价格($)</td>
+                                                <td>操作</td>
                                             </tr>
                                             <c:forEach var="fee_price"
                                                        items="${fn:split(singleBean.free_price_new,',')}"
@@ -2375,16 +2382,21 @@
                                                     <td><input type="text" id="fee_price_val_${feeIndex.index}"
                                                                class="inp_style" title="单击可进行编辑"
                                                                value="${fn:trim(fn:split(fee_price,'@')[1])}"/></td>
+                                                    <td>
+                                                        <button class="del_clo" onclick="delTableTr(this)">删除</button>
+                                                    </td>
                                                 </tr>
                                             </c:forEach>
                                         </table>
+                                        <button class="clear_clo" onclick="addTableTr(this, 0)">新增一行</button>
                                     </div>
                                 </div>
                             </c:if>
 
                             <c:if test="${not empty singleBean.range_price_free_new}">
                                 <div class="goods_p">
-                                    <p class="goods_color">免邮价格:</p><p class="goods_color">${singleBean.range_price_free_new}</p>
+                                    <p class="goods_color">免邮价格:</p>
+                                    <p class="goods_color">${singleBean.range_price_free_new}</p>
                                 </div>
                             </c:if>
 
@@ -2401,13 +2413,13 @@
 
                                 </p>
                             </div>
-                            <%--<div class="goods_p">
-                                <p class="goods_color">bizPrice:</p>
-                                <p class="ul_size">
-                                    <span class="goods_cur"><input class="pr_txt" id="biz_price"
-                                                                   value="${goods.fpriceStr}"/></span>
-                                </p>
-                            </div>--%>
+                                <%--<div class="goods_p">
+                                    <p class="goods_color">bizPrice:</p>
+                                    <p class="ul_size">
+                                        <span class="goods_cur"><input class="pr_txt" id="biz_price"
+                                                                       value="${goods.fpriceStr}"/></span>
+                                    </p>
+                                </div>--%>
                             <div class="goods_p">
                                 <p class="goods_color">重量:</p>
                                 <p class="ul_size">
@@ -2512,7 +2524,7 @@
                         <b style="font-size: 16px;color: red;">产品来源:${goods.fromFlagDesc}</b><br>
                     </c:if>
                     <c:if test="${goods.matchSource == '8'}">
-                        <b  style="font-size: 16px;color: red;">B2C商品标记</b><br>
+                        <b style="font-size: 16px;color: red;">B2C商品标记</b><br>
                     </c:if>
                     <c:if
                             test="${goods.isEdited == 1 || goods.isEdited == 2}">
@@ -2522,7 +2534,10 @@
                         <br>
                         <b style="font-size: 16px;">编辑人：${goods.admin}</b>
                         <br>
-                    </c:if> <c:if test="${goods.promotionFlag >0}">
+                    </c:if>
+                    <b style="font-size: 16px;">类别ID:${goods.catid1}</b>
+                    <br>
+                    <c:if test="${goods.promotionFlag >0}">
                     <br>
                     <b style="font-size: 16px;color: red;">促销商品</b>
                 </c:if><c:if test="${goods.isAbnormal >0}">
@@ -2691,7 +2706,7 @@
                     &nbsp;&nbsp;&nbsp;
                     <c:if test="${goods.matchSource != '8'}">
                         <span class="s_btn" onclick="setNoUpdatePrice('${goods.pid}',8)">标记B2C商品</span>
-                    &nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;
                     </c:if>
                     <a target="_blank"
                        href="http://192.168.1.29:8280/cbtconsole/customerServlet?action=findAllTaoBaoInfo&className=PictureComparisonServlet&aliPid=${goods.aliGoodsPid}&ylbbPid=${goods.pid}"
@@ -3138,7 +3153,7 @@
     }
 
     function openSkuEdit(pid) {
-        var param = "height=660,width=900,top=160,left=550,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        var param = "height=660,width=990,top=160,left=550,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open("/cbtconsole/editc/querySkuByPid?pid=" + pid, "windows", param);
     }
 
@@ -3174,6 +3189,22 @@
         } else {
             $.messager.alert("提示信息", "请填写完整信息", "info");
         }
+    }
+
+    function delTableTr(obj) {
+        $(obj).parent().parent().remove();
+    }
+
+    function addTableTr(obj, num) {
+        var content = '';
+        var length = $(obj).parent().find('table').find('tr').length;
+        if (num > 0) {
+            content += '<tr><td><input type="text" id="wprice_num_' + length + '" class="inp_style wprice_inp" title="单击可进行编辑" value="0"></td><td><input type="text" id="wprice_val_' + length + '" class="inp_style" title="单击可进行编辑" value="0"></td><td><button class="del_clo" onclick="delTableTr(this)">删除</button></td></tr>';
+        } else {
+            content += '<tr><td><input type="text" id="fee_price_num_' + length + '" class="inp_style fee_price_inp" title="单击可进行编辑" value="0" readonly="readonly" style="background-color: rgb(216, 216, 216);"></td><td><input type="text" id="fee_price_val_' + length + '" class="inp_style" title="单击可进行编辑" value="0"></td><td><button class="del_clo" onclick="delTableTr(this)">删除</button></td>\n' +
+                '                                                </tr>';
+        }
+        $(obj).parent().find('table').append(content);
     }
 </script>
 </html>

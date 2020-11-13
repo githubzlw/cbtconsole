@@ -1084,8 +1084,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public int setNoUpdatePrice(String pid, String flag) {
-        return customGoodsMapper.setNoUpdatePrice(pid, flag);
+    public int setNoUpdatePrice(CustomGoodsPublish goods) {
+        return customGoodsMapper.setNoUpdatePrice(goods);
     }
 
 }

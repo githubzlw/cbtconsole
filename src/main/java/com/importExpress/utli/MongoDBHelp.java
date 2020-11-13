@@ -11,6 +11,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.UpdateManyModel;
 import com.mongodb.client.model.WriteModel;
 import com.mongodb.client.result.UpdateResult;
+import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.LoggerFactory;
@@ -261,7 +262,6 @@ public enum MongoDBHelp {
     }
 
     /**
-     *
      * @param collectionName
      * @param list
      * @return
@@ -409,6 +409,7 @@ public enum MongoDBHelp {
 
     /**
      * 查询PID是否存在
+     *
      * @param collectionName
      * @param pid
      * @return
@@ -429,7 +430,7 @@ public enum MongoDBHelp {
         return rs;
     }
 
-    public void clearMongodb3(String collectionName){
+    public void clearMongodb3(String collectionName) {
         this.getConnection();
         if (mongoDatabase3 != null) {
             mongoDatabase3.getCollection(collectionName).drop();
@@ -458,6 +459,13 @@ public enum MongoDBHelp {
             logger.error("mongoDatabase3 is null");
         }
 
+    }
+
+    public void deleteMongo3(String collectionName, List<String> list) {
+        if (CollectionUtils.isNotEmpty(list)) {
+            BasicDBObject find = new BasicDBObject(QueryOperators.IN, list);
+            mongoDatabase3.getCollection(collectionName).deleteMany(find);
+        }
     }
 
 }
