@@ -179,7 +179,8 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y: auto;background: 
 .next_arrow {position: absolute;left: 0;top: 29px;display: block;width: 14px;
 	height: 22px;background: url(/cbtconsole/img/prev_arrow.png) no-repeat;}
 .clear_box{width:100%;height:40px;margin:20px auto;}
-.clear_clo{cursor:pointer;display:inline-block;width:120px;height:40px;line-height: 40px;text-align: center;color:#fff;font-size: 14px;border-radius: 10px;background: #169bd4;}
+.clear_clo{cursor:pointer;display:inline-block;width:120px;height:30px;line-height: 30px;text-align: center;color:#fff;font-size: 14px;border-radius: 10px;background: #169bd4;}
+.del_clo{cursor:pointer;display:inline-block;width:120px;height:30px;line-height: 30px;text-align: center;color:red;font-size: 14px;border-radius: 10px;background: #169bd4;}
 .clear_txt{display: inline-block;line-height: 40px;color:red;}
 
 .table_box{width:80%;margin:0 auto;overflow: hidden;}
@@ -231,7 +232,7 @@ html,body{width:100%;height:100%;overflow-x:hidden;overflow-y: auto;background: 
 .ul_color .red_border{border:1px solid red;}
 .ul_size .red_border{border:1px solid red;}
 
-.inp_style{width:100%;font-size: 16px;background-color: #d8d8d8;readonly:"readonly";}
+.inp_style{width:100%;font-size: 16px;background-color: #d8d8d8;readonly:"readonly";height: 26px;}
 .img_limit{width: 40px;height: 40px;}
 .mask{display:none;position:absolute;left:0;top:0;bottom:0;right:0;margin:auto;background:rgba(0,0,0,0.6);width:360px;height:60px;line-height:60px;text-align:center;border-radius: 10px;font-size:20px;color:#fff;z-index:100;}
 .lb_style{color:red;font-size:16px;}

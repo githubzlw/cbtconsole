@@ -729,6 +729,6 @@ public interface CustomGoodsMapper {
 
     ProductSingleBean queryPidSingleBean(String pid);
 
-   int setNoUpdatePrice(@Param("pid") String pid, @Param("flag") String flag);
+   int setNoUpdatePrice(CustomGoodsPublish goods);
 
 }

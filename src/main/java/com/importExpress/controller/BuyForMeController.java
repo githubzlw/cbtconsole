@@ -655,7 +655,7 @@ public class BuyForMeController {
                             File file = new File(localDiskPath + localFilePath);
                             if (file.exists()) {
                                 // msg = ftpConfig.getLocalShowPath() + localFilePath;
-                                String remotePath = "/usr/local/goodsimg/importcsvimg/buyforme/" + orderNo;
+                                String remotePath = "/data/importcsvimg/buyforme/" + orderNo;
                                 boolean isSuccess = UploadByOkHttp.uploadFile(file, remotePath, 0);
                                 if (!isSuccess) {
                                     isSuccess = UploadByOkHttp.uploadFile(file, remotePath, 0);

@@ -58,6 +58,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Controller
@@ -70,7 +71,7 @@ public class EditorController {
     private DecimalFormat format = new DecimalFormat("#0.00");
     private static List<String> kidsCatidList = new ArrayList<>();
 
-    private static Map<String,String> pidMap = new HashMap<>();
+    private static Map<String, String> pidMap = new HashMap<>();
 
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 
@@ -89,7 +90,7 @@ public class EditorController {
     @Autowired
     private HotManageService hotManageService;
     @Autowired
-	private CategoryService categoryService;
+    private CategoryService categoryService;
 
     @SuppressWarnings({"static-access", "unchecked"})
     @RequestMapping(value = "/detalisEdit", method = {RequestMethod.POST, RequestMethod.GET})
@@ -134,25 +135,25 @@ public class EditorController {
             }
 
             ProductSingleBean singleBean = customGoodsService.queryPidSingleBean(pid);
-            if(singleBean!= null){
-                String regEx="[\\[\\]]";
-                if(StringUtils.isNotBlank(singleBean.getWprice())){
-                    singleBean.setWprice(singleBean.getWprice().replaceAll(regEx,"").replace("$","@").trim());
+            if (singleBean != null) {
+                String regEx = "[\\[\\]]";
+                if (StringUtils.isNotBlank(singleBean.getWprice())) {
+                    singleBean.setWprice(singleBean.getWprice().replaceAll(regEx, "").replace("$", "@").trim());
                 }
-                if(StringUtils.isNotBlank(singleBean.getFree_price_new())){
-                    singleBean.setFree_price_new(singleBean.getFree_price_new().replaceAll(regEx,"").replace("$","@").trim());
+                if (StringUtils.isNotBlank(singleBean.getFree_price_new())) {
+                    singleBean.setFree_price_new(singleBean.getFree_price_new().replaceAll(regEx, "").replace("$", "@").trim());
                 }
             }
             mv.addObject("singleBean", singleBean);
 
-            if(StringUtils.isBlank(goods.getRangePrice())){
+            if (StringUtils.isBlank(goods.getRangePrice())) {
                 goods.setWprice(goods.getFree_price_new());
             }
 
             if (goods.getGoodsState() == 1) {
                 goods.setOffReason(null);
                 goods.setUnsellAbleReasonDesc(null);
-            }else if (goods.getValid() == 0) {
+            } else if (goods.getValid() == 0) {
                 if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
                     goods.setOffReason(null);
                     goods.setUnsellAbleReasonDesc(null);
@@ -252,7 +253,7 @@ public class EditorController {
                 List<ImportExSku> skuList = new ArrayList<ImportExSku>();
                 /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
                 skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
-                skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
+                skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(), ImportExSku.class);
                 // 规格标题名称集合
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
                 // 集合排序
@@ -406,7 +407,7 @@ public class EditorController {
                 goods.setReviseWeight(goods.getFinalWeight());
             }
 
-            String text = GoodsInfoUtils.dealEnInfoImg(goods.getEninfo() , goods.getRemotpath());
+            String text = GoodsInfoUtils.dealEnInfoImg(goods.getEninfo(), goods.getRemotpath());
 
             // 已经放入产品表的size_info_en字段
             //获取文字尺码数据
@@ -473,11 +474,11 @@ public class EditorController {
             mv.addObject("localpath", localpath);
 
             // 描述很精彩标识
-            if(goods.getDescribeGoodFlag() > 0){
-                Map<String,String> rsMap =  customGoodsService.queryDescribeLogInfo(pid);
-                if(rsMap == null || StringUtils.isBlank(rsMap.get("admName"))){
+            if (goods.getDescribeGoodFlag() > 0) {
+                Map<String, String> rsMap = customGoodsService.queryDescribeLogInfo(pid);
+                if (rsMap == null || StringUtils.isBlank(rsMap.get("admName"))) {
                     mv.addObject("describeGoodFlagStr", "");
-                }else{
+                } else {
                     mv.addObject("describeGoodFlagStr", "标识人:" + rsMap.get("admName") + ",时间:" + rsMap.get("create_time"));
                 }
             }
@@ -485,12 +486,12 @@ public class EditorController {
             // 获取海外仓标识信息
             List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
 
-            if(CollectionUtils.isEmpty(goodsOverSeaList)){
-                mv.addObject("goodsOverSeaList",null);
-            }else{
-                mv.addObject("goodsOverSeaList",goodsOverSeaList);
+            if (CollectionUtils.isEmpty(goodsOverSeaList)) {
+                mv.addObject("goodsOverSeaList", null);
+            } else {
+                mv.addObject("goodsOverSeaList", goodsOverSeaList);
                 long count = goodsOverSeaList.stream().filter(e -> e.getIsSupport() > 0).count();
-                if(count > 0){
+                if (count > 0) {
                     goods.setOverSeaFlag(1);
                 }
             }
@@ -498,13 +499,13 @@ public class EditorController {
             // 获取美加可售标识
 
             int salable = customGoodsService.querySalableByPid(pid);
-            mv.addObject("salable",salable);
+            mv.addObject("salable", salable);
 
-            if(StringUtils.isNotBlank(goods.getRangePrice())){
+            if (StringUtils.isNotBlank(goods.getRangePrice())) {
                 // 显示sku重量
-                mv.addObject("isSkuFlag",1);
+                mv.addObject("isSkuFlag", 1);
             } else {
-                mv.addObject("isSkuFlag",0);
+                mv.addObject("isSkuFlag", 0);
             }
 
         } catch (Exception e) {
@@ -582,7 +583,7 @@ public class EditorController {
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
             if (StringUtils.isNotBlank(goods.getSku_new())) {
                 // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-                List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(),ImportExSku.class);
+                List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
                 for (ImportExSkuShow exSku : cbSkus) {
                     if (StringUtils.isNotBlank(exSku.getSpecId())) {
@@ -665,7 +666,7 @@ public class EditorController {
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
             /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
-            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku_new(),ImportExSku.class);
+            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
             String[] skuStrList = skuStr.split(";");
             String[] volumeSkuList = volumeSkuStr.split(";");
             String[] singPriceList = singPriceStr.split(";");
@@ -736,10 +737,10 @@ public class EditorController {
                 for (ImportExSku exSku : skuList) {
                     if (ppid.equals(exSku.getSkuPropIds())) {
                         singlePrice = BigDecimalUtil.truncateFloat(Float.parseFloat(pPrice), 2);
-                        if(priceMin == 0 || priceMin > singlePrice){
+                        if (priceMin == 0 || priceMin > singlePrice) {
                             priceMin = singlePrice;
                         }
-                        if(priceMax <  singlePrice){
+                        if (priceMax < singlePrice) {
                             priceMax = singlePrice;
                         }
                         exSku.getSkuVal().setActSkuCalPrice(singlePrice);
@@ -768,10 +769,10 @@ public class EditorController {
                 for (ImportExSku exSku : skuList) {
                     if (ppid.equals(exSku.getSkuPropIds())) {
                         singleFreePrice = BigDecimalUtil.truncateFloat(Float.parseFloat(pPrice), 2);
-                        if(freeMin == 0 || freeMin > singleFreePrice){
+                        if (freeMin == 0 || freeMin > singleFreePrice) {
                             freeMin = singleFreePrice;
                         }
-                        if(freeMax <  singleFreePrice){
+                        if (freeMax < singleFreePrice) {
                             freeMax = singleFreePrice;
                         }
                         exSku.getSkuVal().setFreeSkuPrice(String.valueOf(singleFreePrice));
@@ -797,12 +798,21 @@ public class EditorController {
                 }
             }*/
             String range_price = null;
-            if(priceMin > 0 && priceMax >0){
-                range_price = priceMin + "-" + priceMax;
+            if (priceMin > 0 && priceMax > 0) {
+                if (priceMin == priceMax) {
+                    range_price = String.valueOf(priceMin);
+                } else {
+                    range_price = priceMin + "-" + priceMax;
+                }
+
             }
             String range_price_free = null;
-            if(freeMin > 0 && freeMax >0){
-                range_price_free = freeMin + "-" + freeMax;
+            if (freeMin > 0 && freeMax > 0) {
+                if (freeMin == freeMax) {
+                    range_price_free = String.valueOf(freeMin);
+                } else {
+                    range_price_free = freeMin + "-" + freeMax;
+                }
             }
             customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight, range_price, range_price_free, Math.max(freeMin, 0));
 
@@ -1035,7 +1045,7 @@ public class EditorController {
             String rangePrice = request.getParameter("rangePrice");
             String rangePriceFree = request.getParameter("rangePriceFree");
             String gd_moq = request.getParameter("gd_moq");
-            if(StringUtils.isNotBlank(gd_moq)){
+            if (StringUtils.isNotBlank(gd_moq)) {
                 cgp.setMorder(Integer.parseInt(gd_moq));
             }
 
@@ -1060,15 +1070,15 @@ public class EditorController {
                             maxPrice = tempPrice;
                         }
                         String tempMoq = tempList[0];
-                        if(tempMoq.contains("-")){
-                            int tempMoqInt = Integer.parseInt(tempMoq.split("-")[0]) ;
-                            if(moq == 0 || tempMoqInt < moq){
-                                moq =  tempMoqInt ;
+                        if (tempMoq.contains("-")) {
+                            int tempMoqInt = Integer.parseInt(tempMoq.split("-")[0]);
+                            if (moq == 0 || tempMoqInt < moq) {
+                                moq = tempMoqInt;
                             }
-                        } else if(tempMoq.contains("≥")){
-                            int tempMoqInt = Integer.parseInt(tempMoq.replace("≥", "").trim()) ;
-                            if(moq == 0 || tempMoqInt < moq){
-                                moq =  tempMoqInt ;
+                        } else if (tempMoq.contains("≥")) {
+                            int tempMoqInt = Integer.parseInt(tempMoq.replace("≥", "").trim());
+                            if (moq == 0 || tempMoqInt < moq) {
+                                moq = tempMoqInt;
                             }
                         }
                     }
@@ -1080,7 +1090,7 @@ public class EditorController {
                 }
             }
 
-            if(StringUtils.isBlank(rangePrice)) {
+            if (StringUtils.isBlank(rangePrice)) {
                 double minPrice = 0;
                 double maxPrice = 0;
                 int moq = 0;
@@ -1130,6 +1140,12 @@ public class EditorController {
                     //cgp.setPrice(df.format(minPrice));
                     cgp.setWprice("[" + wprice.replace("@", " $ ") + "]");
                     cgp.setMorder(moq);
+                }
+            }
+
+            if (StringUtils.isNotBlank(gd_moq)) {
+                if (orGoods.getMorder() != Integer.parseInt(gd_moq)) {
+                    cgp.setMorder(Integer.parseInt(gd_moq));
                 }
             }
 
@@ -1289,9 +1305,9 @@ public class EditorController {
                             Thread thread = new Thread(futureTask);
                             thread.start();
 
-                            if(orGoods.getValid() == 0 || orGoods.getValid() == 2){
+                            if (orGoods.getValid() == 0 || orGoods.getValid() == 2) {
                                 json.setMessage("更新成功,正在验证图片是否存在，异步处理中，请等待");
-                            }else{
+                            } else {
                                 json.setMessage("更新成功,异步上传图片中，请等待");
                             }
 
@@ -1302,9 +1318,9 @@ public class EditorController {
                         Thread thread = new Thread(futureTask);
                         thread.start();
 
-                        if(orGoods.getValid() == 0 || orGoods.getValid() == 2){
+                        if (orGoods.getValid() == 0 || orGoods.getValid() == 2) {
                             json.setMessage("更新成功,正在验证图片是否存在，异步处理中，请等待");
-                        }else{
+                        } else {
                             json.setMessage("更新成功,异步上传图片中，请等待");
                         }
                     }
@@ -1323,7 +1339,6 @@ public class EditorController {
         }
         return json;
     }
-
 
 
     @RequestMapping(value = "/setGoodsOff")
@@ -1460,9 +1475,118 @@ public class EditorController {
                 json.setMessage("获取登录信息失败，请登录");
                 return json;
             }
-            int count = customGoodsService.setNoUpdatePrice(pidStr, flagStr);
-            json.setOk(true);
-            json.setMessage("执行成功");
+
+            int isFreeFlag = 0;
+            // 取出1688商品的全部信息
+            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pidStr, 0);
+            if (StringUtils.isNotBlank(goods.getRange_price_free_new())) {
+
+                AtomicInteger skuUpdateCount = new AtomicInteger();
+                // 获取sku里面的重量
+                // 将goods的entype属性值取出来,即规格图
+                List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
+                double finalWeight = 0;
+                if (StringUtils.isNotBlank(goods.getSku_new())) {
+                    // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                    List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
+
+                    double priceMin = 0;
+                    double priceMax = 0;
+
+                    for (ImportExSku exSku : skuList) {
+                        skuUpdateCount.getAndIncrement();
+                        float costPrice = exSku.getSkuVal().getCostPrice();
+                        if (costPrice > 0) {
+                            double tempPrice = B2CPriceUtil.getFreePrice(costPrice, goods.getFinalWeight(), goods.getVolumeWeight());
+                            exSku.getSkuVal().setFreeSkuPrice(String.valueOf(tempPrice));
+                            if(priceMin == 0 || priceMin > tempPrice){
+                                priceMin = tempPrice;
+                            }
+                            if(priceMax == 0 || priceMax < tempPrice){
+                                priceMax = tempPrice;
+                            }
+                        }
+                    }
+                    if (priceMin > 0 && priceMax > 0) {
+                        if (priceMin == priceMax) {
+                            goods.setRange_price_free_new(String.valueOf(priceMin));
+                        } else {
+                            goods.setRange_price_free_new(priceMin + "-" + priceMax);
+                        }
+                        goods.setPrice_kids(String.valueOf(priceMin));
+                    } else if (priceMin > 0) {
+                        goods.setRange_price_free_new(String.valueOf(priceMin));
+                        goods.setPrice_kids(String.valueOf(priceMin));
+                    } else if (priceMax > 0) {
+                        goods.setRange_price_free_new(String.valueOf(priceMax));
+                        goods.setPrice_kids(String.valueOf(priceMax));
+                    }
+
+                    if (skuUpdateCount.get() > 0) {
+                        goods.setSku_new(JSONArray.toJSONString(skuList));
+                    }
+
+                    List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
+                    for (ImportExSkuShow exSku : cbSkus) {
+                        if (finalWeight == 0 || finalWeight < Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight())) {
+                            finalWeight = Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight());
+                        }
+                        if (StringUtils.isNotBlank(exSku.getSpecId())) {
+                            String chType = customGoodsService.queryChTypeBySkuId(exSku.getSpecId());
+                            if (StringUtils.isBlank(chType)) {
+                                chType = "";
+                            }
+                            exSku.setChType(chType);
+                        }
+                    }
+                }
+                typeList.clear();
+                if (finalWeight < 0.5) {
+                    isFreeFlag = 1;
+                }
+            } else {
+                if (Math.max(Float.parseFloat(goods.getFinalWeight()), Float.parseFloat(goods.getVolumeWeight())) < 0.5) {
+                    isFreeFlag = 1;
+                }
+            }
+
+            /**
+             *
+             * B2C标识按下 操作
+             * 1.morder=1
+             * 2.B2C免邮价 =(1688产品单价【wholesale_price】 *1.4+5+0.042*max(重量，体积重量))/6.6
+             * wprice ，free_price_new [3-98 $ 5.09, 99-198 $ 4.23, ≥199 $ 3.85]  ---》 [≥1 $ 3.85]
+             *
+             * 区间价 情况  1688产品单价 sku_new[costPrice]
+             *
+             */
+            goods.setMorder(1);
+
+            if (StringUtils.isBlank(goods.getRange_price_free_new())) {
+                // [2-2400 $ 6.13,2401-17279 $ 5.57,≥17280 $ 5.15]
+                String[] wpriceList = goods.getWholesalePrice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
+                String priceStr = B2CPriceUtil.getFreePriceStr(Float.parseFloat(wpriceList[0].split("@")[1].trim()), goods.getFinalWeight(), goods.getVolumeWeight());
+                String free_price_new = "[≥1 $ " + priceStr + "]";
+                goods.setFree_price_new(free_price_new);
+
+                wpriceList = goods.getWprice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
+                goods.setWprice("[≥1 $ " + wpriceList[0].split("@")[1].trim() + "]");
+                goods.setPrice_kids(priceStr);
+            }
+
+
+            goods.setMatchSource(8);
+            goods.setImg_check(String.valueOf(isFreeFlag));
+
+            int count = customGoodsService.setNoUpdatePrice(goods);
+            if (count > 0) {
+                json.setOk(true);
+                json.setMessage("执行成功");
+            } else {
+                json.setOk(false);
+                json.setMessage("更新失败");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
@@ -1598,7 +1722,7 @@ public class EditorController {
             if (sku != null && !sku.isEmpty() && sku.startsWith("[")) {
                 /*JSONArray sku_json = JSONArray.fromObject(sku);
                 List<SkuAttrBean> skuList = (List<SkuAttrBean>) JSONArray.toCollection(sku_json, SkuAttrBean.class);*/
-                List<SkuAttrBean> skuList = com.alibaba.fastjson.JSONArray.parseArray(sku,SkuAttrBean.class);
+                List<SkuAttrBean> skuList = com.alibaba.fastjson.JSONArray.parseArray(sku, SkuAttrBean.class);
                 for (SkuAttrBean skuBean : skuList) {
                     // System.err.println(skuBean.toString());
                     SkuValBean skuVal = skuBean.getSkuVal();
@@ -2684,16 +2808,16 @@ public class EditorController {
             if (promotion_flag > 0) {
                 customGoodsService.updatePromotionFlag(pid);
             }
-            if(describe_good_flag > 0){
+            if (describe_good_flag > 0) {
                 // 更新MongoDB,记录日志
                 //u表示更新；c表示创建，d表示删除
                 InputData inputData = new InputData('u');
                 inputData.setPid(pid);
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setDescribe_good_flag(String.valueOf(describe_good_flag));
-                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData,1, 0);
+                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
                 // 记录日志
-                customGoodsService.insertIntoDescribeLog(pid,user.getId());
+                customGoodsService.insertIntoDescribeLog(pid, user.getId());
             }
             json.setOk(true);
             json.setMessage("执行成功");
@@ -2742,25 +2866,25 @@ public class EditorController {
 
         editBean.setDescribe_good_flag(1);
 
-        if(pidMap.containsKey(pid + hotTypeId)){
+        if (pidMap.containsKey(pid + hotTypeId)) {
             json.setOk(false);
             json.setMessage("已经被执行过");
             return json;
-        }else{
-            pidMap.put(pid + hotTypeId,pid);
+        } else {
+            pidMap.put(pid + hotTypeId, pid);
         }
         try {
             customGoodsService.updatePidIsEdited(editBean);
             customGoodsService.insertIntoGoodsEditBean(editBean);
             // 更新MongoDB,记录日志
-            new Thread(()->{
+            new Thread(() -> {
                 //u表示更新；c表示创建，d表示删除
                 InputData inputData = new InputData('u');
                 inputData.setPid(pid);
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setDescribe_good_flag("1");
                 boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
-                if(!isSu){
+                if (!isSu) {
                     LOG.error("saveGoodsDescInfo update mongodb error,pid:" + pid + ",hotTypeId:" + hotTypeId);
                 }
             }).start();
@@ -2768,7 +2892,7 @@ public class EditorController {
             // 记录日志
             customGoodsService.insertIntoDescribeLog(pid, user.getId());
 
-            new Thread(()->{
+            new Thread(() -> {
                 // 插入热卖区数据
                 saveHotGoods(pid, Integer.parseInt(hotTypeId), user.getId());
             }).start();
@@ -3888,13 +4012,13 @@ public class EditorController {
                 if (list != null && list.size() > 0) {
                     for (GoodsParseBean gd : list) {
                         praseEninfoAndUpdate(gd);
-                        if(gd.getAliUpdate() > 0){
-                            count ++;
+                        if (gd.getAliUpdate() > 0) {
+                            count++;
                             // break;
                         }
                     }
                 }
-                if(count > 0){
+                if (count > 0) {
                     // break;
                 }
                 list.clear();
@@ -3912,45 +4036,45 @@ public class EditorController {
     @ResponseBody
     public JsonResult setGoodsOverSea(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
-        com.cbt.pojo.Admuser admuser =UserInfoUtils.getUserInfo(request);
-        if(admuser == null || admuser.getId() == 0){
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null || admuser.getId() == 0) {
             json.setOk(false);
             json.setMessage("请登录后操作");
-            return  json;
+            return json;
         }
         String pid = request.getParameter("pid");
-        if(StringUtils.isBlank(pid)){
+        if (StringUtils.isBlank(pid)) {
             json.setOk(false);
             json.setMessage("获取PID失败");
-            return  json;
+            return json;
         }
         String countryId = request.getParameter("countryId");
-        if(StringUtils.isBlank(countryId)){
+        if (StringUtils.isBlank(countryId)) {
             json.setOk(false);
             json.setMessage("获取countryId失败");
-            return  json;
+            return json;
         }
         String isSupport = request.getParameter("isSupport");
-        if(StringUtils.isBlank(isSupport)){
+        if (StringUtils.isBlank(isSupport)) {
             json.setOk(false);
             json.setMessage("获取是否支持失败");
-            return  json;
+            return json;
         }
         String categoryIdStr = request.getParameter("categoryId");
         int categoryId = 0;
-        if(StringUtils.isBlank(categoryIdStr)){
+        if (StringUtils.isBlank(categoryIdStr)) {
             json.setOk(false);
             json.setMessage("获取热卖区分类失败");
-            return  json;
+            return json;
         }
 
         try {
             categoryId = Integer.parseInt(categoryIdStr);
             int isUpdate = 0;
             List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
-            if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
-                for(GoodsOverSea goods: goodsOverSeaList){
-                    if(goods.getCountryId() == Integer.parseInt(countryId)){
+            if (CollectionUtils.isNotEmpty(goodsOverSeaList)) {
+                for (GoodsOverSea goods : goodsOverSeaList) {
+                    if (goods.getCountryId() == Integer.parseInt(countryId)) {
                         isUpdate = 1;
                         break;
                     }
@@ -3978,10 +4102,10 @@ public class EditorController {
             }
 
             // 加入到热卖区
-            if(supportFlag > 0){
+            if (supportFlag > 0) {
                 // 添加
                 saveHotGoods(pid, categoryId, admuser.getId());
-            }else {
+            } else {
                 // 删除
                 hotGoodsService.deleteGoodsByPid(categoryId, pid);
                 String sqlDel = "delete from hot_selling_goods where hot_selling_id = " + categoryId + " and goods_pid = '" + pid + "'";
@@ -4051,10 +4175,10 @@ public class EditorController {
             inputData.setPid(pid);
             inputData.setSearchable(String.valueOf(flag));
             boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
-            if(isSu){
+            if (isSu) {
                 customGoodsService.setSearchable(pid, flag, admuser.getId());
                 json.setOk(true);
-            } else{
+            } else {
                 json.setOk(false);
                 json.setMessage("更新mongodb失败");
             }
@@ -4094,10 +4218,10 @@ public class EditorController {
             inputData.setTop_sort(String.valueOf(newSort));
             boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
             // boolean isSu = true;
-            if(isSu){
+            if (isSu) {
                 customGoodsService.setTopSort(pid, newSort, admuser.getId());
                 json.setOk(true);
-            } else{
+            } else {
                 json.setOk(false);
                 json.setMessage("更新mongodb失败");
             }
@@ -4137,10 +4261,10 @@ public class EditorController {
             inputData.setSalable(String.valueOf(flag));
             boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
             // boolean isSu = true;
-            if(isSu){
+            if (isSu) {
                 customGoodsService.setSalable(pid, flag, admuser.getId());
                 json.setOk(true);
-            } else{
+            } else {
                 json.setOk(false);
                 json.setMessage("更新mongodb失败");
             }
@@ -4153,16 +4277,15 @@ public class EditorController {
     }
 
 
-
     @RequestMapping(value = "/testOkHttp")
     @ResponseBody
     public JsonResult testOkHttp() {
         JsonResult json = new JsonResult();
         try {
             // 批量上传测试
-        File testFile = new File("/home/data/cbtconsole/cbtimg/test");
-        String filePath = "/usr/local/goodsimg/importcsvimg/test/1122456";
-            UploadByOkHttp.uploadFileBatchOld(testFile,filePath);
+            File testFile = new File("/home/data/cbtconsole/cbtimg/test");
+            String filePath = "/data/importcsvimg/test/1122456";
+            UploadByOkHttp.uploadFileBatchOld(testFile, filePath);
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
@@ -4174,9 +4297,9 @@ public class EditorController {
 
     @RequestMapping(value = "/changePidToNewCatid")
     @ResponseBody
-    public JsonResult changePidToNewCatid(HttpServletRequest request, @RequestParam(name = "pid",required = true) String pid,
-                                          @RequestParam(name = "oldCatid",required = true) String oldCatid,
-                                          @RequestParam(name = "newCatid",required = true) String newCatid) {
+    public JsonResult changePidToNewCatid(HttpServletRequest request, @RequestParam(name = "pid", required = true) String pid,
+                                          @RequestParam(name = "oldCatid", required = true) String oldCatid,
+                                          @RequestParam(name = "newCatid", required = true) String newCatid) {
         JsonResult json = new JsonResult();
         com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
         if (admuser == null || admuser.getId() == 0) {
@@ -4239,7 +4362,7 @@ public class EditorController {
                 int isKids = checkIsKidsCatid(gd.getCatid1()) ? 1 : 0;
                 String servicePrePath = GoodsInfoUtils.changeRemotePathToLocal(gd.getRemotePath() + gd.getPid() + "/desc/", isKids);
                 String localPrePath = ftpConfig.getLocalDiskPath() + "checkImg/" + gd.getPid() + "/desc/";
-                String remotePrePath = GoodsInfoUtils.changeLocalPathToRemotePath(servicePrePath).replace("kidsproductwholesale","import-express");
+                String remotePrePath = GoodsInfoUtils.changeLocalPathToRemotePath(servicePrePath).replace("kidsproductwholesale", "import-express");
                 Random random = new Random();
                 for (Element imel : imgEls) {
                     String imgUrl = imel.attr("src");

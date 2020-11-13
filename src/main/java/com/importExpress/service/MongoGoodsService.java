@@ -146,4 +146,6 @@ public interface MongoGoodsService {
      */
     void createDatabaseIndex();
 
+    void deleteOffLinePid(List<String> list);
+
 }

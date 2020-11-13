@@ -753,7 +753,7 @@ public class UserController {
         if(site == null || site < -1){
             site = -1;
         }
-        userInfo.setSite(site);
+        userInfo.setSite(-1);
 
         try {
 

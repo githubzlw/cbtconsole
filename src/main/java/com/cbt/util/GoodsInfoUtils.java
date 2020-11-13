@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 public class GoodsInfoUtils {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsInfoUtils.class);
 
-    public static final String SERVICE_LOCAL_IMPORT_PATH = "/usr/local/goodsimg";
+    public static final String SERVICE_LOCAL_IMPORT_PATH = "/data";
     public static final String SERVICE_SHOW_IMPORT_URL_1 = "http://img.import-express.com";
     public static final String SERVICE_SHOW_IMPORT_URL_2 = "http://img1.import-express.com";
     public static final String SERVICE_SHOW_IMPORT_URL_3 = "https://img.import-express.com";
@@ -303,6 +303,7 @@ public class GoodsInfoUtils {
             ipes.setFreePrice(Float.parseFloat(ites.getSkuVal().getFreeSkuPrice()));
             ipes.setFianlWeight(ites.getFianlWeight());
             ipes.setSpecId(ites.getSpecId());
+            ipes.setCostPrice(ites.getSkuVal().getCostPrice());
             if (ites.getVolumeWeight() > 0) {
                 ipes.setVolumeWeight(ites.getVolumeWeight());
             } else {

@@ -4024,7 +4024,7 @@ public class ShopUrlController {
                 String remoteShowPath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getRemoteShowPath());
                 String remoteLocalPath = certificateFile.replace(ftpConfig.getLocalShowPath(), FtpConfig.REMOTE_LOCAL_PATH);
                 String destPath = remoteLocalPath.substring(0,remoteLocalPath.lastIndexOf("/"));
-                // destPath = destPath.replace("/usr/local/goodsimg/importcsvimg","");
+                // destPath = destPath.replace("/data/importcsvimg","");
                 *//*json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);
                 if (!json.isOk()) {
                     json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);

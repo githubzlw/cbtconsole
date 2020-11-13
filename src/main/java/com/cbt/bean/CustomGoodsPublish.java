@@ -158,6 +158,16 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private String price_kids;
     private String price_pets;
 
+    private String img_check;
+
+    public String getImg_check() {
+        return img_check;
+    }
+
+    public void setImg_check(String img_check) {
+        this.img_check = img_check;
+    }
+
     public String getRange_price_free_new() {
         return range_price_free_new;
     }

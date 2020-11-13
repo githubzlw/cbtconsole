@@ -135,6 +135,7 @@
         <result column="price_import" property="price_import"/>
         <result column="price_kids" property="price_kids"/>
         <result column="price_pets" property="price_pets"/>
+        <result column="img_check" property="img_check"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -943,7 +944,7 @@
         cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,cbu.weight_flag,cbu.path_catid,
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.volume_weight,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
-        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,cbu.weight,
+        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,cbu.weight,cbu.img_check,
         ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,cbu.promotion_flag,cbu.fprice_str,cbu.searchable,
         ifnull(cbn.ocrcontent1,'') as ocrSizeInfo1,ifnull(cbn.ocrcontent2,'') as ocrSizeInfo2,ifnull(cbn.ocrcontent3,'') as ocrSizeInfo3,
         cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
@@ -1761,8 +1762,12 @@ select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feepri
 from custom_benchmark_ready where pid = #{pid}
     </select>
 
-    <update id="setNoUpdatePrice">
-        update custom_benchmark_ready set matchSource = #{flag} where pid = #{pid}
+    <update id="setNoUpdatePrice" parameterType="com.cbt.bean.CustomGoodsPublish">
+        update custom_benchmark_ready
+        set matchSource = #{matchSource}, img_check = #{img_check}, sku_new = #{sku_new},
+        morder = #{morder},free_price_new = #{free_price_new},range_price_free_new = #{range_price_free_new},
+        wprice = #{wprice},price_kids= #{price_kids},price_import= #{price_kids},price_pets= #{price_kids}
+        where pid = #{pid}
     </update>
 
 </mapper>

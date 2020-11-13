@@ -147,7 +147,7 @@ public class FtpUtil {
 		String ip = "104.247.194.50";//192.168.1.29
 		String user = "importweb";//ftp29
 		String passw = "importftp@123";//29@123
-		String remotePath = "/usr/local/goodsimg/importcsvimg/imgtest/999.png";///2017-09-12/mmlll.png
+		String remotePath = "/data/importcsvimg/imgtest/999.png";///2017-09-12/mmlll.png
 		ContinueFTP2 f1 = new ContinueFTP2(ip, user, passw, "21", remotePath,
 				"E:/20170912101727.png");
 		f1.start();
