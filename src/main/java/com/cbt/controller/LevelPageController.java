@@ -100,7 +100,7 @@ public class LevelPageController {
 		String site = req.getParameter("site");
 		String url  = "https://www.import-express.com/app/rlevel";
 		if("kids".equals(site)) {
-			url  = "https://www.kidsproductwholesale.com/app/rlevel";
+			url  = "https://www.kidscharming.com/app/rlevel";
 		}else if("pets".equals(site)) {
 			url  = "https://www.petstoreinc.com/app/rlevel";
 		}

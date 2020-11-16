@@ -4362,7 +4362,7 @@ public class EditorController {
                 int isKids = checkIsKidsCatid(gd.getCatid1()) ? 1 : 0;
                 String servicePrePath = GoodsInfoUtils.changeRemotePathToLocal(gd.getRemotePath() + gd.getPid() + "/desc/", isKids);
                 String localPrePath = ftpConfig.getLocalDiskPath() + "checkImg/" + gd.getPid() + "/desc/";
-                String remotePrePath = GoodsInfoUtils.changeLocalPathToRemotePath(servicePrePath).replace("kidsproductwholesale", "import-express");
+                String remotePrePath = GoodsInfoUtils.changeLocalPathToRemotePath(servicePrePath).replace("kidscharming", "import-express");
                 Random random = new Random();
                 for (Element imel : imgEls) {
                     String imgUrl = imel.attr("src");
