@@ -1788,7 +1788,7 @@ public class NewOrderDetailsCtr {
                         sbBuffer.append("<br>Kids-Product-Wholesale Team");
                         SendEmail.send(confirmEmail, null, toEmail, SwitchDomainNameUtil.checkNullAndReplace(sbBuffer.toString(),
                                 MultiSiteUtil.getSiteTypeNum(orderNo)),
-                                "Your KidsProductWholesale Order " + orderNo + " transaction is closed!", "", orderNo, 2);
+                                "Your KidsCharming Order " + orderNo + " transaction is closed!", "", orderNo, 2);
                     } else {
                         sbBuffer.append("<br>Import-Express Team");
                         SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
@@ -1906,7 +1906,7 @@ public class NewOrderDetailsCtr {
                         model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
                         String modeStr = JSONObject.toJSONString(model);
                         if (isKidFlag) {
-                            sendMailFactory.sendMail(toEmail, null, "Your KidsProductWholesale Order " + orderNo + " transaction is closed!",
+                            sendMailFactory.sendMail(toEmail, null, "Your KidsCharming Order " + orderNo + " transaction is closed!",
                                     model, TemplateType.CANCEL_ORDER_KID);
                         } else {
                             sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
@@ -2077,7 +2077,7 @@ public class NewOrderDetailsCtr {
                     TemplateType webType = TemplateType.CANCEL_ORDER_IMPORT;
                     switch (isWebSiteFlag) {
                         case 2:
-                            webSiteTitle = "KidsProductWholesale";
+                            webSiteTitle = "KidsCharming";
                             webType = TemplateType.CANCEL_ORDER_KID;
                             break;
                         case 3:

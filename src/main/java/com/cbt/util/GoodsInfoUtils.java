@@ -38,10 +38,10 @@ public class GoodsInfoUtils {
     public static final String SERVICE_SHOW_IMPORT_URL_4 = "https://img1.import-express.com";
 
     public static final String SERVICE_LOCAL_KIDS_PATH = "/data";
-    public static final String SERVICE_SHOW_KIDS_URL_1 = "http://img.kidsproductwholesale.com";
-    public static final String SERVICE_SHOW_KIDS_URL_2 = "http://img1.kidsproductwholesale.com";
-    public static final String SERVICE_SHOW_KIDS_URL_3 = "https://img.kidsproductwholesale.com";
-    public static final String SERVICE_SHOW_KIDS_URL_4 = "https://img1.kidsproductwholesale.com";
+    public static final String SERVICE_SHOW_KIDS_URL_1 = "http://img.kidscharming.com";
+    public static final String SERVICE_SHOW_KIDS_URL_2 = "http://img1.kidscharming.com";
+    public static final String SERVICE_SHOW_KIDS_URL_3 = "https://img.kidscharming.com";
+    public static final String SERVICE_SHOW_KIDS_URL_4 = "https://img1.kidscharming.com";
 
     private static final String DOWN_IMG_PATH = "/usr/local/downImg/";
 

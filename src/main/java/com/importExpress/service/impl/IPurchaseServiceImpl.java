@@ -497,7 +497,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
                 if (websiteType == 1) {
                     modelM.put("toHref", "https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                 } else if (websiteType == 2) {
-                    modelM.put("toHref", "https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                    modelM.put("toHref", "https://www.kidscharming.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                 } else if (websiteType == 3) {
                     modelM.put("toHref", "https://www.petstoreinc.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                 }

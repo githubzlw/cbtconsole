@@ -763,7 +763,7 @@ public class OrderInfoController {
             }
             if (MultiSiteUtil.getSiteTypeNum(orderNo) == 2) {
                 modelM.put("websiteType", 2);
-                modelM.put("accountLink", "https://www.kidsproductwholesale.com/orderInfo/emailLink?orderNo=" + orderNo + "");
+                modelM.put("accountLink", "https://www.kidscharming.com/orderInfo/emailLink?orderNo=" + orderNo + "");
                 sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE_KIDS);
             }
             if (MultiSiteUtil.getSiteTypeNum(orderNo) == 3) {

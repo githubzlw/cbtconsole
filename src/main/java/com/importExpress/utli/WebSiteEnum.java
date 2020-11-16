@@ -12,7 +12,7 @@ public enum WebSiteEnum {
     /**
      * KIDS网站
      */
-    KIDS(2,"https://www.kidsproductwholesale.com","KidsProductWholesale", 'K', 2),
+    KIDS(2,"https://www.kidscharming.com","KidsCharming", 'K', 2),
     /**
      * PETS网站
      */

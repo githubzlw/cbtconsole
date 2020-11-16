@@ -45,7 +45,7 @@ public class MultiSiteUtil {
      * MultiSiteUtil.getSiteTypeNum(null)               = 1
      * MultiSiteUtil.getSiteTypeNum("")                 = 1
      * MultiSiteUtil.getSiteTypeNum("https://www.import-express.com/goodsinfo/")      = 1
-     * MultiSiteUtil.getSiteTypeNum("https://www.kidsproductwholesale.com/goodsinfo")  = 2
+     * MultiSiteUtil.getSiteTypeNum("https://www.kidscharming.com/goodsinfo")  = 2
      * </pre>
      *
      * @param url
@@ -53,7 +53,7 @@ public class MultiSiteUtil {
      */
     public static Integer getSiteTypeNumByUrl(String url){
         if (StringUtils.isNotBlank(url)
-                && StringUtils.containsIgnoreCase(url, "www.kidsproductwholesale.com")) {
+                && StringUtils.containsIgnoreCase(url, "www.kidscharming.com")) {
             return 2;
         }
         if (StringUtils.isNotBlank(url)
@@ -143,7 +143,7 @@ public class MultiSiteUtil {
             case 1:
                 return "https://www.import-express.com";
             case 2:
-                return "https://www.kidsproductwholesale.com";
+                return "https://www.kidscharming.com";
             case 3:
                 return "https://www.petstoreinc.com";
             default:
@@ -156,7 +156,7 @@ public class MultiSiteUtil {
             case 1:
                 return "https://img.import-express.com";
             case 2:
-                return "https://img.kidsproductwholesale.com";
+                return "https://img.kidscharming.com";
             case 3:
                 return "https://img.petstoreinc.com";
             default:
@@ -166,7 +166,7 @@ public class MultiSiteUtil {
 
     public static Map<String, String> webSiteMap = new HashMap<String, String>(){{
         put("ImportExpress", "https://www.import-express.com");
-        put("KidsProductWholesale", "https://www.kidsproductwholesale.com");
+        put("KidsCharming", "https://www.kidscharming.com");
         put("PetStoreInc", "https://www.petstoreinc.com");
     }};
 

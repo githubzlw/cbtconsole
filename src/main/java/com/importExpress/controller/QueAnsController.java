@@ -236,7 +236,7 @@ public class QueAnsController {
 		dateFormat.setLenient(false);
 		String date = dateFormat.format(now);
 		String Website="0";
-		String reg=".*kidsproductwholesale.*";  //判断是否童装网站
+		String reg=".*kidscharming.*";  //判断是否童装网站
 		String regPet=".*import.*";  //判断是否主站
 		boolean isValid=purl.matches(reg);
 		boolean isValidPet=purl.matches(regPet);
