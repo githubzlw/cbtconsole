@@ -465,7 +465,7 @@
         }
 
         function openSyncWindow(pid) {
-            var url = "http://192.168.1.102:8080/syncGoodsToOnline/sync/singleGoodsSync?pid=" + pid;
+            var url = "http://192.168.1.102:8080/productPublish/sync/singleGoodsSync?pid=" + pid;
             var param = "height=400,width=600,top=200,left=600,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
             window.open(url, "windows", param);
         }

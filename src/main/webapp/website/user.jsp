@@ -725,7 +725,7 @@ tr .td_class{width:230px;}
             <span onclick="">import-express</span>
             <br /><br />
             <input type='radio' name='site' value='2'/>
-            <span>kidsproductwholesale</span>
+            <span>kidscharming</span>
             <br /><br />
             <input type='radio' name='site' value='3'/>
             <span>petstoreinc</span>

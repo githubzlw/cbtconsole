@@ -3121,7 +3121,7 @@
                             <%--一键确认采购发送邮件网站名:--%>
                             <select name="websiteType" style="height: 28px;width: 160px;display: none;">
                                 <option value="1" <c:if test="${websiteType == 1}">selected="selected"</c:if>>import-express</option>
-                                <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidsproductwholesale</option>
+                                <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidscharming</option>
                                 <option value="3" <c:if test="${websiteType == 3}">selected="selected"</c:if>>petstoreinc</option>
                             </select>
                             操作/状态
@@ -3516,7 +3516,7 @@
                                 <%--采购确认发送邮件网站名:--%>
                                 <select name="websiteType" style="height: 28px;width: 160px;display: none;">
                                     <option value="1" <c:if test="${websiteType == 1}">selected="selected"</c:if>>import-express</option>
-                                    <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidsproductwholesale</option>
+                                    <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidscharming</option>
                                     <option value="3" <c:if test="${websiteType == 3}">selected="selected"</c:if>>petstoreinc</option>
                                 </select>
                             </div>

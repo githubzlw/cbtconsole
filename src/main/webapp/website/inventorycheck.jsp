@@ -367,7 +367,7 @@ em,i{font-style: normal;}
 			</div>
 			<div class="col-xs-3">
 				<img
-					src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg"
+					src="https://img.kidscharming.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg"
 					alt="" class="img-responsive" id="lu_img">
 			</div>
 		</div>
@@ -437,7 +437,7 @@ em,i{font-style: normal;}
 					<tr>
 						<td class="lu_tb_index">1</td>
 						<td class="lu_tb_name">产品名称产品名称产品名称产品名称</td>
-						<td><img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg" alt="" class="img-responsive"></td>
+						<td><img src="https://img.kidscharming.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg" alt="" class="img-responsive"></td>
 						<td class="lu_tb_skuc">
 						Sku:<span  class="lu_tb_sku">xxxxx</span><br>
 						Skuid:<span  class="lu_tb_skuid">1111111111111</span><br>
