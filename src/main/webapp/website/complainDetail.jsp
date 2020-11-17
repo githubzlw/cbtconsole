@@ -424,7 +424,7 @@ function fn(){
                   <%--邮件回复客户网站名:
                   <select id="website_type" name="websiteType" style="height: 28px;width: 160px;">
                     <option value="1" <c:if test="${websiteType == 1}">selected="selected"</c:if>>import-express</option>
-                    <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidsproductwholesale</option>
+                    <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidscharming</option>
                   </select>--%>
                     <input id="website_type" name="websiteType" type="hidden" value="${complain.site }">
 			      <button type="button" id="submitForm1" onclick="submitForm();" class="btn btn-success">回复客户</button>

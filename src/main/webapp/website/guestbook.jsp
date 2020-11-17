@@ -385,7 +385,7 @@ $(function(){
                 邮件回复网站名: <br />
                 <select id="website_type" name="websiteType" style="height: 28px;width: 160px;">
                     <option value="1" selected="selected">import-express</option>
-                    <option value="2">kidsproductwholesale</option>
+                    <option value="2">kidscharming</option>
                 </select>
 			</div>--%>
 		</form>

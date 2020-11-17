@@ -72,7 +72,7 @@
 	<button id="priceButton" onclick="updatePrice()">定量变更</button>
 	<%--公司网站：<select id="Web_site" style="font-size: 16px; height: 24px; width: 150px;">--%>
 		<%--<option value="0" selected="selected">import-express</option>--%>
-		<%--<option value="1">kidsproductwholesale</option>--%>
+		<%--<option value="1">kidscharming</option>--%>
 	<%--</select>--%>
 	</body>
 </html>
