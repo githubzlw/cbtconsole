@@ -1043,4 +1043,14 @@ public interface CustomGoodsService {
     ProductSingleBean queryPidSingleBean(String pid);
 
     int setNoUpdatePrice(CustomGoodsPublish goods);
+
+    /**
+     * 新增商品信息
+     *
+     * @param cgp
+     * @param adminId
+     * @param type
+     * @return
+     */
+    int saveNewGoodsDetails(CustomGoodsPublish cgp, int adminId, int type);
 }

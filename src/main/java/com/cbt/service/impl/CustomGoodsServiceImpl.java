@@ -1088,4 +1088,12 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.setNoUpdatePrice(goods);
     }
 
+    @Override
+    public int saveNewGoodsDetails(CustomGoodsPublish cgp, int adminId, int type) {
+        cgp.setAdminId(adminId);
+        cgp.setGoodsState(type == 1 ? 4 : 5);
+        return customGoodsMapper.saveNewGoodsDetails(cgp);
+    }
+
+
 }

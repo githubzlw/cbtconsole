@@ -731,4 +731,6 @@ public interface CustomGoodsMapper {
 
    int setNoUpdatePrice(CustomGoodsPublish goods);
 
+   int saveNewGoodsDetails(CustomGoodsPublish goods);
+
 }

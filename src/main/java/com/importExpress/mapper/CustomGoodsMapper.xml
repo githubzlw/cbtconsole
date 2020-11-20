@@ -48,7 +48,7 @@
         <result column="max_price" property="maxPrice"/>
         <result column="weight" property="weight1688"/>
         <result column="weight_flag" property="weightFlag"/>
-        
+
     </resultMap>
 
 
@@ -445,7 +445,8 @@
         (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount
         from custom_benchmark_ready cbu
         <if test="catid !=null">
-            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 = ct.category_id
+            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 =
+            ct.category_id
         </if>
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid
@@ -597,7 +598,7 @@
             and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
         <if test="webSize > 0">
-            and cbu.catid1 in (select category_id from  1688_category ct,search_special ss
+            and cbu.catid1 in (select category_id from 1688_category ct,search_special ss
             where FIND_IN_SET(ss.catid,ct.path) and (ss.type = #{webSize}))
         </if>
         <if test="searchAble > 0">
@@ -625,7 +626,8 @@
     <select id="queryForListByParamCount" parameterType="com.cbt.bean.CustomGoodsQuery" resultType="java.lang.Integer">
         select count(0) from custom_benchmark_ready cbu
         <if test="catid !=null">
-            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 = ct.category_id
+            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 =
+            ct.category_id
         </if>
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -772,7 +774,7 @@
             and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
         <if test="webSize > 0">
-            and cbu.catid1 in (select category_id from  1688_category ct,search_special ss
+            and cbu.catid1 in (select category_id from 1688_category ct,search_special ss
             where FIND_IN_SET(ss.catid,ct.path) and (ss.type = #{webSize}))
         </if>
         <if test="searchAble > 0">
@@ -786,7 +788,8 @@
         path,lv from 1688_category where lv > 0) cat1688 left join
         (select catid1,count(0) as total from custom_benchmark_ready cbu
         <if test="catid !=null">
-            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 = ct.category_id
+            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 =
+            ct.category_id
         </if>
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -927,7 +930,7 @@
             and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
         <if test="webSize > 0">
-            and cbu.catid1 in (select category_id from  1688_category ct,search_special ss
+            and cbu.catid1 in (select category_id from 1688_category ct,search_special ss
             where FIND_IN_SET(ss.catid,ct.path) and (ss.type = #{webSize}))
         </if>
         <if test="searchAble > 0">
@@ -1272,7 +1275,8 @@
         </if>
     </select>
 
-    <select id="queryMd5NoSameListCount" resultType="java.lang.Integer" parameterType="com.importExpress.pojo.ShopMd5Bean">
+    <select id="queryMd5NoSameListCount" resultType="java.lang.Integer"
+            parameterType="com.importExpress.pojo.ShopMd5Bean">
         select count(0)
         from custom_goods_md5_no_same
         where 1=1
@@ -1308,7 +1312,7 @@
 
     <update id="updateSkuInfo">
         update custom_benchmark_ready
-        set  sku = #{sku},is_add_car_flag = 1,sku_new = #{sku}
+        set sku = #{sku},is_add_car_flag = 1,sku_new = #{sku}
         <if test="rangePrice != null">
             ,range_price = #{rangePrice}
         </if>
@@ -1353,20 +1357,21 @@
         AND u.is_test=0
         AND (
         u.email not like '%qq.com%' and u.email not like '%ww.com%' and
-        u.email not like 'test%'   and  u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
-        u.email not like '%qqsss.com' and  u.email not like '%csmfg.com%'  and  u.email not like '%@sourcing-cn.com%'  and
-        u.email not like '%@china-synergy%'  and u.email&lt;>'sb33@gmail.com'  and u.email&lt;>'sbtest@gmail.com'  and
-        u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not like '%@163.com'
+        u.email not like 'test%' and u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
+        u.email not like '%qqsss.com' and u.email not like '%csmfg.com%' and u.email not like '%@sourcing-cn.com%' and
+        u.email not like '%@china-synergy%' and u.email&lt;>'sb33@gmail.com' and u.email&lt;>'sbtest@gmail.com' and
+        u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not like
+        '%@163.com'
         )
         AND od.goods_pid IN (
         cbu.pid
         )
-        ) AS 'is_sold_flag'  -- 商品销售次数
+        ) AS 'is_sold_flag' -- 商品销售次数
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         <where>
             <if test="shopId == null and source == 1">
-                <if test="isEdited > -1">  -- 商品已编辑
+                <if test="isEdited > -1">-- 商品已编辑
                     cge.is_edited = #{isEdited}
                 </if>
                 <if test="valid != -1">
@@ -1395,7 +1400,7 @@
                     cbu.valid = #{valid} and
                 </if>
                 cbu.pid in(
-                    SELECT pid FROM custom_benchmark_show WHERE source = #{source}
+                SELECT pid FROM custom_benchmark_show WHERE source = #{source}
                 )
             </if>
         </where>
@@ -1411,7 +1416,7 @@
         left join custom_goods_edit cge on cbu.pid = cge.pid
         <where>
             <if test="shopId == null and source == 1">
-                <if test="isEdited > -1">  -- 商品已编辑
+                <if test="isEdited > -1">-- 商品已编辑
                     cge.is_edited = #{isEdited}
                 </if>
                 <if test="valid != -1">
@@ -1440,7 +1445,7 @@
                     cbu.valid = #{valid} and
                 </if>
                 cbu.pid in(
-                    SELECT pid FROM custom_benchmark_show WHERE source = #{source}
+                SELECT pid FROM custom_benchmark_show WHERE source = #{source}
                 )
             </if>
         </where>
@@ -1546,10 +1551,13 @@
 
     <select id="queryGoodsWeightChangeList" parameterType="com.importExpress.pojo.GoodsWeightChange"
             resultType="com.importExpress.pojo.GoodsWeightChange">
-        select a.id,a.pid,a.goods_type as goodsType,a.weight,a.volume_weight as volumeWeight,a.admin_id as adminId,a.skuid,
+        select a.id,a.pid,a.goods_type as goodsType,a.weight,a.volume_weight as volumeWeight,a.admin_id as
+        adminId,a.skuid,
         b.admName as adminName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,a.sync_flag as syncFlag,
-        a.update_admin_id as updateAdminId,c.admName as updateAdminName, DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as updateTime
-        from goods_weight_change a left join admuser b  on a.admin_id = b.id left join admuser c  on a.update_admin_id = c.id
+        a.update_admin_id as updateAdminId,c.admName as updateAdminName, DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S')
+        as updateTime
+        from goods_weight_change a left join admuser b on a.admin_id = b.id left join admuser c on a.update_admin_id =
+        c.id
         where 1=1
         <if test="pid !=null">
             and a.pid = #{pid}
@@ -1569,9 +1577,10 @@
         </if>
     </select>
 
-    <select id="queryGoodsWeightChangeListCount" parameterType="com.importExpress.pojo.GoodsWeightChange" resultType="int">
-        select count(0) from goods_weight_change a left join admuser b  on a.admin_id = b.id
-        left join admuser c  on a.update_admin_id = c.id
+    <select id="queryGoodsWeightChangeListCount" parameterType="com.importExpress.pojo.GoodsWeightChange"
+            resultType="int">
+        select count(0) from goods_weight_change a left join admuser b on a.admin_id = b.id
+        left join admuser c on a.update_admin_id = c.id
         where 1=1
         <if test="pid !=null">
             and a.pid = #{pid}
@@ -1698,7 +1707,7 @@
         </if>
     </select>
 
-    <select id="queryGoodsDeleteDetails"  resultMap="queryGoodsResultMap">
+    <select id="queryGoodsDeleteDetails" resultMap="queryGoodsResultMap">
         select id,catid1,pid,custom_main_image,img,name,enname,eninfo,remotpath,valid,localpath,catid1,shop_id
         from custom_benchmark_ready_delete_log where delete_flag = 0 and pid = #{pid}
     </select>
@@ -1769,5 +1778,66 @@ from custom_benchmark_ready where pid = #{pid}
         wprice = #{wprice},price_kids= #{price_kids},price_import= #{price_kids},price_pets= #{price_kids}
         where pid = #{pid}
     </update>
+
+    <select id="queryNewPid" resultType="java.lang.Integer">
+        select pidIndex
+        from custom_benchmark_ready_new_index
+    </select>
+
+    <insert id="saveNewGoodsDetails" parameterType="com.cbt.bean.CustomGoodsPublish">
+        insert into
+        custom_benchmark_ready_new(catid1,path_catid,pid,enname,img,endetail,eninfo,goodsstate,admin_id,bm_flag,fprice_str,size_info_en
+        <if test="rangePrice != null">
+            ,range_price,sku
+        </if>
+        <if test="feeprice != null">
+            ,free_price_new,price_import,price_kids,price_pets
+        </if>
+        <if test="wprice != null">
+            ,wprice
+        </if>
+        <if test="type != null">
+            ,entype
+        </if>
+        <if test="sellUnit != null">
+            ,sellunit
+        </if>
+        <if test="priceIsEdit > 0">
+            ,price_is_edit
+        </if>
+        <if test="customMainImage != null">
+            ,custom_main_image
+        </if>
+        <if test="morder != null">
+            ,morder
+        </if>
+        )
+        values(#{catid1},#{pathCatid},#{pid},#{enname},#{img},#{endetail},#{eninfo},#{goodsState},#{adminId},1,#{fpriceStr},#{sizeInfoEn}
+        <if test="rangePrice != null">
+            ,#{rangePrice},#{sku}
+        </if>
+        <if test="feeprice != null">
+            ,#{feeprice},#{price},#{price},#{price}
+        </if>
+        <if test="wprice != null">
+            ,#{wprice}
+        </if>
+        <if test="type != null">
+            ,#{type}
+        </if>
+        <if test="sellUnit != null">
+            ,#{sellUnit}
+        </if>
+        <if test="priceIsEdit > 0">
+            ,#{priceIsEdit}
+        </if>
+        <if test="customMainImage != null">
+            ,#{customMainImage}
+        </if>
+        <if test="morder != null">
+            ,#{morder}
+        </if>
+        )
+    </insert>
 
 </mapper>
