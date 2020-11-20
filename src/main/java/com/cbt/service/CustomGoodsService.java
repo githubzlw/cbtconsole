@@ -1053,4 +1053,15 @@ public interface CustomGoodsService {
      * @return
      */
     int saveNewGoodsDetails(CustomGoodsPublish cgp, int adminId, int type);
+
+    /**
+     * 获取新增商品的pid
+     * @return
+     */
+    int queryNewPid();
+
+    CustomGoodsPublish queryNewGoodsDetails(String pid);
+
+    int updateNewGoodsDetailsByInfo(CustomGoodsPublish cgp);
+
 }

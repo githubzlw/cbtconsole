@@ -1781,8 +1781,14 @@ from custom_benchmark_ready where pid = #{pid}
 
     <select id="queryNewPid" resultType="java.lang.Integer">
         select pidIndex
-        from custom_benchmark_ready_new_index
+        from custom_benchmark_ready_new_index where id = 1
     </select>
+
+    <update id="updateNewPid">
+        update custom_benchmark_ready_new_index
+        set pidIndex = (pidIndex + 1)
+        where id = 1
+    </update>
 
     <insert id="saveNewGoodsDetails" parameterType="com.cbt.bean.CustomGoodsPublish">
         insert into
@@ -1805,12 +1811,13 @@ from custom_benchmark_ready where pid = #{pid}
         <if test="priceIsEdit > 0">
             ,price_is_edit
         </if>
-        <if test="customMainImage != null">
+        <if test="showMainImage != null">
             ,custom_main_image
         </if>
         <if test="morder != null">
             ,morder
         </if>
+        ,final_weight,volume_weight
         )
         values(#{catid1},#{pathCatid},#{pid},#{enname},#{img},#{endetail},#{eninfo},#{goodsState},#{adminId},1,#{fpriceStr},#{sizeInfoEn}
         <if test="rangePrice != null">
@@ -1831,13 +1838,58 @@ from custom_benchmark_ready where pid = #{pid}
         <if test="priceIsEdit > 0">
             ,#{priceIsEdit}
         </if>
-        <if test="customMainImage != null">
-            ,#{customMainImage}
+        <if test="showMainImage != null">
+            ,#{showMainImage}
         </if>
         <if test="morder != null">
             ,#{morder}
         </if>
+        ,#{finalWeight},#{volumeWeight}
         )
     </insert>
+
+    <select id="queryNewGoodsDetailsByPid" resultMap="editGoodsResultMap">
+        select cbrn.pid,cbrn.enname,cbrn.category_name,cbrn.endetail,cbrn.eninfo,cbrn.feeprice,cbrn.fprice,cbrn.wholesale_price,cbrn.add_price_lv,
+            cbrn.keyword,cbrn.custom_main_image,cbrn.price,cbrn.final_weight,cbrn.wprice,cbrn.entype,cbrn.sku,cbrn.weight_flag,cbrn.path_catid,
+            cbrn.goodsstate,cbrn.bm_flag,cbrn.valid,cbrn.isBenchmark,cbrn.source_pro_flag,cbrn.source_used_flag,cbrn.volume_weight,
+            cbrn.ocr_match_flag,cbrn.priority_flag,cbrn.img,cbrn.range_price,cbrn.revise_weight,cbrn.localpath,cbrn.remotpath,
+            cbrn.is_sold_flag,cbrn.is_add_car_flag,cbrn.ali_pid,cbrn.unsellableReason,cbrn.size_info_en,cbrn.from_flag,cbrn.weight,cbrn.img_check,
+            cbrn.shop_id,cbrn.catid1,cbrn.sellunit,cbrn.promotion_flag,cbrn.fprice_str,cbrn.searchable,
+            cbrn.ali_price,cbrn.matchSource, cbrn.free_price_new,cbrn.range_price_free_new,cbrn.sku_new,
+            cbrn.price_import, cbrn.price_kids,cbrn.price_pets, cbrn.morder
+        from custom_benchmark_ready_new cbrn
+        where cbrn.pid = #{pid}
+    </select>
+
+    <update id="updateNewGoodsDetailsByInfo" parameterType="com.cbt.bean.CustomGoodsPublish">
+        update custom_benchmark_ready_new cbrn
+        set cbrn.enname = #{enname},cbrn.img = #{img},cbrn.endetail = #{endetail},
+        cbrn.eninfo=#{eninfo},cbrn.size_info_en=#{sizeInfoEn}
+        <if test="wprice != null">
+            ,cbrn.wprice=#{wprice}
+        </if>
+        <if test="feeprice != null">
+            ,cbrn.free_price_new = #{feeprice},cbrn.price_import= #{price}
+            ,cbrn.price_kids = #{price},cbrn.price_pets= #{price}
+        </if>
+
+        <if test="sellUnit != null">
+            ,cbrn.sellunit=#{sellUnit}
+        </if>
+
+        <if test="customMainImage != null">
+            ,cbrn.custom_main_image=#{customMainImage}
+        </if>
+        <if test="morder != null">
+            ,cbrn.morder=#{morder}
+        </if>
+        <if test="finalWeight != null">
+            ,cbrn.final_weight=#{finalWeight}
+        </if>
+        <if test="volumeWeight != null">
+            ,cbrn.volume_weight=#{volumeWeight}
+        </if>
+        where cbrn.pid = #{pid}
+    </update>
 
 </mapper>

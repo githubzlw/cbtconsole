@@ -733,4 +733,18 @@ public interface CustomGoodsMapper {
 
    int saveNewGoodsDetails(CustomGoodsPublish goods);
 
+   int queryNewPid();
+
+   int updateNewPid();
+
+    /**
+     * 根据PID查询商品详情
+     *
+     * @param pid
+     * @return
+     */
+    CustomGoodsPublish queryNewGoodsDetailsByPid(@Param("pid") String pid);
+
+    int updateNewGoodsDetailsByInfo(CustomGoodsPublish goods);
+
 }

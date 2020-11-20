@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1095,5 +1096,23 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.saveNewGoodsDetails(cgp);
     }
 
+    @Override
+    @Transactional
+    public int queryNewPid() {
+        int pid = customGoodsMapper.queryNewPid();
+        customGoodsMapper.updateNewPid();
+        return pid;
+    }
+
+    @Override
+    public CustomGoodsPublish queryNewGoodsDetails(String pid) {
+        CustomGoodsPublish bean = customGoodsMapper.queryNewGoodsDetailsByPid(pid);
+        return bean;
+    }
+
+    @Override
+    public int updateNewGoodsDetailsByInfo(CustomGoodsPublish cgp) {
+        return customGoodsMapper.updateNewGoodsDetailsByInfo(cgp);
+    }
 
 }

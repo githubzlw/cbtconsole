@@ -16,6 +16,7 @@ import com.cbt.parse.service.StrUtils;
 import com.cbt.parse.service.*;
 import com.cbt.service.CategoryService;
 import com.cbt.service.CustomGoodsService;
+import com.cbt.service.SingleGoodsService;
 import com.cbt.util.*;
 import com.cbt.warehouse.pojo.HotCategory;
 import com.cbt.warehouse.pojo.HotSellingGoods;
@@ -92,9 +93,12 @@ public class AddNewProductController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private SingleGoodsService singleGoodsService;
+
     @SuppressWarnings({"static-access", "unchecked"})
-    @RequestMapping(value = "/getNewProductDetail", method = {RequestMethod.POST, RequestMethod.GET})
-    public ModelAndView detalisEdit(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @RequestMapping(value = "/addNewProduct", method = {RequestMethod.POST, RequestMethod.GET})
+    public ModelAndView addNewProduct(HttpServletRequest request, HttpServletResponse response) throws IOException {
         DataSourceSelector.restore();
         // ModelAndView mv = new ModelAndView("customgoods_detalis");
         ModelAndView mv = new ModelAndView("new_customgoods_detalis");
@@ -112,11 +116,67 @@ public class AddNewProductController {
         }
         try {
             // 获取需要编辑的内容
-            //String pid = request.getParameter("pid");
+            int pid = customGoodsService.queryNewPid();
 
             // 取出1688商品的全部信息
             CustomGoodsPublish goods = new CustomGoodsPublish();
-            goods.setPid("30000000");
+            goods.setPid(String.valueOf(pid));
+            mv.addObject("goods", goods);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mv.addObject("uid", 0);
+            mv.addObject("message", e.getMessage());
+        }
+        return mv;
+    }
+
+    @SuppressWarnings({"static-access", "unchecked"})
+    @RequestMapping(value = "/getNewProductDetail", method = {RequestMethod.POST, RequestMethod.GET})
+    public ModelAndView getNewProductDetail(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        DataSourceSelector.restore();
+        // ModelAndView mv = new ModelAndView("customgoods_detalis");
+        ModelAndView mv = new ModelAndView("new_customgoods_detalis");
+
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            mv.addObject("uid", 0);
+            mv.addObject("message", "未登录");
+            return mv;
+        } else {
+            mv.addObject("uid", user.getId());
+            mv.addObject("roletype", user.getRoletype());
+        }
+        try {
+            // 获取需要编辑的内容
+            String pid = request.getParameter("pid");
+
+            // 取出1688商品的全部信息
+            CustomGoodsPublish goods = customGoodsService.queryNewGoodsDetails(pid);
+            if (goods != null) {
+                String regEx = "[\\[\\]]";
+                if (StringUtils.isNotBlank(goods.getWprice())) {
+                    goods.setWprice(goods.getWprice().replaceAll(regEx, "").replace("$", "@").trim());
+                }
+                if (StringUtils.isNotBlank(goods.getFree_price_new())) {
+                    goods.setFree_price_new(goods.getFree_price_new().replaceAll(regEx, "").replace("$", "@").trim());
+                }
+
+                List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), "");
+                if (imgs.size() > 0) {
+
+                    request.setAttribute("showimgs", JSONArray.toJSON(imgs));
+                    String firstImg = imgs.get(0);
+
+                    goods.setShowMainImage(firstImg.replace(".60x60.", ".400x400."));
+                }
+
+                HashMap<String, String> pInfo = GoodsInfoUtils.deal1688Sku(goods);
+                request.setAttribute("showattribute", pInfo);
+            }
+            String text = GoodsInfoUtils.dealEnInfoImg(goods.getEninfo(), "");
+            mv.addObject("text", text);
             mv.addObject("goods", goods);
         } catch (Exception e) {
             e.printStackTrace();
@@ -792,12 +852,29 @@ public class AddNewProductController {
                 cgp.setIsUpdateImg(2);
             }
 
+            String imgInfo = request.getParameter("imgInfo");
+            if (!(imgInfo == null || "".equals(imgInfo))) {
+                // 获取的橱窗图进行集合封装
+                cgp.setImg("[" + imgInfo.replace(";", ",") + "]");
+            } else {
+                json.setOk(false);
+                json.setMessage("获取橱窗图失败");
+                return json;
+            }
+
 
             String type = request.getParameter("type");
             // type 0 保存 1 保存并发布
             int tempId = user.getId();
+            int success = 0;
+            CustomGoodsPublish goods = customGoodsService.queryNewGoodsDetails(cgp.getPid());
+            if (goods != null) {
+                success = customGoodsService.updateNewGoodsDetailsByInfo(cgp);
+            }
+            else{
+                success = customGoodsService.saveNewGoodsDetails(cgp, tempId, Integer.parseInt(type));
+            }
 
-            int success = customGoodsService.saveNewGoodsDetails(cgp, tempId, Integer.parseInt(type));
             if (success > 0) {
                 json.setMessage("更新成功");
             } else {
