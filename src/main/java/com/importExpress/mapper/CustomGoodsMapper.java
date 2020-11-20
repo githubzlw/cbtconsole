@@ -747,4 +747,6 @@ public interface CustomGoodsMapper {
 
     int updateNewGoodsDetailsByInfo(CustomGoodsPublish goods);
 
+    int saveNewGoodsDetailsPush(CustomGoodsPublish goods);
+
 }

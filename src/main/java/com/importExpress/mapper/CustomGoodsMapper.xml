@@ -1892,4 +1892,63 @@ from custom_benchmark_ready where pid = #{pid}
         where cbrn.pid = #{pid}
     </update>
 
+
+    <insert id="saveNewGoodsDetailsPush" parameterType="com.cbt.bean.CustomGoodsPublish">
+        insert into
+        custom_benchmark_ready(catid1,path_catid,pid,enname,img,endetail,eninfo,goodsstate,admin_id,bm_flag,fprice_str,size_info_en
+        <if test="rangePrice != null">
+            ,range_price,sku
+        </if>
+        <if test="feeprice != null">
+            ,free_price_new,price_import,price_kids,price_pets
+        </if>
+        <if test="wprice != null">
+            ,wprice
+        </if>
+        <if test="type != null">
+            ,entype
+        </if>
+        <if test="sellUnit != null">
+            ,sellunit
+        </if>
+        <if test="priceIsEdit > 0">
+            ,price_is_edit
+        </if>
+        <if test="showMainImage != null">
+            ,custom_main_image
+        </if>
+        <if test="morder != null">
+            ,morder
+        </if>
+        ,final_weight,volume_weight
+        )
+        select catid1,path_catid,pid,enname,img,endetail,eninfo,goodsstate,admin_id,bm_flag,fprice_str,size_info_en
+        <if test="rangePrice != null">
+            ,range_price,sku
+        </if>
+        <if test="feeprice != null">
+            ,free_price_new,price_import,price_kids,price_pets
+        </if>
+        <if test="wprice != null">
+            ,wprice
+        </if>
+        <if test="type != null">
+            ,entype
+        </if>
+        <if test="sellUnit != null">
+            ,sellunit
+        </if>
+        <if test="priceIsEdit > 0">
+            ,price_is_edit
+        </if>
+        <if test="showMainImage != null">
+            ,custom_main_image
+        </if>
+        <if test="morder != null">
+            ,morder
+        </if>
+        ,final_weight,volume_weight
+        from custom_benchmark_ready_new where pid = #{pid}
+    </insert>
+
 </mapper>

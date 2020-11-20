@@ -7,6 +7,7 @@ import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.BigDecimalUtil;
+import com.cbt.util.DateFormatUtil;
 import com.cbt.util.GoodsInfoUtils;
 import com.cbt.website.bean.SearchResultInfo;
 import com.cbt.website.bean.ShopManagerPojo;
@@ -16,6 +17,7 @@ import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.GoodsMongoDbLocalUtil;
+import com.importExpress.utli.OKHttpUtils;
 import com.importExpress.utli.SwitchDomainNameUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +35,8 @@ import java.util.Map;
 public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     private static final Log logger = LogFactory.getLog(CustomGoodsServiceImpl.class);
+
+    private static final String CHECK_PID_EXISTS_URL = "http://52.34.56.133:15793/mongo/get?pid=";
 
     private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
 
@@ -1093,7 +1098,49 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public int saveNewGoodsDetails(CustomGoodsPublish cgp, int adminId, int type) {
         cgp.setAdminId(adminId);
         cgp.setGoodsState(type == 1 ? 4 : 5);
-        return customGoodsMapper.saveNewGoodsDetails(cgp);
+        CustomGoodsPublish customGoodsPublish = customGoodsMapper.queryNewGoodsDetailsByPid(cgp.getPid());
+        if(customGoodsPublish == null){
+            customGoodsMapper.saveNewGoodsDetails(cgp);
+        }
+
+        int result = 0;
+        if(type == 1){
+            result = checkOnlineMongodbByPid(cgp.getPid());
+            if(result == 0){
+     /*           InputData inputData = new InputData('c'); //u表示更新；c表示创建，d表示删除
+                inputData.setPid(cgp.getPid());
+                inputData.setPath_catid(cgp.getPathCatid());
+                //inputData.setImg_check("1");
+                //inputData.setValid("1");
+                inputData.setImg(cgp.getImg());
+                inputData.setCatid1(cgp.getCatid1());
+                inputData.setGoodsstate(String.valueOf(cgp.getGoodsState()));
+                inputData.setWprice(cgp.getWprice());
+                inputData.setFree_price_new(cgp.getFree_price_new());
+                inputData.setFinal_weight(cgp.getFinalWeight());
+                inputData.setVolume_weight(cgp.getVolumeWeight());
+                inputData.setMorder(String.valueOf(cgp.getMorder()));
+                inputData.setCustom_main_image(cgp.getCustomMainImage());
+                inputData.setEnname(cgp.getEnname());
+                inputData.setEndetail(cgp.getEndetail());
+                inputData.setEninfo(cgp.getEninfo());
+                inputData.setSellunit(cgp.getSellUnit());
+                inputData.setSize_info_en(cgp.getSizeInfoEn());
+                inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+
+                boolean isOk = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
+                //if(isOk){
+                    CustomGoodsPublish bean = queryGoodsDetails(cgp.getPid(),0);
+                    if(bean == null){
+                        result = customGoodsMapper.saveNewGoodsDetailsPush(cgp);
+                    }
+               /* }
+                else{
+
+                }*/
+            }
+        }
+        return result;
     }
 
     @Override
@@ -1113,6 +1160,26 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int updateNewGoodsDetailsByInfo(CustomGoodsPublish cgp) {
         return customGoodsMapper.updateNewGoodsDetailsByInfo(cgp);
+    }
+
+    public static int checkOnlineMongodbByPid(String pid) {
+        OKHttpUtils okHttpUtils = new OKHttpUtils();
+        int rs = 0;
+        try {
+            String result = okHttpUtils.get(CHECK_PID_EXISTS_URL + pid);
+            if ("1".equals(result)) {
+                rs = 1;
+            } else if ("0".equals(result)) {
+                rs = 0;
+            } else if ("-1".equals(result)) {
+                rs = -1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            rs = -2;
+        }
+        System.err.println("pid:" + pid + ",mongodb query result:" + rs);
+        return rs;
     }
 
 }

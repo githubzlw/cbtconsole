@@ -868,7 +868,7 @@ public class AddNewProductController {
             int tempId = user.getId();
             int success = 0;
             CustomGoodsPublish goods = customGoodsService.queryNewGoodsDetails(cgp.getPid());
-            if (goods != null) {
+            if (goods != null && "0".equals(type)) {
                 success = customGoodsService.updateNewGoodsDetailsByInfo(cgp);
             }
             else{
