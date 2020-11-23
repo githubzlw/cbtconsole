@@ -441,10 +441,12 @@
             //if (sg_wprice != null && sg_wprice != "" && sg_wprice.length > 2) {
                 sg_wprice = "";
                 var i = 0;
+
                 $(".wprice_inp").each(function () {
                     var wprice_num = $.trim($("#wprice_num_" + i).val());
                     var wprice_val = $.trim($("#wprice_val_" + i).val());
                     i++;
+
                     if (wprice_num == null || wprice_num == "") {
                         showMessage("区间价格[商品数量]获取失败");
                         return false;
@@ -455,6 +457,7 @@
                         isErr = false;
                         sg_wprice += "," + wprice_num + "@" + wprice_val;
                     }
+
                 });
           /*  } else {
                 isErr = false;
@@ -3008,9 +3011,9 @@
         var content = '';
         var length = $(obj).parent().find('table').find('tr').length;
         if (num > 0) {
-            content += '<tr><td><input type="text" id="wprice_num_' + length + '" class="inp_style wprice_inp" title="单击可进行编辑" value="0"></td><td><input type="text" id="wprice_val_' + length + '" class="inp_style" title="单击可进行编辑" value="0"></td><td><button class="del_clo" onclick="delTableTr(this)">删除</button></td></tr>';
+            content += '<tr><td><input type="text" id="wprice_num_' + (length-1) + '" class="inp_style wprice_inp" title="单击可进行编辑" value="0"></td><td><input type="text" id="wprice_val_' + (length-1) + '" class="inp_style" title="单击可进行编辑" value="0"></td><td><button class="del_clo" onclick="delTableTr(this)">删除</button></td></tr>';
         } else {
-            content += '<tr><td><input type="text" id="fee_price_num_' + length + '" class="inp_style fee_price_inp" title="单击可进行编辑" value="0" style="background-color: rgb(216, 216, 216);"></td><td><input type="text" id="fee_price_val_' + length + '" class="inp_style" title="单击可进行编辑" value="0"></td><td><button class="del_clo" onclick="delTableTr(this)">删除</button></td>\n' +
+            content += '<tr><td><input type="text" id="fee_price_num_' + (length-1) + '" class="inp_style fee_price_inp" title="单击可进行编辑" value="0" style="background-color: rgb(216, 216, 216);"></td><td><input type="text" id="fee_price_val_' + (length-1) + '" class="inp_style" title="单击可进行编辑" value="0"></td><td><button class="del_clo" onclick="delTableTr(this)">删除</button></td>\n' +
                 '                                                </tr>';
         }
         $(obj).parent().find('table').append(content);
