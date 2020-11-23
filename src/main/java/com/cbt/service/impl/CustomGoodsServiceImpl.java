@@ -36,7 +36,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     private static final Log logger = LogFactory.getLog(CustomGoodsServiceImpl.class);
 
-    private static final String CHECK_PID_EXISTS_URL = "http://52.34.56.133:15793/mongo/get?pid=";
+    //private static final String CHECK_PID_EXISTS_URL = "http://52.34.56.133:15793/mongo/get?pid=";
+    private static final String CHECK_PID_EXISTS_URL = "http://192.168.1.153:27017/mongo/get?pid=";
 
     private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
 
@@ -1098,16 +1099,19 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public int saveNewGoodsDetails(CustomGoodsPublish cgp, int adminId, int type) {
         cgp.setAdminId(adminId);
         cgp.setGoodsState(type == 1 ? 4 : 5);
+        int result = 0;
         CustomGoodsPublish customGoodsPublish = customGoodsMapper.queryNewGoodsDetailsByPid(cgp.getPid());
         if(customGoodsPublish == null){
-            customGoodsMapper.saveNewGoodsDetails(cgp);
+            result = customGoodsMapper.saveNewGoodsDetails(cgp);
+        }
+        else{
+            result = customGoodsMapper.updateNewGoodsDetailsByInfo(cgp);
         }
 
-        int result = 0;
         if(type == 1){
             result = checkOnlineMongodbByPid(cgp.getPid());
             if(result == 0){
-     /*           InputData inputData = new InputData('c'); //u表示更新；c表示创建，d表示删除
+                InputData inputData = new InputData('c'); //u表示更新；c表示创建，d表示删除
                 inputData.setPid(cgp.getPid());
                 inputData.setPath_catid(cgp.getPathCatid());
                 //inputData.setImg_check("1");
@@ -1128,16 +1132,16 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 inputData.setSize_info_en(cgp.getSizeInfoEn());
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
 
-                boolean isOk = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
-                //if(isOk){
+                boolean isOk = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
+                if(isOk){
                     CustomGoodsPublish bean = queryGoodsDetails(cgp.getPid(),0);
                     if(bean == null){
                         result = customGoodsMapper.saveNewGoodsDetailsPush(cgp);
                     }
-               /* }
+                }
                 else{
 
-                }*/
+                }
             }
         }
         return result;

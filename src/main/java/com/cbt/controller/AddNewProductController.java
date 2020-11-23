@@ -121,6 +121,9 @@ public class AddNewProductController {
             // 取出1688商品的全部信息
             CustomGoodsPublish goods = new CustomGoodsPublish();
             goods.setPid(String.valueOf(pid));
+            String remotePath = ftpConfig.getLocalShowPath();
+            goods.setRemotpath(remotePath);
+            mv.addObject("text", "");
             mv.addObject("goods", goods);
         } catch (Exception e) {
             e.printStackTrace();
@@ -163,7 +166,8 @@ public class AddNewProductController {
                     goods.setFree_price_new(goods.getFree_price_new().replaceAll(regEx, "").replace("$", "@").trim());
                 }
 
-                List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), "");
+
+                List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(),"");
                 if (imgs.size() > 0) {
 
                     request.setAttribute("showimgs", JSONArray.toJSON(imgs));
@@ -861,7 +865,8 @@ public class AddNewProductController {
                 json.setMessage("获取橱窗图失败");
                 return json;
             }
-
+            String entype = request.getParameter("entype");
+            cgp.setEntype(entype);
 
             String type = request.getParameter("type");
             // type 0 保存 1 保存并发布
@@ -1741,7 +1746,7 @@ public class AddNewProductController {
                     // 生成唯一文件名称
                     String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                     // 本地服务器磁盘全路径
-                    String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                    String localFilePath = "importimg\\" + pid + "\\" + saveFilename + fileSuffix;
                     // 下载网络图片到本地
                     boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
                     if (is) {
@@ -1753,13 +1758,16 @@ public class AddNewProductController {
                             // 压缩图片60x60
                             String localFilePath60x60 = "importimg/" + pid + "/" + saveFilename + ".60x60" + fileSuffix;
 
-                            boolean is400 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 5);
-                            boolean is60 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 6);
-                            if (is60 && is400) {
-                                newImgUrl += ";" + ftpConfig.getLocalShowPath() + localFilePath60x60;
+                            String localFilePathTest = "importimg/" + pid + "/" + saveFilename  + fileSuffix;
+
+                            //boolean is400 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 5);
+                            //boolean is60 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 6);
+                            //if (is60 && is400) {
+                                //newImgUrl += ";" + ftpConfig.getLocalShowPath() + localFilePath60x60;
+                                newImgUrl += ";" + ftpConfig.getLocalShowPath() + localFilePathTest;
                                 json.setOk(true);
                                 json.setMessage("本地图片上传成功");
-                            } else {
+                         /*   } else {
                                 // 判断分辨率不通过删除图片
                                 File file400 = new File(localDiskPath + localFilePath400x400);
                                 if (file400.exists()) {
@@ -1774,7 +1782,7 @@ public class AddNewProductController {
                                 json.setOk(false);
                                 json.setMessage("压缩图片60x60和400x400失败，终止执行");
                                 break;
-                            }
+                            }*/
                         } else {
                             // 图片分辨率小于400*200整体终止执行
                             isSuccess = false;

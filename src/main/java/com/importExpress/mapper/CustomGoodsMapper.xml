@@ -1802,7 +1802,7 @@ from custom_benchmark_ready where pid = #{pid}
         <if test="wprice != null">
             ,wprice
         </if>
-        <if test="type != null">
+        <if test="entype != null">
             ,entype
         </if>
         <if test="sellUnit != null">
@@ -1829,8 +1829,8 @@ from custom_benchmark_ready where pid = #{pid}
         <if test="wprice != null">
             ,#{wprice}
         </if>
-        <if test="type != null">
-            ,#{type}
+        <if test="entype != null">
+            ,#{entype}
         </if>
         <if test="sellUnit != null">
             ,#{sellUnit}
@@ -1889,13 +1889,19 @@ from custom_benchmark_ready where pid = #{pid}
         <if test="volumeWeight != null">
             ,cbrn.volume_weight=#{volumeWeight}
         </if>
+        <if test="entype != null">
+            ,cbrn.entype=#{entype}
+        </if>
+        <if test="goodsState != null">
+            ,cbrn.goodsstate=#{goodsState}
+        </if>
         where cbrn.pid = #{pid}
     </update>
 
 
     <insert id="saveNewGoodsDetailsPush" parameterType="com.cbt.bean.CustomGoodsPublish">
         insert into
-        custom_benchmark_ready(catid1,path_catid,pid,enname,img,endetail,eninfo,goodsstate,admin_id,bm_flag,fprice_str,size_info_en
+        custom_benchmark_ready(catid1,path_catid,pid,enname,img,endetail,eninfo,goodsstate,admin_id,bm_flag,fprice_str,size_info_en,entype
         <if test="rangePrice != null">
             ,range_price,sku
         </if>
@@ -1922,7 +1928,7 @@ from custom_benchmark_ready where pid = #{pid}
         </if>
         ,final_weight,volume_weight
         )
-        select catid1,path_catid,pid,enname,img,endetail,eninfo,goodsstate,admin_id,bm_flag,fprice_str,size_info_en
+        select catid1,path_catid,pid,enname,img,endetail,eninfo,goodsstate,admin_id,bm_flag,fprice_str,size_info_en,entype
         <if test="rangePrice != null">
             ,range_price,sku
         </if>

@@ -40,6 +40,7 @@
         var skuInfo = {};
 
         $(document).ready(function () {
+            createComboTree();
             initDialog();
             closeUploadDialog();
             initXheditor();
@@ -57,7 +58,7 @@
             closeGoodsDescDialog();
             closeOverSeaDialog();
             $('#catid-dlg').dialog('close');
-            createComboTree();
+
         });
 
         function relieveDisabled(obj) {
@@ -366,6 +367,8 @@
                 return;
             }
 
+            var entype = $("#goods_entype").val();
+
             var enname = $("#import_enname").val();
             if (enname == "") {
                 showMessage("翻译名称为空");
@@ -521,7 +524,8 @@
                         "skuCount": skuCount,
                         "goods_finalWeight": goods_finalWeight,
                         "goods_volum_weight": goods_volum_weight,
-                        "gd_moq": gd_moq
+                        "gd_moq": gd_moq,
+                        "entype": entype
                     },
                     success: function (data) {
                         $('.mask').hide();
@@ -2242,7 +2246,8 @@
                                     <span class="prev_arrow"></span>
                                 </p>
                                 <ul class="ul_pic">
-                                    <input type="hidden" id="first_li" style="display: none" value="99"/>
+
+                                    <input type="hidden" id="first_li" style="display: none" value="${goods.showMainImage}"/>
                                     <c:forEach items="${showimgs}" var="imgBean"
                                                varStatus="imgIndex">
                                         <li class="li_pic"><img src="${imgBean}"></li>
@@ -2261,9 +2266,11 @@
                         <div class="goods_detail">
 
                             <div class="goods_top">
+                                <p class="goods_color">商品规格:</p><input id="goods_entype" class="inp_set"
+                                       value="${goods.entype}"/>
 
                             <!-- 非免邮价格显示-->
-
+                                <div class="s_bot"></div>
                                 <div class="goods_p">
                                     <p class="goods_color">非免邮价:</p>
                                     <table border="1" cellspacing="0" cellpadding="0" class="table_style">
@@ -2387,22 +2394,14 @@
                                 <div class="ul_size ul_size_p">
                                     <table id="attribute_table" border="1px" bordercolor="#ccc" cellspacing="0px"
                                            style="border-collapse: collapse" width="100%" id="attribute_table">
-                                        <c:set value="${fn:length(showattribute)}" var="itemLength"></c:set>
+
                                         <tr>
-                                            <c:forEach var="item" items="${showattribute}"
-                                                       varStatus="itemIndex">
-                                            <td width="32%"><input type="text" class="inp_style" title="单击可进行编辑"
-                                                                   id="sku_id_${item.key}" name="sku_key_val"
-                                                                   value="${item.value}"
-                                                                   onchange="addSkuLog('sku_id_${item.key}')"/>
-                                            </td>
-                                            <c:if
-                                                    test="${(itemIndex.index+1) % 3 == 0 || itemIndex.index == itemLength-1}">
+                                           <td><input type="text" class="inp_style" title="单击可进行编辑"
+                                            name="sku_key_val" value="${goods.endetail}" style="width: 99.6%"></td>
                                         </tr>
-                                        </c:if>
-                                        </c:forEach>
+
                                     </table>
-                                    <br><input class="s_btn" type="button" value="添加属性" onclick="addGoodsAttribute();"/>
+                                    <br>
                                 </div>
                             </div>
                         </div>
@@ -2620,16 +2619,8 @@
         <div class="s_bot">
             <h1 style="text-align: center; color: red;">请不要全盘copy，请去掉所有有“品牌”、“店名”的图，请去掉所有有“aliexpress”字样的图</h1>
 
-            <button class="s_btn" style="width: 180px;"
-                    onclick="beforeDeleteMd5('${goods.pid}','${goods.shopId}')">删除同店铺相同MD5图片
-            </button>&nbsp;&nbsp;&nbsp;
-            <span class="s_btn"
-                  onclick="$('#multi_file_dlg').dialog('open');">详情多文件上传</span>
-            &nbsp;&nbsp;&nbsp;<span id="change_img_english" class="s_btn"
-                                    onclick="changeChineseImgToEnglishImg(${goods.pid})">替换图片文字为英文</span>
-            &nbsp;&nbsp;&nbsp;<span id="use_ali_goods" class="s_btn"
-                                    onclick="useAliGoodsDetails(${goods.pid})">使用速卖通详情</span>
-            <div class="bot_l">
+
+            <div class="bot_l" style="width: 100%;">
                 <div class="b_left">
                     <h1 style="text-align: center">importE详情编辑框</h1>
                     <input type="hidden" id="goods_savePath" value="${savePath}" name="savePath">
@@ -2639,14 +2630,7 @@
                 </div>
             </div>
 
-            <div class="bot_r">
-                <h1 style="text-align: center; background-color: #5df55d;">速卖通详情</h1>
-                <div class="bot_c">
-                    <button id="to_left_sp" style="cursor: pointer;"
-                            onclick="addToImportE('${goods.pid}')"></button>
-                </div>
-                <div class="r_box" id="ali_goods_info">${goods.aliGoodsInfo}</div>
-            </div>
+
         </div>
     </div>
 </c:if>
@@ -2788,7 +2772,7 @@
     function addGoodsAttribute() {
         var len = $("#attribute_table tbody tr:last").find('td').length;
         var tdStr = "";
-        if (len == 3) {
+       /* if (len == 3) {
             tdStr = '<tr><td width="32%"><input type="text" class="inp_style" title="单击可进行编辑" '
                 + 'name="sku_key_val" value=""></td></tr>';
             $("#attribute_table tbody").append(tdStr);
@@ -2796,7 +2780,14 @@
             tdStr = '<td width="32%"><input type="text" class="inp_style" title="单击可进行编辑" '
                 + 'name="sku_key_val" value=""></td>';
             $("#attribute_table tbody tr:last").append(tdStr);
+        }*/
+
+        if(len == 0){
+            tdStr = '<td width="32%"><input type="text" class="inp_style" title="单击可进行编辑" '
+                + 'name="sku_key_val" value=""></td>';
         }
+
+        $("#attribute_table tbody tr:last").append(tdStr);
         $(".inp_style").click(function () {
             $(this).removeAttr("readonly");
             $(this).css("background-color", "rgb(255, 255, 255)");
@@ -3019,7 +3010,7 @@
         if (num > 0) {
             content += '<tr><td><input type="text" id="wprice_num_' + length + '" class="inp_style wprice_inp" title="单击可进行编辑" value="0"></td><td><input type="text" id="wprice_val_' + length + '" class="inp_style" title="单击可进行编辑" value="0"></td><td><button class="del_clo" onclick="delTableTr(this)">删除</button></td></tr>';
         } else {
-            content += '<tr><td><input type="text" id="fee_price_num_' + length + '" class="inp_style fee_price_inp" title="单击可进行编辑" value="0" readonly="readonly" style="background-color: rgb(216, 216, 216);"></td><td><input type="text" id="fee_price_val_' + length + '" class="inp_style" title="单击可进行编辑" value="0"></td><td><button class="del_clo" onclick="delTableTr(this)">删除</button></td>\n' +
+            content += '<tr><td><input type="text" id="fee_price_num_' + length + '" class="inp_style fee_price_inp" title="单击可进行编辑" value="0" style="background-color: rgb(216, 216, 216);"></td><td><input type="text" id="fee_price_val_' + length + '" class="inp_style" title="单击可进行编辑" value="0"></td><td><button class="del_clo" onclick="delTableTr(this)">删除</button></td>\n' +
                 '                                                </tr>';
         }
         $(obj).parent().find('table').append(content);
