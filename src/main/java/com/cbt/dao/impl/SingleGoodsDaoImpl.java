@@ -1532,10 +1532,10 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
                     goodsName = "1688 GoodsName";
                 }
                 goods.setGoodsName(goodsName);
-                String remotpath = rss.getString("custom_main_image");
+                goods.setGoodsImg(rss.getString("custom_main_image"));
 
                 goods.setCreateTime(rss.getString("createtime"));
-                goods.setGoodsType(rss.getInt("final_weight"));
+                goods.setAveWeight(rss.getDouble("final_weight"));
                 list.add(goods);
             }
 

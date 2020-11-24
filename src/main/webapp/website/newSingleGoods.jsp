@@ -6,7 +6,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>单个商品上线</title>
+    <title>手工录入商品</title>
     <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
     <script type="text/javascript"
             src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
@@ -117,7 +117,7 @@
 
         function setDatagrid() {
             $('#single_easyui-datagrid').datagrid({
-                title: '单个商品上线',
+                title: '手工录入商品',
                 width: "100%",
                 fit: true,//自动补全
                 striped: true,//设置为true将交替显示行背景。
@@ -241,9 +241,9 @@
         function formatImg(val, row, index) {
             var content = "";
             if (val == null || val == "") {
-                content = "<a target='_blank' href='https://detail.1688.com/offer/" + row.goodsPid + ".html' ><img class='img_sty' scr='/cbtconsole/img/yuanfeihang/loaderTwo.gif' alt='无图' /></a>";
+                content = "<img class='img_sty' scr='/cbtconsole/img/yuanfeihang/loaderTwo.gif' alt='无图' />";
             } else {
-                content = "<a target='_blank' href='https://detail.1688.com/offer/" + row.goodsPid + ".html' ><img class='img_sty' src='" + val + "' alt='无图' /></a>";
+                content = "<img class='img_sty' src='" + val + "' alt='无图' />";
             }
             return content;
         }
@@ -440,6 +440,10 @@
             var param = "height=400,width=600,top=200,left=600,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
             window.open(url, "windows", param);
         }
+
+        function addNewProduct(){
+            window.open("/cbtconsole/newProduct/addNewProduct","_blank");
+        }
     </script>
 
 </head>
@@ -510,45 +514,13 @@
     <form id="single_query_form" action="#" onsubmit="return false;">
 			<span> PID: <input type="text" id="pid_id"
                                style="width: 170px; height: 24px" value=""/></span>&nbsp;&nbsp;
-        <span> 店铺ID: <input type="text" id="query_shop_id"
-                            style="width: 130px; height: 24px" value=""/></span>&nbsp;&nbsp;<span>
-				时间: <input id="query_sttime" class="Wdate"
-                           style="width: 100px; height: 24px" type="text" value=""
-                           onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
-				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate"
-                                                 style="width: 100px; height: 24px;" type="text" value=""
-                                                 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
-			</span>&nbsp;&nbsp;<span> 编辑人: <select id="query_admid"
-                                                   style="font-size: 16px; height: 24px; width: 120px;">
-					<option value="0" selected="selected">全部</option>
-			</select></span>&nbsp;&nbsp;<span> 对标标识: <select id="query_goods_type"
-                                                             style="font-size: 16px; height: 24px; width: 120px;">
-					<option value="-1" selected="selected">全部</option>
-                    <option value="0">非对标</option>
-                    <option value="1">AliExpress对标</option>
-                    <option value="2">Amazon对标</option>
 
-			</select></span>&nbsp;&nbsp;<span> 引流标识: <select
-            id="query_drainage_flag"
-            style="font-size: 16px; height: 24px; width: 100px;">
-					<option value="0" selected="selected">全部</option>
-                    <option value="1">引流商品</option>
-                    <option value="2">非引流商品</option>
 
-			</select></span>&nbsp;&nbsp;
-        <span> 状态: <select id="query_state"
-                           style="font-size: 16px; height: 24px; width: 100px;">
-                <option value="-1" selected="selected">全部</option>
-                <option value="0">待抓取</option>
-                <option value="1">抓取失败</option>
-                <option value="2">待清洗</option>
-                <option value="3">待同步</option>
-                <option value="4">同步成功</option>
-        </select></span>&nbsp;&nbsp;
         &nbsp;&nbsp;<span><input type="button"
-                                 class="enter_btn" value="查询" onclick="doQuery(0)"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <span><input type="button" class="enter_btn" value="录入1688商品"
-                     onclick="enterGoods()"/></span>
+                                 class="enter_btn" value="查询" onclick="doQuery(0)"/></span>
+        &nbsp;<span><input type="button"
+                           class="enter_btn" value="新增" onclick="addNewProduct()"/></span>
+
         <%--<span><a href="/cbtconsole/website/singleGoodsCheck.jsp" target="_blank">跨境商品审核</a></span>--%>
     </form>
 </div>
@@ -557,18 +529,16 @@
        class="easyui-datagrid">
     <thead>
     <tr>
-        <th data-options="field:'goodsPid',width:'150px'">1688PID</th>
+        <th data-options="field:'goodsPid',width:'150px'">PID</th>
         <th
-                data-options="field:'goodsImg',width:'220px',formatter:formatImg">1688图片
+                data-options="field:'goodsImg',width:'220px',formatter:formatImg">图片
         </th>
-        <th data-options="field:'goodsName',width:'440px'">1688产品名称</th>
-        <th data-options="field:'aveWeight',align:'center',width:'140px'">设定重量(KG)</th>
-        <th data-options="field:'shopId',width:'200px',formatter:formatShopNum">店铺商品数</th>
+        <th data-options="field:'goodsName',width:'440px'">产品名称</th>
+        <th data-options="field:'aveWeight',align:'center',width:'140px'">商品重量(KG)</th>
+
         <th
                 data-options="field:'syncFlag',width:'200px',formatter:formatUploadResult">产品上传结果
         </th>
-        <th data-options="field:'goodsType',align:'center',width:'120px',formatter:formatGoodsType">对标标识</th>
-        <th data-options="field:'drainageFlag',align:'center',width:'100px',formatter:formatDrainageFlag">引流标识</th>
         <th data-options="field:'adminName',align:'center',width:'100px'">录入人</th>
         <th data-options="field:'createTime',align:'center',width:'180px'">创建时间</th>
         <th
