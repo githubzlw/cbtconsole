@@ -749,4 +749,6 @@ public interface CustomGoodsMapper {
 
     int saveNewGoodsDetailsPush(CustomGoodsPublish goods);
 
+    int updateEntypeSkuByPid(CustomGoodsPublish goods);
+
 }

@@ -1056,6 +1056,7 @@ public interface CustomGoodsService {
 
     /**
      * 获取新增商品的pid
+     *
      * @return
      */
     int queryNewPid();
@@ -1063,5 +1064,7 @@ public interface CustomGoodsService {
     CustomGoodsPublish queryNewGoodsDetails(String pid);
 
     int updateNewGoodsDetailsByInfo(CustomGoodsPublish cgp);
+
+    int updateEntypeSkuByPid(CustomGoodsPublish cgp);
 
 }

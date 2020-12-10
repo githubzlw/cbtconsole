@@ -3,6 +3,8 @@ package com.cbt.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.cbt.bean.TypeBean;
 import com.cbt.bean.ZoneBean;
 import com.cbt.bean.*;
@@ -14,6 +16,7 @@ import com.cbt.parse.bean.Set;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.parse.service.*;
+import com.cbt.pojo.EntypeBen;
 import com.cbt.service.CategoryService;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.service.SingleGoodsService;
@@ -4029,49 +4032,7 @@ public class AddNewProductController {
         }
     }
 
-    private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
-        try {
 
-            Document nwDoc = Jsoup.parseBodyFragment(gd.getEninfo());
-            // 移除所有的页面效果 kse标签,实际div
-            Elements imgEls = nwDoc.getElementsByTag("img");
-            for (Element imgEl : imgEls) {
-                for (GoodsMd5Bean md5Bean : md5BeanList) {
-                    if (md5Bean.getRemotePath().contains(imgEl.attr("src"))) {
-                        imgEl.remove();
-                    }
-                }
-            }
-            gd.setEninfo(nwDoc.html());
-            customGoodsService.updatePidEnInfo(gd);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println(e.getMessage());
-            LOG.error("pid:" + gd.getPid() + ",deleteAndUpdateGoodsImg error:" + e.getMessage());
-        }
-    }
-
-
-    private boolean deleteImgByUrl(String pid) {
-        /*boolean isSu = false;
-        CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-        if (checkIsKidsCatid(goods.getCatid1()) && goods.getValid() == 0) {
-            // 接口调用
-            isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
-                    *//*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
-                    boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
-                    if (!isSu) {
-                        isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
-                    }
-                    if (!isSu) {
-                        LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
-                    }*//*
-
-        } else {
-            isSu = true;
-        }*/
-        return OKHttpUtils.optionGoodsInterface(pid, 0, 6, 2);
-    }
 
     private boolean checkListContains(List<String> list, String str) {
         boolean isOk = false;
@@ -4101,5 +4062,175 @@ public class AddNewProductController {
         }
         return isCheck;
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/addEnType", method = {RequestMethod.POST, RequestMethod.GET})
+    public JsonResult addEnType(HttpServletRequest request) {
+        DataSourceSelector.restore();
+        JsonResult json = new JsonResult();
+
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        try {
+
+            String enTypeName = request.getParameter("enTypeName");
+
+            String enTypeValue = request.getParameter("enTypeValue");
+
+            String pidStr = request.getParameter("pid");
+            // 获取商品信息
+            CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pidStr, 0);
+            //获取需要删除的规格ids数据，进行匹配删除
+            String typeDeleteIds = request.getParameter("typeDeleteIds");
+            String time = String.valueOf(System.currentTimeMillis());
+            List<TypeBean> newTypeList = new ArrayList<TypeBean>();
+            List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(orGoods, false);
+            TypeBean typeBean = new TypeBean();
+            typeBean.setType(enTypeName);
+            typeBean.setValue(enTypeValue);
+            typeBean.setLableType(enTypeName);
+            typeBean.setId(time.substring(6));
+            typeBean.setImg("");
+            typeBean.setSell("1");
+            if (typeList == null) {
+                typeList = new ArrayList<>();
+            }
+            typeList.add(typeBean);
+
+            System.out.println(typeList);
+           /* if (StringUtils.isNotBlank(typeDeleteIds)) {
+                String[] tpList = typeDeleteIds.split(",");
+
+                if (!(tpList.length == 0 || typeList.isEmpty())) {
+                    //剔除选中的规格
+                    for (TypeBean tpBean : typeList) {
+                        boolean notPt = true;
+                        for (String tpId : tpList) {
+                            if (tpId.equals(tpBean.getId())) {
+                                notPt = false;
+                                break;
+                            }
+                        }
+                        if (notPt) {
+                            newTypeList.add(tpBean);
+                        }
+                    }
+                    //cgp.setType(newTypeList.toString());
+                }
+            }*/
+
+            Date d = new Date();
+            System.out.println(d);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            String dateNowStr = sdf.format(d);
+            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pidStr, 0);
+            boolean isSkuFlag = false;
+            if (StringUtils.isNotBlank(goods.getRangePrice())) {
+                isSkuFlag = true;
+            }
+            List<EntypeBen> entypeBens = JSONArray.parseArray(goods.getEntypeNew(), EntypeBen.class);
+            List<ImportExSku> skuNewList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
+            List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku(), ImportExSku.class);
+            System.out.println(skuList);
+            EntypeBen entypeBen = new EntypeBen();
+            entypeBen.setType(typeBean.getType());
+            entypeBen.setValue(typeBean.getValue());
+            entypeBen.setId(typeBean.getId());
+            entypeBen.setLableType(typeBean.getLableType());
+            entypeBen.setSell(typeBean.getSell());
+            entypeBen.setImg("");
+            if (entypeBens == null) {
+                entypeBens = new ArrayList<>();
+            }
+            entypeBens.add(entypeBen);
+            for (TypeBean typeBean1 : typeList) {
+                if (StringUtils.isNotBlank(enTypeName)
+                        && !enTypeName.equals(typeBean1.getType())) {
+                    ImportExSku importExSku = new ImportExSku();
+                    importExSku.setSkuId(time + dateNowStr);
+                    importExSku.setSpecId(time + dateNowStr);
+                    importExSku.setSkuAttr(time.substring(0, 6) + ":" + time.substring(6) + ";" +
+                            typeBean1.getId().substring(0, typeBean1.getId().length() - 1) + ":" + typeBean1.getId());
+                    importExSku.setSkuPropIds(time.substring(6) + "," + typeBean1.getId());
+                    importExSku.setFianlWeight(skuList.get(0).getFianlWeight());
+                    importExSku.setVolumeWeight(skuList.get(0).getVolumeWeight());
+                    importExSku.setWholesalePrice(skuList.get(0).getWholesalePrice());
+                    ImportExSkuVal importExSkuVal = new ImportExSkuVal();
+                    importExSkuVal.setFreeSkuPrice("0.0");
+                    importExSkuVal.setActivity(true);
+
+                    if (!isSkuFlag) {
+                        importExSkuVal.setFreeSkuPrice(skuList.get(0).getSkuVal().getFreeSkuPrice());
+                        importExSkuVal.setActSkuCalPrice(skuList.get(0).getSkuVal().getActSkuCalPrice());
+                        importExSkuVal.setActSkuMultiCurrencyCalPrice(skuList.get(0).getSkuVal().getActSkuMultiCurrencyCalPrice());
+                        importExSkuVal.setActSkuMultiCurrencyDisplayPrice(skuList.get(0).getSkuVal().getActSkuMultiCurrencyDisplayPrice());
+                        importExSkuVal.setSkuCalPrice(skuList.get(0).getSkuVal().getSkuCalPrice());
+                        importExSkuVal.setSkuMultiCurrencyCalPrice(skuList.get(0).getSkuVal().getSkuMultiCurrencyCalPrice());
+                        importExSkuVal.setSkuMultiCurrencyDisplayPrice(skuList.get(0).getSkuVal().getSkuMultiCurrencyDisplayPrice());
+                        importExSkuVal.setCostPrice(skuList.get(0).getSkuVal().getCostPrice());
+                    }
+                    importExSku.setSkuVal(importExSkuVal);
+                    if (skuList == null) {
+                        skuList = new ArrayList<>();
+                    }
+                    skuList.add(importExSku);
+                }
+            }
+
+            for (TypeBean typeBean1 : typeList) {
+                if (StringUtils.isNotBlank(enTypeName)
+                        && !enTypeName.equals(typeBean1.getType())) {
+                    ImportExSku importExSku = new ImportExSku();
+                    importExSku.setSkuId(time + dateNowStr);
+                    importExSku.setSpecId(time + dateNowStr);
+                    importExSku.setSkuAttr(time.substring(0, 6) + ":" + time.substring(6) + ";" +
+                            typeBean1.getId().substring(0, typeBean1.getId().length() - 1) + ":" + typeBean1.getId());
+                    importExSku.setSkuPropIds(time.substring(6) + "," + typeBean1.getId());
+                    importExSku.setFianlWeight(skuList.get(0).getFianlWeight());
+                    importExSku.setVolumeWeight(skuList.get(0).getVolumeWeight());
+                    importExSku.setWholesalePrice(skuList.get(0).getWholesalePrice());
+                    ImportExSkuVal importExSkuVal = new ImportExSkuVal();
+                    importExSkuVal.setFreeSkuPrice("0.0");
+                    importExSkuVal.setActivity(true);
+                    if (!isSkuFlag) {
+                        importExSkuVal.setFreeSkuPrice(skuList.get(0).getSkuVal().getFreeSkuPrice());
+                        importExSkuVal.setActSkuCalPrice(skuList.get(0).getSkuVal().getActSkuCalPrice());
+                        importExSkuVal.setActSkuMultiCurrencyCalPrice(skuList.get(0).getSkuVal().getActSkuMultiCurrencyCalPrice());
+                        importExSkuVal.setActSkuMultiCurrencyDisplayPrice(skuList.get(0).getSkuVal().getActSkuMultiCurrencyDisplayPrice());
+                        importExSkuVal.setSkuCalPrice(skuList.get(0).getSkuVal().getSkuCalPrice());
+                        importExSkuVal.setSkuMultiCurrencyCalPrice(skuList.get(0).getSkuVal().getSkuMultiCurrencyCalPrice());
+                        importExSkuVal.setSkuMultiCurrencyDisplayPrice(skuList.get(0).getSkuVal().getSkuMultiCurrencyDisplayPrice());
+                        importExSkuVal.setCostPrice(skuList.get(0).getSkuVal().getCostPrice());
+                    }
+                    importExSku.setSkuVal(importExSkuVal);
+                    if (skuNewList == null) {
+                        skuNewList = new ArrayList<>();
+                    }
+                    skuNewList.add(importExSku);
+                }
+            }
+            System.out.println(entypeBens.toString());
+            System.out.println(skuList.toString());
+            System.out.println(skuNewList.toString());
+            goods.setSku_new(skuNewList.toString());
+            goods.setEntype(typeList.toString());
+            goods.setEntypeNew(entypeBens.toString());
+            goods.setSku(skuList.toString());
+            customGoodsService.updateEntypeSkuByPid(goods);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+        }
+        return json;
+    }
+
 
 }

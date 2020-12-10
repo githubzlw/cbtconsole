@@ -1186,4 +1186,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return rs;
     }
 
+    @Override
+    public int updateEntypeSkuByPid(CustomGoodsPublish cgp) {
+        return customGoodsMapper.updateEntypeSkuByPid(cgp);
+    }
+
 }
