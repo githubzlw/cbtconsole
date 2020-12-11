@@ -4187,7 +4187,7 @@ public class AddNewProductController {
                     ImportExSkuVal importExSkuVal = new ImportExSkuVal();
                     importExSkuVal.setFreeSkuPrice("0.0");
                     importExSkuVal.setActivity(true);
-
+                    importExSkuVal.setAvailQuantity(1);
                     if (!isSkuFlag) {
                         importExSkuVal.setFreeSkuPrice(skuList.get(0).getSkuVal().getFreeSkuPrice());
                         importExSkuVal.setActSkuCalPrice(skuList.get(0).getSkuVal().getActSkuCalPrice());
@@ -4221,6 +4221,7 @@ public class AddNewProductController {
                     ImportExSkuVal importExSkuVal = new ImportExSkuVal();
                     importExSkuVal.setFreeSkuPrice("0.0");
                     importExSkuVal.setActivity(true);
+                    importExSkuVal.setAvailQuantity(1);
                     if (!isSkuFlag) {
                         importExSkuVal.setFreeSkuPrice(skuList.get(0).getSkuVal().getFreeSkuPrice());
                         importExSkuVal.setActSkuCalPrice(skuList.get(0).getSkuVal().getActSkuCalPrice());
@@ -4230,6 +4231,7 @@ public class AddNewProductController {
                         importExSkuVal.setSkuMultiCurrencyCalPrice(skuList.get(0).getSkuVal().getSkuMultiCurrencyCalPrice());
                         importExSkuVal.setSkuMultiCurrencyDisplayPrice(skuList.get(0).getSkuVal().getSkuMultiCurrencyDisplayPrice());
                         importExSkuVal.setCostPrice(skuList.get(0).getSkuVal().getCostPrice());
+
                     }
                     importExSku.setSkuVal(importExSkuVal);
                     if (skuNewList == null) {

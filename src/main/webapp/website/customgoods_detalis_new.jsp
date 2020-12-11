@@ -2840,9 +2840,9 @@
          data-options="modal:true"
          style="width: 460px; height: 280px; padding: 10px;">
         <br>
-        规格:<input type="text" id="enTypeName" value=""/>
+        规格名称:<input type="text" id="enTypeName" value=""/><span style="color: red;">*如Color 请注意大小写</span>
         <br>
-        规格描述:<input type="text" id="enTypeValue" value=""/>
+        规格描述:<input type="text" id="enTypeValue" value=""/><span style="color: red;">*如White</span>
         <br>
 
         <div style="text-align: center; padding: 5px 0">
@@ -3238,7 +3238,7 @@
     function addEntype(pid) {
         var enTypeName = $("#enTypeName").val();
         if (enTypeName == null || enTypeName == "") {
-            showMessage("规格不能为空");
+            showMessage("规格名称不能为空");
             return false;
         }
         var enTypeValue = $("#enTypeValue").val();
@@ -3265,7 +3265,8 @@
                 var json = data;
                 closeEnTypeDialog();
                 if (json.ok) {
-                    showMessage(json.message);
+                    showMessage("保存成功！");
+                    window.location.reload();
                 } else {
                     $.messager.alert("提醒", json.message, "error");
                 }
