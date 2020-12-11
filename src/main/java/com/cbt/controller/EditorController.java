@@ -14,6 +14,7 @@ import com.cbt.parse.bean.Set;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.parse.service.*;
+import com.cbt.pojo.EntypeBen;
 import com.cbt.service.CategoryService;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
@@ -1182,6 +1183,28 @@ public class EditorController {
                     //cgp.setType(newTypeList.toString());
                 }
             }
+            List<EntypeBen> newEnTypeList = new ArrayList<EntypeBen>();
+            List<EntypeBen> entypeBens = JSONArray.parseArray(orGoods.getEntypeNew(), EntypeBen.class);
+            if (StringUtils.isNotBlank(typeDeleteIds)) {
+                String[] tpList = typeDeleteIds.split(",");
+
+                if (!(tpList.length == 0 || typeList.isEmpty())) {
+                    //剔除选中的规格
+                    for (EntypeBen entypeBen : entypeBens) {
+                        boolean notPt = true;
+                        for (String tpId : tpList) {
+                            if (tpId.equals(entypeBen.getId())) {
+                                notPt = false;
+                                break;
+                            }
+                        }
+                        if (notPt) {
+                            newEnTypeList.add(entypeBen);
+                        }
+                    }
+                    //cgp.setType(newTypeList.toString());
+                }
+            }
             //获取替换规格的数据
             String typeRepalceIds = request.getParameter("typeRepalceIds");
 
@@ -1201,10 +1224,22 @@ public class EditorController {
                                     break;
                                 }
                             }
+                            for (EntypeBen entypeBen : newEnTypeList) {
+                                if (entypeBen.getId().equals(spSt[0]) && !entypeBen.getType().trim().equals(spSt[1].trim())) {
+                                    entypeBen.setValue(spSt[1].trim());
+                                    break;
+                                }
+                            }
                         } else {
                             for (TypeBean nwType : typeList) {
                                 if (nwType.getId().equals(spSt[0]) && !nwType.getType().trim().equals(spSt[1].trim())) {
                                     nwType.setValue(spSt[1].trim());
+                                    break;
+                                }
+                            }
+                            for (EntypeBen entypeBen : newEnTypeList) {
+                                if (entypeBen.getId().equals(spSt[0]) && !entypeBen.getType().trim().equals(spSt[1].trim())) {
+                                    entypeBen.setValue(spSt[1].trim());
                                     break;
                                 }
                             }
@@ -1215,13 +1250,16 @@ public class EditorController {
 
                 if (StringUtils.isNotBlank(typeDeleteIds)) {
                     cgp.setType(newTypeList.toString());
+                    cgp.setEntypeNew(newEnTypeList.toString());
                 } else {
                     cgp.setType(typeList.toString());
+                    cgp.setEntypeNew(entypeBens.toString());
                 }
                 tpList = null;
             } else {
                 if (StringUtils.isNotBlank(typeDeleteIds)) {
                     cgp.setType(newTypeList.toString());
+                    cgp.setEntypeNew(newEnTypeList.toString());
                     newTypeList.clear();
                 }
             }

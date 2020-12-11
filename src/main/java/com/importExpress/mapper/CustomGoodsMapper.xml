@@ -1054,6 +1054,9 @@
         <if test="morder != null">
             ,b.morder=#{morder}
         </if>
+        <if test="entypeNew != null">
+            ,b.entype_new=#{entypeNew}
+        </if>
         where a.pid = b.pid and b.pid = #{pid}
     </update>
 

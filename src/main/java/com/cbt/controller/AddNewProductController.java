@@ -878,9 +878,15 @@ public class AddNewProductController {
             CustomGoodsPublish goods = customGoodsService.queryNewGoodsDetails(cgp.getPid());
             if (goods != null && "0".equals(type)) {
                 success = customGoodsService.updateNewGoodsDetailsByInfo(cgp);
-            }
-            else{
+            } else {
                 success = customGoodsService.saveNewGoodsDetails(cgp, tempId, Integer.parseInt(type));
+
+            }
+            if ("1".equals(type)) {
+                int isEdit = customGoodsService.checkIsEditedByPid(cgp.getPid());
+                if (isEdit == 0) {
+                    customGoodsService.insertPidIsEdited("", cgp.getPid(), user.getId());
+                }
             }
 
             if (success > 0) {
@@ -4093,7 +4099,12 @@ public class AddNewProductController {
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(orGoods, false);
             String tyteLable = enTypeName;
             if (typeList != null && typeList.size() > 0) {
-                tyteLable = typeList.get(0).getLableType();
+                for (TypeBean typeBean : typeList) {
+                    if (enTypeName.equals(typeBean.getType())) {
+                        tyteLable = typeBean.getLableType();
+                        break;
+                    }
+                }
             }
             TypeBean typeBean = new TypeBean();
             typeBean.setType(enTypeName);
@@ -4143,7 +4154,12 @@ public class AddNewProductController {
             List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku(), ImportExSku.class);
             System.out.println(skuList);
             if (entypeBens != null && entypeBens.size() > 0) {
-                tyteLable = entypeBens.get(0).getLableType();
+                for (EntypeBen entypeBen : entypeBens) {
+                    if (enTypeName.equals(entypeBen.getType())) {
+                        tyteLable = entypeBen.getLableType();
+                        break;
+                    }
+                }
             }
             EntypeBen entypeBen = new EntypeBen();
             entypeBen.setType(typeBean.getType());
@@ -4232,7 +4248,21 @@ public class AddNewProductController {
             goods.setEntype(typeList.toString());
             goods.setEntypeNew(entypeBens.toString());
             goods.setSku(skuList.toString());
-            customGoodsService.updateEntypeSkuByPid(goods);
+            int result = customGoodsService.updateEntypeSkuByPid(goods);
+            if (result > 0) {
+                InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+                inputData.setPid(goods.getPid());
+                inputData.setEntype(goods.getEntype());
+                inputData.setEntype_new(goods.getEntypeNew());
+                inputData.setSku(goods.getSku());
+                inputData.setSku_new(goods.getSku_new());
+                inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
+                int isEdit = customGoodsService.checkIsEditedByPid(goods.getPid());
+                if (isEdit == 0) {
+                    customGoodsService.insertPidIsEdited("", goods.getPid(), user.getId());
+                }
+            }
             json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();
