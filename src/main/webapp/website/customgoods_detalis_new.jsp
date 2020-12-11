@@ -57,7 +57,9 @@
             closeGoodsDescDialog();
             closeOverSeaDialog();
             $('#catid-dlg').dialog('close');
+            closeEnTypeDialog();
             createComboTree();
+
         });
 
         function relieveDisabled(obj) {
@@ -2270,6 +2272,8 @@
                             <div class="goods_top">
                                 <input class="s_btn" type="button" value="移除选中规格" onclick="removeTypeId()"
                                        title="请选中规格，点击删除按钮"/>
+                                <input class="s_btn" type="button" value="添加规格" onclick="openEntypeDialog()"
+                                       title="请选中规格，点击删除按钮"/>
                                 <span style="color: red;">*请选中规格，点击删除按钮，删除完成后请点击保存</span>
                                 <c:set value="" var="typeName"></c:set>
                                 <c:set value="${fn:length(showtypes)}" var="typeLength"></c:set>
@@ -2278,6 +2282,7 @@
                                 <c:if test="${typeName != typeBean.lableType }">
                                 <c:if test="${typeName !=''}">
                                 </ul>
+
                             </div>
                             </c:if>
                             <br>
@@ -2831,6 +2836,24 @@
             </div>
         </div>
     </div>
+    <div id="entype_dlg" class="easyui-dialog" title="添加规格"
+         data-options="modal:true"
+         style="width: 460px; height: 280px; padding: 10px;">
+        <br>
+        规格:<input type="text" id="enTypeName" value=""/>
+        <br>
+        规格描述:<input type="text" id="enTypeValue" value=""/>
+        <br>
+
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="addEntype('${goods.pid}')" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeEnTypeDialog()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
 </c:if>
 </body>
 <script type="text/javascript">
@@ -3206,5 +3229,60 @@
         }
         $(obj).parent().find('table').append(content);
     }
+
+    function openEntypeDialog() {
+        $('#entype_dlg').dialog('open');
+    }
+
+
+    function addEntype(pid) {
+        var enTypeName = $("#enTypeName").val();
+        if (enTypeName == null || enTypeName == "") {
+            showMessage("规格不能为空");
+            return false;
+        }
+        var enTypeValue = $("#enTypeValue").val();
+        if (enTypeValue == null || enTypeValue == "") {
+            showMessage("规格描述不能为空");
+            return false;
+        }
+
+        $.messager.progress({
+            title: '正在保存数据',
+            msg: '请等待...'
+        });
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: '/cbtconsole/newProduct/addEnType',
+            data: {
+                "enTypeName": enTypeName,
+                "enTypeValue": enTypeValue,
+                "pid": pid
+            },
+            success: function (data) {
+                $.messager.progress('close');
+                var json = data;
+                closeEnTypeDialog();
+                if (json.ok) {
+                    showMessage(json.message);
+                } else {
+                    $.messager.alert("提醒", json.message, "error");
+                }
+            },
+            error: function () {
+                $.messager.progress('close');
+                $.messager.alert("提醒", "error", "error");
+            }
+        });
+    }
+
+
+    function closeEnTypeDialog() {
+        $('#entype_dlg').dialog('close');
+        $("#enTypeName").val("");
+        $("#enTypeValue").val("");
+    }
+
 </script>
 </html>

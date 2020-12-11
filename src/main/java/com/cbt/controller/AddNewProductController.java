@@ -4091,10 +4091,14 @@ public class AddNewProductController {
             String time = String.valueOf(System.currentTimeMillis());
             List<TypeBean> newTypeList = new ArrayList<TypeBean>();
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(orGoods, false);
+            String tyteLable = enTypeName;
+            if (typeList != null && typeList.size() > 0) {
+                tyteLable = typeList.get(0).getLableType();
+            }
             TypeBean typeBean = new TypeBean();
             typeBean.setType(enTypeName);
             typeBean.setValue(enTypeValue);
-            typeBean.setLableType(enTypeName);
+            typeBean.setLableType(tyteLable);
             typeBean.setId(time.substring(6));
             typeBean.setImg("");
             typeBean.setSell("1");
@@ -4138,11 +4142,14 @@ public class AddNewProductController {
             List<ImportExSku> skuNewList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
             List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku(), ImportExSku.class);
             System.out.println(skuList);
+            if (entypeBens != null && entypeBens.size() > 0) {
+                tyteLable = entypeBens.get(0).getLableType();
+            }
             EntypeBen entypeBen = new EntypeBen();
             entypeBen.setType(typeBean.getType());
             entypeBen.setValue(typeBean.getValue());
             entypeBen.setId(typeBean.getId());
-            entypeBen.setLableType(typeBean.getLableType());
+            entypeBen.setLableType(tyteLable);
             entypeBen.setSell(typeBean.getSell());
             entypeBen.setImg("");
             if (entypeBens == null) {
@@ -4217,8 +4224,11 @@ public class AddNewProductController {
             }
             System.out.println(entypeBens.toString());
             System.out.println(skuList.toString());
-            System.out.println(skuNewList.toString());
-            goods.setSku_new(skuNewList.toString());
+            if (skuNewList != null) {
+                System.out.println(skuNewList.toString());
+                goods.setSku_new(skuNewList.toString());
+            }
+
             goods.setEntype(typeList.toString());
             goods.setEntypeNew(entypeBens.toString());
             goods.setSku(skuList.toString());
