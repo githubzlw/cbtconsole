@@ -1163,10 +1163,10 @@ public class EditorController {
 
             List<TypeBean> newTypeList = new ArrayList<TypeBean>();
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(orGoods, false);
-            if (StringUtils.isNotBlank(typeDeleteIds)) {
+            if (StringUtils.isNotBlank(typeDeleteIds) && (typeList != null)) {
                 String[] tpList = typeDeleteIds.split(",");
 
-                if (!(tpList.length == 0 || typeList.isEmpty())) {
+                if (!(typeList.isEmpty() || tpList.length == 0 )) {
                     //剔除选中的规格
                     for (TypeBean tpBean : typeList) {
                         boolean notPt = true;
@@ -1185,10 +1185,10 @@ public class EditorController {
             }
             List<EntypeBen> newEnTypeList = new ArrayList<EntypeBen>();
             List<EntypeBen> entypeBens = JSONArray.parseArray(orGoods.getEntypeNew(), EntypeBen.class);
-            if (StringUtils.isNotBlank(typeDeleteIds)) {
+            if (StringUtils.isNotBlank(typeDeleteIds) && (entypeBens != null)) {
                 String[] tpList = typeDeleteIds.split(",");
 
-                if (!(tpList.length == 0 || typeList.isEmpty())) {
+                if (!( entypeBens.isEmpty() || entypeBens.size() == 0)) {
                     //剔除选中的规格
                     for (EntypeBen entypeBen : entypeBens) {
                         boolean notPt = true;
@@ -1296,6 +1296,9 @@ public class EditorController {
                 cgp.setIsUpdateImg(2);
             }
 
+            String brandName = request.getParameter("brandName");
+            cgp.setBrandName(brandName);
+
 
             String type = request.getParameter("type");
             // type 0 保存 1 保存并发布
@@ -1326,7 +1329,7 @@ public class EditorController {
                     String updateTimeStr = orGoods.getUpdateTimeAll();
                     //判断不是正式环境的，不进行搜图图片更新
                     String ip = request.getRemoteAddr();
-                    customGoodsService.updateGoodsState(pidStr, 1);
+                    //customGoodsService.updateGoodsState(pidStr, 1);
                     System.err.println("ip:" + ip);
                     if (cgp.getIsUpdateImg() == 0) {
                         cgp.setIsUpdateImg(1);
@@ -1338,6 +1341,11 @@ public class EditorController {
                             json.setOk(false);
                             json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
                         } else {
+                           /* InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+                            inputData.setPid(cgp.getPid());
+                            inputData.setBrand_name(brandName);
+
+                            GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
                             PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
                             FutureTask futureTask = new FutureTask(pbCallable);
                             Thread thread = new Thread(futureTask);
@@ -1351,6 +1359,11 @@ public class EditorController {
 
                         }
                     } else {
+                       /* InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+                        inputData.setPid(cgp.getPid());
+                        inputData.setBrand_name(brandName);
+
+                        GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
                         PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
                         FutureTask futureTask = new FutureTask(pbCallable);
                         Thread thread = new Thread(futureTask);
