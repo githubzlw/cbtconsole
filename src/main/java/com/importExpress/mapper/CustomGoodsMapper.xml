@@ -136,7 +136,7 @@
         <result column="price_kids" property="price_kids"/>
         <result column="price_pets" property="price_pets"/>
         <result column="img_check" property="img_check"/>
-        <result column="entype_new" property="entypeNew"/>
+        <result column="brand_name" property="brandName"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -958,7 +958,7 @@
         ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num,
         ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag,
         ifnull(pts.sort,-1) as topSort, cbu.free_price_new,cbu.range_price_free_new,cbu.sku_new,
-        cbu.price_import, cbu.price_kids,cbu.price_pets, cbu.morder, cbu.entype_new
+        cbu.price_import, cbu.price_kids,cbu.price_pets, cbu.morder, cbu.entype_new, cbu.brand_name
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -1056,6 +1056,9 @@
         </if>
         <if test="entypeNew != null">
             ,b.entype_new=#{entypeNew}
+        </if>
+        <if test="brandName != null">
+            ,b.brand_name=#{brandName}
         </if>
         where a.pid = b.pid and b.pid = #{pid}
     </update>
@@ -1646,7 +1649,7 @@
         cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
         ifnull(cge.click_num,0) as click_num,
         ifnull(cbc.complain_id,'') as complain_id,ifnull(cge.price_1688,'') as price_1688,ifnull(cge.weight_check,'') as weight_check,
-        (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount
+        (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount, cbu.brand_name
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid

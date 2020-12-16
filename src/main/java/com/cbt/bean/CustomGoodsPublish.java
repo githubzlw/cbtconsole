@@ -162,6 +162,8 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private int morder;
 
+    private String brandName;
+
     public String getImg_check() {
         return img_check;
     }
@@ -1086,5 +1088,13 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     @Override
     public void setMorder(int morder) {
         this.morder = morder;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
     }
 }

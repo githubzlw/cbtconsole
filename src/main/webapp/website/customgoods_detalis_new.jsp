@@ -466,6 +466,8 @@
             var goodsPriceVal = $("#goods_price_id").val();
             var gd_moq = $("#gd_moq").val();
 
+            var brandName = $("#brandName").val();
+
             if (isErr) {
                 return;
             } else {
@@ -499,7 +501,8 @@
                         "wordSizeInfo": wordSizeInfo,
                         "mainImg": mainImg,
                         "skuCount": skuCount,
-                        "gd_moq": gd_moq
+                        "gd_moq": gd_moq,
+                        "brandName": brandName
                     },
                     success: function (data) {
                         $('.mask').hide();
@@ -2515,6 +2518,11 @@
                         </div>
                     </div>
                 </div>
+                <p class="s_tit">
+                    <label class="label"> 描述：<input id="brandName"
+                                                      type="text" class="s_txt" value="${goods.brandName}"/>
+                    </label>
+                </p>
             </div>
         </div>
         <div class="s_r">

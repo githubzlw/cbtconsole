@@ -4240,16 +4240,49 @@ public class AddNewProductController {
                     skuNewList.add(importExSku);
                 }
             }
-            System.out.println(entypeBens.toString());
-            System.out.println(skuList.toString());
+
             if (skuNewList != null) {
-                System.out.println(skuNewList.toString());
                 goods.setSku_new(skuNewList.toString());
+            }else{
+                skuNewList =  new ArrayList<>();
+                ImportExSku importExSku = new ImportExSku();
+                importExSku.setSkuId(time + dateNowStr);
+                importExSku.setSpecId(time + dateNowStr);
+                importExSku.setSkuAttr(time.substring(0, 6) + ":" + time.substring(6) + ";" +
+                        typeBean.getId().substring(0, typeBean.getId().length() - 1) + ":" + typeBean.getId());
+                importExSku.setSkuPropIds(time.substring(6) + "," + typeBean.getId());
+                if (!isSkuFlag) {
+                    ImportExSkuVal importExSkuVal = new ImportExSkuVal();
+                    importExSkuVal.setFreeSkuPrice("0.0");
+                    importExSkuVal.setActivity(true);
+                    importExSkuVal.setAvailQuantity(1);
+                    importExSku.setSkuVal(importExSkuVal);
+                }
+                skuNewList.add(importExSku);
+            }
+            if(skuList != null){
+                goods.setSku(skuList.toString());
+            }
+            else{
+                skuList =  new ArrayList<>();
+                ImportExSku importExSku = new ImportExSku();
+                importExSku.setSkuId(time + dateNowStr);
+                importExSku.setSpecId(time + dateNowStr);
+                importExSku.setSkuAttr(time.substring(0, 6) + ":" + time.substring(6) + ";" +
+                        typeBean.getId().substring(0, typeBean.getId().length() - 1) + ":" + typeBean.getId());
+                importExSku.setSkuPropIds(time.substring(6) + "," + typeBean.getId());
+                if (!isSkuFlag) {
+                    ImportExSkuVal importExSkuVal = new ImportExSkuVal();
+                    importExSkuVal.setFreeSkuPrice("0.0");
+                    importExSkuVal.setActivity(true);
+                    importExSkuVal.setAvailQuantity(1);
+                }
+                skuList.add(importExSku);
             }
 
             goods.setEntype(typeList.toString());
             goods.setEntypeNew(entypeBens.toString());
-            goods.setSku(skuList.toString());
+
             int result = customGoodsService.updateEntypeSkuByPid(goods);
             if (result > 0) {
                 InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
