@@ -1329,7 +1329,7 @@ public class EditorController {
                     String updateTimeStr = orGoods.getUpdateTimeAll();
                     //判断不是正式环境的，不进行搜图图片更新
                     String ip = request.getRemoteAddr();
-                    //customGoodsService.updateGoodsState(pidStr, 1);
+                    customGoodsService.updateGoodsState(pidStr, 1);
                     System.err.println("ip:" + ip);
                     if (cgp.getIsUpdateImg() == 0) {
                         cgp.setIsUpdateImg(1);
@@ -1359,7 +1359,7 @@ public class EditorController {
 
                         }
                     } else {
-                       /* InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+                      /*  InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
                         inputData.setPid(cgp.getPid());
                         inputData.setBrand_name(brandName);
 
