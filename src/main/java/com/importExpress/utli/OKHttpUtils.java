@@ -116,6 +116,25 @@ public class OKHttpUtils {
     }
 
     /**
+     * Get请求
+     *
+     * @param url      请求链接
+     * @return
+     * @throws IOException
+     */
+    public String get(String url) throws Exception {
+        checkAndInitOkHttp();
+
+        Request request = new Request.Builder().addHeader("Connection", "close").url(url).build();
+        Response response = client.newCall(request).execute();
+        if (response.isSuccessful()) {
+            return response.body().string();
+        } else {
+            throw new Exception("Error:" + response.body().string() + "Exception:" + response);
+        }
+    }
+
+    /**
      * Post请求
      *
      * @param url       请求链接

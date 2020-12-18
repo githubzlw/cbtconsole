@@ -1043,4 +1043,28 @@ public interface CustomGoodsService {
     ProductSingleBean queryPidSingleBean(String pid);
 
     int setNoUpdatePrice(CustomGoodsPublish goods);
+
+    /**
+     * 新增商品信息
+     *
+     * @param cgp
+     * @param adminId
+     * @param type
+     * @return
+     */
+    int saveNewGoodsDetails(CustomGoodsPublish cgp, int adminId, int type);
+
+    /**
+     * 获取新增商品的pid
+     *
+     * @return
+     */
+    int queryNewPid();
+
+    CustomGoodsPublish queryNewGoodsDetails(String pid);
+
+    int updateNewGoodsDetailsByInfo(CustomGoodsPublish cgp);
+
+    int updateEntypeSkuByPid(CustomGoodsPublish cgp);
+
 }

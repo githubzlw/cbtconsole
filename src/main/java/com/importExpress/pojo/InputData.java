@@ -115,6 +115,8 @@ public class InputData {
     private String price_kids;
     private String price_pets;
 
+    private String brand_name;
+
     public String getFree_price_new() {
         return free_price_new;
     }
@@ -920,5 +922,13 @@ public class InputData {
 
     public InputData(Character crud) {
         this.crud = crud;
+    }
+
+    public String getBrand_name() {
+        return brand_name;
+    }
+
+    public void setBrand_name(String brand_name) {
+        this.brand_name = brand_name;
     }
 }

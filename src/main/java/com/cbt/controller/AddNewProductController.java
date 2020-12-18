@@ -3,6 +3,8 @@ package com.cbt.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.cbt.bean.TypeBean;
 import com.cbt.bean.ZoneBean;
 import com.cbt.bean.*;
@@ -17,6 +19,7 @@ import com.cbt.parse.service.*;
 import com.cbt.pojo.EntypeBen;
 import com.cbt.service.CategoryService;
 import com.cbt.service.CustomGoodsService;
+import com.cbt.service.SingleGoodsService;
 import com.cbt.util.*;
 import com.cbt.warehouse.pojo.HotCategory;
 import com.cbt.warehouse.pojo.HotSellingGoods;
@@ -63,9 +66,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(value = "/editc")
-public class EditorController {
-    private static final Log LOG = LogFactory.getLog(EditorController.class);
+@RequestMapping(value = "/newProduct")
+public class AddNewProductController {
+    private static final Log LOG = LogFactory.getLog(AddNewProductController.class);
     private String rootPath = "F:/console/tomcatImportCsv/webapps/";
     private String localIP = "http://27.115.38.42:8083/";
     private String wanlIP = "http://192.168.1.27:8083/";
@@ -93,12 +96,52 @@ public class EditorController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private SingleGoodsService singleGoodsService;
+
     @SuppressWarnings({"static-access", "unchecked"})
-    @RequestMapping(value = "/detalisEdit", method = {RequestMethod.POST, RequestMethod.GET})
-    public ModelAndView detalisEdit(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @RequestMapping(value = "/addNewProduct", method = {RequestMethod.POST, RequestMethod.GET})
+    public ModelAndView addNewProduct(HttpServletRequest request, HttpServletResponse response) throws IOException {
         DataSourceSelector.restore();
         // ModelAndView mv = new ModelAndView("customgoods_detalis");
-        ModelAndView mv = new ModelAndView("customgoods_detalis_new");
+        ModelAndView mv = new ModelAndView("new_customgoods_detalis");
+
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            mv.addObject("uid", 0);
+            mv.addObject("message", "未登录");
+            return mv;
+        } else {
+            mv.addObject("uid", user.getId());
+            mv.addObject("roletype", user.getRoletype());
+        }
+        try {
+            // 获取需要编辑的内容
+            int pid = customGoodsService.queryNewPid();
+
+            // 取出1688商品的全部信息
+            CustomGoodsPublish goods = new CustomGoodsPublish();
+            goods.setPid(String.valueOf(pid));
+            String remotePath = ftpConfig.getLocalShowPath();
+            goods.setRemotpath(remotePath);
+            mv.addObject("text", "");
+            mv.addObject("goods", goods);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mv.addObject("uid", 0);
+            mv.addObject("message", e.getMessage());
+        }
+        return mv;
+    }
+
+    @SuppressWarnings({"static-access", "unchecked"})
+    @RequestMapping(value = "/getNewProductDetail", method = {RequestMethod.POST, RequestMethod.GET})
+    public ModelAndView getNewProductDetail(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        DataSourceSelector.restore();
+        // ModelAndView mv = new ModelAndView("customgoods_detalis");
+        ModelAndView mv = new ModelAndView("new_customgoods_detalis");
 
         String sessionId = request.getSession().getId();
         String userJson = Redis.hget(sessionId, "admuser");
@@ -114,401 +157,34 @@ public class EditorController {
         try {
             // 获取需要编辑的内容
             String pid = request.getParameter("pid");
-            if (pid == null || pid.isEmpty()) {
-                return mv;
-            }
-            if (offLineMap.size() == 0) {
-                List<Map<String, String>> mapList = customGoodsService.queryAllOffLineReason();
-                for (Map<String, String> tempMap : mapList) {
-                    offLineMap.put(String.valueOf(tempMap.get("unsellablereason_id")), tempMap.get("unsellablereason_name"));
-                }
-                mapList.clear();
-            }
 
             // 取出1688商品的全部信息
-            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-
-            if (goods == null) {
-                mv.addObject("uid", -1);
-                return mv;
-            } else if (user.getId() == 63) {
-                goods.setCanEdit(0);
-            }
-
-            ProductSingleBean singleBean = customGoodsService.queryPidSingleBean(pid);
-            if (singleBean != null) {
+            CustomGoodsPublish goods = customGoodsService.queryNewGoodsDetails(pid);
+            if (goods != null) {
                 String regEx = "[\\[\\]]";
-                if (StringUtils.isNotBlank(singleBean.getWprice())) {
-                    singleBean.setWprice(singleBean.getWprice().replaceAll(regEx, "").replace("$", "@").trim());
+                if (StringUtils.isNotBlank(goods.getWprice())) {
+                    goods.setWprice(goods.getWprice().replaceAll(regEx, "").replace("$", "@").trim());
                 }
-                if (StringUtils.isNotBlank(singleBean.getFree_price_new())) {
-                    singleBean.setFree_price_new(singleBean.getFree_price_new().replaceAll(regEx, "").replace("$", "@").trim());
-                }
-            }
-            mv.addObject("singleBean", singleBean);
-
-            if (StringUtils.isBlank(goods.getRangePrice())) {
-                goods.setWprice(goods.getFree_price_new());
-            }
-
-            if (goods.getGoodsState() == 1) {
-                goods.setOffReason(null);
-                goods.setUnsellAbleReasonDesc(null);
-            } else if (goods.getValid() == 0) {
-                if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
-                    goods.setOffReason(null);
-                    goods.setUnsellAbleReasonDesc(null);
-                } else if (goods.getUnsellAbleReason() == 0 && StringUtils.isBlank(goods.getOffReason())) {
-                    goods.setOffReason("老数据");
-                }
-            } else if (goods.getValid() == 2) {
-                if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
-                    goods.setOffReason(null);
-                    goods.setUnsellAbleReasonDesc(null);
-                } else {
-                    String rsStr = offLineMap.getOrDefault(String.valueOf(goods.getUnsellAbleReason()), "");
-                    if (StringUtils.isNotBlank(rsStr)) {
-                        goods.setUnsellAbleReasonDesc(offLineMap.get(String.valueOf(goods.getUnsellAbleReason())));
-                    } else {
-                        goods.setUnsellAbleReasonDesc("未知下架原因");
-                    }
-                }
-            } else if (goods.getValid() == 1) {
-                if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3 || goods.getGoodsState() == 5) {
-                    goods.setOffReason(null);
-                    goods.setUnsellAbleReasonDesc(null);
-                }
-            }
-
-            if (goods == null) {
-                mv.addObject("uid", -1);
-                return mv;
-            } else if (user.getId() == 63) {
-                goods.setCanEdit(0);
-            }
-
-            if (StringUtils.isNotBlank(goods.getFeeprice())) {
-                goods.setFeeprice(goods.getFeeprice().replace("[", "").replace("]", "").replace("$", "@"));
-            }
-
-            if (StringUtils.isNotBlank(goods.getWprice())) {
-                goods.setWprice(goods.getWprice().replace("[", "").replace("]", "").replace("$", "@"));
-            }
-
-            if (!"".equals(goods.getOcrSizeInfo1())) {
-                request.setAttribute("ocrSizeInfo1", goods.getOcrSizeInfo1());
-            }
-            if (!"".equals(goods.getOcrSizeInfo2())) {
-                request.setAttribute("ocrSizeInfo2", goods.getOcrSizeInfo2());
-            }
-            if (!"".equals(goods.getOcrSizeInfo3())) {
-                request.setAttribute("ocrSizeInfo3", goods.getOcrSizeInfo3());
-            }
-
-            // 根据shopid查询店铺数据
-        /*int queryId = 0;
-        if (!(goods.getShopId() == null || "".equals(goods.getShopId()))) {
-            ShopManagerPojo spmg = customGoodsService.queryByShopId(goods.getShopId());
-            if (spmg != null) {
-                queryId = spmg.getId();
-            }
-        }*/
-
-            mv.addObject("shopId", goods.getShopId());
-            //查询商品评论信息
-            List<CustomGoodsPublish> reviewList = customGoodsService.getAllReviewByPid(pid);
-            request.setAttribute("reviewList", JSONArray.toJSON(reviewList));
-            // 取出主图筛选数量
-            GoodsPictureQuantity pictureQt = customGoodsService.queryPictureQuantityByPid(pid);
-            pictureQt.setImgDeletedSize(pictureQt.getTypeOriginalSize() + pictureQt.getImgOriginalSize()
-                    - pictureQt.getImgSize() - pictureQt.getTypeSize());
-            // pictureQt.setTypeDeletedSize(pictureQt.getTypeOriginalSize()-pictureQt.getTypeSize());
-            pictureQt.setInfoDeletedSize(pictureQt.getInfoOriginalSize() - pictureQt.getInfoSize());
-            request.setAttribute("pictureQt", pictureQt);
-
-            // 取出1688原货源链接
-
-            // 将goods的entype属性值取出来,即规格图
-            List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
-
-            // 将goods的img属性值取出来,即橱窗图
-            request.setAttribute("showimgs", JSONArray.toJSON("[]"));
-            List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
-            if (imgs.size() > 0) {
-                request.setAttribute("showimgs", JSONArray.toJSON(imgs));
-                String firstImg = imgs.get(0);
-
-                goods.setShowMainImage(firstImg.replace(".60x60.", ".400x400."));
-            }
-
-            HashMap<String, String> pInfo = GoodsInfoUtils.deal1688Sku(goods);
-            request.setAttribute("showattribute", pInfo);
-
-
-            request.setAttribute("isSoldFlag", goods.getIsSoldFlag());
-
-
-            // 处理Sku数据
-            // 判断是否是区间价格，含有区间价格的获取sku数据进行处理
-            if (StringUtils.isNotBlank(goods.getRangePrice()) && StringUtils.isNotBlank(goods.getSku())) {
-                List<ImportExSku> skuList = new ArrayList<ImportExSku>();
-                /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
-                skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
-                skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(), ImportExSku.class);
-                // 规格标题名称集合
-                List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
-                // 集合排序
-                Collections.sort(cbSkus, new Comparator<ImportExSkuShow>() {
-                    public int compare(ImportExSkuShow o1, ImportExSkuShow o2) {
-                        return o1.getPpIds().compareTo(o2.getPpIds());
-                    }
-                });
-                request.setAttribute("showSku", JSONArray.toJSON(cbSkus));
-
-                Map<String, Object> typeNames = new HashMap<String, Object>();
-                for (TypeBean tyb : typeList) {
-                    if (!typeNames.containsKey(tyb.getTypeId())) {
-                        typeNames.put(tyb.getTypeId(), tyb.getType());
-                    }
-                }
-                request.setAttribute("typeNames", typeNames);
-            }
-
-            //判断是否是免邮商品(isSoldFlag > 0)，如果是则显示免邮价格显示
-            if (Integer.parseInt(goods.getIsSoldFlag()) > 0) {
-                if (StringUtils.isNotBlank(goods.getFeeprice())) {
-                    request.setAttribute("feePrice", goods.getFeeprice());
-                } else {
-                    request.setAttribute("feePrice", "");
-                }
-            }
-
-
-            if (typeList.size() > 0) {
-                request.setAttribute("showtypes", JSONArray.toJSON(typeList));
-            } else {
-                request.setAttribute("showtypes", "");
-            }
-
-            //进行利润率计算,区分免邮和费免邮商品
-            goods.setWeight(StrUtils.matchStr(goods.getWeight(), "(\\d+\\.*\\d*)"));
-            //运费计算公式
-            double freight = 0.076 * Double.parseDouble(goods.getFinalWeight()) * 1000;
-            //获取1688价格(1piece)
-            String wholePriceStr = goods.getWholesalePrice();
-            if (StringUtils.isNotBlank(wholePriceStr)) {
-                String firstPrice = wholePriceStr.split(",")[0].split("\\$")[1].trim();
-                firstPrice = firstPrice.replace("]", "");
-                double wholePrice = 0;
-                if (firstPrice.contains("-")) {
-                    wholePrice = Double.parseDouble(firstPrice.split("-")[1].trim());
-                } else {
-                    wholePrice = Double.parseDouble(firstPrice.trim());
-                }
-                //判断免邮非免邮
-                double oldProfit = 0;
-                double singlePrice = 0;
-                String singlePriceStr = "0";
-                if (Integer.parseInt(goods.getIsSoldFlag()) > 0) {
-                    //先取range_price 为空则再取feeprice
-                    if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                        if (goods.getRangePrice().contains("-")) {
-                            singlePriceStr = goods.getRangePrice().split("-")[1].trim();
-                        } else {
-                            singlePriceStr = goods.getRangePrice().trim();
-                        }
-                    } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
-                        singlePriceStr = goods.getFeeprice().split(",")[0];
-                        if (singlePriceStr.contains("\\$")) {
-                            singlePriceStr = singlePriceStr.split("\\$")[1].trim();
-                        } else if (singlePriceStr.contains("@")) {
-                            singlePriceStr = singlePriceStr.split("@")[1].trim();
-                        } else {
-                            singlePriceStr = singlePriceStr.trim();
-                        }
-                    }
-                } else {
-                    //先取range_price 为空则wprice 再为空取price
-                    if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                        if (goods.getRangePrice().contains("-")) {
-                            singlePriceStr = goods.getRangePrice().split("-")[1].trim();
-                        } else {
-                            singlePriceStr = goods.getRangePrice().trim();
-                        }
-                    } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
-                        singlePriceStr = goods.getFeeprice().split(",")[0];
-                        if (singlePriceStr.contains("\\$")) {
-                            singlePriceStr = singlePriceStr.split("\\$")[1].trim();
-                        } else if (singlePriceStr.contains("@")) {
-                            singlePriceStr = singlePriceStr.split("@")[1].trim();
-                        } else {
-                            singlePriceStr = singlePriceStr.trim();
-                        }
-                    } else {
-                        singlePriceStr = goods.getPrice();
-                    }
-                }
-                singlePriceStr = singlePriceStr.replace("[", "").replace("]", "");
-                //获取1piece的最高价格
-                if (singlePriceStr.contains("-")) {
-                    singlePrice = Double.parseDouble(singlePriceStr.split("-")[1].trim());
-                } else {
-                    singlePrice = Double.parseDouble(singlePriceStr);
-                }
-                //计算利润率
-                //oldProfit = (singlePrice * 6.6 - wholePrice) / wholePrice * 100;
-                //goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit,2));
-
-
-                //计算加价率
-            /*if ((goods.getIsBenchmark() == 1 && goods.getBmFlag() == 1) || goods.getIsBenchmark() == 2) {
-                //对标时
-                //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/StrUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/StrUtils.EXCHANGE_RATE(6.6));
-                String aliPirce;
-                if (goods.getAliGoodsPrice().contains("-")) {
-                    aliPirce = goods.getAliGoodsPrice().split("-")[1];
-                } else {
-                    aliPirce = goods.getAliGoodsPrice();
-                }
-                double priceXs = (Double.parseDouble(aliPirce) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
-                //加价率
-                oldProfit = GoodsPriceUpdateUtil.getAddPriceJz(priceXs);
-                goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit, 2));
-            } else {
-                //非对标
-                //catXs = DetailDataUtils.getCatxs(catid1【产品表catid1】,String.valueOf(factory)[1688人民币p1]);
-                double catXs = GoodsPriceUpdateUtil.getCatxs(goods.getCatid1(), String.valueOf(wholePrice));
-                //加价率= 0.55+类别调整值
-                oldProfit = 0.55 + catXs;
-                goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit, 2));
-            }*/
-            } else {
-                System.err.println("pid:" + pid + ",wholePrice is null");
-            }
-
-            // 判断是精准对标的
-            if (goods.getBmFlag() == 1 && goods.getIsBenchmark() == 1) {
-                // 获取实时对标信息
-                Map<String, String> priceMap = customGoodsService.queryNewAliPriceByAliPid(goods.getAliGoodsPid());
-                if (priceMap.size() > 1) {
-                    goods.setCrawlAliDate(priceMap.get("new_time"));
-                    goods.setCrawlAliPrice(priceMap.get("new_price"));
-                }
-            }
-
-            // 直接使用远程路径
-            String localpath = goods.getRemotpath();
-            // 设置默认图的路径
-            if (!(goods.getShowMainImage().contains("http"))) {
-                goods.setShowMainImage(localpath + goods.getShowMainImage());
-            }
-
-            // 判断是否是人为修改的重量，如果是则显示修改的重量，否则显示默认的重量
-            if (goods.getReviseWeight() == null || "".equals(goods.getReviseWeight())) {
-                goods.setReviseWeight(goods.getFinalWeight());
-            }
-
-            String text = GoodsInfoUtils.dealEnInfoImg(goods.getEninfo(), goods.getRemotpath());
-
-            // 已经放入产品表的size_info_en字段
-            //获取文字尺码数据
-            // String wordSizeInfo = customGoodsService.getWordSizeInfoByPid(pid);
-            String wordSizeInfo = goods.getSizeInfoEn();
-            if (StringUtils.isNotBlank(wordSizeInfo)) {
-                if (wordSizeInfo.indexOf("[") == 0) {
-                    wordSizeInfo = wordSizeInfo.substring(1);
-                }
-                if (wordSizeInfo.lastIndexOf("]") == wordSizeInfo.length() - 1) {
-                    wordSizeInfo = wordSizeInfo.substring(0, wordSizeInfo.length() - 1);
-                }
-                goods.setSizeInfoEn(wordSizeInfo);
-            }
-
-            // 当前抓取aliexpress的商品数据
-            boolean isLocal = true;
-            if (!(goods.getAliGoodsPid() == null || "".equals(goods.getAliGoodsPid()))) {
-                GoodsBean algood = null;
-                String aliUrl = "https://www.aliexpress.com/item/"
-                        + (goods.getAliGoodsName() == null ? "ali goods" : goods.getAliGoodsName())
-                        + "/" + goods.getAliGoodsPid() + ".html";
-                goods.setAliGoodsUrl(aliUrl);
-                System.err.println("url:" + aliUrl);
-                if (isLocal) {
-                    // 本地直接获取ali商品信息
-                    algood = ParseGoodsUrl.parseGoodsw(aliUrl, 3);
-                } else {
-                    // 远程访问获取ali商品信息
-                    String resultJson = DownloadMain.getContentClient(ContentConfig.CRAWL_ALI_URL + aliUrl,
-                            null);
-                    algood = (GoodsBean) JSONObject.parseObject(resultJson, GoodsBean.class);
+                if (StringUtils.isNotBlank(goods.getFree_price_new())) {
+                    goods.setFree_price_new(goods.getFree_price_new().replaceAll(regEx, "").replace("$", "@").trim());
                 }
 
-                if (algood == null || algood.getValid() == 0) {
-                    goods.setAliGoodsName("get aliexpress goodsinfo failure this is a test goods");
-                    goods.setAliGoodsImgUrl(
-                            "https://ae01.alicdn.com/kf/HTB1AYzjSpXXXXbHXpXXq6xXFXXXx/960P-1-3MP-HD-Wireless-IP-Camera-wi-fi-Robot-camera-Wifi-Night-Vision-Camera-IP.jpg");
-                } else {
-                    // goods.setAliGoodsName(algood.getpName());
-                    // if (algood.getImgSize().length >= 2) {
-                    // goods.setAliGoodsImgUrl(algood.getpImage().get(0) +
-                    // algood.getImgSize()[1]);
-                    // } else {
-                    // goods.setAliGoodsImgUrl(algood.getpImage().get(0) +
-                    // algood.getImgSize()[0]);
-                    // }
-                    // 获取ali商品的详情文字，并去掉文字中敏感词的数据
 
-                    getTextByHtml(goods, algood, isLocal);
+                List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(),"");
+                if (imgs.size() > 0) {
+
+                    request.setAttribute("showimgs", JSONArray.toJSON(imgs));
+                    String firstImg = imgs.get(0);
+
+                    goods.setShowMainImage(firstImg.replace(".60x60.", ".400x400."));
                 }
+
+                HashMap<String, String> pInfo = GoodsInfoUtils.deal1688Sku(goods);
+                request.setAttribute("showattribute", pInfo);
             }
-            // 返回待编辑数据到编辑页面
+            String text = GoodsInfoUtils.dealEnInfoImg(goods.getEninfo(), "");
             mv.addObject("text", text);
-            mv.addObject("pid", pid);
-
             mv.addObject("goods", goods);
-            // 上传图片保存路径----酌情配置
-            String savePath = localpath.replace(localIP, rootPath);
-            if (IpCheckUtil.checkIsIntranet(request)) {
-                savePath = localpath.replace(wanlIP, rootPath);
-            }
-            mv.addObject("savePath", savePath);
-            mv.addObject("localpath", localpath);
-
-            // 描述很精彩标识
-            if (goods.getDescribeGoodFlag() > 0) {
-                Map<String, String> rsMap = customGoodsService.queryDescribeLogInfo(pid);
-                if (rsMap == null || StringUtils.isBlank(rsMap.get("admName"))) {
-                    mv.addObject("describeGoodFlagStr", "");
-                } else {
-                    mv.addObject("describeGoodFlagStr", "标识人:" + rsMap.get("admName") + ",时间:" + rsMap.get("create_time"));
-                }
-            }
-
-            // 获取海外仓标识信息
-            List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
-
-            if (CollectionUtils.isEmpty(goodsOverSeaList)) {
-                mv.addObject("goodsOverSeaList", null);
-            } else {
-                mv.addObject("goodsOverSeaList", goodsOverSeaList);
-                long count = goodsOverSeaList.stream().filter(e -> e.getIsSupport() > 0).count();
-                if (count > 0) {
-                    goods.setOverSeaFlag(1);
-                }
-            }
-
-            // 获取美加可售标识
-
-            int salable = customGoodsService.querySalableByPid(pid);
-            mv.addObject("salable", salable);
-
-            if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                // 显示sku重量
-                mv.addObject("isSkuFlag", 1);
-            } else {
-                mv.addObject("isSkuFlag", 0);
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
             mv.addObject("uid", 0);
@@ -667,7 +343,7 @@ public class EditorController {
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
             /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
-            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
+            List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
             String[] skuStrList = skuStr.split(";");
             String[] volumeSkuList = volumeSkuStr.split(";");
             String[] singPriceList = singPriceStr.split(";");
@@ -920,7 +596,30 @@ public class EditorController {
 
             CustomGoodsPublish cgp = new CustomGoodsPublish();
 
+            String newCatid =  request.getParameter("catid");
+
+            cgp.setCatid1(newCatid);
+
+            // 验证合法性
+            CategoryBean oldBean = categoryService.queryCategoryById(newCatid);
+            if (oldBean == null) {
+                json.setOk(false);
+                json.setMessage("无新类别ID");
+            } else {
+
+                cgp.setPathCatid(oldBean.getPath());
+            }
+
             String contentStr = request.getParameter("content");
+            if (!(contentStr == null || "".equals(contentStr))) {
+                // 产品详情
+                cgp.setEninfo(contentStr);
+            } else {
+                json.setOk(false);
+                json.setMessage("获取商品详情失败");
+                return json;
+            }
+
             // String localpath = request.getParameter("localpath");
 
             String pidStr = request.getParameter("pid");
@@ -931,36 +630,7 @@ public class EditorController {
                 json.setMessage("获取pid失败");
                 return json;
             }
-            String sellUtil = request.getParameter("sellUtil");
-            if (StringUtils.isNotBlank(sellUtil)) {
-                cgp.setSellUnit(sellUtil);
-            } else {
-                json.setOk(false);
-                json.setMessage("获取售卖单位失败");
-                return json;
-            }
-            // 获取商品信息
-            CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pidStr, 0);
-            if (orGoods.getValid() == 0 && StringUtils.isBlank(orGoods.getOffReason())) {
-                orGoods.setOffReason("老数据");
-            } else if (orGoods.getValid() == 2 && orGoods.getUnsellAbleReason() == 0) {
-                orGoods.setUnsellAbleReasonDesc("老数据");
-            }
 
-            //判断售卖单位是否一致
-//            if(sellUtil.equalsIgnoreCase(orGoods.getSellUnit())){
-//                cgp.setSellUnit(null);
-//            }
-
-            String orFinalWeight = orGoods.getFinalWeight();
-            String remotepath = request.getParameter("remotepath");
-            if (remotepath == null || "".equals(remotepath)) {
-                json.setOk(false);
-                json.setMessage("获取图片远程路径失败");
-                return json;
-            } else {
-                cgp.setRemotpath(remotepath);
-            }
             String enname = request.getParameter("enname");
             if (!(enname == null || "".equals(enname))) {
                 cgp.setEnname(enname);
@@ -969,72 +639,75 @@ public class EditorController {
                 json.setMessage("获取产品名称失败");
                 return json;
             }
-            //String weightStr = request.getParameter("weight");
-            /*if (!(weightStr == null || "".equals(weightStr))) {
-                // 判断重量是否被修改,只有被修改后才进行更新重量和运费
-                // 判断显示的重量是否来自weight字段的值，是则不更新数据
-                if (weightStr.equals(orGoods.getFinalWeight())) {
-                    cgp.setReviseWeight("0");
-                    cgp.setFeeprice("0");
-                } else {
-                    // 判断显示的重量是否来自reviseWeight字段的值，是则不更新数据
-                    if (weightStr.equals(orGoods.getReviseWeight())) {
-                        cgp.setReviseWeight("0");
-                        cgp.setFeeprice("0");
-                    } else {
-                        cgp.setReviseWeight(weightStr);
-                        // 更新运费，逻辑：运输方式E邮宝，运费计算公式（0.08*克重+9）/6.75
-                        DecimalFormat df = new DecimalFormat("######0.00");
-                        // 判断重量是否是很小的值，如果是很小值则设置为1kg
-                        double weight = Double.parseDouble(weightStr) < 0.000001 ? 1.00 : Double.parseDouble(weightStr);
-                        double cFreight = (0.08 * weight * 1000 + 9) / Util.EXCHANGE_RATE;
-                        cgp.setFeeprice(df.format(cFreight));
-                    }
-                }
+
+            String mainImg = request.getParameter("mainImg");
+            if (!(mainImg == null || "".equals(mainImg))) {
+                cgp.setShowMainImage(mainImg);
             } else {
                 json.setOk(false);
-                json.setMessage("获取产品重量失败");
-                return json;
-            }*/
-            String imgInfo = request.getParameter("imgInfo");
-            if (!(imgInfo == null || "".equals(imgInfo))) {
-                // 获取的橱窗图进行集合封装
-                cgp.setImg("[" + imgInfo.replace(";", ",").replace(remotepath, "") + "]");
-            } else {
-                json.setOk(false);
-                json.setMessage("获取橱窗图失败");
+                json.setMessage("获取搜索图失败");
                 return json;
             }
+
+            String goods_finalWeight = request.getParameter("goods_finalWeight");
+            cgp.setFinalWeight(goods_finalWeight);
+
+            String goods_volum_weight = request.getParameter("goods_volum_weight");
+            cgp.setVolumeWeight(goods_volum_weight);
+
+
+
             String endetailStr = request.getParameter("endetail");
             if (!(endetailStr == null || "".equals(endetailStr))) {
                 // 获取的商品属性进行集合封装
                 cgp.setEndetail("[" + endetailStr.replaceAll(";", ", ") + "]");
             } else {
-                // 不校检商品属性
-                cgp.setEndetail("[]");
-            }
-            if (StringUtils.isNotBlank(contentStr)) {
-                if (contentStr.contains("data:image/png;base64")) {
-                    json.setOk(false);
-                    json.setMessage("详情存在截屏图片，不能保存！");
-                    return json;
-                } else {
-                    // 检查详情中是否含有非本地上传和我司网站的图片
-                    // 产品详情
-                    // String eninfo = contentStr.replaceAll(remotepath, "");
-                    //解析和上传阿里商品的图片
-                    json = GoodsInfoUtils.uploadAliImgToLocal(pidStr, contentStr, ftpConfig);
-                    if (json.isOk()) {
-                        cgp.setEninfo(json.getData().toString().replace(remotepath, ""));
-                    } else {
-                        return json;
-                    }
-                }
-            } else {
                 json.setOk(false);
-                json.setMessage("获取商品详情失败");
+                json.setMessage("获取商品属性失败");
                 return json;
             }
+
+            String rangePrice = request.getParameter("rangePrice");
+
+            if (rangePrice == null || "".equals(rangePrice)) {
+                String wprice = request.getParameter("wprice");
+                if (wprice == null || "".equals(wprice)) {
+                   /* json.setOk(false);
+                    json.setMessage("获取区间价格数据失败");
+                    return json;*/
+                } else {
+
+                    String[] priceLst = wprice.split(",");
+                    double price = Double.valueOf(priceLst[0].split("@")[1]);
+                    for (String priceStr : priceLst) {
+                        double tempPrice = Double.valueOf(priceStr.split("@")[1]);
+                        if (tempPrice < price) {
+                            price = tempPrice;
+                        }
+                    }
+                    DecimalFormat df = new DecimalFormat("######0.00");
+                    cgp.setPrice(df.format(price));
+                    cgp.setWprice("[" + wprice.replace("@", " $ ") + "]");
+                }
+            } else {
+                String sku = request.getParameter("sku");
+                if (sku == null || "".equals(sku)) {
+                    json.setOk(false);
+                    json.setMessage("获取单规格价数据失败");
+                    return json;
+                }
+            }
+
+            String sellUtil = request.getParameter("sellUtil");
+            if (StringUtils.isNotBlank(sellUtil)) {
+                cgp.setSellUnit(sellUtil);
+            } else {
+                json.setOk(false);
+                json.setMessage("获取售卖单位失败");
+                return json;
+            }
+
+
 
             String bizPrice = request.getParameter("bizPrice");
             if (StringUtils.isNotBlank(bizPrice) || "0".equals(bizPrice)) {
@@ -1043,8 +716,9 @@ public class EditorController {
                 cgp.setFpriceStr("");
             }
 
-            String rangePrice = request.getParameter("rangePrice");
+
             String rangePriceFree = request.getParameter("rangePriceFree");
+            cgp.setRange_price_free_new(rangePriceFree);
             String gd_moq = request.getParameter("gd_moq");
             if (StringUtils.isNotBlank(gd_moq)) {
                 cgp.setMorder(Integer.parseInt(gd_moq));
@@ -1097,19 +771,9 @@ public class EditorController {
                 int moq = 0;
                 String wprice = request.getParameter("wprice");
                 if (StringUtils.isBlank(wprice)) {
-                    // 判断wprice是不是空的，如果是，不更新wprice和price值
-                    if (orGoods.getWprice() == null || "".equals(orGoods.getWprice())
-                            || orGoods.getWprice().trim().length() < 3) {
-                        cgp.setPrice(orGoods.getPrice());
+
                         cgp.setWprice("[]", 1);
-                    } else {
-                        String goodsPrice = request.getParameter("goodsPrice");
-                        if (StringUtils.isBlank(goodsPrice)) {
-                            json.setOk(false);
-                            json.setMessage("获取区间价格数据失败");
-                            return json;
-                        }
-                    }
+
                 } else {
                     String[] priceLst = wprice.split(",");
                     minPrice = Double.parseDouble(priceLst[0].split("@")[1]);
@@ -1145,66 +809,10 @@ public class EditorController {
             }
 
             if (StringUtils.isNotBlank(gd_moq)) {
-                if (orGoods.getMorder() != Integer.parseInt(gd_moq)) {
-                    cgp.setMorder(Integer.parseInt(gd_moq));
-                }
+              cgp.setMorder(Integer.parseInt(gd_moq));
             }
 
-            GoodsEditBean editBean = new GoodsEditBean();
-            // 判断是否改价 wprice range_price feeprice price  fprice_str
-            if (GoodsInfoUtils.checkPriceIsUpdate(cgp, orGoods, editBean)) {
-                System.err.println("pid:" + pidStr + ",not update price");
-            } else {
-                cgp.setPriceIsEdit(1);
-            }
 
-            //获取需要删除的规格ids数据，进行匹配删除
-            String typeDeleteIds = request.getParameter("typeDeleteIds");
-
-            List<TypeBean> newTypeList = new ArrayList<TypeBean>();
-            List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(orGoods, false);
-            if (StringUtils.isNotBlank(typeDeleteIds) && (typeList != null)) {
-                String[] tpList = typeDeleteIds.split(",");
-
-                if (!(typeList.isEmpty() || tpList.length == 0 )) {
-                    //剔除选中的规格
-                    for (TypeBean tpBean : typeList) {
-                        boolean notPt = true;
-                        for (String tpId : tpList) {
-                            if (tpId.equals(tpBean.getId())) {
-                                notPt = false;
-                                break;
-                            }
-                        }
-                        if (notPt) {
-                            newTypeList.add(tpBean);
-                        }
-                    }
-                    //cgp.setType(newTypeList.toString());
-                }
-            }
-            List<EntypeBen> newEnTypeList = new ArrayList<EntypeBen>();
-            List<EntypeBen> entypeBens = JSONArray.parseArray(orGoods.getEntypeNew(), EntypeBen.class);
-            if (StringUtils.isNotBlank(typeDeleteIds) && (entypeBens != null)) {
-                String[] tpList = typeDeleteIds.split(",");
-
-                if (!( entypeBens.isEmpty() || entypeBens.size() == 0)) {
-                    //剔除选中的规格
-                    for (EntypeBen entypeBen : entypeBens) {
-                        boolean notPt = true;
-                        for (String tpId : tpList) {
-                            if (tpId.equals(entypeBen.getId())) {
-                                notPt = false;
-                                break;
-                            }
-                        }
-                        if (notPt) {
-                            newEnTypeList.add(entypeBen);
-                        }
-                    }
-                    //cgp.setType(newTypeList.toString());
-                }
-            }
             //获取替换规格的数据
             String typeRepalceIds = request.getParameter("typeRepalceIds");
 
@@ -1215,56 +823,11 @@ public class EditorController {
                 String[] spSt;
                 for (String tpCt : tpList) {
                     spSt = tpCt.split("@");
-                    if (spSt.length == 2) {
-                        //判断是否存在删除的规格，如果存在则用newTypeList,否则用typeList
-                        if (StringUtils.isNotBlank(typeDeleteIds)) {
-                            for (TypeBean nwType : newTypeList) {
-                                if (nwType.getId().equals(spSt[0]) && !nwType.getType().trim().equals(spSt[1].trim())) {
-                                    nwType.setValue(spSt[1].trim());
-                                    break;
-                                }
-                            }
-                            for (EntypeBen entypeBen : newEnTypeList) {
-                                if (entypeBen.getId().equals(spSt[0]) && !entypeBen.getType().trim().equals(spSt[1].trim())) {
-                                    entypeBen.setValue(spSt[1].trim());
-                                    break;
-                                }
-                            }
-                        } else {
-                            for (TypeBean nwType : typeList) {
-                                if (nwType.getId().equals(spSt[0]) && !nwType.getType().trim().equals(spSt[1].trim())) {
-                                    nwType.setValue(spSt[1].trim());
-                                    break;
-                                }
-                            }
-                            for (EntypeBen entypeBen : newEnTypeList) {
-                                if (entypeBen.getId().equals(spSt[0]) && !entypeBen.getType().trim().equals(spSt[1].trim())) {
-                                    entypeBen.setValue(spSt[1].trim());
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    spSt = null;
+
                 }
 
-                if (StringUtils.isNotBlank(typeDeleteIds)) {
-                    cgp.setType(newTypeList.toString());
-                    cgp.setEntypeNew(newEnTypeList.toString());
-                } else {
-                    cgp.setType(typeList.toString());
-                    cgp.setEntypeNew(entypeBens.toString());
-                }
-                tpList = null;
-            } else {
-                if (StringUtils.isNotBlank(typeDeleteIds)) {
-                    cgp.setType(newTypeList.toString());
-                    cgp.setEntypeNew(newEnTypeList.toString());
-                    newTypeList.clear();
-                }
+
             }
-            newTypeList.clear();
-            typeList.clear();
 
 
             // 获取文字尺码表
@@ -1283,101 +846,51 @@ public class EditorController {
             }
 
             // 设置主图数据 mainImg
-            String mainImg = request.getParameter("mainImg");
+            //String mainImg = request.getParameter("mainImg");
             if (StringUtils.isNotBlank(mainImg)) {
-                mainImg = mainImg.replace(orGoods.getRemotpath(), "");
+                //mainImg = mainImg.replace(orGoods.getRemotpath(), "");
                 // 进行主图相关的修改  替换主图数据，压缩图片为285x285或者285x380,上传服务器
                 if (mainImg.contains(".60x60")) {
-                    cgp.setCustomMainImage(mainImg.replace(".60x60", ".220x220").replace(orGoods.getRemotpath(), ""));
+                    cgp.setCustomMainImage(mainImg.replace(".60x60", ".220x220"));
                 } else if (mainImg.contains(".400x400")) {
-                    cgp.setCustomMainImage(mainImg.replace(".400x400", ".220x220").replace(orGoods.getRemotpath(), ""));
+                    cgp.setCustomMainImage(mainImg.replace(".400x400", ".220x220"));
                 }
                 cgp.setShowMainImage(mainImg);
                 cgp.setIsUpdateImg(2);
             }
 
-            String brandName = request.getParameter("brandName");
-            cgp.setBrandName(brandName);
-
+            String imgInfo = request.getParameter("imgInfo");
+            if (!(imgInfo == null || "".equals(imgInfo))) {
+                // 获取的橱窗图进行集合封装
+                cgp.setImg("[" + imgInfo.replace(";", ",") + "]");
+            } else {
+                json.setOk(false);
+                json.setMessage("获取橱窗图失败");
+                return json;
+            }
+            String entype = request.getParameter("entype");
+            cgp.setEntype(entype);
 
             String type = request.getParameter("type");
             // type 0 保存 1 保存并发布
             int tempId = user.getId();
-            String tempName = user.getAdmName();
-            editBean.setPublish_flag(Integer.parseInt(type));
-            editBean.setAdmin_id(tempId);
-            editBean.setNew_title(cgp.getEnname());
-            editBean.setOld_title(orGoods.getEnname());
-            editBean.setPid(cgp.getPid());
+            int success = 0;
+            CustomGoodsPublish goods = customGoodsService.queryNewGoodsDetails(cgp.getPid());
+            if (goods != null && "0".equals(type)) {
+                success = customGoodsService.updateNewGoodsDetailsByInfo(cgp);
+            } else {
+                success = customGoodsService.saveNewGoodsDetails(cgp, tempId, Integer.parseInt(type));
 
-            int success = customGoodsService.saveEditDetalis(cgp, tempName, tempId, Integer.parseInt(type));
+            }
+            if ("1".equals(type)) {
+                int isEdit = customGoodsService.checkIsEditedByPid(cgp.getPid());
+                if (isEdit == 0) {
+                    customGoodsService.insertPidIsEdited("", cgp.getPid(), user.getId());
+                }
+            }
+
             if (success > 0) {
-
-                if (editBean.getPriceShowFlag() > 0) {
-                    customGoodsService.insertIntoGoodsPriceOrWeight(editBean);
-                } else {
-                    customGoodsService.insertIntoGoodsEditBean(editBean);
-                }
-                //更新编辑标识
-                editBean.setIs_edited(1);
-                editBean.setPublish_flag(0);
-                customGoodsService.updatePidIsEdited(editBean);
-
-
-                json.setOk(true);
-                if (!(type == null || "".equals(type) || "0".equals(type))) {
-                    String updateTimeStr = orGoods.getUpdateTimeAll();
-                    //判断不是正式环境的，不进行搜图图片更新
-                    String ip = request.getRemoteAddr();
-                    customGoodsService.updateGoodsState(pidStr, 1);
-                    System.err.println("ip:" + ip);
-                    if (cgp.getIsUpdateImg() == 0) {
-                        cgp.setIsUpdateImg(1);
-                    }
-                    if (StringUtils.isNotBlank(updateTimeStr)) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        //离上次编辑小于15分钟，不能发布
-                        if (System.currentTimeMillis() - sdf.parse(updateTimeStr).getTime() == 0) {
-                            json.setOk(false);
-                            json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
-                        } else {
-                           /* InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
-                            inputData.setPid(cgp.getPid());
-                            inputData.setBrand_name(brandName);
-
-                            GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
-                            PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
-                            FutureTask futureTask = new FutureTask(pbCallable);
-                            Thread thread = new Thread(futureTask);
-                            thread.start();
-
-                            if (orGoods.getValid() == 0 || orGoods.getValid() == 2) {
-                                json.setMessage("更新成功,正在验证图片是否存在，异步处理中，请等待");
-                            } else {
-                                json.setMessage("更新成功,异步上传图片中，请等待");
-                            }
-
-                        }
-                    } else {
-                      /*  InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
-                        inputData.setPid(cgp.getPid());
-                        inputData.setBrand_name(brandName);
-
-                        GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
-                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
-                        FutureTask futureTask = new FutureTask(pbCallable);
-                        Thread thread = new Thread(futureTask);
-                        thread.start();
-
-                        if (orGoods.getValid() == 0 || orGoods.getValid() == 2) {
-                            json.setMessage("更新成功,正在验证图片是否存在，异步处理中，请等待");
-                        } else {
-                            json.setMessage("更新成功,异步上传图片中，请等待");
-                        }
-                    }
-                } else {
-                    json.setMessage("更新成功");
-                }
+                json.setMessage("更新成功");
             } else {
                 json.setOk(false);
                 json.setMessage("更新失败，请重试");
@@ -1550,10 +1063,10 @@ public class EditorController {
                         if (costPrice > 0) {
                             double tempPrice = B2CPriceUtil.getFreePrice(costPrice, goods.getFinalWeight(), goods.getVolumeWeight());
                             exSku.getSkuVal().setFreeSkuPrice(String.valueOf(tempPrice));
-                            if(priceMin == 0 || priceMin > tempPrice){
+                            if (priceMin == 0 || priceMin > tempPrice) {
                                 priceMin = tempPrice;
                             }
-                            if(priceMax == 0 || priceMax < tempPrice){
+                            if (priceMax == 0 || priceMax < tempPrice) {
                                 priceMax = tempPrice;
                             }
                         }
@@ -1773,7 +1286,7 @@ public class EditorController {
             if (sku != null && !sku.isEmpty() && sku.startsWith("[")) {
                 /*JSONArray sku_json = JSONArray.fromObject(sku);
                 List<SkuAttrBean> skuList = (List<SkuAttrBean>) JSONArray.toCollection(sku_json, SkuAttrBean.class);*/
-                List<SkuAttrBean> skuList = com.alibaba.fastjson.JSONArray.parseArray(sku, SkuAttrBean.class);
+                List<SkuAttrBean> skuList = JSONArray.parseArray(sku, SkuAttrBean.class);
                 for (SkuAttrBean skuBean : skuList) {
                     // System.err.println(skuBean.toString());
                     SkuValBean skuVal = skuBean.getSkuVal();
@@ -2242,7 +1755,7 @@ public class EditorController {
                     // 生成唯一文件名称
                     String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                     // 本地服务器磁盘全路径
-                    String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                    String localFilePath = "importimg\\" + pid + "\\" + saveFilename + fileSuffix;
                     // 下载网络图片到本地
                     boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
                     if (is) {
@@ -2254,13 +1767,16 @@ public class EditorController {
                             // 压缩图片60x60
                             String localFilePath60x60 = "importimg/" + pid + "/" + saveFilename + ".60x60" + fileSuffix;
 
-                            boolean is400 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 5);
-                            boolean is60 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 6);
-                            if (is60 && is400) {
-                                newImgUrl += ";" + ftpConfig.getLocalShowPath() + localFilePath60x60;
+                            String localFilePathTest = "importimg/" + pid + "/" + saveFilename  + fileSuffix;
+
+                            //boolean is400 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 5);
+                            //boolean is60 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 6);
+                            //if (is60 && is400) {
+                                //newImgUrl += ";" + ftpConfig.getLocalShowPath() + localFilePath60x60;
+                                newImgUrl += ";" + ftpConfig.getLocalShowPath() + localFilePathTest;
                                 json.setOk(true);
                                 json.setMessage("本地图片上传成功");
-                            } else {
+                         /*   } else {
                                 // 判断分辨率不通过删除图片
                                 File file400 = new File(localDiskPath + localFilePath400x400);
                                 if (file400.exists()) {
@@ -2275,7 +1791,7 @@ public class EditorController {
                                 json.setOk(false);
                                 json.setMessage("压缩图片60x60和400x400失败，终止执行");
                                 break;
-                            }
+                            }*/
                         } else {
                             // 图片分辨率小于400*200整体终止执行
                             isSuccess = false;
@@ -2340,7 +1856,7 @@ public class EditorController {
                     String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
                     String saveFilename = GoodsInfoUtils.makeFileName(String.valueOf(random.nextInt(1000)));
                     // 本地服务器磁盘全路径
-                    String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                    String localFilePath = "importimg\\" + pid + "\\" + saveFilename + fileSuffix;
                     // 文件流输出到本地服务器指定路径
                     ImgDownload.writeImageToDisk(file.getBytes(), localDiskPath + localFilePath);
 
@@ -2348,17 +1864,19 @@ public class EditorController {
                     boolean checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 400, 200);
                     if (checked) {
                         // 压缩图片400x400
-                        String localFilePath400x400 = "importimg/" + pid + "/" + saveFilename + ".400x400" + fileSuffix;
+                        String localFilePath400x400 = "importimg\\" + pid + "\\" + saveFilename + ".400x400" + fileSuffix;
                         // 压缩图片60x60
-                        String localFilePath60x60 = "importimg/" + pid + "/" + saveFilename + ".60x60" + fileSuffix;
+                        String localFilePath60x60 = "importimg\\" + pid + "\\" + saveFilename + ".60x60" + fileSuffix;
 
-                        boolean is400 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 5);
-                        boolean is60 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 6);
-                        if (is60 && is400) {
-                            json.setData(ftpConfig.getLocalShowPath() + localFilePath60x60);
-                            json.setOk(true);
-                            json.setMessage("上传橱窗图本地图片成功");
-                        } else {
+                        String localFilePathTest = "importimg/" + pid + "/" + saveFilename  + fileSuffix;
+
+                        //boolean is400 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 5);
+                        //boolean is60 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 6);
+                        //if (is60 && is400) {
+                        json.setData(ftpConfig.getLocalShowPath() + localFilePathTest);
+                        json.setOk(true);
+                        json.setMessage("上传橱窗图本地图片成功");
+                       /* } else {
                             // 判断分辨率不通过删除图片
                             File file60 = new File(localFilePath60x60);
                             if (file60.exists()) {
@@ -2371,7 +1889,7 @@ public class EditorController {
                             // 压缩失败整体终止执行
                             json.setOk(false);
                             json.setMessage("压缩图片60x60或400x400失败，终止上传");
-                        }
+                        }*/
                     } else {
                         // 图片分辨率小于400*200整体终止执行
                         json.setOk(false);
@@ -4520,49 +4038,7 @@ public class EditorController {
         }
     }
 
-    private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
-        try {
 
-            Document nwDoc = Jsoup.parseBodyFragment(gd.getEninfo());
-            // 移除所有的页面效果 kse标签,实际div
-            Elements imgEls = nwDoc.getElementsByTag("img");
-            for (Element imgEl : imgEls) {
-                for (GoodsMd5Bean md5Bean : md5BeanList) {
-                    if (md5Bean.getRemotePath().contains(imgEl.attr("src"))) {
-                        imgEl.remove();
-                    }
-                }
-            }
-            gd.setEninfo(nwDoc.html());
-            customGoodsService.updatePidEnInfo(gd);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println(e.getMessage());
-            LOG.error("pid:" + gd.getPid() + ",deleteAndUpdateGoodsImg error:" + e.getMessage());
-        }
-    }
-
-
-    private boolean deleteImgByUrl(String pid) {
-        /*boolean isSu = false;
-        CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-        if (checkIsKidsCatid(goods.getCatid1()) && goods.getValid() == 0) {
-            // 接口调用
-            isSu = OKHttpUtils.optionGoodsInterface(goods.getPid(), 0, 6, 2);
-                    *//*List<String> imgList = GoodsInfoUtils.getAllImgList(goods, 1);
-                    boolean isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
-                    if (!isSu) {
-                        isSu = UploadByOkHttp.deleteRemoteImgByList(imgList);
-                    }
-                    if (!isSu) {
-                        LOG.error("pid : " + pidStr + " 下架删除kids图片异常");
-                    }*//*
-
-        } else {
-            isSu = true;
-        }*/
-        return OKHttpUtils.optionGoodsInterface(pid, 0, 6, 2);
-    }
 
     private boolean checkListContains(List<String> list, String str) {
         boolean isOk = false;
@@ -4592,4 +4068,244 @@ public class EditorController {
         }
         return isCheck;
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/addEnType", method = {RequestMethod.POST, RequestMethod.GET})
+    public JsonResult addEnType(HttpServletRequest request) {
+        DataSourceSelector.restore();
+        JsonResult json = new JsonResult();
+
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        try {
+
+            String enTypeName = request.getParameter("enTypeName");
+
+            String enTypeValue = request.getParameter("enTypeValue");
+
+            String pidStr = request.getParameter("pid");
+            // 获取商品信息
+            CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pidStr, 0);
+            //获取需要删除的规格ids数据，进行匹配删除
+            String typeDeleteIds = request.getParameter("typeDeleteIds");
+            String time = String.valueOf(System.currentTimeMillis());
+            List<TypeBean> newTypeList = new ArrayList<TypeBean>();
+            List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(orGoods, false);
+            String tyteLable = enTypeName;
+            if (typeList != null && typeList.size() > 0) {
+                for (TypeBean typeBean : typeList) {
+                    if (enTypeName.equals(typeBean.getType())) {
+                        tyteLable = typeBean.getLableType();
+                        break;
+                    }
+                }
+            }
+            TypeBean typeBean = new TypeBean();
+            typeBean.setType(enTypeName);
+            typeBean.setValue(enTypeValue);
+            typeBean.setLableType(tyteLable);
+            typeBean.setId(time.substring(6));
+            typeBean.setImg("");
+            typeBean.setSell("1");
+            if (typeList == null) {
+                typeList = new ArrayList<>();
+            }
+            typeList.add(typeBean);
+
+            System.out.println(typeList);
+           /* if (StringUtils.isNotBlank(typeDeleteIds)) {
+                String[] tpList = typeDeleteIds.split(",");
+
+                if (!(tpList.length == 0 || typeList.isEmpty())) {
+                    //剔除选中的规格
+                    for (TypeBean tpBean : typeList) {
+                        boolean notPt = true;
+                        for (String tpId : tpList) {
+                            if (tpId.equals(tpBean.getId())) {
+                                notPt = false;
+                                break;
+                            }
+                        }
+                        if (notPt) {
+                            newTypeList.add(tpBean);
+                        }
+                    }
+                    //cgp.setType(newTypeList.toString());
+                }
+            }*/
+
+            Date d = new Date();
+            System.out.println(d);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            String dateNowStr = sdf.format(d);
+            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pidStr, 0);
+            boolean isSkuFlag = false;
+            if (StringUtils.isNotBlank(goods.getRangePrice())) {
+                isSkuFlag = true;
+            }
+            List<EntypeBen> entypeBens = JSONArray.parseArray(goods.getEntypeNew(), EntypeBen.class);
+            List<ImportExSku> skuNewList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
+            List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku(), ImportExSku.class);
+            System.out.println(skuList);
+            if (entypeBens != null && entypeBens.size() > 0) {
+                for (EntypeBen entypeBen : entypeBens) {
+                    if (enTypeName.equals(entypeBen.getType())) {
+                        tyteLable = entypeBen.getLableType();
+                        break;
+                    }
+                }
+            }
+            EntypeBen entypeBen = new EntypeBen();
+            entypeBen.setType(typeBean.getType());
+            entypeBen.setValue(typeBean.getValue());
+            entypeBen.setId(typeBean.getId());
+            entypeBen.setLableType(tyteLable);
+            entypeBen.setSell(typeBean.getSell());
+            entypeBen.setImg("");
+            if (entypeBens == null) {
+                entypeBens = new ArrayList<>();
+            }
+            entypeBens.add(entypeBen);
+            for (TypeBean typeBean1 : typeList) {
+                if (StringUtils.isNotBlank(enTypeName)
+                        && !enTypeName.equals(typeBean1.getType())) {
+                    ImportExSku importExSku = new ImportExSku();
+                    importExSku.setSkuId(time + dateNowStr);
+                    importExSku.setSpecId(time + dateNowStr);
+                    importExSku.setSkuAttr(time.substring(0, 6) + ":" + time.substring(6) + ";" +
+                            typeBean1.getId().substring(0, typeBean1.getId().length() - 1) + ":" + typeBean1.getId());
+                    importExSku.setSkuPropIds(time.substring(6) + "," + typeBean1.getId());
+                    importExSku.setFianlWeight(skuList.get(0).getFianlWeight());
+                    importExSku.setVolumeWeight(skuList.get(0).getVolumeWeight());
+                    importExSku.setWholesalePrice(skuList.get(0).getWholesalePrice());
+                    ImportExSkuVal importExSkuVal = new ImportExSkuVal();
+                    importExSkuVal.setFreeSkuPrice("0.0");
+                    importExSkuVal.setActivity(true);
+                    importExSkuVal.setAvailQuantity(1);
+                    if (!isSkuFlag) {
+                        importExSkuVal.setFreeSkuPrice(skuList.get(0).getSkuVal().getFreeSkuPrice());
+                        importExSkuVal.setActSkuCalPrice(skuList.get(0).getSkuVal().getActSkuCalPrice());
+                        importExSkuVal.setActSkuMultiCurrencyCalPrice(skuList.get(0).getSkuVal().getActSkuMultiCurrencyCalPrice());
+                        importExSkuVal.setActSkuMultiCurrencyDisplayPrice(skuList.get(0).getSkuVal().getActSkuMultiCurrencyDisplayPrice());
+                        importExSkuVal.setSkuCalPrice(skuList.get(0).getSkuVal().getSkuCalPrice());
+                        importExSkuVal.setSkuMultiCurrencyCalPrice(skuList.get(0).getSkuVal().getSkuMultiCurrencyCalPrice());
+                        importExSkuVal.setSkuMultiCurrencyDisplayPrice(skuList.get(0).getSkuVal().getSkuMultiCurrencyDisplayPrice());
+                        importExSkuVal.setCostPrice(skuList.get(0).getSkuVal().getCostPrice());
+                    }
+                    importExSku.setSkuVal(importExSkuVal);
+                    if (skuList == null) {
+                        skuList = new ArrayList<>();
+                    }
+                    skuList.add(importExSku);
+                }
+            }
+
+            for (TypeBean typeBean1 : typeList) {
+                if (StringUtils.isNotBlank(enTypeName)
+                        && !enTypeName.equals(typeBean1.getType())) {
+                    ImportExSku importExSku = new ImportExSku();
+                    importExSku.setSkuId(time + dateNowStr);
+                    importExSku.setSpecId(time + dateNowStr);
+                    importExSku.setSkuAttr(time.substring(0, 6) + ":" + time.substring(6) + ";" +
+                            typeBean1.getId().substring(0, typeBean1.getId().length() - 1) + ":" + typeBean1.getId());
+                    importExSku.setSkuPropIds(time.substring(6) + "," + typeBean1.getId());
+                    importExSku.setFianlWeight(skuList.get(0).getFianlWeight());
+                    importExSku.setVolumeWeight(skuList.get(0).getVolumeWeight());
+                    importExSku.setWholesalePrice(skuList.get(0).getWholesalePrice());
+                    ImportExSkuVal importExSkuVal = new ImportExSkuVal();
+                    importExSkuVal.setFreeSkuPrice("0.0");
+                    importExSkuVal.setActivity(true);
+                    importExSkuVal.setAvailQuantity(1);
+                    if (!isSkuFlag) {
+                        importExSkuVal.setFreeSkuPrice(skuList.get(0).getSkuVal().getFreeSkuPrice());
+                        importExSkuVal.setActSkuCalPrice(skuList.get(0).getSkuVal().getActSkuCalPrice());
+                        importExSkuVal.setActSkuMultiCurrencyCalPrice(skuList.get(0).getSkuVal().getActSkuMultiCurrencyCalPrice());
+                        importExSkuVal.setActSkuMultiCurrencyDisplayPrice(skuList.get(0).getSkuVal().getActSkuMultiCurrencyDisplayPrice());
+                        importExSkuVal.setSkuCalPrice(skuList.get(0).getSkuVal().getSkuCalPrice());
+                        importExSkuVal.setSkuMultiCurrencyCalPrice(skuList.get(0).getSkuVal().getSkuMultiCurrencyCalPrice());
+                        importExSkuVal.setSkuMultiCurrencyDisplayPrice(skuList.get(0).getSkuVal().getSkuMultiCurrencyDisplayPrice());
+                        importExSkuVal.setCostPrice(skuList.get(0).getSkuVal().getCostPrice());
+
+                    }
+                    importExSku.setSkuVal(importExSkuVal);
+                    if (skuNewList == null) {
+                        skuNewList = new ArrayList<>();
+                    }
+                    skuNewList.add(importExSku);
+                }
+            }
+
+            if (skuNewList != null) {
+                goods.setSku_new(skuNewList.toString());
+            }else{
+                skuNewList =  new ArrayList<>();
+                ImportExSku importExSku = new ImportExSku();
+                importExSku.setSkuId(time + dateNowStr);
+                importExSku.setSpecId(time + dateNowStr);
+                importExSku.setSkuAttr(time.substring(0, 6) + ":" + time.substring(6) + ";" +
+                        typeBean.getId().substring(0, typeBean.getId().length() - 1) + ":" + typeBean.getId());
+                importExSku.setSkuPropIds(time.substring(6) + "," + typeBean.getId());
+                if (!isSkuFlag) {
+                    ImportExSkuVal importExSkuVal = new ImportExSkuVal();
+                    importExSkuVal.setFreeSkuPrice("0.0");
+                    importExSkuVal.setActivity(true);
+                    importExSkuVal.setAvailQuantity(1);
+                    importExSku.setSkuVal(importExSkuVal);
+                }
+                skuNewList.add(importExSku);
+            }
+            if(skuList != null){
+                goods.setSku(skuList.toString());
+            }
+            else{
+                skuList =  new ArrayList<>();
+                ImportExSku importExSku = new ImportExSku();
+                importExSku.setSkuId(time + dateNowStr);
+                importExSku.setSpecId(time + dateNowStr);
+                importExSku.setSkuAttr(time.substring(0, 6) + ":" + time.substring(6) + ";" +
+                        typeBean.getId().substring(0, typeBean.getId().length() - 1) + ":" + typeBean.getId());
+                importExSku.setSkuPropIds(time.substring(6) + "," + typeBean.getId());
+                if (!isSkuFlag) {
+                    ImportExSkuVal importExSkuVal = new ImportExSkuVal();
+                    importExSkuVal.setFreeSkuPrice("0.0");
+                    importExSkuVal.setActivity(true);
+                    importExSkuVal.setAvailQuantity(1);
+                }
+                skuList.add(importExSku);
+            }
+
+            goods.setEntype(typeList.toString());
+            goods.setEntypeNew(entypeBens.toString());
+
+            int result = customGoodsService.updateEntypeSkuByPid(goods);
+            if (result > 0) {
+                InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+                inputData.setPid(goods.getPid());
+                inputData.setEntype(goods.getEntype());
+                inputData.setEntype_new(goods.getEntypeNew());
+                inputData.setSku(goods.getSku());
+                inputData.setSku_new(goods.getSku_new());
+                inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
+                int isEdit = customGoodsService.checkIsEditedByPid(goods.getPid());
+                if (isEdit == 0) {
+                    customGoodsService.insertPidIsEdited("", goods.getPid(), user.getId());
+                }
+            }
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+        }
+        return json;
+    }
+
+
 }
