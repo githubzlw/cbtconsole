@@ -21,6 +21,7 @@ import com.cbt.util.*;
 import com.cbt.warehouse.pojo.HotCategory;
 import com.cbt.warehouse.pojo.HotSellingGoods;
 import com.cbt.warehouse.service.HotGoodsService;
+import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.UploadByOkHttp;
@@ -1297,7 +1298,7 @@ public class EditorController {
             }
 
             String brandName = request.getParameter("brandName");
-            cgp.setBrandName(brandName);
+            cgp.setBrand_name(brandName);
 
 
             String type = request.getParameter("type");
@@ -1344,7 +1345,12 @@ public class EditorController {
                            /* InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
                             inputData.setPid(cgp.getPid());
                             inputData.setBrand_name(brandName);
-
+                            if(StringUtils.isNotBlank(cgp.getType())){
+                                inputData.setEntype(cgp.getType());
+                            }
+                            if(StringUtils.isNotBlank(cgp.getEntypeNew())){
+                                inputData.setEntype_new(cgp.getEntypeNew());
+                            }
                             GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
                             PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
                             FutureTask futureTask = new FutureTask(pbCallable);
@@ -1362,6 +1368,12 @@ public class EditorController {
                       /*  InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
                         inputData.setPid(cgp.getPid());
                         inputData.setBrand_name(brandName);
+                        if(StringUtils.isNotBlank(cgp.getType())){
+                            inputData.setEntype(cgp.getType());
+                        }
+                        if(StringUtils.isNotBlank(cgp.getEntypeNew())){
+                            inputData.setEntype_new(cgp.getEntypeNew());
+                        }
 
                         GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
                         PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));

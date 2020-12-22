@@ -44,10 +44,11 @@ public class InputData12 {
 	private String custom_main_image;
 	private String remotpath;
 	/**
-     * 描述很精彩标识
-     */
-    private String describe_good_flag;
-    private String is_simplify;
+	 * 描述很精彩标识
+	 */
+	private String describe_good_flag;
+	private String is_simplify;
+	private String brand_name;
 
 
 	public String getIs_simplify() {
@@ -371,7 +372,14 @@ public class InputData12 {
 	}
 
 	public InputData12(Character crud) {
-        this.crud = crud;
-    }
-    
+		this.crud = crud;
+	}
+
+	public String getBrand_name() {
+		return brand_name;
+	}
+
+	public void setBrand_name(String brand_name) {
+		this.brand_name = brand_name;
+	}
 }
