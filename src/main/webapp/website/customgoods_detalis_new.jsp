@@ -2522,7 +2522,7 @@
                 <p style="width: 100%;margin-bottom: 20px;">
                     <label style="display: inline;vertical-align: top;" class="label"> 描述：</label>
                     <textarea style="width: 90%;height: 50px;padding-bottom: 50px;" cols="20" rows="3"
-                              id="brandName">${goods.brandName}</textarea>
+                              id="brandName">${goods.brand_name}</textarea>
                 </p>
             </div>
         </div>
