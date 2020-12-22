@@ -558,7 +558,7 @@ public class GoodsInfoUpdateOnlineUtil {
             }
         }
         if (json.isOk()) {
-            //return updateOnlineAndSolr(inputData, isSolr, 0);
+            return updateOnlineAndSolr(inputData, isSolr, 0);
         } else {
             if (count > 4) {
                 setOffOnlineByPid(inputData.getPid(), "更新本地MongoDB失败");
