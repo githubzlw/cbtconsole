@@ -2518,10 +2518,11 @@
                         </div>
                     </div>
                 </div>
-                <p class="s_tit">
-                    <label class="label"> 描述：<input id="brandName"
-                                                      type="text" class="s_txt" value="${goods.brandName}"/>
-                    </label>
+                <b style="color: red; margin-left: 72px;">描述的格式为：标题@内容@@ 如： Include@1 Jacket, 1Snow Bib@@</b>
+                <p style="width: 100%;margin-bottom: 20px;">
+                    <label style="display: inline;vertical-align: top;" class="label"> 描述：</label>
+                    <textarea style="width: 90%;height: 50px;padding-bottom: 50px;" cols="20" rows="3"
+                              id="brandName">${goods.brandName}</textarea>
                 </p>
             </div>
         </div>

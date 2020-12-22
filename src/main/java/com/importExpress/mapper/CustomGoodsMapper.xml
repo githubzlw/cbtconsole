@@ -136,6 +136,7 @@
         <result column="price_kids" property="price_kids"/>
         <result column="price_pets" property="price_pets"/>
         <result column="img_check" property="img_check"/>
+        <result column="entype_new" property="entypeNew"/>
         <result column="brand_name" property="brandName"/>
     </resultMap>
 
