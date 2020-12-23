@@ -314,6 +314,7 @@
                     + row.goodsPid
                     + '" target="_blank">编辑详情</a><br><br><a href="https://www.import-express.com/goodsinfo/ep-0-0-1'
                     + row.goodsPid + '.html" target="_blank">线上预览</a><br>';
+                content += '<br><input type="button" class="style_btn_delete" value="删除重新上传" onclick="deleteGoodsByPid(\'' + row.goodsPid + '\')">';
             }
             return content;
         }

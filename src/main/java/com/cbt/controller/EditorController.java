@@ -364,7 +364,7 @@ public class EditorController {
                 //计算加价率
             /*if ((goods.getIsBenchmark() == 1 && goods.getBmFlag() == 1) || goods.getIsBenchmark() == 2) {
                 //对标时
-                //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/StrUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/StrUtils.EXCHANGE_RATE(6.6));
+                //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/GoodsInfoUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/GoodsInfoUtils.EXCHANGE_RATE(6.6));
                 String aliPirce;
                 if (goods.getAliGoodsPrice().contains("-")) {
                     aliPirce = goods.getAliGoodsPrice().split("-")[1];
@@ -1167,7 +1167,7 @@ public class EditorController {
             if (StringUtils.isNotBlank(typeDeleteIds) && (typeList != null)) {
                 String[] tpList = typeDeleteIds.split(",");
 
-                if (!(typeList.isEmpty() || tpList.length == 0 )) {
+                if (!(typeList.isEmpty() || tpList.length == 0)) {
                     //剔除选中的规格
                     for (TypeBean tpBean : typeList) {
                         boolean notPt = true;
@@ -1189,7 +1189,7 @@ public class EditorController {
             if (StringUtils.isNotBlank(typeDeleteIds) && (entypeBens != null)) {
                 String[] tpList = typeDeleteIds.split(",");
 
-                if (!( entypeBens.isEmpty() || entypeBens.size() == 0)) {
+                if (!(entypeBens.isEmpty() || entypeBens.size() == 0)) {
                     //剔除选中的规格
                     for (EntypeBen entypeBen : entypeBens) {
                         boolean notPt = true;
@@ -1539,116 +1539,285 @@ public class EditorController {
                 return json;
             }
 
-            int isFreeFlag = 0;
             // 取出1688商品的全部信息
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pidStr, 0);
-            if (StringUtils.isNotBlank(goods.getRange_price_free_new())) {
+            if ("8".equals(flagStr)) {
+                int isFreeFlag = 0;
+
+                if (StringUtils.isNotBlank(goods.getRange_price_free_new())) {
+                    AtomicInteger skuUpdateCount = new AtomicInteger();
+                    // 获取sku里面的重量
+                    // 将goods的entype属性值取出来,即规格图
+                    List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
+                    double finalWeight = 0;
+                    if (StringUtils.isNotBlank(goods.getSku_new())) {
+                        // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                        List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
+
+                        double priceMin = 0;
+                        double priceMax = 0;
+
+                        for (ImportExSku exSku : skuList) {
+                            skuUpdateCount.getAndIncrement();
+                            float costPrice = exSku.getSkuVal().getCostPrice();
+                            if (costPrice > 0) {
+                                double tempPrice = B2CPriceUtil.getFreePrice(costPrice, goods.getFinalWeight(), goods.getVolumeWeight());
+                                exSku.getSkuVal().setFreeSkuPrice(String.valueOf(tempPrice));
+                                if (priceMin == 0 || priceMin > tempPrice) {
+                                    priceMin = tempPrice;
+                                }
+                                if (priceMax == 0 || priceMax < tempPrice) {
+                                    priceMax = tempPrice;
+                                }
+                            }
+                        }
+                        if (priceMin > 0 && priceMax > 0) {
+                            if (priceMin == priceMax) {
+                                goods.setRange_price_free_new(String.valueOf(priceMin));
+                            } else {
+                                goods.setRange_price_free_new(priceMin + "-" + priceMax);
+                            }
+                            goods.setPrice_kids(String.valueOf(priceMin));
+                        } else if (priceMin > 0) {
+                            goods.setRange_price_free_new(String.valueOf(priceMin));
+                            goods.setPrice_kids(String.valueOf(priceMin));
+                        } else if (priceMax > 0) {
+                            goods.setRange_price_free_new(String.valueOf(priceMax));
+                            goods.setPrice_kids(String.valueOf(priceMax));
+                        }
+
+                        if (skuUpdateCount.get() > 0) {
+                            goods.setSku_new(JSONArray.toJSONString(skuList));
+                        }
+
+                        List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
+                        for (ImportExSkuShow exSku : cbSkus) {
+                            if (finalWeight == 0 || finalWeight < Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight())) {
+                                finalWeight = Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight());
+                            }
+                            if (StringUtils.isNotBlank(exSku.getSpecId())) {
+                                String chType = customGoodsService.queryChTypeBySkuId(exSku.getSpecId());
+                                if (StringUtils.isBlank(chType)) {
+                                    chType = "";
+                                }
+                                exSku.setChType(chType);
+                            }
+                        }
+                    }
+                    typeList.clear();
+                    if (finalWeight < 0.5) {
+                        isFreeFlag = 1;
+                    }
+                } else {
+                    if (Math.max(Float.parseFloat(goods.getFinalWeight()), Float.parseFloat(goods.getVolumeWeight())) < 0.5) {
+                        isFreeFlag = 1;
+                    }
+                }
+
+                /**
+                 *
+                 * B2C标识按下 操作
+                 * 1.morder=1
+                 * 2.B2C免邮价 =(1688产品单价【wholesale_price】 *1.4+5+0.042*max(重量，体积重量))/6.6
+                 * wprice ，free_price_new [3-98 $ 5.09, 99-198 $ 4.23, ≥199 $ 3.85]  ---》 [≥1 $ 3.85]
+                 *
+                 * 区间价 情况  1688产品单价 sku_new[costPrice]
+                 *
+                 */
+                goods.setMorder(1);
+
+                if (StringUtils.isBlank(goods.getRange_price_free_new())) {
+                    // [2-2400 $ 6.13,2401-17279 $ 5.57,≥17280 $ 5.15]
+                    String[] wpriceList = goods.getWholesalePrice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
+                    String priceStr = B2CPriceUtil.getFreePriceStr(Float.parseFloat(wpriceList[0].split("@")[1].trim()), goods.getFinalWeight(), goods.getVolumeWeight());
+                    String free_price_new = "[≥1 $ " + priceStr + "]";
+                    goods.setFree_price_new(free_price_new);
+
+                    wpriceList = goods.getWprice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
+                    goods.setWprice("[≥1 $ " + wpriceList[0].split("@")[1].trim() + "]");
+                    goods.setPrice_kids(priceStr);
+                }
+
+
+                goods.setMatchSource(8);
+                goods.setImg_check(String.valueOf(isFreeFlag));
+
+                int count = customGoodsService.setNoUpdatePrice(goods);
+                if (count > 0) {
+                    json.setOk(true);
+                    json.setMessage("执行成功");
+                } else {
+                    json.setOk(false);
+                    json.setMessage("更新失败");
+                }
+            } else {
+                goods.setMatchSource(0);
+                double finalWeight = 0;
+                if (StringUtils.isNotBlank(goods.getFinalWeight())) {
+                    finalWeight = Double.parseDouble(goods.getFinalWeight());
+                } else {
+                    finalWeight = Double.parseDouble(goods.getWeight());
+                }
+                // 还原B2C
+                // 1. 获取加价率
+                double addPriceLv = GoodsInfoUtils.getAddPriceLvNew(finalWeight, 0);
+                // 2.获取运费
+                double initialFreight = GoodsInfoUtils.getCalculateFreight(finalWeight);
+                // 重新计算价格
 
                 AtomicInteger skuUpdateCount = new AtomicInteger();
-                // 获取sku里面的重量
-                // 将goods的entype属性值取出来,即规格图
-                List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
-                double finalWeight = 0;
-                if (StringUtils.isNotBlank(goods.getSku_new())) {
-                    // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-                    List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
+                if (StringUtils.isNotBlank(goods.getRange_price_free_new())) {
+                    // 获取sku里面的重量
+                    // 将goods的entype属性值取出来,即规格图
+                    List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
+                    String moderStr = null;
+                    if (StringUtils.isNotBlank(goods.getSku_new())) {
+                        // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                        List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
 
-                    double priceMin = 0;
-                    double priceMax = 0;
+                        String[] wpriceList = goods.getWholesalePrice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
 
-                    for (ImportExSku exSku : skuList) {
-                        skuUpdateCount.getAndIncrement();
-                        float costPrice = exSku.getSkuVal().getCostPrice();
-                        if (costPrice > 0) {
-                            double tempPrice = B2CPriceUtil.getFreePrice(costPrice, goods.getFinalWeight(), goods.getVolumeWeight());
-                            exSku.getSkuVal().setFreeSkuPrice(String.valueOf(tempPrice));
-                            if(priceMin == 0 || priceMin > tempPrice){
-                                priceMin = tempPrice;
+                        moderStr = wpriceList[0].split("@")[0];
+
+                        double priceMin = 0;
+                        double priceMax = 0;
+
+
+                        for (ImportExSku exSku : skuList) {
+                            skuUpdateCount.getAndIncrement();
+
+
+                            String[] tempArr = exSku.getWholesalePrice().replace("$", "@").replace("[", "").replace("]", "").split("@");
+
+                            String tempWhoPr = tempArr[1];
+                            if (tempArr[1].contains("-")) {
+                                tempWhoPr = tempArr[1].split("-")[1];
                             }
-                            if(priceMax == 0 || priceMax < tempPrice){
-                                priceMax = tempPrice;
+
+                            float factoryPrice = Float.parseFloat(tempWhoPr);
+                            if (factoryPrice > 0) {
+                                double tempPrice = B2CPriceUtil.changeToB2BPrice(factoryPrice, addPriceLv, initialFreight);
+                                exSku.getSkuVal().setFreeSkuPrice(String.valueOf(tempPrice));
+                                if (priceMin == 0 || priceMin > tempPrice) {
+                                    priceMin = tempPrice;
+                                }
+                                if (priceMax == 0 || priceMax < tempPrice) {
+                                    priceMax = tempPrice;
+                                }
                             }
                         }
-                    }
-                    if (priceMin > 0 && priceMax > 0) {
-                        if (priceMin == priceMax) {
+                        if (priceMin > 0 && priceMax > 0) {
+                            if (priceMin == priceMax) {
+                                goods.setRange_price_free_new(String.valueOf(priceMin));
+                            } else {
+                                goods.setRange_price_free_new(priceMin + "-" + priceMax);
+                            }
+                            goods.setPrice_kids(String.valueOf(priceMin));
+                        } else if (priceMin > 0) {
                             goods.setRange_price_free_new(String.valueOf(priceMin));
-                        } else {
-                            goods.setRange_price_free_new(priceMin + "-" + priceMax);
+                            goods.setPrice_kids(String.valueOf(priceMin));
+                        } else if (priceMax > 0) {
+                            goods.setRange_price_free_new(String.valueOf(priceMax));
+                            goods.setPrice_kids(String.valueOf(priceMax));
                         }
-                        goods.setPrice_kids(String.valueOf(priceMin));
-                    } else if (priceMin > 0) {
-                        goods.setRange_price_free_new(String.valueOf(priceMin));
-                        goods.setPrice_kids(String.valueOf(priceMin));
-                    } else if (priceMax > 0) {
-                        goods.setRange_price_free_new(String.valueOf(priceMax));
-                        goods.setPrice_kids(String.valueOf(priceMax));
-                    }
 
-                    if (skuUpdateCount.get() > 0) {
-                        goods.setSku_new(JSONArray.toJSONString(skuList));
-                    }
-
-                    List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
-                    for (ImportExSkuShow exSku : cbSkus) {
-                        if (finalWeight == 0 || finalWeight < Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight())) {
-                            finalWeight = Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight());
+                        if (skuUpdateCount.get() > 0) {
+                            goods.setSku_new(JSONArray.toJSONString(skuList));
                         }
-                        if (StringUtils.isNotBlank(exSku.getSpecId())) {
-                            String chType = customGoodsService.queryChTypeBySkuId(exSku.getSpecId());
-                            if (StringUtils.isBlank(chType)) {
-                                chType = "";
+
+                        List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
+                        for (ImportExSkuShow exSku : cbSkus) {
+                            if (finalWeight == 0 || finalWeight < Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight())) {
+                                finalWeight = Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight());
                             }
-                            exSku.setChType(chType);
+                            if (StringUtils.isNotBlank(exSku.getSpecId())) {
+                                String chType = customGoodsService.queryChTypeBySkuId(exSku.getSpecId());
+                                if (StringUtils.isBlank(chType)) {
+                                    chType = "";
+                                }
+                                exSku.setChType(chType);
+                            }
+                        }
+
+                        String tempModerStr = moderStr;
+                        if (moderStr.contains("≥")) {
+                            tempModerStr = moderStr.replace("≥", "").trim();
+                        } else if (moderStr.contains(">")) {
+                            tempModerStr = moderStr.replace(">", "").trim();
+                        }
+                        if (tempModerStr.contains("-")) {
+                            goods.setMorder(Integer.parseInt(tempModerStr.split("-")[0]));
+                        } else {
+                            goods.setMorder(Integer.parseInt(tempModerStr));
                         }
                     }
+
+                    typeList.clear();
+                } else if (StringUtils.isBlank(goods.getRange_price_free_new())) {
+                    String[] wpriceList = goods.getWholesalePrice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
+                    String rsWpPrice = "";
+                    String rsFreePrice = "";
+                    String priceStr = "";
+                    String moderStr = "";
+                    int clNum = 0;
+                    for (String tempWp : wpriceList) {
+                        String[] tempArr = tempWp.split("@");
+                        clNum++;
+
+                        String tempWhoPr = tempArr[1];
+                        if (tempArr[1].contains("-")) {
+                            tempWhoPr = tempArr[1].split("-")[1];
+                        }
+
+                        String priceFree = B2CPriceUtil.changeToB2BPriceString(Double.parseDouble(tempWhoPr), addPriceLv, initialFreight);
+                        String priceWp = B2CPriceUtil.changeToB2BPriceString(Double.parseDouble(tempWhoPr), addPriceLv, 0);
+                        if (clNum == 1) {
+                            priceStr = priceFree;
+                            moderStr = tempArr[0];
+                        }
+                        rsFreePrice += "," + tempArr[0] + " $ " + priceFree;
+                        rsWpPrice += "," + tempArr[0] + " $ " + priceWp;
+                    }
+                    if (StringUtils.isNotBlank(rsFreePrice) && rsFreePrice.length() > 1) {
+                        goods.setFree_price_new("[" + rsFreePrice.substring(1) + "]");
+                    } else {
+                        goods.setFree_price_new("");
+                    }
+                    if (StringUtils.isNotBlank(rsWpPrice) && rsWpPrice.length() > 1) {
+                        goods.setWprice("[" + rsWpPrice.substring(1) + "]");
+                    } else {
+                        goods.setWprice("");
+                    }
+
+                    goods.setPrice_kids(priceStr);
+                    if (StringUtils.isNotBlank(moderStr)) {
+                        String tempModerStr = moderStr;
+                        if (moderStr.contains("≥")) {
+                            tempModerStr = moderStr.replace("≥", "").trim();
+                        } else if (moderStr.contains(">")) {
+                            tempModerStr = moderStr.replace(">", "").trim();
+                        }
+                        if (tempModerStr.contains("-")) {
+                            goods.setMorder(Integer.parseInt(tempModerStr.split("-")[0]));
+                        } else {
+                            goods.setMorder(Integer.parseInt(tempModerStr));
+                        }
+                    } else {
+                        goods.setMorder(1);
+                    }
                 }
-                typeList.clear();
-                if (finalWeight < 0.5) {
-                    isFreeFlag = 1;
-                }
-            } else {
-                if (Math.max(Float.parseFloat(goods.getFinalWeight()), Float.parseFloat(goods.getVolumeWeight())) < 0.5) {
-                    isFreeFlag = 1;
+                int count = customGoodsService.setNoUpdatePrice(goods);
+                // int count = 1;
+                System.err.println(JSONObject.toJSONString(goods));
+                if (count > 0) {
+                    json.setOk(true);
+                    json.setMessage("执行成功");
+                } else {
+                    json.setOk(false);
+                    json.setMessage("更新失败");
                 }
             }
 
-            /**
-             *
-             * B2C标识按下 操作
-             * 1.morder=1
-             * 2.B2C免邮价 =(1688产品单价【wholesale_price】 *1.4+5+0.042*max(重量，体积重量))/6.6
-             * wprice ，free_price_new [3-98 $ 5.09, 99-198 $ 4.23, ≥199 $ 3.85]  ---》 [≥1 $ 3.85]
-             *
-             * 区间价 情况  1688产品单价 sku_new[costPrice]
-             *
-             */
-            goods.setMorder(1);
-
-            if (StringUtils.isBlank(goods.getRange_price_free_new())) {
-                // [2-2400 $ 6.13,2401-17279 $ 5.57,≥17280 $ 5.15]
-                String[] wpriceList = goods.getWholesalePrice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
-                String priceStr = B2CPriceUtil.getFreePriceStr(Float.parseFloat(wpriceList[0].split("@")[1].trim()), goods.getFinalWeight(), goods.getVolumeWeight());
-                String free_price_new = "[≥1 $ " + priceStr + "]";
-                goods.setFree_price_new(free_price_new);
-
-                wpriceList = goods.getWprice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
-                goods.setWprice("[≥1 $ " + wpriceList[0].split("@")[1].trim() + "]");
-                goods.setPrice_kids(priceStr);
-            }
-
-
-            goods.setMatchSource(8);
-            goods.setImg_check(String.valueOf(isFreeFlag));
-
-            int count = customGoodsService.setNoUpdatePrice(goods);
-            if (count > 0) {
-                json.setOk(true);
-                json.setMessage("执行成功");
-            } else {
-                json.setOk(false);
-                json.setMessage("更新失败");
-            }
 
         } catch (Exception e) {
             e.printStackTrace();

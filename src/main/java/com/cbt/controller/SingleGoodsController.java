@@ -118,13 +118,13 @@ public class SingleGoodsController {
         }
         int drainageFlag = 0;
         String drainageFlagStr = request.getParameter("drainageFlag");
-        if(StringUtils.isNotBlank(drainageFlagStr)){
+        if (StringUtils.isNotBlank(drainageFlagStr)) {
             drainageFlag = Integer.valueOf(drainageFlagStr);
         }
 
         int goodsType = -1;
         String goodsTypeStr = request.getParameter("goodsType");
-        if(StringUtils.isNotBlank(goodsTypeStr)){
+        if (StringUtils.isNotBlank(goodsTypeStr)) {
             goodsType = Integer.valueOf(goodsTypeStr);
         }
 
@@ -141,8 +141,8 @@ public class SingleGoodsController {
             queryPm.setDrainageFlag(drainageFlag);
             queryPm.setGoodsType(goodsType);
             List<SameTypeGoodsBean> res = sgGsService.queryForList(queryPm);
-            for(SameTypeGoodsBean goodsBean : res){
-                if(StringUtils.isNotBlank(goodsBean.getShopId())){
+            for (SameTypeGoodsBean goodsBean : res) {
+                if (StringUtils.isNotBlank(goodsBean.getShopId())) {
                     goodsBean.setShopGoodsNum(sgGsService.queryOnlineGoodsCountByShopId(goodsBean.getShopId()));
                 }
             }
@@ -255,7 +255,7 @@ public class SingleGoodsController {
             json.setMessage("获取1688URL失败");
             return json;
         } else {
-            if (goodsUrl.indexOf("?") > -1) {
+            if (goodsUrl.contains("?")) {
                 goodsUrl = goodsUrl.substring(0, goodsUrl.indexOf("?"));
             }
         }
@@ -286,7 +286,7 @@ public class SingleGoodsController {
 
         String aliPid = request.getParameter("aliPid");
         String aliPrice = request.getParameter("aliPrice");
-        if(goodsType > 0){
+        if (goodsType > 0) {
             if (StringUtils.isBlank(aliPid)) {
                 json.setOk(false);
                 json.setMessage("获取对标商品ID失败");
@@ -299,9 +299,14 @@ public class SingleGoodsController {
             }
         }
 
+        String delFlag = request.getParameter("delFlag");
         try {
+            String pid = goodsUrl.substring(goodsUrl.lastIndexOf("/") + 1, goodsUrl.indexOf(".html"));
+            if ("1".equals(delFlag)) {
+                // sgGsService.deleteGoodsByPid(pid);
+            }
 
-            json = sgGsService.saveGoods(goodsUrl, admuser.getId(), Double.parseDouble(goodsWeight),drainageFlag,goodsType,aliPid,aliPrice, shopId);
+            json = sgGsService.saveGoods(goodsUrl, admuser.getId(), Double.parseDouble(goodsWeight), drainageFlag, goodsType, aliPid, aliPrice, shopId);
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("插入商品失败，原因 :" + e.getMessage());
@@ -380,8 +385,6 @@ public class SingleGoodsController {
             }
         }
     }
-
-
 
 
     @RequestMapping("/queryOffShelfList")
@@ -534,7 +537,7 @@ public class SingleGoodsController {
         int startNum = 0;
         int limitNum = 50;
         String rowsStr = request.getParameter("rows");
-        if(StringUtil.isNotBlank(rowsStr)){
+        if (StringUtil.isNotBlank(rowsStr)) {
             limitNum = Integer.valueOf(rowsStr);
         }
 
@@ -566,7 +569,6 @@ public class SingleGoodsController {
         String ipStr = request.getParameter("ip");
 
 
-
         try {
             SingleGoodsCheck queryPm = new SingleGoodsCheck();
             queryPm.setPid(pid);
@@ -578,7 +580,7 @@ public class SingleGoodsController {
             List<SingleGoodsCheck> res = sgGsService.queryCrossBorderGoodsForList(queryPm);
             //判断是否是外网，如果是，进行路径替换http://117.144.21.74
 
-            Map<String,Integer> rsMap = new HashMap<>();
+            Map<String, Integer> rsMap = new HashMap<>();
             for (SingleGoodsCheck goodsCheck : res) {
                 if (goodsCheck.getShopCheck() > 0) {
                     rsMap.put(goodsCheck.getShopId(), goodsCheck.getShopCheck());
@@ -707,7 +709,7 @@ public class SingleGoodsController {
             queryPm.setStartNum(startNum);
             List<SingleGoodsCheck> res = sgGsService.queryCrossBorderGoodsForList(queryPm);
 
-            if(!(res == null || res.isEmpty())) {
+            if (!(res == null || res.isEmpty())) {
                 List<String> pids = sgGsService.queryIsExistsPidFromSingleOffers(res);
                 boolean isSuccess = false;
                 if (!(pids == null || pids.isEmpty())) {
@@ -771,9 +773,9 @@ public class SingleGoodsController {
             SingleGoodsCheck queryPm = new SingleGoodsCheck();
             queryPm.setShopId(shopId);
             List<SingleGoodsCheck> res = sgGsService.queryCrossBorderGoodsForList(queryPm);
-            if("0".equals(type)){
+            if ("0".equals(type)) {
                 //全过
-                if(!(res == null || res.isEmpty())) {
+                if (!(res == null || res.isEmpty())) {
                     boolean isSuccess = false;
                     List<String> pids = sgGsService.queryIsExistsPidFromSingleOffers(res);
                     if (!(pids == null || pids.isEmpty())) {
@@ -794,17 +796,17 @@ public class SingleGoodsController {
                     }
                     res.clear();
                 }
-            }else if("1".equals(type)){
+            } else if ("1".equals(type)) {
                 //全否
-                for(SingleGoodsCheck goodsCheck : res){
+                for (SingleGoodsCheck goodsCheck : res) {
                     goodsCheck.setIsPass(1);
                 }
                 sgGsService.batchUpdateSingleGoodsCheck(res);
-            }else{
+            } else {
                 json.setOk(false);
                 json.setMessage("获取参数失败，执行终止");
             }
-            if(res != null){
+            if (res != null) {
                 res.clear();
             }
             json.setOk(true);
@@ -818,10 +820,9 @@ public class SingleGoodsController {
     }
 
 
-
     @RequestMapping(value = "/genCatergoryTree")
-	@ResponseBody
-	public List<Map<String, Object>> genCatergoryTree(HttpServletRequest request, HttpServletResponse response) {
+    @ResponseBody
+    public List<Map<String, Object>> genCatergoryTree(HttpServletRequest request, HttpServletResponse response) {
         List<Map<String, Object>> treeMap = new ArrayList<Map<String, Object>>();// 根节点的所有子节点
         String pid = request.getParameter("pid");
         if (StringUtil.isBlank(pid)) {
@@ -846,7 +847,7 @@ public class SingleGoodsController {
 
             List<CategoryBean> categorys = sgGsService.queryCategoryList(queryPm);
             int count = sgGsService.queryCrossBorderGoodsForListCount(queryPm);
-            treeMap = EasyUiTreeUtils.genEasyUiTree(categorys,count);
+            treeMap = EasyUiTreeUtils.genEasyUiTree(categorys, count);
             categorys.clear();
         } catch (Exception e) {
             e.printStackTrace();
@@ -857,7 +858,7 @@ public class SingleGoodsController {
     }
 
 
-	@RequestMapping("/setMainImgByPid")
+    @RequestMapping("/setMainImgByPid")
     @ResponseBody
     public JsonResult setMainImgByPid(HttpServletRequest request, HttpServletResponse response) {
 
