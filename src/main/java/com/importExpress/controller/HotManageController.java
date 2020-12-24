@@ -1145,7 +1145,8 @@ public class HotManageController {
     @RequestMapping("/getClassInfoList")
     @ResponseBody
     public JsonResult getClassInfoList(@RequestParam(value = "jsonName", required = false) String jsonName,
-                                       @RequestParam(value = "className", required = false) String className, int rows, int page) {
+                                       @RequestParam(value = "className", required = false) String className,
+                                       @RequestParam(value = "jsonType", required = false) Integer jsonType, int rows, int page) {
         JsonResult json = new JsonResult();
         HotClassInfo classInfo = new HotClassInfo();
 
@@ -1154,6 +1155,9 @@ public class HotManageController {
         }
         if (StringUtils.isNotBlank(className)) {
             classInfo.setClassName(className);
+        }
+        if (jsonType != null) {
+            classInfo.setJsonType(jsonType);
         }
         if (rows > 0 && page > 0) {
             classInfo.setStartNum((page - 1) * rows);
@@ -1215,6 +1219,7 @@ public class HotManageController {
             json.setMessage("获取参数失败");
             return json;
         }
+        classInfo.setJsonType(-1);
         try {
             List<HotClassInfo> list = hotManageService.getClassInfoList(classInfo);
             HotClassInfo classInfoRs = null;
@@ -1249,41 +1254,36 @@ public class HotManageController {
 
     @RequestMapping("/setClassInfo")
     @ResponseBody
-    public JsonResult setClassInfo(HttpServletRequest request,
-                                   @RequestParam(value = "id", required = false) Integer id,
-                                   @RequestParam(value = "className", required = true) String className,
-                                   @RequestParam(value = "jsonName", required = true) String jsonName) {
+    public JsonResult setClassInfo(HttpServletRequest request,HotClassInfo classInfo) {
 
         JsonResult json = new JsonResult();
 
-        HotClassInfo classInfo = new HotClassInfo();
+        Assert.notNull(classInfo, "classInfo null");
         com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
         if (admuser == null || admuser.getId() == 0) {
             json.setOk(false);
             json.setMessage("请登录后重试");
             return json;
         }
-        if (StringUtils.isBlank(className)) {
+        if (StringUtils.isBlank(classInfo.getClassName())) {
             json.setOk(false);
             json.setMessage("获取分组名称失败");
             return json;
         }
-        if (StringUtils.isBlank(jsonName)) {
+        if (StringUtils.isBlank(classInfo.getJsonName())) {
             json.setOk(false);
             json.setMessage("获取json名称失败");
             return json;
-        } else if (!jsonName.endsWith(".json")) {
-            jsonName += ".json";
+        } else if (!classInfo.getJsonName().endsWith(".json")) {
+            classInfo.setJsonName(classInfo.getJsonName() + ".json");
         }
         try {
-            classInfo.setClassName(className);
-            classInfo.setJsonName(jsonName);
-            if (id == null || id < 1) {
+
+            if (classInfo.getId() < 1) {
                 classInfo.setAdminId(admuser.getId());
                 hotManageService.insertIntoHotClassInfo(classInfo);
                 insertHotClassInfoOnline(classInfo);
             } else {
-                classInfo.setId(id);
                 classInfo.setUpdateAdminId(admuser.getId());
                 updateHotClassInfoOnline(classInfo);
                 hotManageService.updateIntoHotClassInfo(classInfo);
@@ -1869,9 +1869,9 @@ public class HotManageController {
 
     private void insertHotClassInfoOnline(HotClassInfo hotClassInfo) {
 
-        String sql = "insert into hot_class_info(id,class_name,json_name,admin_id) values(";
+        String sql = "insert into hot_class_info(id,class_name,json_name,admin_id,json_type) values(";
         sql += hotClassInfo.getId() + ",'" + hotClassInfo.getClassName() + "','" + hotClassInfo.getJsonName()
-                + "'," + hotClassInfo.getAdminId() + ")";
+                + "'," + hotClassInfo.getAdminId() + "," + hotClassInfo.getJsonType() + ")";
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
@@ -1880,6 +1880,7 @@ public class HotManageController {
 
         String sql = "update hot_class_info set class_name = '" + hotClassInfo.getClassName()
                 + "', json_name = '" + hotClassInfo.getJsonName() + "',update_admin_id = " + hotClassInfo.getUpdateTime()
+                + ", json_type = " + hotClassInfo.getJsonType()
                 + " where id = " + hotClassInfo.getId();
         System.err.println(sql);
         NotifyToCustomerUtil.sendSqlByMq(sql);

@@ -252,7 +252,7 @@
 
     <select id="getClassInfoList" resultType="com.cbt.warehouse.pojo.HotClassInfo"
             parameterType="com.cbt.warehouse.pojo.HotClassInfo">
-        select a.id,a.class_name as className,a.json_name as jsonName,
+        select a.id,a.class_name as className,a.json_name as jsonName,a.json_type as jsonType,
         a.admin_id as adminId,b.admName as adminName,a.update_admin_id as updateAdminId,c.admName as updateAdminName,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,
         DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as updateTime
@@ -268,16 +268,20 @@
         <if test="jsonName != null">
             and a.json_name = CONCAT('%',#{jsonName},'%')
         </if>
+        <if test="jsonType > -1">
+            and a.json_type = #{jsonType}
+        </if>
     </select>
 
     <insert id="insertIntoHotClassInfo" useGeneratedKeys="true" keyProperty="id"
             parameterType="com.cbt.warehouse.pojo.HotClassInfo">
-        insert into hot_class_info(class_name,json_name,admin_id)
-        values(#{className},#{jsonName},#{adminId})
+        insert into hot_class_info(class_name,json_name,admin_id,json_type)
+        values(#{className},#{jsonName},#{adminId},#{jsonType})
     </insert>
 
     <update id="updateIntoHotClassInfo" parameterType="com.cbt.warehouse.pojo.HotClassInfo">
-        update hot_class_info set class_name = #{className},json_name = #{jsonName},update_admin_id = #{updateAdminId}
+        update hot_class_info set class_name = #{className},json_name = #{jsonName},
+        update_admin_id = #{updateAdminId},json_type = #{jsonType}
         where id = #{id}
     </update>
 
