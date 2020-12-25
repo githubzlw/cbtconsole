@@ -151,7 +151,7 @@
 		from 1688_category a left join admuser b on a.update_admin_id = b.id
 		where a.lv > 0
 		<if test="cid != null">
-			and find_in_set(#{cid},a.path)
+			and find_in_set(#{cid},a.path)  or find_in_set(#{cid},a.change_path)
 		</if>
 		order by a.lv,a.`name`
 		<if test="limitNum > 0">

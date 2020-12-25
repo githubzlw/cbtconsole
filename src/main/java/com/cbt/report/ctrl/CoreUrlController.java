@@ -598,7 +598,7 @@ public class CoreUrlController {
 					double finalWeight = Double.valueOf(pft.getFinalWeight());
 					// 运费
 					double feeprice = FeightUtils.getCarFeightNew(finalWeight,Integer.valueOf(pft.getCategoryId()));
-					pft.setFreight(new BigDecimal(feeprice / StrUtils.EXCHANGE_RATE).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+					pft.setFreight(new BigDecimal(feeprice / GoodsInfoUtils.EXCHANGE_RATE).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 					if (pft.getWholesalePrice() == null || "".equals(pft.getWholesalePrice())) {
 						continue;
 					}
@@ -611,7 +611,7 @@ public class CoreUrlController {
 					// 成本利润率=
 					// (我们网站最终展现价格/（1688价格SKU的最高价+运费(这里按照单件运费进行计算))-1
 					double profitMargin = (price
-							/ ((Float.valueOf(strWholesalePrice) + feeprice) / StrUtils.EXCHANGE_RATE)) - 1;
+							/ ((Float.valueOf(strWholesalePrice) + feeprice) / GoodsInfoUtils.EXCHANGE_RATE)) - 1;
 					pft.setRate(new BigDecimal(profitMargin * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 					if (cidMap.containsKey(pft.getCategoryId())) {
 						ShopInfoBean spInf = cidMap.get(pft.getCategoryId());
@@ -622,7 +622,7 @@ public class CoreUrlController {
 					// 计算5件商品的平均运费
 					double feeprice5 = FeightUtils.getCarFeightNew(finalWeight * 5,Integer.valueOf(pft.getCategoryId()));
 					pft.setFreight5Gd(
-							new BigDecimal(feeprice5 / (5*StrUtils.EXCHANGE_RATE) * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+							new BigDecimal(feeprice5 / (5*GoodsInfoUtils.EXCHANGE_RATE) * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 				}
 			}
 			if (cidMap.size() > 0) {

@@ -39,6 +39,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
                 count = rset.getInt(1);
             }
             if (count > 0) {
+
                 json.setOk(false);
                 json.setMessage("当前商品：" + goodsUrl + "，已经存在");
             } else {
@@ -885,12 +886,17 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         // 非物理删除数据
         Connection conn28 = DBHelper.getInstance().getConnection6();
         String delete28 = "delete from  single_goods_offers where goods_pid = '" + pid + "'";
+        String delete282 = "delete from  useful_data.single_goods_ready where pid = '" + pid + "'";
 
         Statement stmt28 = null;
         int rs28 = 0;
         try {
             stmt28 = conn28.createStatement();
-            rs28 = stmt28.executeUpdate(delete28);
+
+            stmt28.addBatch(delete28);
+            stmt28.addBatch(delete282);
+
+            rs28 = stmt28.executeBatch().length;
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("pid:" + pid + ",deleteGoodsByPid error :" + e.getMessage());
