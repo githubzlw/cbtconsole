@@ -10,7 +10,7 @@ import com.cbt.util.BigDecimalUtil;
  */
 public class B2CPriceUtil {
 
-    public static final float CURRENT_RATE = 6.6f;
+    public static final float CURRENT_RATE = 6.5f;
 
 
     public static double changeToB2BPrice(double factoryPrice, double addPriceLv, double initialFreight) {
@@ -32,13 +32,13 @@ public class B2CPriceUtil {
      */
     public static String getFreePriceStr(float costPrice, String finalWeigth, String volumeWeight) {
 
-        double tempNUm = ((costPrice * 1.5 + 5 + 0.042 * 1000 * Math.max(Float.parseFloat(finalWeigth), Float.parseFloat(volumeWeight))) / CURRENT_RATE);
+        double tempNUm = ((costPrice * 1.6 + 5 + 0.042 * 1000 * Math.max(Float.parseFloat(finalWeigth), Float.parseFloat(volumeWeight))) / CURRENT_RATE);
         return BigDecimalUtil.truncateDoubleString(tempNUm, 2);
     }
 
     public static double getFreePrice(float costPrice, String finalWeigth, String volumeWeight) {
 
-        double tempNUm = ((costPrice * 1.5 + 5 + 0.042 * 1000 * Math.max(Float.parseFloat(finalWeigth), Float.parseFloat(volumeWeight))) / CURRENT_RATE);
+        double tempNUm = ((costPrice * 1.6 + 5 + 0.042 * 1000 * Math.max(Float.parseFloat(finalWeigth), Float.parseFloat(volumeWeight))) / CURRENT_RATE);
         return BigDecimalUtil.truncateDouble(tempNUm, 2);
     }
 }
