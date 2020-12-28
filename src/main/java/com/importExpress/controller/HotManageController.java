@@ -1192,6 +1192,7 @@ public class HotManageController {
     public JsonResult queryClassInfoList(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
         HotClassInfo classInfo = new HotClassInfo();
+        classInfo.setJsonType(-1);
         try {
             List<HotClassInfo> list = hotManageService.getClassInfoList(classInfo);
             int length = list.size();
