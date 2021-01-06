@@ -1529,6 +1529,9 @@
 											%</p>
 								</span>
                                 <a href="/cbtconsole/editc/detalisEdit?pid=${orderd.goods_pid}" target="_blank">编辑链接</a>
+                                <c:if test="${'8' == orderd.match_source}">
+                                    <b style="color:red;">(B2C商品)</b>
+                                </c:if>
 									<br>
                                 <span id="spanurl${sd.index}">
 									<p > 1688原始货源价格(RMB):<em style="color:red;">${orderd.price1688}</em> </p>
