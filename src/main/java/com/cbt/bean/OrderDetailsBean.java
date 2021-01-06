@@ -130,6 +130,7 @@ public class OrderDetailsBean implements Cloneable,Serializable {
     private List<String> bh_shop_id;
 	private int isDropshipOrder;
 	private String match_url;//上架的1688产品链接
+
 	private String ali_price;//ali价格
 	private int groupBuyId;//团购活动ID
 	private String final_weight;//产品重量
@@ -150,6 +151,17 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private int overSeaFlag;// 海外仓标识
 	private int isOverseasWarehouseProduct;//是否是海外仓商品
 	private String replacement_product;
+
+	private String match_source;// 是否B2C标识
+
+	public String getMatch_source() {
+		return match_source;
+	}
+
+	public void setMatch_source(String match_source) {
+		this.match_source = match_source;
+	}
+
 	public int getIsOverseasWarehouseProduct() {
 		return isOverseasWarehouseProduct;
 	}

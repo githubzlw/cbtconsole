@@ -31,7 +31,6 @@ public class B2CPriceUtil {
      * @return
      */
     public static String getFreePriceStr(float costPrice, String finalWeigth, String volumeWeight) {
-
         double tempNUm = ((costPrice * 1.6 + 5 + 0.042 * 1000 * Math.max(Float.parseFloat(finalWeigth), Float.parseFloat(volumeWeight))) / CURRENT_RATE);
         return BigDecimalUtil.truncateDoubleString(tempNUm, 2);
     }

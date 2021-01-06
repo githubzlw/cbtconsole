@@ -48,6 +48,7 @@
         <result column="max_price" property="maxPrice"/>
         <result column="weight" property="weight1688"/>
         <result column="weight_flag" property="weightFlag"/>
+        <result column="matchSource" property="matchSource"/>
 
     </resultMap>
 
@@ -1191,7 +1192,8 @@
         select
         cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
         cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,cbu.final_weight,cbu.max_price,
-        cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,cbu.eninfo
+        cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,cbu.eninfo,
+        cbu.matchSource
         from custom_benchmark_ready cbu
         where 1=1 and pid in
         <foreach collection="pidList" index="index" item="item" open="(" separator="," close=")">
@@ -1779,6 +1781,12 @@ select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feepri
 from custom_benchmark_ready where pid = #{pid}
     </select>
 
+    <insert id="insertB2cPriceLog" parameterType="com.cbt.bean.CustomGoodsPublish">
+        insert into custom_b2c_price_log(pid,wprice,free_price_new,range_price_free_new,price_import,morder,admin_id,sku_new)
+        select pid,wprice,free_price_new,range_price_free_new,price_import,morder,#{adminId} as admin_id,sku_new from
+        custom_benchmark_ready where pid = #{pid}
+    </insert>
+
     <update id="setNoUpdatePrice" parameterType="com.cbt.bean.CustomGoodsPublish">
         update custom_benchmark_ready
         set matchSource = #{matchSource}, img_check = #{img_check}, sku_new = #{sku_new},
@@ -1786,6 +1794,11 @@ from custom_benchmark_ready where pid = #{pid}
         wprice = #{wprice},price_kids= #{price_kids},price_import= #{price_kids},price_pets= #{price_kids}
         where pid = #{pid}
     </update>
+
+    <select id="selectB2cPriceLog" resultType="com.cbt.bean.CustomGoodsPublish">
+        select pid,wprice,sku_new,free_price_new,range_price_free_new,price_import,morder
+        from custom_b2c_price_log where pid = #{pid} order by create_time desc limit 1
+    </select>
 
     <select id="queryNewPid" resultType="java.lang.Integer">
         select pidIndex

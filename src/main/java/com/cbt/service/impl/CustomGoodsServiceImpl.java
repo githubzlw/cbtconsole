@@ -1091,8 +1091,18 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
+    public int insertB2cPriceLog(CustomGoodsPublish goods) {
+        return customGoodsMapper.insertB2cPriceLog(goods);
+    }
+
+    @Override
     public int setNoUpdatePrice(CustomGoodsPublish goods) {
         return customGoodsMapper.setNoUpdatePrice(goods);
+    }
+
+    @Override
+    public CustomGoodsPublish selectB2cPriceLog(String pid) {
+        return customGoodsMapper.selectB2cPriceLog(pid);
     }
 
     @Override

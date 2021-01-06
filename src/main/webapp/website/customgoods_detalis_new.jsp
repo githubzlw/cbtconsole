@@ -2722,10 +2722,10 @@
                         <span class="s_btn" onclick="setNoUpdatePrice('${goods.pid}',8)">标记B2C商品</span>
                         &nbsp;&nbsp;&nbsp;
                     </c:if>
-                    <%--<c:if test="${goods.matchSource == '8'}">
-                        <span class="s_btn" onclick="setNoUpdatePrice('${goods.pid}',0)">还原B2B商品</span>
+                    <c:if test="${goods.matchSource == '8'}">
+                        <span class="s_btn" style="display: none;" onclick="setNoUpdatePrice('${goods.pid}',0)">还原B2B商品</span>
                         &nbsp;&nbsp;&nbsp;
-                    </c:if>--%>
+                    </c:if>
                     <a target="_blank"
                        href="http://192.168.1.29:8280/cbtconsole/customerServlet?action=findAllTaoBaoInfo&className=PictureComparisonServlet&aliPid=${goods.aliGoodsPid}&ylbbPid=${goods.pid}"
                        style="color: #ff0000;">重新对标</a>
