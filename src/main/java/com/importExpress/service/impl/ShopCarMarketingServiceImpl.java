@@ -107,13 +107,13 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
     }
 
     @Override
-    public ShopCarUserStatistic queryUserInfo(int userId) {
+    public List<ShopCarUserStatistic> queryUserInfo(int userId) {
         return shopCarMarketingMapper.queryUserInfo(userId);
     }
 
     @Override
-    public int updateAndInsertUserFollowInfo(int userId, int adminId, String content) {
-        shopCarMarketingMapper.insertIntoShopCarFollow(userId, adminId, content);
+    public int updateAndInsertUserFollowInfo(int userId, int adminId, String content, int web_site) {
+        shopCarMarketingMapper.insertIntoShopCarFollow(userId, adminId, content, web_site);
         return shopCarMarketingMapper.updateUserFollowTime(userId, adminId);
     }
 

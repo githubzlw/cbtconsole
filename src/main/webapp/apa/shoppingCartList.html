@@ -63,6 +63,7 @@
             setDatagrid();
             queryAllCountry();
             getAdminList();
+            loadWebSize();
         });
 
         function setDatagrid() {
@@ -93,6 +94,33 @@
                     if (!data.success) {
                         $.messager.alert(data.message);
                     }
+                }
+            });
+        }
+        
+        function loadWebSize() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/shopCarMarketingCtr/queryAllWebSizeList',
+                data: {},
+                success: function (data) {
+                    var json = eval("(" + data + ")");
+                    if (json.ok) {
+
+                        var data = json.data;
+                        var content = '<option value="0">全部</option>';
+                        for(var key in data){
+                            content += '<option value="'+key+'">'+data[key]+'</option>'
+                        }
+                        $("#select_web_site").empty();
+                        $("#select_web_site").append(content);
+                    } else {
+                        $.messager.alert("提醒", json.message, "info");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败,请联系管理员", "info");
                 }
             });
         }
@@ -132,6 +160,7 @@
             var userEmail = $("#query_user_email").val();
             var followId = $("#query_follow_id").val();
             var adminId = $("#query_admin_id").val();
+            var webSite = $("#select_web_site").val();
             //var countryId = $("#query_country_id").val();
             var countryId = $('#query_country_id').combobox('getValue');
             var beginMoney = $("#query_begin_money").val();
@@ -144,7 +173,8 @@
                 "adminId": adminId,
                 "countryId": countryId,
                 "beginMoney": beginMoney,
-                "endMoney": endMoney
+                "endMoney": endMoney,
+                "site": webSite
             });
         }
 
@@ -235,7 +265,7 @@
                 row.userId + '&website=2" target="_blank">Kids跟进</a>';
             }else{
                 content = '<a class="but_color" href="/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId=' +
-                row.userId + '&website='+website+'" target="_blank">'+btVal+'</a>';
+                row.userId + '&website='+row.site+'" target="_blank">'+btVal+'</a>';
             }
             return content;
         }
@@ -247,6 +277,9 @@
 <div id="shop_marketing_toolbar" style="padding: 5px; height: auto">
     <form id="shop_marketing_query_form" action="#" onsubmit="return false;">
 
+        <span>网站:<select id="select_web_site" style="height: 26px;width: 90px;">
+            <option value="0">全部</option>
+        </select></span>
         <span>客户ID:<input id="query_user_id" type="text" value="" style="width: 100px;height: 22px;"/></span>
          &nbsp;&nbsp;<span>客户邮箱:<input id="query_user_email" type="text" value="" style="width: 180px;height: 22px;"/></span>
         &nbsp;&nbsp;<span>国家: <select id="query_country_id" style="font-size: 16px; height: 26px; width: 200px;">
@@ -278,9 +311,9 @@
         <th data-options="field:'currency',align:'center',width:'80px'">货币</th>
         <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
         <th data-options="field:'site',align:'center',width:'100px',formatter:formatSite">网站</th>
-        <th data-options="field:'totalCatid',align:'center',width:'60px'">商品种类</th>
+        <!--<th data-options="field:'totalCatid',align:'center',width:'60px'">商品种类</th>-->
         <th data-options="field:'totalPrice',align:'center',width:'80px',formatter:formatMoney">总金额</th>
-        <th data-options="field:'averagePrice',align:'center',width:'60px'">均价</th>
+        <!--<th data-options="field:'averagePrice',align:'center',width:'60px'">均价</th>-->
         <th data-options="field:'lastAddCartTime',align:'center',width:'130px'">最后添加时间</th>
         <!--<th data-options="field:'lastLoginTime',align:'center',width:'130px'">最后登录时间</th>-->
         <th data-options="field:'saleName',align:'center',width:'80px'">销售</th>
