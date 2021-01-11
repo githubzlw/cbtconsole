@@ -90,8 +90,6 @@ public class ShopCarMarketingController {
     private Map<Integer, String> mapAdm = new HashMap<>();
 
 
-
-
     @RequestMapping("/queryCarInfoByUserId")
     public ModelAndView queryCarInfoByUserId(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView mv = new ModelAndView("goodsCarInfo");
@@ -403,21 +401,22 @@ public class ShopCarMarketingController {
                 return json;
             }*/
 
-            if ("1".equals(websiteType) || "2".equals(websiteType) || "3".equals(websiteType)) {
-                //查询当前客户存在的购物车数据
-            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.parseInt(websiteType));
-                if (CollectionUtils.isEmpty(shopCarMarketingList)) {
-                    json.setOk(false);
-                    json.setMessage("客户购物车信息为空");
-                    return json;
-                }
-                shopCarMarketingList.clear();
+            /*if ("1".equals(websiteType) || "2".equals(websiteType) || "3".equals(websiteType)) {
+
             } else {
                 json.setOk(false);
                 json.setMessage("获取网站类别异常");
                 return json;
-            }
+            }*/
 
+            //查询当前客户存在的购物车数据
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.parseInt(websiteType));
+            if (CollectionUtils.isEmpty(shopCarMarketingList)) {
+                json.setOk(false);
+                json.setMessage("客户购物车信息为空");
+                return json;
+            }
+            shopCarMarketingList.clear();
 
 
                 /*List<GoodsCarActiveSimplBean> listActive = new ArrayList<>();
@@ -1013,23 +1012,22 @@ public class ShopCarMarketingController {
             statistic.setStartNum(startNum);
             statistic.setLimitNum(limitNum);
 
-            if(site > 0){
+            if (site > 0) {
                 statistic.setSite(WebSiteEnum.getSourceCodeByCode(site));
             }
 
 
-
             int count = shopCarMarketingService.queryForListCount(statistic);
             List<ShopCarUserStatistic> res = new ArrayList<>();
-            if(count > 0){
+            if (count > 0) {
                 res = shopCarMarketingService.queryForList(statistic);
-                if(mapAdm.size() == 0){
+                if (mapAdm.size() == 0) {
                     List<Admuser> admusers = admUserDao.queryForList();
-                    if(CollectionUtils.isNotEmpty(admusers)){
-                        admusers.forEach(e-> mapAdm.put(e.getId(),e.getAdmName() ));
+                    if (CollectionUtils.isNotEmpty(admusers)) {
+                        admusers.forEach(e -> mapAdm.put(e.getId(), e.getAdmName()));
                     }
                 }
-                res.forEach(e-> e.setFollowAdminName(mapAdm.get(e.getFollowAdminId())));
+                res.forEach(e -> e.setFollowAdminName(mapAdm.get(e.getFollowAdminId())));
             }
             json.setRows(res);
             json.setTotal(count);
@@ -1077,7 +1075,7 @@ public class ShopCarMarketingController {
 
             List<ShopCarUserStatistic> carUserStatisticList = shopCarMarketingService.queryUserInfo(userId);
             int finalCheckWebsite = checkWebsite;
-            ShopCarUserStatistic carUserStatistic = carUserStatisticList.stream().filter(e-> e.getSite() == finalCheckWebsite).findFirst().orElse(null);
+            ShopCarUserStatistic carUserStatistic = carUserStatisticList.stream().filter(e -> e.getSite() == finalCheckWebsite).findFirst().orElse(null);
             if ("ePacket".equals(carUserStatistic.getShippingName())) {
                 carUserStatistic.setShippingName("EPACKET (USPS)");
             }
@@ -1192,7 +1190,7 @@ public class ShopCarMarketingController {
                 carUserStatistic.setEstimateProfit(0);
                 carUserStatistic.setTotalWhosePrice(0);
             } else {
-                if(totalPrice + carUserStatistic.getTotalFreight() > 0){
+                if (totalPrice + carUserStatistic.getTotalFreight() > 0) {
                     estimateProfit = (totalPrice + carUserStatistic.getTotalFreight() - carUserStatistic.getOffFreight() - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / (totalPrice + carUserStatistic.getTotalFreight()) * 100D;
                 }
                 carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
