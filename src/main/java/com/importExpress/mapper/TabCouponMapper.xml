@@ -145,5 +145,93 @@
         SELECT COUNT(1) FROM tab_coupon_new
         WHERE id LIKE #{couponCode}
     </select>
-    
+
+    <insert id="addTabCouponNew" parameterType="com.importExpress.pojo.TabCouponNew">
+        insert into tab_coupon_new
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                `id`,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="site != null">
+                `site`,
+            </if>
+            <if test="count != null">
+                `count`,
+            </if>
+            <if test="leftCount != null">
+                `leftCount`,
+            </if>
+            <if test="describe != null">
+                `describe`,
+            </if>
+            <if test="value != null">
+                `value`,
+            </if>
+            <if test="from != null">
+                `from`,
+            </if>
+            <if test="to != null">
+                `to`,
+            </if>
+            <if test="valid != null">
+                `valid`,
+            </if>
+            <if test="userid != null">
+                `userid`,
+            </if>
+            <if test="mqlog != null">
+                `mqlog`,
+            </if>
+            `createtime`,
+            <if test="shareFlag != null">
+                `share_flag`,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="site != null">
+                #{site,jdbcType=INTEGER},
+            </if>
+            <if test="count != null">
+                #{count,jdbcType=INTEGER},
+            </if>
+            <if test="leftCount != null">
+                #{leftCount,jdbcType=INTEGER},
+            </if>
+            <if test="describe != null">
+                #{describe,jdbcType=VARCHAR},
+            </if>
+            <if test="value != null">
+                #{value,jdbcType=VARCHAR},
+            </if>
+            <if test="from != null">
+                #{from,jdbcType=TIMESTAMP},
+            </if>
+            <if test="to != null">
+                #{to,jdbcType=TIMESTAMP},
+            </if>
+            <if test="valid != null">
+                #{valid,jdbcType=INTEGER},
+            </if>
+            <if test="userid != null">
+                #{userid,jdbcType=INTEGER},
+            </if>
+            <if test="mqlog != null">
+                #{mqlog,jdbcType=VARCHAR},
+            </if>
+            now(),
+            <if test="shareFlag != null">
+                #{shareFlag,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
 </mapper>

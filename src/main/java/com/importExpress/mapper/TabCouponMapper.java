@@ -42,4 +42,6 @@ public interface TabCouponMapper {
     List<UserBean> queryLocalUser(@Param("list") List<String> list);
 
     long queryCouponCodeCount(@Param("couponCode") String couponCode);
+
+    int addTabCouponNew(TabCouponNew tabCouponNew);
 }

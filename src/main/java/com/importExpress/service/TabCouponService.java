@@ -28,7 +28,11 @@ public interface TabCouponService {
 
     String querycouponcode();
 
-    Map<String,String> delCouponUser(String couponCode, String userid);
+    Map<String, String> delCouponUser(String couponCode, String userid);
 
     int SendGuestbook(int id, String replyContent, String date, String name, String qustion, String pname, String email, int parseInt, String purl, String sale_email, String picPath, Integer websiteType);
+
+    List<String> getCouponCode(String url, String param);
+
+    int addTabCouponNew(TabCouponNew tabCouponNew);
 }
