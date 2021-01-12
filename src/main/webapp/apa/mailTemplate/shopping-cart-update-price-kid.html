@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width" />
-  <title th:text="${title}">KidsProductWholesale ShopCart Show</title>
+  <title th:text="${title}">kidscharming ShopCart Show</title>
   <style type="text/css">
 
     *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -209,8 +209,8 @@
       <td class="header container" align="center">
         <div class="content">
             <span class="brand">
-              <a href="https://www.kidsproductwholesale.com/">
-                <img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/newindex/img/kids_logo.png">
+              <a href="https://www.kidscharming.com/">
+                <img src="https://img.kidscharming.com/importcsvimg/webpic/newindex/img/kids_logo.png">
               </a>
             </span>
         </div>
@@ -240,7 +240,7 @@
                       <div class="dismantling_box" >
                         <div class="order_first">
                           <div class="rece_shop">
-                            <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Kids Product Wholesale.</p>
+                            <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Kids Charming.</p>
                             <p>Recently you have added some items to your shopping  cart. We greatly value your trust
                               and confidence. To express our sincere appreciation for your loyalty to our business,
                               <b>we have sent a coupon to your shopping cart:</b> </p>
@@ -249,7 +249,7 @@
                           <ul class="clearfix">
                             <li class="order_li" th:each="carInfo:${updateList}">
 
-                              <img th:src="${carInfo.googsImg}" src="https://img1.kidsproductwholesale.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
+                              <img th:src="${carInfo.googsImg}" src="https://img1.kidscharming.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
                                <p class="order_title" th:title="${carInfo.goodsTitle}" th:text="${carInfo.goodsTitle}" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
 
                               <div th:if="${not #lists.isEmpty(carInfo.typeList)}" th:each="typeStr:${carInfo.typeList}">
@@ -267,7 +267,7 @@
                           <ul class="clearfix">
                             <li class="order_li" th:each="carInfo:${sourceList}">
 
-                              <img th:src="${carInfo.googsImg}" src="https://img1.kidsproductwholesale.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
+                              <img th:src="${carInfo.googsImg}" src="https://img1.kidscharming.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
                               <p class="order_title" th:title="${carInfo.goodsTitle}" th:text="${carInfo.goodsTitle}" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
 
                               <div th:if="${not #lists.isEmpty(carInfo.typeList)}" th:each="typeStr:${carInfo.typeList}">
@@ -280,18 +280,18 @@
                               <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong></p>-->
                             </li>
                           </ul>
-                          <p class="order_click"><a target="_blank" th:href="${carUrl}" href="https://www.kidsproductwholesale.com/Goods/getShopCar">Click here</a> to see the other items in your shopping cart</p>
+                          <p class="order_click"><a target="_blank" th:href="${carUrl}" href="https://www.kidscharming.com/Goods/getShopCar">Click here</a> to see the other items in your shopping cart</p>
                           <div class="order_usd order_usd_due">
                             <!--<p class="order_off"><strong>Products Cart Final Total:
                               <em>USD</em><em th:text="${totalActualCost}"> 15.00</em></strong><i><strong><em>USD</em><em th:text="${totalProductCost}"> 18.80</em></strong></i></p>-->
                             <p class="estima_time estima_time_color">You have coupon :<span th:text="${couponValue}">0-0</span>
-                              <a th:href="${carUrl}" href="https://www.kidsproductwholesale.com/Goods/getShopCar" target="_blank">CHECK IT OUT</a></p>
+                              <a th:href="${carUrl}" href="https://www.kidscharming.com/Goods/getShopCar" target="_blank">CHECK IT OUT</a></p>
                           </div>
                           <p class="order_rem_p">We'll keep this deal valid <b>for the next 48 hours</b></p>
                           <p class="order_rem_p">Coupon is applicable to all categories.</p>
-                          <p class="order_rem_p">Hurry in to make sure you snag your most-coveted KidsProductWholesale merch  -  don't let this be the one that got away!</p>
+                          <p class="order_rem_p">Hurry in to make sure you snag your most-coveted kidscharming merch  -  don't let this be the one that got away!</p>
                           <p class="order_rem_p">If you have any further concerns or questions please feel free to shoot me an email, I'll get back to you in 24h!</p>
-                          <p class="order_rem_p"><strong>Kids Product Wholesale CHINA</strong><br/>
+                          <p class="order_rem_p"><strong>Kids Charming CHINA</strong><br/>
                             Best product source for small business!</p>
                         </div>
                       </div>
@@ -301,10 +301,10 @@
                             <p class="thanks_so">Yours Sincerely,</p>
                               <p class="thanks_so"> <strong th:text="${adminName}">Lena</strong> | Marketing Manager</p>
                             <p class="thanks_so"> Marketing Department</p>
-                            <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@kidsproductwholesale.com</strong></p>
+                            <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@kidscharming.com</strong></p>
                             <p class="thanks_so">WhatsApp: <strong th:text="${whatsApp}">+86 18717701974</strong></p>
-                            <p class="thanks_so"><a href="https://www.kidsproductwholesale.com" target="_blank">www.kidsproductwholesale.com</a></p>
-                            <span style="display:none;"><img th:src="${emailFollowUrl}" src="https://www.kidsproductwholesale.com/followMe/index.do?fmc=110119911"/></span>
+                            <p class="thanks_so"><a href="https://www.kidscharming.com" target="_blank">www.kidscharming.com</a></p>
+                            <span style="display:none;"><img th:src="${emailFollowUrl}" src="https://www.kidscharming.com/followMe/index.do?fmc=110119911"/></span>
                           </td>
                         </tr>
                       </table>

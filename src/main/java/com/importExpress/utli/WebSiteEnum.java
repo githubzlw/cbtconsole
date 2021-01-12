@@ -8,23 +8,23 @@ public enum WebSiteEnum {
     /**
      * IMPORT网站
      */
-    IMPORTX(1,"https://www.import-express.com","Import-Express", 'I', 1),
+    IMPORTX(1, "https://www.import-express.com", "IMPORT", 'I', 1),
     /**
      * KIDS网站
      */
-    KIDS(2,"https://www.kidscharming.com","KidsCharming", 'K', 2),
+    KIDS(2, "https://www.kidscharming.com", "KIDS", 'K', 2),
     /**
      * PETS网站
      */
-    PETS(3,"https://www.petstoreinc.com","PetStoreInc",'P', 4),
+    PETS(4, "https://www.petstoreinc.com", "PETS", 'P', 4);
     /**
      * CABLE网站
      */
-    CABLE(4,"https://www.cablewirefactory.com/","CableWireFactory",'L', 64),
+    //CABLE(4, "https://www.cablewirefactory.com/", "CableWireFactory", 'L', 64),
     /**
      * PIPE网站
      */
-    PIPE(5,"https://www.pipetankfittings.com/","PipeTankFittings",'E', 32);
+    //PIPE(5, "https://www.pipetankfittings.com/", "PipeTankFittings", 'E', 32);
 
 
     /**
@@ -49,24 +49,24 @@ public enum WebSiteEnum {
     WebSiteEnum(int code) {
         this.code = code;
     }
+
     WebSiteEnum(int code, String url) {
         this.code = code;
         this.url = url;
     }
 
-    WebSiteEnum(int code, String url,String name) {
+    WebSiteEnum(int code, String url, String name) {
         this.code = code;
         this.url = url;
         this.name = name;
     }
 
-    WebSiteEnum(int code, String url,String name, Character siteType) {
+    WebSiteEnum(int code, String url, String name, Character siteType) {
         this.code = code;
         this.url = url;
         this.name = name;
         this.siteType = siteType;
     }
-
 
 
     WebSiteEnum(int code, String url, String name, Character siteType, int sourceCode) {
@@ -120,12 +120,11 @@ public enum WebSiteEnum {
     }
 
 
-
-    public static int getSourceCodeByCode(int code){
-        if(code > 0){
+    public static int getSourceCodeByCode(int code) {
+        if (code > 0) {
             WebSiteEnum orElse = Arrays.stream(WebSiteEnum.values()).filter(e -> e.getCode() == code).findFirst().orElse(null);
-            if(orElse != null){
-                return  orElse.getSourceCode();
+            if (orElse != null) {
+                return orElse.getSourceCode();
             } else {
                 return 0;
             }
