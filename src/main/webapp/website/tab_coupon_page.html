@@ -397,9 +397,7 @@
 
     Datetime('#fromTime');
     Datetime('#toTime');
-    Datetime('#couponFromTime');
-    Datetime('#couponToTime');
-    Datetime('#enableTime');
+
 
     function iniDatetime() {
         //时间选择框日期初始化
@@ -819,8 +817,11 @@
                 temHtml += '<a href=\"#\" onclick=\"showAddCouponShare(\'' + row.id
                     + '\')\">查看分享链接</a>';
             } else {
-                temHtml += '<a href=\"#\" onclick=\"showAddCouponUser(\'' + row.id
-                    + '\')\">关联用户</a>';
+                if (row.mqlog != '' && row.mqlog != null) {
+                    temHtml += '<a href=\"#\" onclick=\"showAddCouponUser(\'' + row.id
+                        + '\')\">关联用户</a>';
+                }
+
             }
             return temHtml;
         }
@@ -980,13 +981,6 @@
                 <table class="table table-striped table-hover"
                        style="float: left; font-size: 13px;">
                     <tr>
-                        <td></td>
-                        <td style="line-height: 28px;">优惠券卷码名称</td>
-                        <td><input name="couponName" type="text"
-                                   style="width: 500px"> <span
-                                class="add-on"></span></td>
-                    </tr>
-                    <tr>
                         <td width="6%"></td>
                         <td width="14%" style="line-height: 28px;">优惠卷所在网站</td>
                         <td width="80%">
@@ -1002,14 +996,12 @@
 
                     <tr>
                         <td></td>
-                        <td>卷类别</td>
+                        <td>卷类别(暂时只有一种)</td>
                         <td>
                             <select name="couponCodeType" id="couponCodeType" style="width: 500px">
-                                <option value="0" selected="selected">0-全场赠券</option>
-                                <option value="1">1-会员赠券</option>
-                                <option value="2">2-购物赠券</option>
-                                <option value="3">3-注册赠券</option>
+                                <option value="1" selected="selected">1-满减券</option>
                             </select>
+                            <span class="add-on" id="errorMessgeValue" style="color: red;"></span>
                             <!-- 满减卷规则 -->
                             <table id="couponCodeType1">
                                 <tr>
@@ -1043,7 +1035,8 @@
                         <td><input name="couponCount" type="text"
                                    placeholder="为0则不可用" style="width: 500px"
                                    onkeyup="value=value.replace(/[^\d]/g,'')"> <span
-                                class="add-on">张</span></td>
+                                class="add-on">张</span> <span class="add-on" id="errorMessgeCount"
+                                                              style="color: red;"></span></td>
                     </tr>
                     <tr>
                         <td></td>
@@ -1058,7 +1051,8 @@
                                     class="glyphicon glyphicon-calendar"></span>
                                     </span>
                             </a>
-
+                            <span class="add-on" id="errorMessgeEnableTime"
+                                  style="color: red;float: left;line-height: 30px;padding-left: 10px;"></span>
                         </td>
                     </tr>
 
@@ -1086,6 +1080,8 @@
                                     class="glyphicon glyphicon-calendar"></span>
 								    </span>
                             </a>
+                            <span class="add-on" id="errorMessgeTime"
+                                  style="color: red;float: left;line-height: 30px;padding-left: 10px;"></span>
                         </td>
                     </tr>
 
@@ -1143,6 +1139,10 @@
         }));
     })
 
+    Datetime('#couponFromTime');
+    Datetime('#couponToTime');
+    Datetime('#enableTime');
+
     function changeCouponDescribe() {
         var valueLeft = $("input[name=couponValueLeft]").val();
         if (valueLeft != undefined && valueLeft != '') {
@@ -1179,26 +1179,34 @@
         var valueLeft = $("input[name=couponValueLeft]").val();
         var valueRight = $("input[name=couponValueRight]").val();
         if (valueRight == '' || valueLeft == '') {
-            $("input[name=couponCode]").next().text("请输入最低消费金额和抵扣金额!");
+            $("#errorMessgeValue").text("请输入最低消费金额和抵扣金额!");
             return false;
         }
         if (valueLeft != '' && valueLeft != '0' && parseInt(valueLeft) < parseInt(valueRight)) {
-            $("input[name=couponCode]").next().text("最低消费金额应大于等于抵扣金额 或者最低消费金额设置为0!");
+            $("#errorMessgeValue").text("最低消费金额应大于等于抵扣金额 或者最低消费金额设置为0!");
             return false;
         }
 
         if (!(parseInt($("input[name=couponCount]").val()) > 0)) {
-            $("input[name=couponCode]").next().text("请录入卷数量, 且卷数量应大于0!");
+            $("#errorMessgeCount").text("请录入卷数量, 且卷数量应大于0!");
             return false;
         }
+
+        var enableTime = $("input[name=enableTime]").val();
+        if (enableTime == '') {
+            $("#errorMessgeEnableTime").text("可以领取时间不能为空!");
+            return false;
+        }
+
+
         var fromTime = $("input[name=couponFromTime]").val();
         var toTime = $("input[name=couponToTime]").val();
         if (fromTime == '' || toTime == '') {
-            $("input[name=couponCode]").next().text("领取开始时间和截止时间不能为空!");
+            $("#errorMessgeTime").text("截止时间不能为空!");
             return false;
         }
         if (new Date(fromTime) > new Date(toTime)) {
-            $("input[name=couponCode]").next().text("领取开始时间应早于领取截止时间!");
+            $("#errorMessgeTime").text("开始时间应早于结束时间!");
             return false;
         }
         return true;

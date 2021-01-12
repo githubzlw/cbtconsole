@@ -401,8 +401,7 @@ public class TabCouponController {
                                                @RequestParam(value = "couponCodeWebsiteType", defaultValue = "0", required = false) Integer couponWebsiteType, //优惠卷所在网站
                                                String couponFromTime,//领取开始时间
                                                String couponToTime,//领取截止时间
-                                               String enableTime,
-                                               String couponName
+                                               String enableTime
     ) {
         Map<String, String> resultMap = new HashMap<String, String>();
         // 获取登录用户信息
@@ -428,8 +427,7 @@ public class TabCouponController {
 
             String url = "https://www.import-express.com/couponV2/generate";
             String param = "amount=" + valueRight + "&count=" + count + "&enableTime=" + enableTime +
-                    "&endTime=" + couponToTime + "&minPoint=" + valueLeft + "&name=" +
-                    couponName + "&note=" + couponDescribe + "&startTime=" + couponFromTime;
+                    "&endTime=" + couponToTime + "&minPoint=" + valueLeft + "&name=coupon" + "&note=" + couponDescribe + "&startTime=" + couponFromTime;
             List<String> resultList = tabCouponService.getCouponCode(url, param);
             if (!CollectionUtils.isEmpty(resultList)) {
                 String jsonStr = resultList.get(0);
