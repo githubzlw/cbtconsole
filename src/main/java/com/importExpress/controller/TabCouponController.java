@@ -5,10 +5,7 @@ import com.cbt.util.Md5Util;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.website.userAuth.bean.Admuser;
-import com.importExpress.pojo.CouponRedisBean;
-import com.importExpress.pojo.TabCouponNew;
-import com.importExpress.pojo.TabCouponRules;
-import com.importExpress.pojo.TabCouponType;
+import com.importExpress.pojo.*;
 import com.importExpress.service.TabCouponService;
 import com.importExpress.service.impl.TabCouponServiceImpl;
 import net.sf.json.JSONObject;
@@ -417,7 +414,7 @@ public class TabCouponController {
         }
         //登陆用户id
         Integer userId = user.getId();
-
+        String code = "";
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             couponFromTime = simpleDateFormat.format(simpleDateFormat.parse(couponFromTime + " 00:00:00"));
@@ -426,9 +423,11 @@ public class TabCouponController {
 
 
             String url = "https://www.import-express.com/couponV2/generate";
+            //String url = "http://192.168.1.168:8080/couponV2/generate";
             String param = "amount=" + valueRight + "&count=" + count + "&enableTime=" + enableTime +
                     "&endTime=" + couponToTime + "&minPoint=" + valueLeft + "&name=coupon" + "&note=" + couponDescribe + "&startTime=" + couponFromTime;
             List<String> resultList = tabCouponService.getCouponCode(url, param);
+
             if (!CollectionUtils.isEmpty(resultList)) {
                 String jsonStr = resultList.get(0);
 
@@ -436,7 +435,7 @@ public class TabCouponController {
                 if ("200".equals(String.valueOf(json.get("code")))) {
 
                     JSONObject data = (JSONObject) json.get("data");
-                    String code = String.valueOf(data.get("code"));
+                    code = String.valueOf(data.get("code"));
                     TabCouponNew tabCouponNew = new TabCouponNew();
                     tabCouponNew.setId(code);
                     tabCouponNew.setCount(count);
@@ -449,15 +448,25 @@ public class TabCouponController {
                     tabCouponNew.setValid(1);
                     tabCouponNew.setValue(valueLeft + "-" + valueRight);
                     tabCouponNew.setUserid(userId);
-                    tabCouponService.addTabCouponNew(tabCouponNew);
+                    int result = tabCouponService.addTabCouponNew(tabCouponNew);
+                    if (result > 0) {
+                        TabCouponLog tabCouponLog = new TabCouponLog();
+                        tabCouponLog.setUserId(userId);
+                        tabCouponLog.setCouponCode(code);
+                        tabCouponService.addTabCouponNewLog(tabCouponLog);
+                    }
                 }
 
             }
             resultMap.put("state", "true");
-
         } catch (Exception e) {
             e.printStackTrace();
             resultMap.put("state", "false");
+            TabCouponLog tabCouponLog = new TabCouponLog();
+            tabCouponLog.setUserId(userId);
+            tabCouponLog.setCouponCode(code);
+            tabCouponLog.setErrorMessage(e.getMessage());
+            tabCouponService.addTabCouponNewLog(tabCouponLog);
         }
         return resultMap;
     }

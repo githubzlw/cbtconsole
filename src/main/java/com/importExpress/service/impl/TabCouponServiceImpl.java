@@ -430,4 +430,10 @@ public class TabCouponServiceImpl implements TabCouponService {
         return tabCouponMapper.addTabCouponNew(tabCouponNew);
     }
 
+    @Override
+    public int addTabCouponNewLog(TabCouponLog tabCouponLog) {
+        return tabCouponMapper.addTabCouponNewLog(tabCouponLog);
+    }
+
+
 }

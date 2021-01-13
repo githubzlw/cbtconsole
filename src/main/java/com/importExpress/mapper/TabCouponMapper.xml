@@ -234,4 +234,32 @@
         </trim>
     </insert>
 
+    <insert id="addTabCouponNewLog" parameterType="com.importExpress.pojo.TabCouponLog">
+        insert into tab_coupon_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                `user_id`,
+            </if>
+            <if test="couponCode != null">
+                `coupon_code`,
+            </if>
+            `create_time`,
+            <if test="errorMessage != null">
+                `error_message`,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="couponCode != null">
+                #{couponCode,jdbcType=VARCHAR},
+            </if>
+            now(),
+            <if test="errorMessage != null">
+                #{errorMessage,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
 </mapper>

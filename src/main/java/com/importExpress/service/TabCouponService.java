@@ -1,9 +1,6 @@
 package com.importExpress.service;
 
-import com.importExpress.pojo.CouponRedisBean;
-import com.importExpress.pojo.TabCouponNew;
-import com.importExpress.pojo.TabCouponRules;
-import com.importExpress.pojo.TabCouponType;
+import com.importExpress.pojo.*;
 
 import java.util.List;
 import java.util.Map;
@@ -35,4 +32,6 @@ public interface TabCouponService {
     List<String> getCouponCode(String url, String param);
 
     int addTabCouponNew(TabCouponNew tabCouponNew);
+
+    int addTabCouponNewLog(TabCouponLog tabCouponLog);
 }
