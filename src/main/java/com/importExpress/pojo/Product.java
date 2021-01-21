@@ -87,6 +87,12 @@ public class Product {
 	 */
 	private int isStock;
 
+
+	/**
+	 * B2C标识 8 B2C，其他 B2B
+	 */
+	private int matchSource;
+
 	public Product(Document document) {
         this.id = String.valueOf(document.get("pid"));
         this.name = String.valueOf(document.get("enname"));
@@ -95,6 +101,12 @@ public class Product {
     public Product(String pid, String custom_main_image) {
         this.id = pid;
         this.image =custom_main_image;
+    }
+
+    public Product(String pid, String custom_main_image, int matchSource) {
+        this.id = pid;
+        this.image =custom_main_image;
+        this.matchSource =matchSource;
     }
 
     /*public Product(String pid, String remotpath, String localpath) {
