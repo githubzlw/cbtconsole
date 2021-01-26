@@ -44,24 +44,54 @@
         }
 
         function hideState() {
+            /*$("#span_state").show();
             var val = $("#database_id").val();
             if (val > 0) {
                 $("#span_state").show();
             } else {
                 $("#span_state").hide();
+            }*/
+        }
+
+        function allProductStatic() {
+            /*$.messager.progress({
+                title: '正在执行',
+                msg: '请等待...'
+            });*/
+            var solrFlag = $("#database_id").val();
+            var valid = $("#state_id").val();
+
+            var url = window.location.href;
+            // http://192.168.1.31:9090/mongo/checkSku/10/1
+            var accessUrl = "http://192.168.1.67:9090/productStatic/allProductSingleFile?valid=" + valid + "&solrFlag=" + solrFlag;
+            if (url.indexOf("192.168.1.9") > -1 || url.indexOf("27.115.38.42") > -1 || url.indexOf("192.168.1.27") > -1) {
+                accessUrl = "http://192.168.1.31:9090/productStatic/allProductSingleFile?valid=" + valid + "&solrFlag=" + solrFlag;
             }
+            var param = "height=400,width=600,top=200,left=600,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+            window.open(accessUrl, "windows", param);
         }
 
         function staticProduct() {
-            $.messager.progress({
+            /*$.messager.progress({
                 title: '正在执行',
                 msg: '请等待...'
-            });
+            });*/
             var site = $("#web_size_type").val();
             var solrFlag = $("#database_id").val();
             var valid = $("#state_id").val();
+
+            var url = window.location.href;
+            // http://192.168.1.31:9090/mongo/checkSku/10/1
+            var accessUrl = "http://192.168.1.67:9090/productStatic/genProductSingleFile?valid=" + valid + "&webSite=" + site + "&solrFlag=" + solrFlag;
+            if (url.indexOf("192.168.1.9") > -1 || url.indexOf("27.115.38.42") > -1 || url.indexOf("192.168.1.27") > -1) {
+                accessUrl = "http://192.168.1.31:9090/productStatic/genProductSingleFile?valid=" + valid + "&webSite=" + site + "&solrFlag=" + solrFlag;
+            }
+
+            var param = "height=400,width=600,top=200,left=600,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+            window.open(accessUrl, "windows", param);
+
             // http://127.0.0.1:8084/cbtconsole/hotManage/staticProduct?valid=1&webSite=1&solrFlag=1
-            $.ajax({
+            /*$.ajax({
                 type: 'POST',
                 url: '/cbtconsole/hotManage/staticProduct',
                 data: {webSite: site, solrFlag: solrFlag, valid: valid},
@@ -77,15 +107,16 @@
                     $.messager.progress('close');
                     $.messager.alert("提醒", "执行失败,请联系管理员", "info");
                 }
-            });
+            });*/
         }
     </script>
     <style type="text/css">
-        .sty_cls{
+        .sty_cls {
             text-align: center;
             font-size: 18px;
         }
-        .sty_cls select,button{
+
+        .sty_cls select, button {
             height: 36px;
             width: 150px;
         }
@@ -94,29 +125,31 @@
 <body>
 <h1 style="text-align: center;">产品单页静态化</h1>
 
-<div class="sty_cls" >
+<div class="sty_cls">
 
     <span>网站:<select id="web_size_type">
 
     </select></span>
     &nbsp;&nbsp;
-    <span>数据读取:<select id="database_id" onchange="hideState()">
-        <option value="0">solr</option>
-        <option value="1">数据库</option>
+    <span style="display: none;">数据读取:<select id="database_id" onchange="hideState()">
+        <option value="0" selected="selected">数据库</option>
+        <!--<option value="1">solr</option>-->
     </select></span>
 
     &nbsp;&nbsp;
-    <span id="span_state" style="display: none;">商品状态:<select id="state_id">
+    <span id="span_state">商品状态:<select id="state_id">
         <option value="-1">全部</option>
-        <option value="0">下架</option>
+        <!--<option value="0">下架</option>-->
         <option value="1">在线</option>
         <option value="2">软下架</option>
     </select></span>
     &nbsp;&nbsp;
     <button onclick="staticProduct()">执行</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button onclick="allProductStatic()">全部网站</button>
 
-    <br>
-    <p>执行结果:<span id="result_id" style="color: red;"></span></p>
+    <!--<br>
+    <p>执行结果:<span id="result_id" style="color: red;"></span></p>-->
 </div>
 
 
