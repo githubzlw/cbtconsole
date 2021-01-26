@@ -63,7 +63,7 @@
 
             var url = window.location.href;
             // http://192.168.1.31:9090/mongo/checkSku/10/1
-            var accessUrl = "http://192.168.1.67:9090/productStatic/allProductSingleFile?valid=" + valid + "&solrFlag=" + solrFlag;
+            var accessUrl = "http://192.168.1.29:9090/productStatic/allProductSingleFile?valid=" + valid + "&solrFlag=" + solrFlag;
             if (url.indexOf("192.168.1.9") > -1 || url.indexOf("27.115.38.42") > -1 || url.indexOf("192.168.1.27") > -1) {
                 accessUrl = "http://192.168.1.31:9090/productStatic/allProductSingleFile?valid=" + valid + "&solrFlag=" + solrFlag;
             }
@@ -82,7 +82,7 @@
 
             var url = window.location.href;
             // http://192.168.1.31:9090/mongo/checkSku/10/1
-            var accessUrl = "http://192.168.1.67:9090/productStatic/genProductSingleFile?valid=" + valid + "&webSite=" + site + "&solrFlag=" + solrFlag;
+            var accessUrl = "http://192.168.1.29:9090/productStatic/genProductSingleFile?valid=" + valid + "&webSite=" + site + "&solrFlag=" + solrFlag;
             if (url.indexOf("192.168.1.9") > -1 || url.indexOf("27.115.38.42") > -1 || url.indexOf("192.168.1.27") > -1) {
                 accessUrl = "http://192.168.1.31:9090/productStatic/genProductSingleFile?valid=" + valid + "&webSite=" + site + "&solrFlag=" + solrFlag;
             }
