@@ -570,6 +570,15 @@
             return info.substring(1);
         }
 
+        function genStaticFile(pid) {
+            var url = "http://52.37.218.73:15792/productStatic/genProductByPid/" + pid;
+            if (window.location.href.indexOf("127.0.0.1") > -1 || window.location.href.indexOf("localhost") > -1) {
+                url = "http://192.168.1.29:15792/productStatic/genProductByPid/" + pid;
+            }
+            var param = "height=400,width=600,top=200,left=600,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+            window.open(url, "windows", param);
+        }
+
 
         function setNoUpdatePrice(pid, flag) {
             $.ajax({
@@ -2334,7 +2343,7 @@
                                         <tr>
                                             <td>商品数量</td>
                                             <td>对应价格($)</td>
-                                            <%--<td>操作</td>--%>
+                                                <%--<td>操作</td>--%>
                                         </tr>
                                         <c:forEach var="wprice" items="${fn:split(singleBean.wprice,',')}"
                                                    varStatus="wpIndex">
@@ -2345,9 +2354,9 @@
                                                 <td><input type="text" id="wprice_val_${wpIndex.index}"
                                                            class="inp_style" title="单击可进行编辑"
                                                            value="${fn:trim(fn:split(wprice,'@')[1])}"/></td>
-                                                <%--<td>
-                                                    <button class="del_clo" onclick="delTableTr(this)">删除</button>
-                                                </td>--%>
+                                                    <%--<td>
+                                                        <button class="del_clo" onclick="delTableTr(this)">删除</button>
+                                                    </td>--%>
                                             </tr>
                                         </c:forEach>
                                     </table>
@@ -2552,9 +2561,9 @@
                     <b style="font-size: 16px;">类别ID:${goods.catid1}</b>
                     <br>
                     <c:if test="${goods.promotionFlag >0}">
-                    <br>
-                    <b style="font-size: 16px;color: red;">促销商品</b>
-                </c:if><c:if test="${goods.isAbnormal >0}">
+                        <br>
+                        <b style="font-size: 16px;color: red;">促销商品</b>
+                    </c:if><c:if test="${goods.isAbnormal >0}">
                     <br>
                     <b style="font-size: 16px;">数据状态:${goods.abnormalValue}</b>
                 </c:if> <c:if test="${goods.describeGoodFlag > 0}">
@@ -2723,13 +2732,15 @@
                         &nbsp;&nbsp;&nbsp;
                     </c:if>
                     <c:if test="${goods.matchSource == '8'}">
-                        <span class="s_btn" style="display: none;" onclick="setNoUpdatePrice('${goods.pid}',0)">还原B2B商品</span>
+                        <span class="s_btn" style="display: none;"
+                              onclick="setNoUpdatePrice('${goods.pid}',0)">还原B2B商品</span>
                         &nbsp;&nbsp;&nbsp;
                     </c:if>
                     <a target="_blank"
                        href="http://192.168.1.29:8280/cbtconsole/customerServlet?action=findAllTaoBaoInfo&className=PictureComparisonServlet&aliPid=${goods.aliGoodsPid}&ylbbPid=${goods.pid}"
                        style="color: #ff0000;">重新对标</a>
-
+                    &nbsp;&nbsp;&nbsp;<span class="s_btn" style="display: none;"
+                                            onclick="genStaticFile('${goods.pid}')">生成静态化文件</span>
                 </div>
                 <br>
                 <div>
