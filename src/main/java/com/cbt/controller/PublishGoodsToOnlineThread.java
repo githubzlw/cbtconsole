@@ -1,6 +1,5 @@
 package com.cbt.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
@@ -29,7 +28,7 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
 
     private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
 
-    private OKHttpUtils okHttpUtils;
+    private OKHttpUtils okHttpUtils = new OKHttpUtils();
     private static List<String> kidsCatidList = new ArrayList<>();
 
 
