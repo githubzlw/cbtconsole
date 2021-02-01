@@ -1301,6 +1301,8 @@ public class EditorController {
             cgp.setBrand_name(brandName);
 
 
+            String staticUrl = request.getParameter("staticUrl");
+
             String type = request.getParameter("type");
             // type 0 保存 1 保存并发布
             int tempId = user.getId();
@@ -1352,7 +1354,7 @@ public class EditorController {
                                 inputData.setEntype_new(cgp.getEntypeNew());
                             }
                             GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
-                            PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
+                            PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount), staticUrl);
                             FutureTask futureTask = new FutureTask(pbCallable);
                             Thread thread = new Thread(futureTask);
                             thread.start();
@@ -1376,7 +1378,7 @@ public class EditorController {
                         }
 
                         GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
-                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
+                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount), staticUrl);
                         FutureTask futureTask = new FutureTask(pbCallable);
                         Thread thread = new Thread(futureTask);
                         thread.start();
@@ -3934,7 +3936,7 @@ public class EditorController {
             if (CollectionUtils.isNotEmpty(pidList)) {
                 for (String pid : pidList) {
                     if (StringUtils.isNotBlank(pid)) {
-                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0, 0);
+                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0, 0, null);
                         FutureTask futureTask = new FutureTask(pbCallable);
                         Thread thread = new Thread(futureTask);
                         thread.start();

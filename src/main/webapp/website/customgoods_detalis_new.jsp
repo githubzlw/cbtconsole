@@ -471,6 +471,11 @@
             if (isErr) {
                 return;
             } else {
+                var staticUrl = "http://192.168.1.31:9090/productStatic/genProductByPid/" + pid;
+                if (window.location.href.indexOf("127.0.0.1") > -1 || window.location.href.indexOf("localhost") > -1) {
+                    staticUrl = "http://192.168.1.29:9090/productStatic/genProductByPid/" + pid;
+                }
+
                 //获取需要删除的规格ids数据
                 var typeDeleteIds = getTypeDeleteIdsData();
                 var typeRepalceIds = getTypeReplaceIdsData();
@@ -502,7 +507,8 @@
                         "mainImg": mainImg,
                         "skuCount": skuCount,
                         "gd_moq": gd_moq,
-                        "brandName": brandName
+                        "brandName": brandName,
+                        "staticUrl": staticUrl
                     },
                     success: function (data) {
                         $('.mask').hide();

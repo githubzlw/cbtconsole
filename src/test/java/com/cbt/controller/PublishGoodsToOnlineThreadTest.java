@@ -49,7 +49,7 @@ public class PublishGoodsToOnlineThreadTest {
     @Test
     public void publishTest() throws ExecutionException, InterruptedException {
         String pid = "1006741705";
-        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 0, 1, 0);
+        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 0, 1, 0, null);
 
         FutureTask futureTask = new FutureTask(pbCallable);
         Thread thread = new Thread(futureTask);
