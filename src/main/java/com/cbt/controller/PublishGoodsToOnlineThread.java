@@ -1,5 +1,6 @@
 package com.cbt.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
@@ -27,6 +28,8 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PublishGoodsToOnlineThread.class);
 
     private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
+
+    private OKHttpUtils okHttpUtils;
     private static List<String> kidsCatidList = new ArrayList<>();
 
 
@@ -42,10 +45,11 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
     private int isUpdateImg;
     private int adminId;
     private int skuCount;
+    private String staticUrl;
 
     // private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
     public PublishGoodsToOnlineThread(String pid, CustomGoodsService customGoodsService, FtpConfig ftpConfig, int isUpdateImg,
-                                      int adminId, int skuCount) {
+                                      int adminId, int skuCount, String staticUrl) {
         super();
         this.pid = pid;
         this.customGoodsService = customGoodsService;
@@ -53,6 +57,8 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         this.isUpdateImg = isUpdateImg;
         this.adminId = adminId;
         this.skuCount = skuCount;
+        // this.staticUrl = staticUrl;
+        this.staticUrl = "http://192.168.1.31:9090/productStatic/genProductByPid/" + pid;
     }
 
     public Boolean call() throws Exception {
@@ -154,6 +160,17 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
             goods.setSkuCount(skuCount);
             customGoodsService.publish(goods);
             customGoodsService.updateGoodsState(pid, 4);
+            // 发布成功后，调用静态化
+
+            if (StringUtils.isNotBlank(staticUrl)) {
+                try {
+                    String rs = okHttpUtils.get(staticUrl);
+                    System.err.println("staticUrl:" + staticUrl + ",rs:" + rs);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOG.error("staticUrl:[{}],error:", staticUrl, e);
+                }
+            }
         } else {
             System.err.println("pid:" + pid + ",处理图片失败---");
             customGoodsService.insertIntoOnlineSync(pid);
@@ -201,7 +218,7 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
         boolean isSuccess = false;
         // 下载需要的图片到本地
         // 新的主图名称
-        if(!goods.getShowMainImage().contains("http")){
+        if (!goods.getShowMainImage().contains("http")) {
             goods.setShowMainImage(goods.getRemotpath() + goods.getShowMainImage());
         }
         String downImgUrl = goods.getShowMainImage().replace(".220x220", ".400x400");
