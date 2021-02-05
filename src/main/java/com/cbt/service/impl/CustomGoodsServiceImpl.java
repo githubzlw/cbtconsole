@@ -39,7 +39,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     //private static final String CHECK_PID_EXISTS_URL = "http://52.34.56.133:15793/mongo/get?pid=";
     private static final String CHECK_PID_EXISTS_URL = "http://192.168.1.153:27017/mongo/get?pid=";
 
+    private static final String DELETE_STATIC_URL = "http://192.168.1.31:9090/productStatic/deleteFileWithPid/";
+
     private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
+
+    private OKHttpUtils okHttpUtils = new OKHttpUtils();
 
     @Autowired
     private GoodsMongoDbLocalUtil mongoDbLocalUtil;
@@ -147,7 +151,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 customGoodsDao.publishTo28(bean);
             }
 
-            if(bean.getValid() == 0 || bean.getValid() == 2){
+            if (bean.getValid() == 0 || bean.getValid() == 2) {
                 //更新SkuGoodsOffers和SingleOffersChild信息
                 int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
                 if (count > 0) {
@@ -248,7 +252,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         if (list == null || list.isEmpty()) {
             return 0;
         }
-        for(CustomGoodsBean goodsBean :list){
+        for (CustomGoodsBean goodsBean : list) {
             mongoDbLocalUtil.updatePid(goodsBean.getPid());
         }
 
@@ -275,7 +279,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public void batchSaveEnName(Admuser user, List<CustomGoodsBean> cgLst) {
         customGoodsDao.batchSaveEnName(user, cgLst);
-        for(CustomGoodsBean goodsBean :cgLst){
+        for (CustomGoodsBean goodsBean : cgLst) {
             mongoDbLocalUtil.updatePid(goodsBean.getPid());
         }
     }
@@ -320,6 +324,15 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // MongoDB
         GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid, type);
         mongoDbLocalUtil.updatePid(pid);
+
+        if (type == -1) {
+            try {
+                String rs = okHttpUtils.get(DELETE_STATIC_URL + pid);
+                System.err.println("delete static Url:" + DELETE_STATIC_URL + pid + ",rs:" + rs);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6, remark);
     }
 
@@ -1111,16 +1124,15 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         cgp.setGoodsState(type == 1 ? 4 : 5);
         int result = 0;
         CustomGoodsPublish customGoodsPublish = customGoodsMapper.queryNewGoodsDetailsByPid(cgp.getPid());
-        if(customGoodsPublish == null){
+        if (customGoodsPublish == null) {
             result = customGoodsMapper.saveNewGoodsDetails(cgp);
-        }
-        else{
+        } else {
             result = customGoodsMapper.updateNewGoodsDetailsByInfo(cgp);
         }
 
-        if(type == 1){
+        if (type == 1) {
             result = checkOnlineMongodbByPid(cgp.getPid());
-            if(result == 0){
+            if (result == 0) {
                 InputData inputData = new InputData('c'); //u表示更新；c表示创建，d表示删除
                 inputData.setPid(cgp.getPid());
                 inputData.setPath_catid(cgp.getPathCatid());
@@ -1143,13 +1155,12 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
 
                 boolean isOk = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
-                if(isOk){
-                    CustomGoodsPublish bean = queryGoodsDetails(cgp.getPid(),0);
-                    if(bean == null){
+                if (isOk) {
+                    CustomGoodsPublish bean = queryGoodsDetails(cgp.getPid(), 0);
+                    if (bean == null) {
                         result = customGoodsMapper.saveNewGoodsDetailsPush(cgp);
                     }
-                }
-                else{
+                } else {
 
                 }
             }
