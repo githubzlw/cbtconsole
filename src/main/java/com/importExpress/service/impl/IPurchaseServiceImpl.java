@@ -44,10 +44,7 @@ import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.pojo.PurchaseInfoBean;
 import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.service.IPurchaseService;
-import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +82,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	private WarehouseMapper dao;
 	int total;
 	int goodsnum = 0;
+
+	private SourcingOrderUtils sourcingOrderUtils = new SourcingOrderUtils();
 
 	@Override
 	public OrderBean getOrders(String orderNo) {
@@ -449,6 +448,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				SendMQ.sendMsg(new RunSqlModel(" UPDATE order_details  SET purchase_state=3,purchase_time=now() WHERE id='"+odid+"' and orderid='"+orderid+"'"));
 				bf.append(orderid).append(";").append(odid).append(";").append(sdf.format(date)).append("&");
 			}
+			sourcingOrderUtils.updateSourcingOrder(orderid, 1);
 
 			if (isDropshipOrder == 1) {
 				String dropshipid=pruchaseMapper.getDpOrderInfo(orderid);

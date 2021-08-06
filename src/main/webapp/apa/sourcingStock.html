@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sourcing订单sku匹配</title>
+    <script type="text/javascript" src="../js/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript">
+        var matchJson = {};
+        var sourcingList = [];
+        var localList = [];
+        var localOjb = [];
+        var currOrderNo = "";
+        $(function () {
+            var orderStr = getUrlParam("orderNo");
+            $("#order_no_ids").empty();
+            if (orderStr.indexOf(",") > -1) {
+                var arr = orderStr.split(",");
+                for (var i = 0; i < arr.length; i++) {
+                    $("#order_no_ids").append('<button class="but_color_l" onclick="readSourcingOrder(\'' + arr[i] + '\')">读取[' + arr[i] + ']Sku信息</button>');
+                }
+            } else {
+                $("#order_no_ids").append('<button class="but_color_l" onclick="readSourcingOrder(\'' + orderStr + '\')">读取[' + orderStr + ']Sku信息</button>');
+                currOrderNo = orderStr;
+                readSourcingOrder(orderStr);
+            }
+        });
+
+
+        function readSourcingOrder(orderNo) {
+            $("#notice_id").show();
+            currOrderNo = orderNo;
+            $.ajax({
+                type: 'GET',
+                async: false,
+                url: '/cbtconsole/sourcingOrder/getOrderStockList?orderNo=' + orderNo,
+                success: function (data) {
+                    if (data.ok) {
+                        var list = data.data;
+
+                        var content = '';
+                        for (var i = 0; i < list.length; i++) {
+                            sourcingList[i] = list[i].skuCode;
+
+                            content += '<tr>';
+                            content += '<td>' + (i + 1) + '</td>';
+                            content += '<td>' + list[i].skuCode + '</td>';
+                            content += '<td><img src="' + list[i].pic + '"/></td>';
+                            content += '<td>' + list[i].spData + '</td>';
+                            content += '<td>' + list[i].stock + '</td>';
+                            content += '<td>' + list[i].lockStock + '</td>';
+                            if (list[i].lockStock > 0) {
+                                matchJson[list[i].skuCode] = 0;
+                                content += '<td class="up_cl"><input id="' + list[i].skuCode + '" value=""/><button onclick="singleSave(this)" class="but_color">更新</button></td>';
+                            } else {
+                                content += '<td class="up_cl"><input disabled="disabled" id="' + list[i].skuCode + '" value=""/><button disabled="disabled" onclick="singleSave(this)">更新</button></td>';
+                            }
+
+                            content += '</tr>';
+                        }
+                        $("#sku_body").empty();
+                        $("#sku_body").append(content);
+                        //console.log(list);
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function (rs) {
+                    console.log(rs);
+                    alert("读取失败");
+                }
+            });
+
+            $.ajax({
+                type: 'GET',
+                async: false,
+                url: '/cbtconsole/sourcingOrder/getLocalOrder?orderNo=' + orderNo,
+                success: function (data) {
+                    if (data.ok) {
+                        var list = data.data;
+
+                        var content = '';
+                        for (var i = 0; i < list.length; i++) {
+                            localList[i] = list[i].id;
+                            localOjb[list[i].id] = list[i].buycount;
+                            content += '<tr>';
+                            content += '<td>' + (i + 1) + '</td>';
+                            content += '<td>' + list[i].id + '</td>';
+                            content += '<td>' + list[i].buycount + '</td>';
+                            content += '<td><img src="' + list[i].car_img + '"/></td>';
+                            content += '<td>' + list[i].goods_type + '</td>';
+                            content += '</tr>';
+                        }
+                        $("#od_body").empty();
+                        $("#od_body").append(content);
+                        //console.log(list);
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function (rs) {
+                    console.log(rs);
+                    alert("读取失败");
+                }
+            });
+
+            if (sourcingList.length > 0 && localList.length > 0) {
+                var minLength = sourcingList.length > localList.length ? localList.length : sourcingList.length;
+                for (var i = 0; i < minLength; i++) {
+                    matchJson[sourcingList[i]] = localList[i];
+                }
+
+                for (var key in matchJson) {
+                    $("#" + key).val(matchJson[key]);
+                }
+            }
+            setTimeout(function () {
+                $("#notice_id").hide();
+            }, 500);
+        }
+
+        function singleSave(obj) {
+            var ipObj = $(obj).parent().find("input");
+            var odId = ipObj.val();
+            if (localList.indexOf(Number(odId)) == -1) {
+                alert("无效ID");
+                return;
+            }
+            var skuCode = ipObj.attr("id");
+            var odId = ipObj.val();
+            matchJson[skuCode] = odId;
+            var param = {};
+            param["orderNo"] = currOrderNo;
+            var stockObj = {};
+            if (localOjb[odId] == 0) {
+                alert("存在0的数据");
+                return false;
+            }
+            stockObj[skuCode] = localOjb[odId];
+            param["matchInfo"] = JSON.stringify(stockObj);
+
+            $(obj).parent().append("<b style='color: red;'>执行中...</b>");
+            $(obj).hide();
+            updateSourcingStock(param);
+        }
+
+        function updateAllSourcingInfo() {
+            if (!currOrderNo) {
+                alert("没有选中订单");
+            }
+
+            var errorCount = 0;
+            var errStr = "";
+            $(".up_cl").each(function (i, item) {
+                var ipObj = $(item).parent().find("input");
+                var odId = ipObj.val();
+
+                if (localList.indexOf(Number(odId)) == -1) {
+                    errorCount++;
+                    errStr += "," + odId;
+                    return;
+                }
+                var skuCode = ipObj.attr("id");
+                var odId = ipObj.val();
+                matchJson[skuCode] = odId;
+            });
+            if (errorCount > 0) {
+                alert(errStr.substring(1) + "无效");
+                return;
+            }
+            var stockObj = {};
+            errorCount = 0;
+            for (var key in matchJson) {
+                if (matchJson[key] > 0) {
+                    if (matchJson[key] == 0) {
+                        errorCount++;
+                        alert("存在0的数据");
+                        break;
+                    }
+                    stockObj[key] = localOjb[matchJson[key]];
+                }
+            }
+            if (errorCount > 0) {
+                return;
+            }
+            var param = {};
+            param["orderNo"] = currOrderNo;
+            param["matchInfo"] = JSON.stringify(stockObj);
+            $("#notice_id").hide();
+            updateSourcingStock(param);
+        }
+
+        function updateSourcingStock(param) {
+            $.ajax({
+                type: 'POST',
+                async: false,
+                data: param,
+                url: '/cbtconsole/sourcingOrder/updateStockMatch',
+                success: function (data) {
+                    if (data.ok) {
+                        alert("更新成功");
+                        readSourcingOrder(currOrderNo);
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function (rs) {
+                    console.log(rs);
+                    alert("更新失败");
+                }
+            });
+
+        }
+
+
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg); //匹配目标参数
+            if (r != null) return unescape(r[2]);
+            return null; //返回参数值
+        }
+    </script>
+
+    <style type="text/css">
+        input {
+            width: 120px;
+            height: 24px;
+        }
+
+        img {
+            max-height: 77px;
+            max-width: 77px;
+        }
+
+        tbody td {
+            height: 80px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 50px;
+            height: 27px;
+            border: 1px #aaa solid;
+            color: #fff;
+            border-radius: 22px;
+        }
+
+        .but_color_l {
+            background: #151eef;
+            height: 26px;
+            border: 1px #aaa solid;
+            color: #fff;
+            border-radius: 22px;
+        }
+    </style>
+</head>
+<body>
+
+<p style="text-align: center">
+    <span style="text-align: center;font-size: 26px;">Sourcing订单的购买库存和我司入库匹配</span>
+    &nbsp;&nbsp;<span id="order_no_ids"></span><span id="notice_id" style="color: red;display: none">执行中...</span>
+</p>
+
+<div style="text-align: center">
+    <table border="1" cellspacing="0" align="center" style="float: left" bordercolor="#efcae7">
+        <caption>Sourcing订单的购买库存信息(<b style="color: red;">*待买库存的数量是0不能更新</b>)</caption>
+        <thead style="background-color: #efcae7;height: 30px;">
+        <tr>
+            <td width="40px;">序号</td>
+            <td width="200px;">sku码</td>
+            <td width="100px;">图片</td>
+            <td width="400px;">sku信息</td>
+            <td width="66px;">已买库存</td>
+            <td width="66px;">待买库存</td>
+            <td width="220px;">操作(匹配od_id)
+                <button class="but_color_l" onclick="updateAllSourcingInfo()">一键更新</button>
+            </td>
+        </tr>
+        </thead>
+
+        <tbody id="sku_body">
+
+        </tbody>
+    </table>
+
+    <table border="1" cellspacing="0" align="center" style="float: left" bordercolor="#12ef4b">
+        <caption>转换后台我司订单信息(<b style="color: red;">*入库的数量是0不能更新</b>)</caption>
+        <thead style="background-color: #12ef4b;height: 30px;">
+        <tr>
+            <td width="50px;">序号</td>
+            <td width="80px;">od_id</td>
+            <td width="66px;">入库数量</td>
+            <td width="100px;">图片</td>
+            <td width="400px;">下单规格</td>
+        </tr>
+        </thead>
+
+        <tbody id="od_body">
+
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
