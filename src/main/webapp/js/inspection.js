@@ -2299,14 +2299,14 @@ function matchSourcingOrder() {
     if (Object.keys(orderObj).length > 0) {
         var orderStr = "";
         for (var key in orderObj) {   //obj中存在几个关键字
-            if (obj.hasOwnProperty(key)) {
+            if (orderObj.hasOwnProperty(key)) {
                 orderStr += "," + key;
             }
         }
         var url = "/cbtconsole/apa/sourcingStock.html?orderNo=" + orderStr.substring(1);
-        var param = "height=860,width=1330,top=70,left=350,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
-        window.open(url, "windows", param);
-        window.open()
+        /*var param = "height=860,width=1330,top=70,left=350,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        window.open(url, "windows", param);*/
+        window.open(url)
     } else {
         alert("无订单");
     }
