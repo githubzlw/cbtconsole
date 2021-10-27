@@ -432,7 +432,6 @@
 
             });
         }
-        
         function hide()
         {
             var login = document.getElementById('login');
@@ -619,7 +618,6 @@
 
         <a href="javascript:show()" style="color: red; font-size:30px;">验货取消</a>
         <a href="javascript:Returngoods()" style="color: red; font-size:30px;">发起退货</a>
-		&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:matchSourcingOrder()" style="color: red; font-size:30px;">Sourcing订单匹配sku</a>
         <div id="login" >
             <a class="aright" href="javascript:hide()" style="color: red; font-size:30px;" >关闭</a>
             <div id="TheInspection" ></div>
