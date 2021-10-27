@@ -192,6 +192,10 @@
                 content = 'Import/Kids';
             }else if(val == 4){
                 content = 'Pets';
+            }else if(val == 32){
+                content = 'Pipe';
+            }else if(val == 64){
+                content = 'Cable';
             }
             return content;
         }
@@ -216,6 +220,12 @@
             }else if(row.site == 4){
                 website = 3;
                 btVal = 'Pets跟进';
+            }else if(row.site == 32){
+                website = 5;
+                btVal = 'Pipe跟进';
+            }else if(row.site == 64){
+                website = 4;
+                btVal = 'Cable跟进';
             }
             var content = '';
             if(row.site == 3){

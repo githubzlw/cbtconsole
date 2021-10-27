@@ -100,7 +100,7 @@ public class ProblemFeedBackController {
 						jumpUrl = "https://www.import-express.com/Goods/getShopCar";
                     } else if (websiteType == 2){
 						siteType = 'K';
-                        jumpUrl = "https://www.kidsproductwholesale.com/Goods/getShopCar";
+                        jumpUrl = "https://www.kidscharming.com/Goods/getShopCar";
                     } else if (websiteType == 3){
 						siteType = 'P';
                         jumpUrl = "https://www.petstoreinc.com/Goods/getShopCar";

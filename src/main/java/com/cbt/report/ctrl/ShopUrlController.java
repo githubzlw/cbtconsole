@@ -3536,6 +3536,8 @@ public class ShopUrlController {
                     break;
                 }
             }
+            // 重量逻辑改动，不再需要检查重量了
+            isZone = false;
             if (isZone) {
                 json.setOk(false);
                 json.setMessage("类别：" + catid + ",存在平均重量没有设定的情况，请设置");
@@ -4022,7 +4024,7 @@ public class ShopUrlController {
                 String remoteShowPath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getRemoteShowPath());
                 String remoteLocalPath = certificateFile.replace(ftpConfig.getLocalShowPath(), FtpConfig.REMOTE_LOCAL_PATH);
                 String destPath = remoteLocalPath.substring(0,remoteLocalPath.lastIndexOf("/"));
-                // destPath = destPath.replace("/usr/local/goodsimg/importcsvimg","");
+                // destPath = destPath.replace("/data/importcsvimg","");
                 *//*json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);
                 if (!json.isOk()) {
                     json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);

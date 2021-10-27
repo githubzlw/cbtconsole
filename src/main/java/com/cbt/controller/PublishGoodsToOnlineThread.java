@@ -33,7 +33,7 @@ public class PublishGoodsToOnlineThread implements Callable<Boolean> {
     /**
      * 图片服务器选择主图路径
      */
-    // private static final String IMG_SERVICE_CHOOSE_MAIN_IMG_URL = "http://104.247.194.50:8080/cloudimginterface/selectSearchImg/editedGoodsMainImg?";
+    // private static final String IMG_SERVICE_CHOOSE_MAIN_IMG_URL = "http://108.61.142.103:8080/cloudimginterface/selectSearchImg/editedGoodsMainImg?";
     // private static final String IMG_SERVICE_CHOOSE_MAIN_IMG_URL = "http://127.0.0.1:8765/cloudimginterface/selectSearchImg/editedGoodsMainImg?";
 
     private String pid;

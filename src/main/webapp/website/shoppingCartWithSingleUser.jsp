@@ -619,7 +619,7 @@
                         <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>--%>
                         <span>网站:<select id="select_web_site"  style="height: 28px;width: 180px;" disabled="disabled">
                             <option value="0">import-express</option>
-                            <option value="1">kidsproductwholesale</option>
+                            <option value="1">kidscharming</option>
                         </select></span>
                        <span>邮件类型:
                             <select id="send_type" style="height: 28px;width: 180px;">

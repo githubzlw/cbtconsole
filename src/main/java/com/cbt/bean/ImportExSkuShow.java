@@ -9,6 +9,25 @@ public class ImportExSkuShow {
     private String chType;
     private String specId;
 
+    private float freePrice;
+    private float costPrice;
+
+	public float getCostPrice() {
+		return costPrice;
+	}
+
+	public void setCostPrice(float costPrice) {
+		this.costPrice = costPrice;
+	}
+
+    public float getFreePrice() {
+        return freePrice;
+    }
+
+    public void setFreePrice(float freePrice) {
+        this.freePrice = freePrice;
+    }
+
     public String getSpecId() {
         return specId;
     }

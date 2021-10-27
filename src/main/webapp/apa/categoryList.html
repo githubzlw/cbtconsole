@@ -499,7 +499,7 @@
                 $.messager.alert("提示信息", "获取网站失败", "info");
                 return;
             }
-            if(localUrl.indexOf("127.0.0.1") || localUrl.indexOf("localhost")){
+            if(localUrl.indexOf("127.0.0.1") > -1 || localUrl.indexOf("localhost") > -1){
                 url = "http://192.168.1.153/app/rcategory";
             }
             var param = "height=400,width=600,top=200,left=600,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
