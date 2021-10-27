@@ -7,30 +7,17 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.cbt.bean.*;
 import com.cbt.warehouse.pojo.OrderDetailsBeans;
 import com.cbt.warehouse.pojo.SampleOrderBean;
+import com.importExpress.mapper.CustomGoodsMapper;
+import com.importExpress.utli.SourcingOrderUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cbt.bean.Address;
-import com.cbt.bean.AutoOrderBean;
-import com.cbt.bean.CodeMaster;
-import com.cbt.bean.Evaluate;
-import com.cbt.bean.Forwarder;
-import com.cbt.bean.OrderBean;
-import com.cbt.bean.OrderChange;
-import com.cbt.bean.OrderDetailsBean;
-import com.cbt.bean.Orderinfo;
-import com.cbt.bean.Payment;
-import com.cbt.bean.ProductReplace;
-import com.cbt.bean.ShippingBean;
-import com.cbt.bean.TabTransitFreightinfoUniteNew;
-import com.cbt.bean.Tb1688OrderHistory;
-import com.cbt.bean.TransitPricecost;
-import com.cbt.bean.UserBean;
 import com.cbt.common.StringUtils;
 import com.cbt.email.entity.EmailReceive1;
 import com.cbt.orderinfo.dao.OrderinfoMapper;
@@ -77,6 +64,11 @@ public class OrderinfoService implements IOrderinfoService {
 	private TabTrackInfoMapping tabTrackInfoMapping;
 	@Autowired
 	private InventoryService inventoryService;
+
+	@Autowired
+	private CustomGoodsMapper customGoodsMapper;
+
+	private SourcingOrderUtils sourcingOrderUtils = new SourcingOrderUtils();
 
 	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(OrderinfoService.class);
 
@@ -389,6 +381,7 @@ public class OrderinfoService implements IOrderinfoService {
 				if(counts == 0){
 					orderinfoMapper.updateOrderInfoState(map);
 					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
+					sourcingOrderUtils.updateSourcingOrder(map.get("orderid"), 2);
 					//判断订单状态是否一致
 					if(!orderinfoMap.get("old_state").toString().equals("2")){
 						//发送消息给客户
@@ -404,6 +397,7 @@ public class OrderinfoService implements IOrderinfoService {
 				int counts=orderinfoMapper.getDetailsState(map);
 				if(counts == 0){
 					orderinfoMapper.updateOrderInfoState(map);
+					sourcingOrderUtils.updateSourcingOrder(map.get("orderid"), 2);
 					SendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 					//判断订单状态是否一致
 					if(!orderinfoMap.get("old_state").toString().equals("2")){
@@ -771,6 +765,7 @@ public class OrderinfoService implements IOrderinfoService {
 			SendMQ.sendMsg(new RunSqlModel("UPDATE order_details t SET t.state = 0 WHERE t.orderid = '"+map.get("orderid")+"' AND t.id = '"+map.get("odid")+"'"));
 			SendMQ.sendMsg(new RunSqlModel("UPDATE orderinfo t SET t.state = 1 WHERE t.order_no = '"+map.get("orderid")+"'"));
 
+			sourcingOrderUtils.updateSourcingOrder(map.get("orderid"), 1);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -2048,6 +2043,22 @@ public class OrderinfoService implements IOrderinfoService {
 			}
 			getRoTypeAndState(changInfo, odb);
 		}
+
+		if(CollectionUtils.isNotEmpty(list)){
+			List<String> pidList = list.stream().map(OrderDetailsBean::getGoods_pid).collect(Collectors.toList());
+			List<CustomGoodsPublish> gdList = customGoodsMapper.queryGoodsByPidList(pidList);
+
+			Map<String, String> pidMap = new HashMap<>();
+			gdList.forEach(e-> pidMap.put(e.getPid(), String.valueOf(e.getMatchSource())));
+
+			list.forEach(e-> e.setMatch_source(pidMap.get(e.getGoods_pid())));
+
+			pidList.clear();
+			gdList.clear();
+			pidMap.clear();
+
+		}
+
 		return list;
 	}
 
