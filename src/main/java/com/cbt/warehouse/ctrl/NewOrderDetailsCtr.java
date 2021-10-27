@@ -27,6 +27,8 @@ import com.cbt.processes.service.UserServer;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
+import com.cbt.util.DoubleUtil;
+import com.cbt.util.Utility;
 import com.cbt.warehouse.service.GoodsCommentsService;
 import com.cbt.warehouse.service.InventoryService;
 import com.cbt.warehouse.util.StringUtil;
@@ -48,10 +50,8 @@ import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.service.OverseasWarehouseStockService;
 import com.importExpress.service.PaymentServiceNew;
-import com.importExpress.utli.FreightUtlity;
-import com.importExpress.utli.MultiSiteUtil;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.SwitchDomainNameUtil;
+import com.importExpress.utli.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -102,6 +102,8 @@ public class NewOrderDetailsCtr {
     private OverseasWarehouseStockService owsService;
     @Autowired
     private CustomGoodsService customGoodsService;
+
+    private SourcingOrderUtils sourcingOrderUtils = new SourcingOrderUtils();
 
     /**
      * /**
@@ -441,7 +443,27 @@ public class NewOrderDetailsCtr {
             request.setAttribute("str_oid", str_oid);
             request.setAttribute("shipMethod", shipMethod);
             request.setAttribute("orderNo", orderNo);
-            request.setAttribute("orderDetail", odb);
+            int totalSize = 0;
+            if (CollectionUtils.isNotEmpty(odb)) {
+                totalSize = odb.size();
+                Map<String, List<OrderDetailsBean>> collect = odb.stream().collect(Collectors.groupingBy(OrderDetailsBean::getShop_id));
+                Map<String, Double> tempMap = new HashMap<>();
+                Map<String, List<OrderDetailsBean>> rsMap = new HashMap<>();
+                collect.forEach((k, v) -> {
+                    if (!tempMap.containsKey(k)) {
+                        tempMap.put(k, 0D);
+                    }
+                    v.forEach(cl -> tempMap.put(k, tempMap.get(k) + Double.parseDouble(cl.getGoodsprice())));
+                });
+                tempMap.forEach((k, v) -> rsMap.put(k + ",total: $" + BigDecimalUtil.truncateDouble(v, 2) + "", collect.get(k)));
+                collect.clear();
+                tempMap.clear();
+                request.setAttribute("orderDetailMap", rsMap);
+            } else {
+                request.setAttribute("orderDetailMap", new HashMap<String, List<OrderDetailsBean>>());
+            }
+
+            request.setAttribute("totalSize", totalSize);
             request.setAttribute("order_state", orderInfo.getState());
             IZoneServer os = new ZoneServer();
             request.setAttribute("countryList", os.getAllZone());
@@ -1992,6 +2014,8 @@ public class NewOrderDetailsCtr {
 
                         LOG.info("订单号:" + orderNo + ",更新线上orderinfo订单状态:" + -1);
                         res = orderwsServer.closeOrder(orderNo);
+
+                        sourcingOrderUtils.updateSourcingOrder(orderNo, -1);
                         //判断取消订单是否是测试订单
 //				        boolean flag=orderwsServer.checkTestOrder(orderNo);
                         if (res > 0) {

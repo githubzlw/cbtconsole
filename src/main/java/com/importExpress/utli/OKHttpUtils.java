@@ -1,6 +1,7 @@
 package com.importExpress.utli;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import okhttp3.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,21 +22,21 @@ public class OKHttpUtils {
     /**
      * 产品上下架图片处理接口
      * 接口地址（get或者post都可以）
-     * 	后台下架
-     * 		http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do?pid=12312313&valid=0&unsellableReason=6&method=2
-     * 	后台上架
-     * 		http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do?pid=12312313&valid=1&unsellableReason=45&method=2
-     *
+     * 后台下架
+     * http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do?pid=12312313&valid=0&unsellableReason=6&method=2
+     * 后台上架
+     * http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do?pid=12312313&valid=1&unsellableReason=45&method=2
+     * <p>
      * 参数
-     * 	method 更新方式 1-添加到上下架列表 后续定时走; 2- 实时更新;
-     * 	valid	更新产品表上下架值 按照上面地址提供
-     * 	unsellableReason  更新产品表原因值 按照上面地址提供
-     *
+     * method 更新方式 1-添加到上下架列表 后续定时走; 2- 实时更新;
+     * valid	更新产品表上下架值 按照上面地址提供
+     * unsellableReason  更新产品表原因值 按照上面地址提供
+     * <p>
      * 返回值
-     * 	state
-     * 		true-更新成功；
-     * 		false-更新失败
-     * 			失败时候 message 是失败原因；
+     * state
+     * true-更新成功；
+     * false-更新失败
+     * 失败时候 message 是失败原因；
      */
     private static final String IMG_ONLINE_AND_DELETE_URL = "http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do";
 
@@ -60,6 +61,7 @@ public class OKHttpUtils {
      * http://192.168.1.48:18079/syncsku/cbt/updateNeedOffShell.do?pid=12312313&valid=0&unsellableReason=6&method=1
      * 后台上架
      * http://192.168.1.48:18079/syncsku/cbt/updateNeedOffShell.do?pid=12312313&valid=1&unsellableReason=45&method=1
+     *
      * @param method 更新方式 1-添加到上下架列表 后续定时走; 2- 实时更新;
      */
     public static boolean optionGoodsInterface(String pid, int valid, int unsellableReason, int method) {
@@ -72,8 +74,8 @@ public class OKHttpUtils {
                     .addFormDataPart("unsellableReason", String.valueOf(unsellableReason))
                     .addFormDataPart("method", String.valueOf(method))
                     .build();*/
-            // Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*").addHeader("Connection", "close").addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").url(IMG_ONLINE_AND_DELETE_URL).post(formBody).build();
-            // client = new OkHttpClient();
+        // Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*").addHeader("Connection", "close").addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").url(IMG_ONLINE_AND_DELETE_URL).post(formBody).build();
+        // client = new OkHttpClient();
             /*OkHttpClient client = getClientInstence();
             Response response = client.newCall(request).execute();
             String rs = response.body().string();
@@ -118,7 +120,7 @@ public class OKHttpUtils {
     /**
      * Get请求
      *
-     * @param url      请求链接
+     * @param url 请求链接
      * @return
      * @throws IOException
      */
@@ -293,6 +295,79 @@ public class OKHttpUtils {
         } else {
             return null;
         }
+    }
+
+
+    /**
+     * Post调用
+     *
+     * @param url
+     * @param params
+     * @return
+     * @throws IOException
+     */
+    public JSONObject postURL(String url, Map<String, String> params) throws IOException {
+
+        // Create okhttp3 form body builder.
+        FormBody.Builder bodyBuilder = new FormBody.Builder();
+
+        // Add form parameters
+        params.forEach((k, v) -> {
+            if (v != null) bodyBuilder.add(k, v);
+        });
+
+        // Build form body.
+        FormBody body = bodyBuilder.build();
+
+        // Create a http request object.
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        return executeCall(url, request);
+    }
+
+
+    /**
+     * call url by retry times
+     *
+     * @param url
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    private JSONObject executeCall(String url, Request request) throws IOException {
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+        } catch (IOException ioe) {
+            //重试15次（每次1秒）
+            try {
+                int count = 0;
+                while (true) {
+                    Thread.sleep(1500);
+                    try {
+                        response = client.newCall(request).execute();
+                    } catch (IOException e) {
+                        //log.warn("do retry ,times=[{}]",count);
+                    }
+                    if (count > 5) {
+                        break;
+                    }
+                    ++count;
+                }
+            } catch (InterruptedException e) {
+            }
+        }
+
+        if (response == null || !response.isSuccessful()) {
+            //log.error("url:[{}]", url);
+            throw new IOException("call url is not successful");
+        }
+
+        return response.body() != null ?
+                JSON.parseObject(response.body().string()) : null;
     }
 
 

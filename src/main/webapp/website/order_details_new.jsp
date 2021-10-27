@@ -1167,6 +1167,7 @@
         <!-- 不是dropship订单 -->
         <div style="width:1440px;">
             <table id="orderDetail" class="ormtable2" align="center">
+                <caption><b style="font-size: 26px;color: red;">商品总数[${totalSize}]</b></caption>
                 <tbody>
                 <tr class="detfretit">
                     <td>商品编号/购物车id</td>
@@ -1179,8 +1180,12 @@
                     <td style="width:500px;">订单操作</td>
                 </tr>
                 </tbody>
-                <c:forEach items="${orderDetail}" var="orderd" varStatus="sd">
-                    <tr id="goodsid_${orderd.goodsid}"
+
+
+                <c:forEach items="${orderDetailMap}" var="orderMap">
+                    <tr style="text-align: center"><td colspan="7"><b style="color: red;font-size: 22px">店铺：${orderMap.key}</b></td></tr>
+                    <c:forEach items="${orderMap.value}" var="orderd" varStatus="sd">
+                        <tr id="goodsid_${orderd.goodsid}"
                         style="${orderd.state == 2?'background-color: #FF8484':''}">
                         <td>${sd.index+1}<br>${orderd.goodsid}/${orderd.id}</td>
                         <td><input type="hidden" value="${orderd.state}"> <a>
@@ -1216,7 +1221,7 @@
                                     </c:if>
                                 </c:forEach>
                             </c:if></td>
-                        <td style="widows: 400px;">
+                        <td style="width: 400px;">
                             <c:if test="${not empty orderd.inventoryRemark}">
                                 <span style="background-color:chartreuse">库存备注:${orderd.inventoryRemark}</span><br>
                             </c:if>
@@ -1614,7 +1619,12 @@
                             <input type="text" style="width: 20px" id="Split_openNum${orderd.id}" onchange="getNum(${orderd.yourorder},this)" value="1"><span>优先发货</span>
                         </td>
                     </tr>
+                    </c:forEach>
+
                 </c:forEach>
+
+
+
             </table>
         </div>
     </c:if>

@@ -284,6 +284,9 @@ public class WarehouseCtrl {
 	private UserFreeNotFreeService userFreeNotFreeService;
 	@Autowired
 	RedisUtil redisUtil;
+
+	private SourcingOrderUtils sourcingOrderUtils = new SourcingOrderUtils();
+
 	/**
 	 *
 	 * @Title getAllBuyer
@@ -5980,6 +5983,9 @@ public class WarehouseCtrl {
 							+ "'>"
 							+ info.getOrderids()
 							+ "</a>");
+					bf.append("<br><a target='_blank' style='text-decoration:underline' href='/cbtconsole/apa/sourcingStock.html?orderNo="
+							+ info.getOrderids()
+							+ "'>Sourcing订单匹配sku</a>");
 					info.setOrderids(bf.toString());
 				}
 				bf.setLength(0);
@@ -6738,6 +6744,8 @@ public class WarehouseCtrl {
 			for (int i = 0; i < cont; i++) {
 				Map<String, Object> declares = sbxxList.get(i);
 				String orderid = (String) declares.get("orderid");
+
+				sourcingOrderUtils.updateSourcingOrder(orderid, 3);
 				//发送邮件给客户告知已经发货
 				IGuestBookService ibs = new GuestBookServiceImpl();
 				OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
@@ -7504,6 +7512,10 @@ public class WarehouseCtrl {
 				// 修改 order_details 的字段 purchase_state，本地状态
 				iWarehouseService.updateODPState(map);
 				int ret = iWarehouseService.updateOpsState(map);
+
+				sourcingOrderUtils.updateSourcingOrder(orderid, 1);
+
+
 				// 同上，线上数据库也修改一份
 				// DataSourceSelector.set("dataSource127hop");
 				// iWarehouseService.updateODPState(map);
