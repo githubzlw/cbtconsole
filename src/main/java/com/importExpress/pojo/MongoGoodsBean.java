@@ -94,4 +94,6 @@ public class MongoGoodsBean {
     private Integer searchable;
     private Integer describe_good_flag;
 
+    private String brand_name;
+
 }

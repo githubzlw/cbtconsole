@@ -740,7 +740,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         ResultSet rsOffer = null;
         String sql28 = "select shop_id,category_id,weight_interval,jd_result as weight,first_interval_rate,"
                 + "other_interval_rate,is_choose,(select count(1) from 1688_category where 1688_category.category_id = shop_categroy_data.category_id "
-                + "and 1688_category.flag = 1) as is_forbit from shop_categroy_data where shop_id = ? and id > 100583 ";
+                + "and 1688_category.flag = 1) as is_forbit from shop_categroy_data where shop_id = ? ";
         if (!(catid == null || "".equals(catid) || "0".equals(catid))) {
             sql28 += " and category_id = ?";
         }
@@ -2466,8 +2466,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
 
         String sql = "select AVG(a.avg_weight) from (select shop_id,catid,avg_weight from shop_catid_avg_weight "
                 + "where catid =  '" + catid + "' and shop_id != '" + shopId + "' "
-                + "union all select shop_id,category_id,jd_result from shop_categroy_data where id > 100583 "
-                + "and  category_id =  '" + catid + "' and shop_id != '" + shopId + "' ) a";
+                + "union all select shop_id,category_id,jd_result from shop_categroy_data where category_id =  '" + catid + "' and shop_id != '" + shopId + "' ) a";
         try {
             conn = DBHelper.getInstance().getConnection5();
             stmt = conn.createStatement();

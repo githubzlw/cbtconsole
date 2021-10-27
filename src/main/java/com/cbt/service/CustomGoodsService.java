@@ -754,7 +754,7 @@ public interface CustomGoodsService {
      * @param adminId
      * @return
      */
-    int updateGoodsSku(String pid, String oldSku, String newSku, int adminId, double finalWeight);
+    int updateGoodsSku(String pid, String oldSku, String newSku, int adminId, double finalWeight, String rangePrice, String rangePriceFree, float minPrice);
 
     /**
      * 标记商品软下架
@@ -1039,4 +1039,32 @@ public interface CustomGoodsService {
      * @return
      */
     List<String> getPipeList();
+
+    ProductSingleBean queryPidSingleBean(String pid);
+
+    int setNoUpdatePrice(CustomGoodsPublish goods);
+
+    /**
+     * 新增商品信息
+     *
+     * @param cgp
+     * @param adminId
+     * @param type
+     * @return
+     */
+    int saveNewGoodsDetails(CustomGoodsPublish cgp, int adminId, int type);
+
+    /**
+     * 获取新增商品的pid
+     *
+     * @return
+     */
+    int queryNewPid();
+
+    CustomGoodsPublish queryNewGoodsDetails(String pid);
+
+    int updateNewGoodsDetailsByInfo(CustomGoodsPublish cgp);
+
+    int updateEntypeSkuByPid(CustomGoodsPublish cgp);
+
 }

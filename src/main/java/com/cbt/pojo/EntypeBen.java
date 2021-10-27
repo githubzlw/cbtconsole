@@ -55,4 +55,28 @@ public class EntypeBen {
     public void setSell(String sell) {
         this.sell = sell;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("{");
+        sb.append("\"type\":\"")
+                .append(type).append('\"');
+        sb.append(",\"value\":\"")
+                .append(value).append('\"');
+        sb.append(",\"img\":\"")
+                .append(img).append('\"');
+        sb.append(",\"id\":\"")
+                .append(id).append('\"');
+        sb.append(",\"lableType\":\"")
+                .append(lableType).append('\"');
+        sb.append(",\"sell\":\"")
+                .append(sell).append('\"');
+        sb.append('}');
+        return sb.toString();
+    }
+
+
+    public EntypeBen() {
+        super();
+    }
 }

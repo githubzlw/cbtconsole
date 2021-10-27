@@ -1105,7 +1105,7 @@
 			<td style="text-align: center;"><span id="count2"></span></td>
 		</tr>
 		<tr>
-			<td  style="text-align:center;vertical-align:middle;" colspan="4">Scanning date:<span id="td14"></span></td>
+			<td style="text-align:center;vertical-align:middle;" colspan="4">Scanning date:<span id="td14"></span></td>
 		</tr>
 	</table>
 	<span id="tborderid3" style="float:right;"></span>
@@ -1113,32 +1113,33 @@
 <div id="corder_detail">
 	<h3 style="margin-left: 35%;">存在以下没验货产品请确认</h3>
 	<div id="corder_detail_conte"></div>
- <input id="checkOrderhid" type="hidden" value=""  />
- <input id="corder_barcode" type="hidden" value=""  />
- <input id="corder_shipno" type="hidden" value=""  />
- <input id="print_hide" type="hidden" value=""  />
- <div style="margin-left: 80%;">
- <input class="yhover" type="button" value="验货完成"  style="width: 80px;float: left;"/>
- <input class="yhovercancle" type="button" value="取消验货"  style="width: 80px;float: left;"/>
- </div>
+	<input id="checkOrderhid" type="hidden" value=""/>
+	<input id="corder_barcode" type="hidden" value=""/>
+	<input id="corder_shipno" type="hidden" value=""/>
+	<input id="print_hide" type="hidden" value=""/>
+	<input id="updateCheckStatusButtonId" type="hidden" value=""/>
+	<div style="margin-left: 80%;">
+		<input class="yhover" type="button" value="验货完成" style="width: 80px;float: left;"/>
+		<input class="yhovercancle" type="button" value="取消验货" style="width: 80px;float: left;"/>
+	</div>
 </div>
 <div class="replace-dv tc" style="display: none;">
-<div class="trnasparent" style="display: none;"></div>
-<div id="replace-dv-f" >
-<h3>请选择货源</h3>
-<div class="overflow-y-h">
-<table class="table-p">
-<thead>
-<tr>
-<td style="width:100px;">sku</td>
-<td style="width:130px;">skuid</td>
-<td style="width:120px;">图片</td>
-</tr>
-</thead>
-<tbody id="replace-product">
+	<div class="trnasparent" style="display: none;"></div>
+	<div id="replace-dv-f">
+		<h3>请选择货源</h3>
+		<div class="overflow-y-h">
+			<table class="table-p">
+				<thead>
+				<tr>
+					<td style="width:100px;">sku</td>
+					<td style="width:130px;">skuid</td>
+					<td style="width:120px;">图片</td>
+				</tr>
+				</thead>
+				<tbody id="replace-product">
 
 
-</tbody>
+				</tbody>
 </table>
 
 </div>

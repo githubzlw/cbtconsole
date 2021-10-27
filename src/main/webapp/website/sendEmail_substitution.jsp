@@ -162,7 +162,7 @@ String url = UUIDUtil.getAutoLoginPath("/orderInfo/getChangeProduct?flag=1&order
     <%--网站名:--%>
     <select id="website_type" style="width: 160px;display: none">
         <option value="1" selected="selected">import-express</option>
-        <option value="2">kidsproductwholesale</option>
+        <option value="2">kidscharming</option>
     </select>
         <script type="text/javascript">
             $.ajax({

@@ -574,7 +574,7 @@ public class CategoryResearchController {
 			result = "{\"status\":false,\"message\":\"当前分类已全部发布\"}";
 		}else{
 			//解压上传文件
-			boolean isSuccess = SyncSingleGoodsToOnlineUtil.downCategoryResearchImgs(sid, "/usr/local/goodsimg/importcsvimg/researchimg/");
+			boolean isSuccess = SyncSingleGoodsToOnlineUtil.downCategoryResearchImgs(sid, "/data/importcsvimg/researchimg/");
 //			List <NameValuePair> params1 = new ArrayList<NameValuePair>();
 //			getContentClientPost(importexpressPath+"/app/flushReasearch",params1);
 			if(isSuccess){

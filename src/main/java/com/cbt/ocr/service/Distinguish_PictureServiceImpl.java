@@ -22,7 +22,7 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 		page=(page-1)*35;
 		List<CustomGoods> list=distinguish_PictureDao.showDistinguish_Pircture(page,imgtype,state,Change_user);
 		int count=distinguish_PictureDao.queryDistinguish_PirctureCount(imgtype,state,Change_user);
-		String len="/usr/local/goodsimg";
+		String len="/data";
 		for (int i=0;i<list.size();i++){
 			list.get(i).setRemotepath("https://img.import-express.com"+list.get(i).getRemotepath().substring(len.length(),list.get(i).getRemotepath().length()));
 		}
@@ -92,7 +92,7 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	@Override
 	public List<CustomGoods> FindRecognition_delete_details(Map<String, Object> map) {
 		List<CustomGoods> list=distinguish_PictureDao.FindRecognition_delete_details(map);
-		String len="/usr/local/goodsimg";
+		String len="/data";
 		for (int i=0;i<list.size();i++){
 			list.get(i).setRemotepath("https://img.import-express.com"+list.get(i).getRemotepath().substring(len.length(),list.get(i).getRemotepath().length()));
 		}

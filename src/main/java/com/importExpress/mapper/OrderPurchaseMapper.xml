@@ -67,19 +67,24 @@
         th.paydata as orderdate,specid,skuid,orderstatus,username
         from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and (th.tbOr1688 between 0 and 3)
         and off_line = 0
-        group by th.orderid,th.shipno,th.itemid) bb
+        <!--group by th.orderid,th.shipno,th.itemid-->
+        ) bb
 		left join (select ir.tborderid,ir.orderid,ir.shipno as od_shipno,ir.itemid as od_pid,ir.specid as tb_specid,ir.skuid as tb_skuid,
 				od.yourorder,od.goodsprice,od.state as od_state,od.purchase_state,oi.orderpaytime,oi.exchange_rate
 				from
-				id_relationtable ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
+				(select tborderid,odid,orderid,shipno,itemid,specid,skuid from  id_relationtable where odid not in(select orderid from order_product_replace where  length(ifnull(tb_goods_pid,''))> 0)   and orderid in(select order_no from orderinfo where orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month))
+union
+select a.tborderid,a.odid,a.orderid,a.shipno, b.tb_goods_pid as itemid,'' as specid,b.tb_skuid as skuid from id_relationtable a,order_product_replace b
+where a.odid = b.orderid and length(ifnull(b.tb_goods_pid,''))> 0 and a.orderid in(select order_no from orderinfo where orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month))
+        ) ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
 				inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
         <!--where od.orderid in(select order_no from orderinfo_curren_monthly)  -->
         where oi.orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month)
         ) aa
-        on bb.tb_orderid = aa.tborderid and bb.itemid = aa.od_pid
+        on bb.tb_orderid = aa.tborderid and bb.itemid = aa.od_pid and bb.skuid = aa.tb_skuid
         <!--and bb.specid = aa.tb_specid and bb.skuid = aa.tb_skuid-->
         where bb.username != '策融by5'
-        order by bb.orderdate desc
+        order by bb.orderdate desc,aa.tborderid desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
         </if>
@@ -91,16 +96,21 @@
         th.paydata as orderdate,specid,skuid,orderstatus,username
         from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and (th.tbOr1688 between 0 and 3)
         and off_line = 0
-        group by th.orderid,th.shipno,th.itemid) bb
+        <!--group by th.orderid,th.shipno,th.itemid-->
+        ) bb
 		left join (select ir.tborderid,ir.orderid,ir.shipno as od_shipno,ir.itemid as od_pid,ir.specid as tb_specid,ir.skuid as tb_skuid,
 				od.yourorder,od.goodsprice,od.state,od.purchase_state,oi.orderpaytime,oi.exchange_rate
 				from
-				id_relationtable ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
+				(select tborderid,odid,orderid,shipno,itemid,specid,skuid from  id_relationtable where odid not in(select orderid from order_product_replace where  length(ifnull(tb_goods_pid,''))> 0)   and orderid in(select order_no from orderinfo where orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month))
+union
+select a.tborderid,a.odid,a.orderid,a.shipno, b.tb_goods_pid as itemid,'' as specid,b.tb_skuid as skuid from id_relationtable a,order_product_replace b
+where a.odid = b.orderid and length(ifnull(b.tb_goods_pid,''))> 0 and a.orderid in(select order_no from orderinfo where orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month))
+        ) ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
 				inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
         <!--where od.orderid in(select order_no from orderinfo_curren_monthly) -->
         where oi.orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month)
         ) aa
-        on bb.tb_orderid = aa.tborderid and bb.itemid = aa.od_pid
+        on bb.tb_orderid = aa.tborderid and bb.itemid = aa.od_pid and bb.skuid = aa.tb_skuid
         where bb.username != '策融by5'
         <!--and bb.specid = aa.tb_specid and bb.skuid = aa.tb_skuid-->
     </select>
@@ -114,11 +124,15 @@
         th.paydata as orderdate,specid,skuid,orderstatus,username
         from taobao_1688_order_history th where th.paydata between #{beginTime} and #{endTime} and (th.tbOr1688 between 0 and 3)
         and off_line = 0
-        group by th.orderid) bb
+        group by th.orderid,th.itemid) bb
 		left join (select ir.tborderid,ir.orderid,ir.shipno as od_shipno,ir.itemid as od_pid,ir.specid as tb_specid,ir.skuid as tb_skuid,
 				od.yourorder,od.goodsprice,od.state as od_state,od.purchase_state,oi.orderpaytime,oi.exchange_rate
 				from
-				id_relationtable ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
+				(select tborderid,odid,orderid,shipno,itemid,specid,skuid from  id_relationtable where odid not in(select orderid from order_product_replace where  length(ifnull(tb_goods_pid,''))> 0)   and orderid in(select order_no from orderinfo where orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month))
+union
+select a.tborderid,a.odid,a.orderid,a.shipno, b.tb_goods_pid as itemid,'' as specid,b.tb_skuid as skuid from id_relationtable a,order_product_replace b
+where a.odid = b.orderid and length(ifnull(b.tb_goods_pid,''))> 0 and a.orderid in(select order_no from orderinfo where orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month))
+) ir inner join order_details od on ir.orderid = od.orderid and ir.odid = od.id
 				inner join orderinfo oi on od.orderid = oi.order_no and oi.user_id in(select id from user where is_test = 0)
         where oi.orderpaytime between DATE_SUB(#{beginTime},INTERVAL 3 month) and DATE_ADD(#{endTime},INTERVAL 3 month)
         group by ir.tborderid,ir.itemid

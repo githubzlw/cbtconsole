@@ -2112,22 +2112,6 @@ function queryRepeat(uid){
         }
     });
 }
-//手动调整采购人员
-function changeBuyer(odid,buyid){
-    $.ajax({
-        url: "/cbtconsole/order/changeBuyer",
-        type:"POST",
-        data : {"odid":odid,"admuserid":buyid},
-        dataType:"json",
-        success:function(data){
-            if(data>0){
-                $("#info"+odid).text("执行成功");
-            }else{
-                $("#info"+odid).text("执行失败");
-            }
-        }
-    });
-}
 
 function changeOrderBuyer(orderid,admuserid){
     $.ajax({

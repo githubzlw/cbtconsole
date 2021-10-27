@@ -954,4 +954,83 @@ public class SingleGoodsController {
         return json;
     }
 
+
+    /**
+     * @param request
+     * @param response
+     * @return JsonResult
+     * @Title queryForList
+     * @Description 根据条件查询列表数据
+     */
+    @RequestMapping("/queryForNewGoodsList")
+    @ResponseBody
+    public EasyUiJsonResult queryForNewGoodsList(HttpServletRequest request, HttpServletResponse response) {
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtil.isBlank(admuserJson)) {
+            json.setSuccess(false);
+            json.setMessage("用户未登陆");
+            return json;
+        }
+
+        int startNum = 0;
+        int limitNum = 40;
+        String rowStr = request.getParameter("rows");
+        if (!(StringUtils.isBlank(rowStr) || "0".equals(rowStr))) {
+            limitNum = Integer.valueOf(rowStr);
+        }
+
+        String pageStr = request.getParameter("page");
+        if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+
+        String pid = request.getParameter("pid");
+        if (pid == null || "".equals(pid)) {
+            pid = "";
+        }
+
+        String sttime = request.getParameter("sttime");
+        if (sttime == null || "".equals(sttime)) {
+            sttime = "";
+        } else {
+            sttime += " 00:00:00";
+        }
+        String edtime = request.getParameter("edtime");
+        if (edtime == null || "".equals(edtime)) {
+            edtime = "";
+        } else {
+            edtime += " 23:59:59";
+        }
+
+        try {
+            SingleQueryGoodsParam queryPm = new SingleQueryGoodsParam();
+            queryPm.setPid(pid);
+
+            queryPm.setEdtime(edtime);
+            queryPm.setSttime(sttime);
+
+            queryPm.setLimitNum(limitNum);
+            queryPm.setStartNum(startNum);
+
+
+            List<SameTypeGoodsBean> res = sgGsService.queryForNewGoodsList(queryPm);
+
+            int count = sgGsService.queryForNewGoodsListCount(queryPm);
+            if (res.size() > 0) {
+                dealRalationAdmin(res);
+            }
+            json.setSuccess(true);
+            json.setRows(res);
+            json.setTotal(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("查询失败，原因 :" + e.getMessage());
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
 }

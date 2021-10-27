@@ -40,4 +40,18 @@ public class BigDecimalUtil {
     }
 
 
+    /**
+     * @param doubleVal   : 原值
+     * @param truncateNum : 截取位数
+     * @return
+     */
+    public static String truncateDoubleString(double doubleVal, int truncateNum) {
+        String resultVal = String.valueOf(doubleVal);
+        if (truncateNum > 0) {
+            BigDecimal bigDecimal = new BigDecimal(doubleVal);
+            resultVal = bigDecimal.setScale(truncateNum, BigDecimal.ROUND_HALF_UP).toString();
+        }
+        return resultVal;
+    }
+
 }

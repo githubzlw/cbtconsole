@@ -983,6 +983,11 @@ public class ShopCarMarketingController {
         if (StringUtils.isNotBlank(countryIdStr)) {
             countryId = Integer.parseInt(countryIdStr);
         }
+        int site = -1;
+        String siteStr = request.getParameter("site");
+        if (StringUtils.isNotBlank(siteStr)) {
+            site = Integer.parseInt(siteStr);
+        }
 
         try {
 
@@ -997,8 +1002,19 @@ public class ShopCarMarketingController {
             statistic.setCountryId(countryId);
             statistic.setStartNum(startNum);
             statistic.setLimitNum(limitNum);
-            List<ShopCarUserStatistic> res = shopCarMarketingService.queryForList(statistic);
+
+            if(site > 0){
+                statistic.setSite(WebSiteEnum.getSourceCodeByCode(site));
+            }
+
+
+
             int count = shopCarMarketingService.queryForListCount(statistic);
+            List<ShopCarUserStatistic> res = new ArrayList<>();
+            if(count > 0){
+                res = shopCarMarketingService.queryForList(statistic);
+            }
+
 
             json.setRows(res);
             json.setTotal(count);

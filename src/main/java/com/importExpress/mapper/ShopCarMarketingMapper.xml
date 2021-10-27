@@ -1718,6 +1718,9 @@
         <if test="countryId > 0">
             and us.countryId = #{countryId}
         </if>
+        <if test="site > 0">
+            and us.site = #{site}
+        </if>
         order by gcf.time_updated desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
@@ -1769,6 +1772,9 @@
         </if>
         <if test="countryId > 0">
             and us.countryId = #{countryId}
+        </if>
+        <if test="site > 0">
+            and us.site = #{site}
         </if>
     </select>
 
