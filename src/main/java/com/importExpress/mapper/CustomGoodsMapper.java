@@ -3,6 +3,7 @@ package com.importExpress.mapper;
 import com.cbt.bean.CategoryBean;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
+import com.cbt.bean.ProductSingleBean;
 import com.cbt.website.bean.PurchasesBean;
 import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
@@ -397,7 +398,7 @@ public interface CustomGoodsMapper {
      * @param sku
      * @return
      */
-    int updateSkuInfo(@Param("pid") String pid, @Param("sku") String sku);
+    int updateSkuInfo(@Param("pid") String pid, @Param("sku") String sku,@Param("rangePrice") String rangePrice, @Param("rangePriceFree") String rangePriceFree, @Param("minPrice") float minPrice);
 
     /**
      * 插入sku更新日志
@@ -725,5 +726,29 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<String> getPipeList();
+
+    ProductSingleBean queryPidSingleBean(String pid);
+
+   int setNoUpdatePrice(CustomGoodsPublish goods);
+
+   int saveNewGoodsDetails(CustomGoodsPublish goods);
+
+   int queryNewPid();
+
+   int updateNewPid();
+
+    /**
+     * 根据PID查询商品详情
+     *
+     * @param pid
+     * @return
+     */
+    CustomGoodsPublish queryNewGoodsDetailsByPid(@Param("pid") String pid);
+
+    int updateNewGoodsDetailsByInfo(CustomGoodsPublish goods);
+
+    int saveNewGoodsDetailsPush(CustomGoodsPublish goods);
+
+    int updateEntypeSkuByPid(CustomGoodsPublish goods);
 
 }

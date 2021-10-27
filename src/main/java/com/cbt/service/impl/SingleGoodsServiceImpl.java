@@ -101,4 +101,14 @@ public class SingleGoodsServiceImpl implements SingleGoodsService {
 		return sgGdDao.queryOnlineGoodsCountByShopId(shopId);
 	}
 
+	@Override
+	public List<SameTypeGoodsBean> queryForNewGoodsList(SingleQueryGoodsParam queryPm) {
+		return sgGdDao.queryForNewGoodsList(queryPm);
+	}
+
+	@Override
+	public int queryForNewGoodsListCount(SingleQueryGoodsParam queryPm) {
+		return sgGdDao.queryForNewGoodsListCount(queryPm);
+	}
+
 }

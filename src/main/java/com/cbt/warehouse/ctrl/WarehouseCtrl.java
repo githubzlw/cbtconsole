@@ -232,7 +232,7 @@ import sun.misc.BASE64Encoder;
 @Controller
 @RequestMapping("/warehouse")
 public class WarehouseCtrl {
-	private static final String UPLOAD_IMG_PATH = "/usr/local/goodsimg/importcsvimg/inspectionImg/";
+	private static final String UPLOAD_IMG_PATH = "/data/importcsvimg/inspectionImg/";
 	// 上传文件存储目录
 	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 	private static final String UPLOAD_DIRECTORY = "upload";
@@ -284,6 +284,9 @@ public class WarehouseCtrl {
 	private UserFreeNotFreeService userFreeNotFreeService;
 	@Autowired
 	RedisUtil redisUtil;
+
+	private SourcingOrderUtils sourcingOrderUtils = new SourcingOrderUtils();
+
 	/**
 	 *
 	 * @Title getAllBuyer
@@ -4063,6 +4066,7 @@ public class WarehouseCtrl {
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOG.error("订单合并异常【合并订单号:" + orderNo + "】", e);
 			return "0";
 		}
@@ -5979,6 +5983,9 @@ public class WarehouseCtrl {
 							+ "'>"
 							+ info.getOrderids()
 							+ "</a>");
+					bf.append("<br><a target='_blank' style='text-decoration:underline' href='/cbtconsole/apa/sourcingStock.html?orderNo="
+							+ info.getOrderids()
+							+ "'>Sourcing订单匹配sku</a>");
 					info.setOrderids(bf.toString());
 				}
 				bf.setLength(0);
@@ -6737,6 +6744,8 @@ public class WarehouseCtrl {
 			for (int i = 0; i < cont; i++) {
 				Map<String, Object> declares = sbxxList.get(i);
 				String orderid = (String) declares.get("orderid");
+
+				sourcingOrderUtils.updateSourcingOrder(orderid, 3);
 				//发送邮件给客户告知已经发货
 				IGuestBookService ibs = new GuestBookServiceImpl();
 				OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
@@ -6764,7 +6773,7 @@ public class WarehouseCtrl {
 				}
 				if (MultiSiteUtil.getSiteTypeNum(orderid)==2){
 					modelM.put("websiteType",2);
-					modelM.put("toHref","https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+					modelM.put("toHref","https://www.kidscharming.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
 					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK_KIDS);
 				}
 				if (MultiSiteUtil.getSiteTypeNum(orderid)==3){
@@ -7503,6 +7512,10 @@ public class WarehouseCtrl {
 				// 修改 order_details 的字段 purchase_state，本地状态
 				iWarehouseService.updateODPState(map);
 				int ret = iWarehouseService.updateOpsState(map);
+
+				sourcingOrderUtils.updateSourcingOrder(orderid, 1);
+
+
 				// 同上，线上数据库也修改一份
 				// DataSourceSelector.set("dataSource127hop");
 				// iWarehouseService.updateODPState(map);
@@ -7535,7 +7548,7 @@ public class WarehouseCtrl {
 						if (websiteType == 1) {
                             modelM.put("toHref", "https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         } else if (websiteType == 2) {
-                            modelM.put("toHref", "https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                            modelM.put("toHref", "https://www.kidscharming.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         } else if (websiteType == 3) {
                             modelM.put("toHref", "https://www.petstoreinc.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         }

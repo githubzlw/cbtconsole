@@ -73,7 +73,7 @@ public class OrderInfoController {
     @Autowired
     private ISpiderServer spiderService;
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
-    private static final String SERVICE_LOCAL_PATH = "/usr/local/goodsimg";
+    private static final String SERVICE_LOCAL_PATH = "/data";
     private static final String SERVICE_SHOW_URL_1 = "http://img.import-express.com";
     private static final String SERVICE_SHOW_URL_2 = "http://img1.import-express.com";
     private static final String SERVICE_SHOW_URL_3 = "https://img.import-express.com";
@@ -763,7 +763,7 @@ public class OrderInfoController {
             }
             if (MultiSiteUtil.getSiteTypeNum(orderNo) == 2) {
                 modelM.put("websiteType", 2);
-                modelM.put("accountLink", "https://www.kidsproductwholesale.com/orderInfo/emailLink?orderNo=" + orderNo + "");
+                modelM.put("accountLink", "https://www.kidscharming.com/orderInfo/emailLink?orderNo=" + orderNo + "");
                 sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE_KIDS);
             }
             if (MultiSiteUtil.getSiteTypeNum(orderNo) == 3) {

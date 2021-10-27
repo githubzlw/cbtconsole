@@ -213,7 +213,7 @@ public class Distinguish_PictureContorller {
 		List<Map<String, String>> bgList=new ArrayList<>();
 		for (int i=0;i<customGoodsList.size();i++ ){
 			Map<String,String> map=new HashMap<>();
-			String len="/usr/local/goodsimg";
+			String len="/data";
 			customGoodsList.get(i).setRemotepath("https://img.import-express.com"+customGoodsList.get(i).getRemotepath().substring(len.length(),customGoodsList.get(i).getRemotepath().length()));
 			String value=customGoodsList.get(i).getId()+","+customGoodsList.get(i).getPid()+","+customGoodsList.get(i).getRemotepath();
 			map.put("id",value);

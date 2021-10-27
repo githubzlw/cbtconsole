@@ -386,7 +386,7 @@ public class NewFtpUtil {
 	}
 
 	public static void main(String[] args) {
-		String ip = "104.247.194.50";// 192.168.1.29
+		String ip = "108.61.142.103";// 192.168.1.29
 		String user = "importweb";// ftp29
 		String passw = "importftp@123";// 29@123
 		String remotePath = "/inspectionImg/2018-07/";// 2017-09-12/

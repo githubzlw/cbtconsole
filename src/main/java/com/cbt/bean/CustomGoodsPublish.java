@@ -152,6 +152,57 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private String free_price_new;
     private String sku_new;
+    private String range_price_free_new;
+
+    private String price_import;
+    private String price_kids;
+    private String price_pets;
+
+    private String img_check;
+
+    private int morder;
+
+    private String brand_name;
+
+    public String getImg_check() {
+        return img_check;
+    }
+
+    public void setImg_check(String img_check) {
+        this.img_check = img_check;
+    }
+
+    public String getRange_price_free_new() {
+        return range_price_free_new;
+    }
+
+    public void setRange_price_free_new(String range_price_free_new) {
+        this.range_price_free_new = range_price_free_new;
+    }
+
+    public String getPrice_import() {
+        return price_import;
+    }
+
+    public void setPrice_import(String price_import) {
+        this.price_import = price_import;
+    }
+
+    public String getPrice_kids() {
+        return price_kids;
+    }
+
+    public void setPrice_kids(String price_kids) {
+        this.price_kids = price_kids;
+    }
+
+    public String getPrice_pets() {
+        return price_pets;
+    }
+
+    public void setPrice_pets(String price_pets) {
+        this.price_pets = price_pets;
+    }
 
     public String getSku_new() {
         return sku_new;
@@ -1027,5 +1078,23 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     public void setFpriceStr(String fpriceStr) {
         this.fpriceStr = fpriceStr;
+    }
+
+    @Override
+    public int getMorder() {
+        return morder;
+    }
+
+    @Override
+    public void setMorder(int morder) {
+        this.morder = morder;
+    }
+
+    public String getBrand_name() {
+        return brand_name;
+    }
+
+    public void setBrand_name(String brand_name) {
+        this.brand_name = brand_name;
     }
 }

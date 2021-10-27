@@ -1,6 +1,8 @@
 package com.cbt.parse.service;
 
 import com.importExpress.utli.ColorRGBUtil;
+import com.importExpress.utli.OKHttpUtils;
+import com.importExpress.utli.RxUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -18,12 +20,12 @@ public class ImgDownload {
 
 	/**
 	 * 测试
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		String url = "https://img.import-express.com/importcsvimg/shopimg/1001616913/4426630628_1406535455.400x400.jpg";
-		String fileName = "E:/cbtimg/editimg/importimg/777.jpg";
+		String fileName = "H:/临时存放/img/777.jpg";
 		System.err.println("downFromImgService:" + downFromImgService(url, fileName));
 	}
 
@@ -47,7 +49,7 @@ public class ImgDownload {
 
 	public static boolean downFromImgService(String imgUrl,String fileName) {
 
-		String ipUrl = imgUrl.replace("https://img.import-express.com","http://104.247.194.50");
+		String ipUrl = imgUrl.replace("https://img.import-express.com","http://108.61.142.103");
 		boolean isDown = false;
 		File file = new File(fileName);
 		if(checkDownFileByName(fileName)){
@@ -57,10 +59,15 @@ public class ImgDownload {
 		FileOutputStream fileOutputStream = null;
 		ByteArrayOutputStream output = null;
 		try {
-			OkHttpClient client = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS)
-					.readTimeout(300, TimeUnit.SECONDS).writeTimeout(300, TimeUnit.SECONDS)
-					.hostnameVerifier((s, sslSession) -> true)
-					.build();
+			OkHttpClient client = new OkHttpClient.Builder()
+					.connectTimeout(600, TimeUnit.SECONDS)
+					.readTimeout(300, TimeUnit.SECONDS)
+					.writeTimeout(300, TimeUnit.SECONDS)
+					.sslSocketFactory(RxUtils.createSSLSocketFactory())
+					.hostnameVerifier(new RxUtils.TrustAllHostnameVerifier())
+					.retryOnConnectionFailure(true).build();
+
+			//  OkHttpClient client = OKHttpUtils.getNoHttpsClient();
 			Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*")
 					.addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").get().url(ipUrl).build();
 			Response response = client.newCall(request).execute();
@@ -121,7 +128,7 @@ public class ImgDownload {
 
 	/**
 	 * 下载图片
-	 * 
+	 *
 	 * @param url
 	 * @param fileName
 	 * @return
@@ -148,7 +155,7 @@ public class ImgDownload {
 
 	/**
 	 * 将图片写入到磁盘
-	 * 
+	 *
 	 * @param img
 	 *            图片数据流
 	 * @param fileName
@@ -170,10 +177,10 @@ public class ImgDownload {
 		fops.flush();
 		fops.close();
 	}
-	
+
 	/**
 	 * 将图片写入到磁盘
-	 * 
+	 *
 	 * @param img
 	 *            图片数据流
 	 * @param fileName
@@ -201,7 +208,7 @@ public class ImgDownload {
 
 	/**
 	 * 根据地址获得数据的字节流
-	 * 
+	 *
 	 * @param strUrl
 	 *            网络连接地址
 	 * @return
@@ -220,7 +227,7 @@ public class ImgDownload {
 
 	/**
 	 * 从输入流中获取数据
-	 * 
+	 *
 	 * @param inStream
 	 *            输入流
 	 * @return

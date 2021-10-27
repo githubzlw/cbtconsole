@@ -121,14 +121,14 @@ public class QuestionAndAnswerServiceImpl implements QuestionAndAnswerService {
 					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From ImportExpress", model, TemplateType.BUSINESS_INQUIRIES);
 				}
                 if ("2".equals(Website)){
-					 urlTem = "https://www.kidsproductwholesale.com/goodsinfo/...-1"+url+".html";
+					 urlTem = "https://www.kidscharming.com/goodsinfo/...-1"+url+".html";
 					model.put("itemUrl",urlTem);
-					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From kidsproductwholesale", model, TemplateType.BUSINESS_INQUIRIES_KIDS);
+					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From KidsCharming", model, TemplateType.BUSINESS_INQUIRIES_KIDS);
 				}
 				if ("3".equals(Website)){
 					urlTem = "https://www.petstoreinc.com/goodsinfo/...-1"+url+".html";
 					model.put("itemUrl",urlTem);
-					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From petstoreinc", model, TemplateType.BUSINESS_INQUIRIES_PET);
+					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From PetStoreinc", model, TemplateType.BUSINESS_INQUIRIES_PET);
 				}
 
             };
