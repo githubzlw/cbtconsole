@@ -66,9 +66,11 @@
 			padding-bottom: 20px;
 			z-index: 1011;
 		}
+
 		ol, ul {
 			list-style: none;
 		}
+
 		.mod_pay3 {
 			width: 720px;
 			position: fixed;
@@ -267,18 +269,106 @@
 			font-size: 12px;
 			font-family: Verdana, 宋体;
 		}
-		html, body { margin:0px; padding:0px;margin-left:5px;}
-		.b { margin-top:5px; padding:0px; overflow:auto; }
-		.line0 { line-height:20px; background-color:lightyellow; padding:0px 15px; }
-		.line1 { line-height:18px; background-color:lightblue; padding:0px 10px; }
-		.w { position:absolute; left:10px; top:150px; width:280px; height:284px; overflow:hidden; border:2px groove #281; cursor:default; -moz-user-select:none; }
-		.t { line-height:20px; height:20px; width:280px; overflow:hidden; background-color:#27C; color:white; font-weight:bold; border-bottom:1px outset blue; text-align:center; }
-		.winBody { height:236px; width:600px; overflow-x:hidden; overflow-y:auto; border-top:0px inset blue; padding:10px; text-indent:10px; background-color:white; }
-		#take_photo{position: fixed;right:0;top:0;    z-index: -3;}
-		#corder_detail{position:fixed;width:60%;height:530px;overflow:auto;top:0;right:0;bottom:0;left:0;margin:auto;background:#dff0d8;z-index:1;display:none;border-radius: 35px;}
-		.i_order{width:96%;height:80px;border-bottom:1px solid #ddd;margin:0 auto;margin-bottom:10px;}
 
-		.corder_img{float:left;width:12%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;}
+		html, body {
+			margin: 0px;
+			padding: 0px;
+			margin-left: 5px;
+		}
+
+		.b {
+			margin-top: 5px;
+			padding: 0px;
+			overflow: auto;
+		}
+
+		.line0 {
+			line-height: 20px;
+			background-color: lightyellow;
+			padding: 0px 15px;
+		}
+
+		.line1 {
+			line-height: 18px;
+			background-color: lightblue;
+			padding: 0px 10px;
+		}
+
+		.w {
+			position: absolute;
+			left: 10px;
+			top: 150px;
+			width: 280px;
+			height: 284px;
+			overflow: hidden;
+			border: 2px groove #281;
+			cursor: default;
+			-moz-user-select: none;
+		}
+
+		.t {
+			line-height: 20px;
+			height: 20px;
+			width: 280px;
+			overflow: hidden;
+			background-color: #27C;
+			color: white;
+			font-weight: bold;
+			border-bottom: 1px outset blue;
+			text-align: center;
+		}
+
+		.winBody {
+			height: 236px;
+			width: 600px;
+			overflow-x: hidden;
+			overflow-y: auto;
+			border-top: 0px inset blue;
+			padding: 10px;
+			text-indent: 10px;
+			background-color: white;
+		}
+
+		#take_photo {
+			position: fixed;
+			right: 0;
+			top: 0;
+			z-index: -3;
+		}
+
+		#corder_detail {
+			position: fixed;
+			width: 60%;
+			height: 530px;
+			overflow: auto;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			margin: auto;
+			background: #dff0d8;
+			z-index: 1;
+			display: none;
+			border-radius: 35px;
+		}
+
+		.i_order {
+			width: 96%;
+			height: 80px;
+			border-bottom: 1px solid #ddd;
+			margin: 0 auto;
+			margin-bottom: 10px;
+		}
+
+		.corder_img {
+			float: left;
+			width: 12%;
+			height: 80px;
+			text-align: center;
+			font-size: 14px;
+			color: #333;
+			line-height: 80px;
+		}
 
 		.corder_q {
 			float: left;
@@ -486,7 +576,6 @@
 			});
 			// $("#TheInspection").css("display","")  ;
 		}
-
 		function Returngoods() {
 			var shipno = $("#ship").html();
 			$.ajax({
@@ -688,8 +777,9 @@
 	<jsp:include page="message_notification.jsp"></jsp:include>
 	<%}  %>
 
-	<div id="take_photo" >
-		<video id="video" width="400px" height="400px" autoplay="autoplay"></video><br>
+	<div id="take_photo">
+		<video id="video" width="400px" height="400px" autoplay="autoplay"></video>
+		<br>
 		<canvas id="canvas" width="400px" height="400px"></canvas>
 	</div>
 	<br>
@@ -708,6 +798,7 @@
 
 		<a href="javascript:show()" style="color: red; font-size:30px;">验货取消</a>
 		<a href="javascript:Returngoods()" style="color: red; font-size:30px;">发起退货</a>
+		&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:matchSourcingOrder()" style="color: red; font-size:30px;">Sourcing订单匹配sku</a>
 		<div id="login">
 			<a class="aright" href="javascript:hide()" style="color: red; font-size:30px;">关闭</a>
 			<div id="TheInspection"></div>
