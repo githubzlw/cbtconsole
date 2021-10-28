@@ -545,19 +545,19 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
 		if(tbskuid=='' && replacet ==''){
 			$(".th_replacet_"+odid).html("");
 			 $.ajax({
-		            url: "/cbtconsole/order/getReplace",
-		            type: "post",
-		            async: true,
-		            data: {
-		            	shipno: shipno,
-		                odid: odid
-		            },
-		            success: function (data) {
-		            	if(data.code==200) {
-                            var hml = '';
-                            var arr = data.data;
-                            for (var i = 0; i < arr.length; i++) {
-                                hml += '<tr class="ra-cls">' +
+                 url: "/cbtconsole/order/getReplace",
+                 type: "post",
+                 async: false,
+                 data: {
+                     shipno: shipno,
+                     odid: odid
+                 },
+                 success: function (data) {
+                     if (data.code == 200) {
+                         var hml = '';
+                         var arr = data.data;
+                         for (var i = 0; i < arr.length; i++) {
+                             hml += '<tr class="ra-cls">' +
                                     '<td><input type="radio" name="' + arr[i].itemid + '" class="ra-i"  value="' + odid + '">' +
                                     arr[i].sku + '</td>' +
                                     '<td class="ra-skuid">' + arr[i].skuID + '</td>' +
@@ -571,14 +571,16 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
                                 $(".replace-dv").show();
                                 $(".trnasparent").show();
                                 clickRa();
+                                th = 0;
+                                return;
                             }
                         } else {
-                            $(".th_replacet_" + odid).html("get replace");
+                         $(".th_replacet_" + odid).html("get replace");
+                         th = 1;
                         }
                     }
              });
-            th = 0;
-            return;
+
         } else {
             th = 1;
         }
