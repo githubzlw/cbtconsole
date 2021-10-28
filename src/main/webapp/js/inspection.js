@@ -1045,6 +1045,7 @@ function search() {
                             }
                         }
                         str += '<table border="1" style="width:600px;height:800px;float:left; margin-left:5px; margin-bottom:5px;"><tr>';
+                        orderObj[json[i].orderid] = 1;
                         str += '<td width="400px"><div>订单号:' + json[i].orderid + '</div><div>商品id：'
                             + json[i].goodsid + ';odid:' + json[i].odid + '</div>';
                         str += '<div>商品名称：<span id="name_' + json[i].odid + '">'
@@ -1533,6 +1534,7 @@ function search() {
                                 }
                             }
                             str += '<table border="1" width="600px" style="float:left;"><tr>';
+                            orderObj[json[i].orderid] = 1;
                             str += '<td width="400px"><div>订单号:' + json[i].orderid + '</div><div>商品id：'
                                 + json[i].goodsid + ';odid:' + json[i].odid + '</div>';
                             str += '<div>商品名称：<span id="name_' + json[i].odid + '">'

@@ -432,6 +432,7 @@
 
             });
         }
+
         function hide()
         {
             var login = document.getElementById('login');
@@ -609,22 +610,24 @@
 	<div id="scanning_frame">
 		<span id="jsp_name" style="background-color:red;font-size:30px;">入库扫描页面--不可做验货操作</span><br><h3 style="color:bisque;padding:10px 20px;background:#f5f5f5;color:#f40">扫描框</h3><br>
 		请输入快递跟踪号：
-		<input type="text" id="search" onFocus="celsearch()"  onkeypress="if (event.keyCode == 13) search()" >
+		<input type="text" id="search" onFocus="celsearch()" onkeypress="if (event.keyCode == 13) search()">
 
 		库位条形码：
-		<input type="text" id="kwhid" onFocus="celkwhid()" readonly="readonly" onkeypress="if (event.keyCode == 13) getPosition()"/>
+		<input type="text" id="kwhid" onFocus="celkwhid()" readonly="readonly"
+			   onkeypress="if (event.keyCode == 13) getPosition()"/>
 
-		<a href="../website/purchase_order_details.jsp"  target="_Blank">未按时入库订单列表</a>
+		<a href="../website/purchase_order_details.jsp" target="_Blank">未按时入库订单列表</a>
 
-        <a href="javascript:show()" style="color: red; font-size:30px;">验货取消</a>
-        <a href="javascript:Returngoods()" style="color: red; font-size:30px;">发起退货</a>
-        <div id="login" >
-            <a class="aright" href="javascript:hide()" style="color: red; font-size:30px;" >关闭</a>
-            <div id="TheInspection" ></div>
-        </div>
-        <div id="over"></div>
+		<a href="javascript:show()" style="color: red; font-size:30px;">验货取消</a>
+		<a href="javascript:Returngoods()" style="color: red; font-size:30px;">发起退货</a>
+		&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:matchSourcingOrder()" style="color: red; font-size:30px;">Sourcing订单匹配sku</a>
+		<div id="login">
+			<a class="aright" href="javascript:hide()" style="color: red; font-size:30px;">关闭</a>
+			<div id="TheInspection"></div>
+		</div>
+		<div id="over"></div>
 
-		<h2 id="ydid"  style="clear:both;"></h2>
+		<h2 id="ydid" style="clear:both;"></h2>
 		<h2 id="positionid"></h2>
 		<input type="hidden" id="tborderid" value=""/>
 		<input type="hidden" id="shipno" value=""/>
