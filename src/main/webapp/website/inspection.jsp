@@ -18,45 +18,59 @@
 	<script type="text/javascript" src="/cbtconsole/js/inspection.js"></script>
 	<title>验货页面</title>
 	<style>
-	.overflow-y-h{    max-height: 340px;
-    height: auto;overflow-y: auto;}
-	#replace-product.td{width:220px;}
-	#replace-dv-f{    position: absolute;
-    z-index: 10;
-    top: 11%;
-    left: 32%;
-    background-color: #fff;
-    padding: 20px;
-    max-height: 800px;}
-	.tc {
-    background-color: rgba(0, 0, 0, 0);
-    top: 0;
-    left: 0;
-}
-	.tc, .trnasparent {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, .5);
-    position: fixed;
-    z-index: 1;
-    display: none;
-    text-align: center;
-    }
+		.overflow-y-h {
+			max-height: 340px;
+			height: auto;
+			overflow-y: auto;
+		}
+
+		#replace-product.td {
+			width: 220px;
+		}
+
+		#replace-dv-f {
+			position: absolute;
+			z-index: 10;
+			top: 11%;
+			left: 32%;
+			background-color: #fff;
+			padding: 20px;
+			max-height: 800px;
+		}
+
+		.tc {
+			background-color: rgba(0, 0, 0, 0);
+			top: 0;
+			left: 0;
+		}
+
+		.tc, .trnasparent {
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, .5);
+			position: fixed;
+			z-index: 1;
+			display: none;
+			text-align: center;
+		}
+
 		.mod_pay6 {
 			width: 400px;
-			height:400px;
+			height: 400px;
 			position: fixed;
 			top: 100px;
 			right: 15%;
-			margin-left:400px;
+			margin-left: 400px;
 			z-index: 1011;
 			padding: 5px;
 			padding-bottom: 20px;
 			z-index: 1011;
 		}
+
 		ol, ul {
 			list-style: none;
 		}
+
 		.mod_pay3 {
 			width: 720px;
 			position: fixed;
@@ -184,22 +198,23 @@
 			font-size: 14px;
 			font-weight: 700
 		}
-        #login
-        {
-            display:none;
-            border:1em solid purple;
-            height:300px;
-            width:500px;
-            position:absolute;/*让节点脱离文档流,我的理解就是,从页面上浮出来,不再按照文档其它内容布局*/
-            top:24%;/*节点脱离了文档流,如果设置位置需要用top和left,right,bottom定位*/
-            left:24%;
-            z-index:2;/*个人理解为层级关系,由于这个节点要在顶部显示,所以这个值比其余节点的都大*/
-            background: white;
-        }
-		#login a
-        {
-			float:right
-        }
+
+		#login {
+			display: none;
+			border: 1em solid purple;
+			height: 300px;
+			width: 500px;
+			position: absolute; /*让节点脱离文档流,我的理解就是,从页面上浮出来,不再按照文档其它内容布局*/
+			top: 24%; /*节点脱离了文档流,如果设置位置需要用top和left,right,bottom定位*/
+			left: 24%;
+			z-index: 2; /*个人理解为层级关系,由于这个节点要在顶部显示,所以这个值比其余节点的都大*/
+			background: white;
+		}
+
+		#login a {
+			float: right
+		}
+
 		.qod_pay3 {
 			width: 720px;
 			height: 500px;
@@ -212,325 +227,486 @@
 			padding: 5px;
 			padding-bottom: 20px;
 			z-index: 1011;
-			border: 15px ;
+			border: 15px;
 		}
-        #over
-        {
-            width: 100%;
-            height: 100%;
-            opacity:0.8;/*设置背景色透明度,1为完全不透明,IE需要使用filter:alpha(opacity=80);*/
-            filter:alpha(opacity=80);
-            display: none;
-            position:absolute;
-            top:0;
-            left:0;
-            z-index:1;
-            background: silver;
-        }
-		.aright{
-			text-align:right;
-		}
-		.strcarype{color: black;font-size: 16px;font-weight:bold;}
 
-		.loading { position: fixed; top: 0px; left: 0px;
-			width: 100%; height: 100%; color:#fff; z-index:9999;
-			background: #000 url(/cbtconsole/img/yuanfeihang/loaderTwo.gif) no-repeat 50% 300px;
-			opacity: 0.4;}
-		* { font-size:12px; font-family:Verdana,宋体; }
-		html, body { margin:0px; padding:0px;margin-left:5px;}
-		.b { margin-top:5px; padding:0px; overflow:auto; }
-		.line0 { line-height:20px; background-color:lightyellow; padding:0px 15px; }
-		.line1 { line-height:18px; background-color:lightblue; padding:0px 10px; }
-		.w { position:absolute; left:10px; top:150px; width:280px; height:284px; overflow:hidden; border:2px groove #281; cursor:default; -moz-user-select:none; }
-		.t { line-height:20px; height:20px; width:280px; overflow:hidden; background-color:#27C; color:white; font-weight:bold; border-bottom:1px outset blue; text-align:center; }
-		.winBody { height:236px; width:600px; overflow-x:hidden; overflow-y:auto; border-top:0px inset blue; padding:10px; text-indent:10px; background-color:white; }
-		#take_photo{position: fixed;right:0;top:0;    z-index: -3;}
-		#corder_detail{position:fixed;width:60%;height:530px;overflow:auto;top:0;right:0;bottom:0;left:0;margin:auto;background:#dff0d8;z-index:1;display:none;border-radius: 35px;}
-		.i_order{width:96%;height:80px;border-bottom:1px solid #ddd;margin:0 auto;margin-bottom:10px;}
-		
-		.corder_img{float:left;width:12%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;}
-		.corder_q{float:left;width:20%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;}
-		.c_sku_c{float:left;width:40%;height:80px;text-align:left;font-size:14px;color:#333;line-height:80px;}
-		.corder_yq_c{float:left;width:13%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;}
-		.corder_c_barcode{float:left;width:15%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;}
-		
-		/* .i_order span{float:left;width:25%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;} */
-		.corder_yq{height: 26px;width: 75px;}
-		.corder_i_barcode{height: 26px;width: 75px;}
-		.corder_img img{width:65px; height:65px;}
-		.brand_state_f{
-		background: #6bdc3c;
+		#over {
+			width: 100%;
+			height: 100%;
+			opacity: 0.8; /*设置背景色透明度,1为完全不透明,IE需要使用filter:alpha(opacity=80);*/
+			filter: alpha(opacity=80);
+			display: none;
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 1;
+			background: silver;
 		}
-		.table-p td,th{border: 1px solid #ddd;}
+
+		.aright {
+			text-align: right;
+		}
+
+		.strcarype {
+			color: black;
+			font-size: 16px;
+			font-weight: bold;
+		}
+
+		.loading {
+			position: fixed;
+			top: 0px;
+			left: 0px;
+			width: 100%;
+			height: 100%;
+			color: #fff;
+			z-index: 9999;
+			background: #000 url(/cbtconsole/img/yuanfeihang/loaderTwo.gif) no-repeat 50% 300px;
+			opacity: 0.4;
+		}
+
+		* {
+			font-size: 12px;
+			font-family: Verdana, 宋体;
+		}
+
+		html, body {
+			margin: 0px;
+			padding: 0px;
+			margin-left: 5px;
+		}
+
+		.b {
+			margin-top: 5px;
+			padding: 0px;
+			overflow: auto;
+		}
+
+		.line0 {
+			line-height: 20px;
+			background-color: lightyellow;
+			padding: 0px 15px;
+		}
+
+		.line1 {
+			line-height: 18px;
+			background-color: lightblue;
+			padding: 0px 10px;
+		}
+
+		.w {
+			position: absolute;
+			left: 10px;
+			top: 150px;
+			width: 280px;
+			height: 284px;
+			overflow: hidden;
+			border: 2px groove #281;
+			cursor: default;
+			-moz-user-select: none;
+		}
+
+		.t {
+			line-height: 20px;
+			height: 20px;
+			width: 280px;
+			overflow: hidden;
+			background-color: #27C;
+			color: white;
+			font-weight: bold;
+			border-bottom: 1px outset blue;
+			text-align: center;
+		}
+
+		.winBody {
+			height: 236px;
+			width: 600px;
+			overflow-x: hidden;
+			overflow-y: auto;
+			border-top: 0px inset blue;
+			padding: 10px;
+			text-indent: 10px;
+			background-color: white;
+		}
+
+		#take_photo {
+			position: fixed;
+			right: 0;
+			top: 0;
+			z-index: -3;
+		}
+
+		#corder_detail {
+			position: fixed;
+			width: 60%;
+			height: 530px;
+			overflow: auto;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			margin: auto;
+			background: #dff0d8;
+			z-index: 1;
+			display: none;
+			border-radius: 35px;
+		}
+
+		.i_order {
+			width: 96%;
+			height: 80px;
+			border-bottom: 1px solid #ddd;
+			margin: 0 auto;
+			margin-bottom: 10px;
+		}
+
+		.corder_img {
+			float: left;
+			width: 12%;
+			height: 80px;
+			text-align: center;
+			font-size: 14px;
+			color: #333;
+			line-height: 80px;
+		}
+
+		.corder_q {
+			float: left;
+			width: 20%;
+			height: 80px;
+			text-align: center;
+			font-size: 14px;
+			color: #333;
+			line-height: 80px;
+		}
+
+		.c_sku_c {
+			float: left;
+			width: 40%;
+			height: 80px;
+			text-align: left;
+			font-size: 14px;
+			color: #333;
+			line-height: 80px;
+		}
+
+		.corder_yq_c {
+			float: left;
+			width: 13%;
+			height: 80px;
+			text-align: center;
+			font-size: 14px;
+			color: #333;
+			line-height: 80px;
+		}
+
+		.corder_c_barcode {
+			float: left;
+			width: 15%;
+			height: 80px;
+			text-align: center;
+			font-size: 14px;
+			color: #333;
+			line-height: 80px;
+		}
+
+		/* .i_order span{float:left;width:25%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;} */
+		.corder_yq {
+			height: 26px;
+			width: 75px;
+		}
+
+		.corder_i_barcode {
+			height: 26px;
+			width: 75px;
+		}
+
+		.corder_img img {
+			width: 65px;
+			height: 65px;
+		}
+
+		.brand_state_f {
+			background: #6bdc3c;
+		}
+
+		.table-p td, th {
+			border: 1px solid #ddd;
+		}
 
 	</style>
 	<%
 		//取出当前登录用户
 		String sessionId = request.getSession().getId();
 		String userJson = Redis.hget(sessionId, "admuser");
-		Admuser adm =(Admuser)SerializeUtil.JsonToObj(userJson, Admuser.class);
-		int userid=adm.getId();
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+		int userid = adm.getId();
 		String loginName = adm.getAdmName();
-		String shipno=request.getParameter("shipno");
-		String barcode=request.getParameter("barcode");
-		String type=request.getParameter("type");
-		String goodsid=request.getParameter("goodsid");
-		String orderid=request.getParameter("orderid");
+		String shipno = request.getParameter("shipno");
+		String barcode = request.getParameter("barcode");
+		String type = request.getParameter("type");
+		String goodsid = request.getParameter("goodsid");
+		String orderid = request.getParameter("orderid");
 	%>
 	<script type="text/javascript">
-        var checked="0";
-        var _barcode="";
-        var flag="0";
-        $(function(){
-            loginName = '<%=loginName%>';
-            shipno='<%=shipno%>';
-            _barcode='<%=barcode%>';
-            orderid='<%=orderid%>';
-            goodsid='<%=goodsid%>';
-            type='<%=type%>';
-            if(shipno!=null && shipno!='undefind' && shipno!="0"){
-                $("#search").val(shipno);
-                if(type=="1"){
-                    checked="0";
-                    if(orderid!=null && orderid!='undefind' && orderid!="null"){
+		var checked = "0";
+		var _barcode = "";
+		var flag = "0";
+		$(function () {
+			loginName = '<%=loginName%>';
+			shipno = '<%=shipno%>';
+			_barcode = '<%=barcode%>';
+			orderid = '<%=orderid%>';
+			goodsid = '<%=goodsid%>';
+			type = '<%=type%>';
+			if (shipno != null && shipno != 'undefind' && shipno != "0") {
+				$("#search").val(shipno);
+				if (type == "1") {
+					checked = "0";
+					if (orderid != null && orderid != 'undefind' && orderid != "null") {
 						$.post("/cbtconsole/WebsiteServlet?action=insertTbInfo&className=ExpressTrackServlet",
-                            {
-                                orderid : orderid,
-                                goodid : goodsid
-                            }, function(res) {
-                                if(res=="0"){
-                                    alert("插入订单失败,不能关联入库");
-                                    return;
-                                }else{
-                                    $("#search").val(res);
-                                }
-                            });
-                    }
-                }else{
-                    checked="1";
-                }
-                document.getElementById('jsp_name').innerHTML= "验货页面--不可做入库操作";
-                document.getElementById('jsp_name').style.backgroundColor="chartreuse";
-                search();
-            }
-        })
+								{
+									orderid: orderid,
+									goodid: goodsid
+								}, function (res) {
+									if (res == "0") {
+										alert("插入订单失败,不能关联入库");
+										return;
+									} else {
+										$("#search").val(res);
+									}
+								});
+					}
+				} else {
+					checked = "1";
+				}
+				document.getElementById('jsp_name').innerHTML = "验货页面--不可做入库操作";
+				document.getElementById('jsp_name').style.backgroundColor = "chartreuse";
+				search();
+			}
+		})
 	</script>
 	<script type="text/javascript">
-        var state = 0;
-        var id_qty="0";
-        function queryRecord(odid){
-            id_qty="0";
-            var record=records.split(";");
-            for(var i=0;i<record.length;i++){
-                var id_id=record[i].split(",")[1];
-                if(id_id==odid){
-                    itemqty=record[i].split(",")[2];
-                    id_qty=itemqty;
-                }
-            }
-        }
+		var state = 0;
+		var id_qty = "0";
 
-        var tbinfo="";
-        var code="无";
-        var records="";
-        function getTaoBaoInfo(orderid){
-            $.ajaxSetup({
-                async: false
-            });
-            $.post("/cbtconsole/WebsiteServlet?action=getTaoBaoInfo&className=ExpressTrackServlet",{orderid : orderid},
-                function(res){
-                    tbinfo =eval(res);
-                    if(tbinfo.length>0){
-                        code=tbinfo[0].imgurl;
-                        records=tbinfo[0].records;
-                        if(checked=="1"){
-                            code=_barcode;
-                        }else if(code=="无"){
-                            code="请清空库位然后扫描入库";
-                        }
-                        $("#kwhid").val(code);
-                        $("#h_b8").val(code);
-                        $("#h_b7").val("1");
-                    }
-                }
-            );
-        }
+		function queryRecord(odid) {
+			id_qty = "0";
+			var record = records.split(";");
+			for (var i = 0; i < record.length; i++) {
+				var id_id = record[i].split(",")[1];
+				if (id_id == odid) {
+					itemqty = record[i].split(",")[2];
+					id_qty = itemqty;
+				}
+			}
+		}
 
-        var objimgwidth = 0;
-        var objimgheight = 0;
-        function AutoResizeImage(objImg){
-            if($(objImg).width() != objimgwidth*2){
-                objimgwidth = $(objImg).width()
-                objimgheight = $(objImg).height()
-                $(objImg).width(objimgwidth*2);
-                $(objImg).height(objimgheight*2);
-            }else{
-                $(objImg).width(objimgwidth);
-                $(objImg).height(objimgheight);
-            }
-        }
-        function show(){
+		var tbinfo = "";
+		var code = "无";
+		var records = "";
 
-            var shipno = $("#ship").html();
-            $.ajax({
-                type: "POST",
-                url: "/cbtconsole/order/getOdid",
-                data: {shipno: shipno},
-                dataType: "json",
-                success: function (msg) {
-                    document.getElementById("TheInspection").innerHTML='';
-                    var i=0;
-                    if(msg.length==0){
-                     alert("没有需要取消的")
-                        return;
-                    }else {
-                        $(msg).each(function (index, item) {
-                            $("#TheInspection").append("<br/>odid："+item + "&nbsp;&nbsp;<button id='msg'" + index + " onclick='retuOdid(" + item + ")'>取消验货</button>&nbsp;&nbsp;")
-                            i++;
-                            if (i == 3) {
-                                $("#TheInspection").append("<br/>")
-                                i = 0;
-                            }
-                        });
-                        var login = document.getElementById('login');
-                        var over = document.getElementById('over');
-                        login.style.display = "block";
-                        over.style.display = "block";
-                    }
-                }
-            });
-         // $("#TheInspection").css("display","")  ;
-        }
-        function Returngoods() {
-            var shipno = $("#ship").html();
-            $.ajax({
-                type: "POST",
-                url: "/cbtconsole/Look/getOrderByship",
-                data: {shipno: shipno},
-                dataType: "json",
-                success: function (msg) {
-                    if (msg.rows != null && msg.rows[0] != undefined) {
-                        var temHtml = '';
-                        $("#cuso").html("");
-                        $("#cuso").append(msg.rows[0].customerorder);
-                        $("#tbso").html("");
-                        $("#tbso").append(msg.rows[0].a1688Order);
-                        document.getElementById("tabl").innerHTML = '';
-                        $("#tabl").append("<tr ><td>选择</td><td>产品pid</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
-                        $(msg.rows).each(function (index, item) {
+		function getTaoBaoInfo(orderid) {
+			$.ajaxSetup({
+				async: false
+			});
+			$.post("/cbtconsole/WebsiteServlet?action=getTaoBaoInfo&className=ExpressTrackServlet", {orderid: orderid},
+					function (res) {
+						tbinfo = eval(res);
+						if (tbinfo.length > 0) {
+							code = tbinfo[0].imgurl;
+							records = tbinfo[0].records;
+							if (checked == "1") {
+								code = _barcode;
+							} else if (code == "无") {
+								code = "请清空库位然后扫描入库";
+							}
+							$("#kwhid").val(code);
+							$("#h_b8").val(code);
+							$("#h_b7").val("1");
+						}
+					}
+			);
+		}
 
-                            $("#tabl").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' name='" + item.item + "' id='c1' /></td><td><a href='https://www.importx.com/goodsinfo/122916001-121814002-1" + item.item + ".html' target='_blank' >" + item.item + "</a></td><td>" + item.sku + "</td><td>" + item.itemNumber + "</td><td>" + item.returnReason + "</td><td>" + item.changeShipno + "</td></tr>");
-                        });
-                        $('#user_remark .remark_list').html(temHtml);
-                        document.getElementById("user_remark").style.display = "";
-                    } else {
-                        alert("订单已全部退货")
-                        document.getElementById("user_remark").style.display = "none";
-                    }
+		var objimgwidth = 0;
+		var objimgheight = 0;
 
-                }
+		function AutoResizeImage(objImg) {
+			if ($(objImg).width() != objimgwidth * 2) {
+				objimgwidth = $(objImg).width()
+				objimgheight = $(objImg).height()
+				$(objImg).width(objimgwidth * 2);
+				$(objImg).height(objimgheight * 2);
+			} else {
+				$(objImg).width(objimgwidth);
+				$(objImg).height(objimgheight);
+			}
+		}
 
-            });
-        }
-        
-        function hide()
-        {
-            var login = document.getElementById('login');
-            var over = document.getElementById('over');
-            login.style.display = "none";
-            over.style.display = "none";
-        }
-        function retuOdid(id)
-        {
-            $.ajax({
-                type: "POST",
-                url: "/cbtconsole/order/updataChecked",
-                data: {id: id},
-                dataType: "json",
-                success: function (msg) {
-                    if(msg==0){
-                        alert("取消验货失败")
-                        return;
-                    }else {
-                        alert("取消验货成功")
-                        window.location.reload();
-                    }
-                }
-            });
+		function show() {
 
-                }
-        function FncloseOut(){
-            document.getElementById("user_remark").style.display = "none";
-            var or = document.all("otherReason");
-            for(var i=0;i<or.length;i++){
-                or[i].value="";
-            }
-        }
-        function addUserRemark() {
-            var cusOrder = $('#cuso').text();
-            var tbOrder = $('#tbso').text();
-            var der = $("#retu").val();
-            var g = "";
-            $("#tabl tr").each(function () {
+			var shipno = $("#ship").html();
+			$.ajax({
+				type: "POST",
+				url: "/cbtconsole/order/getOdid",
+				data: {shipno: shipno},
+				dataType: "json",
+				success: function (msg) {
+					document.getElementById("TheInspection").innerHTML = '';
+					var i = 0;
+					if (msg.length == 0) {
+						alert("没有需要取消的")
+						return;
+					} else {
+						$(msg).each(function (index, item) {
+							$("#TheInspection").append("<br/>odid：" + item + "&nbsp;&nbsp;<button id='msg'" + index + " onclick='retuOdid(" + item + ")'>取消验货</button>&nbsp;&nbsp;")
+							i++;
+							if (i == 3) {
+								$("#TheInspection").append("<br/>")
+								i = 0;
+							}
+						});
+						var login = document.getElementById('login');
+						var over = document.getElementById('over');
+						login.style.display = "block";
+						over.style.display = "block";
+					}
+				}
+			});
+			// $("#TheInspection").css("display","")  ;
+		}
+		function Returngoods() {
+			var shipno = $("#ship").html();
+			$.ajax({
+				type: "POST",
+				url: "/cbtconsole/Look/getOrderByship",
+				data: {shipno: shipno},
+				dataType: "json",
+				success: function (msg) {
+					if (msg.rows != null && msg.rows[0] != undefined) {
+						var temHtml = '';
+						$("#cuso").html("");
+						$("#cuso").append(msg.rows[0].customerorder);
+						$("#tbso").html("");
+						$("#tbso").append(msg.rows[0].a1688Order);
+						document.getElementById("tabl").innerHTML = '';
+						$("#tabl").append("<tr ><td>选择</td><td>产品pid</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
+						$(msg.rows).each(function (index, item) {
 
-                $(this).find('input').each(function () {
-                    var value = $(this).val();
-                    g += value + ",";
+							$("#tabl").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' name='" + item.item + "' id='c1' /></td><td><a href='https://www.importx.com/goodsinfo/122916001-121814002-1" + item.item + ".html' target='_blank' >" + item.item + "</a></td><td>" + item.sku + "</td><td>" + item.itemNumber + "</td><td>" + item.returnReason + "</td><td>" + item.changeShipno + "</td></tr>");
+						});
+						$('#user_remark .remark_list').html(temHtml);
+						document.getElementById("user_remark").style.display = "";
+					} else {
+						alert("订单已全部退货")
+						document.getElementById("user_remark").style.display = "none";
+					}
 
-                });
-            });
-            g += tbOrder + ",";
-            g += cusOrder;
+				}
 
-            $.post("/cbtconsole/Look/AddAllOrder", {
-                cusOrder: g
-            }, function (res) {
-                if (res.rows == 1) {
-                    alert('退货成功');
-                    $("#th" + cusOrder).html("");
-                    $("#th" + cusOrder).append("最后退货时间" + res.footer);
-                } else if (res.rows == 0) {
-                    alert('不可重复退单');
-                } else if (res.rows == 2) {
-                    alert('请勾选要退的商品');
-                } else if (res.rows == 3) {
-                    alert('请填写数据');
-                }
-                else if (res.rows == 4) {
-                    alert('退货数量不能大于可退数量');
-                } else if (res.rows == 5) {
-                    alert('该商品已全部退货');
-                    getItem();
-                }
-                Returngoods();
-            });
-        }
-        function AddOll() {
-            var tbOrder = this.$("#select_id option:selected").val();
-            var cusorder = $('#cuso').text();
-            //alert(cusorder)
-            var returnNO = $("input[name='radioname']checked").val();
-            var isAutoSend = document.getElementsByName('radioname');
-            for (var i = 0; i < isAutoSend.length; i++) {
-                if (isAutoSend[i].checked == true) {
-                    returnNO = isAutoSend[i].value;
-                }
-            }
-            //alert(returnNO)
-            $.post("/cbtconsole/Look/AddRetAllOrder", {
-                cusorder: cusorder, tbOrder: tbOrder, returnNO: returnNO
-            }, function (res) {
-                if (res.rows == 1) {
-                    alert('退货成功');
-                    $("#th" + cusorder).html("");
-                    $("#th" + cusorder).append("最后退货时间" + res.footer);
-                } else {
-                    alert('不可重复退单');
-                }
+			});
+		}
 
-                getItem();
-            });
-        }
+		function hide() {
+			var login = document.getElementById('login');
+			var over = document.getElementById('over');
+			login.style.display = "none";
+			over.style.display = "none";
+		}
+
+		function retuOdid(id) {
+			$.ajax({
+				type: "POST",
+				url: "/cbtconsole/order/updataChecked",
+				data: {id: id},
+				dataType: "json",
+				success: function (msg) {
+					if (msg == 0) {
+						alert("取消验货失败")
+						return;
+					} else {
+						alert("取消验货成功")
+						window.location.reload();
+					}
+				}
+			});
+
+		}
+
+		function FncloseOut() {
+			document.getElementById("user_remark").style.display = "none";
+			var or = document.all("otherReason");
+			for (var i = 0; i < or.length; i++) {
+				or[i].value = "";
+			}
+		}
+
+		function addUserRemark() {
+			var cusOrder = $('#cuso').text();
+			var tbOrder = $('#tbso').text();
+			var der = $("#retu").val();
+			var g = "";
+			$("#tabl tr").each(function () {
+
+				$(this).find('input').each(function () {
+					var value = $(this).val();
+					g += value + ",";
+
+				});
+			});
+			g += tbOrder + ",";
+			g += cusOrder;
+
+			$.post("/cbtconsole/Look/AddAllOrder", {
+				cusOrder: g
+			}, function (res) {
+				if (res.rows == 1) {
+					alert('退货成功');
+					$("#th" + cusOrder).html("");
+					$("#th" + cusOrder).append("最后退货时间" + res.footer);
+				} else if (res.rows == 0) {
+					alert('不可重复退单');
+				} else if (res.rows == 2) {
+					alert('请勾选要退的商品');
+				} else if (res.rows == 3) {
+					alert('请填写数据');
+				} else if (res.rows == 4) {
+					alert('退货数量不能大于可退数量');
+				} else if (res.rows == 5) {
+					alert('该商品已全部退货');
+					getItem();
+				}
+				Returngoods();
+			});
+		}
+
+		function AddOll() {
+			var tbOrder = this.$("#select_id option:selected").val();
+			var cusorder = $('#cuso').text();
+			//alert(cusorder)
+			var returnNO = $("input[name='radioname']checked").val();
+			var isAutoSend = document.getElementsByName('radioname');
+			for (var i = 0; i < isAutoSend.length; i++) {
+				if (isAutoSend[i].checked == true) {
+					returnNO = isAutoSend[i].value;
+				}
+			}
+			//alert(returnNO)
+			$.post("/cbtconsole/Look/AddRetAllOrder", {
+				cusorder: cusorder, tbOrder: tbOrder, returnNO: returnNO
+			}, function (res) {
+				if (res.rows == 1) {
+					alert('退货成功');
+					$("#th" + cusorder).html("");
+					$("#th" + cusorder).append("最后退货时间" + res.footer);
+				} else {
+					alert('不可重复退单');
+				}
+
+				getItem();
+			});
+		}
 
 	</script>
 </head>
@@ -556,7 +732,7 @@
 	</div>
 	<div style="margin:20px 0 20px 40px;">
 		<input class="but_color" type="button" value="提交申请" onclick="addUserRemark()">
-		   <%--部分退单选择此按钮，全单退可以使用下方按钮--%>
+		<%--部分退单选择此按钮，全单退可以使用下方按钮--%>
 	</div>
 </div>
 
@@ -601,32 +777,35 @@
 	<jsp:include page="message_notification.jsp"></jsp:include>
 	<%}  %>
 
-	<div id="take_photo" >
-		<video id="video" width="400px" height="400px" autoplay="autoplay"></video><br>
+	<div id="take_photo">
+		<video id="video" width="400px" height="400px" autoplay="autoplay"></video>
+		<br>
 		<canvas id="canvas" width="400px" height="400px"></canvas>
 	</div>
 	<br>
 	<!-- 扫描框开始 -->
 	<div id="scanning_frame">
-		<span id="jsp_name" style="background-color:red;font-size:30px;">入库扫描页面--不可做验货操作</span><br><h3 style="color:bisque;padding:10px 20px;background:#f5f5f5;color:#f40">扫描框</h3><br>
+		<span id="jsp_name" style="background-color:red;font-size:30px;">入库扫描页面--不可做验货操作</span><br>
+		<h3 style="color:bisque;padding:10px 20px;background:#f5f5f5;color:#f40">扫描框</h3><br>
 		请输入快递跟踪号：
-		<input type="text" id="search" onFocus="celsearch()"  onkeypress="if (event.keyCode == 13) search()" >
+		<input type="text" id="search" onFocus="celsearch()" onkeypress="if (event.keyCode == 13) search()">
 
 		库位条形码：
-		<input type="text" id="kwhid" onFocus="celkwhid()" readonly="readonly" onkeypress="if (event.keyCode == 13) getPosition()"/>
+		<input type="text" id="kwhid" onFocus="celkwhid()" readonly="readonly"
+			   onkeypress="if (event.keyCode == 13) getPosition()"/>
 
-		<a href="../website/purchase_order_details.jsp"  target="_Blank">未按时入库订单列表</a>
+		<a href="../website/purchase_order_details.jsp" target="_Blank">未按时入库订单列表</a>
 
-        <a href="javascript:show()" style="color: red; font-size:30px;">验货取消</a>
-        <a href="javascript:Returngoods()" style="color: red; font-size:30px;">发起退货</a>
+		<a href="javascript:show()" style="color: red; font-size:30px;">验货取消</a>
+		<a href="javascript:Returngoods()" style="color: red; font-size:30px;">发起退货</a>
 		&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:matchSourcingOrder()" style="color: red; font-size:30px;">Sourcing订单匹配sku</a>
-        <div id="login" >
-            <a class="aright" href="javascript:hide()" style="color: red; font-size:30px;" >关闭</a>
-            <div id="TheInspection" ></div>
-        </div>
-        <div id="over"></div>
+		<div id="login">
+			<a class="aright" href="javascript:hide()" style="color: red; font-size:30px;">关闭</a>
+			<div id="TheInspection"></div>
+		</div>
+		<div id="over"></div>
 
-		<h2 id="ydid"  style="clear:both;"></h2>
+		<h2 id="ydid" style="clear:both;"></h2>
 		<h2 id="positionid"></h2>
 		<input type="hidden" id="tborderid" value=""/>
 		<input type="hidden" id="shipno" value=""/>
@@ -749,7 +928,7 @@
 			<tbody>
 			</tbody>
 		</table>
-		
+
 	</div>
 	<!-- 质检-->
 	<div id="div_clothing" style="display: none;">
@@ -1140,14 +1319,13 @@
 
 
 				</tbody>
-</table>
+			</table>
+
+		</div>
+	</div>
+
 
 </div>
-</div>
-
-
-</div>
-
 
 
 </body>
