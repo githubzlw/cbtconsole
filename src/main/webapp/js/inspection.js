@@ -681,7 +681,7 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
         $(isok).css("background", "red");
         $("#status" + odid).css("color", "red");
         $("#status" + odid).html("已验货");
-        $("#" + orderid + "record_" + odid).html(count);
+        $("#" + orderid + "record_" + odid).html((Number(count) + Number(record_)));
         var cureUserId = $("#user_id").val();
 
         if (isDropshipOrder == 3) {
