@@ -600,7 +600,8 @@ public class ProductBatchController {
                 // 更新Mongo
                 customGoodsPublishes.parallelStream().forEach(e -> {
                     try {
-                        customGoodsService.publish(e);
+                        CustomGoodsPublish goodsPublish = customGoodsService.queryGoodsDetails(e.getPid(), 0);
+                        customGoodsService.publish(goodsPublish);
                     } catch (Exception e1) {
                         e1.printStackTrace();
                         logger.error("pid:[" + e.getPid() + "],publish error:", e1);

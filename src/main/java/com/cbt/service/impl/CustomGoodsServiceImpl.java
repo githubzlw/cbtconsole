@@ -101,6 +101,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int publish(CustomGoodsPublish bean) {
 
+        System.err.println("----------pid:" + bean.getPid() + ",publish begin---------");
         //如果存在range_price,则更新sku数据
         if (StringUtils.isNotBlank(bean.getRangePrice())) {
             //sku更新
