@@ -50,6 +50,14 @@
         <result column="weight_flag" property="weightFlag"/>
         <result column="matchSource" property="matchSource"/>
 
+        <result column="sellunit" property="sellUnit"/>
+        <result column="volume_weight" property="volumeWeight"/>
+        <result column="wholesale_price" property="wholesalePrice"/>
+        <result column="wprice" property="wprice"/>
+        <result column="free_price_new" property="free_price_new"/>
+        <result column="sku_new" property="sku_new"/>
+        <result column="morder" property="morder"/>
+
     </resultMap>
 
 
@@ -130,15 +138,7 @@
         <result column="path_catid" property="pathCatid"/>
         <result column="searchable" property="searchable"/>
         <result column="free_price_new" property="free_price_new"/>
-        <result column="range_price_free_new" property="range_price_free_new"/>
         <result column="sku_new" property="sku_new"/>
-        <result column="morder" property="morder"/>
-        <result column="price_import" property="price_import"/>
-        <result column="price_kids" property="price_kids"/>
-        <result column="price_pets" property="price_pets"/>
-        <result column="img_check" property="img_check"/>
-        <result column="entype_new" property="entypeNew"/>
-        <result column="brand_name" property="brand_name"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -445,12 +445,12 @@
         ifnull(adu.id,0) as admin_id,ifnull(cge.is_edited,0) as is_edited,cbu.is_sold_flag,cbu.weight,
         cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
         ifnull(cge.click_num,0) as click_num,
-        ifnull(cbc.complain_id,'') as complain_id,
+        ifnull(cbc.complain_id,'') as complain_id,cbu.sellunit,cbu.volume_weight,cbu.wholesale_price,cbu.wprice,
+        cbu.free_price_new,cbu.sku_new,cbu.morder,
         (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount
         from custom_benchmark_ready cbu
         <if test="catid !=null">
-            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 =
-            ct.category_id
+            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 = ct.category_id
         </if>
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid
@@ -602,7 +602,7 @@
             and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
         <if test="webSize > 0">
-            and cbu.catid1 in (select category_id from 1688_category ct,search_special ss
+            and cbu.catid1 in (select category_id from  1688_category ct,search_special ss
             where FIND_IN_SET(ss.catid,ct.path) and (ss.type = #{webSize}))
         </if>
         <if test="searchAble > 0">
@@ -630,8 +630,7 @@
     <select id="queryForListByParamCount" parameterType="com.cbt.bean.CustomGoodsQuery" resultType="java.lang.Integer">
         select count(0) from custom_benchmark_ready cbu
         <if test="catid !=null">
-            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 =
-            ct.category_id
+            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 = ct.category_id
         </if>
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -778,7 +777,7 @@
             and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
         <if test="webSize > 0">
-            and cbu.catid1 in (select category_id from 1688_category ct,search_special ss
+            and cbu.catid1 in (select category_id from  1688_category ct,search_special ss
             where FIND_IN_SET(ss.catid,ct.path) and (ss.type = #{webSize}))
         </if>
         <if test="searchAble > 0">
@@ -792,8 +791,7 @@
         path,lv from 1688_category where lv > 0) cat1688 left join
         (select catid1,count(0) as total from custom_benchmark_ready cbu
         <if test="catid !=null">
-            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 =
-            ct.category_id
+            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 = ct.category_id
         </if>
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -934,7 +932,7 @@
             and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
         <if test="webSize > 0">
-            and cbu.catid1 in (select category_id from 1688_category ct,search_special ss
+            and cbu.catid1 in (select category_id from  1688_category ct,search_special ss
             where FIND_IN_SET(ss.catid,ct.path) and (ss.type = #{webSize}))
         </if>
         <if test="searchAble > 0">
@@ -951,7 +949,7 @@
         cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,cbu.weight_flag,cbu.path_catid,
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.volume_weight,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
-        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,cbu.weight,cbu.img_check,
+        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,cbu.weight,
         ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,cbu.promotion_flag,cbu.fprice_str,cbu.searchable,
         ifnull(cbn.ocrcontent1,'') as ocrSizeInfo1,ifnull(cbn.ocrcontent2,'') as ocrSizeInfo2,ifnull(cbn.ocrcontent3,'') as ocrSizeInfo3,
         cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
@@ -960,8 +958,7 @@
         ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason,ifnull(cge.weight_flag,0) as weight_flag,
         ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num,
         ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag,
-        ifnull(pts.sort,-1) as topSort, cbu.free_price_new,cbu.range_price_free_new,cbu.sku_new,
-        cbu.price_import, cbu.price_kids,cbu.price_pets, cbu.morder, cbu.entype_new, cbu.brand_name
+        ifnull(pts.sort,-1) as topSort, cbu.free_price_new, cbu.sku_new
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -981,7 +978,7 @@
         review_flag=#{map.update_flag},updatetime=now() where id = #{map.id}
     </update>
     <select id="queryCustomGoodsByLimit" resultMap="goodsParseResultMap">
-        select pid,ali_pid,ali_price,weight,wholesale_price,ali_weight,enInfo,remotpath,catid1,matchSource
+        select pid,ali_pid,ali_price,weight,wholesale_price,ali_weight,enInfo,remotpath,catid1
         from custom_benchmark_ready
         where id &gt; #{minId} and id &lt;= #{maxId}
     </select>
@@ -1037,10 +1034,10 @@
             ,b.range_price=#{rangePrice},b.sku=#{sku}
         </if>
         <if test="feeprice != null">
-            ,b.price=#{price},b.free_price_new=#{feeprice},price_import=#{price},price_kids=#{price},price_pets=#{price}
+            ,b.price=#{price},b.feeprice=#{feeprice},b.range_price=#{rangePrice}
         </if>
         <if test="wprice != null">
-            ,b.price=#{price},b.wprice=#{wprice}
+            ,b.price=#{price},b.wprice=#{wprice},b.range_price=#{rangePrice}
         </if>
         <if test="type != null">
             ,b.entype=#{type}
@@ -1053,15 +1050,6 @@
         </if>
         <if test="customMainImage != null">
             ,b.custom_main_image=#{customMainImage}
-        </if>
-        <if test="morder != null">
-            ,b.morder=#{morder}
-        </if>
-        <if test="entypeNew != null">
-            ,b.entype_new=#{entypeNew}
-        </if>
-        <if test="brand_name != null">
-            ,b.brand_name=#{brand_name}
         </if>
         where a.pid = b.pid and b.pid = #{pid}
     </update>
@@ -1191,10 +1179,13 @@
 
     <select id="queryGoodsByPidList" parameterType="java.util.ArrayList" resultMap="queryGoodsResultMap">
         select
-        cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
+        cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,cbu.shop_id,
         cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,cbu.final_weight,cbu.max_price,
         cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,cbu.eninfo,
-        cbu.matchSource
+        cbu.matchSource,
+        cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,cbu.eninfo,
+        cbu.sellunit,cbu.volume_weight,cbu.wholesale_price,cbu.wprice,
+        cbu.free_price_new,cbu.sku_new,cbu.morder
         from custom_benchmark_ready cbu
         where 1=1 and pid in
         <foreach collection="pidList" index="index" item="item" open="(" separator="," close=")">
@@ -1286,8 +1277,7 @@
         </if>
     </select>
 
-    <select id="queryMd5NoSameListCount" resultType="java.lang.Integer"
-            parameterType="com.importExpress.pojo.ShopMd5Bean">
+    <select id="queryMd5NoSameListCount" resultType="java.lang.Integer" parameterType="com.importExpress.pojo.ShopMd5Bean">
         select count(0)
         from custom_goods_md5_no_same
         where 1=1
@@ -1323,16 +1313,7 @@
 
     <update id="updateSkuInfo">
         update custom_benchmark_ready
-        set sku = #{sku},is_add_car_flag = 1,sku_new = #{sku}
-        <if test="rangePrice != null">
-            ,range_price = #{rangePrice}
-        </if>
-        <if test="rangePriceFree != null">
-            ,range_price_free_new = #{rangePriceFree}
-        </if>
-        <if test="minPrice > 0">
-            ,price_import = #{minPrice},price_kids = #{minPrice},price_pets = #{minPrice}
-        </if>
+        set  sku = #{sku},is_add_car_flag = 1,sku_new = #{sku}
         where pid = #{pid}
     </update>
 
@@ -1368,21 +1349,20 @@
         AND u.is_test=0
         AND (
         u.email not like '%qq.com%' and u.email not like '%ww.com%' and
-        u.email not like 'test%' and u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
-        u.email not like '%qqsss.com' and u.email not like '%csmfg.com%' and u.email not like '%@sourcing-cn.com%' and
-        u.email not like '%@china-synergy%' and u.email&lt;>'sb33@gmail.com' and u.email&lt;>'sbtest@gmail.com' and
-        u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not like
-        '%@163.com'
+        u.email not like 'test%'   and  u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
+        u.email not like '%qqsss.com' and  u.email not like '%csmfg.com%'  and  u.email not like '%@sourcing-cn.com%'  and
+        u.email not like '%@china-synergy%'  and u.email&lt;>'sb33@gmail.com'  and u.email&lt;>'sbtest@gmail.com'  and
+        u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not like '%@163.com'
         )
         AND od.goods_pid IN (
         cbu.pid
         )
-        ) AS 'is_sold_flag' -- 商品销售次数
+        ) AS 'is_sold_flag'  -- 商品销售次数
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         <where>
             <if test="shopId == null and source == 1">
-                <if test="isEdited > -1">-- 商品已编辑
+                <if test="isEdited > -1">  -- 商品已编辑
                     cge.is_edited = #{isEdited}
                 </if>
                 <if test="valid != -1">
@@ -1411,7 +1391,7 @@
                     cbu.valid = #{valid} and
                 </if>
                 cbu.pid in(
-                SELECT pid FROM custom_benchmark_show WHERE source = #{source}
+                    SELECT pid FROM custom_benchmark_show WHERE source = #{source}
                 )
             </if>
         </where>
@@ -1427,7 +1407,7 @@
         left join custom_goods_edit cge on cbu.pid = cge.pid
         <where>
             <if test="shopId == null and source == 1">
-                <if test="isEdited > -1">-- 商品已编辑
+                <if test="isEdited > -1">  -- 商品已编辑
                     cge.is_edited = #{isEdited}
                 </if>
                 <if test="valid != -1">
@@ -1456,7 +1436,7 @@
                     cbu.valid = #{valid} and
                 </if>
                 cbu.pid in(
-                SELECT pid FROM custom_benchmark_show WHERE source = #{source}
+                    SELECT pid FROM custom_benchmark_show WHERE source = #{source}
                 )
             </if>
         </where>
@@ -1562,13 +1542,10 @@
 
     <select id="queryGoodsWeightChangeList" parameterType="com.importExpress.pojo.GoodsWeightChange"
             resultType="com.importExpress.pojo.GoodsWeightChange">
-        select a.id,a.pid,a.goods_type as goodsType,a.weight,a.volume_weight as volumeWeight,a.admin_id as
-        adminId,a.skuid,
+        select a.id,a.pid,a.goods_type as goodsType,a.weight,a.volume_weight as volumeWeight,a.admin_id as adminId,a.skuid,
         b.admName as adminName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as createTime,a.sync_flag as syncFlag,
-        a.update_admin_id as updateAdminId,c.admName as updateAdminName, DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S')
-        as updateTime
-        from goods_weight_change a left join admuser b on a.admin_id = b.id left join admuser c on a.update_admin_id =
-        c.id
+        a.update_admin_id as updateAdminId,c.admName as updateAdminName, DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as updateTime
+        from goods_weight_change a left join admuser b  on a.admin_id = b.id left join admuser c  on a.update_admin_id = c.id
         where 1=1
         <if test="pid !=null">
             and a.pid = #{pid}
@@ -1588,10 +1565,9 @@
         </if>
     </select>
 
-    <select id="queryGoodsWeightChangeListCount" parameterType="com.importExpress.pojo.GoodsWeightChange"
-            resultType="int">
-        select count(0) from goods_weight_change a left join admuser b on a.admin_id = b.id
-        left join admuser c on a.update_admin_id = c.id
+    <select id="queryGoodsWeightChangeListCount" parameterType="com.importExpress.pojo.GoodsWeightChange" resultType="int">
+        select count(0) from goods_weight_change a left join admuser b  on a.admin_id = b.id
+        left join admuser c  on a.update_admin_id = c.id
         where 1=1
         <if test="pid !=null">
             and a.pid = #{pid}
@@ -1653,7 +1629,7 @@
         cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
         ifnull(cge.click_num,0) as click_num,
         ifnull(cbc.complain_id,'') as complain_id,ifnull(cge.price_1688,'') as price_1688,ifnull(cge.weight_check,'') as weight_check,
-        (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount, cbu.brand_name
+        (select count(0) from goods_review where goods_pid = cbu.pid) as reviewCount
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid
@@ -1718,7 +1694,7 @@
         </if>
     </select>
 
-    <select id="queryGoodsDeleteDetails" resultMap="queryGoodsResultMap">
+    <select id="queryGoodsDeleteDetails"  resultMap="queryGoodsResultMap">
         select id,catid1,pid,custom_main_image,img,name,enname,eninfo,remotpath,valid,localpath,catid1,shop_id
         from custom_benchmark_ready_delete_log where delete_flag = 0 and pid = #{pid}
     </select>
@@ -1782,12 +1758,6 @@ select id,catid1,path_catid,pid,price,wprice,custom_main_image,img,weight,feepri
 from custom_benchmark_ready where pid = #{pid}
     </select>
 
-    <insert id="insertB2cPriceLog" parameterType="com.cbt.bean.CustomGoodsPublish">
-        insert into custom_b2c_price_log(pid,wprice,free_price_new,range_price_free_new,price_import,morder,admin_id,sku_new)
-        select pid,wprice,free_price_new,range_price_free_new,price_import,morder,#{adminId} as admin_id,sku_new from
-        custom_benchmark_ready where pid = #{pid}
-    </insert>
-
     <update id="setNoUpdatePrice" parameterType="com.cbt.bean.CustomGoodsPublish">
         update custom_benchmark_ready
         set matchSource = #{matchSource}, img_check = #{img_check}, sku_new = #{sku_new},
@@ -1795,11 +1765,6 @@ from custom_benchmark_ready where pid = #{pid}
         wprice = #{wprice},price_kids= #{price_kids},price_import= #{price_kids},price_pets= #{price_kids}
         where pid = #{pid}
     </update>
-
-    <select id="selectB2cPriceLog" resultType="com.cbt.bean.CustomGoodsPublish">
-        select pid,wprice,sku_new,free_price_new,range_price_free_new,price_import,morder
-        from custom_b2c_price_log where pid = #{pid} order by create_time desc limit 1
-    </select>
 
     <select id="queryNewPid" resultType="java.lang.Integer">
         select pidIndex
@@ -1950,7 +1915,8 @@ from custom_benchmark_ready where pid = #{pid}
         </if>
         ,final_weight,volume_weight
         )
-        select catid1,path_catid,pid,enname,img,endetail,eninfo,goodsstate,admin_id,bm_flag,fprice_str,size_info_en,entype
+        select
+        catid1,path_catid,pid,enname,img,endetail,eninfo,goodsstate,admin_id,bm_flag,fprice_str,size_info_en,entype
         <if test="rangePrice != null">
             ,range_price,sku
         </if>
@@ -1997,5 +1963,38 @@ from custom_benchmark_ready where pid = #{pid}
         </set>
         where pid = #{pid}
     </update>
+
+    <update id="batchUpdatePriceAndWeight" parameterType="java.util.List">
+        <foreach collection="list" item="gd" separator=";">
+            update custom_benchmark_ready set sku_new = #{gd.sku_new},wprice = #{gd.wprice},free_price_new = #{gd.free_price_new},
+            final_weight = #{gd.finalWeight},volume_weight = #{gd.volumeWeight},sellunit = #{gd.sellUnit},morder = #{gd.morder},
+            range_price = #{gd.rangePrice},range_price_free_new = #{gd.range_price_free_new},enname =#{gd.enname},goodsstate = 5
+            where pid =  #{gd.pid}
+        </foreach>
+    </update>
+
+    <select id="queryPidSingleBean" resultType="com.cbt.bean.ProductSingleBean">
+        select matchSource,pid,morder,wprice,range_price,free_price_new,range_price_free_new,sku_new,price_import,price_kids,price_pets
+from custom_benchmark_ready where pid = #{pid}
+    </select>
+
+    <insert id="insertB2cPriceLog" parameterType="com.cbt.bean.CustomGoodsPublish">
+        insert into custom_b2c_price_log(pid,wprice,free_price_new,range_price_free_new,price_import,morder,admin_id,sku_new)
+        select pid,wprice,free_price_new,range_price_free_new,price_import,morder,#{adminId} as admin_id,sku_new from
+        custom_benchmark_ready where pid = #{pid}
+    </insert>
+
+    <update id="setNoUpdatePrice" parameterType="com.cbt.bean.CustomGoodsPublish">
+        update custom_benchmark_ready
+        set matchSource = #{matchSource}, img_check = #{img_check}, sku_new = #{sku_new},
+        morder = #{morder},free_price_new = #{free_price_new},range_price_free_new = #{range_price_free_new},
+        wprice = #{wprice},price_kids= #{price_kids},price_import= #{price_kids},price_pets= #{price_kids}
+        where pid = #{pid}
+    </update>
+
+    <select id="selectB2cPriceLog" resultType="com.cbt.bean.CustomGoodsPublish">
+        select pid,wprice,sku_new,free_price_new,range_price_free_new,price_import,morder
+        from custom_b2c_price_log where pid = #{pid} order by create_time desc limit 1
+    </select>
 
 </mapper>

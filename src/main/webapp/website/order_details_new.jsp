@@ -305,48 +305,6 @@
         }
 
 
-        function Down_sample(orderno, email, paytime) {
-            alert(orderno)
-            if(orderno == null || orderno == ""){
-                alert('获取订单号失败');
-                return ;
-            }
-            var s=0;
-            var orderDetail=${orderDetail};
-            var OrderMap = new Array();
-            $('input:checkbox[name=Split_open]').each(function(k) {
-                if ($(this).is(':checked')) {
-                    alert(k)
-                    var arr=$("#Split_openNum"+orderDetail[k].id);
-                    if (arr>orderDetail[k].yourorder){
-                        alert("你输入的拆单数量不能大于订单数量")
-                        return
-                    }
-                    var yourorder=orderDetail[k].yourorder-arr;
-                    OrderMap.push({id:orderDetail[k].id,userid:orderDetail[k].userid,goodsid:orderDetail[k].goodsid,goodsname:orderDetail[k].goodsname,orderid:orderDetail[k].orderid
-                        ,delivery_time:orderDetail[k].delivery_time,checkprice_fee:orderDetail[k].checkprice_fee,checkproduct_fee:orderDetail[k].checkproduct_fee,state:orderDetail[k].state,
-                        fileupload:orderDetail[k].fileupload, yourorder:yourorder,goodsprice:orderDetail[k].goodsprice,freight:orderDetail[k].freight,downSample:arr})
-                }
-            })
-            $.ajax({
-                type:"post",
-                url:"/cbtconsole/orderSplit/DownSample",
-                dataType:"json",
-                contentType : 'application/json;charset=utf-8',
-                data:JSON.stringify(OrderMap),
-                success:function(res){
-                    alert(res)
-                    if(res==0){
-                        alert("删除失败  !")
-                        return;
-                    }else{
-                        alert("删除成功 !");
-                        // window.location.reload();
-                    }
-                }
-
-            })
-        }
     </script>
 
     <link type="text/css" rel="stylesheet"

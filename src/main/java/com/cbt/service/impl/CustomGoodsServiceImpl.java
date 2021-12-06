@@ -36,8 +36,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     private static final Log logger = LogFactory.getLog(CustomGoodsServiceImpl.class);
 
-    //private static final String CHECK_PID_EXISTS_URL = "http://52.34.56.133:15793/mongo/get?pid=";
-    private static final String CHECK_PID_EXISTS_URL = "http://192.168.1.153:27017/mongo/get?pid=";
+    private static final String CHECK_PID_EXISTS_URL = "http://52.34.56.133:15793/mongo/get?pid=";
+    //private static final String CHECK_PID_EXISTS_URL = "http://192.168.1.153:27017/mongo/get?pid=";
 
     private static final String DELETE_STATIC_URL = "http://192.168.1.31:9090/productStatic/deleteFileWithPid/";
 
@@ -151,7 +151,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 customGoodsDao.publishTo28(bean);
             }
 
-            if (bean.getValid() == 0 || bean.getValid() == 2) {
+            if(bean.getValid() == 0 || bean.getValid() == 2){
                 //更新SkuGoodsOffers和SingleOffersChild信息
                 int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
                 if (count > 0) {
@@ -1210,6 +1210,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int updateEntypeSkuByPid(CustomGoodsPublish cgp) {
         return customGoodsMapper.updateEntypeSkuByPid(cgp);
+    }
+
+    @Override
+    public int batchUpdatePriceAndWeight(List<CustomGoodsPublish> list) {
+        return customGoodsMapper.batchUpdatePriceAndWeight(list);
     }
 
 }

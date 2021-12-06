@@ -1,6 +1,7 @@
 package com.importExpress.utli;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import okhttp3.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -295,6 +296,79 @@ public class OKHttpUtils {
         }
     }
 
+
+
+    /**
+     * Post调用
+     *
+     * @param url
+     * @param params
+     * @return
+     * @throws IOException
+     */
+    public JSONObject postURL(String url, Map<String, String> params) throws IOException {
+
+        // Create okhttp3 form body builder.
+        FormBody.Builder bodyBuilder = new FormBody.Builder();
+
+        // Add form parameters
+        params.forEach((k, v) -> {
+            if (v != null) bodyBuilder.add(k, v);
+        });
+
+        // Build form body.
+        FormBody body = bodyBuilder.build();
+
+        // Create a http request object.
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        return executeCall(url, request);
+    }
+
+
+    /**
+     * call url by retry times
+     *
+     * @param url
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    private JSONObject executeCall(String url, Request request) throws IOException {
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+        } catch (IOException ioe) {
+            //重试15次（每次1秒）
+            try {
+                int count = 0;
+                while (true) {
+                    Thread.sleep(1500);
+                    try {
+                        response = client.newCall(request).execute();
+                    } catch (IOException e) {
+                        //log.warn("do retry ,times=[{}]",count);
+                    }
+                    if (count > 5) {
+                        break;
+                    }
+                    ++count;
+                }
+            } catch (InterruptedException e) {
+            }
+        }
+
+        if (response == null || !response.isSuccessful()) {
+            //log.error("url:[{}]", url);
+            throw new IOException("call url is not successful");
+        }
+
+        return response.body() != null ?
+                JSON.parseObject(response.body().string()) : null;
+    }
 
     private void checkAndInitOkHttp() {
         total++;

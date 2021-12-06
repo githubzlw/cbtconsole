@@ -1071,4 +1071,6 @@ public interface CustomGoodsService {
 
     int updateEntypeSkuByPid(CustomGoodsPublish cgp);
 
+    int batchUpdatePriceAndWeight(List<CustomGoodsPublish> list);
+
 }
