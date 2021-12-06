@@ -598,7 +598,14 @@ public class ProductBatchController {
                 customGoodsService.batchUpdatePriceAndWeight(customGoodsPublishes);
 
                 // 更新Mongo
-                //customGoodsPublishes.forEach(e -> customGoodsService.publish(e));
+                customGoodsPublishes.parallelStream().forEach(e -> {
+                    try {
+                        customGoodsService.publish(e);
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                        logger.error("pid:[" + e.getPid() + "],publish error:", e1);
+                    }
+                });
                 collect.clear();
                 customGoodsPublishes.clear();
 
