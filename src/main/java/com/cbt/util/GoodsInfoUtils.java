@@ -32,7 +32,7 @@ public class GoodsInfoUtils {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsInfoUtils.class);
 
     // 美元汇率
-    public static final double EXCHANGE_RATE = 6.5;
+    public static final double EXCHANGE_RATE = 6.3;
 
     public static final String SERVICE_LOCAL_IMPORT_PATH = "/data";
     public static final String SERVICE_SHOW_IMPORT_URL_1 = "http://img.import-express.com";
