@@ -119,7 +119,7 @@ public class OKHttpUtils {
     /**
      * Get请求
      *
-     * @param url      请求链接
+     * @param url 请求链接
      * @return
      * @throws IOException
      */

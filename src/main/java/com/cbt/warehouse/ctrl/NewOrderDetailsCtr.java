@@ -103,6 +103,8 @@ public class NewOrderDetailsCtr {
     @Autowired
     private CustomGoodsService customGoodsService;
 
+    private SourcingOrderUtils sourcingOrderUtils = new SourcingOrderUtils();
+
     /**
      * /**
      * 根据订单号获取订单详情
@@ -441,7 +443,27 @@ public class NewOrderDetailsCtr {
             request.setAttribute("str_oid", str_oid);
             request.setAttribute("shipMethod", shipMethod);
             request.setAttribute("orderNo", orderNo);
-            request.setAttribute("orderDetail", odb);
+            int totalSize = 0;
+            if (CollectionUtils.isNotEmpty(odb)) {
+                totalSize = odb.size();
+                Map<String, List<OrderDetailsBean>> collect = odb.stream().collect(Collectors.groupingBy(OrderDetailsBean::getShop_id));
+                Map<String, Double> tempMap = new HashMap<>();
+                Map<String, List<OrderDetailsBean>> rsMap = new HashMap<>();
+                collect.forEach((k, v) -> {
+                    if (!tempMap.containsKey(k)) {
+                        tempMap.put(k, 0D);
+                    }
+                    v.forEach(cl -> tempMap.put(k, tempMap.get(k) + Double.parseDouble(cl.getGoodsprice())));
+                });
+                tempMap.forEach((k, v) -> rsMap.put(k + ",total: $" + BigDecimalUtil.truncateDouble(v, 2) + "", collect.get(k)));
+                collect.clear();
+                tempMap.clear();
+                request.setAttribute("orderDetailMap", rsMap);
+            } else {
+                request.setAttribute("orderDetailMap", new HashMap<String, List<OrderDetailsBean>>());
+            }
+
+            request.setAttribute("totalSize", totalSize);
             request.setAttribute("order_state", orderInfo.getState());
             IZoneServer os = new ZoneServer();
             request.setAttribute("countryList", os.getAllZone());

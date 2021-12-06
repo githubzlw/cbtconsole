@@ -15,10 +15,10 @@ import java.util.concurrent.TimeUnit;
 public class UploadByOkHttp {
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(UploadByOkHttp.class);
 
-    private static final String ACCESS_URL_OLD = "http://104.247.194.50:3009/uploadImage";
+    private static final String ACCESS_URL_OLD = "http://108.61.142.103:3009/uploadImage";
     // private static final String ACCESS_URL_OLD = "http://108.61.142.103:3009/uploadImage";
     // private static final String ACCESS_URL_NEW = "http://108.61.142.103:3009/uploadImage";
-    private static final String ACCESS_URL_NEW = "http://104.247.194.50:3009/uploadImage";
+    private static final String ACCESS_URL_NEW = "http://108.61.142.103:3009/uploadImage";
     private static final String TOKEN = "cerong2018jack";
     private static final String DELETE_URL_NEW = "http://104.247.194.50:3008/image/delete";
 
