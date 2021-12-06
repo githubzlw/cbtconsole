@@ -602,6 +602,7 @@ public class ProductBatchController {
                     try {
                         CustomGoodsPublish goodsPublish = customGoodsService.queryGoodsDetails(e.getPid(), 0);
                         customGoodsService.publish(goodsPublish);
+                        customGoodsService.updateGoodsState(e.getPid(), 4);
                     } catch (Exception e1) {
                         e1.printStackTrace();
                         logger.error("pid:[" + e.getPid() + "],publish error:", e1);
