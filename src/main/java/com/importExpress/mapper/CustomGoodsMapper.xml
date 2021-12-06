@@ -258,7 +258,7 @@
     <insert id="insertPidIsEdited">
         insert into custom_goods_edit(pid,shop_id,admin_id)
         values(#{pid},#{shopId},#{adminId})
-        ON DUPLICATE KEY UPDATE admin_id = #{adminId}
+        ON DUPLICATE KEY UPDATE admin_id = #{adminId},is_edited = 1,update_count = update_count + 1
     </insert>
 
     <select id="checkIsEditedByPid" resultType="java.lang.Integer">
