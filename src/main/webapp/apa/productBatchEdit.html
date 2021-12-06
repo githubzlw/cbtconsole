@@ -155,8 +155,8 @@
         }
 
         function formatOperation(val, row, index) {
-            //var content = '<button class="but_color" onclick="showProductInfo(' + row.pid + '_' + row.sku_id + ')" >查看商品</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-            var content = '<button class="style_btn_delete" onclick="deleteProductInfo(' + row.pid + ')">删除</button>';
+            var content = '<a target="_blank" class="but_color" href="/cbtconsole/editc/detalisEdit?pid='+row.pid+'">编辑商品</a><br><br>';
+            content += '<button class="style_btn_delete" onclick="deleteProductInfo(' + row.pid + ')">删除</button>';
             return content;
         }
 
