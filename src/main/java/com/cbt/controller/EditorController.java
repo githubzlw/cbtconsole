@@ -14,12 +14,14 @@ import com.cbt.parse.bean.Set;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.parse.service.*;
+import com.cbt.pojo.EntypeBen;
 import com.cbt.service.CategoryService;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
 import com.cbt.warehouse.pojo.HotCategory;
 import com.cbt.warehouse.pojo.HotSellingGoods;
 import com.cbt.warehouse.service.HotGoodsService;
+import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.UploadByOkHttp;
@@ -58,6 +60,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Controller
@@ -70,7 +73,7 @@ public class EditorController {
     private DecimalFormat format = new DecimalFormat("#0.00");
     private static List<String> kidsCatidList = new ArrayList<>();
 
-    private static Map<String,String> pidMap = new HashMap<>();
+    private static Map<String, String> pidMap = new HashMap<>();
 
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 
@@ -89,7 +92,7 @@ public class EditorController {
     @Autowired
     private HotManageService hotManageService;
     @Autowired
-	private CategoryService categoryService;
+    private CategoryService categoryService;
 
     @SuppressWarnings({"static-access", "unchecked"})
     @RequestMapping(value = "/detalisEdit", method = {RequestMethod.POST, RequestMethod.GET})
@@ -133,14 +136,26 @@ public class EditorController {
                 goods.setCanEdit(0);
             }
 
-            if(StringUtils.isBlank(goods.getRangePrice())){
+            ProductSingleBean singleBean = customGoodsService.queryPidSingleBean(pid);
+            if (singleBean != null) {
+                String regEx = "[\\[\\]]";
+                if (StringUtils.isNotBlank(singleBean.getWprice())) {
+                    singleBean.setWprice(singleBean.getWprice().replaceAll(regEx, "").replace("$", "@").trim());
+                }
+                if (StringUtils.isNotBlank(singleBean.getFree_price_new())) {
+                    singleBean.setFree_price_new(singleBean.getFree_price_new().replaceAll(regEx, "").replace("$", "@").trim());
+                }
+            }
+            mv.addObject("singleBean", singleBean);
+
+            if (StringUtils.isBlank(goods.getRangePrice())) {
                 goods.setWprice(goods.getFree_price_new());
             }
 
             if (goods.getGoodsState() == 1) {
                 goods.setOffReason(null);
                 goods.setUnsellAbleReasonDesc(null);
-            }else if (goods.getValid() == 0) {
+            } else if (goods.getValid() == 0) {
                 if (goods.getGoodsState() == 1 || goods.getGoodsState() == 3) {
                     goods.setOffReason(null);
                     goods.setUnsellAbleReasonDesc(null);
@@ -240,7 +255,7 @@ public class EditorController {
                 List<ImportExSku> skuList = new ArrayList<ImportExSku>();
                 /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
                 skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
-                skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(),ImportExSku.class);
+                skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku(), ImportExSku.class);
                 // 规格标题名称集合
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
                 // 集合排序
@@ -349,7 +364,7 @@ public class EditorController {
                 //计算加价率
             /*if ((goods.getIsBenchmark() == 1 && goods.getBmFlag() == 1) || goods.getIsBenchmark() == 2) {
                 //对标时
-                //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/StrUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/StrUtils.EXCHANGE_RATE(6.6));
+                //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/GoodsInfoUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/GoodsInfoUtils.EXCHANGE_RATE(6.6));
                 String aliPirce;
                 if (goods.getAliGoodsPrice().contains("-")) {
                     aliPirce = goods.getAliGoodsPrice().split("-")[1];
@@ -394,7 +409,7 @@ public class EditorController {
                 goods.setReviseWeight(goods.getFinalWeight());
             }
 
-            String text = GoodsInfoUtils.dealEnInfoImg(goods.getEninfo() , goods.getRemotpath());
+            String text = GoodsInfoUtils.dealEnInfoImg(goods.getEninfo(), goods.getRemotpath());
 
             // 已经放入产品表的size_info_en字段
             //获取文字尺码数据
@@ -461,11 +476,11 @@ public class EditorController {
             mv.addObject("localpath", localpath);
 
             // 描述很精彩标识
-            if(goods.getDescribeGoodFlag() > 0){
-                Map<String,String> rsMap =  customGoodsService.queryDescribeLogInfo(pid);
-                if(rsMap == null || StringUtils.isBlank(rsMap.get("admName"))){
+            if (goods.getDescribeGoodFlag() > 0) {
+                Map<String, String> rsMap = customGoodsService.queryDescribeLogInfo(pid);
+                if (rsMap == null || StringUtils.isBlank(rsMap.get("admName"))) {
                     mv.addObject("describeGoodFlagStr", "");
-                }else{
+                } else {
                     mv.addObject("describeGoodFlagStr", "标识人:" + rsMap.get("admName") + ",时间:" + rsMap.get("create_time"));
                 }
             }
@@ -473,12 +488,12 @@ public class EditorController {
             // 获取海外仓标识信息
             List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
 
-            if(CollectionUtils.isEmpty(goodsOverSeaList)){
-                mv.addObject("goodsOverSeaList",null);
-            }else{
-                mv.addObject("goodsOverSeaList",goodsOverSeaList);
+            if (CollectionUtils.isEmpty(goodsOverSeaList)) {
+                mv.addObject("goodsOverSeaList", null);
+            } else {
+                mv.addObject("goodsOverSeaList", goodsOverSeaList);
                 long count = goodsOverSeaList.stream().filter(e -> e.getIsSupport() > 0).count();
-                if(count > 0){
+                if (count > 0) {
                     goods.setOverSeaFlag(1);
                 }
             }
@@ -486,13 +501,13 @@ public class EditorController {
             // 获取美加可售标识
 
             int salable = customGoodsService.querySalableByPid(pid);
-            mv.addObject("salable",salable);
+            mv.addObject("salable", salable);
 
-            if(StringUtils.isNotBlank(goods.getRangePrice())){
+            if (StringUtils.isNotBlank(goods.getRangePrice())) {
                 // 显示sku重量
-                mv.addObject("isSkuFlag",1);
+                mv.addObject("isSkuFlag", 1);
             } else {
-                mv.addObject("isSkuFlag",0);
+                mv.addObject("isSkuFlag", 0);
             }
 
         } catch (Exception e) {
@@ -570,7 +585,7 @@ public class EditorController {
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
             if (StringUtils.isNotBlank(goods.getSku_new())) {
                 // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-                List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(),ImportExSku.class);
+                List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
                 for (ImportExSkuShow exSku : cbSkus) {
                     if (StringUtils.isNotBlank(exSku.getSpecId())) {
@@ -629,6 +644,18 @@ public class EditorController {
             json.setMessage("获取体积重量失败");
             return json;
         }
+        String singPriceStr = request.getParameter("singPrice");
+        if (StringUtils.isBlank(singPriceStr)) {
+            json.setOk(false);
+            json.setMessage("获取非免邮价格失败");
+            return json;
+        }
+        String singFreePriceStr = request.getParameter("singFreePrice");
+        if (StringUtils.isBlank(singFreePriceStr)) {
+            json.setOk(false);
+            json.setMessage("获取免邮价格失败");
+            return json;
+        }
         String pid = request.getParameter("pid");
         if (StringUtils.isBlank(pid)) {
             json.setOk(false);
@@ -641,10 +668,13 @@ public class EditorController {
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
             /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
-            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku_new(),ImportExSku.class);
+            List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
             String[] skuStrList = skuStr.split(";");
             String[] volumeSkuList = volumeSkuStr.split(";");
+            String[] singPriceList = singPriceStr.split(";");
+            String[] singFreePriceList = singFreePriceStr.split(";");
             double finalWeight = 0;
+
 
             List<GoodsWeightChange> changeList = new ArrayList<>(skuStrList.length * 2);
             Map<String, GoodsWeightChange> changeMap = new HashMap<>(skuStrList.length * 2);
@@ -695,14 +725,98 @@ public class EditorController {
                 }
             }
 
+            // 获取免邮、非免邮价格的最大最小值
+            float priceMin = 0;
+            float priceMax = 0;
+            float freeMin = 0;
+            float freeMax = 0;
+
+            float singlePrice = 0;
+            for (String sPrice : singPriceList) {
+                String[] priceList = sPrice.split("@");
+                String ppid = priceList[0].replace("_", ",");
+                String pPrice = priceList[1];
+                for (ImportExSku exSku : skuList) {
+                    if (ppid.equals(exSku.getSkuPropIds())) {
+                        singlePrice = BigDecimalUtil.truncateFloat(Float.parseFloat(pPrice), 2);
+                        if (priceMin == 0 || priceMin > singlePrice) {
+                            priceMin = singlePrice;
+                        }
+                        if (priceMax < singlePrice) {
+                            priceMax = singlePrice;
+                        }
+                        exSku.getSkuVal().setActSkuCalPrice(singlePrice);
+                        if (changeMap.containsKey(ppid)) {
+                            changeMap.get(ppid).setPrice(pPrice);
+                        } else {
+                            GoodsWeightChange weightChange = new GoodsWeightChange();
+                            weightChange.setSkuid(exSku.getSkuId());
+                            weightChange.setAdminId(user.getId());
+                            weightChange.setPid(pid);
+                            weightChange.setPrice(pPrice);
+                            changeMap.put(ppid, weightChange);
+                            changeList.add(weightChange);
+                        }
+                        break;
+                    }
+                }
+            }
+
+
+            float singleFreePrice = 0;
+            for (String fPrice : singFreePriceList) {
+                String[] priceList = fPrice.split("@");
+                String ppid = priceList[0].replace("_", ",");
+                String pPrice = priceList[1];
+                for (ImportExSku exSku : skuList) {
+                    if (ppid.equals(exSku.getSkuPropIds())) {
+                        singleFreePrice = BigDecimalUtil.truncateFloat(Float.parseFloat(pPrice), 2);
+                        if (freeMin == 0 || freeMin > singleFreePrice) {
+                            freeMin = singleFreePrice;
+                        }
+                        if (freeMax < singleFreePrice) {
+                            freeMax = singleFreePrice;
+                        }
+                        exSku.getSkuVal().setFreeSkuPrice(String.valueOf(singleFreePrice));
+                        if (changeMap.containsKey(ppid)) {
+                            changeMap.get(ppid).setPrice(pPrice);
+                        } else {
+                            GoodsWeightChange weightChange = new GoodsWeightChange();
+                            weightChange.setSkuid(exSku.getSkuId());
+                            weightChange.setAdminId(user.getId());
+                            weightChange.setPid(pid);
+                            weightChange.setPrice(pPrice);
+                            changeMap.put(ppid, weightChange);
+                            changeList.add(weightChange);
+                        }
+                        break;
+                    }
+                }
+            }
 
             /*if(CollectionUtils.isNotEmpty(changeList)){
                 for(GoodsWeightChange changeBean : changeList){
                     customGoodsService.saveGoodsWeightChange(changeBean);
                 }
             }*/
+            String range_price = null;
+            if (priceMin > 0 && priceMax > 0) {
+                if (priceMin == priceMax) {
+                    range_price = String.valueOf(priceMin);
+                } else {
+                    range_price = priceMin + "-" + priceMax;
+                }
 
-            customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight);
+            }
+            String range_price_free = null;
+            if (freeMin > 0 && freeMax > 0) {
+                if (freeMin == freeMax) {
+                    range_price_free = String.valueOf(freeMin);
+                } else {
+                    range_price_free = freeMin + "-" + freeMax;
+                }
+            }
+            customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight, range_price, range_price_free, Math.max(freeMin, 0));
 
             json.setOk(true);
             json.setMessage("执行成功，请到改动重量管理页面审核");
@@ -931,80 +1045,109 @@ public class EditorController {
             }
 
             String rangePrice = request.getParameter("rangePrice");
+            String rangePriceFree = request.getParameter("rangePriceFree");
+            String gd_moq = request.getParameter("gd_moq");
+            if (StringUtils.isNotBlank(gd_moq)) {
+                cgp.setMorder(Integer.parseInt(gd_moq));
+            }
 
-            if (rangePrice == null || "".equals(rangePrice)) {
+            if (StringUtils.isBlank(rangePriceFree)) {
                 //获取最大值和最小值信息
                 String feePrice = request.getParameter("feePrice");
                 double minPrice = 0;
                 double maxPrice = 0;
+                int moq = 0;
                 if (StringUtils.isNotBlank(feePrice)) {
                     String[] priceLst = feePrice.split(",");
                     minPrice = Double.parseDouble(priceLst[0].split("@")[1]);
                     maxPrice = minPrice;
+                    String[] tempList = null;
                     for (String priceStr : priceLst) {
-                        double tempPrice = Double.parseDouble(priceStr.split("@")[1]);
+                        tempList = priceStr.split("@");
+                        double tempPrice = Double.parseDouble(tempList[1]);
                         if (tempPrice < minPrice) {
                             minPrice = tempPrice;
                         }
                         if (tempPrice > maxPrice) {
                             maxPrice = tempPrice;
                         }
+                        String tempMoq = tempList[0];
+                        if (tempMoq.contains("-")) {
+                            int tempMoqInt = Integer.parseInt(tempMoq.split("-")[0]);
+                            if (moq == 0 || tempMoqInt < moq) {
+                                moq = tempMoqInt;
+                            }
+                        } else if (tempMoq.contains("≥")) {
+                            int tempMoqInt = Integer.parseInt(tempMoq.replace("≥", "").trim());
+                            if (moq == 0 || tempMoqInt < moq) {
+                                moq = tempMoqInt;
+                            }
+                        }
                     }
                     //格式化
                     DecimalFormat df = new DecimalFormat("######0.00");
                     cgp.setPrice(df.format(minPrice));
                     cgp.setFeeprice("[" + feePrice.replace("@", " $ ") + "]");
-                } else {
-                    String wprice = request.getParameter("wprice");
-                    if (wprice == null || "".equals(wprice)) {
-                        // 判断wprice是不是空的，如果是，不更新wprice和price值
-                        if (orGoods.getWprice() == null || "".equals(orGoods.getWprice())
-                                || orGoods.getWprice().trim().length() < 3) {
-                            cgp.setPrice(orGoods.getPrice());
-                            cgp.setWprice("[]", 1);
-                        } else {
-                            String goodsPrice = request.getParameter("goodsPrice");
-                            if (StringUtils.isBlank(goodsPrice)) {
-                                json.setOk(false);
-                                json.setMessage("获取区间价格数据失败");
-                                return json;
-                            }
-                        }
-                    } else {
-                        String[] priceLst = wprice.split(",");
-                        minPrice = Double.parseDouble(priceLst[0].split("@")[1]);
-                        maxPrice = minPrice;
-                        for (String priceStr : priceLst) {
-                            double tempPrice = Double.parseDouble(priceStr.split("@")[1]);
-                            if (tempPrice < minPrice) {
-                                minPrice = tempPrice;
-                            }
-                            if (tempPrice > maxPrice) {
-                                maxPrice = tempPrice;
-                            }
-                        }
-                        //格式化
-                        DecimalFormat df = new DecimalFormat("######0.00");
-                        cgp.setPrice(df.format(minPrice));
-                        cgp.setWprice("[" + wprice.replace("@", " $ ") + "]");
-                    }
+                    cgp.setMorder(moq);
                 }
-            } else {
-                String sku = request.getParameter("sku");
-                if (sku == null || "".equals(sku)) {
-                    json.setOk(false);
-                    json.setMessage("获取单规格价数据失败");
-                    return json;
-                } else {
-                   /* JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
-                    List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
-                    List<ImportExSku> skuList = com.alibaba.fastjson.JSONArray.parseArray(orGoods.getSku(),ImportExSku.class);
-                    boolean isSuccess = GoodsInfoUtils.dealSkuByParam(skuList, sku, cgp);
-                    if (!isSuccess) {
-                        json.setOk(false);
-                        json.setMessage("商品单规格价格生成异常，请确认价格！");
-                        return json;
+            }
+
+            if (StringUtils.isBlank(rangePrice)) {
+                double minPrice = 0;
+                double maxPrice = 0;
+                int moq = 0;
+                String wprice = request.getParameter("wprice");
+                if (StringUtils.isBlank(wprice)) {
+                    // 判断wprice是不是空的，如果是，不更新wprice和price值
+                    if (orGoods.getWprice() == null || "".equals(orGoods.getWprice())
+                            || orGoods.getWprice().trim().length() < 3) {
+                        cgp.setPrice(orGoods.getPrice());
+                        cgp.setWprice("[]", 1);
+                    } else {
+                        String goodsPrice = request.getParameter("goodsPrice");
+                        if (StringUtils.isBlank(goodsPrice)) {
+                            json.setOk(false);
+                            json.setMessage("获取区间价格数据失败");
+                            return json;
+                        }
                     }
+                } else {
+                    String[] priceLst = wprice.split(",");
+                    minPrice = Double.parseDouble(priceLst[0].split("@")[1]);
+                    maxPrice = minPrice;
+                    for (String priceStr : priceLst) {
+                        String[] tempList = priceStr.split("@");
+                        double tempPrice = Double.parseDouble(tempList[1]);
+                        if (tempPrice < minPrice) {
+                            minPrice = tempPrice;
+                        }
+                        if (tempPrice > maxPrice) {
+                            maxPrice = tempPrice;
+                        }
+                        String tempMoq = tempList[0];
+                        if (tempMoq.contains("-")) {
+                            int tempMoqInt = Integer.parseInt(tempMoq.split("-")[0]);
+                            if (moq == 0 || tempMoqInt < moq) {
+                                moq = tempMoqInt;
+                            }
+                        } else if (tempMoq.contains("≥")) {
+                            int tempMoqInt = Integer.parseInt(tempMoq.replace("≥", "").trim());
+                            if (moq == 0 || tempMoqInt < moq) {
+                                moq = tempMoqInt;
+                            }
+                        }
+                    }
+                    //格式化
+                    DecimalFormat df = new DecimalFormat("######0.00");
+                    //cgp.setPrice(df.format(minPrice));
+                    cgp.setWprice("[" + wprice.replace("@", " $ ") + "]");
+                    cgp.setMorder(moq);
+                }
+            }
+
+            if (StringUtils.isNotBlank(gd_moq)) {
+                if (orGoods.getMorder() != Integer.parseInt(gd_moq)) {
+                    cgp.setMorder(Integer.parseInt(gd_moq));
                 }
             }
 
@@ -1021,10 +1164,10 @@ public class EditorController {
 
             List<TypeBean> newTypeList = new ArrayList<TypeBean>();
             List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(orGoods, false);
-            if (StringUtils.isNotBlank(typeDeleteIds)) {
+            if (StringUtils.isNotBlank(typeDeleteIds) && (typeList != null)) {
                 String[] tpList = typeDeleteIds.split(",");
 
-                if (!(tpList.length == 0 || typeList.isEmpty())) {
+                if (!(typeList.isEmpty() || tpList.length == 0)) {
                     //剔除选中的规格
                     for (TypeBean tpBean : typeList) {
                         boolean notPt = true;
@@ -1036,6 +1179,28 @@ public class EditorController {
                         }
                         if (notPt) {
                             newTypeList.add(tpBean);
+                        }
+                    }
+                    //cgp.setType(newTypeList.toString());
+                }
+            }
+            List<EntypeBen> newEnTypeList = new ArrayList<EntypeBen>();
+            List<EntypeBen> entypeBens = JSONArray.parseArray(orGoods.getEntypeNew(), EntypeBen.class);
+            if (StringUtils.isNotBlank(typeDeleteIds) && (entypeBens != null)) {
+                String[] tpList = typeDeleteIds.split(",");
+
+                if (!(entypeBens.isEmpty() || entypeBens.size() == 0)) {
+                    //剔除选中的规格
+                    for (EntypeBen entypeBen : entypeBens) {
+                        boolean notPt = true;
+                        for (String tpId : tpList) {
+                            if (tpId.equals(entypeBen.getId())) {
+                                notPt = false;
+                                break;
+                            }
+                        }
+                        if (notPt) {
+                            newEnTypeList.add(entypeBen);
                         }
                     }
                     //cgp.setType(newTypeList.toString());
@@ -1060,10 +1225,22 @@ public class EditorController {
                                     break;
                                 }
                             }
+                            for (EntypeBen entypeBen : newEnTypeList) {
+                                if (entypeBen.getId().equals(spSt[0]) && !entypeBen.getType().trim().equals(spSt[1].trim())) {
+                                    entypeBen.setValue(spSt[1].trim());
+                                    break;
+                                }
+                            }
                         } else {
                             for (TypeBean nwType : typeList) {
                                 if (nwType.getId().equals(spSt[0]) && !nwType.getType().trim().equals(spSt[1].trim())) {
                                     nwType.setValue(spSt[1].trim());
+                                    break;
+                                }
+                            }
+                            for (EntypeBen entypeBen : newEnTypeList) {
+                                if (entypeBen.getId().equals(spSt[0]) && !entypeBen.getType().trim().equals(spSt[1].trim())) {
+                                    entypeBen.setValue(spSt[1].trim());
                                     break;
                                 }
                             }
@@ -1074,13 +1251,16 @@ public class EditorController {
 
                 if (StringUtils.isNotBlank(typeDeleteIds)) {
                     cgp.setType(newTypeList.toString());
+                    cgp.setEntypeNew(newEnTypeList.toString());
                 } else {
                     cgp.setType(typeList.toString());
+                    cgp.setEntypeNew(entypeBens.toString());
                 }
                 tpList = null;
             } else {
                 if (StringUtils.isNotBlank(typeDeleteIds)) {
                     cgp.setType(newTypeList.toString());
+                    cgp.setEntypeNew(newEnTypeList.toString());
                     newTypeList.clear();
                 }
             }
@@ -1117,6 +1297,11 @@ public class EditorController {
                 cgp.setIsUpdateImg(2);
             }
 
+            String brandName = request.getParameter("brandName");
+            cgp.setBrand_name(brandName);
+
+
+            String staticUrl = request.getParameter("staticUrl");
 
             String type = request.getParameter("type");
             // type 0 保存 1 保存并发布
@@ -1159,27 +1344,48 @@ public class EditorController {
                             json.setOk(false);
                             json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
                         } else {
-                            PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
+                           /* InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+                            inputData.setPid(cgp.getPid());
+                            inputData.setBrand_name(brandName);
+                            if(StringUtils.isNotBlank(cgp.getType())){
+                                inputData.setEntype(cgp.getType());
+                            }
+                            if(StringUtils.isNotBlank(cgp.getEntypeNew())){
+                                inputData.setEntype_new(cgp.getEntypeNew());
+                            }
+                            GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
+                            PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount), staticUrl);
                             FutureTask futureTask = new FutureTask(pbCallable);
                             Thread thread = new Thread(futureTask);
                             thread.start();
 
-                            if(orGoods.getValid() == 0 || orGoods.getValid() == 2){
+                            if (orGoods.getValid() == 0 || orGoods.getValid() == 2) {
                                 json.setMessage("更新成功,正在验证图片是否存在，异步处理中，请等待");
-                            }else{
+                            } else {
                                 json.setMessage("更新成功,异步上传图片中，请等待");
                             }
 
                         }
                     } else {
-                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
+                      /*  InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+                        inputData.setPid(cgp.getPid());
+                        inputData.setBrand_name(brandName);
+                        if(StringUtils.isNotBlank(cgp.getType())){
+                            inputData.setEntype(cgp.getType());
+                        }
+                        if(StringUtils.isNotBlank(cgp.getEntypeNew())){
+                            inputData.setEntype_new(cgp.getEntypeNew());
+                        }
+
+                        GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
+                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount), staticUrl);
                         FutureTask futureTask = new FutureTask(pbCallable);
                         Thread thread = new Thread(futureTask);
                         thread.start();
 
-                        if(orGoods.getValid() == 0 || orGoods.getValid() == 2){
+                        if (orGoods.getValid() == 0 || orGoods.getValid() == 2) {
                             json.setMessage("更新成功,正在验证图片是否存在，异步处理中，请等待");
-                        }else{
+                        } else {
                             json.setMessage("更新成功,异步上传图片中，请等待");
                         }
                     }
@@ -1198,7 +1404,6 @@ public class EditorController {
         }
         return json;
     }
-
 
 
     @RequestMapping(value = "/setGoodsOff")
@@ -1305,6 +1510,344 @@ public class EditorController {
         return json;
     }
 
+
+    @RequestMapping(value = "/setNoUpdatePrice")
+    @ResponseBody
+    public JsonResult setNoUpdatePrice(HttpServletRequest request, HttpServletResponse response) {
+
+
+        JsonResult json = new JsonResult();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+
+        String pidStr = request.getParameter("pid");
+        if (pidStr == null || "".equals(pidStr)) {
+            json.setOk(false);
+            json.setMessage("获取pid失败");
+            return json;
+        }
+
+        String flagStr = request.getParameter("flag");
+        if (StringUtils.isBlank(flagStr)) {
+            json.setOk(false);
+            json.setMessage("获取flag失败");
+            return json;
+        }
+        try {
+            Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+            if (user == null || user.getId() == 0) {
+                json.setOk(false);
+                json.setMessage("获取登录信息失败，请登录");
+                return json;
+            }
+
+            // 取出1688商品的全部信息
+            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pidStr, 0);
+            if ("8".equals(flagStr)) {
+
+                goods.setAdminId(user.getId());
+                customGoodsService.insertB2cPriceLog(goods);
+
+                int isFreeFlag = 0;
+
+                if (StringUtils.isNotBlank(goods.getRange_price_free_new())) {
+                    AtomicInteger skuUpdateCount = new AtomicInteger();
+                    // 获取sku里面的重量
+                    // 将goods的entype属性值取出来,即规格图
+                    List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
+                    double finalWeight = 0;
+                    if (StringUtils.isNotBlank(goods.getSku_new())) {
+                        // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                        List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
+
+                        double priceMin = 0;
+                        double priceMax = 0;
+
+                        for (ImportExSku exSku : skuList) {
+                            skuUpdateCount.getAndIncrement();
+                            float costPrice = exSku.getSkuVal().getCostPrice();
+                            if (costPrice > 0) {
+                                double tempPrice = B2CPriceUtil.getFreePrice(costPrice, goods.getFinalWeight(), goods.getVolumeWeight());
+                                exSku.getSkuVal().setFreeSkuPrice(String.valueOf(tempPrice));
+                                if (priceMin == 0 || priceMin > tempPrice) {
+                                    priceMin = tempPrice;
+                                }
+                                if (priceMax == 0 || priceMax < tempPrice) {
+                                    priceMax = tempPrice;
+                                }
+                            }
+                        }
+                        if (priceMin > 0 && priceMax > 0) {
+                            if (priceMin == priceMax) {
+                                goods.setRange_price_free_new(String.valueOf(priceMin));
+                            } else {
+                                goods.setRange_price_free_new(priceMin + "-" + priceMax);
+                            }
+                            goods.setPrice_kids(String.valueOf(priceMin));
+                        } else if (priceMin > 0) {
+                            goods.setRange_price_free_new(String.valueOf(priceMin));
+                            goods.setPrice_kids(String.valueOf(priceMin));
+                        } else if (priceMax > 0) {
+                            goods.setRange_price_free_new(String.valueOf(priceMax));
+                            goods.setPrice_kids(String.valueOf(priceMax));
+                        }
+
+                        if (skuUpdateCount.get() > 0) {
+                            goods.setSku_new(JSONArray.toJSONString(skuList));
+                        }
+
+                        List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
+                        for (ImportExSkuShow exSku : cbSkus) {
+                            if (finalWeight == 0 || finalWeight < Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight())) {
+                                finalWeight = Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight());
+                            }
+                            if (StringUtils.isNotBlank(exSku.getSpecId())) {
+                                String chType = customGoodsService.queryChTypeBySkuId(exSku.getSpecId());
+                                if (StringUtils.isBlank(chType)) {
+                                    chType = "";
+                                }
+                                exSku.setChType(chType);
+                            }
+                        }
+                    }
+                    typeList.clear();
+                    if (finalWeight < 0.5) {
+                        isFreeFlag = 1;
+                    }
+                } else {
+                    if (Math.max(Float.parseFloat(goods.getFinalWeight()), Float.parseFloat(goods.getVolumeWeight())) < 0.5) {
+                        isFreeFlag = 1;
+                    }
+                }
+
+                /**
+                 *
+                 * B2C标识按下 操作
+                 * 1.morder=1
+                 * 2.B2C免邮价 =(1688产品单价【wholesale_price】 *1.4+5+0.042*max(重量，体积重量))/6.6
+                 * wprice ，free_price_new [3-98 $ 5.09, 99-198 $ 4.23, ≥199 $ 3.85]  ---》 [≥1 $ 3.85]
+                 *
+                 * 区间价 情况  1688产品单价 sku_new[costPrice]
+                 *
+                 */
+                goods.setMorder(1);
+
+                if (StringUtils.isBlank(goods.getRange_price_free_new())) {
+                    // [2-2400 $ 6.13,2401-17279 $ 5.57,≥17280 $ 5.15]
+                    String[] wpriceList = goods.getWholesalePrice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
+                    String priceStr = B2CPriceUtil.getFreePriceStr(Float.parseFloat(wpriceList[0].split("@")[1].trim()), goods.getFinalWeight(), goods.getVolumeWeight());
+                    String free_price_new = "[≥1 $ " + priceStr + "]";
+                    goods.setFree_price_new(free_price_new);
+
+                    wpriceList = goods.getWprice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
+                    goods.setWprice("[≥1 $ " + wpriceList[0].split("@")[1].trim() + "]");
+                    goods.setPrice_kids(priceStr);
+                }
+
+
+                goods.setMatchSource(8);
+                goods.setImg_check(String.valueOf(isFreeFlag));
+
+                int count = customGoodsService.setNoUpdatePrice(goods);
+                if (count > 0) {
+                    json.setOk(true);
+                    json.setMessage("执行成功");
+                } else {
+                    json.setOk(false);
+                    json.setMessage("更新失败");
+                }
+            } else {
+                goods = customGoodsService.selectB2cPriceLog(pidStr);
+
+
+                if (goods != null) {
+                    goods.setMatchSource(0);
+                } else {
+                    json.setOk(false);
+                    json.setMessage("无历史记录，不能还原");
+                    return json;
+/*
+                    goods = customGoodsService.queryGoodsDetails(pidStr, 0);
+                    goods.setMatchSource(0);
+                    double finalWeight = 0;
+                    if (StringUtils.isNotBlank(goods.getFinalWeight())) {
+                        finalWeight = Double.parseDouble(goods.getFinalWeight());
+                    } else {
+                        finalWeight = Double.parseDouble(goods.getWeight());
+                    }
+                    // 还原B2C
+                    // 1. 获取加价率
+                    double addPriceLv = GoodsInfoUtils.getAddPriceLvNew(finalWeight, 0);
+                    // 2.获取运费
+                    double initialFreight = GoodsInfoUtils.getCalculateFreight(finalWeight);
+                    // 重新计算价格
+
+                    AtomicInteger skuUpdateCount = new AtomicInteger();
+                    if (StringUtils.isNotBlank(goods.getRange_price_free_new())) {
+                        // 获取sku里面的重量
+                        // 将goods的entype属性值取出来,即规格图
+                        List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
+                        String moderStr = null;
+                        if (StringUtils.isNotBlank(goods.getSku_new())) {
+                            // List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                            List<ImportExSku> skuList = JSONArray.parseArray(goods.getSku_new(), ImportExSku.class);
+
+                            String[] wpriceList = goods.getWholesalePrice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
+
+                            moderStr = wpriceList[0].split("@")[0];
+
+                            double priceMin = 0;
+                            double priceMax = 0;
+
+
+                            for (ImportExSku exSku : skuList) {
+                                skuUpdateCount.getAndIncrement();
+
+
+                                String[] tempArr = exSku.getWholesalePrice().replace("$", "@").replace("[", "").replace("]", "").split("@");
+
+                                String tempWhoPr = tempArr[1];
+                                if (tempArr[1].contains("-")) {
+                                    tempWhoPr = tempArr[1].split("-")[1];
+                                }
+
+                                float factoryPrice = Float.parseFloat(tempWhoPr);
+                                if (factoryPrice > 0) {
+                                    double tempPrice = B2CPriceUtil.changeToB2BPrice(factoryPrice, addPriceLv, initialFreight);
+                                    exSku.getSkuVal().setFreeSkuPrice(String.valueOf(tempPrice));
+                                    if (priceMin == 0 || priceMin > tempPrice) {
+                                        priceMin = tempPrice;
+                                    }
+                                    if (priceMax == 0 || priceMax < tempPrice) {
+                                        priceMax = tempPrice;
+                                    }
+                                }
+                            }
+                            if (priceMin > 0 && priceMax > 0) {
+                                if (priceMin == priceMax) {
+                                    goods.setRange_price_free_new(String.valueOf(priceMin));
+                                } else {
+                                    goods.setRange_price_free_new(priceMin + "-" + priceMax);
+                                }
+                                goods.setPrice_kids(String.valueOf(priceMin));
+                            } else if (priceMin > 0) {
+                                goods.setRange_price_free_new(String.valueOf(priceMin));
+                                goods.setPrice_kids(String.valueOf(priceMin));
+                            } else if (priceMax > 0) {
+                                goods.setRange_price_free_new(String.valueOf(priceMax));
+                                goods.setPrice_kids(String.valueOf(priceMax));
+                            }
+
+                            if (skuUpdateCount.get() > 0) {
+                                goods.setSku_new(JSONArray.toJSONString(skuList));
+                            }
+
+                            List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
+                            for (ImportExSkuShow exSku : cbSkus) {
+                                if (finalWeight == 0 || finalWeight < Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight())) {
+                                    finalWeight = Math.max(exSku.getFianlWeight(), exSku.getVolumeWeight());
+                                }
+                                if (StringUtils.isNotBlank(exSku.getSpecId())) {
+                                    String chType = customGoodsService.queryChTypeBySkuId(exSku.getSpecId());
+                                    if (StringUtils.isBlank(chType)) {
+                                        chType = "";
+                                    }
+                                    exSku.setChType(chType);
+                                }
+                            }
+
+                            String tempModerStr = moderStr;
+                            if (moderStr.contains("≥")) {
+                                tempModerStr = moderStr.replace("≥", "").trim();
+                            } else if (moderStr.contains(">")) {
+                                tempModerStr = moderStr.replace(">", "").trim();
+                            }
+                            if (tempModerStr.contains("-")) {
+                                goods.setMorder(Integer.parseInt(tempModerStr.split("-")[0]));
+                            } else {
+                                goods.setMorder(Integer.parseInt(tempModerStr));
+                            }
+                        }
+
+                        typeList.clear();
+                    } else if (StringUtils.isBlank(goods.getRange_price_free_new())) {
+                        String[] wpriceList = goods.getWholesalePrice().replace("[", "").replace("]", "").replace("$", "@").trim().split(",");
+                        String rsWpPrice = "";
+                        String rsFreePrice = "";
+                        String priceStr = "";
+                        String moderStr = "";
+                        int clNum = 0;
+                        for (String tempWp : wpriceList) {
+                            String[] tempArr = tempWp.split("@");
+                            clNum++;
+
+                            String tempWhoPr = tempArr[1];
+                            if (tempArr[1].contains("-")) {
+                                tempWhoPr = tempArr[1].split("-")[1];
+                            }
+
+                            String priceFree = B2CPriceUtil.changeToB2BPriceString(Double.parseDouble(tempWhoPr), addPriceLv, initialFreight);
+                            String priceWp = B2CPriceUtil.changeToB2BPriceString(Double.parseDouble(tempWhoPr), addPriceLv, 0);
+                            if (clNum == 1) {
+                                priceStr = priceFree;
+                                moderStr = tempArr[0];
+                            }
+                            rsFreePrice += "," + tempArr[0] + " $ " + priceFree;
+                            rsWpPrice += "," + tempArr[0] + " $ " + priceWp;
+                        }
+                        if (StringUtils.isNotBlank(rsFreePrice) && rsFreePrice.length() > 1) {
+                            goods.setFree_price_new("[" + rsFreePrice.substring(1) + "]");
+                        } else {
+                            goods.setFree_price_new("");
+                        }
+                        if (StringUtils.isNotBlank(rsWpPrice) && rsWpPrice.length() > 1) {
+                            goods.setWprice("[" + rsWpPrice.substring(1) + "]");
+                        } else {
+                            goods.setWprice("");
+                        }
+
+                        goods.setPrice_kids(priceStr);
+                        if (StringUtils.isNotBlank(moderStr)) {
+                            String tempModerStr = moderStr;
+                            if (moderStr.contains("≥")) {
+                                tempModerStr = moderStr.replace("≥", "").trim();
+                            } else if (moderStr.contains(">")) {
+                                tempModerStr = moderStr.replace(">", "").trim();
+                            }
+                            if (tempModerStr.contains("-")) {
+                                goods.setMorder(Integer.parseInt(tempModerStr.split("-")[0]));
+                            } else {
+                                goods.setMorder(Integer.parseInt(tempModerStr));
+                            }
+                        } else {
+                            goods.setMorder(1);
+                        }
+                    }*/
+                }
+                if (StringUtils.isNotBlank(goods.getPrice_kids())) {
+                    goods.setPrice_kids(goods.getPrice_import());
+                }
+                int count = customGoodsService.setNoUpdatePrice(goods);
+                // int count = 1;
+                System.err.println(JSONObject.toJSONString(goods));
+                if (count > 0) {
+                    json.setOk(true);
+                    json.setMessage("执行成功");
+                } else {
+                    json.setOk(false);
+                    json.setMessage("更新失败");
+                }
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("pid : " + pidStr + " 执行错误，原因：" + e.getMessage());
+            LOG.error("pid : " + pidStr + " 执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
 
     @RequestMapping(value = "/checkIsHotGoods")
     @ResponseBody
@@ -1432,7 +1975,7 @@ public class EditorController {
             if (sku != null && !sku.isEmpty() && sku.startsWith("[")) {
                 /*JSONArray sku_json = JSONArray.fromObject(sku);
                 List<SkuAttrBean> skuList = (List<SkuAttrBean>) JSONArray.toCollection(sku_json, SkuAttrBean.class);*/
-                List<SkuAttrBean> skuList = com.alibaba.fastjson.JSONArray.parseArray(sku,SkuAttrBean.class);
+                List<SkuAttrBean> skuList = com.alibaba.fastjson.JSONArray.parseArray(sku, SkuAttrBean.class);
                 for (SkuAttrBean skuBean : skuList) {
                     // System.err.println(skuBean.toString());
                     SkuValBean skuVal = skuBean.getSkuVal();
@@ -1603,16 +2146,19 @@ public class EditorController {
                             String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
                             // 文件流输出到本地服务器指定路径
                             ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
+                            System.err.println(localDiskPath + localFilePath);
                             // 检查图片分辨率
                             boolean is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 100, 100);
+                            System.err.println("check Img Resolution:" + is);
                             if (is) {
                                 is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                                 if (is) {
                                     String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
-                                    is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
-                                            localDiskPath + newLocalPath);
+                                    // is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath, localDiskPath + newLocalPath);
+                                    is = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 1);
+                                    System.err.println("check Img Resolution 700:" + is);
                                     if (is) {
-                                        msg = ftpConfig.getLocalShowPath() + newLocalPath;
+                                        msg = ftpConfig.getLocalShowPath() + localFilePath;
                                     } else {
                                         json.setOk(false);
                                         json.setMessage("压缩图片到700*700失败，终止执行");
@@ -1691,10 +2237,10 @@ public class EditorController {
                             is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                             if (is) {
                                 String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
-                                is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
-                                        localDiskPath + newLocalPath);
+                                // is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath, localDiskPath + newLocalPath);
+                                is = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 1);
                                 if (is) {
-                                    imgList.add(ftpConfig.getLocalShowPath() + newLocalPath);
+                                    imgList.add(ftpConfig.getLocalShowPath() + localFilePath);
                                 } else {
                                     json.setOk(false);
                                     json.setMessage("压缩图片到700*700失败，终止执行");
@@ -2515,16 +3061,16 @@ public class EditorController {
             if (promotion_flag > 0) {
                 customGoodsService.updatePromotionFlag(pid);
             }
-            if(describe_good_flag > 0){
+            if (describe_good_flag > 0) {
                 // 更新MongoDB,记录日志
                 //u表示更新；c表示创建，d表示删除
                 InputData inputData = new InputData('u');
                 inputData.setPid(pid);
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setDescribe_good_flag(String.valueOf(describe_good_flag));
-                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData,1, 0);
+                GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
                 // 记录日志
-                customGoodsService.insertIntoDescribeLog(pid,user.getId());
+                customGoodsService.insertIntoDescribeLog(pid, user.getId());
             }
             json.setOk(true);
             json.setMessage("执行成功");
@@ -2573,25 +3119,25 @@ public class EditorController {
 
         editBean.setDescribe_good_flag(1);
 
-        if(pidMap.containsKey(pid + hotTypeId)){
+        if (pidMap.containsKey(pid + hotTypeId)) {
             json.setOk(false);
             json.setMessage("已经被执行过");
             return json;
-        }else{
-            pidMap.put(pid + hotTypeId,pid);
+        } else {
+            pidMap.put(pid + hotTypeId, pid);
         }
         try {
             customGoodsService.updatePidIsEdited(editBean);
             customGoodsService.insertIntoGoodsEditBean(editBean);
             // 更新MongoDB,记录日志
-            new Thread(()->{
+            new Thread(() -> {
                 //u表示更新；c表示创建，d表示删除
                 InputData inputData = new InputData('u');
                 inputData.setPid(pid);
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setDescribe_good_flag("1");
                 boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
-                if(!isSu){
+                if (!isSu) {
                     LOG.error("saveGoodsDescInfo update mongodb error,pid:" + pid + ",hotTypeId:" + hotTypeId);
                 }
             }).start();
@@ -2599,7 +3145,7 @@ public class EditorController {
             // 记录日志
             customGoodsService.insertIntoDescribeLog(pid, user.getId());
 
-            new Thread(()->{
+            new Thread(() -> {
                 // 插入热卖区数据
                 saveHotGoods(pid, Integer.parseInt(hotTypeId), user.getId());
             }).start();
@@ -3390,7 +3936,7 @@ public class EditorController {
             if (CollectionUtils.isNotEmpty(pidList)) {
                 for (String pid : pidList) {
                     if (StringUtils.isNotBlank(pid)) {
-                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0, 0);
+                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0, 0, null);
                         FutureTask futureTask = new FutureTask(pbCallable);
                         Thread thread = new Thread(futureTask);
                         thread.start();
@@ -3719,13 +4265,13 @@ public class EditorController {
                 if (list != null && list.size() > 0) {
                     for (GoodsParseBean gd : list) {
                         praseEninfoAndUpdate(gd);
-                        if(gd.getAliUpdate() > 0){
-                            count ++;
+                        if (gd.getAliUpdate() > 0) {
+                            count++;
                             // break;
                         }
                     }
                 }
-                if(count > 0){
+                if (count > 0) {
                     // break;
                 }
                 list.clear();
@@ -3743,45 +4289,45 @@ public class EditorController {
     @ResponseBody
     public JsonResult setGoodsOverSea(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
-        com.cbt.pojo.Admuser admuser =UserInfoUtils.getUserInfo(request);
-        if(admuser == null || admuser.getId() == 0){
+        com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
+        if (admuser == null || admuser.getId() == 0) {
             json.setOk(false);
             json.setMessage("请登录后操作");
-            return  json;
+            return json;
         }
         String pid = request.getParameter("pid");
-        if(StringUtils.isBlank(pid)){
+        if (StringUtils.isBlank(pid)) {
             json.setOk(false);
             json.setMessage("获取PID失败");
-            return  json;
+            return json;
         }
         String countryId = request.getParameter("countryId");
-        if(StringUtils.isBlank(countryId)){
+        if (StringUtils.isBlank(countryId)) {
             json.setOk(false);
             json.setMessage("获取countryId失败");
-            return  json;
+            return json;
         }
         String isSupport = request.getParameter("isSupport");
-        if(StringUtils.isBlank(isSupport)){
+        if (StringUtils.isBlank(isSupport)) {
             json.setOk(false);
             json.setMessage("获取是否支持失败");
-            return  json;
+            return json;
         }
         String categoryIdStr = request.getParameter("categoryId");
         int categoryId = 0;
-        if(StringUtils.isBlank(categoryIdStr)){
+        if (StringUtils.isBlank(categoryIdStr)) {
             json.setOk(false);
             json.setMessage("获取热卖区分类失败");
-            return  json;
+            return json;
         }
 
         try {
             categoryId = Integer.parseInt(categoryIdStr);
             int isUpdate = 0;
             List<GoodsOverSea> goodsOverSeaList = customGoodsService.queryGoodsOverSeaInfoByPid(pid);
-            if(CollectionUtils.isNotEmpty(goodsOverSeaList)){
-                for(GoodsOverSea goods: goodsOverSeaList){
-                    if(goods.getCountryId() == Integer.parseInt(countryId)){
+            if (CollectionUtils.isNotEmpty(goodsOverSeaList)) {
+                for (GoodsOverSea goods : goodsOverSeaList) {
+                    if (goods.getCountryId() == Integer.parseInt(countryId)) {
                         isUpdate = 1;
                         break;
                     }
@@ -3809,10 +4355,10 @@ public class EditorController {
             }
 
             // 加入到热卖区
-            if(supportFlag > 0){
+            if (supportFlag > 0) {
                 // 添加
                 saveHotGoods(pid, categoryId, admuser.getId());
-            }else {
+            } else {
                 // 删除
                 hotGoodsService.deleteGoodsByPid(categoryId, pid);
                 String sqlDel = "delete from hot_selling_goods where hot_selling_id = " + categoryId + " and goods_pid = '" + pid + "'";
@@ -3882,10 +4428,10 @@ public class EditorController {
             inputData.setPid(pid);
             inputData.setSearchable(String.valueOf(flag));
             boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
-            if(isSu){
+            if (isSu) {
                 customGoodsService.setSearchable(pid, flag, admuser.getId());
                 json.setOk(true);
-            } else{
+            } else {
                 json.setOk(false);
                 json.setMessage("更新mongodb失败");
             }
@@ -3925,10 +4471,10 @@ public class EditorController {
             inputData.setTop_sort(String.valueOf(newSort));
             boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
             // boolean isSu = true;
-            if(isSu){
+            if (isSu) {
                 customGoodsService.setTopSort(pid, newSort, admuser.getId());
                 json.setOk(true);
-            } else{
+            } else {
                 json.setOk(false);
                 json.setMessage("更新mongodb失败");
             }
@@ -3968,10 +4514,10 @@ public class EditorController {
             inputData.setSalable(String.valueOf(flag));
             boolean isSu = GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);
             // boolean isSu = true;
-            if(isSu){
+            if (isSu) {
                 customGoodsService.setSalable(pid, flag, admuser.getId());
                 json.setOk(true);
-            } else{
+            } else {
                 json.setOk(false);
                 json.setMessage("更新mongodb失败");
             }
@@ -3984,16 +4530,15 @@ public class EditorController {
     }
 
 
-
     @RequestMapping(value = "/testOkHttp")
     @ResponseBody
     public JsonResult testOkHttp() {
         JsonResult json = new JsonResult();
         try {
             // 批量上传测试
-        File testFile = new File("/home/data/cbtconsole/cbtimg/test");
-        String filePath = "/usr/local/goodsimg/importcsvimg/test/1122456";
-            UploadByOkHttp.uploadFileBatchOld(testFile,filePath);
+            File testFile = new File("/home/data/cbtconsole/cbtimg/test");
+            String filePath = "/data/importcsvimg/test/1122456";
+            UploadByOkHttp.uploadFileBatchOld(testFile, filePath);
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
@@ -4005,9 +4550,9 @@ public class EditorController {
 
     @RequestMapping(value = "/changePidToNewCatid")
     @ResponseBody
-    public JsonResult changePidToNewCatid(HttpServletRequest request, @RequestParam(name = "pid",required = true) String pid,
-                                          @RequestParam(name = "oldCatid",required = true) String oldCatid,
-                                          @RequestParam(name = "newCatid",required = true) String newCatid) {
+    public JsonResult changePidToNewCatid(HttpServletRequest request, @RequestParam(name = "pid", required = true) String pid,
+                                          @RequestParam(name = "oldCatid", required = true) String oldCatid,
+                                          @RequestParam(name = "newCatid", required = true) String newCatid) {
         JsonResult json = new JsonResult();
         com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
         if (admuser == null || admuser.getId() == 0) {
@@ -4070,7 +4615,7 @@ public class EditorController {
                 int isKids = checkIsKidsCatid(gd.getCatid1()) ? 1 : 0;
                 String servicePrePath = GoodsInfoUtils.changeRemotePathToLocal(gd.getRemotePath() + gd.getPid() + "/desc/", isKids);
                 String localPrePath = ftpConfig.getLocalDiskPath() + "checkImg/" + gd.getPid() + "/desc/";
-                String remotePrePath = GoodsInfoUtils.changeLocalPathToRemotePath(servicePrePath).replace("kidsproductwholesale","import-express");
+                String remotePrePath = GoodsInfoUtils.changeLocalPathToRemotePath(servicePrePath).replace("kidscharming", "import-express");
                 Random random = new Random();
                 for (Element imel : imgEls) {
                     String imgUrl = imel.attr("src");

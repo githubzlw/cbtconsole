@@ -35,7 +35,7 @@
 
         .btn_sty {
             margin: 5px 0 0 0;
-            width: 120px;
+            width: 130px;
             color: #fff;
             background-color: #5db5dc;
             border-color: #2e6da4;
@@ -84,12 +84,12 @@
 
                         var data = json.data;
                         var content = '';
-                        for(var key in data){
-                            content += '<option value="'+key+'">'+data[key]+'</option>'
+                        for (var key in data) {
+                            content += '<option value="' + key + '">' + data[key] + '</option>'
                         }
                         $("#select_web_site").empty();
                         $("#select_web_site").append(content);
-                        if(website > 0){
+                        if (website > 0) {
                             $("#select_web_site").val(website);
                         }
                     } else {
@@ -130,7 +130,7 @@
                 dataType: 'text',
                 url: '/cbtconsole/shopCarMarketingCtr/updateCarGoodsPriceByUserId',
                 data: {
-                    "pid" : pid,
+                    "pid": pid,
                     "goodsId": goodsId,
                     "userId": userId,
                     "goodsPrice": goodsPrice,
@@ -159,7 +159,7 @@
 
         function closeDialog(divId, formId) {
             $('#' + divId).dialog('close');
-            if(formId && formId != null){
+            if (formId && formId != null) {
                 $("#" + formId)[0].reset();
             }
         }
@@ -201,39 +201,39 @@
             });
         }
 
-        function confirmAndSendEmail(userId, userEmail, emailContentId,type) {
+        function confirmAndSendEmail(userId, userEmail, emailContentId, type) {
             var emailContent = $("#" + emailContentId).val();
-                if (emailContent == null || emailContent == "") {
-                    $.messager.alert("提醒", "获取邮件内容失败", "info");
-                    return false;
-                } else {
-                    $.ajax({
-                        type: 'POST',
-                        dataType: 'text',
-                        url: '/cbtconsole/shopCarMarketingCtr/confirmAndSendEmail',
-                        data: {
-                            "userEmail": userEmail,
-                            "userId": userId,
-                            "emailContent": emailContent
-                        },
-                        success: function (data) {
-                            var json = eval("(" + data + ")");
-                            if(json.ok){
-                                showMessage("执行成功");
-                                if (type == 1) {
-                                    closeDialog('simple_email_div', 'simple_form_enter');
-                                } else {
-                                    closeDialog('shop_cart_div', 'hop_cart_form');
-                                }
-                            }else{
-                                $.messager.alert("提醒", json.message, "info");
+            if (emailContent == null || emailContent == "") {
+                $.messager.alert("提醒", "获取邮件内容失败", "info");
+                return false;
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'text',
+                    url: '/cbtconsole/shopCarMarketingCtr/confirmAndSendEmail',
+                    data: {
+                        "userEmail": userEmail,
+                        "userId": userId,
+                        "emailContent": emailContent
+                    },
+                    success: function (data) {
+                        var json = eval("(" + data + ")");
+                        if (json.ok) {
+                            showMessage("执行成功");
+                            if (type == 1) {
+                                closeDialog('simple_email_div', 'simple_form_enter');
+                            } else {
+                                closeDialog('shop_cart_div', 'hop_cart_form');
                             }
-                        },
-                        error: function () {
-                            $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                        } else {
+                            $.messager.alert("提醒", json.message, "info");
                         }
-                    });
-                }
+                    },
+                    error: function () {
+                        $.messager.alert("提醒", "执行失败,请联系管理员", "info");
+                    }
+                });
+            }
         }
 
         function openComparedEmail(userId) {
@@ -250,7 +250,17 @@
             var url = "/cbtconsole/userinfo/getUserInfo.do?userId=" + userId;
             window.open(url);
         }
-        
+
+        function getNewCarInfo(userId, website) {
+            var url = "http://192.168.1.31:9090/webSiteCar/getSingleInfo/" + userId;
+            var iWidth = 666; //弹出窗口的宽度;
+            var iHeight = 333; //弹出窗口的高度;
+            var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
+            var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置;
+            var param = "height=" + iHeight + ",width=" + iWidth + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no";
+            window.open(url, 'windows', param);
+        }
+
         function openFollowInfo() {
             $("#follow_info_id").dialog('open');
         }
@@ -266,9 +276,9 @@
                 },
                 success: function (data) {
                     var json = eval("(" + data + ")");
-                    if(json.ok){
+                    if (json.ok) {
                         showMessage("执行成功");
-                    }else{
+                    } else {
                         $.messager.alert("提醒", json.message, "info");
                     }
                 },
@@ -277,14 +287,14 @@
                 }
             });
         }
-        
 
-        function  openSendEmail(userId, website) {
+
+        function openSendEmail(userId, website) {
             var type = $("#send_type").val();
-            if(type == 2){
+            if (type == 2) {
                 // 动态展示折扣券
                 getCouponCode(userId, website);
-            }else{
+            } else {
                 var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId="
                     + userId + "&type=" + type + "&website=" + website;
                 var iWidth = 1680; //弹出窗口的宽度;
@@ -345,64 +355,64 @@
             var typeCodeMo = $("#coupon_type").val();//卷类别
             var valueLeft = $("#coupon_min_amount").val();//最低消费金额
             var valueRight = $("#coupon_deduction").val();// 该卷抵扣金额
-            var describe =  $("#coupon_desc").val();// 描述
+            var describe = $("#coupon_desc").val();// 描述
             var count = 1;
             var fromTime = $("#coupon_begin_time").val();
             var toTime = $("#coupon_end_time").val();
             var websiteType = couponWebsiteType;
             var userids = $("#coupon_user_id").val();
             var isSu = true;
-            if(couponWebsiteType < 1){
+            if (couponWebsiteType < 1) {
                 $.messager.alert("提醒", "获取网站类别失败", "info");
                 isSu = false;
                 return isSu;
             }
-            if(couponCode ==  null || couponCode == ""){
+            if (couponCode == null || couponCode == "") {
                 $.messager.alert("提醒", "获取卷码失败", "info");
                 isSu = false;
                 return isSu;
             }
-            if(typeCodeMo < 1){
+            if (typeCodeMo < 1) {
                 $.messager.alert("提醒", "获取卷类别失败", "info");
                 isSu = false;
                 return isSu;
             }
-            if(valueLeft < 0){
+            if (valueLeft < 0) {
                 $.messager.alert("提醒", "获取最低消费金额失败", "info");
                 isSu = false;
                 return isSu;
             }
-            if(valueRight < 0){
+            if (valueRight < 0) {
                 $.messager.alert("提醒", "获取该卷抵扣金额失败", "info");
                 isSu = false;
                 return isSu;
             }
-            if(describe ==  null || describe == ""){
+            if (describe == null || describe == "") {
                 $.messager.alert("提醒", "获取该卷描述失败", "info");
                 isSu = false;
                 return isSu;
             }
-            if(fromTime ==  null || fromTime == ""){
+            if (fromTime == null || fromTime == "") {
                 $.messager.alert("提醒", "获取开始时间失败", "info");
                 isSu = false;
                 return isSu;
             }
-            if(toTime ==  null || toTime == ""){
+            if (toTime == null || toTime == "") {
                 $.messager.alert("提醒", "获取到期时间失败", "info");
                 isSu = false;
                 return isSu;
             }
-            if(userids < 0){
+            if (userids < 0) {
                 $.messager.alert("提醒", "获取客户ID失败", "info");
                 isSu = false;
                 return isSu;
             }
-            if(valueLeft * 0.07 < valueRight){
+            if (valueLeft * 0.07 < valueRight) {
                 $.messager.alert("提醒", "折扣金额不能超过最低消费金额的7%", "info");
                 isSu = false;
                 return isSu;
             }
-            if(valueLeft < 100){
+            if (valueLeft < 100) {
                 $.messager.alert("提醒", "最低消费金额不能小于100", "info");
                 isSu = false;
                 return isSu;
@@ -412,24 +422,24 @@
                 isSu = false;
                 return isSu;
             }*/
-            if(isSu){
+            if (isSu) {
                 $(obj).prop("disabled", true);
                 $.ajax({
                     type: "POST",
                     url: "/cbtconsole/coupon/addcoupon.do",
                     data: {
-                        couponWebsiteType:couponWebsiteType,
-                        couponCode:couponCode,
-                        type:typeCodeMo,
-                        valueLeft:valueLeft,
-                        valueRight:valueRight,
-                        describe:describe,
-                        count:count,
-                        fromTime:fromTime,
-                        toTime:toTime,
-                        websiteType:websiteType,
-                        userids:userids,
-                        isShopCar:1
+                        couponWebsiteType: couponWebsiteType,
+                        couponCode: couponCode,
+                        type: typeCodeMo,
+                        valueLeft: valueLeft,
+                        valueRight: valueRight,
+                        describe: describe,
+                        count: count,
+                        fromTime: fromTime,
+                        toTime: toTime,
+                        websiteType: websiteType,
+                        userids: userids,
+                        isShopCar: 1
                     },
                     dataType: "json",
                     success: function (msg) {
@@ -457,7 +467,7 @@
         }
 
         function changeDescribe(price) {
-            if(price && price > 0){
+            if (price && price > 0) {
                 $("#coupon_desc").val('If order over  $' + price);
             }
         }
@@ -474,7 +484,7 @@
          data-options="modal:true" style="width: 500px; height: 250px;">
         <form id="simple_coupon_enter" style="text-align: center" action="#" onsubmit="return false">
 
-            <table cellspacing="1" >
+            <table cellspacing="1">
 
                 <tr>
                     <td style="display: none;">
@@ -494,11 +504,14 @@
                 </tr>
                 <tr>
                     <td>最低消费金额</td>
-                    <td><input id="coupon_min_amount" type="number" step="0.01" value="100" onchange="changeDescribe(this.value)"/>(<b style="color: red">*根据总产品金额给</b>)</td>
+                    <td><input id="coupon_min_amount" type="number" step="0.01" value="100"
+                               onchange="changeDescribe(this.value)"/>(<b style="color: red">*根据总产品金额给</b>)
+                    </td>
                 </tr>
                 <tr>
                     <td>抵扣金额</td>
-                    <td><input id="coupon_deduction" type="number" step="0.01"/>(<b style="color: red">*按照优惠券逻辑设置</b>)</td>
+                    <td><input id="coupon_deduction" type="number" step="0.01"/>(<b style="color: red">*按照优惠券逻辑设置</b>)
+                    </td>
                 </tr>
                 <tr>
                     <td>描述(自动生成):</td>
@@ -507,22 +520,24 @@
                 <tr>
                     <td>截止时间:</td>
                     <td><input id="coupon_begin_time" class="Wdate"
-                           style="width: 168px; height: 24px" type="text" value=""
-                           onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
-                    <input id="coupon_end_time" class="Wdate"
-                           style="width: 168px; height: 24px" type="text" value=""
-                           onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></td>
+                               style="width: 168px; height: 24px" type="text" value=""
+                               onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+                        <input id="coupon_end_time" class="Wdate"
+                               style="width: 168px; height: 24px" type="text" value=""
+                               onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></td>
                 </tr>
 
                 <tr>
-                    <td colspan="2" style="text-align: center;"><button onclick="addCoupon(this)">创建</button>
-                    &nbsp;&nbsp;<button onclick="closeDialog('simple_coupon_div', 'simple_coupon_enter')">关闭</button></td>
+                    <td colspan="2" style="text-align: center;">
+                        <button onclick="addCoupon(this)">创建</button>
+                        &nbsp;&nbsp;<button onclick="closeDialog('simple_coupon_div', 'simple_coupon_enter')">关闭
+                    </button>
+                    </td>
                 </tr>
             </table>
 
         </form>
     </div>
-
 
 
     <div id="simple_email_div" class="easyui-dialog" title="发送邮件(简单跟进)"
@@ -562,13 +577,14 @@
         </form>
     </div>
 
-    <div id="follow_info_id" class="easyui-dialog" title="跟进列表" data-options="modal:true" style="width: 400px; height: 300px;">
+    <div id="follow_info_id" class="easyui-dialog" title="跟进列表" data-options="modal:true"
+         style="width: 400px; height: 300px;">
         <table border="1" cellpadding="1" cellspacing="0" align="center">
             <thead>
-                <tr>
-                    <td style="width: 80px;">跟进人</td>
-                    <td style="width: 150px;">跟进时间</td>
-                </tr>
+            <tr>
+                <td style="width: 80px;">跟进人</td>
+                <td style="width: 150px;">跟进时间</td>
+            </tr>
             </thead>
             <c:if test="${not empty followList}">
                 <c:forEach items="${followList}" var="fl">
@@ -579,7 +595,9 @@
                 </c:forEach>
             </c:if>
             <tr>
-                <td colspan="2" style="text-align: center;"><button onclick="closeDialog('follow_info_id', null)">关闭</button></td>
+                <td colspan="2" style="text-align: center;">
+                    <button onclick="closeDialog('follow_info_id', null)">关闭</button>
+                </td>
             </tr>
         </table>
     </div>
@@ -596,10 +614,11 @@
                 <td>
                     <c:choose>
                         <c:when test="${isGetFreigthResult==true}">
-                           预估利润率:${userInfo.estimateProfit}<em>%</em>【(商品总价+购物车运费-线下采购运输运费-商品采购价)/商品采购价(${userInfo.totalPrice}+${userInfo.totalFreight}-${userInfo.offFreight}-${userInfo.totalWhosePrice})/(${userInfo.totalPrice}+${userInfo.totalFreight}))】
+                            预估利润率:${userInfo.estimateProfit}
+                            <em>%</em>【(商品总价+购物车运费-线下采购运输运费-商品采购价)/商品采购价(${userInfo.totalPrice}+${userInfo.totalFreight}-${userInfo.offFreight}-${userInfo.totalWhosePrice})/(${userInfo.totalPrice}+${userInfo.totalFreight}))】
                         </c:when>
                         <c:otherwise>
-                             <font color="red">没有获取到正确运费无法预估</font>
+                            <font color="red">没有获取到正确运费无法预估</font>
                         </c:otherwise>
                     </c:choose>
                 </td>
@@ -614,14 +633,14 @@
             <tr>
                 <td colspan="4">
                     <div style="text-align: center">
-                        <%--<input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
-                        &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>--%>
-                        <span>网站:<select id="select_web_site"  style="height: 28px;width: 180px;" disabled="disabled">
+                            <%--<input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
+                            &nbsp;&nbsp;
+                            <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>--%>
+                        <span>网站:<select id="select_web_site" style="height: 28px;width: 180px;" disabled="disabled">
                             <option value="0">import-express</option>
-                            <option value="1">kidsproductwholesale</option>
+                            <option value="1">kidscharming</option>
                         </select></span>
-                       <span>邮件类型:
+                        <span>邮件类型:
                             <select id="send_type" style="height: 28px;width: 180px;">
                             <option value="1" selected="selected">不做变动,直接发送</option>
                             <%--<option value="2">给单个产品价格改价</option>--%>
@@ -631,17 +650,22 @@
                             </select>
                         </span>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="发送邮件" onclick="openSendEmail(${userId}, ${param.website})"/>
+                        <input class="btn_sty" type="button" value="发送邮件"
+                               onclick="openSendEmail(${userId}, ${param.website})"/>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId}, ${param.website})"/>
+                        <input class="btn_sty" type="button" value="竞争对手对比"
+                               onclick="openComparedEmail(${userId}, ${param.website})"/>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="查看客户信息" onclick="openUserInfo(${userId}, ${param.website})"/>
+                        <input class="btn_sty" type="button" value="查看客户信息"
+                               onclick="openUserInfo(${userId}, ${param.website})"/>
 
-                            <input class="btn_sty" type="button" value="查看跟进记录" onclick="openFollowInfo()"/>
+                        &nbsp;&nbsp;<input class="btn_sty" type="button" value="查看跟进记录" onclick="openFollowInfo()"/>
                         &nbsp;&nbsp;
-                        <%--<input class="btn_sty" type="button" value="查看EDM跟踪" onclick="openUserFollow(${userId}, ${param.website})"/>--%>
+                            <%--<input class="btn_sty" type="button" value="查看EDM跟踪" onclick="openUserFollow(${userId}, ${param.website})"/>--%>
                         &nbsp;&nbsp;
-                        <%--<input class="btn_sty" style="display: none;" type="button" value="恢复线上数据" onclick="recoverOnlineData(${userId}, ${param.website})"/>--%>
+                            <%--<input class="btn_sty" style="display: none;" type="button" value="恢复线上数据" onclick="recoverOnlineData(${userId}, ${param.website})"/>--%>
+                        &nbsp;&nbsp;<input class="btn_sty" type="button" value="重新获取购物车"
+                                           onclick="getNewCarInfo(${userId}, ${param.website})"/>
                     </div>
                 </td>
             </tr>
@@ -665,8 +689,8 @@
                 <td style="width: 180px;">对标商品信息</td>
                 <td style="width: 80px;">数量</td>
                 <td style="width: 80px;">原价</td>
-               <%-- <td style="width: 80px;">改价</td>--%>
-                <%--<td style="width: 140px;">操作</td>--%>
+                    <%-- <td style="width: 80px;">改价</td>--%>
+                    <%--<td style="width: 140px;">操作</td>--%>
             </tr>
             </thead>
             <tbody>
@@ -716,22 +740,22 @@
                             ${good.cartGoodsPrice}
                         </c:if>
                     </td>
-                    <%--<td style="text-align: center">
-                        <c:if test="${good.cartOldPrice > 0}">
-                            ${good.cartGoodsPrice}
-                        </c:if>
-                    </td>
-                    <td>
-                        <input type="number" value="" style="width: 120px;"/>
-                        <c:if test="${good.cartOldPrice > 0}">
-                            <br><input class="btn_sty" type="button" value="修改价格"
-                                       onclick="updateGoodsPrice('${good.pid}',${good.id},${userId},${good.cartOldPrice},this)"/>
-                        </c:if>
-                        <c:if test="${good.cartOldPrice == 0}">
-                            <br><input class="btn_sty" type="button" value="修改价格"
-                                       onclick="updateGoodsPrice('${good.pid}',${good.id},${userId},${good.cartGoodsPrice},this)"/>
-                        </c:if>
-                    </td>--%>
+                        <%--<td style="text-align: center">
+                            <c:if test="${good.cartOldPrice > 0}">
+                                ${good.cartGoodsPrice}
+                            </c:if>
+                        </td>
+                        <td>
+                            <input type="number" value="" style="width: 120px;"/>
+                            <c:if test="${good.cartOldPrice > 0}">
+                                <br><input class="btn_sty" type="button" value="修改价格"
+                                           onclick="updateGoodsPrice('${good.pid}',${good.id},${userId},${good.cartOldPrice},this)"/>
+                            </c:if>
+                            <c:if test="${good.cartOldPrice == 0}">
+                                <br><input class="btn_sty" type="button" value="修改价格"
+                                           onclick="updateGoodsPrice('${good.pid}',${good.id},${userId},${good.cartGoodsPrice},this)"/>
+                            </c:if>
+                        </td>--%>
                 </tr>
             </c:forEach>
 

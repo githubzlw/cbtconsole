@@ -3,6 +3,7 @@ package com.importExpress.mapper;
 import com.cbt.bean.CategoryBean;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
+import com.cbt.bean.ProductSingleBean;
 import com.cbt.website.bean.PurchasesBean;
 import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
@@ -276,14 +277,16 @@ public interface CustomGoodsMapper {
 
     /**
      * 根据PID查询数据信息
+     *
      * @param pidList
      * @return
      */
-    List<CustomGoodsPublish>  queryGoodsByPidList(@Param("pidList") List<String> pidList);
+    List<CustomGoodsPublish> queryGoodsByPidList(@Param("pidList") List<String> pidList);
 
 
     /**
      * 更新详情数据
+     *
      * @param gd
      * @return
      */
@@ -291,6 +294,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 更新MD5删除的图片标记
+     *
      * @param pid
      * @param url
      * @return
@@ -299,6 +303,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 删除同店铺MD5临时表数据
+     *
      * @param pid
      * @param url
      * @param shopId
@@ -307,70 +312,78 @@ public interface CustomGoodsMapper {
     int deleteMd5ImgSameTempFlag(@Param("pid") String pid, @Param("url") String url, @Param("shopId") String shopId);
 
 
-
     /**
      * 获取相同店铺下的商品信息
+     *
      * @param shopMd5Bean
      * @return
      */
-	List<ShopMd5Bean> queryForMd5List(ShopMd5Bean shopMd5Bean);
+    List<ShopMd5Bean> queryForMd5List(ShopMd5Bean shopMd5Bean);
 
     /**
-     *获取相同店铺下的商品信息总数
+     * 获取相同店铺下的商品信息总数
+     *
      * @param shopMd5Bean
      * @return
      */
-	int queryForMd5ListCount(ShopMd5Bean shopMd5Bean);
+    int queryForMd5ListCount(ShopMd5Bean shopMd5Bean);
 
     /**
      * 跟进店铺ID查询商品的MD5数据
+     *
      * @param shopId
      * @return
      */
-	List<GoodsMd5Bean> queryShopGoodsByMd5(@Param("md5Val") String shopId);
+    List<GoodsMd5Bean> queryShopGoodsByMd5(@Param("md5Val") String shopId);
 
     /**
      * 根据MD5数据标识已删除
+     *
      * @param goodsMd5
      * @return
      */
-	int updateImgDeleteByMd5(@Param("goodsMd5") String goodsMd5);
+    int updateImgDeleteByMd5(@Param("goodsMd5") String goodsMd5);
 
 
-	/**
+    /**
      * 删除非同店铺MD5临时表数据
+     *
      * @param goodsMd5
      * @return
      */
     int deleteMd5ImgNoSameTempFlag(@Param("goodsMd5") String goodsMd5);
 
-	/**
+    /**
      * 获取不同店铺下的商品信息
+     *
      * @param shopMd5Bean
      * @return
      */
-	List<ShopMd5Bean> queryMd5NoSameList(ShopMd5Bean shopMd5Bean);
+    List<ShopMd5Bean> queryMd5NoSameList(ShopMd5Bean shopMd5Bean);
 
     /**
-     *获取不同店铺下的商品信息总数
+     * 获取不同店铺下的商品信息总数
+     *
      * @param shopMd5Bean
      * @return
      */
-	int queryMd5NoSameListCount(ShopMd5Bean shopMd5Bean);
+    int queryMd5NoSameListCount(ShopMd5Bean shopMd5Bean);
 
 
-	/**
+    /**
      * 设置产品对标信息
+     *
      * @param pid
      * @param aliPid
      * @param aliPrice
      * @return
      */
-	int setNewAliPidInfo(@Param("pid") String pid, @Param("aliPid") String aliPid, @Param("aliPrice") String aliPrice);
+    int setNewAliPidInfo(@Param("pid") String pid, @Param("aliPid") String aliPid, @Param("aliPrice") String aliPrice);
 
 
-	/**
+    /**
      * 根据状态获取PID数据
+     *
      * @param state
      * @return
      */
@@ -378,6 +391,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 插入价格或者重量记录
+     *
      * @param editBean
      * @return
      */
@@ -385,6 +399,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 更新WeightFlag状态
+     *
      * @param pid
      * @param flag
      * @return
@@ -393,14 +408,16 @@ public interface CustomGoodsMapper {
 
     /**
      * 更新sku数据
+     *
      * @param pid
      * @param sku
      * @return
      */
-    int updateSkuInfo(@Param("pid") String pid, @Param("sku") String sku);
+    int updateSkuInfo(@Param("pid") String pid, @Param("sku") String sku, @Param("rangePrice") String rangePrice, @Param("rangePriceFree") String rangePriceFree, @Param("minPrice") float minPrice);
 
     /**
      * 插入sku更新日志
+     *
      * @param pid
      * @param oldSku
      * @param newSku
@@ -413,6 +430,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 标记商品软下架
+     *
      * @param pid
      * @param reason
      * @return
@@ -421,6 +439,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 根据店铺ID查询PID数据
+     *
      * @param shopId : 店铺ID
      * @return
      */
@@ -428,7 +447,8 @@ public interface CustomGoodsMapper {
 
     /**
      * 更新体积重量
-     * @param pid : pID
+     *
+     * @param pid       : pID
      * @param newWeight : 新的重量
      * @return
      */
@@ -441,12 +461,14 @@ public interface CustomGoodsMapper {
 
     /**
      * 查询全部店铺售卖金额
+     *
      * @return
      */
     List<ShopGoodsSalesAmount> queryShopGoodsSalesAmountAll();
 
     /**
      * 查询单个店铺售卖金额
+     *
      * @param shopId
      * @return
      */
@@ -455,6 +477,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 插入商品压缩和上传图片失败日志
+     *
      * @param pid
      * @param imgUrl
      * @param adminId
@@ -462,8 +485,10 @@ public interface CustomGoodsMapper {
      * @return
      */
     int insertIntoGoodsImgUpLog(@Param("pid") String pid, @Param("imgUrl") String imgUrl, @Param("adminId") int adminId, @Param("remark") String remark);
+
     @Select("SELECT shipno as shipnoid,tborderid from id_relationtable WHERE orderid=#{purchasesBean.orderNo} AND odid=#{purchasesBean.od_id} AND goodid=#{purchasesBean.goodsid} LIMIT 1")
     PurchasesBean FindShipnoByOdid(@Param("purchasesBean") PurchasesBean purchasesBean);
+
     @Select("SELECT shipno from taobao_1688_order_history WHERE orderid=#{tborderid} LIMIT 1")
     String FindShipnoByTbor(@Param("tborderid") String tborderid);
 
@@ -477,6 +502,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 查询kids下类别信息
+     *
      * @return
      */
     List<String> queryKidsCanUploadCatid();
@@ -485,6 +511,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 根据skuId查询中文规格信息
+     *
      * @param skuId
      * @return
      */
@@ -492,6 +519,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 查询所有黑名单店铺
+     *
      * @return
      */
     List<String> queryAllShopBlackList();
@@ -507,6 +535,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 查询描述很精彩日志数据
+     *
      * @param pid
      * @return
      */
@@ -514,14 +543,16 @@ public interface CustomGoodsMapper {
 
     /**
      * 获取全部描述很精彩pid
+     *
      * @return
      */
     List<String> queryDescribeLogList();
 
-    Map<String,String>  getGoodsByPid(@Param("pid") String pid);
+    Map<String, String> getGoodsByPid(@Param("pid") String pid);
 
     /**
      * 插入海外仓数据
+     *
      * @param goodsOverSea
      * @return
      */
@@ -529,6 +560,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 查询海外仓数据
+     *
      * @param pid
      * @return
      */
@@ -545,6 +577,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 添加日志
+     *
      * @param pid
      * @param flag
      * @param adminId
@@ -558,6 +591,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 保存重量改动信息
+     *
      * @param weightChange
      * @return
      */
@@ -565,6 +599,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 分页查询重量改动信息
+     *
      * @param weightChange
      * @return
      */
@@ -572,6 +607,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 重量改动信息总数
+     *
      * @param weightChange
      * @return
      */
@@ -579,6 +615,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 设置重量改动信息同步标识
+     *
      * @param weightChange
      * @return
      */
@@ -586,6 +623,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 更新海外仓数据
+     *
      * @param goodsOverSea
      * @return
      */
@@ -593,6 +631,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 分页获取数据
+     *
      * @param minId
      * @param maxId
      * @return
@@ -601,6 +640,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 查询单个bean
+     *
      * @param pid
      * @return
      */
@@ -608,6 +648,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 插入分类数据
+     *
      * @param cidMap
      * @return
      */
@@ -615,12 +656,14 @@ public interface CustomGoodsMapper {
 
     /**
      * 获取所有Categorybean
+     *
      * @return
      */
     List<CategoryBean> queryAllCategoryBean();
 
     /**
      * 根据类别获取类别和子类数据
+     *
      * @param catid
      * @return
      */
@@ -628,12 +671,14 @@ public interface CustomGoodsMapper {
 
     /**
      * 查询需要发布的数据
+     *
      * @return
      */
     List<String> queryOnlineSync();
 
     /**
      * 删除发布的数据
+     *
      * @param pid
      * @return
      */
@@ -641,6 +686,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 插入发布的数据
+     *
      * @param pid
      * @return
      */
@@ -648,6 +694,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 查询侵权商品
+     *
      * @param queryBean
      * @return
      */
@@ -655,6 +702,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 查询侵权商品总数
+     *
      * @param queryBean
      * @return
      */
@@ -662,6 +710,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 侵权单个数据
+     *
      * @param pid
      * @return
      */
@@ -677,6 +726,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 查询美加可售标识
+     *
      * @param pid
      * @return
      */
@@ -684,6 +734,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 添加日志
+     *
      * @param pid
      * @param flag
      * @param adminId
@@ -693,6 +744,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 获取全部产品数据的map
+     *
      * @param minId
      * @param maxId
      * @return
@@ -701,6 +753,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 获取网站类别数据
+     *
      * @param webSite
      * @return
      */
@@ -708,6 +761,7 @@ public interface CustomGoodsMapper {
 
     /**
      * 产品店铺表更新，供可搜索使用
+     *
      * @param shopId
      * @param type
      * @return
@@ -716,14 +770,44 @@ public interface CustomGoodsMapper {
 
     /**
      * 根据类别查询店铺数据
+     *
      * @return
      */
     List<String> queryShopIdByType(int type);
 
     /**
      * 获取管接口和电缆PID信息
+     *
      * @return
      */
     List<String> getPipeList();
+
+    ProductSingleBean queryPidSingleBean(String pid);
+
+    int insertB2cPriceLog(CustomGoodsPublish goods);
+
+    int setNoUpdatePrice(CustomGoodsPublish goods);
+
+    CustomGoodsPublish selectB2cPriceLog(@Param("pid") String pid);
+
+    int saveNewGoodsDetails(CustomGoodsPublish goods);
+
+    int queryNewPid();
+
+    int updateNewPid();
+
+    /**
+     * 根据PID查询商品详情
+     *
+     * @param pid
+     * @return
+     */
+    CustomGoodsPublish queryNewGoodsDetailsByPid(@Param("pid") String pid);
+
+    int updateNewGoodsDetailsByInfo(CustomGoodsPublish goods);
+
+    int saveNewGoodsDetailsPush(CustomGoodsPublish goods);
+
+    int updateEntypeSkuByPid(CustomGoodsPublish goods);
 
 }

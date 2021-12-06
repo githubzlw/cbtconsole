@@ -809,7 +809,7 @@ public class ShopUrlController {
                     double finalWeight = Double.valueOf(pft.getFinalWeight());
                     // 运费
                     double feeprice = FeightUtils.getCarFeightNew(finalWeight, Integer.valueOf(pft.getCategoryId()));
-                    pft.setFreight(new BigDecimal(feeprice / StrUtils.EXCHANGE_RATE)
+                    pft.setFreight(new BigDecimal(feeprice / GoodsInfoUtils.EXCHANGE_RATE)
                             .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
                     if (pft.getWholesalePrice() == null || "".equals(pft.getWholesalePrice())) {
                         continue;
@@ -823,7 +823,7 @@ public class ShopUrlController {
                     // 成本利润率=
                     // (我们网站最终展现价格/（1688价格SKU的最高价+运费(这里按照单件运费进行计算))-1
                     double profitMargin = (price
-                            / ((Float.valueOf(strWholesalePrice) + feeprice) / StrUtils.EXCHANGE_RATE)) - 1;
+                            / ((Float.valueOf(strWholesalePrice) + feeprice) / GoodsInfoUtils.EXCHANGE_RATE)) - 1;
                     pft.setRate(new BigDecimal(profitMargin * 100).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
                     if (cidMap.containsKey(pft.getCategoryId())) {
                         ShopInfoBean spInf = cidMap.get(pft.getCategoryId());
@@ -834,7 +834,7 @@ public class ShopUrlController {
                     // 计算5件商品的平均运费
                     double feeprice5 = FeightUtils.getCarFeightNew(finalWeight * 5,
                             Integer.valueOf(pft.getCategoryId()));
-                    pft.setFreight5Gd(new BigDecimal(feeprice5 / (5 * StrUtils.EXCHANGE_RATE) * 100)
+                    pft.setFreight5Gd(new BigDecimal(feeprice5 / (5 * GoodsInfoUtils.EXCHANGE_RATE) * 100)
                             .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
                 }
             }
@@ -3536,6 +3536,8 @@ public class ShopUrlController {
                     break;
                 }
             }
+            // 重量逻辑改动，不再需要检查重量了
+            isZone = false;
             if (isZone) {
                 json.setOk(false);
                 json.setMessage("类别：" + catid + ",存在平均重量没有设定的情况，请设置");
@@ -4022,7 +4024,7 @@ public class ShopUrlController {
                 String remoteShowPath = certificateFile.replace(ftpConfig.getLocalShowPath(), ftpConfig.getRemoteShowPath());
                 String remoteLocalPath = certificateFile.replace(ftpConfig.getLocalShowPath(), FtpConfig.REMOTE_LOCAL_PATH);
                 String destPath = remoteLocalPath.substring(0,remoteLocalPath.lastIndexOf("/"));
-                // destPath = destPath.replace("/usr/local/goodsimg/importcsvimg","");
+                // destPath = destPath.replace("/data/importcsvimg","");
                 *//*json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);
                 if (!json.isOk()) {
                     json = NewFtpUtil.uploadFileToRemoteSSM(localFilePath, destPath, ftpConfig);

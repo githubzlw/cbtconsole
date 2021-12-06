@@ -232,7 +232,7 @@ import sun.misc.BASE64Encoder;
 @Controller
 @RequestMapping("/warehouse")
 public class WarehouseCtrl {
-	private static final String UPLOAD_IMG_PATH = "/usr/local/goodsimg/importcsvimg/inspectionImg/";
+	private static final String UPLOAD_IMG_PATH = "/data/importcsvimg/inspectionImg/";
 	// 上传文件存储目录
 	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 	private static final String UPLOAD_DIRECTORY = "upload";
@@ -4066,6 +4066,7 @@ public class WarehouseCtrl {
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOG.error("订单合并异常【合并订单号:" + orderNo + "】", e);
 			return "0";
 		}
@@ -6772,7 +6773,7 @@ public class WarehouseCtrl {
 				}
 				if (MultiSiteUtil.getSiteTypeNum(orderid)==2){
 					modelM.put("websiteType",2);
-					modelM.put("toHref","https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+					modelM.put("toHref","https://www.kidscharming.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
 					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK_KIDS);
 				}
 				if (MultiSiteUtil.getSiteTypeNum(orderid)==3){
@@ -7547,7 +7548,7 @@ public class WarehouseCtrl {
 						if (websiteType == 1) {
                             modelM.put("toHref", "https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         } else if (websiteType == 2) {
-                            modelM.put("toHref", "https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                            modelM.put("toHref", "https://www.kidscharming.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         } else if (websiteType == 3) {
                             modelM.put("toHref", "https://www.petstoreinc.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
                         }

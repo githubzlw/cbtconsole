@@ -451,22 +451,24 @@
 		// $("#gen_show_notice").show();
 		//$(".refresh_color").css("background","#aaa");
 		//$(".refresh_color").attr("disabled",true);
-		var url = "http://52.37.218.73:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
-		if(webType == 1){
-		    url = "http://52.37.218.73:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
+        // http://192.168.1.67:15792/hotProduct/refreshJson?hotClassId=1&webSite=1
+		var url = "http://52.37.218.73:15792/hotProduct/refreshJson?webSite="+webType;
+		/*if(webType == 1){
+		    url = "http://52.37.218.73:15792/hotProduct/refreshJson?webSite="+webType;
         } else if(webType == 2){
-		    url = "http://52.37.218.73:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
+		    url = "http://52.37.218.73:15792/hotProduct/refreshJson?webSite="+webType;
         } else if(webType == 3){
-		    url = "http://52.37.218.73:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
+		    url = "http://52.37.218.73:15792/hotProduct/refreshJson?webSite="+webType;
         }else if(webType == 4){
-		    url = "http://52.37.218.73:15792/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
+		    url = "http://52.37.218.73:15792/hotProduct/refreshJson?webSite="+webType;
         }else{
 		    $("#gen_show_notice").text("选择分组失败，不刷新！");
 		    return;
-        }
+        }*/
         if(window.location.href.indexOf("127.0.0.1") > -1 || window.location.href.indexOf("localhost") > -1){
-            url =  "http://192.168.1.153:8088/CbtStaticize/hotGoods/refreshJson.do?webSite="+webType;
+            url =  "http://192.168.1.67:15792/hotProduct/refreshJson?webSite="+webType;
         }
+        //url =  "http://192.168.1.67:15792/hotProduct/refreshJson?webSite="+webType;
         if(hotType > 0){
             url += "&hotClassId="+hotType;
         }
@@ -498,10 +500,10 @@
     		$(".refresh_color").css("background","#aaa");
     		$(".refresh_color").attr("disabled",true);
             var url = "https://www.import-express.com/popProducts/refreshHotJson?html=1&webType="+webType;
-            if(webType == 1){
+            /*if(webType == 1){
                 url = "https://www.import-express.com/popProducts/refreshHotJson?html=1&webType="+webType;
             }else if(webType == 2){
-                url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?html=1&webType="+webType;
+                url = "https://www.kidscharming.com/popProducts/refreshHotJson?html=1&webType="+webType;
             }else if(webType == 3){
                 url = "https://www.petstoreinc.com/popProducts/refreshHotJson?html=1&webType="+webType;
             }else if(webType == 4){
@@ -509,7 +511,7 @@
             }else{
                 $("#gen_show_notice").text("选择分组失败，不刷新！");
                 return;
-            }
+            }*/
     		$.ajax({
     			type : "GET",
     			url : url,

@@ -455,7 +455,7 @@ public class CustomGoodsController {
                 }
 
                 PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(goods.getPid(),
-                        customGoodsService, ftpConfig, goods.getIsUpdateImg(), user.getId(), 0);
+                        customGoodsService, ftpConfig, goods.getIsUpdateImg(), user.getId(), 0, null);
 
                 FutureTask futureTask = new FutureTask(pbCallable);
                 Thread thread = new Thread(futureTask);

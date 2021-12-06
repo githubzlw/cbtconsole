@@ -224,4 +224,24 @@ public interface SingleGoodsDao {
 	 */
 	int insertIntoSingleGoods(Goods1688OfferBean goodsOffer);
 
+	/**
+	 *
+	 * @Title queryForList
+	 * @Description 根据条件查询数据
+	 * @param queryPm
+	 * @return 数据集合
+	 * @return List<SameTypeGoodsBean>
+	 */
+	List<SameTypeGoodsBean> queryForNewGoodsList(SingleQueryGoodsParam queryPm);
+
+	/**
+	 *
+	 * @Title queryForListCount
+	 * @Description 查询结果集总数
+	 * @param queryPm
+	 * @return 总数
+	 * @return int
+	 */
+	int queryForNewGoodsListCount(SingleQueryGoodsParam queryPm);
+
 }

@@ -675,6 +675,47 @@ public class MongoDBController {
     }
 
 
+    @GetMapping("/deleteOffLinePid")
+    @ResponseBody
+    public JsonResult deleteOffLinePid() {
+        JsonResult json = new JsonResult();
+        try {
+
+            int limitNum = 400;
+            int maxId = customGoodsService.queryMaxIdFromCustomGoods();
+            int fc = maxId / limitNum;
+            if (maxId % limitNum > 0) {
+                fc++;
+            }
+
+            List<MongoGoodsBean> list = null;
+            List<String> tempList = null;
+            mongoGoodsService.clearDatabase();
+
+            for (int i = 1; i <= fc; i++) {
+                try {
+                    list = mongoGoodsService.queryBeanByLimit((i - 1) * limitNum, i * limitNum);
+                    tempList = list.stream().filter(e -> e.getValid() == 0).map(MongoGoodsBean::getPid).collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(tempList)) {
+                        mongoGoodsService.deleteOffLinePid(tempList);
+                        tempList.clear();
+                    }
+                    list.clear();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+            logger.error("syncDeleteInfo error:", e);
+        }
+        return json;
+    }
+
+
     private boolean syncInfo(String pid) {
         boolean isSu = false;
         try {

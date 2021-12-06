@@ -42,7 +42,7 @@ public interface ShopCarMarketingMapper {
 
     List<ShopCarInfo> queryShopCarInfoByUserId(@Param("userId") int userId);
 
-    ShopCarUserStatistic queryUserInfo(@Param("userId") int userId);
+    List<ShopCarUserStatistic> queryUserInfo(@Param("userId") int userId);
 
 
     /**
@@ -61,7 +61,7 @@ public interface ShopCarMarketingMapper {
      * @param content
      * @return
      */
-    int insertIntoShopCarFollow(@Param("userId") int userId, @Param("adminId") int adminId, @Param("content") String content);
+    int insertIntoShopCarFollow(@Param("userId") int userId, @Param("adminId") int adminId, @Param("content") String content, @Param("web_site") int web_site);
 
     /**
      * 获取购物车营销列表

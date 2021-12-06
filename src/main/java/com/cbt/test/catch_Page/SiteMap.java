@@ -33,7 +33,7 @@ public class SiteMap {
         List<String> listStr=new ArrayList<String>();
         List<String> productInfoList = getProductInfo();
         for(int j=0;j<productInfoList.size();j++){
-//            listStr.add("https://www.kidsproductwholesale.com/goodsinfo/"+productInfoList.get(j)+".com");
+//            listStr.add("https://www.kidscharming.com/goodsinfo/"+productInfoList.get(j)+".com");
             listStr.add("https://www.petstoreinc.com/goodsinfo/"+productInfoList.get(j)+".html");
         }
         int i=1;

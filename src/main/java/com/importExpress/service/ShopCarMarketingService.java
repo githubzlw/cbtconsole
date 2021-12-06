@@ -41,7 +41,7 @@ public interface ShopCarMarketingService {
     List<ShopCarInfo> queryShopCarInfoByUserId(int userId);
 
 
-    ShopCarUserStatistic queryUserInfo(int userId);
+    List<ShopCarUserStatistic> queryUserInfo(int userId);
 
 
     /**
@@ -52,7 +52,7 @@ public interface ShopCarMarketingService {
      * @param content
      * @return
      */
-    int updateAndInsertUserFollowInfo(int userId, int adminId, String content);
+    int updateAndInsertUserFollowInfo(int userId, int adminId, String content,int web_site);
 
     /**
      * 获取购物车营销列表
