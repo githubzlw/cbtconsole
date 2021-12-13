@@ -168,7 +168,7 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setRevise_weight(bean.getReviseWeight());
         inputData.setFinal_weight(bean.getFinalWeight());
         // inputData.setPrice(bean.getPrice());
-        // inputData.setWprice(bean.getWprice());
+        inputData.setWprice(bean.getWprice());
         // inputData.setRange_price(bean.getRangePrice());
         // inputData.setSku(bean.getSku());
         inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
