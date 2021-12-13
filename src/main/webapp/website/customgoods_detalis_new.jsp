@@ -496,7 +496,7 @@
                         // "sku": singSkus.substring(1),
                         "wprice": sg_wprice.substring(1),
                         "feePrice": sg_free_price.substring(1),
-                        "rangePrice": range_price,
+                        "rangePrice": null,
                         "rangePriceFree": range_price_free,
                         "bizPrice": bizPrice,
                         "goodsPrice": goodsPriceVal,
