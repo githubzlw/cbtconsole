@@ -1,5 +1,6 @@
 package com.cbt.bean;
 
+import com.cbt.util.GoodsInfoUtils;
 import com.cbt.util.StrUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -101,7 +102,7 @@ public class GoodsOfferBean {
             priceStrList = StrUtils.matchStrList("(\\d+\\.\\d{1,2})", priceStrs[0]);
             if (!priceStrList.isEmpty()) {
                 String price_1688 = priceStrList.get(0);
-                double factoryPrice = Double.valueOf(price_1688.split("-")[0]) / StrUtils.EXCHANGE_RATE;
+                double factoryPrice = Double.valueOf(price_1688.split("-")[0]) / GoodsInfoUtils.EXCHANGE_RATE;
                 if (factoryPrice < 0.01) {
                     factoryPrice = Double.valueOf(price_1688.split("-")[0]);
                 }

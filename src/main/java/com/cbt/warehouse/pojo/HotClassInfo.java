@@ -20,6 +20,7 @@ public class HotClassInfo implements Serializable {
     private int id;
     private String className;
     private String jsonName;
+    private int jsonType;//0:B2B,1:B2C类别
     private int adminId;// 创建人id
     private String adminName;//创建人
     private String createTime;// 创建时间

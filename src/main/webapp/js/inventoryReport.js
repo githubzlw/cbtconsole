@@ -198,7 +198,7 @@ $(function(){
 	})
 	
 	$('#tc1').click(function(){
-		$("#lu_img").attr("src","https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg");
+		$("#lu_img").attr("src","https://img.kidscharming.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg");
 		 $("#lu_name").html("产品名称产品名称产品名称产品名称"); 
 		 $("#lu_catid").val(""); 
 		 $("#lu_pid").val(""); 
@@ -219,7 +219,7 @@ $(function(){
 			 trHtml = trHtml+"<tr>";
 			 trHtml = trHtml+"<td class='lu_tb_index'>1</td>";
 			 trHtml = trHtml+"<td class='lu_tb_name'>产品名称产品名称产品名称产品名称</td>";
-			 trHtml = trHtml+"<td><img src='https://img.kidsproductwholesale.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg' alt='' class='img-responsive'></td>";
+			 trHtml = trHtml+"<td><img src='https://img.kidscharming.com/importcsvimg/webpic/img/cl_72/children/banner1.jpg' alt='' class='img-responsive'></td>";
 			 trHtml = trHtml+"<td class='lu_tb_skuc'>";
 			 trHtml = trHtml+"Sku:<span  class='lu_tb_sku'>xxxxx</span><br>";
 			 trHtml = trHtml+"Skuid:<span  class='lu_tb_skuid'>1111111111111</span><br>";

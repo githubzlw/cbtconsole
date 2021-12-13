@@ -9,10 +9,21 @@ public class ImportExSkuShow {
     private String chType;
     private String specId;
 
+
     private float freePrice;
     private float costPrice;
 
-	public float getCostPrice() {
+    private String skuId;
+
+    public String getSkuId() {
+        return skuId;
+    }
+
+    public void setSkuId(String skuId) {
+        this.skuId = skuId;
+    }
+
+    public float getCostPrice() {
 		return costPrice;
 	}
 

@@ -251,7 +251,7 @@ public class EditorController {
 
             // 处理Sku数据
             // 判断是否是区间价格，含有区间价格的获取sku数据进行处理
-            if (StringUtils.isNotBlank(goods.getRangePrice()) && StringUtils.isNotBlank(goods.getSku())) {
+            if (StringUtils.isNotBlank(goods.getRange_price_free_new()) && StringUtils.isNotBlank(goods.getSku_new())) {
                 List<ImportExSku> skuList = new ArrayList<ImportExSku>();
                 /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
                 skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
@@ -364,7 +364,7 @@ public class EditorController {
                 //计算加价率
             /*if ((goods.getIsBenchmark() == 1 && goods.getBmFlag() == 1) || goods.getIsBenchmark() == 2) {
                 //对标时
-                //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/StrUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/StrUtils.EXCHANGE_RATE(6.6));
+                //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/GoodsInfoUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/GoodsInfoUtils.EXCHANGE_RATE(6.6));
                 String aliPirce;
                 if (goods.getAliGoodsPrice().contains("-")) {
                     aliPirce = goods.getAliGoodsPrice().split("-")[1];
@@ -503,7 +503,7 @@ public class EditorController {
             int salable = customGoodsService.querySalableByPid(pid);
             mv.addObject("salable", salable);
 
-            if (StringUtils.isNotBlank(goods.getRangePrice())) {
+            if (StringUtils.isNotBlank(goods.getRange_price_free_new())) {
                 // 显示sku重量
                 mv.addObject("isSkuFlag", 1);
             } else {
@@ -1167,7 +1167,7 @@ public class EditorController {
             if (StringUtils.isNotBlank(typeDeleteIds) && (typeList != null)) {
                 String[] tpList = typeDeleteIds.split(",");
 
-                if (!(typeList.isEmpty() || tpList.length == 0 )) {
+                if (!(typeList.isEmpty() || tpList.length == 0)) {
                     //剔除选中的规格
                     for (TypeBean tpBean : typeList) {
                         boolean notPt = true;
@@ -1189,7 +1189,7 @@ public class EditorController {
             if (StringUtils.isNotBlank(typeDeleteIds) && (entypeBens != null)) {
                 String[] tpList = typeDeleteIds.split(",");
 
-                if (!( entypeBens.isEmpty() || entypeBens.size() == 0)) {
+                if (!(entypeBens.isEmpty() || entypeBens.size() == 0)) {
                     //剔除选中的规格
                     for (EntypeBen entypeBen : entypeBens) {
                         boolean notPt = true;
@@ -1301,6 +1301,8 @@ public class EditorController {
             cgp.setBrand_name(brandName);
 
 
+            String staticUrl = request.getParameter("staticUrl");
+
             String type = request.getParameter("type");
             // type 0 保存 1 保存并发布
             int tempId = user.getId();
@@ -1352,7 +1354,7 @@ public class EditorController {
                                 inputData.setEntype_new(cgp.getEntypeNew());
                             }
                             GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
-                            PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
+                            PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount), staticUrl);
                             FutureTask futureTask = new FutureTask(pbCallable);
                             Thread thread = new Thread(futureTask);
                             thread.start();
@@ -1376,7 +1378,7 @@ public class EditorController {
                         }
 
                         GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData, 1, 0);*/
-                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount));
+                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id(), Integer.parseInt(skuCount), staticUrl);
                         FutureTask futureTask = new FutureTask(pbCallable);
                         Thread thread = new Thread(futureTask);
                         thread.start();
@@ -3746,7 +3748,7 @@ public class EditorController {
             if (CollectionUtils.isNotEmpty(pidList)) {
                 for (String pid : pidList) {
                     if (StringUtils.isNotBlank(pid)) {
-                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0, 0);
+                        PublishGoodsToOnlineThread pbCallable = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0, 0, null);
                         FutureTask futureTask = new FutureTask(pbCallable);
                         Thread thread = new Thread(futureTask);
                         thread.start();

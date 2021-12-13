@@ -729,9 +729,13 @@ public interface CustomGoodsMapper {
 
     ProductSingleBean queryPidSingleBean(String pid);
 
-   int setNoUpdatePrice(CustomGoodsPublish goods);
+    int insertB2cPriceLog(CustomGoodsPublish goods);
 
-   int saveNewGoodsDetails(CustomGoodsPublish goods);
+    int setNoUpdatePrice(CustomGoodsPublish goods);
+
+    CustomGoodsPublish selectB2cPriceLog(@Param("pid") String pid);
+
+    int saveNewGoodsDetails(CustomGoodsPublish goods);
 
    int queryNewPid();
 
@@ -750,5 +754,7 @@ public interface CustomGoodsMapper {
     int saveNewGoodsDetailsPush(CustomGoodsPublish goods);
 
     int updateEntypeSkuByPid(CustomGoodsPublish goods);
+
+    int batchUpdatePriceAndWeight(@Param("list") List<CustomGoodsPublish> list);
 
 }

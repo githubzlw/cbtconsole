@@ -37,9 +37,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -55,8 +53,11 @@ public class HotManageController {
     // private static final String HOT_FILE_LOCAL_PATH = "E:/hotJson";
     // private static final String HOT_UPLOAD_TO_PATH = "http://127.0.0.1:8087/popProducts/hotFileUpload";
 
-    private static final String STATIC_UTL_REMOTE = "http://52.37.218.73:15792/CbtStaticize/productHtml/genJson.do";
-    private static final String STATIC_UTL_LOCAL = "http://192.168.1.29:8383/CbtStaticize/productHtml/genJson.do";
+    private static final String STATIC_UTL_REMOTE = "http://52.37.218.73:15792//singleProduct/genFileWithPidList";
+    private static final String STATIC_UTL_LOCAL = "http://192.168.1.67:15792/singleProduct/genFileWithPidList";
+
+    private static final Integer B2B_FLAG = 0;
+    private static final Integer B2C_FLAG = 8;
 
 
     private OKHttpUtils okHttpUtils = new OKHttpUtils();
@@ -1145,7 +1146,8 @@ public class HotManageController {
     @RequestMapping("/getClassInfoList")
     @ResponseBody
     public JsonResult getClassInfoList(@RequestParam(value = "jsonName", required = false) String jsonName,
-                                       @RequestParam(value = "className", required = false) String className, int rows, int page) {
+                                       @RequestParam(value = "className", required = false) String className,
+                                       @RequestParam(value = "jsonType", required = false) Integer jsonType, int rows, int page) {
         JsonResult json = new JsonResult();
         HotClassInfo classInfo = new HotClassInfo();
 
@@ -1154,6 +1156,9 @@ public class HotManageController {
         }
         if (StringUtils.isNotBlank(className)) {
             classInfo.setClassName(className);
+        }
+        if (jsonType != null) {
+            classInfo.setJsonType(jsonType);
         }
         if (rows > 0 && page > 0) {
             classInfo.setStartNum((page - 1) * rows);
@@ -1188,6 +1193,7 @@ public class HotManageController {
     public JsonResult queryClassInfoList(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
         HotClassInfo classInfo = new HotClassInfo();
+        classInfo.setJsonType(-1);
         try {
             List<HotClassInfo> list = hotManageService.getClassInfoList(classInfo);
             int length = list.size();
@@ -1215,6 +1221,7 @@ public class HotManageController {
             json.setMessage("获取参数失败");
             return json;
         }
+        classInfo.setJsonType(-1);
         try {
             List<HotClassInfo> list = hotManageService.getClassInfoList(classInfo);
             HotClassInfo classInfoRs = null;
@@ -1249,41 +1256,36 @@ public class HotManageController {
 
     @RequestMapping("/setClassInfo")
     @ResponseBody
-    public JsonResult setClassInfo(HttpServletRequest request,
-                                   @RequestParam(value = "id", required = false) Integer id,
-                                   @RequestParam(value = "className", required = true) String className,
-                                   @RequestParam(value = "jsonName", required = true) String jsonName) {
+    public JsonResult setClassInfo(HttpServletRequest request, HotClassInfo classInfo) {
 
         JsonResult json = new JsonResult();
 
-        HotClassInfo classInfo = new HotClassInfo();
+        Assert.notNull(classInfo, "classInfo null");
         com.cbt.pojo.Admuser admuser = UserInfoUtils.getUserInfo(request);
         if (admuser == null || admuser.getId() == 0) {
             json.setOk(false);
             json.setMessage("请登录后重试");
             return json;
         }
-        if (StringUtils.isBlank(className)) {
+        if (StringUtils.isBlank(classInfo.getClassName())) {
             json.setOk(false);
             json.setMessage("获取分组名称失败");
             return json;
         }
-        if (StringUtils.isBlank(jsonName)) {
+        if (StringUtils.isBlank(classInfo.getJsonName())) {
             json.setOk(false);
             json.setMessage("获取json名称失败");
             return json;
-        } else if (!jsonName.endsWith(".json")) {
-            jsonName += ".json";
+        } else if (!classInfo.getJsonName().endsWith(".json")) {
+            classInfo.setJsonName(classInfo.getJsonName() + ".json");
         }
         try {
-            classInfo.setClassName(className);
-            classInfo.setJsonName(jsonName);
-            if (id == null || id < 1) {
+
+            if (classInfo.getId() < 1) {
                 classInfo.setAdminId(admuser.getId());
                 hotManageService.insertIntoHotClassInfo(classInfo);
                 insertHotClassInfoOnline(classInfo);
             } else {
-                classInfo.setId(id);
                 classInfo.setUpdateAdminId(admuser.getId());
                 updateHotClassInfoOnline(classInfo);
                 hotManageService.updateIntoHotClassInfo(classInfo);
@@ -1539,15 +1541,32 @@ public class HotManageController {
                     if (CollectionUtils.isNotEmpty(list)) {
                         AtomicInteger count = new AtomicInteger();
 
+                        Map<Integer, List<String>> siteMap = new HashMap<>();
+
+                        List<String> b2cList = new ArrayList<>();
+                        siteMap.put(B2C_FLAG, b2cList);
+                        List<String> b2bList = new ArrayList<>();
+                        siteMap.put(B2B_FLAG, b2bList);
+
                         list.forEach(e -> {
                             if (!finalPipeList.contains(e.getPid())) {
                                 if (flag > -1) {
                                     if (e.getValid() == flag) {
+                                        if (B2C_FLAG == e.getMatchSource()) {
+                                            siteMap.get(B2C_FLAG).add(e.getPid());
+                                        } else {
+                                            siteMap.get(B2B_FLAG).add(e.getPid());
+                                        }
                                         spPid.append("," + e.getPid());
                                         count.getAndIncrement();
                                     }
                                 } else {
                                     if (e.getValid() == 1 || e.getValid() == 2) {
+                                        if (B2C_FLAG == e.getMatchSource()) {
+                                            siteMap.get(B2C_FLAG).add(e.getPid());
+                                        } else {
+                                            siteMap.get(B2B_FLAG).add(e.getPid());
+                                        }
                                         spPid.append("," + e.getPid());
                                         count.getAndIncrement();
                                     }
@@ -1556,49 +1575,52 @@ public class HotManageController {
                         });
                         if (count.get() > 0) {
                             System.err.println("database cicle:" + i + "/total:" + fc + "," + count.get());
-                            int countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
-                            if (countFlag == 0) {
-                                countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
-                            }
-                            totalNum += countFlag;
+                            totalNum += dealSiteMap(siteMap, webSite, url);
                         }
                         list.clear();
+                        siteMap.clear();
                     }
-                    /*if (totalNum > 2) {
+                    if (totalNum > 2) {
                         break;
-                    }*/
+                    }
                 }
             } else {
                 List<Product> productList = SolrProductUtils.getSolrKidsProducts(webSite, isOnline);
                 int count = 0;
                 StringBuffer spPid = new StringBuffer();
+
+                Map<Integer, List<String>> siteMap = new HashMap<>();
+                List<String> b2cList = new ArrayList<>();
+                siteMap.put(B2C_FLAG, b2cList);
+                List<String> b2bList = new ArrayList<>();
+                siteMap.put(B2B_FLAG, b2bList);
+
                 for (Product product : productList) {
                     if (!finalPipeList.contains(product.getId())) {
+                        if (B2C_FLAG == product.getMatchSource()) {
+                            siteMap.get(B2C_FLAG).add(product.getId());
+                        } else {
+                            siteMap.get(B2B_FLAG).add(product.getId());
+                        }
                         spPid.append("," + product.getId());
                         count++;
                         if (count % 200 == 0) {
                             // 转存数据
                             count++;
                             System.err.println("solr cicle :" + count + "/total:" + productList.size());
-                            int countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
-                            if (countFlag == 0) {
-                                countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
-                            }
-                            totalNum += countFlag;
+                            totalNum += dealSiteMap(siteMap, webSite, url);
+                            siteMap.get(B2C_FLAG).clear();
+                            siteMap.get(B2B_FLAG).clear();
                         }
-                        /*if (totalNum > 2) {
+                        if (totalNum > 2) {
                             break;
-                        }*/
+                        }
                     }
                 }
 
                 if (count % 200 > 0) {
                     System.err.println("solr cicle :" + count + "/total:" + productList.size());
-                    int countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
-                    if (countFlag == 0) {
-                        countFlag = getByStaticTomcat(spPid.toString().substring(1), webSite, url);
-                    }
-                    totalNum += countFlag;
+                    totalNum += dealSiteMap(siteMap, webSite, url);
                 }
             }
             finalPipeList.clear();
@@ -1613,12 +1635,34 @@ public class HotManageController {
         return json;
     }
 
-    private int getByStaticTomcat(String pidList, int webSite, String url) {
+
+    private int dealSiteMap(Map<Integer, List<String>> siteMap, int webSite, String url) {
+        int totalNum = 0;
+        int countFlag = 0;
+        if (CollectionUtils.isNotEmpty(siteMap.get(B2C_FLAG))) {
+            countFlag = getByStaticTomcat(StringUtils.join(siteMap.get(B2C_FLAG), ","), webSite, url, B2C_FLAG);
+            if (countFlag == 0) {
+                countFlag = getByStaticTomcat(StringUtils.join(siteMap.get(B2C_FLAG), ","), webSite, url, B2C_FLAG);
+            }
+            totalNum += countFlag;
+        }
+        if (CollectionUtils.isNotEmpty(siteMap.get(B2B_FLAG))) {
+            countFlag = getByStaticTomcat(StringUtils.join(siteMap.get(B2B_FLAG), ","), webSite, url, B2B_FLAG);
+            if (countFlag == 0) {
+                countFlag = getByStaticTomcat(StringUtils.join(siteMap.get(B2B_FLAG), ","), webSite, url, B2B_FLAG);
+            }
+            totalNum += countFlag;
+        }
+        return totalNum;
+    }
+
+    private int getByStaticTomcat(String pidList, int webSite, String url, int matchSource) {
         int count = 0;
         try {
             OkHttpClient okHttpClient = OKHttpUtils.getClientInstance();
             RequestBody formBody = new FormBody.Builder()
                     .add("webSite", String.valueOf(webSite))
+                    .add("bcFlag", String.valueOf(matchSource))
                     .add("pidList", pidList).build();
             Request request = new Request.Builder().addHeader("Accept", "*/*")
                     .addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
@@ -1869,9 +1913,9 @@ public class HotManageController {
 
     private void insertHotClassInfoOnline(HotClassInfo hotClassInfo) {
 
-        String sql = "insert into hot_class_info(id,class_name,json_name,admin_id) values(";
+        String sql = "insert into hot_class_info(id,class_name,json_name,admin_id,json_type) values(";
         sql += hotClassInfo.getId() + ",'" + hotClassInfo.getClassName() + "','" + hotClassInfo.getJsonName()
-                + "'," + hotClassInfo.getAdminId() + ")";
+                + "'," + hotClassInfo.getAdminId() + "," + hotClassInfo.getJsonType() + ")";
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
@@ -1880,6 +1924,7 @@ public class HotManageController {
 
         String sql = "update hot_class_info set class_name = '" + hotClassInfo.getClassName()
                 + "', json_name = '" + hotClassInfo.getJsonName() + "',update_admin_id = " + hotClassInfo.getUpdateTime()
+                + ", json_type = " + hotClassInfo.getJsonType()
                 + " where id = " + hotClassInfo.getId();
         System.err.println(sql);
         NotifyToCustomerUtil.sendSqlByMq(sql);

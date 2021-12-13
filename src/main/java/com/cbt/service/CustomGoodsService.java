@@ -1042,7 +1042,11 @@ public interface CustomGoodsService {
 
     ProductSingleBean queryPidSingleBean(String pid);
 
+    int insertB2cPriceLog(CustomGoodsPublish goods);
+
     int setNoUpdatePrice(CustomGoodsPublish goods);
+
+    CustomGoodsPublish selectB2cPriceLog(String pid);
 
     /**
      * 新增商品信息
@@ -1066,5 +1070,7 @@ public interface CustomGoodsService {
     int updateNewGoodsDetailsByInfo(CustomGoodsPublish cgp);
 
     int updateEntypeSkuByPid(CustomGoodsPublish cgp);
+
+    int batchUpdatePriceAndWeight(List<CustomGoodsPublish> list);
 
 }

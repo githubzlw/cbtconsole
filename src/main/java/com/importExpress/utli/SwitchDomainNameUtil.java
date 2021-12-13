@@ -22,7 +22,7 @@ public class SwitchDomainNameUtil {
     private static final String IMPORT_DOMAIN_NAME_2 = "ImportExpress";
     private static final String IMPORT_DOMAIN_NAME_3 = "Import Express";
 
-    // https://www.kidsproductwholesale.com/
+    // https://www.kidscharming.com/
     private static final String KIDS_DOMAIN_NAME_1 = "kidscharming";
     private static final String KIDS_DOMAIN_NAME_2 = "KidsCharming";
     private static final String KIDS_DOMAIN_NAME_3 = "Kids Charming";

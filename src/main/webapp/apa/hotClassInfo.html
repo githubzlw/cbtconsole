@@ -113,9 +113,11 @@
         function doQuery() {
             var className = $("#query_class_name").val();
             var jsonName = $("#query_json_name").val();
+            var jsonType = $("#query_json_type").val();
             $("#hot_easyui-datagrid").datagrid("load", {
                 "className": className,
-                "jsonName": jsonName
+                "jsonName": jsonName,
+                "jsonType": jsonType
             });
         }
 
@@ -131,6 +133,14 @@
             var content = '<button class="but_color" onclick="updateAndInsertClassIfo(' + row.id + ',1)">编辑</button>';
             content += '<button class="del_color" onclick="deleteClassIfo(' + row.id + ')">删除</button>';
             return content;
+        }
+        
+        function formatBC(val, row, index) {
+            if(val > 0){
+                return 'B2C';
+            } else{
+                return 'B2B';
+            }
         }
 
         function updateAndInsertClassIfo(id, type) {
@@ -159,6 +169,7 @@
                         $("#info_class_id").val(json.id);
                         $("#class_name").val(json.className);
                         $("#json_name").val(json.jsonName);
+                        $("#json_type").val(json.jsonType);
                     } else {
                         $.messager.alert("提醒", '查询失败:' + data.message, "info");
                     }
@@ -172,18 +183,21 @@
 
         function saveClassIfo() {
             var infoClassId = $("#info_class_id").val();
-            if(!infoClassId){
+            if (!infoClassId) {
                 infoClassId = 0;
             }
             var jsonName = $("#json_name").val();
             var className = $("#class_name").val();
+            var jsonType = $("#json_type").val();
+
             $.ajax({
                 type: "POST",
                 url: "/cbtconsole/hotManage/setClassInfo",
                 data: {
                     id: infoClassId,
                     jsonName: jsonName,
-                    className: className
+                    className: className,
+                    jsonType: jsonType
                 },
                 success: function (data) {
                     if (data.ok) {
@@ -231,6 +245,11 @@
     <form id="hot_query_form" action="#" onsubmit="return false;">
         <span>分组名称:<input id="query_class_name"/></span>
         <span>json文件名称:<input id="query_json_name"/></span>
+        <span>B2C:<select id="query_json_type" style="width: 88px;height: 22px;">
+            <option value="-1">全部</option>
+            <option value="0">B2B</option>
+            <option value="1">B2C</option>
+        </select></span>
         <input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;
         <span><input type="button" class="but_color" value="新增分组" onclick="updateAndInsertClassIfo(0,0)"/></span>
         <span id="gen_show_notice" style="color: red; display: none;">正在执行中...</span>
@@ -243,6 +262,7 @@
     <tr>
         <th data-options="field:'className',width:'300px'">分组名称</th>
         <th data-options="field:'jsonName',width:'300px'">json名称</th>
+        <th data-options="field:'jsonType',align:'center',width:'60px',formatter:formatBC">是否B2C</th>
         <th data-options="field:'adminName',align:'center',width:'100px'">创建人</th>
         <th data-options="field:'createTime',align:'center',width:'150px'">创建时间</th>
         <th data-options="field:'updateAdminName',align:'center',width:'100px'">修改人</th>
@@ -264,6 +284,15 @@
             <tr>
                 <td>热卖分组名称:</td>
                 <td><input id="class_name" value="" style="width: 200px; height: 28px;" placeholder="请输入分组名称"/>
+                </td>
+            </tr>
+            <tr>
+                <td>是否B2C</td>
+                <td>
+                    <select id="json_type" style="height: 28px;width: 80px;">
+                        <option value="0">B2B</option>
+                        <option value="1">B2C</option>
+                    </select>
                 </td>
             </tr>
             <tr>

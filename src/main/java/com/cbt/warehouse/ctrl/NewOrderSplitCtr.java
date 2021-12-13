@@ -806,7 +806,7 @@ public class NewOrderSplitCtr {
             TemplateType  webType= TemplateType.DISMANTLING_IMPORT;
             switch (isWebSiteFlag) {
                 case 2:
-                    webSiteTitle = "Kids Product Wholesale";
+                    webSiteTitle = "Kids Charming";
                     webType = TemplateType.DISMANTLING_KID;
                     break;
                 case 3:

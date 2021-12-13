@@ -57,8 +57,9 @@
     <div>
         <span >网站名:
             <select disabled="disabled" id="website_type" style="height: 28px;width: 160px;">
-                <option value="1" selected="selected">import-express</option>
-                <option value="2">kidsproductwholesale</option>
+                <option value="1" selected="selected">IMPORT</option>
+                <option value="2">KIDS</option>
+                <option value="4">PETS</option>
             </select>
         </span>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"

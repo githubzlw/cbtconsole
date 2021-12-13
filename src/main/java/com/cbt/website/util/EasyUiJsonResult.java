@@ -41,6 +41,18 @@ public class EasyUiJsonResult implements Serializable {
 		this.message = message;
 	}
 
+	public static EasyUiJsonResult success(Object rows, int total){
+		EasyUiJsonResult result = new EasyUiJsonResult();
+		result.setSuccess(rows, total);
+		return result;
+	}
+
+	public static EasyUiJsonResult error(String message){
+		EasyUiJsonResult result = new EasyUiJsonResult();
+		result.setError(message);
+		return result;
+	}
+
 	public String getMessage() {
 		return message;
 	}

@@ -31,6 +31,9 @@ import java.util.regex.Pattern;
 public class GoodsInfoUtils {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsInfoUtils.class);
 
+    // 美元汇率
+    public static final double EXCHANGE_RATE = 6.3;
+
     public static final String SERVICE_LOCAL_IMPORT_PATH = "/data";
     public static final String SERVICE_SHOW_IMPORT_URL_1 = "http://img.import-express.com";
     public static final String SERVICE_SHOW_IMPORT_URL_2 = "http://img1.import-express.com";
@@ -304,6 +307,7 @@ public class GoodsInfoUtils {
             ipes.setFianlWeight(ites.getFianlWeight());
             ipes.setSpecId(ites.getSpecId());
             ipes.setCostPrice(ites.getSkuVal().getCostPrice());
+            ipes.setSkuId(ites.getSkuId());
             if (ites.getVolumeWeight() > 0) {
                 ipes.setVolumeWeight(ites.getVolumeWeight());
             } else {
@@ -912,16 +916,15 @@ public class GoodsInfoUtils {
     }
 
     /**
-     *
      * @param gd
-     * @param isKids : 是否是kids的服务器
-     * @param isLocal : 是否转换远程本地
+     * @param isKids    : 是否是kids的服务器
+     * @param isLocal   : 是否转换远程本地
      * @param isMainImg : 是否包含主图 220和285
      * @return
      */
     public static List<String> getAllImgList(CustomGoodsPublish gd, int isKids, int isLocal, boolean isMainImg) {
         List<String> changeImglist = new ArrayList<>();
-        if(isMainImg) {
+        if (isMainImg) {
             // 主图
             String orMainImg220x220 = null;
             if (StringUtils.isNotBlank(gd.getShowMainImage())) {
@@ -1503,8 +1506,8 @@ public class GoodsInfoUtils {
                             break;
                         }
                     }
-                }else{
-                    localNum ++;
+                } else {
+                    localNum++;
                 }
             }
         }
@@ -1664,20 +1667,36 @@ public class GoodsInfoUtils {
         return isSu;
     }
 
-    public static String dealEnInfoImg(String enInfo, String remotePath){
-        if(StringUtils.isNotBlank(enInfo)){
+    public static String dealEnInfoImg(String enInfo, String remotePath) {
+        if (StringUtils.isNotBlank(enInfo)) {
             Document docHtml = Jsoup.parse(enInfo);
             Elements imgList = docHtml.getElementsByTag("img");
-            for(Element imgEl : imgList){
+            for (Element imgEl : imgList) {
                 String imgUrl = imgEl.attr("src");
-                if(StringUtils.isNotBlank(imgUrl) && !imgUrl.contains("http")){
+                if (StringUtils.isNotBlank(imgUrl) && !imgUrl.contains("http")) {
                     imgEl.attr("src", remotePath + imgUrl);
                 }
             }
             return docHtml.html();
-        }else{
+        } else {
             return enInfo;
         }
+    }
+
+
+    // 加价率20201214
+    public static double getAddPriceLvNew(double weight, double factory) {
+
+        double addPriceLv = 0;
+        //加价率 = (汇率*50美元/((汇率*50美元/1.22-EUB首重运费 25元)/(产品重量*EUB每克运费 0.085+产品1688价格))-5-0.042*产品重量）/产品价
+        addPriceLv = Math.max((EXCHANGE_RATE * 50 / ((EXCHANGE_RATE * 50 / 1.22 - 25) / (weight * 0.085 + factory)) - 5 - 0.042 * weight) / factory, 1.2);
+        return addPriceLv;
+
+    }
+
+    // 获取计算价格的运费
+    public static double getCalculateFreight(double weight) {
+        return (5 + 0.042 * (weight * 1000)) / EXCHANGE_RATE;
     }
 
 }
