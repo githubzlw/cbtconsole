@@ -3206,7 +3206,7 @@
     }
 
     function openSkuEdit(pid) {
-        var param = "height=660,width=990,top=160,left=550,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        var param = "height=660,width=1130,top=160,left=500,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open("/cbtconsole/editc/querySkuByPid?pid=" + pid, "windows", param);
     }
 

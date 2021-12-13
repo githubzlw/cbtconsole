@@ -251,7 +251,7 @@ public class EditorController {
 
             // 处理Sku数据
             // 判断是否是区间价格，含有区间价格的获取sku数据进行处理
-            if (StringUtils.isNotBlank(goods.getRangePrice()) && StringUtils.isNotBlank(goods.getSku())) {
+            if (StringUtils.isNotBlank(goods.getRange_price_free_new()) && StringUtils.isNotBlank(goods.getSku_new())) {
                 List<ImportExSku> skuList = new ArrayList<ImportExSku>();
                 /*JSONArray sku_json = JSONArray.fromObject(goods.getSku());
                 skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);*/
@@ -503,7 +503,7 @@ public class EditorController {
             int salable = customGoodsService.querySalableByPid(pid);
             mv.addObject("salable", salable);
 
-            if (StringUtils.isNotBlank(goods.getRangePrice())) {
+            if (StringUtils.isNotBlank(goods.getRange_price_free_new())) {
                 // 显示sku重量
                 mv.addObject("isSkuFlag", 1);
             } else {

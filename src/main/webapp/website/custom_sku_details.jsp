@@ -72,6 +72,7 @@
                 <td>免邮价</td>
                 <td>重量(KG)</td>
                 <td>体积重量(KG)</td>
+                <td>SKU-ID</td>
             </tr>
             </thead>
 
@@ -95,6 +96,7 @@
                     <td style="width: 80px;">
                         <input class="inp_style inp_vlm_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
                                value="${sku_bean.volumeWeight}"/></td>
+                    <td>${sku_bean.skuId}</td>
                 </tr>
             </c:forEach>
             </tbody>

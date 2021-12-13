@@ -307,6 +307,7 @@ public class GoodsInfoUtils {
             ipes.setFianlWeight(ites.getFianlWeight());
             ipes.setSpecId(ites.getSpecId());
             ipes.setCostPrice(ites.getSkuVal().getCostPrice());
+            ipes.setSkuId(ites.getSkuId());
             if (ites.getVolumeWeight() > 0) {
                 ipes.setVolumeWeight(ites.getVolumeWeight());
             } else {

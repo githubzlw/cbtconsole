@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>产品批量折扣管理</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #pid_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #pid_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 130px;
+            height: 28px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+
+        #enter_div_sty {
+            display: none;
+            position: fixed;
+            top: 25%;
+            background: #8cdab6;
+            padding: 50px;
+            right: 20%;
+            width: 1111px;
+            height: 333px;
+            box-shadow: 1px 10px 15px #e2e2e2;
+        }
+
+        .style_btn_delete {
+            width: 120px;
+            height: 26px;
+            background-color: red;
+            border-color: #ffffff;
+            font-size: 16px;
+            padding: 0px;
+            border-radius: 0px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            line-height: 20px;
+            font-weight: bold;
+            font-style: normal;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        var dataList = {};
+        $(document).ready(function () {
+            closeDialog();
+            closeUploadDialog();
+            setDatagrid();
+
+        });
+
+
+        function setDatagrid() {
+            var webSite = $("#web_size_type").val();
+            $('#pid_easyui-datagrid').datagrid({
+                title: '产品批量折扣管理',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#pid_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/productDiscount/list',//url调用Action方法
+                loadMsg: '数据装载中......',
+                queryParams: {
+                    webSite: webSite
+                },
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 10,//默认选择的分页是每页50行数据
+                pageList: [10, 20, 30],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.messager.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (data.success) {
+                        var tempData = data.rows;
+                        for (var i = 0; i < tempData; i++) {
+                            dataList[tempData[i].pid + "_" + tempData[i].sku_id] = tempData[i];
+                        }
+                    }
+                }
+            });
+        }
+
+        function doQuery() {
+            var pid = $("#query_pid").val();
+            var sku_id = $("#query_sku_id").val();
+
+            $("#pid_easyui-datagrid").datagrid("load", {
+                pid: pid,
+                sku_id: sku_id
+            });
+        }
+
+
+        function formatOperation(val, row, index) {
+            var content = '<br><a target="_blank" class="but_color" href="/cbtconsole/editc/detalisEdit?pid=' + row.pid + '">编辑商品</a>';
+            content += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button class="style_btn_delete" onclick="deleteProductInfo(' + row.pid + ',\'\')">删除整个商品</button>';
+            if (row.sku_id && row.sku_id.length > 0) {
+                content += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button class="style_btn_delete" onclick="deleteProductInfo(' + row.pid + ',' + row.sku_id + ')">删除商品SKU</button>';
+            }
+            return content;
+        }
+
+        function closeDialog() {
+            $('#enter_div_sty').hide();
+            $("#pid_form_enter")[0].reset();
+        }
+
+        function enterPidList() {
+            $('#enter_div_sty').show();
+        }
+
+        function addRows() {
+            $("#insert_pid_tbody").append('<tr>\n' +
+                '                <td><input name="pid" value=""/></td>\n' +
+                '                <td><input name="sku_id" value=""/></td>\n' +
+                '                <td><input name="p1_num" value="0" type="number" step="1"/></td>\n' +
+                '                <td><input name="p1_discount" value="0" type="number" step="0.01"/></td>\n' +
+                '                <td><input name="p1_num" value="0" type="number" step="1"/></td>\n' +
+                '                <td><input name="p1_discount" value="0" type="number" step="0.01"/></td>\n' +
+                '            </tr>');
+        }
+
+        function savePidList() {
+            var list = [];
+            var content = '';
+            $("#insert_pid_tbody").find("tr").each(function (i, item) {
+                var pid = $(this).find("td").eq(0).find("input").val();
+                var sku_id = $(this).find("td").eq(1).find("input").val();
+                var p1_num = $(this).find("td").eq(2).find("input").val();
+                var p1_discount = $(this).find("td").eq(3).find("input").val();
+                var p2_num = $(this).find("td").eq(4).find("input").val();
+                var p2_discount = $(this).find("td").eq(5).find("input").val();
+                if (pid && pid.length > 0) {
+                    if (p1_num > 0 && p1_discount > 0) {
+                        var tempJson = {};
+                        tempJson["pid"] = pid;
+                        tempJson["sku_id"] = sku_id;
+                        tempJson["p1_num"] = p1_num;
+                        tempJson["p1_discount"] = p1_discount;
+                        tempJson["p2_num"] = p2_num;
+                        tempJson["p2_discount"] = p2_discount;
+                        list[list.length] = tempJson;
+                    } else {
+                        content += '第' + (i + 1) + '行输入有异常<br>';
+                    }
+                }
+            });
+
+            if (content.length > 0) {
+                $.messager.alert("提醒", content, "info");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/productDiscount/insertBatch",
+                    data: {
+                        discountList: JSON.stringify(list)
+                    },
+                    success: function (data) {
+                        if (data.code == 200) {
+                            closeDialog();
+                            doQuery();
+                        } else {
+                            $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                        }
+                    },
+                    error: function (res) {
+                        $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                    }
+                });
+            }
+
+
+        }
+
+        function deleteProductInfo(pid, skuId) {
+            $.messager.confirm('提示', '是否删除?删除后数据将无法恢复', function (rs) {
+                if (rs) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/cbtconsole/productDiscount/delete",
+                        data: {
+                            pidList: pid,
+                            skuIdList: skuId
+                        },
+                        success: function (data) {
+                            if (data.code == 200) {
+                                doQuery();
+                            } else {
+                                $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                            }
+                        },
+                        error: function (res) {
+                            $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                        }
+                    });
+                }
+            });
+        }
+
+
+        function closeUploadDialog() {
+            $('#insert_pid_dlg').dialog('close');
+        }
+
+    </script>
+</head>
+<body>
+
+<div id="pid_toolbar" style="padding: 5px; height: auto">
+    <form id="pid_query_form" action="#" onsubmit="return false;">
+        <span><button class="but_color" onclick="enterPidList()">新增PID</button></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span>PID:<input type="text" id="query_pid" style="width: 130px; height: 24px"
+                                                 value=""/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span>SKU-ID:<input type="text" id="query_sku_id" style="width: 130px; height: 24px"
+                                                    value=""/></span>
+        <span>
+            <input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
+    </form>
+</div>
+
+<table id="pid_easyui-datagrid"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'pid',width:'120px'">PID</th>
+        <th data-options="field:'sku_id',width:'120px'">SKU_ID</th>
+        <!--<th
+                data-options="field:'main_img',align:'center',width:'80px',formatter:formatImg">主图
+        </th>-->
+        <th data-options="field:'p1_num',align:'center',width:'100px'">p1折扣起始值</th>
+        <th data-options="field:'p1_discount',align:'center',width:'120px'">p1折扣率</th>
+        <th data-options="field:'p2_num',align:'center',width:'90px'">p2折扣起始值</th>
+        <th data-options="field:'p2_discount',align:'center',width:'90px'">p2折扣率</th>
+        <th data-options="field:'admin_name',align:'center',width:'100px'">编辑人</th>
+        <th data-options="field:'update_time',align:'center',width:'100px'">操作时间</th>
+        <th
+                data-options="field:'opFlag',align:'center',width:'300px',formatter:formatOperation">操作
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+<div id="enter_div_sty">
+    <form id="pid_form_enter" action="#" onsubmit="return false">
+        <table border="1" cellspacing="0">
+            <caption><b style="text-align: center;font-size: 18px;">请输入PID和SKU相关数据,非SKU数据SKU_ID不填写</b></caption>
+            <thead>
+            <tr style="background-color: yellowgreen;">
+                <td>PID</td>
+                <td>SKU_ID</td>
+                <td>p1折扣起始值</td>
+                <td>p1折扣率</td>
+                <td>p2折扣起始值</td>
+                <td>p2折扣率</td>
+            </tr>
+            </thead>
+            <tbody id="insert_pid_tbody">
+            <tr>
+                <td><input name="pid" value=""/></td>
+                <td><input name="sku_id" value=""/></td>
+                <td><input name="p1_num" value="0" type="number" step="1"/></td>
+                <td><input name="p1_discount" value="0" type="number" step="0.01"/></td>
+                <td><input name="p1_num" value="0" type="number" step="1"/></td>
+                <td><input name="p1_discount" value="0" type="number" step="0.01"/></td>
+            </tr>
+            </tbody>
+        </table>
+        <div style="text-align: center;">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton" onclick="addRows()" style="width: 80px">新增一行</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton" onclick="savePidList()" style="width: 80px">保存</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeDialog()"
+               style="width: 80px">取消</a>
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>
