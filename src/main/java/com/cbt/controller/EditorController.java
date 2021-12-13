@@ -148,9 +148,9 @@ public class EditorController {
             }
             mv.addObject("singleBean", singleBean);
 
-            if (StringUtils.isBlank(goods.getRangePrice())) {
+            /*if (StringUtils.isBlank(goods.getRange_price_free_new())) {
                 goods.setWprice(goods.getFree_price_new());
-            }
+            }*/
 
             if (goods.getGoodsState() == 1) {
                 goods.setOffReason(null);
@@ -188,8 +188,8 @@ public class EditorController {
                 goods.setCanEdit(0);
             }
 
-            if (StringUtils.isNotBlank(goods.getFeeprice())) {
-                goods.setFeeprice(goods.getFeeprice().replace("[", "").replace("]", "").replace("$", "@"));
+            if (StringUtils.isNotBlank(goods.getFree_price_new())) {
+                goods.setFree_price_new(goods.getFree_price_new().replace("[", "").replace("]", "").replace("$", "@"));
             }
 
             if (StringUtils.isNotBlank(goods.getWprice())) {
@@ -312,14 +312,14 @@ public class EditorController {
                 String singlePriceStr = "0";
                 if (Integer.parseInt(goods.getIsSoldFlag()) > 0) {
                     //先取range_price 为空则再取feeprice
-                    if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                        if (goods.getRangePrice().contains("-")) {
-                            singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                    if (StringUtils.isNotBlank(goods.getRange_price_free_new())) {
+                        if (goods.getRange_price_free_new().contains("-")) {
+                            singlePriceStr = goods.getRange_price_free_new().split("-")[1].trim();
                         } else {
-                            singlePriceStr = goods.getRangePrice().trim();
+                            singlePriceStr = goods.getRange_price_free_new().trim();
                         }
-                    } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
-                        singlePriceStr = goods.getFeeprice().split(",")[0];
+                    } else if (StringUtils.isNotBlank(goods.getFree_price_new())) {
+                        singlePriceStr = goods.getFree_price_new().split(",")[0];
                         if (singlePriceStr.contains("\\$")) {
                             singlePriceStr = singlePriceStr.split("\\$")[1].trim();
                         } else if (singlePriceStr.contains("@")) {
@@ -330,14 +330,14 @@ public class EditorController {
                     }
                 } else {
                     //先取range_price 为空则wprice 再为空取price
-                    if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                        if (goods.getRangePrice().contains("-")) {
-                            singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                    if (StringUtils.isNotBlank(goods.getRange_price_free_new())) {
+                        if (goods.getRange_price_free_new().contains("-")) {
+                            singlePriceStr = goods.getRange_price_free_new().split("-")[1].trim();
                         } else {
-                            singlePriceStr = goods.getRangePrice().trim();
+                            singlePriceStr = goods.getRange_price_free_new().trim();
                         }
-                    } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
-                        singlePriceStr = goods.getFeeprice().split(",")[0];
+                    } else if (StringUtils.isNotBlank(goods.getFree_price_new())) {
+                        singlePriceStr = goods.getFree_price_new().split(",")[0];
                         if (singlePriceStr.contains("\\$")) {
                             singlePriceStr = singlePriceStr.split("\\$")[1].trim();
                         } else if (singlePriceStr.contains("@")) {
@@ -1092,7 +1092,7 @@ public class EditorController {
                 }
             }
 
-            if (StringUtils.isBlank(rangePrice)) {
+            if (StringUtils.isBlank(rangePriceFree)) {
                 double minPrice = 0;
                 double maxPrice = 0;
                 int moq = 0;
