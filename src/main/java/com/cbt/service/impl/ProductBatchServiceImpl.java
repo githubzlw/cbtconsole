@@ -59,7 +59,7 @@ public class ProductBatchServiceImpl implements ProductBatchService {
     @Async
     public void asyncGet(String url) {
         try {
-            TimeUnit.SECONDS.sleep(20);
+            TimeUnit.SECONDS.sleep(10);
             System.err.println("--------" + url);
             okHttpUtils.get(url);
         } catch (Exception e) {

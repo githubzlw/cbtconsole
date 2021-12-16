@@ -217,12 +217,10 @@ public class ProductBatchDiscountController {
     private void insertProductBatchDiscount(List<ProductBatchDiscount> list) {
         String sql = "insert into product_batch_discount(pid,sku_id,p1_num,p1_discount,p2_num,p2_discount,admin_id) values";
         StringBuffer sb = new StringBuffer();
-        list.forEach(e -> {
-            sb.append("('").append(e.getPid()).append("','").append(StringUtils.isNotBlank(e.getSku_id()) ? e.getSku_id() : "").append("',")
-                    .append(e.getP1_num()).append(",").append(e.getP1_discount()).append(",").append(e.getP2_num()).append(",")
-                    .append(e.getP2_discount()).append(",").append(e.getAdmin_id()).append(")");
-        });
-        NotifyToCustomerUtil.sendSqlByMq(sql + sb.toString() + ";");
+        list.forEach(e -> sb.append(",('").append(e.getPid()).append("','").append(StringUtils.isNotBlank(e.getSku_id()) ? e.getSku_id() : "").append("',")
+                .append(e.getP1_num()).append(",").append(e.getP1_discount()).append(",").append(e.getP2_num()).append(",")
+                .append(e.getP2_discount()).append(",").append(e.getAdmin_id()).append(")") );
+        NotifyToCustomerUtil.sendSqlByMq(sql + sb.toString().substring(1) + ";");
         productBatchService.asyncGet(productBatchDiscountUrl);
     }
 
