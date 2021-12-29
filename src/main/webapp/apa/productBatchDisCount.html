@@ -151,6 +151,8 @@
         function closeDialog() {
             $('#enter_div_sty').hide();
             $("#pid_form_enter")[0].reset();
+            $("#insert_pid_tbody").empty();
+            addRows();
         }
 
         function enterPidList() {

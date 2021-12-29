@@ -710,7 +710,10 @@ public class ProductBatchController {
             }
             y++;
 
-
+            if(null == row.getCell(y)){
+                rsList.add(batchBean);
+                continue;
+            }
             if (row.getCell(y).getCellType() == 0) {
                 batchBean.setP2_free_price(String.valueOf(row.getCell(y).getNumericCellValue()));
             } else {
@@ -733,6 +736,10 @@ public class ProductBatchController {
             y++;
 
 
+            if(null == row.getCell(y)){
+                rsList.add(batchBean);
+                continue;
+            }
             if (row.getCell(y).getCellType() == 0) {
                 if (row.getCell(y).getNumericCellValue() > 0) {
                     batchBean.setP3_moq((int) row.getCell(y).getNumericCellValue());
