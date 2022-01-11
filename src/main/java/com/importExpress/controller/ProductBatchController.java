@@ -92,70 +92,7 @@ public class ProductBatchController {
 
             List<ProductBatchBean> rsList = genList(userInfo);
 
-            List<String> list = getListByRedis(userInfo);
-            if (CollectionUtils.isNotEmpty(list)) {
-                List<CustomGoodsPublish> customGoodsPublishes = customGoodsService.queryGoodsByPidList(list);
-                customGoodsPublishes.forEach(e -> {
-                    if (StringUtils.isNotBlank(e.getSku_new())) {
-                        List<ImportExSku> importExSkuList = JSONArray.parseArray(e.getSku_new(), ImportExSku.class);
-
-                        importExSkuList.forEach(el -> {
-                            ProductBatchBean pb = new ProductBatchBean();
-                            pb.setPid(e.getPid());
-                            pb.setCatid(e.getCatid1());
-                            pb.setName_en(e.getEnname());
-                            pb.setName_ch(e.getName());
-                            pb.setSku_id(el.getSkuId());
-                            pb.setShop_id(e.getShopId());
-                            pb.setUnit(e.getSellUnit());
-                            pb.setWeight(BigDecimalUtil.truncateDoubleString(el.getFianlWeight() * 1000, 2));
-                            pb.setVolume_weight(BigDecimalUtil.truncateDoubleString(el.getVolumeWeight() * 1000, 2));
-                            pb.setPacking_size(e.getVolum());
-                            if (e.getShowMainImage().contains("http")) {
-                                pb.setMain_img(e.getShowMainImage());
-                            } else {
-                                pb.setMain_img(e.getRemotpath() + e.getShowMainImage());
-                            }
-
-                            pb.setP1_moq(e.getMorder());
-                            pb.setP1_free_price(el.getSkuVal().getFreeSkuPrice());
-                            pb.setP1_wprice(String.valueOf(el.getSkuVal().getSkuCalPrice()));
-                            pb.setP1_1688(String.valueOf(el.getSkuVal().getCostPrice()));
-
-                            pb.setOld_1688(e.getWholesalePrice());
-
-                            rsList.add(pb);
-
-                        });
-
-                    } else {
-                        ProductBatchBean pb = new ProductBatchBean();
-                        pb.setPid(e.getPid());
-                        pb.setCatid(e.getCatid1());
-                        pb.setName_en(e.getEnname());
-                        pb.setName_ch(e.getName());
-                        pb.setSku_id("");
-                        pb.setShop_id(e.getShopId());
-                        pb.setUnit(e.getSellUnit());
-                        pb.setWeight(BigDecimalUtil.truncateDoubleString(Double.parseDouble(StringUtils.isNotBlank(e.getFinalWeight()) ? e.getFinalWeight() : e.getWeight()) * 1000, 2));
-                        if (StringUtils.isNotBlank(e.getVolumeWeight())) {
-                            pb.setVolume_weight(BigDecimalUtil.truncateDoubleString(Double.parseDouble(e.getVolumeWeight()) * 1000, 2));
-                        }
-                        pb.setPacking_size(e.getVolum());
-                        if (e.getShowMainImage().contains("http")) {
-                            pb.setMain_img(e.getShowMainImage());
-                        } else {
-                            pb.setMain_img(e.getRemotpath() + e.getShowMainImage());
-                        }
-
-                        dealWpriceOrFreePrice(e, pb);
-
-                        rsList.add(pb);
-                    }
-                });
-            }
-
-            return EasyUiJsonResult.success(rsList, list.size());
+            return EasyUiJsonResult.success(rsList, rsList.size());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("insert,error:", e);
@@ -642,7 +579,7 @@ public class ProductBatchController {
             //读取一行
             row = sheet.getRow(j);
             //去掉空行和表头
-            if (row == null || row.getFirstCellNum() == j) {
+            if (row == null || row.getFirstCellNum() == j || row.getLastCellNum() < 9 || row.getPhysicalNumberOfCells() < 9) {
                 continue;
             }
             //遍历所有的列
@@ -699,6 +636,10 @@ public class ProductBatchController {
             }
             y++;
 
+            if(null == row.getCell(y)){
+                rsList.add(batchBean);
+                continue;
+            }
             if (row.getCell(y).getCellType() == 0) {
                 if (row.getCell(y).getNumericCellValue() > 0) {
                     batchBean.setP2_moq((int) row.getCell(y).getNumericCellValue());

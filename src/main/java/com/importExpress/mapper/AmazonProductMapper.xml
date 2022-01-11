@@ -68,4 +68,35 @@
         where goods_pid = #{amazonPid} and deal_state = 1
     </select>
 
+    <select id="queryAmazonOrderList" parameterType="com.importExpress.pojo.AmazonOrderParam" resultType="com.importExpress.pojo.AmazonOrderBean">
+        select id,date_time,fn_sku,asin,msku,title,disposition,starting_warehouse_balance,in_transit_between_warehouses,receipts,customer_shipments,
+        customer_returns,vendor_returns,warehouse_transfer,found,lost,damaged,disposed,other_events,ending_warehouse_balance,unknown_events,location
+        from amazon_order_sku
+        <if test="pageSize > 0">
+            limit #{pageNum},#{pageSize}
+        </if>
+    </select>
+
+    <select id="queryAmazonOrderListCount" parameterType="com.importExpress.pojo.AmazonOrderParam" resultType="java.lang.Integer">
+        select count(0)
+        from amazon_order_sku
+    </select>
+    
+    <insert id="insertAmazonOrder" parameterType="com.importExpress.pojo.AmazonOrderBean">
+        insert into amazon_order_sku(date_time,fn_sku,asin,msku,title,disposition,starting_warehouse_balance,in_transit_between_warehouses,receipts,customer_shipments,
+        customer_returns,vendor_returns,warehouse_transfer,found,lost,damaged,disposed,other_events,ending_warehouse_balance,unknown_events,location)
+        values(#{date_time},#{fn_sku},#{asin},#{msku},#{title},#{disposition},#{starting_warehouse_balance},#{in_transit_between_warehouses},#{receipts},#{customer_shipments},#{
+        customer_returns},#{vendor_returns},#{warehouse_transfer},#{found},#{lost},#{damaged},#{disposed},#{other_events},#{ending_warehouse_balance},#{unknown_events},#{location})
+    </insert>
+
+    <insert id="insertAmazonOrderList" parameterType="java.util.List">
+        insert into amazon_order_sku(date_time,fn_sku,asin,msku,title,disposition,starting_warehouse_balance,in_transit_between_warehouses,receipts,customer_shipments,
+        customer_returns,vendor_returns,warehouse_transfer,found,lost,damaged,disposed,other_events,ending_warehouse_balance,unknown_events,location)
+        values
+        <foreach collection="list" item="pd" separator=",">
+            (#{pd.date_time},#{pd.fn_sku},#{pd.asin},#{pd.msku},#{pd.title},#{pd.disposition},#{pd.starting_warehouse_balance},#{pd.in_transit_between_warehouses},#{pd.receipts},#{pd.customer_shipments},
+            #{pd.customer_returns},#{pd.vendor_returns},#{pd.warehouse_transfer},#{pd.found},#{pd.lost},#{pd.damaged},#{pd.disposed},#{pd.other_events},#{pd.ending_warehouse_balance},#{pd.unknown_events},#{pd.location})
+        </foreach>
+    </insert>
+
 </mapper>

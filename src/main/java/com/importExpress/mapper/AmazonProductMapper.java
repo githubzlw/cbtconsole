@@ -1,5 +1,7 @@
 package com.importExpress.mapper;
 
+import com.importExpress.pojo.AmazonOrderBean;
+import com.importExpress.pojo.AmazonOrderParam;
 import com.importExpress.pojo.AmazonProductBean;
 import org.apache.ibatis.annotations.Param;
 
@@ -42,4 +44,12 @@ public interface AmazonProductMapper {
      * @return
      */
     int checkAmazonProductIsExists(@Param("amazonPid") String amazonPid);
+
+    List<AmazonOrderBean> queryAmazonOrderList(AmazonOrderParam param);
+
+    int queryAmazonOrderListCount(AmazonOrderParam param);
+
+    int insertAmazonOrder(AmazonOrderBean orderBean);
+
+    int insertAmazonOrderList(@Param("list") List<AmazonOrderBean> list);
 }

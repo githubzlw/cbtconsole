@@ -1,5 +1,7 @@
 package com.importExpress.service;
 
+import com.importExpress.pojo.AmazonOrderBean;
+import com.importExpress.pojo.AmazonOrderParam;
 import com.importExpress.pojo.AmazonProductBean;
 
 import java.util.List;
@@ -42,4 +44,13 @@ public interface AmazonProductService {
      * @return
      */
     int checkAmazonProductIsExists(String amazonPid);
+
+
+    List<AmazonOrderBean> queryAmazonOrderList(AmazonOrderParam param);
+
+    int queryAmazonOrderListCount(AmazonOrderParam param);
+
+    int insertAmazonOrder(AmazonOrderBean orderBean);
+
+    int insertAmazonOrderList(List<AmazonOrderBean> orderBeanList);
 }
