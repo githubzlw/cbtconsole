@@ -68,9 +68,11 @@
                     <td id="type_name_${type_name.key}">${type_name.value}</td>
                 </c:forEach>
                 <td>规格中文</td>
-                <td>单价</td>
+                <td>非免邮价</td>
+                <td>免邮价</td>
                 <td>重量(KG)</td>
                 <td>体积重量(KG)</td>
+                <td>SKU-ID</td>
             </tr>
             </thead>
 
@@ -82,13 +84,19 @@
                             style="width: 130px;">${fn:split(tp_ar,'@')[2]}</td>
                     </c:forEach>
                     <td style="width: 160px;text-align: center;"><span>${sku_bean.chType}</span></td>
-                    <td style="width: 80px;text-align: center;"><span>${sku_bean.price}</span></td>
+                    <td style="width: 80px;text-align: center;">
+                        <input class="inp_style inp_not_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
+                               value="${sku_bean.price}"/></td>
+                    <td style="width: 80px;text-align: center;">
+                        <input class="inp_style inp_free_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
+                               value="${sku_bean.freePrice}"/></td>
                     <td style="width: 80px;">
                         <input class="inp_style inp_cmn_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
                                value="${sku_bean.fianlWeight}"/></td>
                     <td style="width: 80px;">
                         <input class="inp_style inp_vlm_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
                                value="${sku_bean.volumeWeight}"/></td>
+                    <td>${sku_bean.skuId}</td>
                 </tr>
             </c:forEach>
             </tbody>
@@ -147,21 +155,21 @@
         // 循环遍历table,判断最大规格数据
         $("#sku_body").find("tr").each(function () {
             var tdVal = $(this).find("td").eq(0).text();
-            var noBlankVal = tdVal.replace(/\s+/g,"");
+            var noBlankVal = tdVal.replace(/\s+/g, "");
             if (typeObj.hasOwnProperty(noBlankVal)) {
                 typeObj[noBlankVal] = typeObj[noBlankVal] + 1;
             } else {
                 typeObj[noBlankVal] = 1;
                 var tVal = "tp_00";
                 var ln = getLeng(typeObj);
-                if(ln < 9){
+                if (ln < 9) {
                     tVal = "tp_0" + ln;
-                }else{
+                } else {
                     tVal = "tp_" + ln;
                 }
                 typeMap[noBlankVal] = tVal;
             }
-            $(this).find("td").eq(4).find("input").addClass("com_" + typeMap[noBlankVal]);
+            $(this).find("td").eq(5).find("input").addClass("com_" + typeMap[noBlankVal]);
             $(this).find("td:last").find("input").addClass("vlm_" + typeMap[noBlankVal]);
         });
         // 取最大值
@@ -176,8 +184,8 @@
 
     function getLeng(obj) {
         var ln = 0;
-        for(var key in typeObj){
-            ln ++;
+        for (var key in typeObj) {
+            ln++;
         }
         return ln;
     }
@@ -196,6 +204,8 @@
         var reg = /(^[-+]?[1-9]\d*(\.\d{1,3})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
         var singSkus = "";
         var singVlmSkus = "";
+        var singPrice = "";
+        var singFreePrice = "";
         var isNotErr = true;
         $(".inp_cmn_price").each(function () {
             var ppid = $(this).attr("data-id");
@@ -227,6 +237,36 @@
                 singVlmSkus += ";" + ppid + "@" + pweight;
             }
         });
+        $(".inp_not_price").each(function () {
+            var ppid = $(this).attr("data-id");
+            var price = $(this).val();
+            if (ppid == null || ppid == "") {
+                showMessage("单规格ID获取失败");
+                isNotErr = false;
+                return false;
+            } else if (!reg.test(price)) {
+                showMessage("非免邮价格异常");
+                isNotErr = false;
+                return false;
+            } else {
+                singPrice += ";" + ppid + "@" + price;
+            }
+        });
+        $(".inp_free_price").each(function () {
+            var ppid = $(this).attr("data-id");
+            var freePrice = $(this).val();
+            if (ppid == null || ppid == "") {
+                showMessage("单规格ID获取失败");
+                isNotErr = false;
+                return false;
+            } else if (!reg.test(freePrice)) {
+                showMessage("免邮价格异常");
+                isNotErr = false;
+                return false;
+            } else {
+                singFreePrice += ";" + ppid + "@" + freePrice;
+            }
+        });
         if (isNotErr) {
             showMessage("正在执行，请等待...");
             $.ajax({
@@ -236,7 +276,9 @@
                 data: {
                     "pid": pid,
                     "sku": singSkus.substring(1),
-                    "volumeSku": singVlmSkus.substring(1)
+                    "volumeSku": singVlmSkus.substring(1),
+                    "singPrice": singPrice.substring(1),
+                    "singFreePrice": singFreePrice.substring(1)
                 },
                 success: function (data) {
                     $('.mask').hide();
@@ -266,40 +308,70 @@
                     } else {
                         var smallW = parseFloat(weightList[0]);
                         var bigW = parseFloat(weightList[1]);
-                        var avgW = parseFloat((bigW - smallW) / (maxVal - 1));
+                        var tempMaxVal = maxVal;
+                        if (maxVal == 1) {
+                            tempMaxVal = Object.keys(typeObj).length;
+                        }
+                        var avgW = parseFloat((bigW - smallW) / (tempMaxVal - 1));
+
                         var totalW = 0;
                         if (flag == 2) {
                             for (var keyV in typeObj) {
                                 totalW = parseFloat(smallW);
                                 var tempVal = totalW;
                                 if (type == 1) {
-                                    $(".com_" + typeMap[keyV]).each(function () {
-                                        $(this).val(tempVal.toFixed(3));
-                                        tempVal = tempVal + avgW;
-                                    });
+                                    if (maxVal == 1) {
+                                        $(".inp_cmn_price").each(function () {
+                                            $(this).val(tempVal.toFixed(3));
+                                            tempVal = tempVal + avgW;
+                                        });
+                                    } else {
+                                        $(".com_" + typeMap[keyV]).each(function () {
+                                            $(this).val(tempVal.toFixed(3));
+                                            tempVal = tempVal + avgW;
+                                        });
+                                    }
                                 } else {
-                                    $(".vlm_" + typeMap[keyV]).each(function () {
-                                        $(this).val(tempVal.toFixed(3));
-                                        tempVal = tempVal + avgW;
-                                    });
+                                    if (maxVal == 1) {
+                                        $(".inp_vlm_price").each(function () {
+                                            $(this).val(tempVal.toFixed(3));
+                                            tempVal = tempVal + avgW;
+                                        });
+                                    } else {
+                                        $(".vlm_" + typeMap[keyV]).each(function () {
+                                            $(this).val(tempVal.toFixed(3));
+                                            tempVal = tempVal + avgW;
+                                        });
+                                    }
                                 }
                                 totalW = tempVal;
-
                             }
                         } else {
                             for (var keyV in typeObj) {
                                 totalW = bigW;
                                 var tempVal = totalW;
                                 if (type == 1) {
-                                    $(".com_" + typeMap[keyV]).each(function () {
-                                        $(this).val(tempVal.toFixed(3));
-
-                                    });
+                                    if (maxVal == 1) {
+                                        $(".inp_cmn_price").each(function () {
+                                            $(this).val(tempVal.toFixed(3));
+                                        });
+                                    } else {
+                                        $(".com_" + typeMap[keyV]).each(function () {
+                                            $(this).val(tempVal.toFixed(3));
+                                        });
+                                    }
                                 } else {
-                                    $(".vlm_" + typeMap[keyV]).each(function () {
-                                        $(this).val(tempVal.toFixed(3));
-                                        tempVal = tempVal - avgW;
-                                    });
+                                    if (maxVal == 1) {
+                                        $(".inp_vlm_price").each(function () {
+                                            $(this).val(tempVal.toFixed(3));
+                                            tempVal = tempVal - avgW;
+                                        });
+                                    } else {
+                                        $(".vlm_" + typeMap[keyV]).each(function () {
+                                            $(this).val(tempVal.toFixed(3));
+                                            tempVal = tempVal - avgW;
+                                        });
+                                    }
                                 }
                                 totalW = tempVal;
                             }

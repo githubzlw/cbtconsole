@@ -15,7 +15,7 @@ public class ShopGoodsSyncThread implements Runnable {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ShopGoodsSyncThread.class);
 	// private static final String ACCESSUTL = "http://127.0.0.1:8080/checkimage/clear/shopGoods?shopId=";
 	//private static final String ACCESSUTL = "http://192.168.1.31:8080/checkimage/sync/shopGoodsSync?shopId=";
-	private static final String ACCESSUTL = "http://192.168.1.31:8088/syncGoodsToOnline/sync/shopGoodsSync?shopId=";
+	private static final String ACCESSUTL = "http://192.168.1.102:8080/productPublish/sync/shopGoodsSync?shopId=";
 //	private static final String ACCESSUTL = "http://127.0.0.1:8383/syncGoodsToOnline/sync/shopGoodsSync?shopId=";
 
 	private String shopId;

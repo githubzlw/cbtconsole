@@ -305,48 +305,6 @@
         }
 
 
-        function Down_sample(orderno, email, paytime) {
-            alert(orderno)
-            if(orderno == null || orderno == ""){
-                alert('获取订单号失败');
-                return ;
-            }
-            var s=0;
-            var orderDetail=${orderDetail};
-            var OrderMap = new Array();
-            $('input:checkbox[name=Split_open]').each(function(k) {
-                if ($(this).is(':checked')) {
-                    alert(k)
-                    var arr=$("#Split_openNum"+orderDetail[k].id);
-                    if (arr>orderDetail[k].yourorder){
-                        alert("你输入的拆单数量不能大于订单数量")
-                        return
-                    }
-                    var yourorder=orderDetail[k].yourorder-arr;
-                    OrderMap.push({id:orderDetail[k].id,userid:orderDetail[k].userid,goodsid:orderDetail[k].goodsid,goodsname:orderDetail[k].goodsname,orderid:orderDetail[k].orderid
-                        ,delivery_time:orderDetail[k].delivery_time,checkprice_fee:orderDetail[k].checkprice_fee,checkproduct_fee:orderDetail[k].checkproduct_fee,state:orderDetail[k].state,
-                        fileupload:orderDetail[k].fileupload, yourorder:yourorder,goodsprice:orderDetail[k].goodsprice,freight:orderDetail[k].freight,downSample:arr})
-                }
-            })
-            $.ajax({
-                type:"post",
-                url:"/cbtconsole/orderSplit/DownSample",
-                dataType:"json",
-                contentType : 'application/json;charset=utf-8',
-                data:JSON.stringify(OrderMap),
-                success:function(res){
-                    alert(res)
-                    if(res==0){
-                        alert("删除失败  !")
-                        return;
-                    }else{
-                        alert("删除成功 !");
-                        // window.location.reload();
-                    }
-                }
-
-            })
-        }
     </script>
 
     <link type="text/css" rel="stylesheet"
@@ -1167,6 +1125,7 @@
         <!-- 不是dropship订单 -->
         <div style="width:1440px;">
             <table id="orderDetail" class="ormtable2" align="center">
+                <caption><b style="font-size: 26px;color: red;">商品总数[${totalSize}]</b></caption>
                 <tbody>
                 <tr class="detfretit">
                     <td>商品编号/购物车id</td>
@@ -1179,8 +1138,12 @@
                     <td style="width:500px;">订单操作</td>
                 </tr>
                 </tbody>
-                <c:forEach items="${orderDetail}" var="orderd" varStatus="sd">
-                    <tr id="goodsid_${orderd.goodsid}"
+
+
+                <c:forEach items="${orderDetailMap}" var="orderMap">
+                    <tr style="text-align: center"><td colspan="7"><b style="color: red;font-size: 22px">店铺：${orderMap.key}</b></td></tr>
+                    <c:forEach items="${orderMap.value}" var="orderd" varStatus="sd">
+                        <tr id="goodsid_${orderd.goodsid}"
                         style="${orderd.state == 2?'background-color: #FF8484':''}">
                         <td>${sd.index+1}<br>${orderd.goodsid}/${orderd.id}</td>
                         <td><input type="hidden" value="${orderd.state}"> <a>
@@ -1216,7 +1179,7 @@
                                     </c:if>
                                 </c:forEach>
                             </c:if></td>
-                        <td style="widows: 400px;">
+                        <td style="width: 400px;">
                             <c:if test="${not empty orderd.inventoryRemark}">
                                 <span style="background-color:chartreuse">库存备注:${orderd.inventoryRemark}</span><br>
                             </c:if>
@@ -1529,6 +1492,9 @@
 											%</p>
 								</span>
                                 <a href="/cbtconsole/editc/detalisEdit?pid=${orderd.goods_pid}" target="_blank">编辑链接</a>
+                                <c:if test="${'8' == orderd.match_source}">
+                                    <b style="color:red;">(B2C商品)</b>
+                                </c:if>
 									<br>
                                 <span id="spanurl${sd.index}">
 									<p > 1688原始货源价格(RMB):<em style="color:red;">${orderd.price1688}</em> </p>
@@ -1614,7 +1580,12 @@
                             <input type="text" style="width: 20px" id="Split_openNum${orderd.id}" onchange="getNum(${orderd.yourorder},this)" value="1"><span>优先发货</span>
                         </td>
                     </tr>
+                    </c:forEach>
+
                 </c:forEach>
+
+
+
             </table>
         </div>
     </c:if>

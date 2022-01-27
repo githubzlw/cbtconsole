@@ -22,21 +22,21 @@ public class OKHttpUtils {
     /**
      * 产品上下架图片处理接口
      * 接口地址（get或者post都可以）
-     * 后台下架
-     * http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do?pid=12312313&valid=0&unsellableReason=6&method=2
-     * 后台上架
-     * http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do?pid=12312313&valid=1&unsellableReason=45&method=2
-     * <p>
+     * 	后台下架
+     * 		http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do?pid=12312313&valid=0&unsellableReason=6&method=2
+     * 	后台上架
+     * 		http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do?pid=12312313&valid=1&unsellableReason=45&method=2
+     *
      * 参数
-     * method 更新方式 1-添加到上下架列表 后续定时走; 2- 实时更新;
-     * valid	更新产品表上下架值 按照上面地址提供
-     * unsellableReason  更新产品表原因值 按照上面地址提供
-     * <p>
+     * 	method 更新方式 1-添加到上下架列表 后续定时走; 2- 实时更新;
+     * 	valid	更新产品表上下架值 按照上面地址提供
+     * 	unsellableReason  更新产品表原因值 按照上面地址提供
+     *
      * 返回值
-     * state
-     * true-更新成功；
-     * false-更新失败
-     * 失败时候 message 是失败原因；
+     * 	state
+     * 		true-更新成功；
+     * 		false-更新失败
+     * 			失败时候 message 是失败原因；
      */
     private static final String IMG_ONLINE_AND_DELETE_URL = "http://192.168.1.48:18079/syncsku/cbt/updateOffShellGoods.do";
 
@@ -61,7 +61,6 @@ public class OKHttpUtils {
      * http://192.168.1.48:18079/syncsku/cbt/updateNeedOffShell.do?pid=12312313&valid=0&unsellableReason=6&method=1
      * 后台上架
      * http://192.168.1.48:18079/syncsku/cbt/updateNeedOffShell.do?pid=12312313&valid=1&unsellableReason=45&method=1
-     *
      * @param method 更新方式 1-添加到上下架列表 后续定时走; 2- 实时更新;
      */
     public static boolean optionGoodsInterface(String pid, int valid, int unsellableReason, int method) {
@@ -74,8 +73,8 @@ public class OKHttpUtils {
                     .addFormDataPart("unsellableReason", String.valueOf(unsellableReason))
                     .addFormDataPart("method", String.valueOf(method))
                     .build();*/
-        // Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*").addHeader("Connection", "close").addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").url(IMG_ONLINE_AND_DELETE_URL).post(formBody).build();
-        // client = new OkHttpClient();
+            // Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*").addHeader("Connection", "close").addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").url(IMG_ONLINE_AND_DELETE_URL).post(formBody).build();
+            // client = new OkHttpClient();
             /*OkHttpClient client = getClientInstence();
             Response response = client.newCall(request).execute();
             String rs = response.body().string();
@@ -298,6 +297,7 @@ public class OKHttpUtils {
     }
 
 
+
     /**
      * Post调用
      *
@@ -369,7 +369,6 @@ public class OKHttpUtils {
         return response.body() != null ?
                 JSON.parseObject(response.body().string()) : null;
     }
-
 
     private void checkAndInitOkHttp() {
         total++;

@@ -474,7 +474,7 @@
 
         function formatPid(val, row, index) {
             return '<span name="pid">' + row.pid + '</span><br /><br /><a target="_blank" href="https://detail.1688.com/offer/'+ row.pid +'.html">原1688链接</a>' +
-                '<br /><br /><a target="_blank" href="https://www.import-express.com/goodsinfo/cbtconsole-1'+ row.pid +'.html">线上链接</a>';
+                '<br /><br /><a target="_blank" href="https://www.import-express.com/goodsinfo/p-0-0-1'+ row.pid +'.html">线上链接</a>';
         }
 
     </script>

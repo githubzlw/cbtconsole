@@ -292,7 +292,7 @@ function catalogProduct(id){
 			}
 			var requestHost = "https://www.import-express.com";
 			if(data.template == 2){
-				requestHost = "https://www.kidsproductwholesale.com";
+				requestHost = "https://www.kidscharming.com";
 			}else if(data.template == 4){
 				requestHost = "https://www.petstoreinc.com";
 			}
@@ -337,7 +337,7 @@ function searchFromRemote(){
 	var temp = $("#query_temp").val();
 	var requestHost = "https://www.import-express.com";
 	if(temp == 2){
-		requestHost = "https://www.kidsproductwholesale.com";
+		requestHost = "https://www.kidscharming.com";
 	}else if(temp == 4){
 		requestHost = "https://www.petstoreinc.com";
 	}

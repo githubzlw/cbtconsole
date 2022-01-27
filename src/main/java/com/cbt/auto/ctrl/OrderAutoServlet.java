@@ -505,7 +505,7 @@ public class OrderAutoServlet extends HttpServlet {
                     String parent_id=rs.getString("category_id");
                     if(childIds!=null && !"".equals(childIds)){
                         System.out.println("childIds==="+childIds);
-                        if(childIds.indexOf(",")>-1){
+                        if(childIds.contains(",")){
                             String [] str=childIds.split(",");
                             for (String s : str) {
                                 getData(s,i,parent_id);

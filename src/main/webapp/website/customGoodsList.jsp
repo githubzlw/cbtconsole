@@ -672,7 +672,11 @@ b {
 				<!-- 最近发布人  -->
 				<%--<span id="admin_${index.index}" style="text-align: center;"> ${list.admin}--%>
 
-				<br><a href="${list.url}" target="_blank">本地预览</a> <br><a href="${list.url}" target="_blank">线上预览</a>
+				<br>
+				<a href="http://192.168.1.29:8087/goodsinfo/p-0-0-1${list.pid}.html" target="_blank">本地预览</a>
+				<br>
+				<%--<a href="${list.url}" target="_blank">线上预览</a>--%>
+				<a href="https://www.import-express.com/goodsinfo/p-0-0-1${list.pid}.html" target="_blank">线上预览</a>
 			</span></td>
 			</tr>
 

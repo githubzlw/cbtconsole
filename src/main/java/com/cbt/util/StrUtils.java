@@ -12,8 +12,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class StrUtils {
 	
-	// 美元汇率
-	public static final double EXCHANGE_RATE = 6.3;
+
 	
 	/**Object转数字String
 	 * @param object

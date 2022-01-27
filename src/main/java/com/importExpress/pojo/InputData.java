@@ -107,6 +107,64 @@ public class InputData {
     private String is_simplify;
     private String top_sort;
 
+
+    private String free_price_new;
+    private String range_price_free_new;
+    private String sku_new;
+    private String price_import;
+    private String price_kids;
+    private String price_pets;
+
+    private String brand_name;
+
+    public String getFree_price_new() {
+        return free_price_new;
+    }
+
+    public void setFree_price_new(String free_price_new) {
+        this.free_price_new = free_price_new;
+    }
+
+    public String getRange_price_free_new() {
+        return range_price_free_new;
+    }
+
+    public void setRange_price_free_new(String range_price_free_new) {
+        this.range_price_free_new = range_price_free_new;
+    }
+
+    public String getSku_new() {
+        return sku_new;
+    }
+
+    public void setSku_new(String sku_new) {
+        this.sku_new = sku_new;
+    }
+
+    public String getPrice_import() {
+        return price_import;
+    }
+
+    public void setPrice_import(String price_import) {
+        this.price_import = price_import;
+    }
+
+    public String getPrice_kids() {
+        return price_kids;
+    }
+
+    public void setPrice_kids(String price_kids) {
+        this.price_kids = price_kids;
+    }
+
+    public String getPrice_pets() {
+        return price_pets;
+    }
+
+    public void setPrice_pets(String price_pets) {
+        this.price_pets = price_pets;
+    }
+
     public String getTop_sort() {
         return top_sort;
     }
@@ -864,5 +922,13 @@ public class InputData {
 
     public InputData(Character crud) {
         this.crud = crud;
+    }
+
+    public String getBrand_name() {
+        return brand_name;
+    }
+
+    public void setBrand_name(String brand_name) {
+        this.brand_name = brand_name;
     }
 }

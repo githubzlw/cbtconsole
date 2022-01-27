@@ -37,7 +37,7 @@ public class SourcingOrderUtils {
 
 
         Assert.isTrue(StringUtils.isNotBlank(orderNo), "orderNo null");
-        Assert.isTrue(null != state && state > -1, "state null");
+        Assert.isTrue(null != state && state >= -1, "state null");
         try {
 
             Map<String, String> param = new HashMap<>();

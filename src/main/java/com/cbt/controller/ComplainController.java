@@ -110,7 +110,7 @@ public class ComplainController {
 		for(ComplainVO c:list){
 			String isRefund = complainRefundByUserids.get(c.getUserid()+"");
 			isRefund = isRefund==null||isRefund.isEmpty()?"0":isRefund;
-			c.setIsRefund(Integer.valueOf(isRefund));
+			c.setIsRefund(Integer.parseInt(isRefund));
 			List<String> corderIdList = c.getOrderIdList();
 			List<String> disputeList = c.getDisputeList();
 			if((disputeList == null || disputeList.isEmpty()) && corderIdList != null && !corderIdList.isEmpty()) {
@@ -169,13 +169,13 @@ public class ComplainController {
 						for (int i = 0; i < imgArr.length; i++) {
 							if (imgArr[i].contains("/servicerequest")) {
 								if (i < imgArr.length - 1) {
-									sb.append(preHttp + imgArr[i] + ",");
+									sb.append(preHttp).append(imgArr[i]).append(",");
 								} else {
-									sb.append(preHttp + imgArr[i]);
+									sb.append(preHttp).append(imgArr[i]);
 								}
 							} else {
 								if (i < imgArr.length - 1) {
-									sb.append(imgArr[i] + ",");
+									sb.append(imgArr[i]).append(",");
 								} else {
 									sb.append(imgArr[i]);
 								}
@@ -224,15 +224,15 @@ public class ComplainController {
 						for (int i = 0; i < imgArr.length; i++) {
 							if (imgArr[i].contains("/servicerequest")) {
 								if (i < imgArr.length - 1) {
-									sb.append(preHttpNew + imgArr[i] + ",");
+									sb.append(preHttpNew).append(imgArr[i]).append(",");
 								} else {
-									sb.append(preHttpNew + imgArr[i]);
+									sb.append(preHttpNew).append(imgArr[i]);
 								}
 							} else {
 								if (i < imgArr.length - 1) {
-									sb.append(preHttpOld + imgArr[i] + ",");
+									sb.append(preHttpOld).append(imgArr[i]).append(",");
 								} else {
-									sb.append(preHttpOld + imgArr[i]);
+									sb.append(preHttpOld).append(imgArr[i]);
 								}
 							}
 						}

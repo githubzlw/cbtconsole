@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.ProductBatchMapper">
+
+    <select id="list" parameterType="com.importExpress.pojo.ProductBatchDiscountParam"
+            resultType="com.importExpress.pojo.ProductBatchDiscount">
+        select pbd.id,pbd.pid,pbd.sku_id,pbd.p1_num,pbd.p1_discount,pbd.p2_num,pbd.p2_discount,pbd.admin_id,
+        ad.admName as admin_name,pbd.update_time
+        from product_batch_discount pbd left join admuser ad on pbd.admin_id = ad.id
+        where 1=1
+        <if test="pid != null">
+            and pbd.pid = #{pid}
+        </if>
+        <if test="sku_id">
+            and pbd.sku_id = #{sku_id}
+        </if>
+        <if test="admin_id > 0">
+            and pbd.admin_id = #{admin_id}
+        </if>
+        order by pbd.update_time desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="listByPid" parameterType="java.util.List" resultType="com.importExpress.pojo.ProductBatchDiscount">
+        select pbd.id,pbd.pid,pbd.sku_id,pbd.p1_num,pbd.p1_discount,pbd.p2_num,pbd.p2_discount,pbd.admin_id,
+        ad.admName as admin_name,pbd.update_time
+        from product_batch_discount pbd left join admuser ad on pbd.admin_id = ad.id
+        where 1=1 and pid in
+        <foreach collection="list" item="pid" open="(" close=")" separator=",">
+            #{pid}
+        </foreach>
+    </select>
+
+
+    <select id="listCount" parameterType="com.importExpress.pojo.ProductBatchDiscountParam"
+            resultType="java.lang.Integer">
+        select count(0)
+        from product_batch_discount pbd left join admuser ad on pbd.admin_id = ad.id
+        where 1=1
+        <if test="pid != null">
+            and pbd.pid = #{pid}
+        </if>
+        <if test="sku_id">
+            and pbd.sku_id = #{sku_id}
+        </if>
+        <if test="admin_id > 0">
+            and pbd.admin_id = #{admin_id}
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.importExpress.pojo.ProductBatchDiscountParam">
+        insert into product_batch_discount(pid,sku_id,p1_num,p1_discount,p2_num,p2_discount,admin_id)
+        values (#{pid},#{sku_id},#{p1_num},#{p1_discount},#{p2_num},#{p2_discount},#{admin_id})
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into product_batch_discount(pid,sku_id,p1_num,p1_discount,p2_num,p2_discount,admin_id)
+        values
+        <foreach collection="list" item="pd" separator=",">
+            (#{pd.pid},#{pd.sku_id},#{pd.p1_num},#{pd.p1_discount},#{pd.p2_num},#{pd.p2_discount},#{pd.admin_id})
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.importExpress.pojo.ProductBatchDiscount">
+        update product_batch_discount
+        set p1_num = #{p1_num},p1_discount = #{p1_discount},p2_num = #{p2_num},p2_discount = #{p2_discount},admin_id = #{admin_id}
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.util.List">
+        delete from product_batch_discount where pid in
+        <foreach collection="pidList" item="pd" open="(" close=")" separator=",">
+            #{pd}
+        </foreach>
+        <if test="skuIdList != null">
+            and sku_id
+            <foreach collection="skuIdList" item="skuId" open="(" close=")" separator=",">
+                #{skuId}
+            </foreach>
+        </if>
+    </delete>
+
+</mapper>

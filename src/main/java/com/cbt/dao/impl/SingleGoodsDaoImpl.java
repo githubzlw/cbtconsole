@@ -39,6 +39,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
                 count = rset.getInt(1);
             }
             if (count > 0) {
+
                 json.setOk(false);
                 json.setMessage("当前商品：" + goodsUrl + "，已经存在");
             } else {
@@ -885,12 +886,17 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         // 非物理删除数据
         Connection conn28 = DBHelper.getInstance().getConnection6();
         String delete28 = "delete from  single_goods_offers where goods_pid = '" + pid + "'";
+        String delete282 = "delete from  useful_data.single_goods_ready where pid = '" + pid + "'";
 
         Statement stmt28 = null;
         int rs28 = 0;
         try {
             stmt28 = conn28.createStatement();
-            rs28 = stmt28.executeUpdate(delete28);
+
+            stmt28.addBatch(delete28);
+            stmt28.addBatch(delete282);
+
+            rs28 = stmt28.executeBatch().length;
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("pid:" + pid + ",deleteGoodsByPid error :" + e.getMessage());
@@ -1479,5 +1485,138 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         }
         return rs;
     }
+
+
+    @Override
+    public List<SameTypeGoodsBean> queryForNewGoodsList(SingleQueryGoodsParam queryPm) {
+        Connection conn29 = DBHelper.getInstance().getConnection();
+        String querySql = "select pid,custom_main_image,enname,createtime,final_weight"
+                + " from custom_benchmark_ready_new cbrn "
+                + "where 1 = 1 ";
+
+        if (!(queryPm.getPid() == null || "".equals(queryPm.getPid()))) {
+            querySql += " and cbrn.pid = ?";
+        }
+
+        if (!(queryPm.getSttime() == null || "".equals(queryPm.getSttime()))) {
+            querySql += " and cbrn.create_time >= ? ";
+        }
+        if (!(queryPm.getEdtime() == null || "".equals(queryPm.getEdtime()))) {
+            querySql += " and cbrn.create_time <= ?";
+        }
+
+
+        querySql += " order by cbrn.createtime desc limit ?,?";
+        PreparedStatement stmt = null;
+        ResultSet rss = null;
+        List<SameTypeGoodsBean> list = new ArrayList<SameTypeGoodsBean>();
+        try {
+            int count = 1;
+            stmt = conn29.prepareStatement(querySql);
+
+            if (!(queryPm.getPid() == null || "".equals(queryPm.getPid()))) {
+                stmt.setString(count++, queryPm.getPid());
+            }
+
+            if (!(queryPm.getSttime() == null || "".equals(queryPm.getSttime()))) {
+                stmt.setString(count++, queryPm.getSttime());
+            }
+            if (!(queryPm.getEdtime() == null || "".equals(queryPm.getEdtime()))) {
+                stmt.setString(count++, queryPm.getEdtime());
+            }
+
+            stmt.setInt(count++, queryPm.getStartNum());
+            stmt.setInt(count++, queryPm.getLimitNum());
+            rss = stmt.executeQuery();
+            while (rss.next()) {
+
+                SameTypeGoodsBean goods = new SameTypeGoodsBean();
+                String pid = rss.getString("pid");
+                goods.setGoodsPid(pid);
+                String goodsName = rss.getString("enname");
+                if (goodsName == null || "".equals(goodsName)) {
+                    goodsName = "1688 GoodsName";
+                }
+                goods.setGoodsName(goodsName);
+                goods.setGoodsImg(rss.getString("custom_main_image"));
+
+                goods.setCreateTime(rss.getString("createtime"));
+                goods.setAveWeight(rss.getDouble("final_weight"));
+                list.add(goods);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("queryForList error :" + e.getMessage());
+            LOG.error("queryForList error :" + e.getMessage());
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            DBHelper.getInstance().closeConnection(conn29);
+        }
+        return list;
+    }
+
+    @Override
+    public int queryForNewGoodsListCount(SingleQueryGoodsParam queryPm) {
+        Connection conn29 = DBHelper.getInstance().getConnection();
+        String querySql = "select count(pid) from custom_benchmark_ready_new " +
+                " where 1=1 ";
+        if (!(queryPm.getPid() == null || "".equals(queryPm.getPid()))) {
+            querySql += " and cbrn.pid = ?";
+        }
+
+        if (!(queryPm.getSttime() == null || "".equals(queryPm.getSttime()))) {
+            querySql += " and cbrn.create_time >= ? ";
+        }
+        if (!(queryPm.getEdtime() == null || "".equals(queryPm.getEdtime()))) {
+            querySql += " and cbrn.create_time <= ?";
+        }
+
+        PreparedStatement stmt = null;
+        ResultSet rss = null;
+        int count = 0;
+        try {
+            int total = 1;
+            stmt = conn29.prepareStatement(querySql);
+
+            if (!(queryPm.getPid() == null || "".equals(queryPm.getPid()))) {
+                stmt.setString(total++, queryPm.getPid());
+            }
+
+            if (!(queryPm.getSttime() == null || "".equals(queryPm.getSttime()))) {
+                stmt.setString(total++, queryPm.getSttime());
+            }
+            if (!(queryPm.getEdtime() == null || "".equals(queryPm.getEdtime()))) {
+                stmt.setString(total++, queryPm.getEdtime());
+            }
+
+            rss = stmt.executeQuery();
+            if (rss.next()) {
+                count = rss.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("queryForListCount error :" + e.getMessage());
+            LOG.error("queryForListCount error :" + e.getMessage());
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            DBHelper.getInstance().closeConnection(conn29);
+        }
+        return count;
+    }
+
 
 }

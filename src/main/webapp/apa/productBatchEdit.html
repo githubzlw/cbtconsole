@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>产品批量编辑导出管理</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #pid_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #pid_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 130px;
+            height: 28px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+
+        #enter_div_sty {
+            display: none;
+            position: fixed;
+            top: 25%;
+            background: #8cdab6;
+            padding: 50px;
+            right: 30%;
+            width: 666px;
+            height: 199px;
+            box-shadow: 1px 10px 15px #e2e2e2;
+        }
+
+        .style_btn_delete {
+            width: 80px;
+            height: 30px;
+            background-color: red;
+            border-color: #ffffff;
+            font-size: 16px;
+            padding: 0px;
+            border-radius: 0px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            line-height: 20px;
+            font-weight: bold;
+            font-style: normal;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        var dataList = {};
+        $(document).ready(function () {
+            closeDialog();
+            closeUploadDialog();
+            setDatagrid();
+
+        });
+
+
+        function setDatagrid() {
+            var webSite = $("#web_size_type").val();
+            $('#pid_easyui-datagrid').datagrid({
+                title: '产品批量编辑导出管理',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#pid_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/productBatch/list',//url调用Action方法
+                loadMsg: '数据装载中......',
+                queryParams: {
+                    webSite: webSite
+                },
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 30,//默认选择的分页是每页50行数据
+                pageList: [30],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.messager.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (data.success) {
+                        var tempData = data.rows;
+                        for (var i = 0; i < tempData; i++) {
+                            dataList[tempData[i].pid + "_" + tempData[i].sku_id] = tempData[i];
+                        }
+                    }
+                }
+            });
+        }
+
+        function doQuery() {
+            $("#pid_easyui-datagrid").datagrid("load", {});
+        }
+
+        function formatImg(val, row, index) {
+            return '<img src="' + val + '" style="max-height:80px;max-width:80px;"/>';
+        }
+
+
+        function formatP1P2P3(val, row, index) {
+            var content = '<div>';
+            if (row.sku_id) {
+                content += '<p>[MOQ:' + row.p1_moq + '<span>,免邮价($):' + row.p1_free_price + '</span><span>,非免邮价($):' + row.p1_wprice + '</span><span>,1688价(￥):' + row.p1_1688 + ']</span></p>';
+            } else {
+                content += '<p><span>P1-</span>[MOQ:' + row.p1_moq + '<span>,免邮价($):' + row.p1_free_price + '</span><span>,非免邮价($):' + row.p1_wprice + '</span><span>,1688价(￥):' + row.p1_1688 + ']</span></p>';
+                if (row.p2_moq > 0) {
+                    content += '<p><span>P2-</span>[MOQ:' + row.p2_moq + '<span>,免邮价($):' + row.p2_free_price + '</span><span>,非免邮价($):' + row.p2_wprice + '</span><span>,1688价(￥):' + row.p2_1688 + ']</span></p>';
+                }
+                if (row.p3_moq > 0) {
+                    content += '<p><span>P3-</span>[MOQ:' + row.p3_moq + '<span>,免邮价($):' + row.p3_free_price + '</span><span>,非免邮价($):' + row.p3_wprice + '</span><span>,1688价(￥):' + row.p3_1688 + ']</span></p>';
+                }
+            }
+            content += '</div>';
+            return content;
+        }
+
+        function formatOperation(val, row, index) {
+            var content = '<a target="_blank" class="but_color" href="/cbtconsole/editc/detalisEdit?pid='+row.pid+'">编辑商品</a><br><br>';
+            content += '<button class="style_btn_delete" onclick="deleteProductInfo(' + row.pid + ')">删除</button>';
+            return content;
+        }
+
+        function showUploadDialog() {
+            $('#excel_dlg').dialog('open');
+        }
+
+        function closeDialog() {
+            $('#enter_div_sty').hide();
+            $("#file_form_enter")[0].reset();
+        }
+
+        function enterPidList() {
+            $('#enter_div_sty').show();
+            $("#insert_pid_list").val("");
+        }
+
+
+        function savePidList() {
+            var insert_pid_list = $("#insert_pid_list").val();
+            if (!insert_pid_list || insert_pid_list.length == 0) {
+                $.messager.alert("提醒", '请输入PID', "info");
+                return false;
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/productBatch/insert",
+                    data: {
+                        pidList: insert_pid_list
+                    },
+                    success: function (data) {
+                        if (data.code == 200) {
+                            closeDialog();
+                            // $.messager.alert("提醒", '保存成功', "info");
+                            doQuery();
+                        } else {
+                            $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                        }
+                    },
+                    error: function (res) {
+                        $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                    }
+                });
+            }
+
+        }
+
+        function deleteProductInfo(pid) {
+            $.messager.confirm('提示', '是否删除?删除后数据将无法恢复', function (rs) {
+                if (rs) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/cbtconsole/productBatch/delete",
+                        data: {
+                            pidList: pid
+                        },
+                        success: function (data) {
+                            if (data.code == 200) {
+                                doQuery();
+                            } else {
+                                $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                            }
+                        },
+                        error: function (res) {
+                            $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                        }
+                    });
+                }
+            });
+        }
+
+        function uploadExcelFile() {
+            //选择本地文件的使用form提交后台
+            var formData = new FormData($("#upload_file_form")[0]);
+            $.messager.progress({
+                title: '正在上传本地文件',
+                msg: '请等待...'
+            });
+            $.ajax({
+                    url: '/cbtconsole/productBatch/import',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        $.messager.progress('close');
+                        if (data.code == 200) {
+                            closeUploadDialog();
+                            doQuery();
+                        } else {
+                            $.messager.alert("提醒", data.message, "info");
+                        }
+                    },
+                    error: function (XMLResponse) {
+                        $.messager.progress('close');
+                        $.messager.alert("提醒", "执行错误，请联系管理员", "error");
+                    }
+                });
+        }
+
+
+        function deleteAll() {
+            $.messager.confirm('提示', '是否删除?删除后数据将无法恢复', function (rs) {
+                if (rs) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/cbtconsole/productBatch/deleteAll",
+                        data: {},
+                        success: function (data) {
+                            if (data.code == 200) {
+                                doQuery();
+                            } else {
+                                $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                            }
+                        },
+                        error: function (res) {
+                            $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                        }
+                    });
+                }
+            });
+        }
+
+        function genExcel() {
+            window.location.href = "/cbtconsole/productBatch/export";
+        }
+
+        function closeUploadDialog() {
+            $('#excel_dlg').dialog('close');
+            $("#upload_file_form")[0].reset();
+        }
+
+    </script>
+</head>
+<body>
+
+<div id="pid_toolbar" style="padding: 5px; height: auto">
+    <form id="pid_query_form" action="#" onsubmit="return false;">
+        &nbsp;&nbsp;&nbsp;&nbsp;<span><button class="but_color" onclick="genExcel()">导出EXCEL</button></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span><button class="but_color" onclick="showUploadDialog()">导入修改后EXCEL</button></span>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span><input type="button" class="but_color" value="录入PID" onclick="enterPidList()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <b style="color: red;font-size: 18px;">SKU的商品价格部分请填写P1的相关内容，非SKU商品按照P1-P2-P3填写，P2-P3没有的不填写</b>
+        <span>
+            <input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span><button class="style_btn_delete" onclick="deleteAll()">全部删除</button></span>
+
+
+    </form>
+</div>
+
+<table id="pid_easyui-datagrid"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'pid',width:'120px'">PID</th>
+        <th data-options="field:'name_en',width:'120px'">产品名称</th>
+        <th
+                data-options="field:'main_img',align:'center',width:'80px',formatter:formatImg">主图
+        </th>
+        <th data-options="field:'catid',align:'center',width:'100px'">所属类别</th>
+        <th data-options="field:'shop_id',align:'center',width:'120px'">店铺ID</th>
+        <th data-options="field:'sku_id',align:'center',width:'90px'">skuId</th>
+        <th data-options="field:'weight',align:'center',width:'90px'">重量(g)</th>
+        <th data-options="field:'volume_weight',align:'center',width:'100px'">体积重量(g)</th>
+        <th data-options="field:'unit',align:'center',width:'80px'">单位</th>
+
+        <th data-options="field:'p1_moq',align:'center',width:'420px',formatter:formatP1P2P3">P1-P2-P3价格数据</th>
+        <!--<th data-options="field:'p1_moq',align:'center',width:'80px'">P1 MOQ</th>
+        <th data-options="field:'p1_free_price',align:'center',width:'80px'">P1免邮价</th>
+        <th data-options="field:'p1_wprice',align:'center',width:'80px'">P1非免邮价</th>
+        <th data-options="field:'p1_1688',align:'center',width:'80px'">P1 1688价格</th>
+
+        <th data-options="field:'p2_moq',align:'center',width:'80px'">P2 MOQ</th>
+        <th data-options="field:'p2_free_price',align:'center',width:'80px'">P2免邮价</th>
+        <th data-options="field:'p2_wprice',align:'center',width:'80px'">P2非免邮价</th>
+        <th data-options="field:'p2_1688',align:'center',width:'80px'">P2 1688价格</th>
+
+        <th data-options="field:'p3_moq',align:'center',width:'80px'">P3 MOQ</th>
+        <th data-options="field:'p3_free_price',align:'center',width:'80px'">P3免邮价</th>
+        <th data-options="field:'p3_wprice',align:'center',width:'80px'">P3非免邮价</th>
+        <th data-options="field:'p3_1688',align:'center',width:'80px'">P3 1688价格</th>-->
+
+        <th
+                data-options="field:'opFlag',align:'center',width:'120px',formatter:formatOperation">操作
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+<div id="enter_div_sty">
+    <b style="text-align: center">请输入PID,使用英文逗号分隔</b>
+    <form id="file_form_enter" action="#" onsubmit="return false">
+        <textarea id="insert_pid_list" rows="10" cols="90">
+            
+        </textarea>
+        <div style="text-align: center;">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton" onclick="savePidList()" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeDialog()"
+               style="width: 80px">取消</a>
+        </div>
+
+    </form>
+</div>
+
+<div id="excel_dlg" class="easyui-dialog" title="上传EXCEL文件,仅限xls和xlsx"
+     data-options="modal:true"
+     style="width: 440px; height: 200px; padding: 10px;">
+    <form id="upload_file_form" method="post" enctype="multipart/form-data">
+        <div style="margin-bottom: 20px">
+            Excel:<input
+                id="local_picture" name="uploadfile" class="easyui-filebox"
+                data-options="prompt:'请选择Excel上传,仅限xls和xlsx...'"
+                style="width: 360px">
+        </div>
+    </form>
+
+    <div style="text-align: center; padding: 5px 0">
+        <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+           class="easyui-linkbutton"
+           onclick="uploadExcelFile('${goods.pid}')" style="width: 80px">确认上传</a>
+        <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+           class="easyui-linkbutton" onclick="closeUploadDialog()"
+           style="width: 80px">关闭</a>
+    </div>
+</div>
+
+</body>
+</html>

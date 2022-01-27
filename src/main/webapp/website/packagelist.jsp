@@ -732,8 +732,9 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
                                         
 		<input id="plckid" type="button" value="批量出库" onclick="batchCk()" style="width: 350px"/>
 		<%--公司网站：<select id="Web_site" style="font-size: 16px; height: 24px; width: 150px;">--%>
-		<%--<option value="0" selected="selected">import-express</option>--%>
-		<%--<option value="1">kidsproductwholesale</option>--%>
+		<%--<option value="1" selected="selected">IMPORT</option>
+                <option value="2">KIDS</option>
+                <option value="4">PETS</option>--%>
 	<%--</select>--%>
 	</div>                           
 </div>                              

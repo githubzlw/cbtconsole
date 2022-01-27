@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width" />
-  <title th:text="${title}">KidsProductWholesale ShopCart Show</title>
+  <title th:text="${title}">KidsCharming ShopCart Show</title>
   <style type="text/css">
 
     *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -206,8 +206,8 @@
       <td class="header container" align="center">
         <div class="content">
             <span class="brand">
-              <a href="https://www.kidsproductwholesale.com/">
-                <img src="https://img.kidsproductwholesale.com/importcsvimg/webpic/newindex/img/kids_logo.png">
+              <a href="https://www.kidscharming.com/">
+                <img src="https://img.kidscharming.com/importcsvimg/webpic/newindex/img/kids_logo.png">
               </a>
             </span>
         </div>
@@ -237,7 +237,7 @@
                       <div class="dismantling_box" >
                         <div class="order_first">
                           <div class="rece_shop">
-                            <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Kids Product Wholesale.</p>
+                            <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Kids Charming.</p>
                             <p>I noticed that you were about to buy some products from our website but haven't completed your order yet.</p>
                             <p>Is there anything I could help you with?</p>
                             <p>Here's your shopping cart list.</p>
@@ -246,7 +246,7 @@
 
                             <li class="order_li" th:each="carInfo:${sourceList}">
 
-                              <img th:src="${carInfo.googsImg}" src="https://img.kidsproductwholesale.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
+                              <img th:src="${carInfo.googsImg}" src="https://img.kidscharming.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
                                <p class="order_title" th:title="${carInfo.goodsTitle}" th:text="${carInfo.goodsTitle}" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
 
                               <div th:if="${not #lists.isEmpty(carInfo.typeList)}" th:each="typeStr:${carInfo.typeList}">
@@ -261,7 +261,7 @@
                              </li>
                            </ul>
                           <p class="order_rem_p">If there were any reasons why you didn't complete your purchase, please don't hesitate to let me know by responding to this Email, our team will absolutely try every effort to meet your satisfaction!</p>
-                          <p class="order_rem_p"><strong>Kids Product Wholesale CHINA</strong><br/>
+                          <p class="order_rem_p"><strong>Kids Charming CHINA</strong><br/>
                             Best product source for small business!</p>
                         </div>
                       </div>
@@ -271,10 +271,10 @@
                             <p class="thanks_so">Yours Sincerely,</p>
                               <p class="thanks_so"> <strong th:text="${adminName}">Lena</strong> | Marketing Manager</p>
                             <p class="thanks_so"> Marketing Department</p>
-                            <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@kidsproductwholesale.com</strong></p>
+                            <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@kidscharming.com</strong></p>
                             <p class="thanks_so">WhatsApp: <strong th:text="${whatsApp}">+86 18717701974</strong></p>
-                            <p class="thanks_so"><a href="https://www.kidsproductwholesale.com" target="_blank">www.kidsproductwholesale.com</a></p>
-                            <span style="display:none;"><img th:src="${emailFollowUrl}" src="https://www.kidsproductwholesale.com/followMe/index.do?fmc=110119911"/></span>
+                            <p class="thanks_so"><a href="https://www.kidscharming.com" target="_blank">www.kidscharming.com</a></p>
+                            <span style="display:none;"><img th:src="${emailFollowUrl}" src="https://www.kidscharming.com/followMe/index.do?fmc=110119911"/></span>
                           </td>
                         </tr>
                       </table>

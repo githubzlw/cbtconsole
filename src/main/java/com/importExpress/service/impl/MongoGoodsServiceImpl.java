@@ -150,8 +150,8 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
                                     && !"0".equals(map.get(key).toString())) {
                                 List<String> list = customGoodsMapper.queryCatidByPath(map.get(key).toString());
                                 // paramBean.put("catid1", new BasicDBObject(QueryOperators.IN, list));
-                                if(CollectionUtils.isNotEmpty(list)){
-                                    if(webSiteFlag > 0){
+                                if (CollectionUtils.isNotEmpty(list)) {
+                                    if (webSiteFlag > 0) {
                                         catidList.clear();
                                     }
                                     catidList.addAll(list);
@@ -353,7 +353,7 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
                             paramBean.put("shop_id", map.get(key).toString());
                             break;
                         case "chKeyWord":
-                            Pattern pattern = Pattern.compile("^.*"+map.get(key).toString()+".*$", Pattern.CASE_INSENSITIVE);
+                            Pattern pattern = Pattern.compile("^.*" + map.get(key).toString() + ".*$", Pattern.CASE_INSENSITIVE);
                             // paramBean.put("name", "/" + map.get(key).toString() + "/");
                             paramBean.put("name", pattern);
                             break;
@@ -367,7 +367,7 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
                                 }
                             }
                             break;
-                            case "searchAble":
+                        case "searchAble":
                             String searchAble = map.get(key).toString();
                             if (StringUtils.isNotBlank(searchAble) && Integer.parseInt(searchAble) > 0) {
                                 searchAbleFlag = 1;
@@ -399,10 +399,10 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
                     }
                 }
             }
-            if(CollectionUtils.isNotEmpty(catidList)){
+            if (CollectionUtils.isNotEmpty(catidList)) {
                 paramBean.put("catid1", new BasicDBObject(QueryOperators.IN, catidList));
             }
-            if(searchAbleFlag > 0){
+            if (searchAbleFlag > 0) {
                 BasicDBList endList = new BasicDBList();
                 endList.add(paramBean);
                 endList.add(searchBean);
@@ -441,8 +441,8 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
         List<WriteModel<Document>> writeModelList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(list)) {
             for (Map<String, Object> map : list) {
-                Map<String , Object> tempMap = new HashMap<>();
-                map.forEach((k,v)->{
+                Map<String, Object> tempMap = new HashMap<>();
+                map.forEach((k, v) -> {
                     tempMap.put(k, v.toString());
                 });
                 tempMap.put("pid", Long.parseLong(map.get("pid").toString()));
@@ -500,17 +500,17 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
     @Override
     public int insertOrUpdateMongodb(String pid) throws Exception {
         MongoGoodsBean bean = queryBeanByPid(pid);
-            if (bean == null || StringUtils.isBlank(bean.getPid())) {
-                return 0;
+        if (bean == null || StringUtils.isBlank(bean.getPid())) {
+            return 0;
+        } else {
+            boolean isExists = checkIsMongoByPid(pid);
+            if (isExists) {
+                updateGoodsInfoToMongoDb(bean);
             } else {
-                boolean isExists = checkIsMongoByPid(pid);
-                if (isExists) {
-                    updateGoodsInfoToMongoDb(bean);
-                } else {
-                    insertGoodsToMongoSingle(bean);
-                }
-                return 1;
+                insertGoodsToMongoSingle(bean);
             }
+            return 1;
+        }
     }
 
     @Override
@@ -521,6 +521,11 @@ public class MongoGoodsServiceImpl implements MongoGoodsService {
     @Override
     public void createDatabaseIndex() {
         MongoDBHelp.INSTANCE.createIndex3(GOODS_COLLECTION_NAME);
+    }
+
+    @Override
+    public void deleteOffLinePid(List<String> list) {
+        MongoDBHelp.INSTANCE.deleteMongo3(GOODS_COLLECTION_NAME, list);
     }
 
     private List<WriteModel<Document>> changeToMongoInsertDocument(List<MongoGoodsBean> list) throws Exception {

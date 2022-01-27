@@ -26,4 +26,7 @@ public class GoodsWeightChange {
     private int startNum;
     private int limitNum;
     private String skuid;
+
+    private String price;
+    private String freePrice;
 }

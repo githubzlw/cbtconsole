@@ -314,6 +314,7 @@
                     + row.goodsPid
                     + '" target="_blank">编辑详情</a><br><br><a href="https://www.import-express.com/goodsinfo/ep-0-0-1'
                     + row.goodsPid + '.html" target="_blank">线上预览</a><br>';
+                content += '<br><input type="button" class="style_btn_delete" value="删除重新上传" onclick="deleteGoodsByPid(\'' + row.goodsPid + '\')">';
             }
             return content;
         }
@@ -465,7 +466,7 @@
         }
 
         function openSyncWindow(pid) {
-            var url = "http://192.168.1.102:8080/syncGoodsToOnline/sync/singleGoodsSync?pid=" + pid;
+            var url = "http://192.168.1.102:8080/productPublish/sync/singleGoodsSync?pid=" + pid;
             var param = "height=400,width=600,top=200,left=600,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
             window.open(url, "windows", param);
         }

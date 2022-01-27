@@ -638,7 +638,7 @@ public class UserController {
         }
         int catalogIdInt = 0;
 
-        // https://www.kidsproductwholesale.com/apa/recatalog.html?id=2
+        // https://www.kidscharming.com/apa/recatalog.html?id=2
         String urlStr = sendUrl.substring(sendUrl.indexOf("?") + 1);
         String[] andList = urlStr.split("&");
         if(andList.length > 0){
@@ -753,7 +753,7 @@ public class UserController {
         if(site == null || site < -1){
             site = -1;
         }
-        userInfo.setSite(site);
+        userInfo.setSite(-1);
 
         try {
 

@@ -2,6 +2,7 @@ package com.importExpress.utli;
 
 import com.importExpress.pojo.Product;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,7 +46,7 @@ public class SolrProductUtils {
         int total = 0;
         while (true) {
             System.out.println("从solr获取商品数据 page " + page + " 每页条数 rows " + rows);
-            String solrUrl = url + "/product/select?fl=custom_pid,custom_main_image&q=*:*&rows="
+            String solrUrl = url + "/product/select?fl=custom_pid,custom_main_image,custom_matchSource&q=*:*&rows="
                     + rows + "&start=" + (page++ * rows) + "&wt=csv";
             if (site == 2) {  // kids网站的
                 solrUrl += "&fq=custom_path_catid:%22311%22%20OR%20custom_path_catid:%22125386001%22%20OR%20custom_path_catid:%22126128002%22%20OR%20custom_path_catid:%221813%22%20OR%20custom_path_catid:%221037002%22%20OR%20custom_path_catid:%221501%22%20OR%20custom_path_catid:%22125296002%22%20OR%20custom_path_catid:%22123184002%22%20OR%20custom_path_catid:%22122110001%22%20OR%20custom_path_catid:%221752%22";
@@ -55,17 +56,23 @@ public class SolrProductUtils {
 
             String res = HttpClientUtil.doGet(solrUrl);
             for (String line : res.split("\n")) {
-                if ("custom_pid,custom_main_image".equals(line)) {
+                if ("custom_pid,custom_main_image,custom_matchSource".equals(line)) {
                     continue;
                 }
                 String[] lineArr = line.split(",");
                 if (!pidSet.contains(lineArr[0])) {
                     pidSet.add(lineArr[0]);
-                    productList.add(new Product(lineArr[0], lineArr[1]));  // 每行的对应数据
+                    int matchSource = 0;
+                    if(lineArr.length == 2 || StringUtils.isBlank(lineArr[2])){
+                        matchSource = 0;
+                    } else{
+                        matchSource = Integer.parseInt(lineArr[2]);
+                    }
+                    productList.add(new Product(lineArr[0], lineArr[1], matchSource));  // 每行的对应数据
                     total ++;
                 }
             }
-            if ("custom_pid,custom_main_image\n".equals(res)) {  // 最后一页了
+            if ("custom_pid,custom_main_image,custom_matchSource\n".equals(res)) {  // 最后一页了
                 break;
             }
             if(total > 0){

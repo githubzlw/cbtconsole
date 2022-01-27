@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 public class ShopGoodsDealThread implements Runnable {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ShopGoodsDealThread.class);
 //	private static final String ACCESSUTL = "http://192.168.1.100:8080/checkimage/clear/shopGoods?shopId=";
-	private static final String ACCESSUTL = "http://192.168.1.31:8080/checkimage/clear/shopGoods?shopId=";
+	// private static final String ACCESSUTL = "http://192.168.1.31:8080/checkimage/clear/shopGoods?shopId=";
+	private static final String ACCESSUTL = "http://192.168.1.28:8081/checkimage/clear/shopGoods?shopId=";
+
 	
 
 	private String shopId;

@@ -77,86 +77,87 @@
 
 
     <resultMap id="shopCarInfoResultMap" type="com.importExpress.pojo.ShopCarInfo">
-        <id column ="id" property="id"/>
-        <result column ="itemId" property="pid"/>
-        <result column ="googs_price" property="cartGoodsPrice"/>
-        <result column ="googs_number" property="cartGoodsNum"/>
-        <result column ="googs_img" property="cartGoodsImg"/>
-        <result column ="per_weight" property="cartWeight"/>
-        <result column ="price1" property="cartOldPrice"/>
-        <result column ="custom_main_image" property="mainImg"/>
-        <result column ="remotpath" property="remotePath"/>
-        <result column ="wprice" property="wprice"/>
-        <result column ="isBenchmark" property="isBenchmark"/>
-        <result column ="bm_flag" property="bmFlag"/>
-        <result column ="wholesale_price" property="wholesalePrice"/>
-        <result column ="weight" property="weight1688"/>
-        <result column ="ali_pid" property="aliPid"/>
-        <result column ="ali_img" property="aliImg"/>
-        <result column ="ali_price" property="aliPrice"/>
-        <result column ="final_weight" property="finalWeight"/>
-        <result column ="catid1" property="catid1"/>
-        <result column ="goods_title" property="goodsTitle"/>
-        <result column ="goods_type" property="goodsType"/>
-        <result column ="norm_least" property="moq"/>
-        <result column ="ali_name" property="aliName"/>
-        <result column ="ali_name" property="aliName"/>
-        <result column ="website" property="website"/>
+        <id column="id" property="id"/>
+        <result column="itemId" property="pid"/>
+        <result column="googs_price" property="cartGoodsPrice"/>
+        <result column="googs_number" property="cartGoodsNum"/>
+        <result column="googs_img" property="cartGoodsImg"/>
+        <result column="per_weight" property="cartWeight"/>
+        <result column="price1" property="cartOldPrice"/>
+        <result column="custom_main_image" property="mainImg"/>
+        <result column="remotpath" property="remotePath"/>
+        <result column="wprice" property="wprice"/>
+        <result column="isBenchmark" property="isBenchmark"/>
+        <result column="bm_flag" property="bmFlag"/>
+        <result column="wholesale_price" property="wholesalePrice"/>
+        <result column="weight" property="weight1688"/>
+        <result column="ali_pid" property="aliPid"/>
+        <result column="ali_img" property="aliImg"/>
+        <result column="ali_price" property="aliPrice"/>
+        <result column="final_weight" property="finalWeight"/>
+        <result column="catid1" property="catid1"/>
+        <result column="goods_title" property="goodsTitle"/>
+        <result column="goods_type" property="goodsType"/>
+        <result column="norm_least" property="moq"/>
+        <result column="ali_name" property="aliName"/>
+        <result column="ali_name" property="aliName"/>
+        <result column="website" property="website"/>
+        <result column="moq" property="moq"/>
     </resultMap>
 
     <resultMap id="shopCarUserStatisticResultMap" type="com.importExpress.pojo.ShopCarUserStatistic">
-        <id column ="userid" property="userId"/>
-        <result column ="email" property="userEmail"/>
-        <result column ="createtime" property="createTime"/>
-        <result column ="last_add_cart_time" property="lastAddCartTime"/>
-        <result column ="last_login_time" property="lastLoginTime"/>
-        <result column ="shippingname" property="shippingName"/>
-        <result column ="countryId" property="countryId"/>
-        <result column ="country" property="countryName"/>
+        <id column="userid" property="userId"/>
+        <result column="email" property="userEmail"/>
+        <result column="createtime" property="createTime"/>
+        <result column="last_add_cart_time" property="lastAddCartTime"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="shippingname" property="shippingName"/>
+        <result column="countryId" property="countryId"/>
+        <result column="country" property="countryName"/>
 
 
-        <result column ="total_catid" property="totalCatid"/>
-        <result column ="total_price" property="totalPrice"/>
-        <result column ="average_price" property="averagePrice"/>
-        <result column ="currency" property="currency"/>
-        <result column ="follow_admin_id" property="followAdminId"/>
-        <result column ="follow_admin_name" property="followAdminName"/>
-        <result column ="follow_time" property="followTime"/>
-        <result column ="adminid" property="saleId"/>
-        <result column ="admName" property="saleName"/>
-        <result column ="site" property="site"/>
+        <result column="total_catid" property="totalCatid"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="average_price" property="averagePrice"/>
+        <result column="currency" property="currency"/>
+        <result column="follow_admin_id" property="followAdminId"/>
+        <result column="follow_admin_name" property="followAdminName"/>
+        <result column="follow_time" property="followTime"/>
+        <result column="adminid" property="saleId"/>
+        <result column="admName" property="saleName"/>
+        <result column="site" property="site"/>
     </resultMap>
 
 
     <resultMap id="shopTrackingResultMap" type="com.importExpress.pojo.ShopTrackingBean">
-        <result column ="user_id" property="userId"/>
-        <result column ="follow_time" property="followTime"/>
-        <result column ="order_no" property="orderNo"/>
-        <result column ="order_pay_time" property="orderPayTime"/>
-        <result column ="payment_amount" property="orderPayAmount"/>
-        <result column ="admin_id" property="adminId"/>
-        <result column ="admName" property="adminName"/>
+        <result column="user_id" property="userId"/>
+        <result column="follow_time" property="followTime"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="order_pay_time" property="orderPayTime"/>
+        <result column="payment_amount" property="orderPayAmount"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="admName" property="adminName"/>
     </resultMap>
 
 
     <resultMap id="zoneResultMap" type="com.importExpress.pojo.ZoneBean">
-        <id column ="id" property="id"/>
-        <result column ="country" property="country"/>
-        <result column ="zone" property="zone"/>
-        <result column ="fedexie" property="fedexie"/>
-        <result column ="area" property="area"/>
+        <id column="id" property="id"/>
+        <result column="country" property="country"/>
+        <result column="zone" property="zone"/>
+        <result column="fedexie" property="fedexie"/>
+        <result column="area" property="area"/>
     </resultMap>
 
 
     <resultMap id="followLogResultMap" type="com.importExpress.pojo.FollowLogBean">
-        <id column ="id" property="id"/>
-        <result column ="user_id" property="userId"/>
-        <result column ="user_email" property="userEmail"/>
-        <result column ="admin_id" property="adminId"/>
-        <result column ="admin_name" property="adminName"/>
-        <result column ="follow_code" property="followCode"/>
-        <result column ="create_time" property="createTime"/>
-        <result column ="user_ip" property="userIp"/>
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="admin_name" property="adminName"/>
+        <result column="follow_code" property="followCode"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_ip" property="userIp"/>
     </resultMap>
 
 
@@ -232,7 +233,7 @@
     price4, goodsUrlMD5, bizPriceDiscount, spiderPrice, priceListSize, comparealiPrice, 
     group_buy_id, skuid_1688, isFreeShipProduct, sampleFee, sampleMoq, website
   </sql>
-    <select id="selectByUserIdAndType" resultMap="BaseResultMap" >
+    <select id="selectByUserIdAndType" resultMap="BaseResultMap">
         select a.id, a.goodsdata_id, a.userid, a.sessionid, a.catid, a.itemId, a.shopId, a.goods_url, a.goods_title,
             a.googs_seller, a.googs_img, a.googs_price, a.googs_number, a.googs_size, a.googs_color, a.freight,
             a.delivery_time, a.norm_most, a.norm_least, a.state, a.remark, a.datatime, a.flag, a.pWprice, a.true_shipping,
@@ -1641,7 +1642,7 @@
     <select id="queryShopCarInfoByUserId" resultMap="shopCarInfoResultMap">
         select a.id,a.itemId as pid,a.googs_price,a.googs_number,a.price1,a.per_weight,
         b.custom_main_image,b.remotpath,b.wprice,b.isBenchmark,b.bm_flag,b.wholesale_price,
-        b.weight,b.ali_pid,b.ali_img,b.ali_price,b.final_weight,b.catid1,
+        b.weight,b.ali_pid,b.ali_img,b.ali_price,b.final_weight,b.catid1,a.sampleMoq as moq,
         a.goods_title,a.goods_type,a.norm_least,a.googs_img,a.price1,b.ali_name,a.website
         from shop_car_marketing a, custom_benchmark_ready b
         where a.userid = #{userId} and a.itemId = b.pid and b.valid in(1,2)
@@ -1652,8 +1653,9 @@
         select a.userid,a.shipping_method_type,date_format(b.createtime,'%Y-%m-%d %H:%i:%s') as createtime,
         <!-- date_format(b.createtime,'%Y-%m-%d %H:%i:%s') as last_login_time,  -->
         '' as last_login_time,
-        b.countryId,b.country,b.grade,b.email,b.site
-        from shop_cart_data a LEFT JOIN (select user.id,user.email,user.createtime,user.countryId,user.grade,user.site,zone.country
+        b.countryId,b.country,b.grade,b.email,a.web_site as site
+        from shop_cart_data a LEFT JOIN (select
+        user.id,user.email,user.createtime,user.countryId,user.grade,user.site,zone.country
         from user LEFT JOIN zone on user.countryId = zone.id) b on a.userid = b.id
         where a.userid = #{userId}
     </select>
@@ -1664,61 +1666,52 @@
     </update>
 
     <insert id="insertIntoShopCarFollow">
-        insert into shop_car_follow(user_id,content,admin_id)
-        values(#{userId},#{content},#{adminId})
+        insert into shop_car_follow(user_id,content,admin_id,web_site)
+        values(#{userId},#{content},#{adminId},#{web_site})
     </insert>
 
     <select id="queryForList" parameterType="com.importExpress.pojo.ShopCarUserStatistic"
-            resultMap="shopCarUserStatisticResultMap">
-        select gcf.userid,us.email,scm.total_catid,DATE_FORMAT(gcf.time_updated,'%Y-%m-%d %H:%i:%s') as last_add_cart_time,
-        convert(scm.total_price,decimal(10,2)) as total_price,convert(scm.average_price,decimal(10,2)) as average_price,
-        us.countryId,zone.country,us.currency,au.adminid,au.admName,us.site,
-        '' as last_login_time,ifnull(adm.id,0) as follow_admin_id,ifnull(adm.admName,'') as follow_admin_name,
-        DATE_FORMAT(gcf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time
-        from shop_cart_data gcf
-        inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
-        (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
-        inner join shop_car_distribution sb on sa.userid = sb.user_id
-        <if test="distributionAdminId > 0">
-            and sb.admin_id = #{distributionAdminId}
-        </if>
-        where userid > 0 group by userid
-        )scm on gcf.userid = scm.userid
-        left join user us on gcf.userid = us.id
-        left join (select admin_r_user.userid,admin_r_user.adminid,admuser.admName from admin_r_user,admuser
-        where admin_r_user.adminid = admuser.id
-        ) au on gcf.userid=au.userid
-        left join zone on us.countryId = zone.id
-        left join admuser adm on gcf.follow_admin_id = adm.id
-        where 1=1
+            resultType="com.importExpress.pojo.ShopCarUserStatistic">
+        select scd.userid, DATE_FORMAT(scd.time_updated,'%Y-%m-%d %H:%i:%s') as lastAddCartTime,
+        scd.follow_admin_id as followAdminId,DATE_FORMAT(scd.follow_time,'%Y-%m-%d %H:%i:%s') as followTime,
+        scd.car_total_price as totalPrice,scd.web_site as site,
+        us.email as userEmail,us.countryId,zn.country as countryName,us.currency,aru.adminid,adu.admName as saleName
+        from shop_cart_data scd ,user us
+        inner join admin_r_user aru on us.id =aru.userid
+        left join zone zn on us.countryId = zn.id
+        left join admuser adu on aru.adminid = adu.id
+        where scd.userid = us.id and scd.userid > 0 and scd.car_total_price > 0
         <if test="userId > 0">
-            and gcf.userid = #{userId}
+            and scd.userid = #{userId}
         </if>
         <if test="userEmail != null">
             and us.email = #{userEmail}
         </if>
         <if test="isOrder == 0">
-            and gcf.userid not in(select DISTINCT user_id from orderinfo)
+            and scd.userid not in(select DISTINCT user_id from orderinfo)
         </if>
         <if test="isOrder == 1">
-            and gcf.userid in(select DISTINCT user_id from orderinfo)
+            and scd.userid in(select DISTINCT user_id from orderinfo)
         </if>
         <if test="followAdminId > 0">
-            and gcf.follow_admin_id = #{followAdminId}
+            and scd.follow_admin_id = #{followAdminId}
         </if>
         <if test="saleId > 0">
-            and au.adminid = #{saleId}
+            and aru.adminid = #{saleId}
         </if>
         <if test="beginMoney > 0">
-            and scm.total_price &gt;= #{beginMoney}
+            and scd.car_total_price &gt;= #{beginMoney}
         </if>
         <if test="endMoney > 0">
-            and scm.total_price &lt;= #{endMoney}
+            and scd.car_total_price &lt;= #{endMoney}
         </if>
         <if test="countryId > 0">
             and us.countryId = #{countryId}
         </if>
-        order by gcf.time_updated desc
+        <if test="site > 0">
+            and scd.web_site = #{site}
+        </if>
+        order by scd.time_updated desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
         </if>
@@ -1726,60 +1719,54 @@
 
     <select id="queryForListCount" parameterType="com.importExpress.pojo.ShopCarUserStatistic"
             resultType="java.lang.Integer">
-        select count(1)
-        from shop_cart_data gcf
-        inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
-        (sum(googs_price * googs_number)/sum(googs_number)) as average_price from shop_car_marketing sa
-        inner join shop_car_distribution sb on sa.userid = sb.user_id
-        <if test="distributionAdminId > 0">
-            and sb.admin_id = #{distributionAdminId}
-        </if>
-        where userid > 0 group by userid
-        )scm on gcf.userid = scm.userid
-        left join user us on gcf.userid = us.id
-        left join (select admin_r_user.userid,admin_r_user.adminid,admuser.admName from admin_r_user,admuser
-        where admin_r_user.adminid = admuser.id
-        ) au on gcf.userid=au.userid
-        left join zone on us.countryId = zone.id
-        left join admuser adm on gcf.follow_admin_id = adm.id
-        where 1=1
+        select count(0)
+        from shop_cart_data scd ,user us
+        inner join admin_r_user aru on us.id =aru.userid
+        left join zone zn on us.countryId = zn.id
+        left join admuser adu on aru.adminid = adu.id
+        where scd.userid = us.id and scd.userid > 0 and scd.car_total_price > 0
         <if test="userId > 0">
-            and gcf.userid = #{userId}
+            and scd.userid = #{userId}
         </if>
         <if test="userEmail != null">
             and us.email = #{userEmail}
         </if>
         <if test="isOrder == 0">
-            and gcf.userid not in(select DISTINCT user_id from orderinfo)
+            and scd.userid not in(select DISTINCT user_id from orderinfo)
         </if>
         <if test="isOrder == 1">
-            and gcf.userid in(select DISTINCT user_id from orderinfo)
+            and scd.userid in(select DISTINCT user_id from orderinfo)
         </if>
         <if test="followAdminId > 0">
-            and gcf.follow_admin_id = #{followAdminId}
+            and scd.follow_admin_id = #{followAdminId}
         </if>
         <if test="saleId > 0">
-            and au.adminid = #{saleId}
+            and aru.adminid = #{saleId}
         </if>
         <if test="beginMoney > 0">
-            and scm.total_price &gt;= #{beginMoney}
+            and scd.car_total_price &gt;= #{beginMoney}
         </if>
         <if test="endMoney > 0">
-            and scm.total_price &lt;= #{endMoney}
+            and scd.car_total_price &lt;= #{endMoney}
         </if>
         <if test="countryId > 0">
             and us.countryId = #{countryId}
         </if>
+        <if test="site > 0">
+            and scd.web_site = #{site}
+        </if>
     </select>
 
-    <select id="queryTrackingList" parameterType="com.importExpress.pojo.ShopTrackingBean" resultMap="shopTrackingResultMap">
+    <select id="queryTrackingList" parameterType="com.importExpress.pojo.ShopTrackingBean"
+            resultMap="shopTrackingResultMap">
         select * from (select a.user_id,a.create_time as follow_time,a.admin_id,c.admName,b.orderid as order_no,
         payment_amount,date_format(b.createtime,'%Y-%m-%d %H:%i:%s') as order_pay_time
-        from shop_car_follow a  LEFT JOIN  (select sum(payment_amount) as payment_amount,userid,orderid,createtime from payment
+        from shop_car_follow a LEFT JOIN (select sum(payment_amount) as payment_amount,userid,orderid,createtime from
+        payment
         where paystatus = 1 and paytype in(0,1,2,5) group by orderid) b on a.user_id = b.userid
         and DATE_SUB(a.create_time,INTERVAL 8 HOUR) &lt;=b.createtime
         and b.createtime &lt;= DATE_ADD(a.create_time,INTERVAL 7 DAY)
-	    LEFT JOIN admuser c on a.admin_id = c.id where 1=1 and b.orderid is not null  GROUP BY b.orderid) rs
+        LEFT JOIN admuser c on a.admin_id = c.id where 1=1 and b.orderid is not null GROUP BY b.orderid) rs
         where 1=1
         <if test="userId > 0">
             and rs.user_id = #{userId}
@@ -1802,14 +1789,16 @@
     </select>
 
 
-    <select id="queryTrackingListCount" parameterType="com.importExpress.pojo.ShopTrackingBean" resultType="java.lang.Integer">
+    <select id="queryTrackingListCount" parameterType="com.importExpress.pojo.ShopTrackingBean"
+            resultType="java.lang.Integer">
         select count(1) from (select a.user_id,a.create_time as follow_time,a.admin_id,c.admName,b.orderid as order_no,
         payment_amount,date_format(b.createtime,'%Y-%m-%d %H:%i:%s') as order_pay_time
-        from shop_car_follow a  LEFT JOIN  (select sum(payment_amount) as payment_amount,userid,orderid,createtime from payment
+        from shop_car_follow a LEFT JOIN (select sum(payment_amount) as payment_amount,userid,orderid,createtime from
+        payment
         where paystatus = 1 and paytype in(0,1,2,5) group by orderid) b on a.user_id = b.userid
         and DATE_SUB(a.create_time,INTERVAL 8 HOUR) &lt;=b.createtime
         and b.createtime &lt;= DATE_ADD(a.create_time,INTERVAL 7 DAY)
-	    LEFT JOIN admuser c on a.admin_id = c.id where 1=1 and b.orderid is not null  GROUP BY b.orderid) rs
+        LEFT JOIN admuser c on a.admin_id = c.id where 1=1 and b.orderid is not null GROUP BY b.orderid) rs
         where 1=1
         <if test="userId > 0">
             and rs.user_id = #{userId}
@@ -1861,7 +1850,8 @@
     </select>
 
 
-    <select id="queryFollowLogListCount" resultType="java.lang.Integer" parameterType="com.importExpress.pojo.FollowLogBean">
+    <select id="queryFollowLogListCount" resultType="java.lang.Integer"
+            parameterType="com.importExpress.pojo.FollowLogBean">
         select count(0)
         from
         email_direct_marketing_log lg,(select admin_r_user.userid as user_id,user.email as user_email,user.follow_code,

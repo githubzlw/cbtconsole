@@ -564,7 +564,7 @@
             if (localUrl.indexOf(".1.27:") > -1 || localUrl.indexOf(".1.9:") > -1) {
                 url = "https://www.import-express.com/goodslistxx?background=1&hotid=";
                 if (webType == 2) {
-                    url = "https://www.kidsproductwholesale.com/goodslistxx?background=1&hotid=";
+                    url = "https://www.kidscharming.com/goodslistxx?background=1&hotid=";
                 } else if (webType == 3){
                     url = "https://www.petstoreinc.com/goodslistxx?background=1&hotid=";
                 } else if (webType == 4){

@@ -5,16 +5,15 @@ import com.cbt.util.Md5Util;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.website.userAuth.bean.Admuser;
-import com.importExpress.pojo.CouponRedisBean;
-import com.importExpress.pojo.TabCouponNew;
-import com.importExpress.pojo.TabCouponRules;
-import com.importExpress.pojo.TabCouponType;
+import com.importExpress.pojo.*;
 import com.importExpress.service.TabCouponService;
 import com.importExpress.service.impl.TabCouponServiceImpl;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -381,5 +380,96 @@ public class TabCouponController {
         }
         return result;
     }
+
+    /**
+     * 新增折扣卷
+     * http://127.0.0.1:8086/cbtconsole/coupon/addTabCouponNew.do
+     *
+     * @return 返回可用卷规则集合
+     **/
+    @RequestMapping(value = "/addTabCouponNew.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, String> addTabCouponNew(HttpServletRequest request,
+                                               Integer couponCodeType, //卷类别
+                                               @RequestParam(value = "couponValueLeft", defaultValue = "0", required = false) Integer valueLeft, //慢减卷最低消费金额
+                                               @RequestParam(value = "couponValueRight", defaultValue = "0", required = false) Integer valueRight, //满减卷优惠金额
+                                               String couponDescribe, //卷描述
+                                               @RequestParam(value = "couponCount", defaultValue = "0", required = false) Integer count, //卷数量
+                                               @RequestParam(value = "couponCodeWebsiteType", defaultValue = "0", required = false) Integer couponWebsiteType, //优惠卷所在网站
+                                               String couponFromTime,//领取开始时间
+                                               String couponToTime,//领取截止时间
+                                               String enableTime
+    ) {
+        Map<String, String> resultMap = new HashMap<String, String>();
+        // 获取登录用户信息
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (null == user) {
+            // 用户未登陆
+            resultMap.put("message", "用户未登陆,请登陆后重试!");
+            resultMap.put("code", "1");
+            resultMap.put("state", "false");
+            return resultMap;
+        }
+        //登陆用户id
+        Integer userId = user.getId();
+        String code = "";
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            couponFromTime = simpleDateFormat.format(simpleDateFormat.parse(couponFromTime + " 00:00:00"));
+            couponToTime = simpleDateFormat.format(simpleDateFormat.parse(couponToTime + " 00:00:00"));
+            enableTime = simpleDateFormat.format(simpleDateFormat.parse(enableTime + " 00:00:00"));
+
+
+            String url = "https://www.import-express.com/couponV2/generate";
+            //String url = "http://192.168.1.168:8080/couponV2/generate";
+            String param = "amount=" + valueRight + "&count=" + count + "&enableTime=" + enableTime +
+                    "&endTime=" + couponToTime + "&minPoint=" + valueLeft + "&name=coupon" + "&note=" + couponDescribe + "&startTime=" + couponFromTime;
+            List<String> resultList = tabCouponService.getCouponCode(url, param);
+
+            if (!CollectionUtils.isEmpty(resultList)) {
+                String jsonStr = resultList.get(0);
+
+                JSONObject json = JSONObject.fromObject(jsonStr);
+                if ("200".equals(String.valueOf(json.get("code")))) {
+
+                    JSONObject data = (JSONObject) json.get("data");
+                    code = String.valueOf(data.get("code"));
+                    TabCouponNew tabCouponNew = new TabCouponNew();
+                    tabCouponNew.setId(code);
+                    tabCouponNew.setCount(count);
+                    tabCouponNew.setDescribe(couponDescribe);
+                    tabCouponNew.setFrom(simpleDateFormat.parse(couponFromTime));
+                    tabCouponNew.setLeftCount(valueRight);
+                    tabCouponNew.setSite(couponWebsiteType);
+                    tabCouponNew.setTo(simpleDateFormat.parse(couponToTime));
+                    tabCouponNew.setType(couponCodeType);
+                    tabCouponNew.setValid(1);
+                    tabCouponNew.setValue(valueLeft + "-" + valueRight);
+                    tabCouponNew.setUserid(userId);
+                    int result = tabCouponService.addTabCouponNew(tabCouponNew);
+                    if (result > 0) {
+                        TabCouponLog tabCouponLog = new TabCouponLog();
+                        tabCouponLog.setUserId(userId);
+                        tabCouponLog.setCouponCode(code);
+                        tabCouponService.addTabCouponNewLog(tabCouponLog);
+                    }
+                }
+
+            }
+            resultMap.put("state", "true");
+        } catch (Exception e) {
+            e.printStackTrace();
+            resultMap.put("state", "false");
+            TabCouponLog tabCouponLog = new TabCouponLog();
+            tabCouponLog.setUserId(userId);
+            tabCouponLog.setCouponCode(code);
+            tabCouponLog.setErrorMessage(e.getMessage());
+            tabCouponService.addTabCouponNewLog(tabCouponLog);
+        }
+        return resultMap;
+    }
+
 
 }

@@ -17,6 +17,15 @@ public class ImportExSkuVal {
 	private float skuMultiCurrencyCalPrice;
 	private float skuMultiCurrencyDisplayPrice;
 	private String freeSkuPrice;
+	private float costPrice;
+
+	public float getCostPrice() {
+		return costPrice;
+	}
+
+	public void setCostPrice(float costPrice) {
+		this.costPrice = costPrice;
+	}
 
 	public float getActSkuCalPrice() {
 		return actSkuCalPrice;
@@ -106,7 +115,7 @@ public class ImportExSkuVal {
 				+ inventory + "\", \"isActivity\":\"" + isActivity + "\", \"skuCalPrice\":\"" + skuCalPrice
 				+ "\", \"skuMultiCurrencyCalPrice\":\"" + skuMultiCurrencyCalPrice
 				+ "\", \"skuMultiCurrencyDisplayPrice\":\"" + skuMultiCurrencyDisplayPrice
-				+ "\", \"freeSkuPrice\":\"" + freeSkuPrice + "\"}";
+				+ "\", \"costPrice\":\"" + costPrice + "\", \"freeSkuPrice\":\"" + freeSkuPrice + "\"}";
 	}
 
 }

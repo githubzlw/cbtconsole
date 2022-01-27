@@ -3,6 +3,7 @@ package com.importExpress.utli;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cbt.util.GoodsInfoUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.cbt.util.BigDecimalUtil;
@@ -78,7 +79,7 @@ public class GoodsPricePraseUtil {
                 double feePrice = FreightUtlity.getFeightWs(weight_final);
                 if (!priceStrList.isEmpty()) {
 //                    String price_1688 = priceStrList.get(0);
-//                    double factoryPrice = Double.valueOf(price_1688.split("-")[0]) / StrUtils.EXCHANGE_RATE;
+//                    double factoryPrice = Double.valueOf(price_1688.split("-")[0]) / GoodsInfoUtils.EXCHANGE_RATE;
 //                    if (factoryPrice < 0.01) {
 //                        factoryPrice = Double.valueOf(price_1688.split("-")[0]);
 //                    }
@@ -94,8 +95,8 @@ public class GoodsPricePraseUtil {
 
                     
                     
-                    String changeMinPrice = String.valueOf(BigDecimalUtil.truncateDouble((Double.valueOf(minPrice)+feePrice) / StrUtils.EXCHANGE_RATE, 2));
-                    String changeMaxPrice = String.valueOf(BigDecimalUtil.truncateDouble((Double.valueOf(maxPrice)+feePrice) / StrUtils.EXCHANGE_RATE, 2));
+                    String changeMinPrice = String.valueOf(BigDecimalUtil.truncateDouble((Double.valueOf(minPrice)+feePrice) / GoodsInfoUtils.EXCHANGE_RATE, 2));
+                    String changeMaxPrice = String.valueOf(BigDecimalUtil.truncateDouble((Double.valueOf(maxPrice)+feePrice) / GoodsInfoUtils.EXCHANGE_RATE, 2));
                     if ("0".equals(minPrice) && "0".equals(maxPrice)) {
                         gd.setShowPrice("--");
                     } else if ("0".equals(minPrice)) {
