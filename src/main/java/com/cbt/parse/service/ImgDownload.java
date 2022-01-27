@@ -18,7 +18,7 @@ public class ImgDownload {
 
 	/**
 	 * 测试
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -121,7 +121,7 @@ public class ImgDownload {
 
 	/**
 	 * 下载图片
-	 * 
+	 *
 	 * @param url
 	 * @param fileName
 	 * @return
@@ -148,7 +148,7 @@ public class ImgDownload {
 
 	/**
 	 * 将图片写入到磁盘
-	 * 
+	 *
 	 * @param img
 	 *            图片数据流
 	 * @param fileName
@@ -170,10 +170,10 @@ public class ImgDownload {
 		fops.flush();
 		fops.close();
 	}
-	
+
 	/**
 	 * 将图片写入到磁盘
-	 * 
+	 *
 	 * @param img
 	 *            图片数据流
 	 * @param fileName
@@ -201,7 +201,7 @@ public class ImgDownload {
 
 	/**
 	 * 根据地址获得数据的字节流
-	 * 
+	 *
 	 * @param strUrl
 	 *            网络连接地址
 	 * @return
@@ -220,7 +220,7 @@ public class ImgDownload {
 
 	/**
 	 * 从输入流中获取数据
-	 * 
+	 *
 	 * @param inStream
 	 *            输入流
 	 * @return

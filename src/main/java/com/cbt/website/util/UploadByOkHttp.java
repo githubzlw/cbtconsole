@@ -15,16 +15,18 @@ import java.util.concurrent.TimeUnit;
 public class UploadByOkHttp {
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(UploadByOkHttp.class);
 
-    private static final String ACCESS_URL_OLD = "http://104.247.194.50:3009/uploadImage";
+    private static final String ACCESS_URL_OLD = "http://108.61.142.103:3009/uploadImage";
+    // private static final String ACCESS_URL_OLD = "http://108.61.142.103:3009/uploadImage";
+    // private static final String ACCESS_URL_NEW = "http://108.61.142.103:3009/uploadImage";
     private static final String ACCESS_URL_NEW = "http://108.61.142.103:3009/uploadImage";
     private static final String TOKEN = "cerong2018jack";
     private static final String DELETE_URL_NEW = "http://108.61.142.103:3008/image/delete";
 
-    public static final String SERVICE_LOCAL_IMPORT_PATH = "/usr/local/goodsimg";
+    public static final String SERVICE_LOCAL_IMPORT_PATH = "/data";
     /**
      * 客户投诉上传图片位置
      */
-    public static final String SERVICE_LOCAL_SERVICE_REQUEST = "/usr/local/goodsimg/importcsvimg/servicerequest/";
+    public static final String SERVICE_LOCAL_SERVICE_REQUEST = "/data/importcsvimg/servicerequest/";
 
     public static OkHttpClient initClient() {
         OkHttpClient client = new OkHttpClient.Builder().connectTimeout(300, TimeUnit.SECONDS)
@@ -331,18 +333,18 @@ public class UploadByOkHttp {
 			String sourcePrePath = "E:/";
 			String sourceFileName = "3155222823_1506463280.jpg";
 			if (i < 10) {
-				String preFilePath = "/usr/local/goodsimg/importcsvimg/test/36996699/";
+				String preFilePath = "/data/importcsvimg/test/36996699/";
 				uploadMap.put(sourcePrePath + sourceFileName, preFilePath);
 			} else {
-				String preFilePath = "/usr/local/goodsimg/importcsvimg/test/36996699/desc/";
+				String preFilePath = "/data/importcsvimg/test/36996699/desc/";
 				uploadMap.put(sourcePrePath + sourceFileName, preFilePath);
 			}
 		}
 		doUpload(uploadMap);*/
 
         // 批量上传测试
-        File testFile = new File("G:/singleimg/singleimg135/571374457941");
-        String filePath = "/usr/local/goodsimg/importcsvimg/test/789456";
+        File testFile = new File("H:/临时存放/cbtconsole/规格11.12-谢/39540712455");
+        String filePath = "/data/importcsvimg/singleimg1/39540712455";
 
         uploadFileBatchOld(testFile, filePath);
     }

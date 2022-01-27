@@ -1031,13 +1031,14 @@ public class OrderDao implements IOrderDao{
 	@Override
 	public Address getUserAddrById(int id) {
 		// TODO Auto-generated method stub
-		String sql ="select address.*,zone.country as countryname from address,zone where address.id="+id+" and zone.id=address.country and (ISNULL(address.delflag) or address.delflag='0') order by createtime";
+		String sql ="select address.*,zone.country as countryname from address,zone where address.id=? and zone.id=address.country and (ISNULL(address.delflag) or address.delflag='0') order by createtime";
 		Connection conn = DBHelper.getInstance().getConnection();
 		Address temp = new Address();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, id);
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				temp.setRecipients(rs.getString("recipients"));

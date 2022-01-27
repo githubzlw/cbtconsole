@@ -12,6 +12,7 @@ import com.cbt.website.dao2.IWebsiteOrderDetailDao;
 import com.cbt.website.dao2.WebsiteOrderDetailDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.utli.SourcingOrderUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,8 @@ public class UpdateOrderStateServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private PaymentDaoImp paymentDao = new PaymentDao();
+
+    private SourcingOrderUtils sourcingOrderUtils = new SourcingOrderUtils();
 
     /**
      * @see HttpServlet#HttpServlet()
@@ -95,6 +98,7 @@ public class UpdateOrderStateServlet extends HttpServlet {
                             res = dao.websiteUpdateOrderState(orderid, state);
                             // 插入订单状态修改日志表
                             dao.updateOrderStateLog(orderid, state,Integer.valueOf(oldStateStr), remark, admuser.getId());
+                            sourcingOrderUtils.updateSourcingOrder(orderid, state);
                             // 插入消息提醒表中
                             InsertMessageNotification msgNtDao = new InsertMessageNotification();
                             msgNtDao.insertOrderStatusChanges(orderid, admuser, state);
@@ -110,7 +114,9 @@ public class UpdateOrderStateServlet extends HttpServlet {
                             res = 0;
                         }
                     } else {
+
                         res = dao.websiteUpdateOrderState(orderid, state);
+                        sourcingOrderUtils.updateSourcingOrder(orderid, state);
                         // 插入订单状态修改日志表
                         dao.updateOrderStateLog(orderid, state, Integer.valueOf(oldStateStr),remark, admuser.getId());
                         // 插入消息提醒表中
